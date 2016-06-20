@@ -1,0 +1,11 @@
+[package]
+authors = ["Jake Goulding <jake.goulding@integer32.com>"]
+name = "ui"
+version = "0.1.0"
+
+[dependencies]
+env_logger = "0.3.3"
+iron = "0.3.0"
+log = "0.3.6"
+mount = "0.1.0"
+staticfile = "0.2.0"
