@@ -69,9 +69,14 @@ fn do_compile(req: &CompileRequest) -> String {
     command.spawn().expect("Failed to run").wait().expect("Failed to run2");
     // TODO: grab stderr, stdout from spawn
 
-    let (stdout, _stderr) = gather_results(&scratch_dir);
+    let (stdout, stderr) = gather_results(&scratch_dir);
 
-    format!(r#"{{ "output": ">{}<" }}"#, stdout) // TODO: real JSON
+    let response = CompileResponse {
+        program_stdout: stdout,
+        program_stderr: stderr,
+    };
+
+    serde_json::ser::to_string(&response).expect("Can't serialize")
 }
 
 fn write_source_code(dir: &Temp, code: &str) {
@@ -132,4 +137,10 @@ fn gather_results(dir: &Temp) -> (String, String) {
 #[derive(Debug, Clone, Deserialize)]
 struct CompileRequest {
     code: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct CompileResponse {
+    program_stdout: String,
+    program_stderr: String,
 }

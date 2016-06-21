@@ -10,7 +10,7 @@ function requestBuild() {
 }
 
 function receiveBuildSuccess(json) {
-  return { type: BUILD_SUCCEEDED, output: json.output };
+  return { type: BUILD_SUCCEEDED, output: json.program_stdout };
 }
 
 function receiveBuildFailure() {
