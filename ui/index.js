@@ -6,7 +6,7 @@ import createLogger from 'redux-logger';
 import thunk from 'redux-thunk';
 
 import playgroundApp from './reducers';
-import Header from './Header.jsx';
+import Playground from './Playground.jsx';
 
 const logger = createLogger(); // TODO: Development only
 const store = createStore(
@@ -16,7 +16,7 @@ const store = createStore(
 
 ReactDOM.render(
   <Provider store={store}>
-    <Header />
+    <Playground />
   </Provider>,
   document.getElementById('playground')
 );
