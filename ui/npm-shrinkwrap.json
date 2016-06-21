@@ -177,6 +177,11 @@
       "from": "babel-plugin-syntax-jsx@>=6.3.13 <7.0.0",
       "resolved": "https://registry.npmjs.org/babel-plugin-syntax-jsx/-/babel-plugin-syntax-jsx-6.8.0.tgz"
     },
+    "babel-plugin-syntax-object-rest-spread": {
+      "version": "6.8.0",
+      "from": "babel-plugin-syntax-object-rest-spread@>=6.8.0 <7.0.0",
+      "resolved": "https://registry.npmjs.org/babel-plugin-syntax-object-rest-spread/-/babel-plugin-syntax-object-rest-spread-6.8.0.tgz"
+    },
     "babel-plugin-transform-es2015-arrow-functions": {
       "version": "6.8.0",
       "from": "babel-plugin-transform-es2015-arrow-functions@>=6.3.13 <7.0.0",
@@ -365,6 +370,11 @@
       "version": "4.11.4",
       "from": "bn.js@>=4.1.1 <5.0.0",
       "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-4.11.4.tgz"
+    },
+    "brace": {
+      "version": "0.8.0",
+      "from": "brace@>=0.8.0 <0.9.0",
+      "resolved": "https://registry.npmjs.org/brace/-/brace-0.8.0.tgz"
     },
     "brace-expansion": {
       "version": "1.1.5",
@@ -1539,6 +1549,21 @@
       "from": "lodash-es@>=4.2.1 <5.0.0",
       "resolved": "https://registry.npmjs.org/lodash-es/-/lodash-es-4.13.1.tgz"
     },
+    "lodash._root": {
+      "version": "3.0.1",
+      "from": "lodash._root@>=3.0.0 <3.1.0",
+      "resolved": "https://registry.npmjs.org/lodash._root/-/lodash._root-3.0.1.tgz"
+    },
+    "lodash.isequal": {
+      "version": "4.2.0",
+      "from": "lodash.isequal@>=4.1.1 <5.0.0",
+      "resolved": "https://registry.npmjs.org/lodash.isequal/-/lodash.isequal-4.2.0.tgz"
+    },
+    "lodash.keys": {
+      "version": "4.0.7",
+      "from": "lodash.keys@>=4.0.0 <5.0.0",
+      "resolved": "https://registry.npmjs.org/lodash.keys/-/lodash.keys-4.0.7.tgz"
+    },
     "lodash.memoize": {
       "version": "3.0.4",
       "from": "lodash.memoize@>=3.0.3 <3.1.0",
@@ -1750,6 +1775,11 @@
       "version": "15.1.0",
       "from": "react@latest",
       "resolved": "https://registry.npmjs.org/react/-/react-15.1.0.tgz"
+    },
+    "react-ace": {
+      "version": "3.4.1",
+      "from": "react-ace@latest",
+      "resolved": "https://registry.npmjs.org/react-ace/-/react-ace-3.4.1.tgz"
     },
     "react-dom": {
       "version": "15.1.0",
@@ -2028,6 +2058,11 @@
       "version": "0.0.4",
       "from": "vm-browserify@>=0.0.1 <0.1.0",
       "resolved": "https://registry.npmjs.org/vm-browserify/-/vm-browserify-0.0.4.tgz"
+    },
+    "w3c-blob": {
+      "version": "0.0.1",
+      "from": "w3c-blob@0.0.1",
+      "resolved": "https://registry.npmjs.org/w3c-blob/-/w3c-blob-0.0.1.tgz"
     },
     "whatwg-fetch": {
       "version": "1.0.0",
