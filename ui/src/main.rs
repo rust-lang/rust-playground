@@ -10,14 +10,21 @@ extern crate staticfile;
 extern crate bodyparser;
 extern crate serde;
 extern crate serde_json;
+extern crate mktemp;
 
 use std::env;
 use std::path::PathBuf;
+use std::io::prelude::*;
+use std::io::BufWriter;
+use std::fs::File;
+use std::process::Command;
 
 use mount::Mount;
 use staticfile::Static;
 use iron::prelude::*;
 use iron::status;
+
+use mktemp::Temp;
 
 const DEFAULT_ADDRESS: &'static str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
@@ -54,7 +61,50 @@ fn compile(req: &mut Request) -> IronResult<Response> {
 }
 
 fn do_compile(req: &CompileRequest) -> String {
+    let scratch_dir = Temp::new_dir().expect("Unable to create temp dir");
+
+    write_source_code(&scratch_dir, &req.code);
+    let mut command = compile_command(&scratch_dir);
+
+    command.spawn().expect("Failed to run").wait().expect("Failed to run2");
+
     format!(r#"{{ "output": ">{}<" }}"#, req.code) // TODO: real JSON
+}
+
+fn write_source_code(dir: &Temp, code: &str) {
+    let data = code.as_bytes();
+
+    let path = {
+        let mut p = dir.to_path_buf();
+        p.push("main.rs");
+        p
+    };
+
+    let file = File::create(&path).expect("Unable to create source code");
+    let mut file = BufWriter::new(file);
+
+    file.write_all(data).expect("Unable to write source code");
+
+    debug!("Wrote {} bytes of source to {}", data.len(), path.display());
+}
+
+fn compile_command(dir: &Temp) -> Command {
+    let utf8_dir = dir.as_ref().to_str().expect("Unable to convert directory to UTF-8");
+    let mount_source_volume = format!("--volume={}:/source", utf8_dir);
+
+    let mut cmd = Command::new("docker");
+
+    cmd
+        .arg("run")
+        .arg(mount_source_volume)
+        .arg("rust-stable")
+        .arg("bash")
+        .arg("-c")
+        .arg("source $HOME/.cargo/env; cd /source; rustc main.rs; ./main > program-stdout 2> program-stderr < /dev/null");
+
+    debug!("Compilation command is {:?}", cmd);
+
+    cmd
 }
 
 #[derive(Debug, Clone, Deserialize)]
