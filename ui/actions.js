@@ -39,5 +39,11 @@ export function performBuild() {
       .then(json => dispatch(receiveBuildSuccess(json)));
     // TODO: JSON content-type
     // TODO: Failure case
-  }
+  };
+}
+
+export const EDIT_CODE = 'EDIT_CODE';
+
+export function editCode(code) {
+  return { type: EDIT_CODE, code };
 }

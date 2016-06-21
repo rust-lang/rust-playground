@@ -1,15 +1,15 @@
 import React, { PropTypes } from 'react';
-import { performBuild } from './actions';
+import { performBuild, editCode } from './actions';
 import { connect } from 'react-redux';
 
 class Header extends React.Component {
   render() {
-    const { code, onBuildClick } = this.props;
+    const { code, onBuildClick, onEditCode } = this.props;
 
     return (
       <div>
         <button onClick={ onBuildClick }>Build</button>
-        <textarea value={ code } />
+        <textarea value={ code } onChange={ (e) => onEditCode(e.target.value) } />
       </div>
     );
   }
@@ -35,6 +35,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     onBuildClick: () => {
       dispatch(performBuild());
+    },
+    onEditCode: (code) => {
+      dispatch(editCode(code));
     }
   };
 };

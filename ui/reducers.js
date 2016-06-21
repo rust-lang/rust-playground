@@ -8,6 +8,8 @@ const playgroundApp = (state = { building: false, error: false }, action) => {
     return { ...state, building: false, error: false, code: action.output };
   case actions.REQUEST_BUILD:
     return { ...state, building: false, error: true };
+  case actions.EDIT_CODE:
+    return { ...state, code: action.code };
   default:
     return state;
   }

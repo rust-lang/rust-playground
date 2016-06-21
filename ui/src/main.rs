@@ -15,7 +15,7 @@ extern crate mktemp;
 use std::env;
 use std::path::PathBuf;
 use std::io::prelude::*;
-use std::io::BufWriter;
+use std::io::{BufReader, BufWriter};
 use std::fs::File;
 use std::process::Command;
 
@@ -67,8 +67,11 @@ fn do_compile(req: &CompileRequest) -> String {
     let mut command = compile_command(&scratch_dir);
 
     command.spawn().expect("Failed to run").wait().expect("Failed to run2");
+    // TODO: grab stderr, stdout from spawn
 
-    format!(r#"{{ "output": ">{}<" }}"#, req.code) // TODO: real JSON
+    let (stdout, _stderr) = gather_results(&scratch_dir);
+
+    format!(r#"{{ "output": ">{}<" }}"#, stdout) // TODO: real JSON
 }
 
 fn write_source_code(dir: &Temp, code: &str) {
@@ -105,6 +108,25 @@ fn compile_command(dir: &Temp) -> Command {
     debug!("Compilation command is {:?}", cmd);
 
     cmd
+}
+
+fn slurp_file(path: &PathBuf) -> String {
+    let file = File::open(path).expect("Couldn't open the file");
+    let mut file = BufReader::new(file);
+
+    let mut data = String::new();
+    file.read_to_string(&mut data).expect("Couldn't read data");
+    data
+}
+
+fn gather_results(dir: &Temp) -> (String, String) {
+    let mut out = dir.as_ref().to_path_buf();
+    out.push("program-stdout");
+
+    let mut err = dir.as_ref().to_path_buf();
+    err.push("program-stderr");
+
+    (slurp_file(&out), slurp_file(&err))
 }
 
 #[derive(Debug, Clone, Deserialize)]
