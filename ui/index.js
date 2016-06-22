@@ -1,3 +1,6 @@
+import promisePolyfill from 'es6-promise';
+promisePolyfill.polyfill();
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';

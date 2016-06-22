@@ -4,6 +4,7 @@
   "description": "UI for the Rust playground",
   "main": "index.js",
   "dependencies": {
+    "es6-promise": "^3.2.1",
     "isomorphic-fetch": "^2.2.1",
     "react": "^15.1.0",
     "react-ace": "^3.4.1",

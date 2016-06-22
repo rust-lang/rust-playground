@@ -6,13 +6,13 @@ export default class Output extends React.Component {
 
     return (
       <div>
-        <pre>
+        <pre className="output-stderr">
           <code>
             { stderr }
           </code>
         </pre>
         <hr />
-        <pre>
+        <pre className="output-stdout">
           <code>
             { stdout }
           </code>
