@@ -13,9 +13,9 @@ extern crate serde_json;
 extern crate mktemp;
 
 use std::env;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::io::prelude::*;
-use std::io::BufWriter;
+use std::io::{BufReader, BufWriter};
 use std::fs::File;
 use std::process::Command;
 
@@ -39,6 +39,7 @@ fn main() {
     let mut mount = Mount::new();
     mount.mount("/", Static::new(&root));
     mount.mount("/compile", compile);
+    mount.mount("/format", format);
 
     info!("Starting the server on {}:{}", address, port);
     Iron::new(mount).http((&*address, port)).expect("Unable to start server");
@@ -60,6 +61,22 @@ fn compile(req: &mut Request) -> IronResult<Response> {
     }
 }
 
+fn format(req: &mut Request) -> IronResult<Response> {
+    match req.get::<bodyparser::Struct<FormatRequest>>() {
+        Ok(Some(req)) => {
+            Ok(Response::with((status::Ok, do_format(&req))))
+        }
+        Ok(None) => {
+            // TODO: real error
+            Ok(Response::with((status::Ok, r#"{ "code": "FAIL1" }"#)))
+        },
+        Err(_) => {
+            // TODO: real error
+            Ok(Response::with((status::Ok, r#"{ "code": "FAIL2" }"#)))
+        }
+    }
+}
+
 fn do_compile(req: &CompileRequest) -> String {
     let scratch_dir = Temp::new_dir().expect("Unable to create temp dir");
 
@@ -77,7 +94,34 @@ fn do_compile(req: &CompileRequest) -> String {
     serde_json::ser::to_string(&response).expect("Can't serialize")
 }
 
-fn write_source_code(dir: &Temp, code: &str) {
+fn do_format(req: &FormatRequest) -> String {
+    let scratch_dir = Temp::new_dir().expect("Unable to create temp dir");
+
+    let path = write_source_code(&scratch_dir, &req.code);
+    let mut command = format_command(&scratch_dir);
+
+    let output = command.output().expect("Failed to run");
+
+    let response = FormatResponse {
+        success: output.status.success(),
+        code: read(path.as_path()),
+        stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
+        stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
+    };
+
+    serde_json::ser::to_string(&response).expect("Can't serialize")
+}
+
+fn read(path: &Path) -> String {
+    let f = File::open(path).expect("Couldn't open");
+    let mut f = BufReader::new(f);
+
+    let mut s = String::new();
+    f.read_to_string(&mut s).expect("Couldn't read");
+    s
+}
+
+fn write_source_code(dir: &Temp, code: &str) -> PathBuf {
     let data = code.as_bytes();
 
     let path = {
@@ -92,6 +136,7 @@ fn write_source_code(dir: &Temp, code: &str) {
     file.write_all(data).expect("Unable to write source code");
 
     debug!("Wrote {} bytes of source to {}", data.len(), path.display());
+    path
 }
 
 fn compile_command(dir: &Temp, channel: &str) -> Command {
@@ -114,6 +159,24 @@ fn compile_command(dir: &Temp, channel: &str) -> Command {
     cmd
 }
 
+fn format_command(dir: &Temp) -> Command {
+    let utf8_dir = dir.as_ref().to_str().expect("Unable to convert directory to UTF-8");
+    let mount_source_volume = format!("{}:/source", utf8_dir);
+
+    let mut cmd = Command::new("docker");
+
+    cmd
+        .arg("run")
+        .args(&["--volume", &mount_source_volume])
+        .args(&["--workdir", "/source"])
+        .arg("rustfmt")
+        .args(&["main.rs"]);
+
+    debug!("Formatting command is {:?}", cmd);
+
+    cmd
+}
+
 #[derive(Debug, Clone, Deserialize)]
 struct CompileRequest {
     channel: String,
@@ -123,6 +186,19 @@ struct CompileRequest {
 #[derive(Debug, Clone, Serialize)]
 struct CompileResponse {
     success: bool,
+    stdout: String,
+    stderr: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct FormatRequest {
+    code: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct FormatResponse {
+    success: bool,
+    code: String,
     stdout: String,
     stderr: String,
 }

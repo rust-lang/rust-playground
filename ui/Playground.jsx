@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { changeChannel, performBuild, editCode } from './actions';
+import { changeChannel, performBuild, performFormat, editCode } from './actions';
 import { connect } from 'react-redux';
 import Header from './Header.jsx';
 import Editor from './Editor.jsx';
@@ -7,11 +7,11 @@ import Output from './Output.jsx';
 
 class Playground extends React.Component {
   render() {
-    const { code, status: { stdout, stderr }, build, configuration: { channel }, changeChannel, onEditCode } = this.props;
+    const { code, status: { stdout, stderr }, build, format, configuration: { channel }, changeChannel, onEditCode } = this.props;
 
     return (
       <div>
-        <Header build={build} channel={channel} changeChannel={changeChannel} />
+        <Header build={build} format={format} channel={channel} changeChannel={changeChannel} />
         <Editor code={code} onEditCode={onEditCode} />
         <Output stdout={stdout} stderr={stderr} />
       </div>
@@ -21,6 +21,7 @@ class Playground extends React.Component {
 
 Playground.propTypes = {
   build: PropTypes.func.isRequired,
+  format: PropTypes.func.isRequired,
   configuration: PropTypes.object.isRequired,
   changeChannel: PropTypes.func.isRequired,
   onEditCode: PropTypes.func.isRequired,
@@ -43,6 +44,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     build: () => {
       dispatch(performBuild());
+    },
+    format: () => {
+      dispatch(performFormat());
     },
     onEditCode: (code) => {
       dispatch(editCode(code));

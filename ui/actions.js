@@ -54,3 +54,42 @@ export const EDIT_CODE = 'EDIT_CODE';
 export function editCode(code) {
   return { type: EDIT_CODE, code };
 }
+
+export const REQUEST_FORMAT = 'REQUEST_FORMAT';
+export const FORMAT_SUCCEEDED = 'FORMAT_SUCCEEDED';
+export const FORMAT_FAILED = 'FORMAT_FAILED';
+
+function requestFormat() {
+  return { type: REQUEST_FORMAT };
+}
+
+function receiveFormatSuccess(json) {
+  return { type: FORMAT_SUCCEEDED, code: json.code };
+}
+
+function receiveFormatFailure() {
+  return { type: FORMAT_FAILED };
+}
+
+export function performFormat() {
+  return function (dispatch, getState) {
+    dispatch(requestFormat());
+
+    // TODO: Un-hardcode URL
+    const formatUrl = url.format({ pathname: '/format' });
+
+    const state = getState();
+    const { code } = state;
+
+    return fetch(formatUrl, {
+      method: 'post',
+      body: JSON.stringify({
+        code
+      })
+    })
+      .then(response => response.json())
+      .then(json => dispatch(receiveFormatSuccess(json)));
+    // TODO: JSON content-type
+    // TODO: Failure case
+  };
+}

@@ -18,13 +18,15 @@ const code = (state = "", action) => {
   switch (action.type) {
   case actions.EDIT_CODE:
     return action.code;
+  case actions.FORMAT_SUCCEEDED:
+    return action.code;
   default:
     return state;
   }
 };
 
 const defaultStatus = {
-  building: false,
+  building: false, // TODO: rename to progress or something
   error: "",
   stdout: "",
   stderr: ""
@@ -37,6 +39,12 @@ const status = (state = defaultStatus, action) => {
   case actions.BUILD_SUCCEEDED:
     return { ...state, building: false, stdout: action.stdout, stderr: action.stderr };
   case actions.BUILD_FAILED:
+    return { ...state, building: false, error: "Some kind of error" };
+  case actions.REQUEST_FORMAT:
+    return { ...state, building: true, error: "" };
+  case actions.FORMAT_SUCCEEDED:
+    return { ...state, building: false, stdout: action.stdout, stderr: action.stderr };
+  case actions.FORMAT_FAILED:
     return { ...state, building: false, error: "Some kind of error" };
   default:
     return state;
