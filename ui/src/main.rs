@@ -15,7 +15,7 @@ extern crate mktemp;
 use std::env;
 use std::path::PathBuf;
 use std::io::prelude::*;
-use std::io::{BufReader, BufWriter};
+use std::io::BufWriter;
 use std::fs::File;
 use std::process::Command;
 
@@ -66,14 +66,12 @@ fn do_compile(req: &CompileRequest) -> String {
     write_source_code(&scratch_dir, &req.code);
     let mut command = compile_command(&scratch_dir);
 
-    command.spawn().expect("Failed to run").wait().expect("Failed to run2");
-    // TODO: grab stderr, stdout from spawn
-
-    let (stdout, stderr) = gather_results(&scratch_dir);
+    let output = command.output().expect("Failed to run");
 
     let response = CompileResponse {
-        program_stdout: stdout,
-        program_stderr: stderr,
+        success: output.status.success(),
+        stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
+        stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
     };
 
     serde_json::ser::to_string(&response).expect("Can't serialize")
@@ -108,30 +106,11 @@ fn compile_command(dir: &Temp) -> Command {
         .arg("rust-stable")
         .arg("bash")
         .arg("-c")
-        .arg("source $HOME/.cargo/env; cd /source; rustc main.rs; ./main > program-stdout 2> program-stderr < /dev/null");
+        .arg("source $HOME/.cargo/env; cd /source; rustc main.rs; ./main");
 
     debug!("Compilation command is {:?}", cmd);
 
     cmd
-}
-
-fn slurp_file(path: &PathBuf) -> String {
-    let file = File::open(path).expect("Couldn't open the file");
-    let mut file = BufReader::new(file);
-
-    let mut data = String::new();
-    file.read_to_string(&mut data).expect("Couldn't read data");
-    data
-}
-
-fn gather_results(dir: &Temp) -> (String, String) {
-    let mut out = dir.as_ref().to_path_buf();
-    out.push("program-stdout");
-
-    let mut err = dir.as_ref().to_path_buf();
-    err.push("program-stderr");
-
-    (slurp_file(&out), slurp_file(&err))
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -141,6 +120,7 @@ struct CompileRequest {
 
 #[derive(Debug, Clone, Serialize)]
 struct CompileResponse {
-    program_stdout: String,
-    program_stderr: String,
+    success: bool,
+    stdout: String,
+    stderr: String,
 }

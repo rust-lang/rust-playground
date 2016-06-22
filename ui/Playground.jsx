@@ -7,13 +7,13 @@ import Output from './Output.jsx';
 
 class Playground extends React.Component {
   render() {
-    const { code, output, onBuildClick, onEditCode } = this.props;
+    const { code, status: { stdout, stderr }, onBuildClick, onEditCode } = this.props;
 
     return (
       <div>
         <Header onBuildClick={onBuildClick} />
         <Editor code={code} onEditCode={onEditCode} />
-        <Output output={output} />
+        <Output stdout={stdout} stderr={stderr} />
       </div>
     );
   }
@@ -23,13 +23,13 @@ Playground.propTypes = {
   onBuildClick: PropTypes.func.isRequired,
   onEditCode: PropTypes.func.isRequired,
   code: PropTypes.string.isRequired,
-  output: PropTypes.string.isRequired
+  status: PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) => {
   return {
     code: state.code,
-    output: state.output
+    status: state.status
   };
 }
 
