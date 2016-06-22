@@ -64,7 +64,7 @@ fn do_compile(req: &CompileRequest) -> String {
     let scratch_dir = Temp::new_dir().expect("Unable to create temp dir");
 
     write_source_code(&scratch_dir, &req.code);
-    let mut command = compile_command(&scratch_dir);
+    let mut command = compile_command(&scratch_dir, &req.channel);
 
     let output = command.output().expect("Failed to run");
 
@@ -94,19 +94,20 @@ fn write_source_code(dir: &Temp, code: &str) {
     debug!("Wrote {} bytes of source to {}", data.len(), path.display());
 }
 
-fn compile_command(dir: &Temp) -> Command {
+fn compile_command(dir: &Temp, channel: &str) -> Command {
     let utf8_dir = dir.as_ref().to_str().expect("Unable to convert directory to UTF-8");
-    let mount_source_volume = format!("--volume={}:/source", utf8_dir);
+    let mount_source_volume = format!("{}:/source", utf8_dir);
+
+    let container = format!("rust-{}", channel);
 
     let mut cmd = Command::new("docker");
 
     cmd
         .arg("run")
-        .arg(mount_source_volume)
-        .arg("rust-stable")
-        .arg("bash")
-        .arg("-c")
-        .arg("source $HOME/.cargo/env; cd /source; rustc main.rs; ./main");
+        .args(&["--volume", &mount_source_volume])
+        .args(&["--workdir", "/source"])
+        .arg(&container)
+        .args(&["bash", "-c", r#"rustc main.rs && ./main"#]);
 
     debug!("Compilation command is {:?}", cmd);
 
@@ -115,6 +116,7 @@ fn compile_command(dir: &Temp) -> Command {
 
 #[derive(Debug, Clone, Deserialize)]
 struct CompileRequest {
+    channel: String,
     code: String,
 }
 

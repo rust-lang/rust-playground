@@ -1,6 +1,19 @@
 import { combineReducers } from 'redux';
 import * as actions from './actions';
 
+const defaultConfiguration = {
+  channel: "stable"
+};
+
+const configuration = (state = defaultConfiguration, action) => {
+  switch (action.type) {
+  case actions.CHANGE_CHANNEL:
+    return { ...state, channel: action.channel };
+  default:
+    return state;
+  }
+};
+
 const code = (state = "", action) => {
   switch (action.type) {
   case actions.EDIT_CODE:
@@ -31,6 +44,7 @@ const status = (state = defaultStatus, action) => {
 };
 
 const playgroundApp = combineReducers({
+  configuration,
   code,
   status
 });
