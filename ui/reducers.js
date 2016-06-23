@@ -37,13 +37,13 @@ const status = (state = defaultStatus, action) => {
   case actions.REQUEST_BUILD:
     return { ...state, building: true, error: "" };
   case actions.BUILD_SUCCEEDED:
-    return { ...state, building: false, stdout: action.stdout, stderr: action.stderr };
+    return { ...state, building: false, stdout: action.stdout || "", stderr: action.stderr || ""};
   case actions.BUILD_FAILED:
     return { ...state, building: false, error: "Some kind of error" };
   case actions.REQUEST_FORMAT:
     return { ...state, building: true, error: "" };
   case actions.FORMAT_SUCCEEDED:
-    return { ...state, building: false, stdout: action.stdout, stderr: action.stderr };
+    return { ...state, building: false, stdout: action.stdout || "", stderr: action.stderr || "" };
   case actions.FORMAT_FAILED:
     return { ...state, building: false, error: "Some kind of error" };
   default:
