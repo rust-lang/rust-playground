@@ -40,7 +40,7 @@ function jsonPost(urlObj, body) {
 }
 
 const routes = {
-  compile: { pathname: '/compile' },
+  execute: { pathname: '/execute' },
   format: { pathname: '/format' }
 };
 
@@ -53,7 +53,7 @@ export function performBuild() {
     const { code, configuration: { channel, mode, tests } } = state;
     const body = { channel, mode, tests, code };
 
-    return jsonPost(routes.compile, body)
+    return jsonPost(routes.execute, body)
       .then(json => dispatch(receiveBuildSuccess(json)));
     // TODO: Failure case
   };

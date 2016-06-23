@@ -38,18 +38,18 @@ fn main() {
 
     let mut mount = Mount::new();
     mount.mount("/", Static::new(&root));
-    mount.mount("/compile", compile);
+    mount.mount("/execute", execute);
     mount.mount("/format", format);
 
     info!("Starting the server on {}:{}", address, port);
     Iron::new(mount).http((&*address, port)).expect("Unable to start server");
 }
 
-fn compile(req: &mut Request) -> IronResult<Response> {
-    match req.get::<bodyparser::Struct<CompileRequest>>() {
+fn execute(req: &mut Request) -> IronResult<Response> {
+    match req.get::<bodyparser::Struct<ExecuteRequest>>() {
         Ok(Some(req)) => {
             let sandbox = Sandbox::new();
-            let resp = sandbox.compile(&req);
+            let resp = sandbox.execute(&req);
             let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
 
             Ok(Response::with((status::Ok, body)))
@@ -95,13 +95,13 @@ impl Sandbox {
         }
     }
 
-    pub fn compile(&self, req: &CompileRequest) -> CompileResponse {
+    pub fn execute(&self, req: &ExecuteRequest) -> ExecuteResponse {
         self.write_source_code(&req.code);
-        let mut command = self.compile_command(&req.channel, &req.mode, req.tests);
+        let mut command = self.execute_command(&req.channel, &req.mode, req.tests);
 
         let output = command.output().expect("Failed to run");
 
-        CompileResponse {
+        ExecuteResponse {
             success: output.status.success(),
             stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
             stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
@@ -140,7 +140,7 @@ impl Sandbox {
         path
     }
 
-    fn compile_command(&self, channel: &str, mode: &str, tests: bool) -> Command {
+    fn execute_command(&self, channel: &str, mode: &str, tests: bool) -> Command {
         let container = format!("rust-{}", channel);
         let mut cmd = self.docker_command();
 
@@ -154,7 +154,7 @@ impl Sandbox {
 
         cmd.arg(&container).args(&["bash", "-c", execution_cmd]);
 
-        debug!("Compilation command is {:?}", cmd);
+        debug!("Execution command is {:?}", cmd);
 
         cmd
     }
@@ -196,7 +196,7 @@ fn read(path: &Path) -> String {
 }
 
 #[derive(Debug, Clone, Deserialize)]
-struct CompileRequest {
+struct ExecuteRequest {
     channel: String,
     mode: String,
     tests: bool,
@@ -204,7 +204,7 @@ struct CompileRequest {
 }
 
 #[derive(Debug, Clone, Serialize)]
-struct CompileResponse {
+struct ExecuteResponse {
     success: bool,
     stdout: String,
     stderr: String,
