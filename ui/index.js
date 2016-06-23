@@ -1,5 +1,4 @@
-import promisePolyfill from 'es6-promise';
-promisePolyfill.polyfill();
+import "babel-polyfill";
 
 import React from 'react';
 import ReactDOM from 'react-dom';
