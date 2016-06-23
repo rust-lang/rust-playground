@@ -28,30 +28,33 @@ function receiveBuildFailure() {
   return { type: BUILD_FAILED };
 }
 
-// TODO: Check a cache
+function jsonPost(urlObj, body) {
+  const urlStr = url.format(urlObj);
+
+  // TODO: JSON content-type
+  return fetch(urlStr, {
+    method: 'post',
+    body: JSON.stringify(body)
+  })
+    .then(response => response.json());
+}
+
+const routes = {
+  compile: { pathname: '/compile' },
+  format: { pathname: '/format' }
+};
 
 export function performBuild() {
+  // TODO: Check a cache
   return function (dispatch, getState) {
     dispatch(requestBuild());
 
-    // TODO: Un-hardcode URL
-    const compileUrl = url.format({ pathname: '/compile' });
-
     const state = getState();
     const { code, configuration: { channel, mode, tests } } = state;
+    const body = { channel, mode, tests, code };
 
-    return fetch(compileUrl, {
-      method: 'post',
-      body: JSON.stringify({
-        channel,
-        mode,
-        tests,
-        code
-      })
-    })
-      .then(response => response.json())
+    return jsonPost(routes.compile, body)
       .then(json => dispatch(receiveBuildSuccess(json)));
-    // TODO: JSON content-type
     // TODO: Failure case
   };
 }
@@ -79,24 +82,15 @@ function receiveFormatFailure() {
 }
 
 export function performFormat() {
+  // TODO: Check a cache
   return function (dispatch, getState) {
     dispatch(requestFormat());
 
-    // TODO: Un-hardcode URL
-    const formatUrl = url.format({ pathname: '/format' });
+    const { code } = getState();
+    const body = { code };
 
-    const state = getState();
-    const { code } = state;
-
-    return fetch(formatUrl, {
-      method: 'post',
-      body: JSON.stringify({
-        code
-      })
-    })
-      .then(response => response.json())
+    return jsonPost(routes.format, body)
       .then(json => dispatch(receiveFormatSuccess(json)));
-    // TODO: JSON content-type
     // TODO: Failure case
   };
 }
