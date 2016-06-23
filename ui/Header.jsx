@@ -13,7 +13,7 @@ function oneRadio(name, currentValue, possibleValue, change, labelText) {
 export default class Header extends React.Component {
   render() {
     const {
-      execute, compileToAssembly, compileToLLVM, format,
+      execute, compileToAssembly, compileToLLVM, format, saveToGist,
       channel, changeChannel, mode, changeMode,
       tests
     } = this.props;
@@ -31,6 +31,7 @@ export default class Header extends React.Component {
         <button onClick={ compileToAssembly }>ASM</button>
         <button onClick={ compileToLLVM }>LLVM IR</button>
         <button onClick={ format }>Format</button>
+        <button onClick={ saveToGist }>Gist</button>
         { oneChannel("stable", "Stable") }
         { oneChannel("beta", "Beta") }
         { oneChannel("nightly", "Nightly") }
@@ -46,6 +47,7 @@ Header.propTypes = {
   compileToAssembly: PropTypes.func.isRequired,
   compileToLLVM: PropTypes.func.isRequired,
   format: PropTypes.func.isRequired,
+  saveToGist: PropTypes.func.isRequired,
   channel: PropTypes.string.isRequired,
   changeChannel: PropTypes.func.isRequired,
   mode: PropTypes.string.isRequired,

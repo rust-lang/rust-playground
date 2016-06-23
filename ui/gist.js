@@ -4,14 +4,37 @@ import url from 'url';
 const baseUrlObj = {
   protocol: 'https:',
   host: 'api.github.com',
-  pathname: '/gists/'
+  pathname: '/gists'
 };
 
 const baseUrlStr = url.format(baseUrlObj);
 
+const FILENAME = 'playground.rs';
+
 export function load(id) {
-  let gistUrl = url.resolve(baseUrlStr, id);
-  return fetch(gistUrl)
+  return fetch(`${baseUrlStr}/${id}`)
     .then(response => response.json())
-    .then(gist => gist.files['playground.rs'].content);
+    .then(gist => gist.files[FILENAME].content);
+}
+
+const gistBody = (code) => ({
+  description: "Rust code shared from the playground",
+  public: true,
+  files: {
+    [ FILENAME ]: {
+      content: code
+    }
+  }
+});
+
+export function save(code) {
+  return fetch(baseUrlStr, {
+    method: 'post',
+    body: JSON.stringify(gistBody(code))
+  })
+    .then(response => response.json())
+    .then(response => {
+      let { id, html_url: url } = response;
+      return { id, url };
+    });
 }

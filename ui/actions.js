@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import url from 'url';
-import { load } from './gist';
+import { load as loadGist, save as saveGist } from './gist';
 
 export const CHANGE_CHANNEL = 'CHANGE_CHANNEL';
 export const CHANGE_MODE = 'CHANGE_MODE';
@@ -163,8 +163,37 @@ export function performGistLoad(id) {
   return function (dispatch, getState) {
     dispatch(requestGistLoad());
 
-    load(id)
+    loadGist(id)
       .then(code => dispatch(receiveGistLoadSuccess(code)));
+    // TODO: Failure case
+  };
+}
+
+export const REQUEST_SAVE_TO_GIST = 'REQUEST_SAVE_TO_GIST';
+export const SAVE_TO_GIST_SUCCEEDED = 'SAVE_TO_GIST_SUCCEEDED';
+export const SAVE_TO_GIST_FAILED = 'SAVE_TO_GIST_FAILED';
+
+function requestSaveToGist() {
+  return { type: REQUEST_SAVE_TO_GIST };
+}
+
+function receiveSaveToGistSuccess(json) {
+  const { id, url } = json;
+  return { type: SAVE_TO_GIST_SUCCEEDED, id, url };
+}
+
+function receiveSaveToGistFailure(json) {
+  return { type: SAVE_TO_GIST_FAILED, error: json.error };
+}
+
+export function performSaveToGist() {
+  return function (dispatch, getState) {
+    dispatch(requestSaveToGist());
+
+    const { code } = getState();
+
+    return saveGist(code)
+      .then(json => dispatch(receiveSaveToGistSuccess(json)));
     // TODO: Failure case
   };
 }

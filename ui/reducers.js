@@ -59,6 +59,14 @@ const status = (state = defaultStatus, action) => {
   case actions.GIST_LOAD_FAILED:
     return { ...state, requestInProgress: false, error: "Some kind of error" };
 
+  case actions.REQUEST_SAVE_TO_GIST:
+    return { ...state, requestInProgress: true };
+  case actions.SAVE_TO_GIST_SUCCEEDED:
+    let { id, url } = action;
+    return { ...state, requestInProgress: false, gist: { id, url } };
+  case actions.SAVE_TO_GIST_FAILED:
+    return { ...state, requestInProgress: false, error: "Some kind of error" };
+
   case actions.REQUEST_COMPILE:
     return { ...state, requestInProgress: true, error: "" };
   case actions.COMPILE_SUCCEEDED:

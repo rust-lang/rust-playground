@@ -1,5 +1,10 @@
 import React, { PropTypes } from 'react';
-import { changeChannel, changeMode, performExecute, performCompileToAssembly, performCompileToLLVM, performFormat, editCode } from './actions';
+import {
+  changeChannel, changeMode,
+  performExecute, performCompileToAssembly, performCompileToLLVM,
+  performFormat, performSaveToGist,
+  editCode
+} from './actions';
 import { connect } from 'react-redux';
 import Header from './Header.jsx';
 import Editor from './Editor.jsx';
@@ -8,8 +13,8 @@ import Output from './Output.jsx';
 class Playground extends React.Component {
   render() {
     const { code,
-            status: { code: compiledCode, stdout, stderr, error },
-            execute, compileToAssembly, compileToLLVM, format,
+            status: { code: compiledCode, stdout, stderr, error, gist },
+            execute, compileToAssembly, compileToLLVM, format, saveToGist,
             configuration: { channel, mode, tests },
             changeChannel, changeMode, onEditCode
           } = this.props;
@@ -19,12 +24,12 @@ class Playground extends React.Component {
         <Header execute={execute}
                 compileToAssembly={compileToAssembly}
                 compileToLLVM={compileToLLVM}
-                format={format}
+                format={format} saveToGist={saveToGist}
                 channel={channel} changeChannel={changeChannel}
                 mode={mode} changeMode={changeMode}
                 tests={tests} />
         <Editor code={code} onEditCode={onEditCode} />
-        <Output code={compiledCode} stdout={stdout} stderr={stderr} error={error} />
+        <Output code={compiledCode} stdout={stdout} stderr={stderr} error={error} gist={gist} />
       </div>
     );
   }
@@ -35,6 +40,7 @@ Playground.propTypes = {
   compileToAssembly: PropTypes.func.isRequired,
   compileToLLVM: PropTypes.func.isRequired,
   format: PropTypes.func.isRequired,
+  saveToGist: PropTypes.func.isRequired,
   configuration: PropTypes.object.isRequired,
   changeChannel: PropTypes.func.isRequired,
   onEditCode: PropTypes.func.isRequired,
@@ -58,6 +64,7 @@ const mapDispatchToProps = (dispatch) => {
     compileToAssembly: () => dispatch(performCompileToAssembly()),
     compileToLLVM: () => dispatch(performCompileToLLVM()),
     format: () => dispatch(performFormat()),
+    saveToGist: () => dispatch(performSaveToGist()),
     onEditCode: (code) => dispatch(editCode(code))
   };
 };
