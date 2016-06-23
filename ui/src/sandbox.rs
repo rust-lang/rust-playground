@@ -80,23 +80,11 @@ impl Sandbox {
     }
 
     fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool) -> Command {
-        use self::CompileTarget::*;
-        use self::Mode::*;
-
         let mut cmd = self.docker_command();
 
-        let execution_cmd = match (target, mode, tests) {
-            (LlvmIr, Debug, false) => r#"rustc main.rs -o compiler-output --emit llvm-ir"#,
-            (LlvmIr, Debug, true) => r#"rustc --test main.rs -o compiler-output --emit llvm-ir"#,
-            (LlvmIr, Release, false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit llvm-ir"#,
-            (LlvmIr, Release, true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit llvm-ir"#,
-            (Assembly, Debug, false) => r#"rustc main.rs -o compiler-output --emit asm"#,
-            (Assembly, Debug, true) => r#"rustc --test main.rs -o compiler-output --emit asm"#,
-            (Assembly, Release, false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit asm"#,
-            (Assembly, Release, true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit asm"#,
-        };
+        let execution_cmd = build_execution_command(Some((target, "compiler-output")), mode, tests, "main.rs");
 
-        cmd.arg(&channel.container_name()).args(&["bash", "-c", execution_cmd]);
+        cmd.arg(&channel.container_name()).args(&["bash", "-c", &execution_cmd]);
 
         debug!("Compilation command is {:?}", cmd);
 
@@ -104,18 +92,12 @@ impl Sandbox {
     }
 
     fn execute_command(&self, channel: Channel, mode: Mode, tests: bool) -> Command {
-        use self::Mode::*;
-
         let mut cmd = self.docker_command();
 
-        let execution_cmd = match (mode, tests) {
-            (Debug, false) => r#"rustc main.rs && ./main"#,
-            (Debug, true) => r#"rustc --test main.rs && ./main"#,
-            (Release, false) => r#"rustc -C opt-level=3 main.rs && ./main"#,
-            (Release, true) => r#"rustc -C opt-level=3 --test main.rs && ./main"#,
-        };
+        let mut execution_cmd = build_execution_command(None, mode, tests, "main.rs");
+        execution_cmd.push_str(" && ./main");
 
-        cmd.arg(&channel.container_name()).args(&["bash", "-c", execution_cmd]);
+        cmd.arg(&channel.container_name()).args(&["bash", "-c", &execution_cmd]);
 
         debug!("Execution command is {:?}", cmd);
 
@@ -147,6 +129,36 @@ impl Sandbox {
 
         cmd
     }
+}
+
+fn build_execution_command(target: Option<(CompileTarget, &str)>, mode: Mode, tests: bool, source_file: &str) -> String {
+    use self::CompileTarget::*;
+    use self::Mode::*;
+
+    let mut s = String::from("rustc");
+
+    match mode {
+        Debug => s.push_str(" -g"),
+        Release => s.push_str(" -C opt-level=3"),
+    }
+
+    if tests {
+        s.push_str(" --test");
+    }
+
+    if let Some((target, filename)) = target {
+        match target {
+            Assembly => s.push_str(" --emit asm"),
+            LlvmIr => s.push_str(" --emit llvm-ir"),
+        }
+        s.push_str(" -o ");
+        s.push_str(filename);
+    }
+
+    s.push_str(" ");
+    s.push_str(source_file);
+
+    s
 }
 
 fn read(path: &Path) -> Option<String> {
