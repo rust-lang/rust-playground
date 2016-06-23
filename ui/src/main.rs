@@ -1,3 +1,4 @@
+#![feature(try_from)]
 #![feature(custom_derive, plugin)]
 #![plugin(serde_macros)]
 
@@ -15,6 +16,7 @@ extern crate mktemp;
 extern crate quick_error;
 
 use std::any::Any;
+use std::convert::{TryFrom, TryInto};
 use std::env;
 use std::path::PathBuf;
 
@@ -50,24 +52,35 @@ fn main() {
 
 fn compile(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: CompileRequest| {
-        sandbox.compile(&req.into()).map(CompileResponse::from)
+        let req = try!(req.try_into());
+        sandbox
+            .compile(&req)
+            .map(CompileResponse::from)
+            .map_err(Error::Sandbox)
     })
 }
 
 fn execute(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: ExecuteRequest| {
-        sandbox.execute(&req.into()).map(ExecuteResponse::from)
+        let req = try!(req.try_into());
+        sandbox
+            .execute(&req)
+            .map(ExecuteResponse::from)
+            .map_err(Error::Sandbox)
     })
 }
 
 fn format(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: FormatRequest| {
-        sandbox.format(&req.into()).map(FormatResponse::from)
+        sandbox
+            .format(&req.into())
+            .map(FormatResponse::from)
+            .map_err(Error::Sandbox)
     })
 }
 
 fn with_sandbox<Req, Resp, F>(req: &mut Request, f: F) -> IronResult<Response>
-    where F: FnOnce(Sandbox, Req) -> sandbox::Result<Resp>,
+    where F: FnOnce(Sandbox, Req) -> Result<Resp>,
           Req: Deserialize + Clone + Any + 'static,
           Resp: Serialize,
 {
@@ -114,12 +127,26 @@ quick_error! {
             cause(err)
             from()
         }
+        InvalidTarget(value: String) {
+            description("an invalid target was passed")
+            display("The value {:?} is not a valid target", value)
+        }
+        InvalidChannel(value: String) {
+            description("an invalid channel was passed")
+            display("The value {:?} is not a valid channel", value,)
+        }
+        InvalidMode(value: String) {
+            description("an invalid mode was passed")
+            display("The value {:?} is not a valid mode", value)
+        }
         RequestMissing {
             description("no request was provided")
             display("No request was provided")
         }
     }
 }
+
+type Result<T> = ::std::result::Result<T, Error>;
 
 const FATAL_ERROR_JSON: &'static str =
     r#"{"error": "Multiple cascading errors occurred, abandon all hope"}"#;
@@ -138,15 +165,17 @@ struct CompileRequest {
     code: String,
 }
 
-impl From<CompileRequest> for sandbox::CompileRequest {
-    fn from(me: CompileRequest) -> Self {
-        sandbox::CompileRequest {
-            target: parse_target(&me.target),
-            channel: parse_channel(&me.channel),
-            mode: parse_mode(&me.mode),
+impl TryFrom<CompileRequest> for sandbox::CompileRequest {
+    type Err = Error;
+
+    fn try_from(me: CompileRequest) -> Result<Self> {
+        Ok(sandbox::CompileRequest {
+            target: try!(parse_target(&me.target)),
+            channel: try!(parse_channel(&me.channel)),
+            mode: try!(parse_mode(&me.mode)),
             tests: me.tests,
             code: me.code,
-        }
+        })
     }
 }
 
@@ -177,14 +206,16 @@ struct ExecuteRequest {
     code: String,
 }
 
-impl From<ExecuteRequest> for sandbox::ExecuteRequest {
-    fn from(me: ExecuteRequest) -> Self {
-        sandbox::ExecuteRequest {
-            channel: parse_channel(&me.channel),
-            mode: parse_mode(&me.mode),
+impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
+    type Err = Error;
+
+    fn try_from(me: ExecuteRequest) -> Result<Self> {
+        Ok(sandbox::ExecuteRequest {
+            channel: try!(parse_channel(&me.channel)),
+            mode: try!(parse_mode(&me.mode)),
             tests: me.tests,
             code: me.code,
-        }
+        })
     }
 }
 
@@ -237,27 +268,27 @@ impl From<sandbox::FormatResponse> for FormatResponse {
     }
 }
 
-fn parse_target(s: &str) -> sandbox::CompileTarget {
-    match s {
+fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
+    Ok(match s {
         "asm" => sandbox::CompileTarget::Assembly,
         "llvm-ir" => sandbox::CompileTarget::LlvmIr,
-        _ => panic!("Unknown compilation target {}", s),
-    }
+        _ => return Err(Error::InvalidTarget(s.into()))
+    })
 }
 
-fn parse_channel(s: &str) -> sandbox::Channel {
-    match s {
+fn parse_channel(s: &str) -> Result<sandbox::Channel> {
+    Ok(match s {
         "stable" => sandbox::Channel::Stable,
         "beta" => sandbox::Channel::Beta,
         "nightly" => sandbox::Channel::Nightly,
-        _ => panic!("Unknown channel {}", s),
-    }
+        _ => return Err(Error::InvalidChannel(s.into()))
+    })
 }
 
-fn parse_mode(s: &str) -> sandbox::Mode {
-    match s {
+fn parse_mode(s: &str) -> Result<sandbox::Mode> {
+    Ok(match s {
         "debug" => sandbox::Mode::Debug,
         "release" => sandbox::Mode::Release,
-        _ => panic!("Unknown mode {}", s),
-    }
+        _ => return Err(Error::InvalidMode(s.into()))
+    })
 }
