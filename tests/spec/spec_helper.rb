@@ -36,3 +36,10 @@ end
 Capybara.javascript_driver = :poltergeist
 Capybara.app_host = "http://#{ADDRESS}:#{PORT}"
 Capybara.run_server = false
+
+RSpec.configure do |config|
+  config.before do
+    visit '/'
+    page.execute_script 'localStorage.clear();'
+  end
+end
