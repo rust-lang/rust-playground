@@ -22,7 +22,7 @@ impl Sandbox {
 
         let mut output_path = self.scratch_dir.as_ref().to_path_buf();
         output_path.push("compiler-output");
-        let mut command = self.compile_command(&req.target, &req.channel, &req.mode, req.tests);
+        let mut command = self.compile_command(req.target, &req.channel, &req.mode, req.tests);
 
         let output = command.output().expect("Failed to run");
 
@@ -79,19 +79,21 @@ impl Sandbox {
         path
     }
 
-    fn compile_command(&self, target: &str, channel: &str, mode: &str, tests: bool) -> Command {
+    fn compile_command(&self, target: CompileTarget, channel: &str, mode: &str, tests: bool) -> Command {
+        use self::CompileTarget::*;
+
         let container = format!("rust-{}", channel);
         let mut cmd = self.docker_command();
 
         let execution_cmd = match (target, mode, tests) {
-            ("llvm-ir", "debug", false) => r#"rustc main.rs -o compiler-output --emit llvm-ir"#,
-            ("llvm-ir", "debug", true) => r#"rustc --test main.rs -o compiler-output --emit llvm-ir"#,
-            ("llvm-ir", "release", false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit llvm-ir"#,
-            ("llvm-ir", "release", true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit llvm-ir"#,
-            ("asm", "debug", false) => r#"rustc main.rs -o compiler-output --emit asm"#,
-            ("asm", "debug", true) => r#"rustc --test main.rs -o compiler-output --emit asm"#,
-            ("asm", "release", false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit asm"#,
-            ("asm", "release", true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit asm"#,
+            (LlvmIr, "debug", false) => r#"rustc main.rs -o compiler-output --emit llvm-ir"#,
+            (LlvmIr, "debug", true) => r#"rustc --test main.rs -o compiler-output --emit llvm-ir"#,
+            (LlvmIr, "release", false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit llvm-ir"#,
+            (LlvmIr, "release", true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit llvm-ir"#,
+            (Assembly, "debug", false) => r#"rustc main.rs -o compiler-output --emit asm"#,
+            (Assembly, "debug", true) => r#"rustc --test main.rs -o compiler-output --emit asm"#,
+            (Assembly, "release", false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit asm"#,
+            (Assembly, "release", true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit asm"#,
             other => panic!("Unknown configuration: {:?}", other),
         };
 
@@ -161,9 +163,15 @@ fn read(path: &Path) -> Option<String> {
     Some(s)
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum CompileTarget {
+    Assembly,
+    LlvmIr,
+}
+
 #[derive(Debug, Clone)]
 pub struct CompileRequest {
-    pub target: String,
+    pub target: CompileTarget,
     pub channel: String,
     pub mode: String,
     pub tests: bool,

@@ -115,12 +115,20 @@ struct CompileRequest {
 impl From<CompileRequest> for sandbox::CompileRequest {
     fn from(me: CompileRequest) -> Self {
         sandbox::CompileRequest {
-            target: me.target,
+            target: parse_target(&me.target),
             channel: me.channel,
             mode: me.mode,
             tests: me.tests,
             code: me.code,
         }
+    }
+}
+
+fn parse_target(s: &str) -> sandbox::CompileTarget {
+    match s {
+        "asm" => sandbox::CompileTarget::Assembly,
+        "llvm-ir" => sandbox::CompileTarget::LlvmIr,
+        _ => panic!("Unknown compilation target {}", s),
     }
 }
 
