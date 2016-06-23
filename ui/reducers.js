@@ -36,7 +36,7 @@ const code = (state = "", action) => {
 };
 
 const defaultStatus = {
-  building: false, // TODO: rename to progress or something
+  requestInProgress: false,
   error: "",
   stdout: "",
   stderr: ""
@@ -44,18 +44,18 @@ const defaultStatus = {
 
 const status = (state = defaultStatus, action) => {
   switch (action.type) {
-  case actions.REQUEST_BUILD:
-    return { ...state, building: true, error: "" };
-  case actions.BUILD_SUCCEEDED:
-    return { ...state, building: false, stdout: action.stdout || "", stderr: action.stderr || ""};
-  case actions.BUILD_FAILED:
-    return { ...state, building: false, error: "Some kind of error" };
+  case actions.REQUEST_EXECUTE:
+    return { ...state, requestInProgress: true, error: "" };
+  case actions.EXECUTE_SUCCEEDED:
+    return { ...state, requestInProgress: false, stdout: action.stdout || "", stderr: action.stderr || ""};
+  case actions.EXECUTE_FAILED:
+    return { ...state, requestInProgress: false, error: "Some kind of error" };
   case actions.REQUEST_FORMAT:
-    return { ...state, building: true, error: "" };
+    return { ...state, requestInProgress: true, error: "" };
   case actions.FORMAT_SUCCEEDED:
-    return { ...state, building: false, stdout: action.stdout || "", stderr: action.stderr || "" };
+    return { ...state, requestInProgress: false, stdout: action.stdout || "", stderr: action.stderr || "" };
   case actions.FORMAT_FAILED:
-    return { ...state, building: false, error: "Some kind of error" };
+    return { ...state, requestInProgress: false, error: "Some kind of error" };
   default:
     return state;
   }

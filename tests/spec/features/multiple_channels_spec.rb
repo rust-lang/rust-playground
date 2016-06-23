@@ -11,7 +11,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
 
   scenario "using stable Rust" do
     choose("Stable")
-    click_on("Build")
+    click_on("Run")
 
     within('.output-stdout') do
       expect(page).to have_content 'rustc'
@@ -22,7 +22,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
 
   scenario "using beta Rust" do
     choose("Beta")
-    click_on("Build")
+    click_on("Run")
 
     within('.output-stdout') do
       expect(page).to have_content 'rustc'
@@ -33,7 +33,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
 
   scenario "using nightly Rust" do
     choose("Nightly")
-    click_on("Build")
+    click_on("Run")
 
     within('.output-stdout') do
       expect(page).to have_content 'rustc'

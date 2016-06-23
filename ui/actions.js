@@ -12,20 +12,20 @@ export function changeMode(mode) {
   return { type: CHANGE_MODE, mode };
 }
 
-export const REQUEST_BUILD = 'REQUEST_BUILD';
-export const BUILD_SUCCEEDED = 'BUILD_SUCCEEDED';
-export const BUILD_FAILED = 'BUILD_FAILED';
+export const REQUEST_EXECUTE = 'REQUEST_EXECUTE';
+export const EXECUTE_SUCCEEDED = 'EXECUTE_SUCCEEDED';
+export const EXECUTE_FAILED = 'EXECUTE_FAILED';
 
-function requestBuild() {
-  return { type: REQUEST_BUILD };
+function requestExecute() {
+  return { type: REQUEST_EXECUTE };
 }
 
-function receiveBuildSuccess(json) {
-  return { type: BUILD_SUCCEEDED, stdout: json.stdout, stderr: json.stderr };
+function receiveExecuteSuccess(json) {
+  return { type: EXECUTE_SUCCEEDED, stdout: json.stdout, stderr: json.stderr };
 }
 
-function receiveBuildFailure() {
-  return { type: BUILD_FAILED };
+function receiveExecuteFailure() {
+  return { type: EXECUTE_FAILED };
 }
 
 function jsonPost(urlObj, body) {
@@ -44,17 +44,17 @@ const routes = {
   format: { pathname: '/format' }
 };
 
-export function performBuild() {
+export function performExecute() {
   // TODO: Check a cache
   return function (dispatch, getState) {
-    dispatch(requestBuild());
+    dispatch(requestExecute());
 
     const state = getState();
     const { code, configuration: { channel, mode, tests } } = state;
     const body = { channel, mode, tests, code };
 
     return jsonPost(routes.execute, body)
-      .then(json => dispatch(receiveBuildSuccess(json)));
+      .then(json => dispatch(receiveExecuteSuccess(json)));
     // TODO: Failure case
   };
 }

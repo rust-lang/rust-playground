@@ -9,7 +9,7 @@ RSpec.feature "Compiling in different modes", type: :feature, js: true do
 
   scenario "compiling in debug mode" do
     choose("Debug")
-    click_on("Build")
+    click_on("Run")
 
     within('.output-stderr') do
       expect(page.text.strip).to be_empty
@@ -23,7 +23,7 @@ RSpec.feature "Compiling in different modes", type: :feature, js: true do
 
   scenario "compiling in release mode" do
     choose("Release")
-    click_on("Build")
+    click_on("Run")
 
     within('.output-stdout') do
       expect(page).to_not have_content 'Compiling in debug mode'

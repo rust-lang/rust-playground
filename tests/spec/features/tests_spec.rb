@@ -31,7 +31,7 @@ RSpec.feature "Running tests", type: :feature, js: true do
           println!("Running in main");
       }
     EOF
-    click_on("Build")
+    click_on("Run")
 
     within('.output-stdout') do
       expect(page).to_not have_content 'running 1 test'
