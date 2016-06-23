@@ -12,14 +12,16 @@ function oneRadio(name, currentValue, possibleValue, change, labelText) {
 
 export default class Header extends React.Component {
   render() {
-    const { build, format, channel, changeChannel, mode, changeMode } = this.props;
+    const { build, format, channel, changeChannel, mode, changeMode, tests } = this.props;
 
     const oneChannel = (value, labelText) => oneRadio("channel", channel, value, changeChannel, labelText);
     const oneMode = (value, labelText) => oneRadio("mode", mode, value, changeMode, labelText);
 
+    const executionLabel = tests ? "Test" : "Build";
+
     return (
       <div>
-        <button onClick={ build }>Build</button>
+        <button onClick={ build }>{ executionLabel }</button>
         <button onClick={ format }>Format</button>
         { oneChannel("stable", "Stable") }
         { oneChannel("beta", "Beta") }
@@ -37,5 +39,6 @@ Header.propTypes = {
   channel: PropTypes.string.isRequired,
   changeChannel: PropTypes.func.isRequired,
   mode: PropTypes.string.isRequired,
-  changeMode: PropTypes.func.isRequired
+  changeMode: PropTypes.func.isRequired,
+  tests: PropTypes.bool.isRequired
 };

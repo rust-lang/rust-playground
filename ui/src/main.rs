@@ -97,7 +97,7 @@ impl Sandbox {
 
     pub fn compile(&self, req: &CompileRequest) -> CompileResponse {
         self.write_source_code(&req.code);
-        let mut command = self.compile_command(&req.channel, &req.mode);
+        let mut command = self.compile_command(&req.channel, &req.mode, req.tests);
 
         let output = command.output().expect("Failed to run");
 
@@ -140,14 +140,16 @@ impl Sandbox {
         path
     }
 
-    fn compile_command(&self, channel: &str, mode: &str) -> Command {
+    fn compile_command(&self, channel: &str, mode: &str, tests: bool) -> Command {
         let container = format!("rust-{}", channel);
         let mut cmd = self.docker_command();
 
-        let execution_cmd = if mode == "debug" {
-            r#"rustc main.rs && ./main"#
-        } else {
-            r#"rustc -C opt-level=3 main.rs && ./main"#
+        let execution_cmd = match (mode, tests) {
+            ("debug", false) => r#"rustc main.rs && ./main"#,
+            ("debug", true) => r#"rustc --test main.rs && ./main"#,
+            ("release", false) => r#"rustc -C opt-level=3 main.rs && ./main"#,
+            ("release", true) => r#"rustc -C opt-level=3 --test main.rs && ./main"#,
+            other => panic!("Unknown configuration: {:?}", other),
         };
 
         cmd.arg(&container).args(&["bash", "-c", execution_cmd]);
@@ -197,6 +199,7 @@ fn read(path: &Path) -> String {
 struct CompileRequest {
     channel: String,
     mode: String,
+    tests: bool,
     code: String,
 }
 

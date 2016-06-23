@@ -7,11 +7,19 @@ import Output from './Output.jsx';
 
 class Playground extends React.Component {
   render() {
-    const { code, status: { stdout, stderr }, build, format, configuration: { channel, mode }, changeChannel, changeMode, onEditCode } = this.props;
+    const { code,
+            status: { stdout, stderr },
+            build, format,
+            configuration: { channel, mode, tests },
+            changeChannel, changeMode, onEditCode
+          } = this.props;
 
     return (
       <div>
-        <Header build={build} format={format} channel={channel} changeChannel={changeChannel} mode={mode} changeMode={changeMode} />
+        <Header build={build} format={format}
+                channel={channel} changeChannel={changeChannel}
+                mode={mode} changeMode={changeMode}
+                tests={tests} />
         <Editor code={code} onEditCode={onEditCode} />
         <Output stdout={stdout} stderr={stderr} />
       </div>

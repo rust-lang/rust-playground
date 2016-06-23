@@ -38,14 +38,15 @@ export function performBuild() {
     const compileUrl = url.format({ pathname: '/compile' });
 
     const state = getState();
-    const { code, configuration: { channel, mode } } = state;
+    const { code, configuration: { channel, mode, tests } } = state;
 
     return fetch(compileUrl, {
       method: 'post',
       body: JSON.stringify({
         channel,
-        code,
-        mode
+        mode,
+        tests,
+        code
       })
     })
       .then(response => response.json())

@@ -3,8 +3,13 @@ import * as actions from './actions';
 
 const defaultConfiguration = {
   channel: "stable",
-  mode: "debug"
+  mode: "debug",
+  tests: false
 };
+
+const hasTests = (code) => code.includes('#[test]');
+const hasMainMethod = (code) => code.includes('fn main()');
+const runAsTest = (code) => hasTests(code) && !hasMainMethod(code);
 
 const configuration = (state = defaultConfiguration, action) => {
   switch (action.type) {
@@ -12,6 +17,8 @@ const configuration = (state = defaultConfiguration, action) => {
     return { ...state, channel: action.channel };
   case actions.CHANGE_MODE:
     return { ...state, mode: action.mode };
+  case actions.EDIT_CODE:
+    return { ...state, tests: runAsTest(action.code) };
   default:
     return state;
   }
