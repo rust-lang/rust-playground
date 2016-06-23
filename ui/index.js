@@ -14,8 +14,11 @@ import playgroundApp from './reducers';
 import { performGistLoad } from './actions';
 import Playground from './Playground.jsx';
 
-const logger = createLogger(); // TODO: Development only
-const middlewares = applyMiddleware(thunk, logger);
+var mw = [thunk];
+if (process.env.NODE_ENV !== 'production') {
+  mw.push(createLogger());
+}
+const middlewares = applyMiddleware(...mw);
 const enhancers = compose(middlewares, persistState(undefined, { serialize, deserialize }));
 const store = createStore(playgroundApp, enhancers);
 

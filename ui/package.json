@@ -21,8 +21,10 @@
     "babel-preset-react": "^6.5.0",
     "babelify": "^7.3.0",
     "browserify": "^13.0.1",
+    "envify": "^3.4.1",
     "redux-devtools": "^3.3.1",
     "redux-logger": "^2.6.1",
+    "uglifyify": "^3.0.2",
     "watchify": "^3.7.0"
   },
   "scripts": {
