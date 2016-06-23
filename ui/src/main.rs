@@ -48,7 +48,11 @@ fn main() {
 fn compile(req: &mut Request) -> IronResult<Response> {
     match req.get::<bodyparser::Struct<CompileRequest>>() {
         Ok(Some(req)) => {
-            Ok(Response::with((status::Ok, do_compile(&req))))
+            let sandbox = Sandbox::new();
+            let resp = sandbox.compile(&req);
+            let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
+
+            Ok(Response::with((status::Ok, body)))
         }
         Ok(None) => {
             // TODO: real error
@@ -64,7 +68,10 @@ fn compile(req: &mut Request) -> IronResult<Response> {
 fn format(req: &mut Request) -> IronResult<Response> {
     match req.get::<bodyparser::Struct<FormatRequest>>() {
         Ok(Some(req)) => {
-            Ok(Response::with((status::Ok, do_format(&req))))
+            let sandbox = Sandbox::new();
+            let resp = sandbox.format(&req);
+            let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
+            Ok(Response::with((status::Ok, body)))
         }
         Ok(None) => {
             // TODO: real error
@@ -77,39 +84,98 @@ fn format(req: &mut Request) -> IronResult<Response> {
     }
 }
 
-fn do_compile(req: &CompileRequest) -> String {
-    let scratch_dir = Temp::new_dir().expect("Unable to create temp dir");
-
-    write_source_code(&scratch_dir, &req.code);
-    let mut command = compile_command(&scratch_dir, &req.channel);
-
-    let output = command.output().expect("Failed to run");
-
-    let response = CompileResponse {
-        success: output.status.success(),
-        stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
-        stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
-    };
-
-    serde_json::ser::to_string(&response).expect("Can't serialize")
+struct Sandbox {
+    scratch_dir: Temp,
 }
 
-fn do_format(req: &FormatRequest) -> String {
-    let scratch_dir = Temp::new_dir().expect("Unable to create temp dir");
+impl Sandbox {
+    fn new() -> Self {
+        Sandbox {
+            scratch_dir: Temp::new_dir().expect("Unable to create temp dir"),
+        }
+    }
 
-    let path = write_source_code(&scratch_dir, &req.code);
-    let mut command = format_command(&scratch_dir);
+    pub fn compile(&self, req: &CompileRequest) -> CompileResponse {
+        self.write_source_code(&req.code);
+        let mut command = self.compile_command(&req.channel);
 
-    let output = command.output().expect("Failed to run");
+        let output = command.output().expect("Failed to run");
 
-    let response = FormatResponse {
-        success: output.status.success(),
-        code: read(path.as_path()),
-        stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
-        stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
-    };
+        CompileResponse {
+            success: output.status.success(),
+            stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
+            stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
+        }
+    }
 
-    serde_json::ser::to_string(&response).expect("Can't serialize")
+    pub fn format(&self, req: &FormatRequest) -> FormatResponse {
+        let path = self.write_source_code(&req.code);
+        let mut command = self.format_command();
+
+        let output = command.output().expect("Failed to run");
+
+        FormatResponse {
+            success: output.status.success(),
+            code: read(path.as_path()),
+            stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
+            stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
+        }
+    }
+
+    fn write_source_code(&self, code: &str) -> PathBuf {
+        let data = code.as_bytes();
+
+        let path = {
+            let mut p = self.scratch_dir.to_path_buf();
+            p.push("main.rs");
+            p
+        };
+
+        let file = File::create(&path).expect("Unable to create source code");
+        let mut file = BufWriter::new(file);
+
+        file.write_all(data).expect("Unable to write source code");
+
+        debug!("Wrote {} bytes of source to {}", data.len(), path.display());
+        path
+    }
+
+    fn compile_command(&self, channel: &str) -> Command {
+        let container = format!("rust-{}", channel);
+        let mut cmd = self.docker_command();
+
+        cmd.arg(&container).args(&["bash", "-c", r#"rustc main.rs && ./main"#]);
+
+        debug!("Compilation command is {:?}", cmd);
+
+        cmd
+    }
+
+    fn format_command(&self) -> Command {
+        let mut cmd = self.docker_command();
+
+        cmd.arg("rustfmt").args(&["main.rs"]);
+
+        debug!("Formatting command is {:?}", cmd);
+
+        cmd
+    }
+
+    fn docker_command(&self) -> Command {
+        const DIR_INSIDE_CONTAINER: &'static str = "/source";
+
+        let utf8_dir = self.scratch_dir.as_ref().to_str().expect("Unable to convert directory to UTF-8");
+        let mount_source_volume = format!("{}:{}", utf8_dir, DIR_INSIDE_CONTAINER);
+
+        let mut cmd = Command::new("docker");
+
+        cmd
+            .arg("run")
+            .args(&["--volume", &mount_source_volume])
+            .args(&["--workdir", DIR_INSIDE_CONTAINER]);
+
+        cmd
+    }
 }
 
 fn read(path: &Path) -> String {
@@ -119,62 +185,6 @@ fn read(path: &Path) -> String {
     let mut s = String::new();
     f.read_to_string(&mut s).expect("Couldn't read");
     s
-}
-
-fn write_source_code(dir: &Temp, code: &str) -> PathBuf {
-    let data = code.as_bytes();
-
-    let path = {
-        let mut p = dir.to_path_buf();
-        p.push("main.rs");
-        p
-    };
-
-    let file = File::create(&path).expect("Unable to create source code");
-    let mut file = BufWriter::new(file);
-
-    file.write_all(data).expect("Unable to write source code");
-
-    debug!("Wrote {} bytes of source to {}", data.len(), path.display());
-    path
-}
-
-fn compile_command(dir: &Temp, channel: &str) -> Command {
-    let utf8_dir = dir.as_ref().to_str().expect("Unable to convert directory to UTF-8");
-    let mount_source_volume = format!("{}:/source", utf8_dir);
-
-    let container = format!("rust-{}", channel);
-
-    let mut cmd = Command::new("docker");
-
-    cmd
-        .arg("run")
-        .args(&["--volume", &mount_source_volume])
-        .args(&["--workdir", "/source"])
-        .arg(&container)
-        .args(&["bash", "-c", r#"rustc main.rs && ./main"#]);
-
-    debug!("Compilation command is {:?}", cmd);
-
-    cmd
-}
-
-fn format_command(dir: &Temp) -> Command {
-    let utf8_dir = dir.as_ref().to_str().expect("Unable to convert directory to UTF-8");
-    let mount_source_volume = format!("{}:/source", utf8_dir);
-
-    let mut cmd = Command::new("docker");
-
-    cmd
-        .arg("run")
-        .args(&["--volume", &mount_source_volume])
-        .args(&["--workdir", "/source"])
-        .arg("rustfmt")
-        .args(&["main.rs"]);
-
-    debug!("Formatting command is {:?}", cmd);
-
-    cmd
 }
 
 #[derive(Debug, Clone, Deserialize)]
