@@ -15,7 +15,7 @@ extern crate mktemp;
 use std::env;
 use std::path::{Path, PathBuf};
 use std::io::prelude::*;
-use std::io::{BufReader, BufWriter};
+use std::io::{BufReader, BufWriter, ErrorKind};
 use std::fs::File;
 use std::process::Command;
 
@@ -38,11 +38,32 @@ fn main() {
 
     let mut mount = Mount::new();
     mount.mount("/", Static::new(&root));
+    mount.mount("/compile", compile);
     mount.mount("/execute", execute);
     mount.mount("/format", format);
 
     info!("Starting the server on {}:{}", address, port);
     Iron::new(mount).http((&*address, port)).expect("Unable to start server");
+}
+
+fn compile(req: &mut Request) -> IronResult<Response> {
+    match req.get::<bodyparser::Struct<CompileRequest>>() {
+        Ok(Some(req)) => {
+            let sandbox = Sandbox::new();
+            let resp = sandbox.compile(&req);
+            let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
+
+            Ok(Response::with((status::Ok, body)))
+        }
+        Ok(None) => {
+            // TODO: real error
+            Ok(Response::with((status::Ok, r#"{ "output": "FAIL1" }"#)))
+        },
+        Err(_) => {
+            // TODO: real error
+            Ok(Response::with((status::Ok, r#"{ "output": "FAIL2" }"#)))
+        }
+    }
 }
 
 fn execute(req: &mut Request) -> IronResult<Response> {
@@ -95,6 +116,23 @@ impl Sandbox {
         }
     }
 
+    pub fn compile(&self, req: &CompileRequest) -> CompileResponse {
+        self.write_source_code(&req.code);
+
+        let mut output_path = self.scratch_dir.as_ref().to_path_buf();
+        output_path.push("compiler-output");
+        let mut command = self.compile_command(&req.target, &req.channel, &req.mode, req.tests);
+
+        let output = command.output().expect("Failed to run");
+
+        CompileResponse {
+            success: output.status.success(),
+            code: read(&output_path).unwrap_or_else(String::new),
+            stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
+            stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
+        }
+    }
+
     pub fn execute(&self, req: &ExecuteRequest) -> ExecuteResponse {
         self.write_source_code(&req.code);
         let mut command = self.execute_command(&req.channel, &req.mode, req.tests);
@@ -116,7 +154,7 @@ impl Sandbox {
 
         FormatResponse {
             success: output.status.success(),
-            code: read(path.as_path()),
+            code: read(path.as_path()).expect("No formatting output"),
             stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
             stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
         }
@@ -138,6 +176,25 @@ impl Sandbox {
 
         debug!("Wrote {} bytes of source to {}", data.len(), path.display());
         path
+    }
+
+    fn compile_command(&self, target: &str, channel: &str, mode: &str, tests: bool) -> Command {
+        let container = format!("rust-{}", channel);
+        let mut cmd = self.docker_command();
+
+        let execution_cmd = match (target, mode, tests) {
+            ("llvm-ir", "debug", false) => r#"rustc main.rs -o compiler-output --emit llvm-ir"#,
+            ("llvm-ir", "debug", true) => r#"rustc --test main.rs -o compiler-output --emit llvm-ir"#,
+            ("llvm-ir", "release", false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit llvm-ir"#,
+            ("llvm-ir", "release", true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit llvm-ir"#,
+            other => panic!("Unknown configuration: {:?}", other),
+        };
+
+        cmd.arg(&container).args(&["bash", "-c", execution_cmd]);
+
+        debug!("Compilation command is {:?}", cmd);
+
+        cmd
     }
 
     fn execute_command(&self, channel: &str, mode: &str, tests: bool) -> Command {
@@ -186,13 +243,34 @@ impl Sandbox {
     }
 }
 
-fn read(path: &Path) -> String {
-    let f = File::open(path).expect("Couldn't open");
+fn read(path: &Path) -> Option<String> {
+    let f = match File::open(path) {
+        Ok(f) => f,
+        Err(ref e) if e.kind() == ErrorKind::NotFound => return None,
+        Err(e) => panic!("Couldn't open file {}: {}", path.display(), e),
+    };
     let mut f = BufReader::new(f);
 
     let mut s = String::new();
     f.read_to_string(&mut s).expect("Couldn't read");
-    s
+    Some(s)
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct CompileRequest {
+    target: String,
+    channel: String,
+    mode: String,
+    tests: bool,
+    code: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct CompileResponse {
+    success: bool,
+    code: String,
+    stdout: String,
+    stderr: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]

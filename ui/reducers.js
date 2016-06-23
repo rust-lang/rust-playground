@@ -38,18 +38,28 @@ const code = (state = "", action) => {
 const defaultStatus = {
   requestInProgress: false,
   error: "",
+  code: "",
   stdout: "",
   stderr: ""
 };
 
 const status = (state = defaultStatus, action) => {
   switch (action.type) {
+  case actions.REQUEST_COMPILE:
+    return { ...state, requestInProgress: true, error: "" };
+  case actions.COMPILE_SUCCEEDED:
+    const { code = "", stdout = "", stderr = "" } = action;
+    return { ...state, requestInProgress: false, code, stdout, stderr };
+  case actions.COMPILE_FAILED:
+    return { ...state, requestInProgress: false, error: "Some kind of error" };
+
   case actions.REQUEST_EXECUTE:
     return { ...state, requestInProgress: true, error: "" };
   case actions.EXECUTE_SUCCEEDED:
     return { ...state, requestInProgress: false, stdout: action.stdout || "", stderr: action.stderr || ""};
   case actions.EXECUTE_FAILED:
     return { ...state, requestInProgress: false, error: "Some kind of error" };
+
   case actions.REQUEST_FORMAT:
     return { ...state, requestInProgress: true, error: "" };
   case actions.FORMAT_SUCCEEDED:

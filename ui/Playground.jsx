@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { changeChannel, changeMode, performExecute, performFormat, editCode } from './actions';
+import { changeChannel, changeMode, performExecute, performCompileToLLVM, performFormat, editCode } from './actions';
 import { connect } from 'react-redux';
 import Header from './Header.jsx';
 import Editor from './Editor.jsx';
@@ -8,20 +8,20 @@ import Output from './Output.jsx';
 class Playground extends React.Component {
   render() {
     const { code,
-            status: { stdout, stderr },
-            execute, format,
+            status: { code: compiledCode, stdout, stderr },
+            execute, compileToLLVM, format,
             configuration: { channel, mode, tests },
             changeChannel, changeMode, onEditCode
           } = this.props;
 
     return (
       <div>
-        <Header execute={execute} format={format}
+        <Header execute={execute} compileToLLVM={compileToLLVM} format={format}
                 channel={channel} changeChannel={changeChannel}
                 mode={mode} changeMode={changeMode}
                 tests={tests} />
         <Editor code={code} onEditCode={onEditCode} />
-        <Output stdout={stdout} stderr={stderr} />
+        <Output code={compiledCode} stdout={stdout} stderr={stderr} />
       </div>
     );
   }
@@ -29,6 +29,7 @@ class Playground extends React.Component {
 
 Playground.propTypes = {
   execute: PropTypes.func.isRequired,
+  compileToLLVM: PropTypes.func.isRequired,
   format: PropTypes.func.isRequired,
   configuration: PropTypes.object.isRequired,
   changeChannel: PropTypes.func.isRequired,
@@ -55,6 +56,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     execute: () => {
       dispatch(performExecute());
+    },
+    compileToLLVM: () => {
+      dispatch(performCompileToLLVM());
     },
     format: () => {
       dispatch(performFormat());
