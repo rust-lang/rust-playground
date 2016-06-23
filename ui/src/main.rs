@@ -11,6 +11,8 @@ extern crate bodyparser;
 extern crate serde;
 extern crate serde_json;
 extern crate mktemp;
+#[macro_use]
+extern crate quick_error;
 
 use std::env;
 use std::path::PathBuf;
@@ -47,8 +49,8 @@ fn main() {
 fn compile(req: &mut Request) -> IronResult<Response> {
     match req.get::<bodyparser::Struct<CompileRequest>>() {
         Ok(Some(req)) => {
-            let sandbox = Sandbox::new();
-            let resp = CompileResponse::from(sandbox.compile(&req.into()));
+            let sandbox = Sandbox::new().expect("Unable to create sandbox");
+            let resp = CompileResponse::from(sandbox.compile(&req.into()).expect("Unable to compile"));
             let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
 
             Ok(Response::with((status::Ok, body)))
@@ -67,8 +69,8 @@ fn compile(req: &mut Request) -> IronResult<Response> {
 fn execute(req: &mut Request) -> IronResult<Response> {
     match req.get::<bodyparser::Struct<ExecuteRequest>>() {
         Ok(Some(req)) => {
-            let sandbox = Sandbox::new();
-            let resp = ExecuteResponse::from(sandbox.execute(&req.into()));
+            let sandbox = Sandbox::new().expect("Unable to create sandbox");;
+            let resp = ExecuteResponse::from(sandbox.execute(&req.into()).expect("Unable to execute"));
             let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
 
             Ok(Response::with((status::Ok, body)))
@@ -87,8 +89,8 @@ fn execute(req: &mut Request) -> IronResult<Response> {
 fn format(req: &mut Request) -> IronResult<Response> {
     match req.get::<bodyparser::Struct<FormatRequest>>() {
         Ok(Some(req)) => {
-            let sandbox = Sandbox::new();
-            let resp = FormatResponse::from(sandbox.format(&req.into()));
+            let sandbox = Sandbox::new().expect("Unable to create sandbox");;
+            let resp = FormatResponse::from(sandbox.format(&req.into()).expect("Unable to format"));
             let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
             Ok(Response::with((status::Ok, body)))
         }

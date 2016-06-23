@@ -1,67 +1,110 @@
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::{BufReader, BufWriter, ErrorKind};
+use std::io::{self, BufReader, BufWriter, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::string;
 
 use mktemp::Temp;
+
+quick_error! {
+    #[derive(Debug)]
+    pub enum Error {
+        UnableToCreateTempDir(err: io::Error) {
+            description("unable to create temporary directory")
+            display("Unable to create temporary directory: {}", err)
+            cause(err)
+        }
+        UnableToCreateSourceFile(err: io::Error) {
+            description("unable to create source file")
+            display("Unable to create source file: {}", err)
+            cause(err)
+        }
+        UnableToExecuteCompiler(err: io::Error) {
+            description("unable to execute the compiler")
+            display("Unable to execute the compiler: {}", err)
+            cause(err)
+        }
+        UnableToReadOutput(err: io::Error) {
+            description("unable to read output file")
+            display("Unable to read output file: {}", err)
+            cause(err)
+        }
+        OutputNotUtf8(err: string::FromUtf8Error) {
+            description("output was not valid UTF-8")
+            display("Output was not valid UTF-8: {}", err)
+            cause(err)
+        }
+        OutputMissing {
+            description("output was missing")
+            display("Output was missing")
+        }
+
+    }
+}
+
+pub type Result<T> = ::std::result::Result<T, Error>;
 
 pub struct Sandbox {
     scratch_dir: Temp,
 }
 
+fn vec_to_str(v: Vec<u8>) -> Result<String> {
+    String::from_utf8(v).map_err(Error::OutputNotUtf8)
+}
+
 impl Sandbox {
-    pub fn new() -> Self {
-        Sandbox {
-            scratch_dir: Temp::new_dir().expect("Unable to create temp dir"),
-        }
+    pub fn new() -> Result<Self> {
+        Ok(Sandbox {
+            scratch_dir: try!(Temp::new_dir().map_err(Error::UnableToCreateTempDir)),
+        })
     }
 
-    pub fn compile(&self, req: &CompileRequest) -> CompileResponse {
-        self.write_source_code(&req.code);
+    pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
+        try!(self.write_source_code(&req.code));
 
         let mut output_path = self.scratch_dir.as_ref().to_path_buf();
         output_path.push("compiler-output");
         let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests);
 
-        let output = command.output().expect("Failed to run");
+        let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
-        CompileResponse {
+        Ok(CompileResponse {
             success: output.status.success(),
-            code: read(&output_path).unwrap_or_else(String::new),
-            stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
-            stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
-        }
+            code: try!(read(&output_path)).unwrap_or_else(String::new),
+            stdout: try!(vec_to_str(output.stdout)),
+            stderr: try!(vec_to_str(output.stderr)),
+        })
     }
 
-    pub fn execute(&self, req: &ExecuteRequest) -> ExecuteResponse {
-        self.write_source_code(&req.code);
+    pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
+        try!(self.write_source_code(&req.code));
         let mut command = self.execute_command(req.channel, req.mode, req.tests);
 
-        let output = command.output().expect("Failed to run");
+        let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
-        ExecuteResponse {
+        Ok(ExecuteResponse {
             success: output.status.success(),
-            stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
-            stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
-        }
+            stdout: try!(vec_to_str(output.stdout)),
+            stderr: try!(vec_to_str(output.stderr)),
+        })
     }
 
-    pub fn format(&self, req: &FormatRequest) -> FormatResponse {
-        let path = self.write_source_code(&req.code);
+    pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
+        let path = try!(self.write_source_code(&req.code));
         let mut command = self.format_command();
 
-        let output = command.output().expect("Failed to run");
+        let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
-        FormatResponse {
+        Ok(FormatResponse {
             success: output.status.success(),
-            code: read(path.as_path()).expect("No formatting output"),
-            stdout: String::from_utf8(output.stdout).expect("Stdout was not UTF-8"),
-            stderr: String::from_utf8(output.stderr).expect("Stderr was not UTF-8"),
-        }
+            code: try!(try!(read(path.as_path())).ok_or(Error::OutputMissing)),
+            stdout: try!(vec_to_str(output.stdout)),
+            stderr: try!(vec_to_str(output.stderr)),
+        })
     }
 
-    fn write_source_code(&self, code: &str) -> PathBuf {
+    fn write_source_code(&self, code: &str) -> Result<PathBuf> {
         let data = code.as_bytes();
 
         let path = {
@@ -70,13 +113,13 @@ impl Sandbox {
             p
         };
 
-        let file = File::create(&path).expect("Unable to create source code");
+        let file = try!(File::create(&path).map_err(Error::UnableToCreateSourceFile));
         let mut file = BufWriter::new(file);
 
-        file.write_all(data).expect("Unable to write source code");
+        try!(file.write_all(data).map_err(Error::UnableToCreateSourceFile));
 
         debug!("Wrote {} bytes of source to {}", data.len(), path.display());
-        path
+        Ok(path)
     }
 
     fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool) -> Command {
@@ -117,14 +160,15 @@ impl Sandbox {
     fn docker_command(&self) -> Command {
         const DIR_INSIDE_CONTAINER: &'static str = "/source";
 
-        let utf8_dir = self.scratch_dir.as_ref().to_str().expect("Unable to convert directory to UTF-8");
-        let mount_source_volume = format!("{}:{}", utf8_dir, DIR_INSIDE_CONTAINER);
+        let mut mount_source_volume = self.scratch_dir.as_ref().as_os_str().to_os_string();
+        mount_source_volume.push(":");
+        mount_source_volume.push(DIR_INSIDE_CONTAINER);
 
         let mut cmd = Command::new("docker");
 
         cmd
             .arg("run")
-            .args(&["--volume", &mount_source_volume])
+            .arg("--volume").arg(&mount_source_volume)
             .args(&["--workdir", DIR_INSIDE_CONTAINER]);
 
         cmd
@@ -161,17 +205,17 @@ fn build_execution_command(target: Option<(CompileTarget, &str)>, mode: Mode, te
     s
 }
 
-fn read(path: &Path) -> Option<String> {
+fn read(path: &Path) -> Result<Option<String>> {
     let f = match File::open(path) {
         Ok(f) => f,
-        Err(ref e) if e.kind() == ErrorKind::NotFound => return None,
-        Err(e) => panic!("Couldn't open file {}: {}", path.display(), e),
+        Err(ref e) if e.kind() == ErrorKind::NotFound => return Ok(None),
+        Err(e) => return Err(Error::UnableToReadOutput(e)),
     };
     let mut f = BufReader::new(f);
 
     let mut s = String::new();
-    f.read_to_string(&mut s).expect("Couldn't read");
-    Some(s)
+    try!(f.read_to_string(&mut s).map_err(Error::UnableToReadOutput));
+    Ok(Some(s))
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
