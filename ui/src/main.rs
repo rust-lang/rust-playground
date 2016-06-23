@@ -71,24 +71,62 @@ fn with_sandbox<Req, Resp, F>(req: &mut Request, f: F) -> IronResult<Response>
           Req: Deserialize + Clone + Any + 'static,
           Resp: Serialize,
 {
-    match req.get::<bodyparser::Struct<Req>>() {
-        Ok(Some(req)) => {
-            let sandbox = Sandbox::new().expect("Unable to create sandbox");
+    let response = req.get::<bodyparser::Struct<Req>>()
+        .map_err(Error::Deserialization)
+        .and_then(|r| r.ok_or(Error::RequestMissing))
+        .and_then(|req| {
+            let sandbox = try!(Sandbox::new());
+            let resp = try!(f(sandbox, req));
+            let body = try!(serde_json::ser::to_string(&resp));
+            Ok(body)
+        });
 
-            let resp = f(sandbox, req).expect("Sandbox request failed");
-            let body = serde_json::ser::to_string(&resp).expect("Can't serialize response");
-
-            Ok(Response::with((status::Ok, body)))
-        },
-        Ok(None) => {
-            // TODO: real error
-            Ok(Response::with((status::Ok, r#"{ "output": "FAIL1" }"#)))
-        },
-        Err(_) => {
-            // TODO: real error
-            Ok(Response::with((status::Ok, r#"{ "output": "FAIL2" }"#)))
+    match response {
+        Ok(body) => Ok(Response::with((status::Ok, body))),
+        Err(err) => {
+            let err = ErrorJson { error: err.to_string() };
+            match serde_json::ser::to_string(&err) {
+                Ok(error_str) => Ok(Response::with((status::InternalServerError, error_str))),
+                Err(_) => Ok(Response::with((status::InternalServerError, FATAL_ERROR_JSON))),
+            }
         },
     }
+}
+
+quick_error! {
+    #[derive(Debug)]
+    pub enum Error {
+        Sandbox(err: sandbox::Error) {
+            description("sandbox operation failed")
+            display("Sandbox operation failed: {}", err)
+            cause(err)
+            from()
+        }
+        Serialization(err: serde_json::Error) {
+            description("unable to serialize response")
+            display("Unable to serialize response: {}", err)
+            cause(err)
+            from()
+        }
+        Deserialization(err: bodyparser::BodyError) {
+            description("unable to deserialize request")
+            display("Unable to deserialize request: {}", err)
+            cause(err)
+            from()
+        }
+        RequestMissing {
+            description("no request was provided")
+            display("No request was provided")
+        }
+    }
+}
+
+const FATAL_ERROR_JSON: &'static str =
+    r#"{"error": "Multiple cascading errors occurred, abandon all hope"}"#;
+
+#[derive(Debug, Clone, Serialize)]
+struct ErrorJson {
+    error: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]

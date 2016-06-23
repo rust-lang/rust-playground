@@ -39,7 +39,6 @@ quick_error! {
             description("output was missing")
             display("Output was missing")
         }
-
     }
 }
 
