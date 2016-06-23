@@ -25,8 +25,8 @@ function receiveExecuteSuccess(json) {
   return { type: EXECUTE_SUCCEEDED, stdout: json.stdout, stderr: json.stderr };
 }
 
-function receiveExecuteFailure() {
-  return { type: EXECUTE_FAILED };
+function receiveExecuteFailure(json) {
+  return { type: EXECUTE_FAILED, error: json.error };
 }
 
 function jsonPost(urlObj, body) {
@@ -37,7 +37,15 @@ function jsonPost(urlObj, body) {
     method: 'post',
     body: JSON.stringify(body)
   })
-    .then(response => response.json());
+    .catch(error => { error })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        return response.json().then(j => Promise.reject(j));
+      }
+    })
+  ;
 }
 
 const routes = {
@@ -56,8 +64,8 @@ export function performExecute() {
     const body = { channel, mode, tests, code };
 
     return jsonPost(routes.execute, body)
-      .then(json => dispatch(receiveExecuteSuccess(json)));
-    // TODO: Failure case
+      .then(json => dispatch(receiveExecuteSuccess(json)))
+      .catch(json => dispatch(receiveExecuteFailure(json)));
   };
 }
 
@@ -74,8 +82,8 @@ function receiveCompileSuccess(json) {
   return { type: COMPILE_SUCCEEDED, code, stdout, stderr };
 }
 
-function receiveCompileFailure() {
-  return { type: COMPILE_FAILED };
+function receiveCompileFailure(json) {
+  return { type: COMPILE_FAILED, error: json.error };
 }
 
 function performCompile(target) {
@@ -88,8 +96,8 @@ function performCompile(target) {
     const body = { channel, mode, tests, code, target };
 
     return jsonPost(routes.compile, body)
-      .then(json => dispatch(receiveCompileSuccess(json)));
-    // TODO: Failure case
+      .then(json => dispatch(receiveCompileSuccess(json)))
+      .catch(json => dispatch(receiveCompileFailure(json)));
   };
 }
 
@@ -114,8 +122,8 @@ function receiveFormatSuccess(json) {
   return { type: FORMAT_SUCCEEDED, code: json.code };
 }
 
-function receiveFormatFailure() {
-  return { type: FORMAT_FAILED };
+function receiveFormatFailure(json) {
+  return { type: FORMAT_FAILED, error: json.error };
 }
 
 export function performFormat() {
@@ -127,8 +135,8 @@ export function performFormat() {
     const body = { code };
 
     return jsonPost(routes.format, body)
-      .then(json => dispatch(receiveFormatSuccess(json)));
-    // TODO: Failure case
+      .then(json => dispatch(receiveFormatSuccess(json)))
+      .catch(json => dispatch(receiveFormatFailure(json)));
   };
 }
 

@@ -8,7 +8,7 @@ import Output from './Output.jsx';
 class Playground extends React.Component {
   render() {
     const { code,
-            status: { code: compiledCode, stdout, stderr },
+            status: { code: compiledCode, stdout, stderr, error },
             execute, compileToAssembly, compileToLLVM, format,
             configuration: { channel, mode, tests },
             changeChannel, changeMode, onEditCode
@@ -24,7 +24,7 @@ class Playground extends React.Component {
                 mode={mode} changeMode={changeMode}
                 tests={tests} />
         <Editor code={code} onEditCode={onEditCode} />
-        <Output code={compiledCode} stdout={stdout} stderr={stderr} />
+        <Output code={compiledCode} stdout={stdout} stderr={stderr} error={error} />
       </div>
     );
   }

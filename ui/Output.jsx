@@ -2,10 +2,16 @@ import React, { PropTypes } from 'react';
 
 export default class Output extends React.Component {
   render() {
-    const { code, stdout, stderr } = this.props;
+    const { error, code, stdout, stderr } = this.props;
 
     return (
       <div>
+        <pre className="output-error">
+          <code>
+            { error }
+          </code>
+        </pre>
+        <hr />
         <pre className="output-code">
           <code>
             { code }
@@ -29,6 +35,7 @@ export default class Output extends React.Component {
 };
 
 Output.propTypes = {
+  error: PropTypes.string.isRequired,
   code: PropTypes.string.isRequired,
   stdout: PropTypes.string.isRequired,
   stderr: PropTypes.string.isRequired

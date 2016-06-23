@@ -65,21 +65,21 @@ const status = (state = defaultStatus, action) => {
     const { code = "", stdout = "", stderr = "" } = action;
     return { ...state, requestInProgress: false, code, stdout, stderr };
   case actions.COMPILE_FAILED:
-    return { ...state, requestInProgress: false, error: "Some kind of error" };
+    return { ...state, requestInProgress: false, error: action.error };
 
   case actions.REQUEST_EXECUTE:
     return { ...state, requestInProgress: true, error: "" };
   case actions.EXECUTE_SUCCEEDED:
     return { ...state, requestInProgress: false, stdout: action.stdout || "", stderr: action.stderr || ""};
   case actions.EXECUTE_FAILED:
-    return { ...state, requestInProgress: false, error: "Some kind of error" };
+    return { ...state, requestInProgress: false, error: action.error };
 
   case actions.REQUEST_FORMAT:
     return { ...state, requestInProgress: true, error: "" };
   case actions.FORMAT_SUCCEEDED:
     return { ...state, requestInProgress: false, stdout: action.stdout || "", stderr: action.stderr || "" };
   case actions.FORMAT_FAILED:
-    return { ...state, requestInProgress: false, error: "Some kind of error" };
+    return { ...state, requestInProgress: false, error: action.error };
   default:
     return state;
   }
