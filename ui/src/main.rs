@@ -116,19 +116,11 @@ impl From<CompileRequest> for sandbox::CompileRequest {
     fn from(me: CompileRequest) -> Self {
         sandbox::CompileRequest {
             target: parse_target(&me.target),
-            channel: me.channel,
+            channel: parse_channel(&me.channel),
             mode: me.mode,
             tests: me.tests,
             code: me.code,
         }
-    }
-}
-
-fn parse_target(s: &str) -> sandbox::CompileTarget {
-    match s {
-        "asm" => sandbox::CompileTarget::Assembly,
-        "llvm-ir" => sandbox::CompileTarget::LlvmIr,
-        _ => panic!("Unknown compilation target {}", s),
     }
 }
 
@@ -162,7 +154,7 @@ struct ExecuteRequest {
 impl From<ExecuteRequest> for sandbox::ExecuteRequest {
     fn from(me: ExecuteRequest) -> Self {
         sandbox::ExecuteRequest {
-            channel: me.channel,
+            channel: parse_channel(&me.channel),
             mode: me.mode,
             tests: me.tests,
             code: me.code,
@@ -216,5 +208,22 @@ impl From<sandbox::FormatResponse> for FormatResponse {
             stdout: me.stdout,
             stderr: me.stderr,
         }
+    }
+}
+
+fn parse_target(s: &str) -> sandbox::CompileTarget {
+    match s {
+        "asm" => sandbox::CompileTarget::Assembly,
+        "llvm-ir" => sandbox::CompileTarget::LlvmIr,
+        _ => panic!("Unknown compilation target {}", s),
+    }
+}
+
+fn parse_channel(s: &str) -> sandbox::Channel {
+    match s {
+        "stable" => sandbox::Channel::Stable,
+        "beta" => sandbox::Channel::Beta,
+        "nightly" => sandbox::Channel::Nightly,
+        _ => panic!("Unknown channel {}", s),
     }
 }

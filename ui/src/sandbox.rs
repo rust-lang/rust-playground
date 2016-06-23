@@ -22,7 +22,7 @@ impl Sandbox {
 
         let mut output_path = self.scratch_dir.as_ref().to_path_buf();
         output_path.push("compiler-output");
-        let mut command = self.compile_command(req.target, &req.channel, &req.mode, req.tests);
+        let mut command = self.compile_command(req.target, req.channel, &req.mode, req.tests);
 
         let output = command.output().expect("Failed to run");
 
@@ -36,7 +36,7 @@ impl Sandbox {
 
     pub fn execute(&self, req: &ExecuteRequest) -> ExecuteResponse {
         self.write_source_code(&req.code);
-        let mut command = self.execute_command(&req.channel, &req.mode, req.tests);
+        let mut command = self.execute_command(req.channel, &req.mode, req.tests);
 
         let output = command.output().expect("Failed to run");
 
@@ -79,10 +79,9 @@ impl Sandbox {
         path
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: &str, mode: &str, tests: bool) -> Command {
+    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: &str, tests: bool) -> Command {
         use self::CompileTarget::*;
 
-        let container = format!("rust-{}", channel);
         let mut cmd = self.docker_command();
 
         let execution_cmd = match (target, mode, tests) {
@@ -97,15 +96,14 @@ impl Sandbox {
             other => panic!("Unknown configuration: {:?}", other),
         };
 
-        cmd.arg(&container).args(&["bash", "-c", execution_cmd]);
+        cmd.arg(&channel.container_name()).args(&["bash", "-c", execution_cmd]);
 
         debug!("Compilation command is {:?}", cmd);
 
         cmd
     }
 
-    fn execute_command(&self, channel: &str, mode: &str, tests: bool) -> Command {
-        let container = format!("rust-{}", channel);
+    fn execute_command(&self, channel: Channel, mode: &str, tests: bool) -> Command {
         let mut cmd = self.docker_command();
 
         let execution_cmd = match (mode, tests) {
@@ -116,7 +114,7 @@ impl Sandbox {
             other => panic!("Unknown configuration: {:?}", other),
         };
 
-        cmd.arg(&container).args(&["bash", "-c", execution_cmd]);
+        cmd.arg(&channel.container_name()).args(&["bash", "-c", execution_cmd]);
 
         debug!("Execution command is {:?}", cmd);
 
@@ -169,10 +167,29 @@ pub enum CompileTarget {
     LlvmIr,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Channel {
+    Stable,
+    Beta,
+    Nightly,
+}
+
+impl Channel {
+    fn container_name(&self) -> &'static str {
+        use self::Channel::*;
+
+        match *self {
+            Stable => "rust-stable",
+            Beta => "rust-beta",
+            Nightly => "rust-nightly",
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct CompileRequest {
     pub target: CompileTarget,
-    pub channel: String,
+    pub channel: Channel,
     pub mode: String,
     pub tests: bool,
     pub code: String,
@@ -188,7 +205,7 @@ pub struct CompileResponse {
 
 #[derive(Debug, Clone)]
 pub struct ExecuteRequest {
-    pub channel: String,
+    pub channel: Channel,
     pub mode: String,
     pub tests: bool,
     pub code: String,
