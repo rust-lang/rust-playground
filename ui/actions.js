@@ -32,20 +32,23 @@ function receiveExecuteFailure(json) {
 function jsonPost(urlObj, body) {
   const urlStr = url.format(urlObj);
 
-  // TODO: JSON content-type
   return fetch(urlStr, {
     method: 'post',
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify(body)
   })
-    .catch(error => { error })
+    .catch(error => { return { error }; })
     .then(response => {
       if (response.ok) {
         return response.json();
       } else {
-        return response.json().then(j => Promise.reject(j));
+        return response.json()
+          .then(j => Promise.reject(j))
+          .catch(e => { return Promise.reject({ error: e.toString() }); });
       }
-    })
-  ;
+    });
 }
 
 const routes = {
