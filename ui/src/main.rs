@@ -187,6 +187,10 @@ impl Sandbox {
             ("llvm-ir", "debug", true) => r#"rustc --test main.rs -o compiler-output --emit llvm-ir"#,
             ("llvm-ir", "release", false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit llvm-ir"#,
             ("llvm-ir", "release", true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit llvm-ir"#,
+            ("asm", "debug", false) => r#"rustc main.rs -o compiler-output --emit asm"#,
+            ("asm", "debug", true) => r#"rustc --test main.rs -o compiler-output --emit asm"#,
+            ("asm", "release", false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit asm"#,
+            ("asm", "release", true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit asm"#,
             other => panic!("Unknown configuration: {:?}", other),
         };
 

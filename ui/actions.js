@@ -92,6 +92,7 @@ function performCompile(target) {
   };
 }
 
+export const performCompileToAssembly = () => performCompile('asm');
 export const performCompileToLLVM = () => performCompile('llvm-ir');
 
 export const EDIT_CODE = 'EDIT_CODE';

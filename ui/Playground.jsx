@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { changeChannel, changeMode, performExecute, performCompileToLLVM, performFormat, editCode } from './actions';
+import { changeChannel, changeMode, performExecute, performCompileToAssembly, performCompileToLLVM, performFormat, editCode } from './actions';
 import { connect } from 'react-redux';
 import Header from './Header.jsx';
 import Editor from './Editor.jsx';
@@ -9,14 +9,17 @@ class Playground extends React.Component {
   render() {
     const { code,
             status: { code: compiledCode, stdout, stderr },
-            execute, compileToLLVM, format,
+            execute, compileToAssembly, compileToLLVM, format,
             configuration: { channel, mode, tests },
             changeChannel, changeMode, onEditCode
           } = this.props;
 
     return (
       <div>
-        <Header execute={execute} compileToLLVM={compileToLLVM} format={format}
+        <Header execute={execute}
+                compileToAssembly={compileToAssembly}
+                compileToLLVM={compileToLLVM}
+                format={format}
                 channel={channel} changeChannel={changeChannel}
                 mode={mode} changeMode={changeMode}
                 tests={tests} />
@@ -29,6 +32,7 @@ class Playground extends React.Component {
 
 Playground.propTypes = {
   execute: PropTypes.func.isRequired,
+  compileToAssembly: PropTypes.func.isRequired,
   compileToLLVM: PropTypes.func.isRequired,
   format: PropTypes.func.isRequired,
   configuration: PropTypes.object.isRequired,
@@ -48,24 +52,13 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    changeChannel: (channel) => {
-      dispatch(changeChannel(channel));
-    },
-    changeMode: (mode) => {
-      dispatch(changeMode(mode));
-    },
-    execute: () => {
-      dispatch(performExecute());
-    },
-    compileToLLVM: () => {
-      dispatch(performCompileToLLVM());
-    },
-    format: () => {
-      dispatch(performFormat());
-    },
-    onEditCode: (code) => {
-      dispatch(editCode(code));
-    }
+    changeChannel: (channel) => dispatch(changeChannel(channel)),
+    changeMode: (mode) => dispatch(changeMode(mode)),
+    execute: () => dispatch(performExecute()),
+    compileToAssembly: () => dispatch(performCompileToAssembly()),
+    compileToLLVM: () => dispatch(performCompileToLLVM()),
+    format: () => dispatch(performFormat()),
+    onEditCode: (code) => dispatch(editCode(code))
   };
 };
 
