@@ -97,7 +97,7 @@ impl Sandbox {
 
     pub fn compile(&self, req: &CompileRequest) -> CompileResponse {
         self.write_source_code(&req.code);
-        let mut command = self.compile_command(&req.channel);
+        let mut command = self.compile_command(&req.channel, &req.mode);
 
         let output = command.output().expect("Failed to run");
 
@@ -140,11 +140,17 @@ impl Sandbox {
         path
     }
 
-    fn compile_command(&self, channel: &str) -> Command {
+    fn compile_command(&self, channel: &str, mode: &str) -> Command {
         let container = format!("rust-{}", channel);
         let mut cmd = self.docker_command();
 
-        cmd.arg(&container).args(&["bash", "-c", r#"rustc main.rs && ./main"#]);
+        let execution_cmd = if mode == "debug" {
+            r#"rustc main.rs && ./main"#
+        } else {
+            r#"rustc -C opt-level=3 main.rs && ./main"#
+        };
+
+        cmd.arg(&container).args(&["bash", "-c", execution_cmd]);
 
         debug!("Compilation command is {:?}", cmd);
 
@@ -190,6 +196,7 @@ fn read(path: &Path) -> String {
 #[derive(Debug, Clone, Deserialize)]
 struct CompileRequest {
     channel: String,
+    mode: String,
     code: String,
 }
 

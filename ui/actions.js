@@ -2,9 +2,14 @@ import fetch from 'isomorphic-fetch';
 import url from 'url';
 
 export const CHANGE_CHANNEL = 'CHANGE_CHANNEL';
+export const CHANGE_MODE = 'CHANGE_MODE';
 
 export function changeChannel(channel) {
   return { type: CHANGE_CHANNEL, channel };
+}
+
+export function changeMode(mode) {
+  return { type: CHANGE_MODE, mode };
 }
 
 export const REQUEST_BUILD = 'REQUEST_BUILD';
@@ -33,13 +38,14 @@ export function performBuild() {
     const compileUrl = url.format({ pathname: '/compile' });
 
     const state = getState();
-    const { code, configuration: { channel } } = state;
+    const { code, configuration: { channel, mode } } = state;
 
     return fetch(compileUrl, {
       method: 'post',
       body: JSON.stringify({
         channel,
-        code
+        code,
+        mode
       })
     })
       .then(response => response.json())

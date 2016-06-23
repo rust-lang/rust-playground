@@ -2,13 +2,16 @@ import { combineReducers } from 'redux';
 import * as actions from './actions';
 
 const defaultConfiguration = {
-  channel: "stable"
+  channel: "stable",
+  mode: "debug"
 };
 
 const configuration = (state = defaultConfiguration, action) => {
   switch (action.type) {
   case actions.CHANGE_CHANNEL:
     return { ...state, channel: action.channel };
+  case actions.CHANGE_MODE:
+    return { ...state, mode: action.mode };
   default:
     return state;
   }
