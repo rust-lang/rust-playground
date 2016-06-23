@@ -1821,6 +1821,11 @@
       "from": "redux-devtools-instrument@>=1.0.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/redux-devtools-instrument/-/redux-devtools-instrument-1.0.1.tgz"
     },
+    "redux-localstorage": {
+      "version": "0.4.1",
+      "from": "redux-localstorage@latest",
+      "resolved": "https://registry.npmjs.org/redux-localstorage/-/redux-localstorage-0.4.1.tgz"
+    },
     "redux-thunk": {
       "version": "2.1.0",
       "from": "redux-thunk@latest",
