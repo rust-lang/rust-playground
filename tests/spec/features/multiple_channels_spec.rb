@@ -5,7 +5,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
 
   before :each do
     visit '/'
-    set_editor(version_code)
+    editor.set(version_code)
   end
 
   scenario "using stable Rust" do
@@ -41,10 +41,8 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
     end
   end
 
-  def set_editor(text)
-    within("#editor") do
-      find('.ace_text-input', visible: false).set(text)
-    end
+  def editor
+    Editor.new(page)
   end
 
   def version_code
