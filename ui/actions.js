@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import url from 'url';
+import { load } from './gist';
 
 export const CHANGE_CHANNEL = 'CHANGE_CHANNEL';
 export const CHANGE_MODE = 'CHANGE_MODE';
@@ -127,6 +128,32 @@ export function performFormat() {
 
     return jsonPost(routes.format, body)
       .then(json => dispatch(receiveFormatSuccess(json)));
+    // TODO: Failure case
+  };
+}
+
+export const REQUEST_GIST_LOAD = 'REQUEST_GIST_LOAD';
+export const GIST_LOAD_SUCCEEDED = 'GIST_LOAD_SUCCEEDED';
+export const GIST_LOAD_FAILED = 'GIST_LOAD_FAILED';
+
+function requestGistLoad() {
+  return { type: REQUEST_GIST_LOAD };
+}
+
+function receiveGistLoadSuccess(code) {
+  return { type: GIST_LOAD_SUCCEEDED, code };
+}
+
+function receiveGistLoadFailure() {
+  return { type: GIST_LOAD_FAILED };
+}
+
+export function performGistLoad(id) {
+  return function (dispatch, getState) {
+    dispatch(requestGistLoad());
+
+    load(id)
+      .then(code => dispatch(receiveGistLoadSuccess(code)));
     // TODO: Failure case
   };
 }

@@ -26,10 +26,17 @@ const configuration = (state = defaultConfiguration, action) => {
 
 const code = (state = "", action) => {
   switch (action.type) {
+  case actions.REQUEST_GIST_LOAD:
+    return "";
+  case actions.GIST_LOAD_SUCCEEDED:
+    return action.code;
+
   case actions.EDIT_CODE:
     return action.code;
+
   case actions.FORMAT_SUCCEEDED:
     return action.code;
+
   default:
     return state;
   }
@@ -45,6 +52,13 @@ const defaultStatus = {
 
 const status = (state = defaultStatus, action) => {
   switch (action.type) {
+  case actions.REQUEST_GIST_LOAD:
+    return { ...state, requestInProgress: true };
+  case actions.GIST_LOAD_SUCCEEDED:
+    return { ...state, requestInProgress: false };
+  case actions.GIST_LOAD_FAILED:
+    return { ...state, requestInProgress: false, error: "Some kind of error" };
+
   case actions.REQUEST_COMPILE:
     return { ...state, requestInProgress: true, error: "" };
   case actions.COMPILE_SUCCEEDED:

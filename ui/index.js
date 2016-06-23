@@ -7,15 +7,25 @@ import { applyMiddleware, createStore, compose } from 'redux';
 import createLogger from 'redux-logger';
 import thunk from 'redux-thunk';
 import persistState from 'redux-localstorage';
+import url from 'url';
 
 import { serialize, deserialize } from './local_storage';
 import playgroundApp from './reducers';
+import { performGistLoad } from './actions';
 import Playground from './Playground.jsx';
 
 const logger = createLogger(); // TODO: Development only
 const middlewares = applyMiddleware(thunk, logger);
 const enhancers = compose(middlewares, persistState(undefined, { serialize, deserialize }));
 const store = createStore(playgroundApp, enhancers);
+
+// Process query parameters
+const urlObj = url.parse(window.location.href, true);
+const query = urlObj.query;
+
+if (query.gist) {
+  store.dispatch(performGistLoad(query.gist));
+}
 
 ReactDOM.render(
   <Provider store={store}>
