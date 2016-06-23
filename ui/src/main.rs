@@ -20,7 +20,7 @@ use staticfile::Static;
 use iron::prelude::*;
 use iron::status;
 
-use sandbox::{Sandbox, CompileRequest, ExecuteRequest, FormatRequest};
+use sandbox::Sandbox;
 
 const DEFAULT_ADDRESS: &'static str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
@@ -48,7 +48,7 @@ fn compile(req: &mut Request) -> IronResult<Response> {
     match req.get::<bodyparser::Struct<CompileRequest>>() {
         Ok(Some(req)) => {
             let sandbox = Sandbox::new();
-            let resp = sandbox.compile(&req);
+            let resp = CompileResponse::from(sandbox.compile(&req.into()));
             let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
 
             Ok(Response::with((status::Ok, body)))
@@ -68,7 +68,7 @@ fn execute(req: &mut Request) -> IronResult<Response> {
     match req.get::<bodyparser::Struct<ExecuteRequest>>() {
         Ok(Some(req)) => {
             let sandbox = Sandbox::new();
-            let resp = sandbox.execute(&req);
+            let resp = ExecuteResponse::from(sandbox.execute(&req.into()));
             let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
 
             Ok(Response::with((status::Ok, body)))
@@ -88,7 +88,7 @@ fn format(req: &mut Request) -> IronResult<Response> {
     match req.get::<bodyparser::Struct<FormatRequest>>() {
         Ok(Some(req)) => {
             let sandbox = Sandbox::new();
-            let resp = sandbox.format(&req);
+            let resp = FormatResponse::from(sandbox.format(&req.into()));
             let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
             Ok(Response::with((status::Ok, body)))
         }
@@ -99,6 +99,114 @@ fn format(req: &mut Request) -> IronResult<Response> {
         Err(_) => {
             // TODO: real error
             Ok(Response::with((status::Ok, r#"{ "code": "FAIL2" }"#)))
+        }
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct CompileRequest {
+    target: String,
+    channel: String,
+    mode: String,
+    tests: bool,
+    code: String,
+}
+
+impl From<CompileRequest> for sandbox::CompileRequest {
+    fn from(me: CompileRequest) -> Self {
+        sandbox::CompileRequest {
+            target: me.target,
+            channel: me.channel,
+            mode: me.mode,
+            tests: me.tests,
+            code: me.code,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct CompileResponse {
+    success: bool,
+    code: String,
+    stdout: String,
+    stderr: String,
+}
+
+impl From<sandbox::CompileResponse> for CompileResponse {
+    fn from(me: sandbox::CompileResponse) -> Self {
+        CompileResponse {
+            success: me.success,
+            code: me.code,
+            stdout: me.stdout,
+            stderr: me.stderr,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct ExecuteRequest {
+    channel: String,
+    mode: String,
+    tests: bool,
+    code: String,
+}
+
+impl From<ExecuteRequest> for sandbox::ExecuteRequest {
+    fn from(me: ExecuteRequest) -> Self {
+        sandbox::ExecuteRequest {
+            channel: me.channel,
+            mode: me.mode,
+            tests: me.tests,
+            code: me.code,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct ExecuteResponse {
+    success: bool,
+    stdout: String,
+    stderr: String,
+}
+
+impl From<sandbox::ExecuteResponse> for ExecuteResponse {
+    fn from(me: sandbox::ExecuteResponse) -> Self {
+        ExecuteResponse {
+            success: me.success,
+            stdout: me.stdout,
+            stderr: me.stderr,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct FormatRequest {
+    code: String,
+}
+
+impl From<FormatRequest> for sandbox::FormatRequest {
+    fn from(me: FormatRequest) -> Self {
+        sandbox::FormatRequest {
+            code: me.code,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct FormatResponse {
+    success: bool,
+    code: String,
+    stdout: String,
+    stderr: String,
+}
+
+impl From<sandbox::FormatResponse> for FormatResponse {
+    fn from(me: sandbox::FormatResponse) -> Self {
+        FormatResponse {
+            success: me.success,
+            code: me.code,
+            stdout: me.stdout,
+            stderr: me.stderr,
         }
     }
 }

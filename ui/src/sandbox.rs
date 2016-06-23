@@ -161,7 +161,7 @@ fn read(path: &Path) -> Option<String> {
     Some(s)
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct CompileRequest {
     pub target: String,
     pub channel: String,
@@ -170,7 +170,7 @@ pub struct CompileRequest {
     pub code: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct CompileResponse {
     pub success: bool,
     pub code: String,
@@ -178,7 +178,7 @@ pub struct CompileResponse {
     pub stderr: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct ExecuteRequest {
     pub channel: String,
     pub mode: String,
@@ -186,19 +186,19 @@ pub struct ExecuteRequest {
     pub code: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct ExecuteResponse {
     pub success: bool,
     pub stdout: String,
     pub stderr: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct FormatRequest {
     pub code: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct FormatResponse {
     pub success: bool,
     pub code: String,
