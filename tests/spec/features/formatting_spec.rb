@@ -1,9 +1,7 @@
 require 'spec_helper'
 require 'support/editor'
 
-RSpec.feature "Multiple Rust versions", type: :feature, js: true do
-  # TODO: Automatically start server?
-
+RSpec.feature "Formatting source code", type: :feature, js: true do
   before :each do
     visit '/'
   end
