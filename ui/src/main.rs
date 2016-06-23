@@ -14,13 +14,15 @@ extern crate mktemp;
 #[macro_use]
 extern crate quick_error;
 
+use std::any::Any;
 use std::env;
 use std::path::PathBuf;
 
-use mount::Mount;
-use staticfile::Static;
 use iron::prelude::*;
 use iron::status;
+use mount::Mount;
+use serde::{Serialize, Deserialize};
+use staticfile::Static;
 
 use sandbox::Sandbox;
 
@@ -47,34 +49,37 @@ fn main() {
 }
 
 fn compile(req: &mut Request) -> IronResult<Response> {
-    match req.get::<bodyparser::Struct<CompileRequest>>() {
-        Ok(Some(req)) => {
-            let sandbox = Sandbox::new().expect("Unable to create sandbox");
-            let resp = CompileResponse::from(sandbox.compile(&req.into()).expect("Unable to compile"));
-            let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
-
-            Ok(Response::with((status::Ok, body)))
-        }
-        Ok(None) => {
-            // TODO: real error
-            Ok(Response::with((status::Ok, r#"{ "output": "FAIL1" }"#)))
-        },
-        Err(_) => {
-            // TODO: real error
-            Ok(Response::with((status::Ok, r#"{ "output": "FAIL2" }"#)))
-        }
-    }
+    with_sandbox(req, |sandbox, req: CompileRequest| {
+        sandbox.compile(&req.into()).map(CompileResponse::from)
+    })
 }
 
 fn execute(req: &mut Request) -> IronResult<Response> {
-    match req.get::<bodyparser::Struct<ExecuteRequest>>() {
+    with_sandbox(req, |sandbox, req: ExecuteRequest| {
+        sandbox.execute(&req.into()).map(ExecuteResponse::from)
+    })
+}
+
+fn format(req: &mut Request) -> IronResult<Response> {
+    with_sandbox(req, |sandbox, req: FormatRequest| {
+        sandbox.format(&req.into()).map(FormatResponse::from)
+    })
+}
+
+fn with_sandbox<Req, Resp, F>(req: &mut Request, f: F) -> IronResult<Response>
+    where F: FnOnce(Sandbox, Req) -> sandbox::Result<Resp>,
+          Req: Deserialize + Clone + Any + 'static,
+          Resp: Serialize,
+{
+    match req.get::<bodyparser::Struct<Req>>() {
         Ok(Some(req)) => {
-            let sandbox = Sandbox::new().expect("Unable to create sandbox");;
-            let resp = ExecuteResponse::from(sandbox.execute(&req.into()).expect("Unable to execute"));
-            let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
+            let sandbox = Sandbox::new().expect("Unable to create sandbox");
+
+            let resp = f(sandbox, req).expect("Sandbox request failed");
+            let body = serde_json::ser::to_string(&resp).expect("Can't serialize response");
 
             Ok(Response::with((status::Ok, body)))
-        }
+        },
         Ok(None) => {
             // TODO: real error
             Ok(Response::with((status::Ok, r#"{ "output": "FAIL1" }"#)))
@@ -82,26 +87,7 @@ fn execute(req: &mut Request) -> IronResult<Response> {
         Err(_) => {
             // TODO: real error
             Ok(Response::with((status::Ok, r#"{ "output": "FAIL2" }"#)))
-        }
-    }
-}
-
-fn format(req: &mut Request) -> IronResult<Response> {
-    match req.get::<bodyparser::Struct<FormatRequest>>() {
-        Ok(Some(req)) => {
-            let sandbox = Sandbox::new().expect("Unable to create sandbox");;
-            let resp = FormatResponse::from(sandbox.format(&req.into()).expect("Unable to format"));
-            let body = serde_json::ser::to_string(&resp).expect("Can't serialize");
-            Ok(Response::with((status::Ok, body)))
-        }
-        Ok(None) => {
-            // TODO: real error
-            Ok(Response::with((status::Ok, r#"{ "code": "FAIL1" }"#)))
         },
-        Err(_) => {
-            // TODO: real error
-            Ok(Response::with((status::Ok, r#"{ "code": "FAIL2" }"#)))
-        }
     }
 }
 
