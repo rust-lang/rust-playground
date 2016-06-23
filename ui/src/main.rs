@@ -117,7 +117,7 @@ impl From<CompileRequest> for sandbox::CompileRequest {
         sandbox::CompileRequest {
             target: parse_target(&me.target),
             channel: parse_channel(&me.channel),
-            mode: me.mode,
+            mode: parse_mode(&me.mode),
             tests: me.tests,
             code: me.code,
         }
@@ -155,7 +155,7 @@ impl From<ExecuteRequest> for sandbox::ExecuteRequest {
     fn from(me: ExecuteRequest) -> Self {
         sandbox::ExecuteRequest {
             channel: parse_channel(&me.channel),
-            mode: me.mode,
+            mode: parse_mode(&me.mode),
             tests: me.tests,
             code: me.code,
         }
@@ -225,5 +225,13 @@ fn parse_channel(s: &str) -> sandbox::Channel {
         "beta" => sandbox::Channel::Beta,
         "nightly" => sandbox::Channel::Nightly,
         _ => panic!("Unknown channel {}", s),
+    }
+}
+
+fn parse_mode(s: &str) -> sandbox::Mode {
+    match s {
+        "debug" => sandbox::Mode::Debug,
+        "release" => sandbox::Mode::Release,
+        _ => panic!("Unknown mode {}", s),
     }
 }

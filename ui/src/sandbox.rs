@@ -22,7 +22,7 @@ impl Sandbox {
 
         let mut output_path = self.scratch_dir.as_ref().to_path_buf();
         output_path.push("compiler-output");
-        let mut command = self.compile_command(req.target, req.channel, &req.mode, req.tests);
+        let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests);
 
         let output = command.output().expect("Failed to run");
 
@@ -36,7 +36,7 @@ impl Sandbox {
 
     pub fn execute(&self, req: &ExecuteRequest) -> ExecuteResponse {
         self.write_source_code(&req.code);
-        let mut command = self.execute_command(req.channel, &req.mode, req.tests);
+        let mut command = self.execute_command(req.channel, req.mode, req.tests);
 
         let output = command.output().expect("Failed to run");
 
@@ -79,21 +79,21 @@ impl Sandbox {
         path
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: &str, tests: bool) -> Command {
+    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool) -> Command {
         use self::CompileTarget::*;
+        use self::Mode::*;
 
         let mut cmd = self.docker_command();
 
         let execution_cmd = match (target, mode, tests) {
-            (LlvmIr, "debug", false) => r#"rustc main.rs -o compiler-output --emit llvm-ir"#,
-            (LlvmIr, "debug", true) => r#"rustc --test main.rs -o compiler-output --emit llvm-ir"#,
-            (LlvmIr, "release", false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit llvm-ir"#,
-            (LlvmIr, "release", true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit llvm-ir"#,
-            (Assembly, "debug", false) => r#"rustc main.rs -o compiler-output --emit asm"#,
-            (Assembly, "debug", true) => r#"rustc --test main.rs -o compiler-output --emit asm"#,
-            (Assembly, "release", false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit asm"#,
-            (Assembly, "release", true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit asm"#,
-            other => panic!("Unknown configuration: {:?}", other),
+            (LlvmIr, Debug, false) => r#"rustc main.rs -o compiler-output --emit llvm-ir"#,
+            (LlvmIr, Debug, true) => r#"rustc --test main.rs -o compiler-output --emit llvm-ir"#,
+            (LlvmIr, Release, false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit llvm-ir"#,
+            (LlvmIr, Release, true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit llvm-ir"#,
+            (Assembly, Debug, false) => r#"rustc main.rs -o compiler-output --emit asm"#,
+            (Assembly, Debug, true) => r#"rustc --test main.rs -o compiler-output --emit asm"#,
+            (Assembly, Release, false) => r#"rustc -C opt-level=3 main.rs -o compiler-output --emit asm"#,
+            (Assembly, Release, true) => r#"rustc -C opt-level=3 --test main.rs -o compiler-output --emit asm"#,
         };
 
         cmd.arg(&channel.container_name()).args(&["bash", "-c", execution_cmd]);
@@ -103,15 +103,16 @@ impl Sandbox {
         cmd
     }
 
-    fn execute_command(&self, channel: Channel, mode: &str, tests: bool) -> Command {
+    fn execute_command(&self, channel: Channel, mode: Mode, tests: bool) -> Command {
+        use self::Mode::*;
+
         let mut cmd = self.docker_command();
 
         let execution_cmd = match (mode, tests) {
-            ("debug", false) => r#"rustc main.rs && ./main"#,
-            ("debug", true) => r#"rustc --test main.rs && ./main"#,
-            ("release", false) => r#"rustc -C opt-level=3 main.rs && ./main"#,
-            ("release", true) => r#"rustc -C opt-level=3 --test main.rs && ./main"#,
-            other => panic!("Unknown configuration: {:?}", other),
+            (Debug, false) => r#"rustc main.rs && ./main"#,
+            (Debug, true) => r#"rustc --test main.rs && ./main"#,
+            (Release, false) => r#"rustc -C opt-level=3 main.rs && ./main"#,
+            (Release, true) => r#"rustc -C opt-level=3 --test main.rs && ./main"#,
         };
 
         cmd.arg(&channel.container_name()).args(&["bash", "-c", execution_cmd]);
@@ -186,11 +187,17 @@ impl Channel {
     }
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Mode {
+    Debug,
+    Release,
+}
+
 #[derive(Debug, Clone)]
 pub struct CompileRequest {
     pub target: CompileTarget,
     pub channel: Channel,
-    pub mode: String,
+    pub mode: Mode,
     pub tests: bool,
     pub code: String,
 }
@@ -206,7 +213,7 @@ pub struct CompileResponse {
 #[derive(Debug, Clone)]
 pub struct ExecuteRequest {
     pub channel: Channel,
-    pub mode: String,
+    pub mode: Mode,
     pub tests: bool,
     pub code: String,
 }
