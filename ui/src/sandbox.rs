@@ -167,6 +167,7 @@ impl Sandbox {
 
         cmd
             .arg("run")
+            .arg("--rm")
             .arg("--volume").arg(&mount_source_volume)
             .args(&["--workdir", DIR_INSIDE_CONTAINER])
             .args(&["--net", "none"])
