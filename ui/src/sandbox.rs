@@ -171,7 +171,8 @@ impl Sandbox {
             .args(&["--workdir", DIR_INSIDE_CONTAINER])
             .args(&["--net", "none"])
             .args(&["--memory", "256m"])
-            .args(&["--memory-swap", "320m"]);
+            .args(&["--memory-swap", "320m"])
+            .args(&["--env", "PLAYGROUND_TIMEOUT=10"]);
 
         cmd
     }
@@ -344,7 +345,30 @@ mod test {
         let sb = Sandbox::new().expect("Unable to create sandbox");
         let resp = sb.execute(&req).expect("Unable to execute code");
 
+        println!("{:?}", resp);
         assert!(resp.stderr.contains("Killed"));
-        assert!(resp.stderr.contains("./main"));
+    }
+
+    #[test]
+    fn wallclock_time_is_limited() {
+        let code = r#"
+            fn main() {
+                let a_long_time = std::time::Duration::from_secs(20);
+                std::thread::sleep(a_long_time);
+            }
+        "#;
+
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            tests: false,
+            code: code.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.execute(&req).expect("Unable to execute code");
+
+        println!("{:?}", resp);
+        assert!(resp.stderr.contains("Killed"));
     }
 }
