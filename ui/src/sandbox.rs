@@ -168,7 +168,8 @@ impl Sandbox {
         cmd
             .arg("run")
             .arg("--volume").arg(&mount_source_volume)
-            .args(&["--workdir", DIR_INSIDE_CONTAINER]);
+            .args(&["--workdir", DIR_INSIDE_CONTAINER])
+            .args(&["--net", "none"]);
 
         cmd
     }
@@ -291,4 +292,33 @@ pub struct FormatResponse {
     pub code: String,
     pub stdout: String,
     pub stderr: String,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn network_connections_are_disabled() {
+        let code = r#"
+            fn main() {
+                match ::std::net::TcpStream::connect("google.com:80") {
+                    Ok(_) => println!("Able to connect to the outside world"),
+                    Err(e) => println!("Failed to connect {}, {:?}", e, e),
+                }
+            }
+        "#;
+
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            tests: false,
+            code: code.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.execute(&req).expect("Unable to execute code");
+
+        assert!(resp.stdout.contains("Failed to connect"));
+    }
 }
