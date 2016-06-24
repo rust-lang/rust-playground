@@ -1,3 +1,4 @@
+var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
@@ -31,6 +32,7 @@ module.exports = {
       title: "Rust Playground",
       template: 'index.ejs'
     }),
-    new ExtractTextPlugin("styles.css")
+    new ExtractTextPlugin("styles.css"),
+    new webpack.EnvironmentPlugin(["NODE_ENV"])
   ]
 };
