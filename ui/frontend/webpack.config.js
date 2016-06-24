@@ -1,7 +1,11 @@
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
-  entry: './index.js',
+  entry: [
+    './index.js',
+    './index.scss'
+  ],
 
   output: {
     path: './build',
@@ -13,7 +17,11 @@ module.exports = {
       {
         test: [/\.js$/, /\.jsx$/],
         exclude: /node_modules/,
-        loader: 'babel-loader'
+        loader: 'babel'
+      },
+      {
+        test: /\.scss$/,
+        loader: ExtractTextPlugin.extract("style", ["css", "sass"])
       }
     ]
   },
@@ -22,6 +30,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "Rust Playground",
       template: 'index.ejs'
-    })
+    }),
+    new ExtractTextPlugin("styles.css")
   ]
 };
