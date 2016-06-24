@@ -1,3 +1,5 @@
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+
 module.exports = {
   entry: './index.js',
 
@@ -14,5 +16,12 @@ module.exports = {
         loader: 'babel-loader'
       }
     ]
-  }
+  },
+
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: "Rust Playground",
+      template: 'index.ejs'
+    })
+  ]
 };
