@@ -169,7 +169,9 @@ impl Sandbox {
             .arg("run")
             .arg("--volume").arg(&mount_source_volume)
             .args(&["--workdir", DIR_INSIDE_CONTAINER])
-            .args(&["--net", "none"]);
+            .args(&["--net", "none"])
+            .args(&["--memory", "256m"])
+            .args(&["--memory-swap", "320m"]);
 
         cmd
     }
@@ -320,5 +322,29 @@ mod test {
         let resp = sb.execute(&req).expect("Unable to execute code");
 
         assert!(resp.stdout.contains("Failed to connect"));
+    }
+
+    #[test]
+    fn memory_usage_is_limited() {
+        let code = r#"
+            fn main() {
+                let megabyte = 1024 * 1024;
+                let mut big = vec![0u8; 384 * megabyte];
+                *big.last_mut().unwrap() += 1;
+            }
+        "#;
+
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            tests: false,
+            code: code.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.execute(&req).expect("Unable to execute code");
+
+        assert!(resp.stderr.contains("Killed"));
+        assert!(resp.stderr.contains("./main"));
     }
 }
