@@ -24,7 +24,11 @@ const configuration = (state = defaultConfiguration, action) => {
   }
 };
 
-const code = (state = "", action) => {
+const defaultCode = `fn main() {
+    println!("Hello, world!");
+}`;
+
+const code = (state = defaultCode, action) => {
   switch (action.type) {
   case actions.REQUEST_GIST_LOAD:
     return "";
