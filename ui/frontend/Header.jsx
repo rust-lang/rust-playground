@@ -1,13 +1,12 @@
 import React, { PropTypes } from 'react';
 
 function oneRadio(name, currentValue, possibleValue, change, labelText) {
-  return (
-    <label>
-      <input type="radio" name={name}
-             checked={ currentValue === possibleValue } onChange={ () => change(possibleValue) } />
-        <span>{labelText}</span>
-    </label>
-  );
+  const id = `${name}-${possibleValue}`;
+  return [
+    <input className="header-radio" type="radio" name={name} id={id} key={`${id}-input`}
+           checked={ currentValue === possibleValue } onChange={ () => change(possibleValue) } />,
+    <label className="header-radio-label" htmlFor={id} key={`${id}-label`}>{labelText}</label>
+  ];
 }
 
 export default class Header extends React.Component {
@@ -26,17 +25,38 @@ export default class Header extends React.Component {
     const executionLabel = tests ? "Test" : "Run";
 
     return (
-      <div>
-        <button onClick={ execute }>{ executionLabel }</button>
-        <button onClick={ compileToAssembly }>ASM</button>
-        <button onClick={ compileToLLVM }>LLVM IR</button>
-        <button onClick={ format }>Format</button>
-        <button onClick={ saveToGist }>Gist</button>
-        { oneChannel("stable", "Stable") }
-        { oneChannel("beta", "Beta") }
-        { oneChannel("nightly", "Nightly") }
-        { oneMode("debug", "Debug") }
-        { oneMode("release", "Release") }
+      <div className="header">
+        <div className="header-compilation header-set">
+          <button className="header-btn header-btn-primary"
+                  onClick={ execute }>{ executionLabel }</button>
+          <button className="header-btn"
+                  onClick={ compileToAssembly }>ASM</button>
+          <button className="header-btn"
+                  onClick={ compileToLLVM }>LLVM IR</button>
+        </div>
+
+        <div className="header-format header-set">
+          <button className="header-btn"
+                  onClick={ format }>Format</button>
+        </div>
+
+        <div className="header-sharing header-set">
+          <button className="header-btn"
+                  onClick={ saveToGist }>Gist</button>
+        </div>
+
+        <div className="header-mode header-set">
+          <legend className="header-radio-title">Mode</legend>
+          { oneMode("debug", "Debug") }
+          { oneMode("release", "Release") }
+        </div>
+
+        <div className="header-channel header-set">
+          <legend className="header-radio-title">Channel</legend>
+          { oneChannel("stable", "Stable") }
+          { oneChannel("beta", "Beta") }
+          { oneChannel("nightly", "Nightly") }
+        </div>
       </div>
     );
   }

@@ -13,14 +13,17 @@ export default class Editor extends React.Component {
     const { code, onEditCode } = this.props;
 
     return (
-      <AceEditor
-         mode="rust"
-         theme="github"
-         keyboardHandler="emacs"
-         value={ code }
-         onChange={ onEditCode }
-         name="editor"
-         editorProps={ { $blockScrolling: true } } />
+      <div className="editor">
+        <AceEditor
+           mode="rust"
+           theme="github"
+           keyboardHandler="emacs"
+           value={ code }
+           onChange={ onEditCode }
+           name="editor"
+           width="auto"
+           editorProps={ { $blockScrolling: true } } />
+      </div>
     );
   }
 };
