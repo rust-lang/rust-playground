@@ -10,7 +10,7 @@ module.exports = {
 
   output: {
     path: './build',
-    filename: 'index.js'
+    filename: 'index-[hash].js'
   },
 
   module: {
@@ -32,7 +32,7 @@ module.exports = {
       title: "Rust Playground",
       template: 'index.ejs'
     }),
-    new ExtractTextPlugin("styles.css"),
+    new ExtractTextPlugin("styles-[hash].css"),
     new webpack.EnvironmentPlugin(["NODE_ENV"])
   ]
 };
