@@ -19,6 +19,7 @@ use std::any::Any;
 use std::convert::{TryFrom, TryInto};
 use std::env;
 use std::path::PathBuf;
+use std::time::Duration;
 
 use iron::prelude::*;
 use iron::status;
@@ -33,6 +34,8 @@ const DEFAULT_PORT: u16 = 5000;
 
 mod sandbox;
 
+const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
+
 fn main() {
     env_logger::init().expect("Unable to initialize logger");
 
@@ -41,7 +44,7 @@ fn main() {
     let port = env::var("PLAYGROUND_UI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(DEFAULT_PORT);
 
     let mut mount = Mount::new();
-    mount.mount("/", Static::new(&root));
+    mount.mount("/", Static::new(&root).cache(Duration::from_secs(ONE_YEAR_IN_SECONDS)));
     mount.mount("/compile", compile);
     mount.mount("/execute", execute);
     mount.mount("/format", format);
