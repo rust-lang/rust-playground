@@ -1,14 +1,37 @@
 # Rust Playground Reimplementation
 
-This is an alternate implementation of the [Rust Playground][play].
+This is an [alternate implementation of the Rust Playground][us].
+
+[us]: http://play.integer32.com/
+
+## Why?
+
+At one point, the [official Rust Playground][play] lost the ability to
+run [rustfmt][rustfmt], which is a key piece of functionality for
+me. It also utilized a less-common sandboxing technology.
+
+I saw this as a chance to re-implement the Playground in a new tech
+stack, both as a learning opportunity and as encouragement for other
+people to contribute using technology they are already familiar with.
+
+Since then, the official Playground has re-enabled rustfmt and now
+uses [Docker][docker], but I hope that the frontend stack is more
+comfortable to potential contributors. Because this is the unofficial
+playground, it may also inspire more experimentation that would be
+harder to do in an established piece of software.
 
 [play]: https://play.rust-lang.org/
+[rustfmt]: https://github.com/rust-lang-nursery/rustfmt
 
 ## Architecture
 
-A React frontend communicates with an Iron backend. Docker containers
-are used to provide the various compilers and tool as well as to help
-isolate them.
+A [React][react] frontend communicates with an [Iron][iron]
+backend. [Docker][docker] containers are used to provide the various
+compilers and tool as well as to help isolate them.
+
+[react]: https://facebook.github.io/react/
+[iron]: http://ironframework.io/
+[docker]: https://www.docker.com/
 
 ## Resource Limits
 
