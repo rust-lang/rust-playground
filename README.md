@@ -89,15 +89,9 @@ cd rust-playground
 
 #### Build containers
 ```
-cd compiler/stable
-docker build -t rust-stable .
-cd ../beta
-docker build -t rust-beta .
-cd ../nightly
-docker build -t rust-nightly .
-cd ../rustfmt
-docker build -t rustfmt .
-cd ../../
+cd compiler/
+./build.sh
+cd ../
 ```
 
 #### Build the UI backend
