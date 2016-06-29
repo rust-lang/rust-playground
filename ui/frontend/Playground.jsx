@@ -1,11 +1,13 @@
 import React, { PropTypes } from 'react';
 import {
-  changeChannel, changeMode,
+  changeEditor, changeChannel, changeMode,
   performExecute, performCompileToAssembly, performCompileToLLVM,
   performFormat, performSaveToGist,
-  editCode
+  editCode, toggleConfiguration
 } from './actions';
 import { connect } from 'react-redux';
+
+import Configuration from './Configuration.jsx';
 import Header from './Header.jsx';
 import Editor from './Editor.jsx';
 import Output from './Output.jsx';
@@ -15,21 +17,39 @@ class Playground extends React.Component {
     const { code,
             status: { code: compiledCode, stdout, stderr, error, gist },
             execute, compileToAssembly, compileToLLVM, format, saveToGist,
-            configuration: { channel, mode, tests },
-            changeChannel, changeMode, onEditCode
+            configuration: { channel, mode, tests, editor, shown: showConfig },
+            changeChannel, changeMode, onEditCode, changeEditor,
+            toggleConfiguration
           } = this.props;
+
+    const config = showConfig ? this.renderConfiguration() : null;
 
     return (
       <div>
+        { config }
         <Header execute={execute}
                 compileToAssembly={compileToAssembly}
                 compileToLLVM={compileToLLVM}
                 format={format} saveToGist={saveToGist}
                 channel={channel} changeChannel={changeChannel}
                 mode={mode} changeMode={changeMode}
-                tests={tests} />
-        <Editor code={code} onEditCode={onEditCode} />
+                tests={tests} toggleConfiguration={toggleConfiguration} />
+        <Editor editor={editor} code={code} onEditCode={onEditCode} />
         <Output code={compiledCode} stdout={stdout} stderr={stderr} error={error} gist={gist} />
+      </div>
+    );
+  }
+
+  renderConfiguration() {
+    const { configuration: { editor }, changeEditor, toggleConfiguration } = this.props;
+
+    return (
+      <div className="modal-backdrop">
+        <div className="modal-content">
+          <Configuration editor={editor}
+                         changeEditor={changeEditor}
+                         toggleConfiguration={toggleConfiguration} />
+        </div>
       </div>
     );
   }
@@ -58,6 +78,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    toggleConfiguration: () => dispatch(toggleConfiguration()),
+    changeEditor: (editor) => dispatch(changeEditor(editor)),
     changeChannel: (channel) => dispatch(changeChannel(channel)),
     changeMode: (mode) => dispatch(changeMode(mode)),
     execute: () => dispatch(performExecute()),

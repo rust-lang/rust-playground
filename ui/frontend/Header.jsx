@@ -14,7 +14,8 @@ export default class Header extends React.Component {
     const {
       execute, compileToAssembly, compileToLLVM, format, saveToGist,
       channel, changeChannel, mode, changeMode,
-      tests
+      tests,
+      toggleConfiguration
     } = this.props;
 
     const oneChannel = (value, labelText) =>
@@ -57,6 +58,11 @@ export default class Header extends React.Component {
           { oneChannel("beta", "Beta") }
           { oneChannel("nightly", "Nightly") }
         </div>
+
+        <div className="header-set">
+          <button className="header-btn"
+                  onClick={toggleConfiguration}>Config</button>
+        </div>
       </div>
     );
   }
@@ -72,5 +78,6 @@ Header.propTypes = {
   changeChannel: PropTypes.func.isRequired,
   mode: PropTypes.string.isRequired,
   changeMode: PropTypes.func.isRequired,
-  tests: PropTypes.bool.isRequired
+  tests: PropTypes.bool.isRequired,
+  toggleConfiguration: PropTypes.func.isRequired
 };

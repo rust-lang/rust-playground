@@ -2,8 +2,19 @@ import fetch from 'isomorphic-fetch';
 import url from 'url';
 import { load as loadGist, save as saveGist } from './gist';
 
+export const TOGGLE_CONFIGURATION = 'TOGGLE_CONFIGURATION';
+
+export function toggleConfiguration() {
+  return { type: TOGGLE_CONFIGURATION };
+}
+
+export const CHANGE_EDITOR = 'CHANGE_EDITOR';
 export const CHANGE_CHANNEL = 'CHANGE_CHANNEL';
 export const CHANGE_MODE = 'CHANGE_MODE';
+
+export function changeEditor(editor) {
+  return { type: CHANGE_EDITOR, editor };
+}
 
 export function changeChannel(channel) {
   return { type: CHANGE_CHANNEL, channel };
