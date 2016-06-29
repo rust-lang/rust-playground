@@ -1,3 +1,4 @@
 FROM rust-stable
 
-RUN rustup default beta
+ARG date
+RUN rustup default "beta-${date}"

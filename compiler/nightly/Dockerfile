@@ -1,3 +1,4 @@
 FROM rust-stable
 
-RUN rustup default nightly
+ARG date
+RUN rustup default "nightly-${date}"

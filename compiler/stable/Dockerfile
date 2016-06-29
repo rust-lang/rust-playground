@@ -9,6 +9,9 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 ENV PATH=/root/.cargo/bin:$PATH
 
+ARG date
+RUN rustup default "stable-${date}"
+
 ADD entrypoint.sh /root/
 
 ENTRYPOINT ["/root/entrypoint.sh"]
