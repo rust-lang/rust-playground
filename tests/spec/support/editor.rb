@@ -5,9 +5,7 @@ class Editor
   end
 
   def set(text)
-    page.within("#editor") do
-      page.find('.ace_text-input', visible: false).set(text)
-    end
+    page.execute_script "ace.edit('editor').setValue(#{text.to_json})"
   end
 
   def has_line?(text)
