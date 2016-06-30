@@ -17,7 +17,7 @@ for channel in stable beta nightly; do
     cd ..
 done
 
-for tool in rustfmt clippy; do
+for tool in rustfmt; do
     cd "${tool}"
     docker build -t "${tool}" .
     cd ..

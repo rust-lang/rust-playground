@@ -38,11 +38,8 @@ export default class Header extends React.Component {
         </div>
 
         <div className="header-tools header-set">
-          <legend className="header-title">Tools</legend>
           <button className="header-btn"
                   onClick={ format }>Format</button>
-          <button className="header-btn"
-                  onClick={ clippy }>Clippy</button>
         </div>
 
         <div className="header-sharing header-set">
