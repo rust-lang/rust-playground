@@ -71,9 +71,10 @@ const status = (state = defaultStatus, action) => {
 
   case actions.REQUEST_SAVE_TO_GIST:
     return { ...state, requestInProgress: true };
-  case actions.SAVE_TO_GIST_SUCCEEDED:
+  case actions.SAVE_TO_GIST_SUCCEEDED: {
     let { id, url } = action;
     return { ...state, requestInProgress: false, gist: { id, url } };
+  }
   case actions.SAVE_TO_GIST_FAILED:
     return { ...state, requestInProgress: false, error: "Some kind of error" };
 
@@ -88,15 +89,19 @@ const status = (state = defaultStatus, action) => {
 
   case actions.REQUEST_EXECUTE:
     return { ...state, requestInProgress: true, error: "" };
-  case actions.EXECUTE_SUCCEEDED:
-    return { ...state, requestInProgress: false, stdout: action.stdout || "", stderr: action.stderr || ""};
+  case actions.EXECUTE_SUCCEEDED: {
+    const { stdout = "", stderr = "" } = action;
+    return { ...state, requestInProgress: false, stdout, stderr };
+  }
   case actions.EXECUTE_FAILED:
     return { ...state, requestInProgress: false, error: action.error };
 
   case actions.REQUEST_FORMAT:
     return { ...state, requestInProgress: true, error: "" };
-  case actions.FORMAT_SUCCEEDED:
-    return { ...state, requestInProgress: false, stdout: action.stdout || "", stderr: action.stderr || "" };
+  case actions.FORMAT_SUCCEEDED: {
+    const { stdout = "", stderr = "" } = action;
+    return { ...state, requestInProgress: false, stdout, stderr };
+  }
   case actions.FORMAT_FAILED:
     return { ...state, requestInProgress: false, error: action.error };
 
