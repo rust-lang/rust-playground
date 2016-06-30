@@ -1,14 +1,17 @@
 require 'spec_helper'
 require 'support/editor'
+require 'support/playground_actions'
 
 RSpec.feature "Compiling in different modes", type: :feature, js: true do
+  include PlaygroundActions
+
   before :each do
     visit '/'
     editor.set(compilation_mode_code)
   end
 
   scenario "compiling in debug mode" do
-    choose("Debug")
+    choose_styled("Debug")
     click_on("Run")
 
     within('.output-stderr') do
@@ -22,7 +25,7 @@ RSpec.feature "Compiling in different modes", type: :feature, js: true do
   end
 
   scenario "compiling in release mode" do
-    choose("Release")
+    choose_styled("Release")
     click_on("Run")
 
     within('.output-stdout') do

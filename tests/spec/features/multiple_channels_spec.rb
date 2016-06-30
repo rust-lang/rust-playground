@@ -1,8 +1,9 @@
 require 'spec_helper'
-#require 'support/editor'
+require 'support/editor'
+require 'support/playground_actions'
 
 RSpec.feature "Multiple Rust versions", type: :feature, js: true do
-  # TODO: Automatically start server?
+  include PlaygroundActions
 
   before :each do
     visit '/'
@@ -10,7 +11,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
   end
 
   scenario "using stable Rust" do
-    choose("Stable")
+    choose_styled("Stable")
     click_on("Run")
 
     within('.output-stdout') do
@@ -21,7 +22,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
   end
 
   scenario "using beta Rust" do
-    choose("Beta")
+    choose_styled("Beta")
     click_on("Run")
 
     within('.output-stdout') do
@@ -32,7 +33,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
   end
 
   scenario "using nightly Rust" do
-    choose("Nightly")
+    choose_styled("Nightly")
     click_on("Run")
 
     within('.output-stdout') do
