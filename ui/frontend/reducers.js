@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import * as actions from './actions';
+import output from './reducers/output';
 
 export const defaultConfiguration = {
   shown: false,
@@ -121,7 +122,8 @@ const status = (state = defaultStatus, action) => {
 const playgroundApp = combineReducers({
   configuration,
   code,
-  status
+  status,
+  output
 });
 
 export default playgroundApp;
