@@ -12,7 +12,8 @@ function oneRadio(name, currentValue, possibleValue, change, labelText) {
 export default class Header extends React.Component {
   render() {
     const {
-      execute, compileToAssembly, compileToLLVM, format, saveToGist,
+      execute, compileToAssembly, compileToLLVM,
+      format, clippy, saveToGist,
       channel, changeChannel, mode, changeMode,
       tests,
       toggleConfiguration
@@ -36,9 +37,12 @@ export default class Header extends React.Component {
                   onClick={ compileToLLVM }>LLVM IR</button>
         </div>
 
-        <div className="header-format header-set">
+        <div className="header-tools header-set">
+          <legend className="header-title">Tools</legend>
           <button className="header-btn"
                   onClick={ format }>Format</button>
+          <button className="header-btn"
+                  onClick={ clippy }>Clippy</button>
         </div>
 
         <div className="header-sharing header-set">
@@ -47,13 +51,13 @@ export default class Header extends React.Component {
         </div>
 
         <div className="header-mode header-set">
-          <legend className="header-radio-title">Mode</legend>
+          <legend className="header-title">Mode</legend>
           { oneMode("debug", "Debug") }
           { oneMode("release", "Release") }
         </div>
 
         <div className="header-channel header-set">
-          <legend className="header-radio-title">Channel</legend>
+          <legend className="header-title">Channel</legend>
           { oneChannel("stable", "Stable") }
           { oneChannel("beta", "Beta") }
           { oneChannel("nightly", "Nightly") }
@@ -73,6 +77,7 @@ Header.propTypes = {
   compileToAssembly: PropTypes.func.isRequired,
   compileToLLVM: PropTypes.func.isRequired,
   format: PropTypes.func.isRequired,
+  clippy: PropTypes.func.isRequired,
   saveToGist: PropTypes.func.isRequired,
   channel: PropTypes.string.isRequired,
   changeChannel: PropTypes.func.isRequired,

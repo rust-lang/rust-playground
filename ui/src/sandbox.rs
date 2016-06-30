@@ -103,6 +103,19 @@ impl Sandbox {
         })
     }
 
+    pub fn clippy(&self, req: &ClippyRequest) -> Result<ClippyResponse> {
+        try!(self.write_source_code(&req.code));
+        let mut command = self.clippy_command();
+
+        let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
+
+        Ok(ClippyResponse {
+            success: output.status.success(),
+            stdout: try!(vec_to_str(output.stdout)),
+            stderr: try!(vec_to_str(output.stderr)),
+        })
+    }
+
     fn write_source_code(&self, code: &str) -> Result<PathBuf> {
         let data = code.as_bytes();
 
@@ -152,6 +165,16 @@ impl Sandbox {
         cmd.arg("rustfmt").args(&["main.rs"]);
 
         debug!("Formatting command is {:?}", cmd);
+
+        cmd
+    }
+
+    fn clippy_command(&self) -> Command {
+        let mut cmd = self.docker_command();
+
+        cmd.arg("clippy").args(&["bash", "-c", "cp main.rs /playground/src/main.rs && cd /playground && cargo clippy"]);
+
+        debug!("Clippy command is {:?}", cmd);
 
         cmd
     }
@@ -294,6 +317,18 @@ pub struct FormatRequest {
 pub struct FormatResponse {
     pub success: bool,
     pub code: String,
+    pub stdout: String,
+    pub stderr: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct ClippyRequest {
+    pub code: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct ClippyResponse {
+    pub success: bool,
     pub stdout: String,
     pub stderr: String,
 }

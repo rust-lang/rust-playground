@@ -48,6 +48,7 @@ fn main() {
     mount.mount("/compile", compile);
     mount.mount("/execute", execute);
     mount.mount("/format", format);
+    mount.mount("/clippy", clippy);
 
     info!("Starting the server on {}:{}", address, port);
     Iron::new(mount).http((&*address, port)).expect("Unable to start server");
@@ -78,6 +79,15 @@ fn format(req: &mut Request) -> IronResult<Response> {
         sandbox
             .format(&req.into())
             .map(FormatResponse::from)
+            .map_err(Error::Sandbox)
+    })
+}
+
+fn clippy(req: &mut Request) -> IronResult<Response> {
+    with_sandbox(req, |sandbox, req: ClippyRequest| {
+        sandbox
+            .clippy(&req.into())
+            .map(ClippyResponse::from)
             .map_err(Error::Sandbox)
     })
 }
@@ -265,6 +275,36 @@ impl From<sandbox::FormatResponse> for FormatResponse {
         FormatResponse {
             success: me.success,
             code: me.code,
+            stdout: me.stdout,
+            stderr: me.stderr,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct ClippyRequest {
+    code: String,
+}
+
+impl From<ClippyRequest> for sandbox::ClippyRequest {
+    fn from(me: ClippyRequest) -> Self {
+        sandbox::ClippyRequest {
+            code: me.code,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct ClippyResponse {
+    success: bool,
+    stdout: String,
+    stderr: String,
+}
+
+impl From<sandbox::ClippyResponse> for ClippyResponse {
+    fn from(me: sandbox::ClippyResponse) -> Self {
+        ClippyResponse {
+            success: me.success,
             stdout: me.stdout,
             stderr: me.stderr,
         }

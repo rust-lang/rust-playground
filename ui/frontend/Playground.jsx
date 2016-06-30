@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import {
   changeEditor, changeChannel, changeMode,
   performExecute, performCompileToAssembly, performCompileToLLVM,
-  performFormat, performSaveToGist,
+  performFormat, performClippy, performSaveToGist,
   editCode, toggleConfiguration
 } from './actions';
 import { connect } from 'react-redux';
@@ -16,7 +16,7 @@ class Playground extends React.Component {
   render() {
     const { code,
             status: { code: compiledCode, stdout, stderr, error, gist },
-            execute, compileToAssembly, compileToLLVM, format, saveToGist,
+            execute, compileToAssembly, compileToLLVM, format, clippy, saveToGist,
             configuration: { channel, mode, tests, editor, shown: showConfig },
             changeChannel, changeMode, onEditCode, changeEditor,
             toggleConfiguration
@@ -30,7 +30,7 @@ class Playground extends React.Component {
         <Header execute={execute}
                 compileToAssembly={compileToAssembly}
                 compileToLLVM={compileToLLVM}
-                format={format} saveToGist={saveToGist}
+                format={format} clippy={clippy} saveToGist={saveToGist}
                 channel={channel} changeChannel={changeChannel}
                 mode={mode} changeMode={changeMode}
                 tests={tests} toggleConfiguration={toggleConfiguration} />
@@ -86,6 +86,7 @@ const mapDispatchToProps = (dispatch) => {
     compileToAssembly: () => dispatch(performCompileToAssembly()),
     compileToLLVM: () => dispatch(performCompileToLLVM()),
     format: () => dispatch(performFormat()),
+    clippy: () => dispatch(performClippy()),
     saveToGist: () => dispatch(performSaveToGist()),
     onEditCode: (code) => dispatch(editCode(code))
   };

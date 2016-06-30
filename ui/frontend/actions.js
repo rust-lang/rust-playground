@@ -2,6 +2,13 @@ import fetch from 'isomorphic-fetch';
 import url from 'url';
 import { load as loadGist, save as saveGist } from './gist';
 
+const routes = {
+  compile: { pathname: '/compile' },
+  execute: { pathname: '/execute' },
+  format: { pathname: '/format' },
+  clippy: { pathname: '/clippy' }
+};
+
 export const TOGGLE_CONFIGURATION = 'TOGGLE_CONFIGURATION';
 
 export function toggleConfiguration() {
@@ -61,12 +68,6 @@ function jsonPost(urlObj, body) {
       }
     });
 }
-
-const routes = {
-  compile: { pathname: '/compile' },
-  execute: { pathname: '/execute' },
-  format: { pathname: '/format' }
-};
 
 export function performExecute() {
   // TODO: Check a cache
@@ -151,6 +152,37 @@ export function performFormat() {
     return jsonPost(routes.format, body)
       .then(json => dispatch(receiveFormatSuccess(json)))
       .catch(json => dispatch(receiveFormatFailure(json)));
+  };
+}
+
+export const REQUEST_CLIPPY = 'REQUEST_CLIPPY';
+export const CLIPPY_SUCCEEDED = 'CLIPPY_SUCCEEDED';
+export const CLIPPY_FAILED = 'CLIPPY_FAILED';
+
+function requestClippy() {
+  return { type: REQUEST_CLIPPY };
+}
+
+function receiveClippySuccess(json) {
+  const { stdout, stderr} = json;
+  return { type: CLIPPY_SUCCEEDED, stdout, stderr };
+}
+
+function receiveClippyFailure(json) {
+  return { type: CLIPPY_FAILED, error: json.error };
+}
+
+export function performClippy() {
+  // TODO: Check a cache
+  return function (dispatch, getState) {
+    dispatch(requestClippy());
+
+    const { code } = getState();
+    const body = { code };
+
+    return jsonPost(routes.clippy, body)
+      .then(json => dispatch(receiveClippySuccess(json)))
+      .catch(json => dispatch(receiveClippyFailure(json)));
   };
 }
 

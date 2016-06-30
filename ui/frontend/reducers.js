@@ -79,9 +79,10 @@ const status = (state = defaultStatus, action) => {
 
   case actions.REQUEST_COMPILE:
     return { ...state, requestInProgress: true, error: "" };
-  case actions.COMPILE_SUCCEEDED:
+  case actions.COMPILE_SUCCEEDED: {
     const { code = "", stdout = "", stderr = "" } = action;
     return { ...state, requestInProgress: false, code, stdout, stderr };
+  }
   case actions.COMPILE_FAILED:
     return { ...state, requestInProgress: false, error: action.error };
 
@@ -97,6 +98,15 @@ const status = (state = defaultStatus, action) => {
   case actions.FORMAT_SUCCEEDED:
     return { ...state, requestInProgress: false, stdout: action.stdout || "", stderr: action.stderr || "" };
   case actions.FORMAT_FAILED:
+    return { ...state, requestInProgress: false, error: action.error };
+
+  case actions.REQUEST_CLIPPY:
+    return { ...state, requestInProgress: true, error: "" };
+  case actions.CLIPPY_SUCCEEDED: {
+    const { stdout = "", stderr = "" } = action;
+    return { ...state, requestInProgress: false, stdout, stderr};
+  }
+  case actions.CLIPPY_FAILED:
     return { ...state, requestInProgress: false, error: action.error };
   default:
     return state;
