@@ -24,6 +24,7 @@ end
 
 require 'capybara/rspec'
 require 'capybara/poltergeist'
+require 'capybara-screenshot/rspec'
 require 'phantomjs'
 
 ADDRESS = ENV.fetch('PLAYGROUND_UI_ADDRESS', '127.0.0.1')

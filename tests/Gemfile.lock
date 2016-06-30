@@ -9,8 +9,13 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
+    capybara-screenshot (1.0.13)
+      capybara (>= 1.0, < 3)
+      launchy
     cliver (0.3.2)
     diff-lcs (1.2.5)
+    launchy (2.4.3)
+      addressable (~> 2.3)
     mime-types (3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
@@ -53,6 +58,7 @@ PLATFORMS
 
 DEPENDENCIES
   capybara
+  capybara-screenshot
   phantomjs
   poltergeist
   rspec
