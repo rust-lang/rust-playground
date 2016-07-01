@@ -189,6 +189,21 @@ body {
         height: 100%;
         overflow: scroll;
     }
+
+    &-header {
+        display: flex;
+        white-space: nowrap;
+        color: $border;
+
+        &:before, &:after {
+            border-top: 1px solid $border;
+            content: '';
+            flex: 1 1 0%;
+            margin: auto;
+        }
+        &:before { margin-right: 2%; }
+        &:after { margin-left: 2% }
+    }
 }
 
 $PHI: 2.61803398875;

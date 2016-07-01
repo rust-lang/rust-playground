@@ -5,15 +5,7 @@ export default class Output extends React.Component {
     const { output: { meta: { focus } }, changeFocus } = this.props;
 
     const onePane = (panel, focus, fn) => {
-      if (focus === panel) {
-        return (
-          <div className={`output-${panel}`}>
-            { fn() }
-          </div>
-        );
-      } else {
-        return null;
-      }
+      return focus === panel ? fn() : null;
     };
 
     const oneButton = (kind, label) =>
@@ -44,11 +36,11 @@ export default class Output extends React.Component {
     const { stdout, stderr, error } = this.props.output.execute;
 
     return (
-      <pre>
-        <code className="output-error">{error}</code>
-        <code className="output-stderr">{stderr}</code>
-        <code className="output-stdout">{stdout}</code>
-      </pre>
+      <div className="output-execute">
+        {this.renderSection('error', 'Errors', error)}
+        {this.renderSection('stderr', 'Standard Error', stderr)}
+        {this.renderSection('stderr', 'Standard Output', stdout)}
+      </div>
     );
   }
 
@@ -56,11 +48,11 @@ export default class Output extends React.Component {
     const { stdout, stderr, error } = this.props.output.clippy;
 
     return (
-      <pre>
-        <code className="output-error">{error}</code>
-        <code className="output-stderr">{stderr}</code>
-        <code className="output-stdout">{stdout}</code>
-      </pre>
+      <div className="output-clippy">
+        {this.renderSection('error', 'Errors', error)}
+        {this.renderSection('stderr', 'Standard Error', stderr)}
+        {this.renderSection('stderr', 'Standard Output', stdout)}
+      </div>
     );
   }
 
@@ -68,12 +60,12 @@ export default class Output extends React.Component {
     const { code, stdout, stderr, error } = this.props.output.llvmIr;
 
     return (
-      <pre>
-        <code className="output-error">{error}</code>
-        <code className="output-stderr">{stderr}</code>
-        <code className="output-stdout">{stdout}</code>
-        <code className="output-code">{code}</code>
-      </pre>
+      <div className="output-llvm-ir">
+        {this.renderSection('error', 'Errors', error)}
+        {this.renderSection('stderr', 'Standard Error', stderr)}
+        {this.renderSection('stderr', 'Standard Output', stdout)}
+        {this.renderSection('code', 'Result', code)}
+      </div>
     );
   }
 
@@ -81,12 +73,12 @@ export default class Output extends React.Component {
     const { code, stdout, stderr, error } = this.props.output.assembly;
 
     return (
-      <pre>
-        <code className="output-error">{error}</code>
-        <code className="output-stderr">{stderr}</code>
-        <code className="output-stdout">{stdout}</code>
-        <code className="output-code">{code}</code>
-      </pre>
+      <div className="output-asm">
+        {this.renderSection('error', 'Errors', error)}
+        {this.renderSection('stderr', 'Standard Error', stderr)}
+        {this.renderSection('stderr', 'Standard Output', stdout)}
+        {this.renderSection('code', 'Result', code)}
+      </div>
     );
   }
 
@@ -94,7 +86,7 @@ export default class Output extends React.Component {
     const { id, url } = this.props.output.gist;
 
     return (
-      <div>
+      <div className="output-gist">
         <p>
           <a href={`/?gist=${id}`}>Permalink to the playground</a>
         </p>
@@ -103,6 +95,19 @@ export default class Output extends React.Component {
         </p>
       </div>
     );
+  }
+
+  renderSection(kind, label, content) {
+    if (content) {
+      return (
+        <div className={`output-${kind}`}>
+          <span className="output-header">{label}</span>
+          <pre><code>{content}</code></pre>
+        </div>
+      );
+    } else {
+      return null;
+    }
   }
 };
 
