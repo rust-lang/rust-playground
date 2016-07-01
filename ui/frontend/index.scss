@@ -76,6 +76,7 @@ body {
         @include pillboxes($radius);
         background-color: white;
         border: 1px $border solid;
+        cursor: pointer;
 
         &-primary {
             background-color: $rust;
@@ -113,9 +114,11 @@ body {
             @include pillboxes($radius);
             background-color: $unselected-radio;
             border: 1px $rust solid;
+            cursor: pointer;
 
             :checked + & {
                 background-color: $selected-radio;
+                cursor: default;
             }
         }
     }
