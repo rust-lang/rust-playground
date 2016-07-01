@@ -123,3 +123,18 @@ sudo \
   PLAYGROUND_UI_ROOT=$PWD/frontend/build \
   ./target/x86_64-unknown-linux-musl/release/ui
 ```
+
+## Development
+
+If you only want to run the frontend UI locally in order to make HTML/CSS/JS
+changes:
+
+```
+cd ui/frontend
+npm install
+npm run watch # Will rebuild and watch for changes
+```
+
+Then open in your browser the built `ui/frontend/build/index.html`.
+
+
