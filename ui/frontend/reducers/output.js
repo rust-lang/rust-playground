@@ -17,6 +17,9 @@ const meta = (state = defaultMeta, action) => {
           ({ ...finish(), focus });
 
   switch (action.type) {
+  case actions.CHANGE_FOCUS:
+    return { ...state, focus: action.focus };
+
   case actions.REQUEST_CLIPPY:
   case actions.REQUEST_COMPILE:
   case actions.REQUEST_EXECUTE:
@@ -31,7 +34,7 @@ const meta = (state = defaultMeta, action) => {
 
   case actions.COMPILE_FAILED:
   case actions.COMPILE_SUCCEEDED:
-    return finishAndFocus('compile');
+    return finishAndFocus(action.compileKind);
 
   case actions.EXECUTE_FAILED:
   case actions.EXECUTE_SUCCEEDED:
@@ -75,20 +78,50 @@ const clippy = (state = defaultClippy, action) => {
   }
 };
 
-const defaultCompile = {
+const defaultLlvmIr = {
   code: null,
   stdout: null,
   stderr: null,
   error: null
 };
 
-const compile = (state = defaultCompile, action) => {
+const llvmIr = (state = defaultLlvmIr, action) => {
   switch (action.type) {
   case actions.REQUEST_COMPILE:
-    return defaultCompile;
+    return defaultLlvmIr;
   case actions.COMPILE_SUCCEEDED: {
-    const { code = "", stdout = "", stderr = "" } = action;
-    return { ...state, code, stdout, stderr };
+    const { compileKind, code = "", stdout = "", stderr = "" } = action;
+    if (compileKind === 'llvm-ir') {
+      return { ...state, code, stdout, stderr };
+    } else {
+      return state;
+    }
+  }
+  case actions.COMPILE_FAILED:
+    return { ...state, error: action.error };
+  default:
+    return state;
+  }
+};
+
+const defaultAssembly = {
+  code: null,
+  stdout: null,
+  stderr: null,
+  error: null
+};
+
+const assembly = (state = defaultAssembly, action) => {
+  switch (action.type) {
+  case actions.REQUEST_COMPILE:
+    return defaultAssembly;
+  case actions.COMPILE_SUCCEEDED: {
+    const { compileKind, code = "", stdout = "", stderr = "" } = action;
+    if (compileKind === 'asm') {
+      return { ...state, code, stdout, stderr };
+    } else {
+      return state;
+    }
   }
   case actions.COMPILE_FAILED:
     return { ...state, error: action.error };
@@ -142,7 +175,8 @@ const gist = (state = defaultGist, action) => {
 const output = combineReducers({
   meta,
   clippy,
-  compile,
+  assembly,
+  llvmIr,
   execute,
   gist
 });

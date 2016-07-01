@@ -18,6 +18,7 @@ export function toggleConfiguration() {
 export const CHANGE_EDITOR = 'CHANGE_EDITOR';
 export const CHANGE_CHANNEL = 'CHANGE_CHANNEL';
 export const CHANGE_MODE = 'CHANGE_MODE';
+export const CHANGE_FOCUS = 'CHANGE_FOCUS';
 
 export function changeEditor(editor) {
   return { type: CHANGE_EDITOR, editor };
@@ -29,6 +30,10 @@ export function changeChannel(channel) {
 
 export function changeMode(mode) {
   return { type: CHANGE_MODE, mode };
+}
+
+export function changeFocus(focus) {
+  return { type: CHANGE_FOCUS, focus };
 }
 
 export const REQUEST_EXECUTE = 'REQUEST_EXECUTE';
@@ -88,31 +93,31 @@ export const REQUEST_COMPILE = 'REQUEST_COMPILE';
 export const COMPILE_SUCCEEDED = 'COMPILE_SUCCEEDED';
 export const COMPILE_FAILED = 'COMPILE_FAILED';
 
-function requestCompile() {
-  return { type: REQUEST_COMPILE };
+function requestCompile(compileKind) {
+  return { type: REQUEST_COMPILE, compileKind };
 }
 
-function receiveCompileSuccess(json) {
+function receiveCompileSuccess(compileKind, json) {
   let { code, stdout, stderr } = json;
-  return { type: COMPILE_SUCCEEDED, code, stdout, stderr };
+  return { type: COMPILE_SUCCEEDED, code, stdout, stderr, compileKind };
 }
 
-function receiveCompileFailure(json) {
-  return { type: COMPILE_FAILED, error: json.error };
+function receiveCompileFailure(compileKind, json) {
+  return { type: COMPILE_FAILED, error: json.error, compileKind };
 }
 
 function performCompile(target) {
   // TODO: Check a cache
   return function (dispatch, getState) {
-    dispatch(requestCompile());
+    dispatch(requestCompile(target));
 
     const state = getState();
     const { code, configuration: { channel, mode, tests } } = state;
     const body = { channel, mode, tests, code, target };
 
     return jsonPost(routes.compile, body)
-      .then(json => dispatch(receiveCompileSuccess(json)))
-      .catch(json => dispatch(receiveCompileFailure(json)));
+      .then(json => dispatch(receiveCompileSuccess(target, json)))
+      .catch(json => dispatch(receiveCompileFailure(target, json)));
   };
 }
 

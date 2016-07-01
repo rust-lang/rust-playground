@@ -53,76 +53,9 @@ const code = (state = defaultCode, action) => {
   }
 };
 
-const defaultStatus = {
-  requestInProgress: false,
-  error: "",
-  code: "",
-  stdout: "",
-  stderr: ""
-};
-
-const status = (state = defaultStatus, action) => {
-  switch (action.type) {
-  case actions.REQUEST_GIST_LOAD:
-    return { ...state, requestInProgress: true };
-  case actions.GIST_LOAD_SUCCEEDED:
-    return { ...state, requestInProgress: false };
-  case actions.GIST_LOAD_FAILED:
-    return { ...state, requestInProgress: false, error: "Some kind of error" };
-
-  case actions.REQUEST_SAVE_TO_GIST:
-    return { ...state, requestInProgress: true };
-  case actions.SAVE_TO_GIST_SUCCEEDED: {
-    let { id, url } = action;
-    return { ...state, requestInProgress: false, gist: { id, url } };
-  }
-  case actions.SAVE_TO_GIST_FAILED:
-    return { ...state, requestInProgress: false, error: "Some kind of error" };
-
-  case actions.REQUEST_COMPILE:
-    return { ...state, requestInProgress: true, error: "" };
-  case actions.COMPILE_SUCCEEDED: {
-    const { code = "", stdout = "", stderr = "" } = action;
-    return { ...state, requestInProgress: false, code, stdout, stderr };
-  }
-  case actions.COMPILE_FAILED:
-    return { ...state, requestInProgress: false, error: action.error };
-
-  case actions.REQUEST_EXECUTE:
-    return { ...state, requestInProgress: true, error: "" };
-  case actions.EXECUTE_SUCCEEDED: {
-    const { stdout = "", stderr = "" } = action;
-    return { ...state, requestInProgress: false, stdout, stderr };
-  }
-  case actions.EXECUTE_FAILED:
-    return { ...state, requestInProgress: false, error: action.error };
-
-  case actions.REQUEST_FORMAT:
-    return { ...state, requestInProgress: true, error: "" };
-  case actions.FORMAT_SUCCEEDED: {
-    const { stdout = "", stderr = "" } = action;
-    return { ...state, requestInProgress: false, stdout, stderr };
-  }
-  case actions.FORMAT_FAILED:
-    return { ...state, requestInProgress: false, error: action.error };
-
-  case actions.REQUEST_CLIPPY:
-    return { ...state, requestInProgress: true, error: "" };
-  case actions.CLIPPY_SUCCEEDED: {
-    const { stdout = "", stderr = "" } = action;
-    return { ...state, requestInProgress: false, stdout, stderr};
-  }
-  case actions.CLIPPY_FAILED:
-    return { ...state, requestInProgress: false, error: action.error };
-  default:
-    return state;
-  }
-};
-
 const playgroundApp = combineReducers({
   configuration,
   code,
-  status,
   output
 });
 

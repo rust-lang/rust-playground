@@ -3,7 +3,8 @@ import {
   changeEditor, changeChannel, changeMode,
   performExecute, performCompileToAssembly, performCompileToLLVM,
   performFormat, performClippy, performSaveToGist,
-  editCode, toggleConfiguration
+  editCode, toggleConfiguration,
+  changeFocus
 } from './actions';
 import { connect } from 'react-redux';
 
@@ -15,11 +16,11 @@ import Output from './Output.jsx';
 class Playground extends React.Component {
   render() {
     const { code,
-            status: { code: compiledCode, stdout, stderr, error, gist },
             execute, compileToAssembly, compileToLLVM, format, clippy, saveToGist,
             configuration: { channel, mode, tests, editor, shown: showConfig },
             changeChannel, changeMode, onEditCode, changeEditor,
-            toggleConfiguration
+            toggleConfiguration,
+            output, changeFocus
           } = this.props;
 
     const config = showConfig ? this.renderConfiguration() : null;
@@ -35,7 +36,7 @@ class Playground extends React.Component {
                 mode={mode} changeMode={changeMode}
                 tests={tests} toggleConfiguration={toggleConfiguration} />
         <Editor editor={editor} code={code} onEditCode={onEditCode} />
-        <Output code={compiledCode} stdout={stdout} stderr={stderr} error={error} gist={gist} />
+        <Output output={output} changeFocus={changeFocus} />
       </div>
     );
   }
@@ -64,17 +65,13 @@ Playground.propTypes = {
   configuration: PropTypes.object.isRequired,
   changeChannel: PropTypes.func.isRequired,
   onEditCode: PropTypes.func.isRequired,
-  code: PropTypes.string.isRequired,
-  status: PropTypes.object.isRequired
+  code: PropTypes.string.isRequired
 };
 
 const mapStateToProps = (state) => {
-  return {
-    configuration: state.configuration,
-    code: state.code,
-    status: state.status
-  };
-}
+  const { configuration, code, output } = state;
+  return { configuration, code, output };
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
@@ -82,6 +79,7 @@ const mapDispatchToProps = (dispatch) => {
     changeEditor: (editor) => dispatch(changeEditor(editor)),
     changeChannel: (channel) => dispatch(changeChannel(channel)),
     changeMode: (mode) => dispatch(changeMode(mode)),
+    changeFocus: (outputPane) => dispatch(changeFocus(outputPane)),
     execute: () => dispatch(performExecute()),
     compileToAssembly: () => dispatch(performCompileToAssembly()),
     compileToLLVM: () => dispatch(performCompileToLLVM()),
