@@ -18,6 +18,27 @@ body {
     padding: 0 1em;
 }
 
+.playground {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+
+    padding-bottom: 1em;
+
+    &-editor {
+        flex: 2 1 0%;
+        position: relative;
+        min-height: 10em;
+
+        border: 4px solid $border;
+        border-radius: 4px;
+    }
+
+    &-output {
+        flex: 1 1 0%;
+    }
+}
+
 .configuration {
     position: relative;
     width: 100%;
@@ -136,14 +157,18 @@ body {
     }
 }
 
-.editor {
-    border: 4px solid $border;
-    border-radius: 4px;
+#editor {
+    position: absolute;
+    // Height / width is applied to the element
+}
 
+.editor {
     &-simple {
-        border: none;
-        height: 500px;
+        position: absolute;
         width: 100%;
+        height: 100%;
+
+        border: none;
         font-family: monospace;
     }
 }

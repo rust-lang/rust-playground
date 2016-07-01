@@ -28,15 +28,23 @@ class Playground extends React.Component {
     return (
       <div>
         { config }
-        <Header execute={execute}
-                compileToAssembly={compileToAssembly}
-                compileToLLVM={compileToLLVM}
-                format={format} clippy={clippy} saveToGist={saveToGist}
-                channel={channel} changeChannel={changeChannel}
-                mode={mode} changeMode={changeMode}
-                tests={tests} toggleConfiguration={toggleConfiguration} />
-        <Editor editor={editor} code={code} onEditCode={onEditCode} />
-        <Output output={output} changeFocus={changeFocus} />
+        <div className="playground">
+          <div className="playground-header">
+            <Header execute={execute}
+                    compileToAssembly={compileToAssembly}
+                    compileToLLVM={compileToLLVM}
+                    format={format} clippy={clippy} saveToGist={saveToGist}
+                    channel={channel} changeChannel={changeChannel}
+                    mode={mode} changeMode={changeMode}
+                    tests={tests} toggleConfiguration={toggleConfiguration} />
+          </div>
+          <div className="playground-editor">
+            <Editor editor={editor} code={code} onEditCode={onEditCode} />
+          </div>
+          <div className="playground-output">
+            <Output output={output} changeFocus={changeFocus} />
+          </div>
+        </div>
       </div>
     );
   }
