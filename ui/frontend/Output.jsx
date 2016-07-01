@@ -21,17 +21,21 @@ export default class Output extends React.Component {
 
     return (
       <div className="output">
-        { onePane('execute', focus, () => this.renderExecute()) }
-        { onePane('clippy', focus, () => this.renderClippy()) }
-        { onePane('asm', focus, () => this.renderAssembly()) }
-        { onePane('llvm-ir', focus, () => this.renderLlvmIr()) }
-        { onePane('gist', focus, () => this.renderGist()) }
-        { oneButton('execute', 'Execute') }
-        { oneButton('clippy', 'Clippy') }
-        { oneButton('asm', 'ASM') }
-        { oneButton('llvm-ir', 'LLVM IR') }
-        { oneButton('gist', 'Gist') }
-        <button onClick={ () => changeFocus(null) }>Close</button>
+        <div className="output-tabs">
+          { oneButton('execute', 'Execute') }
+          { oneButton('clippy', 'Clippy') }
+          { oneButton('asm', 'ASM') }
+          { oneButton('llvm-ir', 'LLVM IR') }
+          { oneButton('gist', 'Gist') }
+          <button onClick={ () => changeFocus(null) }>Close</button>
+        </div>
+        <div className="output-body">
+          { onePane('execute', focus, () => this.renderExecute()) }
+          { onePane('clippy', focus, () => this.renderClippy()) }
+          { onePane('asm', focus, () => this.renderAssembly()) }
+          { onePane('llvm-ir', focus, () => this.renderLlvmIr()) }
+          { onePane('gist', focus, () => this.renderGist()) }
+        </div>
       </div>
     );
   }

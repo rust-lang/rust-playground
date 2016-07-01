@@ -26,19 +26,17 @@ body {
     padding-bottom: 1em;
 
     &-editor {
-        flex: 2 1 0%;
+        flex: 1 1 0%;
         position: relative;
-        min-height: 10em;
 
         border: 4px solid $border;
         border-radius: 4px;
     }
 
     &-output {
-        flex: 0 1 0%;
-
         &-focused {
-            flex-grow: 1;
+            flex: 1 1 0%;
+            position: relative;
         }
     }
 }
@@ -174,6 +172,22 @@ body {
 
         border: none;
         font-family: monospace;
+    }
+}
+
+.output {
+    display: flex;
+    flex-direction: column;
+
+    .playground-output-focused & {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    &-body {
+        height: 100%;
+        overflow: scroll;
     }
 }
 
