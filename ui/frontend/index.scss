@@ -78,6 +78,10 @@ body {
         border: 1px $border solid;
         cursor: pointer;
 
+        &:hover {
+            background-color: darken(white, 10%);
+        }
+
         &-primary {
             background-color: $rust;
 
@@ -90,6 +94,10 @@ body {
 
             &:after {
                 content: " ▶";
+            }
+
+            &:hover {
+                background-color: darken($rust, 10%);
             }
         }
     }
@@ -115,6 +123,10 @@ body {
             background-color: $unselected-radio;
             border: 1px $rust solid;
             cursor: pointer;
+
+            &:hover {
+                background-color: desaturate($selected-radio, 10%);
+            }
 
             :checked + & {
                 background-color: $selected-radio;
