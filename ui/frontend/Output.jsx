@@ -31,6 +31,7 @@ export default class Output extends React.Component {
         { oneButton('asm', 'ASM') }
         { oneButton('llvm-ir', 'LLVM IR') }
         { oneButton('gist', 'Gist') }
+        <button onClick={ () => changeFocus(null) }>Close</button>
       </div>
     );
   }

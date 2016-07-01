@@ -25,6 +25,8 @@ class Playground extends React.Component {
 
     const config = showConfig ? this.renderConfiguration() : null;
 
+    const outputFocused = output.meta.focus ? 'playground-output-focused' : '';
+
     return (
       <div>
         { config }
@@ -41,7 +43,7 @@ class Playground extends React.Component {
           <div className="playground-editor">
             <Editor editor={editor} code={code} onEditCode={onEditCode} />
           </div>
-          <div className="playground-output">
+          <div className={`playground-output ${outputFocused}`}>
             <Output output={output} changeFocus={changeFocus} />
           </div>
         </div>
@@ -61,6 +63,13 @@ class Playground extends React.Component {
         </div>
       </div>
     );
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.output.meta.focus !== prevProps.output.meta.focus) {
+      // Inform the ACE editor that its size has changed.
+      window.dispatchEvent(new Event('resize'));
+    }
   }
 };
 
