@@ -4,7 +4,8 @@ $background: #E1E1DB;
 $rust: #AA4422;
 $selected-radio: desaturate(lighten($rust, 30%), 20%);
 $unselected-radio: lighten($selected-radio, 20%);
-$border: #BBBBBB;
+$border-color: #BBBBBB;
+$border: 1px solid $border-color;
 
 html {
     box-sizing: border-box;
@@ -29,7 +30,7 @@ body {
         flex: 1 1 0%;
         position: relative;
 
-        border: 4px solid $border;
+        border: 4px solid $border-color;
         border-radius: 4px;
     }
 
@@ -98,7 +99,7 @@ body {
     &-btn {
         @include pillboxes($radius);
         background-color: white;
-        border: 1px $border solid;
+        border: $border;
         cursor: pointer;
 
         &:hover {
@@ -144,7 +145,7 @@ body {
         &-label {
             @include pillboxes($radius);
             background-color: $unselected-radio;
-            border: 1px $rust solid;
+            border: 1px solid $rust;
             cursor: pointer;
 
             &:hover {
@@ -176,8 +177,13 @@ body {
 }
 
 .output {
+    $current-tab: #f9ffff;
+    $background-tab: desaturate($current-tab, 100%);
+
     display: flex;
     flex-direction: column;
+
+    margin-top: 0.2em;
 
     .playground-output-focused & {
         position: absolute;
@@ -185,18 +191,54 @@ body {
         height: 100%;
     }
 
+    &-tabs {
+        display: flex;
+    }
+
+    &-tab {
+        flex: 1 1 0%;
+
+        line-height: 1.5em;
+        background-color: $background-tab;
+        border: $border;
+        border-right: none;
+
+        &:last-of-type {
+            border-right: $border;
+        }
+
+        &-selected {
+            background-color: $current-tab;
+            border-bottom: none;
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        &-close {
+            flex: 0 1 0%;
+        }
+    }
+
     &-body {
         height: 100%;
         overflow: scroll;
+
+        background-color: $current-tab;
+        border: $border;
+        border-top: none;
+
+        padding: 0.5em;
     }
 
     &-header {
         display: flex;
         white-space: nowrap;
-        color: $border;
+        color: $border-color;
 
         &:before, &:after {
-            border-top: 1px solid $border;
+            border-top: $border;
             content: '';
             flex: 1 1 0%;
             margin: auto;

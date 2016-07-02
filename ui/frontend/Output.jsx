@@ -3,10 +3,16 @@ import React, { PropTypes } from 'react';
 const hasProperties = (obj) => Object.values(obj).some(val => val);
 
 function Tab(props) {
-  const { label, onClick, tabProps } = props;
+  const { kind, focus, label, onClick, tabProps } = props;
 
   if (hasProperties(tabProps)) {
-    return <button onClick={props.onClick}>{props.label}</button>;
+    const selected = focus === kind ? "output-tab-selected" : "";
+    return (
+      <button className={`output-tab ${selected}`}
+              onClick={props.onClick}>
+        {label}
+      </button>
+    );
   } else {
     return null;
   }
@@ -86,18 +92,20 @@ export default class Output extends React.Component {
       changeFocus
     } = this.props;
 
-    const close = focus ? <button onClick={() => changeFocus(null)}>Close</button> : null;
+    const somethingToShow = [execute, clippy, assembly, llvmIr, gist].some(hasProperties);
 
-    return (
-      <div className="output">
-        <div className="output-tabs">
-          <Tab label="Execution" onClick={() => changeFocus('execute')} tabProps={execute} />
-          <Tab label="Clippy" onClick={() => changeFocus('clippy')} tabProps={clippy} />
-          <Tab label="ASM" onClick={() => changeFocus('asm')} tabProps={assembly} />
-          <Tab label="LLVM IR" onClick={() => changeFocus('llvm-ir')} tabProps={llvmIr} />
-          <Tab label="Gist" onClick={() => changeFocus('gist')} tabProps={gist} />
-          { close }
-        </div>
+    if (!somethingToShow) {
+      return null;
+    }
+
+    var close = null, body = null;
+    if (focus) {
+      close = (
+        <button className="output-tab output-tab-close"
+                onClick={() => changeFocus(null)}>Close</button>
+      );
+
+      body = (
         <div className="output-body">
           <SimplePane {...execute} kind="execute" focus={focus} />
           <SimplePane {...clippy} kind="clippy" focus={focus} />
@@ -105,6 +113,36 @@ export default class Output extends React.Component {
           <PaneWithCode {...llvmIr} kind="llvm-ir" focus={focus} />
           <Gist {...gist} focus={focus} />
         </div>
+      );
+    }
+
+    return (
+      <div className="output">
+        <div className="output-tabs">
+          <Tab kind="execute" focus={focus}
+               label="Execution"
+               onClick={() => changeFocus('execute')}
+               tabProps={execute} />
+          <Tab kind="clippy"
+               focus={focus}
+               label="Clippy"
+               onClick={() => changeFocus('clippy')}
+               tabProps={clippy} />
+          <Tab kind ="asm" focus={focus}
+               label="ASM"
+               onClick={() => changeFocus('asm')}
+               tabProps={assembly} />
+          <Tab kind="llvm-ir" focus={focus}
+               label="LLVM IR"
+               onClick={() => changeFocus('llvm-ir')}
+               tabProps={llvmIr} />
+          <Tab kind="gist" focus={focus}
+               label="Gist"
+               onClick={() => changeFocus('gist')}
+               tabProps={gist} />
+          { close }
+        </div>
+        { body }
       </div>
     );
   }
