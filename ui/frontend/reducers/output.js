@@ -88,7 +88,11 @@ const defaultLlvmIr = {
 const llvmIr = (state = defaultLlvmIr, action) => {
   switch (action.type) {
   case actions.REQUEST_COMPILE:
-    return defaultLlvmIr;
+    if (action.compileKind === 'llvm-ir') {
+      return defaultLlvmIr;
+    } else {
+      return state;
+    }
   case actions.COMPILE_SUCCEEDED: {
     const { compileKind, code = "", stdout = "", stderr = "" } = action;
     if (compileKind === 'llvm-ir') {
@@ -114,7 +118,11 @@ const defaultAssembly = {
 const assembly = (state = defaultAssembly, action) => {
   switch (action.type) {
   case actions.REQUEST_COMPILE:
-    return defaultAssembly;
+    if (action.compileKind === 'asm') {
+      return defaultAssembly;
+    } else {
+      return state;
+    }
   case actions.COMPILE_SUCCEEDED: {
     const { compileKind, code = "", stdout = "", stderr = "" } = action;
     if (compileKind === 'asm') {
