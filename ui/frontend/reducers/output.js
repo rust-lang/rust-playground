@@ -175,6 +175,10 @@ const gist = (state = defaultGist, action) => {
   }
   case actions.SAVE_TO_GIST_FAILED:
     return { ...state, error: "Some kind of error" };
+  case actions.GIST_LOAD_SUCCEEDED: {
+    const { id, url } = action;
+    return { ...state, id, url };
+  }
   default:
     return state;
   }

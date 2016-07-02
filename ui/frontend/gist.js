@@ -14,7 +14,11 @@ const FILENAME = 'playground.rs';
 export function load(id) {
   return fetch(`${baseUrlStr}/${id}`)
     .then(response => response.json())
-    .then(gist => gist.files[FILENAME].content);
+    .then(gist => ({
+      id: id,
+      url: gist.html_url,
+      code: gist.files[FILENAME].content
+    }));
 }
 
 const gistBody = (code) => ({

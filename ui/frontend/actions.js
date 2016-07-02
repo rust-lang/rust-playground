@@ -199,8 +199,9 @@ function requestGistLoad() {
   return { type: REQUEST_GIST_LOAD };
 }
 
-function receiveGistLoadSuccess(code) {
-  return { type: GIST_LOAD_SUCCEEDED, code };
+function receiveGistLoadSuccess(gist) {
+  const { id, url, code } = gist;
+  return { type: GIST_LOAD_SUCCEEDED, id, url, code };
 }
 
 function receiveGistLoadFailure() {
@@ -212,7 +213,7 @@ export function performGistLoad(id) {
     dispatch(requestGistLoad());
 
     loadGist(id)
-      .then(code => dispatch(receiveGistLoadSuccess(code)));
+      .then(gist => dispatch(receiveGistLoadSuccess(gist)));
     // TODO: Failure case
   };
 }
