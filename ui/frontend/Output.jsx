@@ -1,90 +1,69 @@
 import React, { PropTypes } from 'react';
 
-export default class Output extends React.Component {
-  render() {
-    const { output: { meta: { focus } }, changeFocus } = this.props;
+const hasProperties = (obj) => Object.values(obj).some(val => val);
 
-    const onePane = (panel, focus, fn) => {
-      return focus === panel ? fn() : null;
-    };
+function Tab(props) {
+  const { label, onClick, tabProps } = props;
 
-    const oneButton = (kind, label) =>
-            <button onClick={() => changeFocus(kind)}>{label}</button>;
+  if (hasProperties(tabProps)) {
+    return <button onClick={props.onClick}>{props.label}</button>;
+  } else {
+    return null;
+  }
+}
 
+function Section(props) {
+  const { kind, label, content } = props;
+
+  if (content) {
     return (
-      <div className="output">
-        <div className="output-tabs">
-          { oneButton('execute', 'Execute') }
-          { oneButton('clippy', 'Clippy') }
-          { oneButton('asm', 'ASM') }
-          { oneButton('llvm-ir', 'LLVM IR') }
-          { oneButton('gist', 'Gist') }
-          <button onClick={ () => changeFocus(null) }>Close</button>
-        </div>
-        <div className="output-body">
-          { onePane('execute', focus, () => this.renderExecute()) }
-          { onePane('clippy', focus, () => this.renderClippy()) }
-          { onePane('asm', focus, () => this.renderAssembly()) }
-          { onePane('llvm-ir', focus, () => this.renderLlvmIr()) }
-          { onePane('gist', focus, () => this.renderGist()) }
-        </div>
+      <div className={`output-${kind}`}>
+        <span className="output-header">{label}</span>
+        <pre><code>{content}</code></pre>
       </div>
     );
+  } else {
+    return null;
   }
+}
 
-  renderExecute() {
-    const { stdout, stderr, error } = this.props.output.execute;
+function SimplePane(props) {
+  const { focus, kind, stdout, stderr, error } = props;
 
+  if (focus === kind) {
     return (
-      <div className="output-execute">
-        {this.renderSection('error', 'Errors', error)}
-        {this.renderSection('stderr', 'Standard Error', stderr)}
-        {this.renderSection('stderr', 'Standard Output', stdout)}
+      <div className={`output-${kind}`}>
+        <Section kind='error' label='Errors' content={error} />
+        <Section kind='stderr' label='Standard Error' content={stderr} />
+        <Section kind='stderr' label='Standard Output' content={stdout} />
       </div>
     );
+  } else {
+    return null;
   }
+}
 
-  renderClippy() {
-    const { stdout, stderr, error } = this.props.output.clippy;
+function PaneWithCode(props) {
+  const { focus, kind, code, stdout, stderr, error } = props;
 
+  if (focus === kind) {
     return (
-      <div className="output-clippy">
-        {this.renderSection('error', 'Errors', error)}
-        {this.renderSection('stderr', 'Standard Error', stderr)}
-        {this.renderSection('stderr', 'Standard Output', stdout)}
+      <div className={`output-${kind}`}>
+        <Section kind='error' label='Errors' content={error} />
+        <Section kind='stderr' label='Standard Error' content={stderr} />
+        <Section kind='stderr' label='Standard Output' content={stdout} />
+        <Section kind='code' label='Result' content={code} />
       </div>
     );
+  } else {
+    return null;
   }
+}
 
-  renderLlvmIr() {
-    const { code, stdout, stderr, error } = this.props.output.llvmIr;
+function Gist(props) {
+  const { focus, id, url } = props;
 
-    return (
-      <div className="output-llvm-ir">
-        {this.renderSection('error', 'Errors', error)}
-        {this.renderSection('stderr', 'Standard Error', stderr)}
-        {this.renderSection('stderr', 'Standard Output', stdout)}
-        {this.renderSection('code', 'Result', code)}
-      </div>
-    );
-  }
-
-  renderAssembly() {
-    const { code, stdout, stderr, error } = this.props.output.assembly;
-
-    return (
-      <div className="output-asm">
-        {this.renderSection('error', 'Errors', error)}
-        {this.renderSection('stderr', 'Standard Error', stderr)}
-        {this.renderSection('stderr', 'Standard Output', stdout)}
-        {this.renderSection('code', 'Result', code)}
-      </div>
-    );
-  }
-
-  renderGist() {
-    const { id, url } = this.props.output.gist;
-
+  if (focus === 'gist') {
     return (
       <div className="output-gist">
         <p>
@@ -95,21 +74,54 @@ export default class Output extends React.Component {
         </p>
       </div>
     );
+  } else {
+    return null;
   }
+}
 
-  renderSection(kind, label, content) {
-    if (content) {
-      return (
-        <div className={`output-${kind}`}>
-          <span className="output-header">{label}</span>
-          <pre><code>{content}</code></pre>
+export default class Output extends React.Component {
+  render() {
+    const {
+      output: { meta: { focus }, execute, clippy, assembly, llvmIr, gist },
+      changeFocus
+    } = this.props;
+
+    const close = focus ? <button onClick={() => changeFocus(null)}>Close</button> : null;
+
+    return (
+      <div className="output">
+        <div className="output-tabs">
+          <Tab label="Execution" onClick={() => changeFocus('execute')} tabProps={execute} />
+          <Tab label="Clippy" onClick={() => changeFocus('clippy')} tabProps={clippy} />
+          <Tab label="ASM" onClick={() => changeFocus('asm')} tabProps={assembly} />
+          <Tab label="LLVM IR" onClick={() => changeFocus('llvm-ir')} tabProps={llvmIr} />
+          <Tab label="Gist" onClick={() => changeFocus('gist')} tabProps={gist} />
+          { close }
         </div>
-      );
-    } else {
-      return null;
-    }
+        <div className="output-body">
+          <SimplePane {...execute} kind="execute" focus={focus} />
+          <SimplePane {...clippy} kind="clippy" focus={focus} />
+          <PaneWithCode {...assembly} kind="asm" focus={focus} />
+          <PaneWithCode {...llvmIr} kind="llvm-ir" focus={focus} />
+          <Gist {...gist} focus={focus} />
+        </div>
+      </div>
+    );
   }
 };
+
+const simpleProps = PropTypes.shape({
+  stdout: PropTypes.string,
+  stderr: PropTypes.string,
+  error: PropTypes.string
+});
+
+const withCodeProps = PropTypes.shape({
+  code: PropTypes.string,
+  stdout: PropTypes.string,
+  stderr: PropTypes.string,
+  error: PropTypes.string
+});
 
 Output.propTypes = {
   meta: PropTypes.shape({
@@ -117,31 +129,10 @@ Output.propTypes = {
     focus: PropTypes.string
   }),
 
-  clippy: PropTypes.shape({
-    stdout: PropTypes.string,
-    stderr: PropTypes.string,
-    error: PropTypes.string
-  }),
-
-  llvmIr: PropTypes.shape({
-    code: PropTypes.string,
-    stdout: PropTypes.string,
-    stderr: PropTypes.string,
-    error: PropTypes.string
-  }),
-
-  assembly: PropTypes.shape({
-    code: PropTypes.string,
-    stdout: PropTypes.string,
-    stderr: PropTypes.string,
-    error: PropTypes.string
-  }),
-
-  execute: PropTypes.shape({
-    stdout: PropTypes.string,
-    stderr: PropTypes.string,
-    error: PropTypes.string
-  }),
+  execute: simpleProps,
+  clippy: simpleProps,
+  llvmIr: withCodeProps,
+  assembly: withCodeProps,
 
   gist: PropTypes.shape({
     id: PropTypes.string,
