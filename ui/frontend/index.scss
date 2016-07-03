@@ -203,6 +203,8 @@ body {
         border: $border;
         border-right: none;
 
+        cursor: pointer;
+
         &:last-of-type {
             border-right: $border;
         }
@@ -210,6 +212,8 @@ body {
         &-selected {
             background-color: $current-tab;
             border-bottom: none;
+
+            cursor: default;
 
             &:focus {
                 outline: none;
