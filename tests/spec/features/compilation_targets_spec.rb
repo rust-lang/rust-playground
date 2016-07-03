@@ -8,7 +8,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   end
 
   scenario "compiling to assembly" do
-    click_on("ASM")
+    within('.header') { click_on("ASM") }
 
     within('.output-code') do
       expect(page).to have_content '.text'
@@ -19,7 +19,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   end
 
   scenario "compiling to LLVM IR" do
-    click_on("LLVM IR")
+    within('.header') { click_on("LLVM IR") }
 
     within('.output-code') do
       expect(page).to have_content 'ModuleID'

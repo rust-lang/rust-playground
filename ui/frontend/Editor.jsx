@@ -41,7 +41,8 @@ export default class Editor extends React.Component {
          value={ code }
          onChange={ onEditCode }
          name="editor"
-         width="auto"
+         width="100%"
+         height="100%"
          editorProps={ { $blockScrolling: true } } />
     );
   }

@@ -2,6 +2,7 @@ var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var CompressionPlugin = require("compression-webpack-plugin");
+var autoprefixer = require('autoprefixer');
 
 module.exports = {
   entry: [
@@ -23,7 +24,7 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract("style", ["css", "sass"])
+        loader: ExtractTextPlugin.extract("style", ["css", "postcss", "sass"])
       }
     ]
   },
@@ -35,7 +36,11 @@ module.exports = {
     }),
     new ExtractTextPlugin("styles-[hash].css"),
     new webpack.EnvironmentPlugin(["NODE_ENV"])
-  ]
+  ],
+
+  postcss: function () {
+    return [autoprefixer];
+  }
 };
 
 if (process.env.NODE_ENV === 'production') {

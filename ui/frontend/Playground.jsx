@@ -3,7 +3,8 @@ import {
   changeEditor, changeChannel, changeMode,
   performExecute, performCompileToAssembly, performCompileToLLVM,
   performFormat, performClippy, performSaveToGist,
-  editCode, toggleConfiguration
+  editCode, toggleConfiguration,
+  changeFocus
 } from './actions';
 import { connect } from 'react-redux';
 
@@ -15,27 +16,37 @@ import Output from './Output.jsx';
 class Playground extends React.Component {
   render() {
     const { code,
-            status: { code: compiledCode, stdout, stderr, error, gist },
             execute, compileToAssembly, compileToLLVM, format, clippy, saveToGist,
             configuration: { channel, mode, tests, editor, shown: showConfig },
             changeChannel, changeMode, onEditCode, changeEditor,
-            toggleConfiguration
+            toggleConfiguration,
+            output, changeFocus
           } = this.props;
 
     const config = showConfig ? this.renderConfiguration() : null;
 
+    const outputFocused = output.meta.focus ? 'playground-output-focused' : '';
+
     return (
       <div>
         { config }
-        <Header execute={execute}
-                compileToAssembly={compileToAssembly}
-                compileToLLVM={compileToLLVM}
-                format={format} clippy={clippy} saveToGist={saveToGist}
-                channel={channel} changeChannel={changeChannel}
-                mode={mode} changeMode={changeMode}
-                tests={tests} toggleConfiguration={toggleConfiguration} />
-        <Editor editor={editor} code={code} onEditCode={onEditCode} />
-        <Output code={compiledCode} stdout={stdout} stderr={stderr} error={error} gist={gist} />
+        <div className="playground">
+          <div className="playground-header">
+            <Header execute={execute}
+                    compileToAssembly={compileToAssembly}
+                    compileToLLVM={compileToLLVM}
+                    format={format} clippy={clippy} saveToGist={saveToGist}
+                    channel={channel} changeChannel={changeChannel}
+                    mode={mode} changeMode={changeMode}
+                    tests={tests} toggleConfiguration={toggleConfiguration} />
+          </div>
+          <div className="playground-editor">
+            <Editor editor={editor} code={code} onEditCode={onEditCode} />
+          </div>
+          <div className={`playground-output ${outputFocused}`}>
+            <Output output={output} changeFocus={changeFocus} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -53,6 +64,20 @@ class Playground extends React.Component {
       </div>
     );
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.output.meta.focus !== prevProps.output.meta.focus) {
+      // Inform the ACE editor that its size has changed.
+      try {
+        window.dispatchEvent(new Event('resize'));
+      } catch (ex) {
+        // IE 11
+        const evt = window.document.createEvent('UIEvents');
+        evt.initUIEvent('resize', true, false, window, 0);
+        window.dispatchEvent(evt);
+      }
+    }
+  }
 };
 
 Playground.propTypes = {
@@ -64,17 +89,13 @@ Playground.propTypes = {
   configuration: PropTypes.object.isRequired,
   changeChannel: PropTypes.func.isRequired,
   onEditCode: PropTypes.func.isRequired,
-  code: PropTypes.string.isRequired,
-  status: PropTypes.object.isRequired
+  code: PropTypes.string.isRequired
 };
 
 const mapStateToProps = (state) => {
-  return {
-    configuration: state.configuration,
-    code: state.code,
-    status: state.status
-  };
-}
+  const { configuration, code, output } = state;
+  return { configuration, code, output };
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
@@ -82,6 +103,7 @@ const mapDispatchToProps = (dispatch) => {
     changeEditor: (editor) => dispatch(changeEditor(editor)),
     changeChannel: (channel) => dispatch(changeChannel(channel)),
     changeMode: (mode) => dispatch(changeMode(mode)),
+    changeFocus: (outputPane) => dispatch(changeFocus(outputPane)),
     execute: () => dispatch(performExecute()),
     compileToAssembly: () => dispatch(performCompileToAssembly()),
     compileToLLVM: () => dispatch(performCompileToLLVM()),

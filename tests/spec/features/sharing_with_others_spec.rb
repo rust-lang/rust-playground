@@ -7,13 +7,13 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
   scenario "saving to a Gist" do
     editor.set(code)
 
-    click_on 'Gist'
+    within('.header') { click_on 'Gist' }
 
     # Save the other link before we navigate away
-    direct_link = find_link("The gist")[:href]
+    direct_link = find_link("Direct link to the gist")[:href]
 
-    click_on "Share me"
-    expect(page).to_not have_link("Share me")
+    click_on "Permalink to the playground"
+    expect(page).to_not have_link("Permalink to the playground")
     expect(editor).to have_line 'automated test'
 
     visit direct_link

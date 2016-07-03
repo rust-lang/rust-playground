@@ -6,7 +6,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
 
   scenario "formatting code" do
     editor.set 'fn main() { [1,2,3,4]; }'
-    click_on("Format")
+    within('.header') { click_on("Format") }
 
     within('#editor') do
       expect(editor).to have_line '[1, 2, 3, 4];'
@@ -15,7 +15,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
 
   scenario "linting code with Clippy" do
     editor.set code_with_lint_warnings
-    click_on("Clippy")
+    within('.header') { click_on("Clippy") }
 
     within(".output-stderr") do
       expect(page).to have_content 'warn(eq_op)'
