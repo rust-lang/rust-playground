@@ -41,7 +41,7 @@ function SimplePane(props) {
       <div className={`output-${kind}`}>
         <Section kind='error' label='Errors' content={error} />
         <Section kind='stderr' label='Standard Error' content={stderr} />
-        <Section kind='stderr' label='Standard Output' content={stdout} />
+        <Section kind='stdout' label='Standard Output' content={stdout} />
       </div>
     );
   } else {
