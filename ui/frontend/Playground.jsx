@@ -68,7 +68,14 @@ class Playground extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.props.output.meta.focus !== prevProps.output.meta.focus) {
       // Inform the ACE editor that its size has changed.
-      window.dispatchEvent(new Event('resize'));
+      try {
+        window.dispatchEvent(new Event('resize'));
+      } catch (ex) {
+        // IE 11
+        const evt = window.document.createEvent('UIEvents');
+        evt.initUIEvent('resize', true, false, window, 0);
+        window.dispatchEvent(evt);
+      }
     }
   }
 };

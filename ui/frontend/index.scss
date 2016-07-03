@@ -21,7 +21,7 @@ body {
 
 .playground {
     display: flex;
-    min-height: 100vh;
+    height: 100vh;
     flex-direction: column;
 
     padding-bottom: 1em;
@@ -217,7 +217,7 @@ body {
         }
 
         &-close {
-            flex: 0 1 0%;
+            flex: 0 0 auto;
         }
     }
 
