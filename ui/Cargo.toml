@@ -17,4 +17,8 @@ mount = "0.1.0"
 quick-error = "1.1.0"
 serde = "0.7.10"
 serde_json = "0.7.1"
-staticfile = { version = "0.2.0", features = ["cache"] }
+
+[dependencies.staticfile]
+git = "https://github.com/integer32llc/staticfile"
+branch = "no-nanoseconds"
+features = ["cache"]
