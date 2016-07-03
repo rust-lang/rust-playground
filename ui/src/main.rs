@@ -1,6 +1,4 @@
 #![feature(try_from)]
-#![feature(custom_derive, plugin)]
-#![plugin(serde_macros)]
 
 #[macro_use]
 extern crate log;
@@ -164,19 +162,7 @@ type Result<T> = ::std::result::Result<T, Error>;
 const FATAL_ERROR_JSON: &'static str =
     r#"{"error": "Multiple cascading errors occurred, abandon all hope"}"#;
 
-#[derive(Debug, Clone, Serialize)]
-struct ErrorJson {
-    error: String,
-}
-
-#[derive(Debug, Clone, Deserialize)]
-struct CompileRequest {
-    target: String,
-    channel: String,
-    mode: String,
-    tests: bool,
-    code: String,
-}
+include!(concat!(env!("OUT_DIR"), "/data.rs"));
 
 impl TryFrom<CompileRequest> for sandbox::CompileRequest {
     type Err = Error;
@@ -192,14 +178,6 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
-struct CompileResponse {
-    success: bool,
-    code: String,
-    stdout: String,
-    stderr: String,
-}
-
 impl From<sandbox::CompileResponse> for CompileResponse {
     fn from(me: sandbox::CompileResponse) -> Self {
         CompileResponse {
@@ -209,14 +187,6 @@ impl From<sandbox::CompileResponse> for CompileResponse {
             stderr: me.stderr,
         }
     }
-}
-
-#[derive(Debug, Clone, Deserialize)]
-struct ExecuteRequest {
-    channel: String,
-    mode: String,
-    tests: bool,
-    code: String,
 }
 
 impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
@@ -232,13 +202,6 @@ impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
-struct ExecuteResponse {
-    success: bool,
-    stdout: String,
-    stderr: String,
-}
-
 impl From<sandbox::ExecuteResponse> for ExecuteResponse {
     fn from(me: sandbox::ExecuteResponse) -> Self {
         ExecuteResponse {
@@ -249,25 +212,12 @@ impl From<sandbox::ExecuteResponse> for ExecuteResponse {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
-struct FormatRequest {
-    code: String,
-}
-
 impl From<FormatRequest> for sandbox::FormatRequest {
     fn from(me: FormatRequest) -> Self {
         sandbox::FormatRequest {
             code: me.code,
         }
     }
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct FormatResponse {
-    success: bool,
-    code: String,
-    stdout: String,
-    stderr: String,
 }
 
 impl From<sandbox::FormatResponse> for FormatResponse {
@@ -281,24 +231,12 @@ impl From<sandbox::FormatResponse> for FormatResponse {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
-struct ClippyRequest {
-    code: String,
-}
-
 impl From<ClippyRequest> for sandbox::ClippyRequest {
     fn from(me: ClippyRequest) -> Self {
         sandbox::ClippyRequest {
             code: me.code,
         }
     }
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct ClippyResponse {
-    success: bool,
-    stdout: String,
-    stderr: String,
 }
 
 impl From<sandbox::ClippyResponse> for ClippyResponse {
