@@ -14,8 +14,6 @@ RSpec.feature "Compiling in different modes", type: :feature, js: true do
     choose_styled("Debug")
     click_on("Run")
 
-    expect(page).to_not have_css('.output-stderr')
-
     within('.output-stdout') do
       expect(page).to have_content 'Compiling in debug mode'
       expect(page).to_not have_content 'Compiling in release mode'
@@ -25,8 +23,6 @@ RSpec.feature "Compiling in different modes", type: :feature, js: true do
   scenario "compiling in release mode" do
     choose_styled("Release")
     click_on("Run")
-
-    expect(page).to_not have_css('.output-stderr')
 
     within('.output-stdout') do
       expect(page).to_not have_content 'Compiling in debug mode'

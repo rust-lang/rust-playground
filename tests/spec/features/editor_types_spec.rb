@@ -14,8 +14,6 @@ RSpec.feature "Editing in different editors", type: :feature, js: true do
 
     click_on("Run")
 
-    expect(page).to_not have_css('.output-stderr')
-
     within('.output-stdout') do
       expect(page).to have_content 'simple editor'
     end

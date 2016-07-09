@@ -1,0 +1,16 @@
+[package]
+authors = ["Jake Goulding <jake.goulding@integer32.com>"]
+name = "top-crates"
+version = "0.1.0"
+
+[dependencies]
+hyper = "0.9.9"
+mktemp = "0.2.1"
+semver = "0.2.3"
+serde = "0.7.12"
+serde_json = "0.7.4"
+
+[dependencies.toml]
+version = "0.1.30"
+default-features = false
+features = ["serde"]
