@@ -1,0 +1,8 @@
+
+[dependencies]
+rand = "0.3.14"
+
+[package]
+authors = ["The Rust Playground"]
+name = "playground"
+version = "0.0.1"

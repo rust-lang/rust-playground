@@ -1,17 +1,15 @@
-FROM ubuntu:14.04
-
-RUN apt-get update && apt-get install -y \
-    curl \
-    gcc \
- && rm -rf /var/lib/apt/lists/*
-
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-
-ENV PATH=/root/.cargo/bin:$PATH
+FROM rust-base
 
 ARG date
 RUN rustup default "stable-${date}"
 
-ADD entrypoint.sh /root/
+RUN cd / && \
+    cargo new --bin playground
+
+WORKDIR /playground
+
+RUN mv /root/Cargo.toml ./Cargo.toml && \
+    cargo build && \
+    cargo build --release
 
 ENTRYPOINT ["/root/entrypoint.sh"]

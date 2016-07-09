@@ -2,14 +2,18 @@
 
 set -eu -o pipefail
 
-base=https://static.rust-lang.org/dist
+cd base
+docker build -t 'rust-base' .
+cd ..
+
+date_url_base=https://static.rust-lang.org/dist
 
 for channel in stable beta nightly; do
     filename="channel-rust-${channel}-date.txt"
 
     cd "$channel"
 
-    curl -o "${filename}" "${base}/${filename}"
+    curl -o "${filename}" "${date_url_base}/${filename}"
     date=$(cat "${filename}")
 
     docker build -t "rust-${channel}" --build-arg date="${date}" .
