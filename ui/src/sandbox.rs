@@ -162,7 +162,7 @@ impl Sandbox {
     fn format_command(&self) -> Command {
         let mut cmd = self.docker_command();
 
-        cmd.arg("rustfmt").args(&["main.rs"]);
+        cmd.arg("rustfmt").args(&["--write-mode", "overwrite", "src/main.rs"]);
 
         debug!("Formatting command is {:?}", cmd);
 
@@ -497,6 +497,22 @@ mod test {
         assert!(resp.code.contains(".file"));
         assert!(resp.code.contains(".section"));
         assert!(resp.code.contains(".align"));
+    }
+
+    #[test]
+    fn formatting_code() {
+        let req = FormatRequest {
+            code: "fn foo () { method_call(); }".to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.format(&req).expect("Unable to format code");
+
+        let lines: Vec<_> = resp.code.lines().collect();
+
+        assert_eq!(lines[0], "fn foo() {");
+        assert_eq!(lines[1], "    method_call();");
+        assert_eq!(lines[2], "}");
     }
 
     #[test]
