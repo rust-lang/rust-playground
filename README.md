@@ -97,8 +97,7 @@ cd ../
 #### Build the UI backend
 ```
 cd ui
-docker run -it --rm -v $PWD:/ui --entrypoint /bin/bash rust-nightly
-cd /ui
+docker run -it --rm -v $PWD:/ui --workdir /ui --entrypoint /bin/bash rust-nightly
 rustup target add x86_64-unknown-linux-musl
 cargo build --target=x86_64-unknown-linux-musl --release
 # exit docker
@@ -106,8 +105,7 @@ cargo build --target=x86_64-unknown-linux-musl --release
 
 #### Build the UI frontend
 ```
-docker run -it --rm -v $PWD/frontend:/ui --entrypoint /bin/bash node
-cd /ui
+docker run -it --rm -v $PWD/frontend:/ui --workdir /ui --entrypoint /bin/bash node
 npm install
 NODE_ENV=production npm run build
 # exit docker
