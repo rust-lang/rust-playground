@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react';
 
+import Loader from './Loader.jsx';
+
 const hasProperties = (obj) => Object.values(obj).some(val => val);
 
 function Tab(props) {
@@ -18,13 +20,17 @@ function Tab(props) {
   }
 }
 
+function Header(props) {
+  return <span className="output-header">{ props.label }</span>;
+}
+
 function Section(props) {
   const { kind, label, content } = props;
 
   if (content) {
     return (
       <div className={`output-${kind}`}>
-        <span className="output-header">{label}</span>
+        <Header label={label} />
         <pre><code>{content}</code></pre>
       </div>
     );
@@ -33,15 +39,27 @@ function Section(props) {
   }
 }
 
+function MyLoader(props) {
+  return (
+    <div>
+      <Header label="Progress" />
+      <Loader />
+    </div>
+  );
+}
+
 function SimplePane(props) {
-  const { focus, kind, stdout, stderr, error } = props;
+  const { focus, kind, requestsInProgress, stdout, stderr, error, children } = props;
 
   if (focus === kind) {
+    const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
     return (
       <div className={`output-${kind}`}>
+        { loader }
         <Section kind='error' label='Errors' content={error} />
         <Section kind='stderr' label='Standard Error' content={stderr} />
         <Section kind='stdout' label='Standard Output' content={stdout} />
+        { children }
       </div>
     );
   } else {
@@ -50,20 +68,13 @@ function SimplePane(props) {
 }
 
 function PaneWithCode(props) {
-  const { focus, kind, code, stdout, stderr, error } = props;
+  const { code, ...rest } = props;
 
-  if (focus === kind) {
-    return (
-      <div className={`output-${kind}`}>
-        <Section kind='error' label='Errors' content={error} />
-        <Section kind='stderr' label='Standard Error' content={stderr} />
-        <Section kind='stderr' label='Standard Output' content={stdout} />
-        <Section kind='code' label='Result' content={code} />
-      </div>
-    );
-  } else {
-    return null;
-  }
+  return (
+    <SimplePane {...rest} >
+      <Section kind='code' label='Result' content={code} />
+    </SimplePane>
+  );
 }
 
 function Gist(props) {
