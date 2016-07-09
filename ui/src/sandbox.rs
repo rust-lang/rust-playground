@@ -172,7 +172,7 @@ impl Sandbox {
     fn clippy_command(&self) -> Command {
         let mut cmd = self.docker_command();
 
-        cmd.arg("clippy").args(&["bash", "-c", "cp main.rs /playground/src/main.rs && cd /playground && cargo clippy"]);
+        cmd.arg("clippy").args(&["cargo", "clippy"]);
 
         debug!("Clippy command is {:?}", cmd);
 
@@ -513,6 +513,26 @@ mod test {
         assert_eq!(lines[0], "fn foo() {");
         assert_eq!(lines[1], "    method_call();");
         assert_eq!(lines[2], "}");
+    }
+
+    #[test]
+    fn linting_code() {
+        let code = r#"
+        fn main() {
+            let a = 0.0 / 0.0;
+            println!("NaN is {}", a);
+        }
+        "#;
+
+        let req = ClippyRequest {
+            code: code.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.clippy(&req).expect("Unable to lint code");
+
+        assert!(resp.stderr.contains("warn(eq_op)"));
+        assert!(resp.stderr.contains("warn(zero_divided_by_zero)"));
     }
 
     #[test]
