@@ -21,7 +21,8 @@ const meta = (state = defaultMeta, action) => {
     return { ...state, focus: action.focus };
 
   case actions.REQUEST_CLIPPY:
-  case actions.REQUEST_COMPILE:
+  case actions.REQUEST_COMPILE_LLVM_IR:
+  case actions.REQUEST_COMPILE_ASSEMBLY:
   case actions.REQUEST_EXECUTE:
   case actions.REQUEST_FORMAT:
   case actions.REQUEST_GIST_LOAD:
@@ -32,9 +33,13 @@ const meta = (state = defaultMeta, action) => {
   case actions.CLIPPY_SUCCEEDED:
     return finishAndFocus('clippy');
 
-  case actions.COMPILE_FAILED:
-  case actions.COMPILE_SUCCEEDED:
-    return finishAndFocus(action.compileKind);
+  case actions.COMPILE_LLVM_IR_FAILED:
+  case actions.COMPILE_LLVM_IR_SUCCEEDED:
+    return finishAndFocus('llvm-ir');
+
+  case actions.COMPILE_ASSEMBLY_FAILED:
+  case actions.COMPILE_ASSEMBLY_SUCCEEDED:
+    return finishAndFocus('asm');
 
   case actions.EXECUTE_FAILED:
   case actions.EXECUTE_SUCCEEDED:
@@ -87,21 +92,13 @@ const defaultLlvmIr = {
 
 const llvmIr = (state = defaultLlvmIr, action) => {
   switch (action.type) {
-  case actions.REQUEST_COMPILE:
-    if (action.compileKind === 'llvm-ir') {
-      return defaultLlvmIr;
-    } else {
-      return state;
-    }
-  case actions.COMPILE_SUCCEEDED: {
-    const { compileKind, code = "", stdout = "", stderr = "" } = action;
-    if (compileKind === 'llvm-ir') {
-      return { ...state, code, stdout, stderr };
-    } else {
-      return state;
-    }
+  case actions.REQUEST_COMPILE_LLVM_IR:
+    return defaultLlvmIr;
+  case actions.COMPILE_LLVM_IR_SUCCEEDED: {
+    const { code = "", stdout = "", stderr = "" } = action;
+    return { ...state, code, stdout, stderr };
   }
-  case actions.COMPILE_FAILED:
+  case actions.COMPILE_LLVM_IR_FAILED:
     return { ...state, error: action.error };
   default:
     return state;
@@ -117,21 +114,13 @@ const defaultAssembly = {
 
 const assembly = (state = defaultAssembly, action) => {
   switch (action.type) {
-  case actions.REQUEST_COMPILE:
-    if (action.compileKind === 'asm') {
-      return defaultAssembly;
-    } else {
-      return state;
-    }
-  case actions.COMPILE_SUCCEEDED: {
-    const { compileKind, code = "", stdout = "", stderr = "" } = action;
-    if (compileKind === 'asm') {
-      return { ...state, code, stdout, stderr };
-    } else {
-      return state;
-    }
+  case actions.REQUEST_COMPILE_ASSEMBLY:
+    return defaultAssembly;
+  case actions.COMPILE_ASSEMBLY_SUCCEEDED: {
+    const { code = "", stdout = "", stderr = "" } = action;
+    return { ...state, code, stdout, stderr };
   }
-  case actions.COMPILE_FAILED:
+  case actions.COMPILE_ASSEMBLY_FAILED:
     return { ...state, error: action.error };
   default:
     return state;

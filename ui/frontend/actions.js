@@ -89,40 +89,68 @@ export function performExecute() {
   };
 }
 
-export const REQUEST_COMPILE = 'REQUEST_COMPILE';
-export const COMPILE_SUCCEEDED = 'COMPILE_SUCCEEDED';
-export const COMPILE_FAILED = 'COMPILE_FAILED';
-
-function requestCompile(compileKind) {
-  return { type: REQUEST_COMPILE, compileKind };
-}
-
-function receiveCompileSuccess(compileKind, json) {
-  let { code, stdout, stderr } = json;
-  return { type: COMPILE_SUCCEEDED, code, stdout, stderr, compileKind };
-}
-
-function receiveCompileFailure(compileKind, json) {
-  return { type: COMPILE_FAILED, error: json.error, compileKind };
-}
-
-function performCompile(target) {
+function performCompile(target, { request, success, failure }) {
   // TODO: Check a cache
   return function (dispatch, getState) {
-    dispatch(requestCompile(target));
+    dispatch(request());
 
     const state = getState();
     const { code, configuration: { channel, mode, tests } } = state;
     const body = { channel, mode, tests, code, target };
 
     return jsonPost(routes.compile, body)
-      .then(json => dispatch(receiveCompileSuccess(target, json)))
-      .catch(json => dispatch(receiveCompileFailure(target, json)));
+      .then(json => dispatch(success(json)))
+      .catch(json => dispatch(failure(json)));
   };
 }
 
-export const performCompileToAssembly = () => performCompile('asm');
-export const performCompileToLLVM = () => performCompile('llvm-ir');
+export const REQUEST_COMPILE_ASSEMBLY = 'REQUEST_COMPILE_ASSEMBLY';
+export const COMPILE_ASSEMBLY_SUCCEEDED = 'COMPILE_ASSEMBLY_SUCCEEDED';
+export const COMPILE_ASSEMBLY_FAILED = 'COMPILE_ASSEMBLY_FAILED';
+
+function requestCompileAssembly() {
+  return { type: REQUEST_COMPILE_ASSEMBLY };
+}
+
+function receiveCompileAssemblySuccess(json) {
+  let { code, stdout, stderr } = json;
+  return { type: COMPILE_ASSEMBLY_SUCCEEDED, code, stdout, stderr };
+}
+
+function receiveCompileAssemblyFailure(json) {
+  return { type: COMPILE_ASSEMBLY_FAILED, error: json.error };
+}
+
+export const performCompileToAssembly = () =>
+  performCompile('asm', {
+    request: requestCompileAssembly,
+    success: receiveCompileAssemblySuccess,
+    failure: receiveCompileAssemblyFailure
+  });
+
+export const REQUEST_COMPILE_LLVM_IR = 'REQUEST_COMPILE_LLVM_IR';
+export const COMPILE_LLVM_IR_SUCCEEDED = 'COMPILE_LLVM_IR_SUCCEEDED';
+export const COMPILE_LLVM_IR_FAILED = 'COMPILE_LLVM_IR_FAILED';
+
+function requestCompileLlvmIr() {
+  return { type: REQUEST_COMPILE_LLVM_IR };
+}
+
+function receiveCompileLlvmIrSuccess(json) {
+  let { code, stdout, stderr } = json;
+  return { type: COMPILE_LLVM_IR_SUCCEEDED, code, stdout, stderr };
+}
+
+function receiveCompileLlvmIrFailure(json) {
+  return { type: COMPILE_LLVM_IR_FAILED, error: json.error };
+}
+
+export const performCompileToLLVM = () =>
+  performCompile('llvm-ir', {
+    request: requestCompileLlvmIr,
+    success: receiveCompileLlvmIrSuccess,
+    failure: receiveCompileLlvmIrFailure
+  });
 
 export const EDIT_CODE = 'EDIT_CODE';
 
