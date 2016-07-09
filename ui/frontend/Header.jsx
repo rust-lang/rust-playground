@@ -13,7 +13,7 @@ export default class Header extends React.Component {
   render() {
     const {
       execute, compileToAssembly, compileToLLVM,
-      format, clippy, saveToGist,
+      format, clippy, gistSave,
       channel, changeChannel, mode, changeMode,
       tests,
       toggleConfiguration
@@ -47,7 +47,7 @@ export default class Header extends React.Component {
 
         <div className="header-sharing header-set">
           <button className="header-btn"
-                  onClick={ saveToGist }>Gist</button>
+                  onClick={ gistSave }>Gist</button>
         </div>
 
         <div className="header-mode header-set">
@@ -78,7 +78,7 @@ Header.propTypes = {
   compileToLLVM: PropTypes.func.isRequired,
   format: PropTypes.func.isRequired,
   clippy: PropTypes.func.isRequired,
-  saveToGist: PropTypes.func.isRequired,
+  gistSave: PropTypes.func.isRequired,
   channel: PropTypes.string.isRequired,
   changeChannel: PropTypes.func.isRequired,
   mode: PropTypes.string.isRequired,

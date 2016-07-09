@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import {
   changeEditor, changeChannel, changeMode,
   performExecute, performCompileToAssembly, performCompileToLLVM,
-  performFormat, performClippy, performSaveToGist,
+  performFormat, performClippy, performGistSave,
   editCode, toggleConfiguration,
   changeFocus
 } from './actions';
@@ -16,7 +16,7 @@ import Output from './Output.jsx';
 class Playground extends React.Component {
   render() {
     const { code,
-            execute, compileToAssembly, compileToLLVM, format, clippy, saveToGist,
+            execute, compileToAssembly, compileToLLVM, format, clippy, gistSave,
             configuration: { channel, mode, tests, editor, shown: showConfig },
             changeChannel, changeMode, onEditCode, changeEditor,
             toggleConfiguration,
@@ -35,7 +35,7 @@ class Playground extends React.Component {
             <Header execute={execute}
                     compileToAssembly={compileToAssembly}
                     compileToLLVM={compileToLLVM}
-                    format={format} clippy={clippy} saveToGist={saveToGist}
+                    format={format} clippy={clippy} gistSave={gistSave}
                     channel={channel} changeChannel={changeChannel}
                     mode={mode} changeMode={changeMode}
                     tests={tests} toggleConfiguration={toggleConfiguration} />
@@ -85,7 +85,7 @@ Playground.propTypes = {
   compileToAssembly: PropTypes.func.isRequired,
   compileToLLVM: PropTypes.func.isRequired,
   format: PropTypes.func.isRequired,
-  saveToGist: PropTypes.func.isRequired,
+  gistSave: PropTypes.func.isRequired,
   configuration: PropTypes.object.isRequired,
   changeChannel: PropTypes.func.isRequired,
   onEditCode: PropTypes.func.isRequired,
@@ -109,7 +109,7 @@ const mapDispatchToProps = (dispatch) => {
     compileToLLVM: () => dispatch(performCompileToLLVM()),
     format: () => dispatch(performFormat()),
     clippy: () => dispatch(performClippy()),
-    saveToGist: () => dispatch(performSaveToGist()),
+    gistSave: () => dispatch(performGistSave()),
     onEditCode: (code) => dispatch(editCode(code))
   };
 };

@@ -78,17 +78,18 @@ function PaneWithCode(props) {
 }
 
 function Gist(props) {
-  const { focus, id, url } = props;
+  const { focus, requestsInProgress, id, url } = props;
 
   if (focus === 'gist') {
+    const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
+    const permalink = id ? <p><a href={`/?gist=${id}`}>Permalink to the playground</a></p> : null;
+    const directLink = url ? (<p><a href={url}>Direct link to the gist</a></p>) : null;
+
     return (
       <div className="output-gist">
-        <p>
-          <a href={`/?gist=${id}`}>Permalink to the playground</a>
-        </p>
-        <p>
-          <a href={url}>Direct link to the gist</a>
-        </p>
+        { loader }
+        { permalink }
+        { directLink }
       </div>
     );
   } else {

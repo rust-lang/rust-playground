@@ -26,7 +26,7 @@ const meta = (state = defaultMeta, action) => {
     return { ...state, focus: 'format' }; // TODO: show somehow
 
   case actions.REQUEST_GIST_LOAD:
-  case actions.REQUEST_SAVE_TO_GIST:
+  case actions.REQUEST_GIST_SAVE:
     return { ...state, focus: 'gist' };
 
   default:
@@ -141,21 +141,22 @@ const defaultGist = {
   error: null
 };
 
-// TODO: rename SAVE_TO_GIST actions
 const gist = (state = defaultGist, action) => {
   switch (action.type) {
-  case actions.REQUEST_GIST: // TODO: load gist request?
+  case actions.REQUEST_GIST_LOAD:
+  case actions.REQUEST_GIST_SAVE:
     return start(defaultGist, state);
-  case actions.SAVE_TO_GIST_SUCCEEDED: {
-    let { id, url } = action;
-    return finish(state, { id, url });
-  }
-  case actions.SAVE_TO_GIST_FAILED:
-    return finish(state, { error: "Some kind of error" });
-  case actions.GIST_LOAD_SUCCEEDED: {
+
+  case actions.GIST_LOAD_SUCCEEDED:
+  case actions.GIST_SAVE_SUCCEEDED: {
     const { id, url } = action;
     return finish(state, { id, url });
   }
+
+  case actions.GIST_LOAD_FAILED:
+  case actions.GIST_SAVE_FAILED:
+    return finish(state, { error: "Some kind of error" });
+
   default:
     return state;
   }

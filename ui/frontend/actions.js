@@ -246,31 +246,31 @@ export function performGistLoad(id) {
   };
 }
 
-export const REQUEST_SAVE_TO_GIST = 'REQUEST_SAVE_TO_GIST';
-export const SAVE_TO_GIST_SUCCEEDED = 'SAVE_TO_GIST_SUCCEEDED';
-export const SAVE_TO_GIST_FAILED = 'SAVE_TO_GIST_FAILED';
+export const REQUEST_GIST_SAVE = 'REQUEST_GIST_SAVE';
+export const GIST_SAVE_SUCCEEDED = 'GIST_SAVE_SUCCEEDED';
+export const GIST_SAVE_FAILED = 'GIST_SAVE_FAILED';
 
-function requestSaveToGist() {
-  return { type: REQUEST_SAVE_TO_GIST };
+function requestGistSave() {
+  return { type: REQUEST_GIST_SAVE };
 }
 
-function receiveSaveToGistSuccess(json) {
+function receiveGistSaveSuccess(json) {
   const { id, url } = json;
-  return { type: SAVE_TO_GIST_SUCCEEDED, id, url };
+  return { type: GIST_SAVE_SUCCEEDED, id, url };
 }
 
-function receiveSaveToGistFailure(json) {
-  return { type: SAVE_TO_GIST_FAILED, error: json.error };
+function receiveGistSaveFailure(json) {
+  return { type: GIST_SAVE_FAILED, error: json.error };
 }
 
-export function performSaveToGist() {
+export function performGistSave() {
   return function (dispatch, getState) {
-    dispatch(requestSaveToGist());
+    dispatch(requestGistSave());
 
     const { code } = getState();
 
     return saveGist(code)
-      .then(json => dispatch(receiveSaveToGistSuccess(json)));
+      .then(json => dispatch(receiveGistSaveSuccess(json)));
     // TODO: Failure case
   };
 }
