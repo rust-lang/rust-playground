@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{self, BufReader, BufWriter, ErrorKind};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::Command;
 use std::string;
 
@@ -45,7 +45,8 @@ quick_error! {
 pub type Result<T> = ::std::result::Result<T, Error>;
 
 pub struct Sandbox {
-    scratch_dir: Temp,
+    input_file: Temp,
+    output_dir: Temp,
 }
 
 fn vec_to_str(v: Vec<u8>) -> Result<String> {
@@ -55,22 +56,27 @@ fn vec_to_str(v: Vec<u8>) -> Result<String> {
 impl Sandbox {
     pub fn new() -> Result<Self> {
         Ok(Sandbox {
-            scratch_dir: try!(Temp::new_dir().map_err(Error::UnableToCreateTempDir)),
+            input_file: try!(Temp::new_file().map_err(Error::UnableToCreateTempDir)),
+            output_dir: try!(Temp::new_dir().map_err(Error::UnableToCreateTempDir)),
         })
     }
 
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
         try!(self.write_source_code(&req.code));
 
-        let mut output_path = self.scratch_dir.as_ref().to_path_buf();
-        output_path.push("compiler-output");
         let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
+        let mut result_path = self.output_dir.as_ref().to_path_buf();
+        match req.target {
+            CompileTarget::Assembly => result_path.push("compilation.s"),
+            CompileTarget::LlvmIr   => result_path.push("compilation.ll"),
+        }
+
         Ok(CompileResponse {
             success: output.status.success(),
-            code: try!(read(&output_path)).unwrap_or_else(String::new),
+            code: try!(read(&result_path)).unwrap_or_else(String::new),
             stdout: try!(vec_to_str(output.stdout)),
             stderr: try!(vec_to_str(output.stderr)),
         })
@@ -90,14 +96,14 @@ impl Sandbox {
     }
 
     pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
-        let path = try!(self.write_source_code(&req.code));
+        try!(self.write_source_code(&req.code));
         let mut command = self.format_command();
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
         Ok(FormatResponse {
             success: output.status.success(),
-            code: try!(try!(read(path.as_path())).ok_or(Error::OutputMissing)),
+            code: try!(try!(read(self.input_file.as_ref())).ok_or(Error::OutputMissing)),
             stdout: try!(vec_to_str(output.stdout)),
             stderr: try!(vec_to_str(output.stderr)),
         })
@@ -116,30 +122,25 @@ impl Sandbox {
         })
     }
 
-    fn write_source_code(&self, code: &str) -> Result<PathBuf> {
+    fn write_source_code(&self, code: &str) -> Result<()> {
         let data = code.as_bytes();
 
-        let path = {
-            let mut p = self.scratch_dir.to_path_buf();
-            p.push("main.rs");
-            p
-        };
-
-        let file = try!(File::create(&path).map_err(Error::UnableToCreateSourceFile));
+        let path = self.input_file.as_ref();
+        let file = try!(File::create(path).map_err(Error::UnableToCreateSourceFile));
         let mut file = BufWriter::new(file);
 
         try!(file.write_all(data).map_err(Error::UnableToCreateSourceFile));
 
         debug!("Wrote {} bytes of source to {}", data.len(), path.display());
-        Ok(path)
+        Ok(())
     }
 
     fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool) -> Command {
         let mut cmd = self.docker_command();
 
-        let execution_cmd = build_execution_command(Some((target, "compiler-output")), mode, tests, "main.rs");
+        let execution_cmd = build_execution_command(Some(target), mode, tests);
 
-        cmd.arg(&channel.container_name()).args(&["bash", "-c", &execution_cmd]);
+        cmd.arg(&channel.container_name()).args(&execution_cmd);
 
         debug!("Compilation command is {:?}", cmd);
 
@@ -149,10 +150,9 @@ impl Sandbox {
     fn execute_command(&self, channel: Channel, mode: Mode, tests: bool) -> Command {
         let mut cmd = self.docker_command();
 
-        let mut execution_cmd = build_execution_command(None, mode, tests, "main.rs");
-        execution_cmd.push_str(" && ./main");
+        let execution_cmd = build_execution_command(None, mode, tests);
 
-        cmd.arg(&channel.container_name()).args(&["bash", "-c", &execution_cmd]);
+        cmd.arg(&channel.container_name()).args(&execution_cmd);
 
         debug!("Execution command is {:?}", cmd);
 
@@ -180,19 +180,22 @@ impl Sandbox {
     }
 
     fn docker_command(&self) -> Command {
-        const DIR_INSIDE_CONTAINER: &'static str = "/source";
+        let mut mount_input_file = self.input_file.as_ref().as_os_str().to_os_string();
+        mount_input_file.push(":");
+        mount_input_file.push("/playground/src/main.rs");
 
-        let mut mount_source_volume = self.scratch_dir.as_ref().as_os_str().to_os_string();
-        mount_source_volume.push(":");
-        mount_source_volume.push(DIR_INSIDE_CONTAINER);
+        let mut mount_output_dir = self.output_dir.as_ref().as_os_str().to_os_string();
+        mount_output_dir.push(":");
+        mount_output_dir.push("/playground-result");
 
         let mut cmd = Command::new("docker");
 
         cmd
             .arg("run")
             .arg("--rm")
-            .arg("--volume").arg(&mount_source_volume)
-            .args(&["--workdir", DIR_INSIDE_CONTAINER])
+            .arg("--volume").arg(&mount_input_file)
+            .arg("--volume").arg(&mount_output_dir)
+            .args(&["--workdir", "/playground"])
             .args(&["--net", "none"])
             .args(&["--memory", "256m"])
             .args(&["--memory-swap", "320m"])
@@ -202,34 +205,32 @@ impl Sandbox {
     }
 }
 
-fn build_execution_command(target: Option<(CompileTarget, &str)>, mode: Mode, tests: bool, source_file: &str) -> String {
+fn build_execution_command(target: Option<CompileTarget>, mode: Mode, tests: bool) -> Vec<&'static str> {
     use self::CompileTarget::*;
     use self::Mode::*;
 
-    let mut s = String::from("rustc");
+    let mut cmd = vec!["cargo"];
 
-    match mode {
-        Debug => s.push_str(" -g"),
-        Release => s.push_str(" -C opt-level=3"),
+    match (target, tests) {
+        (Some(_), _)  => cmd.push("rustc"),
+        (None, true)  => cmd.push("test"),
+        (None, false) => cmd.push("run"),
     }
 
-    if tests {
-        s.push_str(" --test");
+    if mode == Release {
+        cmd.push("--release");
     }
 
-    if let Some((target, filename)) = target {
+    if let Some(target) = target {
+        cmd.extend(&["--", "-o", "/playground-result/compilation"]);
+
         match target {
-            Assembly => s.push_str(" --emit asm"),
-            LlvmIr => s.push_str(" --emit llvm-ir"),
-        }
-        s.push_str(" -o ");
-        s.push_str(filename);
+            Assembly => cmd.push("--emit=asm"),
+             LlvmIr  => cmd.push("--emit=llvm-ir"),
+         }
     }
 
-    s.push_str(" ");
-    s.push_str(source_file);
-
-    s
+    cmd
 }
 
 fn read(path: &Path) -> Result<Option<String>> {
@@ -336,6 +337,167 @@ pub struct ClippyResponse {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    const HELLO_WORLD_CODE: &'static str = r#"
+    fn main() {
+        println!("Hello, world!");
+    }
+    "#;
+
+    #[test]
+    fn basic_functionality() {
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            tests: false,
+            code: HELLO_WORLD_CODE.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.execute(&req).expect("Unable to execute code");
+
+        assert!(resp.stdout.contains("Hello, world!"));
+    }
+
+    const COMPILATION_MODE_CODE: &'static str = r#"
+    #[cfg(debug_assertions)]
+    fn main() {
+        println!("Compiling in debug mode");
+    }
+
+    #[cfg(not(debug_assertions))]
+    fn main() {
+        println!("Compiling in release mode");
+    }
+    "#;
+
+    #[test]
+    fn debug_mode() {
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            tests: false,
+            code: COMPILATION_MODE_CODE.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.execute(&req).expect("Unable to execute code");
+
+        assert!(resp.stdout.contains("debug mode"));
+    }
+
+    #[test]
+    fn release_mode() {
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Release,
+            tests: false,
+            code: COMPILATION_MODE_CODE.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.execute(&req).expect("Unable to execute code");
+
+        assert!(resp.stdout.contains("release mode"));
+    }
+
+    static VERSION_CODE: &'static str = r#"
+    use std::process::Command;
+
+    fn main() {
+        let output = Command::new("rustc").arg("--version").output().unwrap();
+        let output = String::from_utf8(output.stdout).unwrap();
+        println!("{}", output);
+    }
+    "#;
+
+    #[test]
+    fn stable_channel() {
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            tests: false,
+            code: VERSION_CODE.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.execute(&req).expect("Unable to execute code");
+
+        assert!(resp.stdout.contains("rustc"));
+        assert!(!resp.stdout.contains("beta"));
+        assert!(!resp.stdout.contains("nightly"));
+    }
+
+    #[test]
+    fn beta_channel() {
+        let req = ExecuteRequest {
+            channel: Channel::Beta,
+            mode: Mode::Debug,
+            tests: false,
+            code: VERSION_CODE.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.execute(&req).expect("Unable to execute code");
+
+        assert!(resp.stdout.contains("rustc"));
+        assert!(resp.stdout.contains("beta"));
+        assert!(!resp.stdout.contains("nightly"));
+    }
+
+    #[test]
+    fn nightly_channel() {
+        let req = ExecuteRequest {
+            channel: Channel::Nightly,
+            mode: Mode::Debug,
+            tests: false,
+            code: VERSION_CODE.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.execute(&req).expect("Unable to execute code");
+
+        assert!(resp.stdout.contains("rustc"));
+        assert!(!resp.stdout.contains("beta"));
+        assert!(resp.stdout.contains("nightly"));
+    }
+
+    #[test]
+    fn output_llvm_ir() {
+        let req = CompileRequest {
+            target: CompileTarget::LlvmIr,
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            tests: false,
+            code: HELLO_WORLD_CODE.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.compile(&req).expect("Unable to compile code");
+
+        assert!(resp.code.contains("ModuleID"));
+        assert!(resp.code.contains("target datalayout"));
+        assert!(resp.code.contains("target triple"));
+    }
+
+    #[test]
+    fn output_assembly() {
+        let req = CompileRequest {
+            target: CompileTarget::Assembly,
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            tests: false,
+            code: HELLO_WORLD_CODE.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.compile(&req).expect("Unable to compile code");
+
+        assert!(resp.code.contains(".text"));
+        assert!(resp.code.contains(".file"));
+        assert!(resp.code.contains(".section"));
+        assert!(resp.code.contains(".align"));
+    }
 
     #[test]
     fn network_connections_are_disabled() {
