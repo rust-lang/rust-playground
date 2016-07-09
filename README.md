@@ -126,15 +126,27 @@ sudo \
 
 ## Development
 
-If you only want to run the frontend UI locally in order to make HTML/CSS/JS
-changes:
-
+### Build the UI
 ```
 cd ui/frontend
 npm install
 npm run watch # Will rebuild and watch for changes
 ```
 
-Then open in your browser the built `ui/frontend/build/index.html`.
+If you don't need the backend running because you are only making
+basic HTML/CSS/JS changes, directly open in your browser the built
+`ui/frontend/build/index.html`.
 
+### Build and run the server
+```
+cd ui
+RUST_LOG=ui=debug \
+PLAYGROUND_UI_ROOT=$PWD/frontend/build/ \
+cargo run
+```
 
+### Build the containers
+```
+cd compiler
+./build.sh
+```
