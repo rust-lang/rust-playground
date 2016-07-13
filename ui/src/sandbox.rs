@@ -199,7 +199,8 @@ impl Sandbox {
             .args(&["--net", "none"])
             .args(&["--memory", "256m"])
             .args(&["--memory-swap", "320m"])
-            .args(&["--env", "PLAYGROUND_TIMEOUT=10"]);
+            .args(&["--env", "PLAYGROUND_TIMEOUT=10"])
+            .args(&["--env", "RUST_NEW_ERROR_FORMAT=true"]);
 
         cmd
     }
