@@ -58,27 +58,36 @@ should be cleaned when that request ends.
 
 ## Deployment
 
-### Amazon EC2
+### Amazon EC2 (Amazon Linux)
 
 Here's an example session. This could definitely be improved and
 automated.
 
-#### Dependencies
+#### Dependencies (as root)
 
 ```
-sudo yum update -y
-sudo yum install -y docker git
-sudo service docker start
-sudo usermod -a -G docker ec2-user
+yum update -y
+yum install -y docker git
+
+vim /etc/sysconfig/docker
+# Add to OPTIONS: --storage-driver=overlay
+
+service docker start
+usermod -a -G docker ec2-user
+
+fallocate -l 1G /swap.fs
+chmod 0600 /swap.fs
+mkswap /swap.fs
+swapon /swap.fs
 ```
 
-#### Set aside disk space
+#### Set aside disk space (as root)
 ```
-sudo dd if=/dev/zero of=/playground.fs bs=1024 count=512000
-sudo losetup /dev/loop2 /playground.fs
-sudo mkfs -t ext3 -m 1 -v /dev/loop2
-sudo mkdir /mnt/vfs
-sudo mount -t ext3 /dev/loop2 /mnt/vfs
+fallocate -l 512M /playground.fs
+losetup /dev/loop0 /playground.fs
+mkfs -t ext3 -m 1 -v /dev/loop0
+mkdir /mnt/playground
+mount -t ext3 /dev/loop0 /mnt/playground
 ```
 
 #### Get the code
@@ -87,11 +96,17 @@ git clone https://github.com/integer32llc/rust-playground.git
 cd rust-playground
 ```
 
-#### Build containers
+#### Build the containers
 ```
 cd compiler/
 ./build.sh
 cd ../
+```
+
+#### Set a crontab to rebuild the containers
+
+```
+0 0 * * * cd /home/ec2-user/rust-playground/compiler && ./build.sh && docker rmi $(docker images | grep "^<none>" | awk '{print $3}')
 ```
 
 #### Build the UI backend
@@ -105,7 +120,8 @@ cargo build --target=x86_64-unknown-linux-musl --release
 
 #### Build the UI frontend
 ```
-docker run -it --rm -v $PWD/frontend:/ui --workdir /ui --entrypoint /bin/bash node
+cd ui/frontend
+docker run -it --rm -v $PWD:/ui --workdir /ui --entrypoint /bin/bash node
 npm install
 NODE_ENV=production npm run build
 # exit docker
@@ -113,8 +129,9 @@ NODE_ENV=production npm run build
 
 #### Run the server
 ```
+cd ui
 sudo \
-  TMPDIR=/mnt/vfs \
+  TMPDIR=/mnt/playground \
   RUST_LOG=info \
   PLAYGROUND_UI_ADDRESS=0.0.0.0 \
   PLAYGROUND_UI_PORT=80 \
