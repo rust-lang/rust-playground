@@ -222,6 +222,11 @@
       "from": "babel-plugin-syntax-async-functions@>=6.8.0 <7.0.0",
       "resolved": "https://registry.npmjs.org/babel-plugin-syntax-async-functions/-/babel-plugin-syntax-async-functions-6.8.0.tgz"
     },
+    "babel-plugin-syntax-class-properties": {
+      "version": "6.8.0",
+      "from": "babel-plugin-syntax-class-properties@>=6.8.0 <7.0.0",
+      "resolved": "https://registry.npmjs.org/babel-plugin-syntax-class-properties/-/babel-plugin-syntax-class-properties-6.8.0.tgz"
+    },
     "babel-plugin-syntax-flow": {
       "version": "6.8.0",
       "from": "babel-plugin-syntax-flow@>=6.3.13 <7.0.0",
@@ -236,6 +241,11 @@
       "version": "6.8.0",
       "from": "babel-plugin-syntax-object-rest-spread@>=6.8.0 <7.0.0",
       "resolved": "https://registry.npmjs.org/babel-plugin-syntax-object-rest-spread/-/babel-plugin-syntax-object-rest-spread-6.8.0.tgz"
+    },
+    "babel-plugin-transform-class-properties": {
+      "version": "6.10.2",
+      "from": "babel-plugin-transform-class-properties@latest",
+      "resolved": "https://registry.npmjs.org/babel-plugin-transform-class-properties/-/babel-plugin-transform-class-properties-6.10.2.tgz"
     },
     "babel-plugin-transform-es2015-arrow-functions": {
       "version": "6.8.0",
