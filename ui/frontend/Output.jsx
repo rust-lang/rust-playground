@@ -48,6 +48,25 @@ function MyLoader(props) {
   );
 }
 
+import { PrismCode } from "react-prism";
+
+export default class HighlightErrors extends React.Component {
+  render() {
+    const { label, children } = this.props;
+
+    return (
+      <div className="output-stderr">
+        <Header label={label} />
+        <pre>
+          <PrismCode className="language-rust_errors">
+            {children}
+          </PrismCode>
+        </pre>
+      </div>
+    );
+  }
+}
+
 function SimplePane(props) {
   const { focus, kind, requestsInProgress, stdout, stderr, error, children } = props;
 
@@ -57,7 +76,7 @@ function SimplePane(props) {
       <div className={`output-${kind}`}>
         { loader }
         <Section kind='error' label='Errors' content={error} />
-        <Section kind='stderr' label='Standard Error' content={stderr} />
+        <HighlightErrors label="Standard Error">{stderr}</HighlightErrors>
         <Section kind='stdout' label='Standard Output' content={stdout} />
         { children }
       </div>
