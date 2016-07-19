@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import PureComponent from './PureComponent.jsx';
 
 import Loader from './Loader.jsx';
 
@@ -48,6 +49,25 @@ function MyLoader(props) {
   );
 }
 
+import { PrismCode } from "react-prism";
+
+export default class HighlightErrors extends PureComponent {
+  render() {
+    const { label, children } = this.props;
+
+    return (
+      <div className="output-stderr">
+        <Header label={label} />
+        <pre>
+          <PrismCode className="language-rust_errors">
+            {children}
+          </PrismCode>
+        </pre>
+      </div>
+    );
+  }
+}
+
 function SimplePane(props) {
   const { focus, kind, requestsInProgress, stdout, stderr, error, children } = props;
 
@@ -57,7 +77,7 @@ function SimplePane(props) {
       <div className={`output-${kind}`}>
         { loader }
         <Section kind='error' label='Errors' content={error} />
-        <Section kind='stderr' label='Standard Error' content={stderr} />
+        <HighlightErrors label="Standard Error">{stderr}</HighlightErrors>
         <Section kind='stdout' label='Standard Output' content={stdout} />
         { children }
       </div>
@@ -97,7 +117,7 @@ function Gist(props) {
   }
 }
 
-export default class Output extends React.Component {
+export default class Output extends PureComponent {
   render() {
     const {
       output: { meta: { focus }, execute, clippy, assembly, llvmIr, gist },

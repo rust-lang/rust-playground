@@ -53,9 +53,26 @@ const code = (state = defaultCode, action) => {
   }
 };
 
+const defaultPosition = {
+  line: 0,
+  column: 0,
+};
+
+const position = (state = defaultPosition, action) => {
+  switch (action.type) {
+  case actions.GOTO_POSITION: {
+    const { line, column } = action;
+    return { ...state, line, column };
+  }
+  default:
+    return state;
+  }
+};
+
 const playgroundApp = combineReducers({
   configuration,
   code,
+  position,
   output
 });
 

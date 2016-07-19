@@ -15,7 +15,7 @@ import Output from './Output.jsx';
 
 class Playground extends React.Component {
   render() {
-    const { code,
+    const { code, position,
             execute, compileToAssembly, compileToLLVM, format, clippy, gistSave,
             configuration: { channel, mode, tests, editor, shown: showConfig },
             changeChannel, changeMode, onEditCode, changeEditor,
@@ -41,7 +41,7 @@ class Playground extends React.Component {
                     tests={tests} toggleConfiguration={toggleConfiguration} />
           </div>
           <div className="playground-editor">
-            <Editor editor={editor} code={code} onEditCode={onEditCode} />
+            <Editor editor={editor} code={code} position={position} onEditCode={onEditCode} />
           </div>
           <div className={`playground-output ${outputFocused}`}>
             <Output output={output} changeFocus={changeFocus} />
@@ -93,8 +93,8 @@ Playground.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-  const { configuration, code, output } = state;
-  return { configuration, code, output };
+  const { configuration, code, position, output } = state;
+  return { configuration, code, position, output };
 };
 
 const mapDispatchToProps = (dispatch) => {

@@ -153,9 +153,14 @@ export const performCompileToLLVM = () =>
   });
 
 export const EDIT_CODE = 'EDIT_CODE';
+export const GOTO_POSITION = 'GOTO_POSITION';
 
 export function editCode(code) {
   return { type: EDIT_CODE, code };
+}
+
+export function gotoPosition(line, column) {
+  return { type: GOTO_POSITION, line: +line, column: +column };
 }
 
 export const REQUEST_FORMAT = 'REQUEST_FORMAT';

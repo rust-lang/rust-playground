@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import PureComponent from './PureComponent.jsx';
 
 function oneRadio(name, currentValue, possibleValue, change, labelText) {
   const id = `${name}-${possibleValue}`;
@@ -9,7 +10,7 @@ function oneRadio(name, currentValue, possibleValue, change, labelText) {
   ];
 }
 
-export default class Header extends React.Component {
+export default class Header extends PureComponent {
   render() {
     const {
       execute, compileToAssembly, compileToLLVM,
