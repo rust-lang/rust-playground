@@ -3024,6 +3024,11 @@
       "from": "react-addons-pure-render-mixin@15.1.0",
       "resolved": "https://registry.npmjs.org/react-addons-pure-render-mixin/-/react-addons-pure-render-mixin-15.1.0.tgz"
     },
+    "react-addons-shallow-compare": {
+      "version": "15.1.0",
+      "from": "react-addons-shallow-compare@15.1.0",
+      "resolved": "https://registry.npmjs.org/react-addons-shallow-compare/-/react-addons-shallow-compare-15.1.0.tgz"
+    },
     "react-dom": {
       "version": "15.1.0",
       "from": "react-dom@latest",

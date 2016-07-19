@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import PureComponent from './PureComponent.jsx';
 
 import Loader from './Loader.jsx';
 
@@ -50,7 +51,7 @@ function MyLoader(props) {
 
 import { PrismCode } from "react-prism";
 
-export default class HighlightErrors extends React.Component {
+export default class HighlightErrors extends PureComponent {
   render() {
     const { label, children } = this.props;
 
@@ -116,7 +117,7 @@ function Gist(props) {
   }
 }
 
-export default class Output extends React.Component {
+export default class Output extends PureComponent {
   render() {
     const {
       output: { meta: { focus }, execute, clippy, assembly, llvmIr, gist },

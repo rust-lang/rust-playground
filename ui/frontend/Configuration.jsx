@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
+import PureComponent from './PureComponent.jsx';
 
-export default class Configuration extends React.Component {
+export default class Configuration extends PureComponent {
   render() {
     const { editor, changeEditor, toggleConfiguration } = this.props;
 

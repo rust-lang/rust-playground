@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
+import PureComponent from './PureComponent.jsx';
 
-export default class Loader extends React.Component {
+export default class Loader extends PureComponent {
   render() {
 
     return (

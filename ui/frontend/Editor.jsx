@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import PureComponent from './PureComponent.jsx';
 import AceEditor from 'react-ace';
 import brace from 'brace';
 
@@ -8,7 +9,7 @@ import 'brace/keybinding/emacs';
 // https://github.com/securingsincity/react-ace/issues/95
 import 'brace/ext/language_tools';
 
-class SimpleEditor extends React.Component {
+class SimpleEditor extends PureComponent {
   onChange = e => this.props.onEditCode(e.target.value);
   trackEditor = component => this._editor = component;
 
@@ -50,7 +51,7 @@ class SimpleEditor extends React.Component {
   }
 }
 
-class AdvancedEditor extends React.Component {
+class AdvancedEditor extends PureComponent {
   trackEditor = component => this._editor = component;
 
   render() {
@@ -89,7 +90,7 @@ class AdvancedEditor extends React.Component {
   }
 }
 
-export default class Editor extends React.Component {
+export default class Editor extends PureComponent {
   render() {
     const { editor, code, position, onEditCode } = this.props;
     const SelectedEditor = editor === "simple" ? SimpleEditor : AdvancedEditor;

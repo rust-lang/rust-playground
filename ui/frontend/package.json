@@ -11,6 +11,7 @@
     "react": "^15.1.0",
     "react-ace": "^3.4.1",
     "react-addons-pure-render-mixin": "^15.1.0",
+    "react-addons-shallow-compare": "^15.1.0",
     "react-dom": "^15.1.0",
     "react-prism": "^3.2.1",
     "react-redux": "^4.4.5",
