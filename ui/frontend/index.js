@@ -12,7 +12,7 @@ import url from 'url';
 import { configureRustErrors } from './highlighting';
 import { serialize, deserialize } from './local_storage';
 import playgroundApp from './reducers';
-import { performGistLoad } from './actions';
+import { gotoPosition, performGistLoad } from './actions';
 import Playground from './Playground.jsx';
 
 var mw = [thunk];
@@ -23,7 +23,7 @@ const middlewares = applyMiddleware(...mw);
 const enhancers = compose(middlewares, persistState(undefined, { serialize, deserialize }));
 const store = createStore(playgroundApp, enhancers);
 
-configureRustErrors((line, col) => console.log(line, col));
+configureRustErrors((line, col) => store.dispatch(gotoPosition(line, col)));
 
 // Process query parameters
 const urlObj = url.parse(window.location.href, true);
