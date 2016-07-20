@@ -17,7 +17,7 @@ people to contribute using technology they are already familiar with.
 Since then, the official Playground has re-enabled rustfmt and now
 uses [Docker][docker], but I hope that the frontend stack is more
 comfortable to potential contributors. Because this is the unofficial
-playground, it may also inspire more experimentation that would be
+Playground, it may also inspire more experimentation that would be
 harder to do in an established piece of software.
 
 [play]: https://play.rust-lang.org/
@@ -56,6 +56,18 @@ suggested to run the server such that the temp directory is a
 space-limited. One bad actor may fill up this shared space, but it
 should be cleaned when that request ends.
 
+## Security Hall of Fame
+
+A large set of thanks go to those individuals who have helped by
+reporting security holes or other attack vectors against the
+Playground. Each report helps us make the Playground better!
+
+* Preliminary sandbox testing (PID limit) by Stefan O'Rear.
+
+If you'd like to perform tests that you think might disrupt service of
+the Playground, get in touch and we can create an isolated clone to
+perform tests on! Once fixed, you can choose to be credited here.
+
 ## Deployment
 
 ### Amazon EC2 (Amazon Linux)
@@ -69,8 +81,13 @@ automated.
 yum update -y
 yum install -y docker git
 
+# Use a production-quality storage driver that doesn't leak disk space
 vim /etc/sysconfig/docker
 # Add to OPTIONS: --storage-driver=overlay
+
+# Allow controlling the PID limit
+vim /etc/cgconfig.conf
+# Add:    pids       = /cgroup/pids;
 
 service docker start
 usermod -a -G docker ec2-user
