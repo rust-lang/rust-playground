@@ -118,8 +118,16 @@ function Gist(props) {
 }
 
 export default class Output extends PureComponent {
+  focusClose = () => this.props.changeFocus(null);
+  focusExecute = () => this.props.changeFocus('execute');
+  focusClippy = () => this.props.changeFocus('clippy');
+  focusAssembly = () => this.props.changeFocus('asm');
+  focusLlvmIr = () => this.props.changeFocus('llvm-ir');
+  focusGist = () => this.props.changeFocus('gist');
+
   render() {
     const {
+      focusClose, focusExecute, focusClippy, focusAssembly, focusLlvmIr, focusGist,
       output: { meta: { focus }, execute, clippy, assembly, llvmIr, gist },
       changeFocus
     } = this.props;
@@ -134,7 +142,7 @@ export default class Output extends PureComponent {
     if (focus) {
       close = (
         <button className="output-tab output-tab-close"
-                onClick={() => changeFocus(null)}>Close</button>
+                onClick={focusClose}>Close</button>
       );
 
       body = (
@@ -153,24 +161,24 @@ export default class Output extends PureComponent {
         <div className="output-tabs">
           <Tab kind="execute" focus={focus}
                label="Execution"
-               onClick={() => changeFocus('execute')}
+               onClick={focusExecute}
                tabProps={execute} />
           <Tab kind="clippy"
                focus={focus}
                label="Clippy"
-               onClick={() => changeFocus('clippy')}
+               onClick={focusClippy}
                tabProps={clippy} />
           <Tab kind ="asm" focus={focus}
                label="ASM"
-               onClick={() => changeFocus('asm')}
+               onClick={focusAssembly}
                tabProps={assembly} />
           <Tab kind="llvm-ir" focus={focus}
                label="LLVM IR"
-               onClick={() => changeFocus('llvm-ir')}
+               onClick={focusLlvmIr}
                tabProps={llvmIr} />
           <Tab kind="gist" focus={focus}
                label="Gist"
-               onClick={() => changeFocus('gist')}
+               onClick={focusGist}
                tabProps={gist} />
           { close }
         </div>
