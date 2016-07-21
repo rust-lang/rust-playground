@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import PureComponent from './PureComponent.jsx';
+import PureComponent from './PureComponent';
 
 function oneRadio(name, currentValue, possibleValue, change, labelText) {
   const id = `${name}-${possibleValue}`;

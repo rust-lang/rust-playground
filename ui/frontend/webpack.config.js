@@ -15,6 +15,10 @@ module.exports = {
     filename: 'index-[hash].js'
   },
 
+  resolve: {
+    extensions: ['', '.js', '.jsx']
+  },
+
   module: {
     loaders: [
       {

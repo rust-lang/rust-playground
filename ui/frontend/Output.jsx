@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
-import PureComponent from './PureComponent.jsx';
+import PureComponent from './PureComponent';
 
-import Loader from './Loader.jsx';
+import Loader from './Loader';
 
 const hasProperties = (obj) => Object.values(obj).some(val => val);
 
