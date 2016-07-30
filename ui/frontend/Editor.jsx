@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import PureComponent from './PureComponent.jsx';
+import PureComponent from './PureComponent';
 import AceEditor from 'react-ace';
 import brace from 'brace';
 

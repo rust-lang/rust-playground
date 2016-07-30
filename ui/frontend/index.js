@@ -13,7 +13,7 @@ import { configureRustErrors } from './highlighting';
 import { serialize, deserialize } from './local_storage';
 import playgroundApp from './reducers';
 import { gotoPosition, performGistLoad } from './actions';
-import Playground from './Playground.jsx';
+import Playground from './Playground';
 
 var mw = [thunk];
 if (process.env.NODE_ENV !== 'production') {

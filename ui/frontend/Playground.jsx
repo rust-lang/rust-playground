@@ -8,10 +8,10 @@ import {
 } from './actions';
 import { connect } from 'react-redux';
 
-import Configuration from './Configuration.jsx';
-import Header from './Header.jsx';
-import Editor from './Editor.jsx';
-import Output from './Output.jsx';
+import Configuration from './Configuration';
+import Header from './Header';
+import Editor from './Editor';
+import Output from './Output';
 
 class Playground extends React.Component {
   render() {
