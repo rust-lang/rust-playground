@@ -77,7 +77,7 @@ const defaultLlvmIr = {
 const llvmIr = (state = defaultLlvmIr, action) => {
   switch (action.type) {
   case actions.REQUEST_COMPILE_LLVM_IR:
-      return start(defaultLlvmIr, state);
+    return start(defaultLlvmIr, state);
   case actions.COMPILE_LLVM_IR_SUCCEEDED: {
     const { code = "", stdout = "", stderr = "" } = action;
     return finish(state, { code, stdout, stderr });
