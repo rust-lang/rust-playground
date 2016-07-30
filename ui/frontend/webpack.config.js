@@ -23,11 +23,11 @@ module.exports = {
   output: {
     path: './build',
     filename: '[name]-[chunkhash].js',
-    chunkFilename: '[chunkhash].js'
+    chunkFilename: '[chunkhash].js',
   },
 
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx'],
   },
 
   module: {
@@ -35,13 +35,13 @@ module.exports = {
       {
         test: [/\.js$/, /\.jsx$/],
         exclude: /node_modules/,
-        loader: 'babel'
+        loader: 'babel',
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract("style", ["css", "postcss", "sass"])
-      }
-    ]
+        loader: ExtractTextPlugin.extract("style", ["css", "postcss", "sass"]),
+      },
+    ],
   },
 
   plugins: [
@@ -62,15 +62,15 @@ module.exports = {
 
   postcss: function () {
     return [autoprefixer];
-  }
+  },
 };
 
 if (process.env.NODE_ENV === 'production') {
   module.exports.plugins.push(
     new webpack.optimize.UglifyJsPlugin({
       compress: {
-        warnings: false
-      }
+        warnings: false,
+      },
     }),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new CompressionPlugin({ algorithm: 'zopfli' })

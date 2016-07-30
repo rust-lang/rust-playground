@@ -4,7 +4,7 @@ import url from 'url';
 const baseUrlObj = {
   protocol: 'https:',
   host: 'api.github.com',
-  pathname: '/gists'
+  pathname: '/gists',
 };
 
 const baseUrlStr = url.format(baseUrlObj);
@@ -17,7 +17,7 @@ export function load(id) {
     .then(gist => ({
       id: id,
       url: gist.html_url,
-      code: gist.files[FILENAME].content
+      code: gist.files[FILENAME].content,
     }));
 }
 
@@ -26,15 +26,15 @@ const gistBody = (code) => ({
   public: true,
   files: {
     [ FILENAME ]: {
-      content: code
-    }
-  }
+      content: code,
+    },
+  },
 });
 
 export function save(code) {
   return fetch(baseUrlStr, {
     method: 'post',
-    body: JSON.stringify(gistBody(code))
+    body: JSON.stringify(gistBody(code)),
   })
     .then(response => response.json())
     .then(response => {

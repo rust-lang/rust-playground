@@ -221,19 +221,19 @@ class Output extends PureComponent {
 const simpleProps = PropTypes.shape({
   stdout: PropTypes.string,
   stderr: PropTypes.string,
-  error: PropTypes.string
+  error: PropTypes.string,
 });
 
 const withCodeProps = PropTypes.shape({
   code: PropTypes.string,
   stdout: PropTypes.string,
   stderr: PropTypes.string,
-  error: PropTypes.string
+  error: PropTypes.string,
 });
 
 Output.propTypes = {
   meta: PropTypes.shape({
-    focus: PropTypes.string
+    focus: PropTypes.string,
   }),
 
   execute: simpleProps,
@@ -243,10 +243,10 @@ Output.propTypes = {
 
   gist: PropTypes.shape({
     id: PropTypes.string,
-    url: PropTypes.string
+    url: PropTypes.string,
   }),
 
-  changeFocus: PropTypes.func.isRequired
+  changeFocus: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ output }) => output;

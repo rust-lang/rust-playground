@@ -8,7 +8,7 @@ export const defaultConfiguration = {
   theme: "github",
   channel: "stable",
   mode: "debug",
-  tests: false
+  tests: false,
 };
 
 const hasTests = (code) => code.includes('#[test]');
@@ -76,7 +76,7 @@ const playgroundApp = combineReducers({
   configuration,
   code,
   position,
-  output
+  output,
 });
 
 export default playgroundApp;

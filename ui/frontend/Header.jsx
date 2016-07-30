@@ -19,7 +19,7 @@ function oneRadio(name, currentValue, possibleValue, change, labelText) {
   return [
     <input className="header-radio" type="radio" name={name} id={id} key={`${id}-input`}
            checked={ currentValue === possibleValue } onChange={ () => change(possibleValue) } />,
-    <label className="header-radio-label" htmlFor={id} key={`${id}-label`}>{labelText}</label>
+    <label className="header-radio-label" htmlFor={id} key={`${id}-label`}>{labelText}</label>,
   ];
 }
 
@@ -30,7 +30,7 @@ class Header extends PureComponent {
       format, clippy, gistSave,
       channel, changeChannel, mode, changeMode,
       tests,
-      toggleConfiguration
+      toggleConfiguration,
     } = this.props;
 
     const oneChannel = (value, labelText) =>
@@ -98,7 +98,7 @@ Header.propTypes = {
   gistSave: PropTypes.func.isRequired,
   mode: PropTypes.string.isRequired,
   tests: PropTypes.bool.isRequired,
-  toggleConfiguration: PropTypes.func.isRequired
+  toggleConfiguration: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ configuration: { channel, mode, tests } }) => (

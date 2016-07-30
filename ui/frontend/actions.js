@@ -6,7 +6,7 @@ const routes = {
   compile: { pathname: '/compile' },
   execute: { pathname: '/execute' },
   format: { pathname: '/format' },
-  clippy: { pathname: '/clippy' }
+  clippy: { pathname: '/clippy' },
 };
 
 export const TOGGLE_CONFIGURATION = 'TOGGLE_CONFIGURATION';
@@ -63,9 +63,9 @@ function jsonPost(urlObj, body) {
   return fetch(urlStr, {
     method: 'post',
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   })
     .catch(error => { return { error }; })
     .then(response => {
@@ -130,7 +130,7 @@ export const performCompileToAssembly = () =>
   performCompile('asm', {
     request: requestCompileAssembly,
     success: receiveCompileAssemblySuccess,
-    failure: receiveCompileAssemblyFailure
+    failure: receiveCompileAssemblyFailure,
   });
 
 export const REQUEST_COMPILE_LLVM_IR = 'REQUEST_COMPILE_LLVM_IR';
@@ -154,7 +154,7 @@ export const performCompileToLLVM = () =>
   performCompile('llvm-ir', {
     request: requestCompileLlvmIr,
     success: receiveCompileLlvmIrSuccess,
-    failure: receiveCompileLlvmIrFailure
+    failure: receiveCompileLlvmIrFailure,
   });
 
 export const EDIT_CODE = 'EDIT_CODE';
