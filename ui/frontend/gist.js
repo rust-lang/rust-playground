@@ -37,8 +37,5 @@ export function save(code) {
     body: JSON.stringify(gistBody(code)),
   })
     .then(response => response.json())
-    .then(response => {
-      let { id, html_url: url } = response;
-      return { id, url };
-    });
+    .then(({ id, html_url: url }) => ({ id, url }));
 }

@@ -49,12 +49,12 @@ function requestExecute() {
   return { type: REQUEST_EXECUTE };
 }
 
-function receiveExecuteSuccess(json) {
-  return { type: EXECUTE_SUCCEEDED, stdout: json.stdout, stderr: json.stderr };
+function receiveExecuteSuccess({ stdout, stderr }) {
+  return { type: EXECUTE_SUCCEEDED, stdout, stderr };
 }
 
-function receiveExecuteFailure(json) {
-  return { type: EXECUTE_FAILED, error: json.error };
+function receiveExecuteFailure({ error }) {
+  return { type: EXECUTE_FAILED, error };
 }
 
 function jsonPost(urlObj, body) {
@@ -117,13 +117,12 @@ function requestCompileAssembly() {
   return { type: REQUEST_COMPILE_ASSEMBLY };
 }
 
-function receiveCompileAssemblySuccess(json) {
-  let { code, stdout, stderr } = json;
+function receiveCompileAssemblySuccess({ code, stdout, stderr }) {
   return { type: COMPILE_ASSEMBLY_SUCCEEDED, code, stdout, stderr };
 }
 
-function receiveCompileAssemblyFailure(json) {
-  return { type: COMPILE_ASSEMBLY_FAILED, error: json.error };
+function receiveCompileAssemblyFailure({ error }) {
+  return { type: COMPILE_ASSEMBLY_FAILED, error };
 }
 
 export const performCompileToAssembly = () =>
@@ -141,13 +140,12 @@ function requestCompileLlvmIr() {
   return { type: REQUEST_COMPILE_LLVM_IR };
 }
 
-function receiveCompileLlvmIrSuccess(json) {
-  let { code, stdout, stderr } = json;
+function receiveCompileLlvmIrSuccess({ code, stdout, stderr }) {
   return { type: COMPILE_LLVM_IR_SUCCEEDED, code, stdout, stderr };
 }
 
-function receiveCompileLlvmIrFailure(json) {
-  return { type: COMPILE_LLVM_IR_FAILED, error: json.error };
+function receiveCompileLlvmIrFailure({ error }) {
+  return { type: COMPILE_LLVM_IR_FAILED, error };
 }
 
 export const performCompileToLLVM = () =>
@@ -176,12 +174,12 @@ function requestFormat() {
   return { type: REQUEST_FORMAT };
 }
 
-function receiveFormatSuccess(json) {
-  return { type: FORMAT_SUCCEEDED, code: json.code };
+function receiveFormatSuccess({ code }) {
+  return { type: FORMAT_SUCCEEDED, code };
 }
 
-function receiveFormatFailure(json) {
-  return { type: FORMAT_FAILED, error: json.error };
+function receiveFormatFailure({ error }) {
+  return { type: FORMAT_FAILED, error };
 }
 
 export function performFormat() {
@@ -206,13 +204,12 @@ function requestClippy() {
   return { type: REQUEST_CLIPPY };
 }
 
-function receiveClippySuccess(json) {
-  const { stdout, stderr } = json;
+function receiveClippySuccess({ stdout, stderr }) {
   return { type: CLIPPY_SUCCEEDED, stdout, stderr };
 }
 
-function receiveClippyFailure(json) {
-  return { type: CLIPPY_FAILED, error: json.error };
+function receiveClippyFailure({ error }) {
+  return { type: CLIPPY_FAILED, error };
 }
 
 export function performClippy() {
@@ -264,14 +261,13 @@ function requestGistSave() {
   return { type: REQUEST_GIST_SAVE };
 }
 
-function receiveGistSaveSuccess(json) {
-  const { id, url } = json;
+function receiveGistSaveSuccess({ id, url }) {
   return { type: GIST_SAVE_SUCCEEDED, id, url };
 }
 
 
-function receiveGistSaveFailure(json) { // eslint-disable-line no-unused-vars
-  return { type: GIST_SAVE_FAILED, error: json.error };
+function receiveGistSaveFailure({ error }) { // eslint-disable-line no-unused-vars
+  return { type: GIST_SAVE_FAILED, error };
 }
 
 export function performGistSave() {
