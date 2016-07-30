@@ -1,7 +1,7 @@
 import Prism from "prismjs";
 
 export function configureRustErrors(gotoPosition) {
-  Prism.languages.rust_errors = {
+  Prism.languages.rust_errors = { // eslint-disable-line camelcase
     'warning':/warning:.*\n/,
     'error': {
       pattern: /error:.*\n/,
