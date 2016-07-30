@@ -1,4 +1,4 @@
-/* global ACE_THEMES */
+/* global ACE_THEMES:false */
 
 import React, { PropTypes } from 'react';
 import PureComponent from './PureComponent';

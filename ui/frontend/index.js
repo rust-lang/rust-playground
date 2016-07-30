@@ -1,3 +1,5 @@
+/* global process:false */
+
 import "babel-polyfill";
 
 import React from 'react';
