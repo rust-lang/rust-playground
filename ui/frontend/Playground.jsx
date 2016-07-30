@@ -69,7 +69,7 @@ class Playground extends React.Component {
     );
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, _prevState) {
     if (this.props.output.meta.focus !== prevProps.output.meta.focus) {
       // Inform the ACE editor that its size has changed.
       try {

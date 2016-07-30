@@ -12,7 +12,7 @@ function Tab(props) {
     const selected = focus === kind ? "output-tab-selected" : "";
     return (
       <button className={`output-tab ${selected}`}
-              onClick={props.onClick}>
+              onClick={onClick}>
         {label}
       </button>
     );
@@ -40,7 +40,7 @@ function Section(props) {
   }
 }
 
-function MyLoader(props) {
+function MyLoader(_props) {
   return (
     <div>
       <Header label="Progress" />
@@ -129,7 +129,6 @@ export default class Output extends PureComponent {
     const {
       focusClose, focusExecute, focusClippy, focusAssembly, focusLlvmIr, focusGist,
       output: { meta: { focus }, execute, clippy, assembly, llvmIr, gist },
-      changeFocus
     } = this.props;
 
     const somethingToShow = [execute, clippy, assembly, llvmIr, gist].some(hasProperties);

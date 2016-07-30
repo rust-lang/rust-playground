@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import PureComponent from './PureComponent';
 import AceEditor from 'react-ace';
-import brace from 'brace';
 
 import 'brace/mode/rust';
 import 'brace/keybinding/emacs';
@@ -21,7 +20,7 @@ class SimpleEditor extends PureComponent {
     );
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, _prevState) {
     this.gotoPosition(prevProps.position, this.props.position);
   }
 
@@ -72,7 +71,7 @@ class AdvancedEditor extends PureComponent {
     );
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, _prevState) {
     this.gotoPosition(prevProps.position, this.props.position);
   }
 

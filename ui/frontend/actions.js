@@ -242,12 +242,12 @@ function receiveGistLoadSuccess(gist) {
   return { type: GIST_LOAD_SUCCEEDED, id, url, code };
 }
 
-function receiveGistLoadFailure() {
+function receiveGistLoadFailure() { // eslint-disable-line no-unused-vars
   return { type: GIST_LOAD_FAILED };
 }
 
 export function performGistLoad(id) {
-  return function (dispatch, getState) {
+  return function (dispatch, _getState) {
     dispatch(requestGistLoad());
 
     loadGist(id)
@@ -269,7 +269,8 @@ function receiveGistSaveSuccess(json) {
   return { type: GIST_SAVE_SUCCEEDED, id, url };
 }
 
-function receiveGistSaveFailure(json) {
+
+function receiveGistSaveFailure(json) { // eslint-disable-line no-unused-vars
   return { type: GIST_SAVE_FAILED, error: json.error };
 }
 
