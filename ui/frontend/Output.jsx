@@ -169,7 +169,7 @@ class Output extends PureComponent {
       return null;
     }
 
-    var close = null, body = null;
+    let close = null, body = null;
     if (focus) {
       close = (
         <button className="output-tab output-tab-close"

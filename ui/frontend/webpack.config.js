@@ -1,12 +1,12 @@
 /* global process:false */
 
-var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var CompressionPlugin = require("compression-webpack-plugin");
-var autoprefixer = require('autoprefixer');
-var glob = require('glob');
-var basename = require('basename');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
+const autoprefixer = require('autoprefixer');
+const glob = require('glob');
+const basename = require('basename');
 
 const thisPackage = require('./package.json');
 const vendorLibraries = Object.keys(thisPackage.dependencies);
