@@ -82,7 +82,7 @@ class Playground extends React.Component {
       }
     }
   }
-};
+}
 
 Playground.propTypes = {
   execute: PropTypes.func.isRequired,

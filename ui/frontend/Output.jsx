@@ -186,7 +186,7 @@ export default class Output extends PureComponent {
       </div>
     );
   }
-};
+}
 
 const simpleProps = PropTypes.shape({
   stdout: PropTypes.string,

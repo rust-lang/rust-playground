@@ -101,7 +101,7 @@ export default class Editor extends PureComponent {
       </div>
     );
   }
-};
+}
 
 Editor.propTypes = {
   editor: PropTypes.string.isRequired,

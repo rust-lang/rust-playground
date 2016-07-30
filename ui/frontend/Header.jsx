@@ -71,7 +71,7 @@ export default class Header extends PureComponent {
       </div>
     );
   }
-};
+}
 
 Header.propTypes = {
   execute: PropTypes.func.isRequired,

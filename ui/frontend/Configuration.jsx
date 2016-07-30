@@ -39,7 +39,7 @@ export default class Configuration extends PureComponent {
       </div>
     );
   }
-};
+}
 
 Configuration.propTypes = {
   editor: PropTypes.string.isRequired,

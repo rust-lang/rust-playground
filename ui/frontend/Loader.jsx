@@ -12,6 +12,6 @@ export default class Loader extends PureComponent {
       </div>
     );
   }
-};
+}
 
 Loader.propTypes = {};
