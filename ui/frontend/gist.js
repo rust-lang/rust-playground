@@ -25,7 +25,7 @@ const gistBody = code => ({
   description: "Rust code shared from the playground",
   public: true,
   files: {
-    [ FILENAME ]: {
+    [FILENAME]: {
       content: code,
     },
   },
