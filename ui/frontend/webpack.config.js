@@ -4,15 +4,19 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var CompressionPlugin = require("compression-webpack-plugin");
 var autoprefixer = require('autoprefixer');
 
+const thisPackage = require('./package.json');
+const vendorLibraries = Object.keys(thisPackage.dependencies);
+
 module.exports = {
-  entry: [
-    './index.js',
-    './index.scss'
-  ],
+  entry: {
+    app: ['./index.js', './index.scss'],
+    vendor: vendorLibraries,
+  },
 
   output: {
     path: './build',
-    filename: 'index-[hash].js'
+    filename: '[name]-[chunkhash].js',
+    chunkFilename: '[chunkhash].js'
   },
 
   resolve: {
@@ -36,10 +40,14 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       title: "Rust Playground",
-      template: 'index.ejs'
+      template: 'index.ejs',
+      chunksSortMode: 'dependency',
     }),
-    new ExtractTextPlugin("styles-[hash].css"),
-    new webpack.EnvironmentPlugin(["NODE_ENV"])
+    new ExtractTextPlugin("styles-[chunkhash].css"),
+    new webpack.EnvironmentPlugin(["NODE_ENV"]),
+    new webpack.optimize.CommonsChunkPlugin({
+      names: ['vendor', 'manifest'],
+    }),
   ],
 
   postcss: function () {
