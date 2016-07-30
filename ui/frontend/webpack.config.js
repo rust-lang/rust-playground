@@ -1,10 +1,12 @@
-var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var CompressionPlugin = require("compression-webpack-plugin");
-var autoprefixer = require('autoprefixer');
-var glob = require('glob');
-var basename = require('basename');
+/* global process:false */
+
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
+const autoprefixer = require('autoprefixer');
+const glob = require('glob');
+const basename = require('basename');
 
 const thisPackage = require('./package.json');
 const vendorLibraries = Object.keys(thisPackage.dependencies);
@@ -21,11 +23,11 @@ module.exports = {
   output: {
     path: './build',
     filename: '[name]-[chunkhash].js',
-    chunkFilename: '[chunkhash].js'
+    chunkFilename: '[chunkhash].js',
   },
 
   resolve: {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx'],
   },
 
   module: {
@@ -33,13 +35,13 @@ module.exports = {
       {
         test: [/\.js$/, /\.jsx$/],
         exclude: /node_modules/,
-        loader: 'babel'
+        loader: 'babel',
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract("style", ["css", "postcss", "sass"])
-      }
-    ]
+        loader: ExtractTextPlugin.extract("style", ["css", "postcss", "sass"]),
+      },
+    ],
   },
 
   plugins: [
@@ -60,17 +62,17 @@ module.exports = {
 
   postcss: function () {
     return [autoprefixer];
-  }
+  },
 };
 
 if (process.env.NODE_ENV === 'production') {
   module.exports.plugins.push(
     new webpack.optimize.UglifyJsPlugin({
       compress: {
-        warnings: false
-      }
+        warnings: false,
+      },
     }),
     new webpack.optimize.OccurrenceOrderPlugin(),
-    new CompressionPlugin({algorithm: 'zopfli'})
+    new CompressionPlugin({ algorithm: 'zopfli' })
   );
 }

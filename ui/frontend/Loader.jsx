@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import PureComponent from './PureComponent';
 
 export default class Loader extends PureComponent {
@@ -12,6 +12,4 @@ export default class Loader extends PureComponent {
       </div>
     );
   }
-};
-
-Loader.propTypes = {};
+}

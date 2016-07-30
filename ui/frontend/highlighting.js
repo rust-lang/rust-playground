@@ -1,7 +1,7 @@
 import Prism from "prismjs";
 
 export function configureRustErrors(gotoPosition) {
-  Prism.languages.rust_errors = {
+  Prism.languages.rust_errors = { // eslint-disable-line camelcase
     'warning':/warning:.*\n/,
     'error': {
       pattern: /error:.*\n/,
@@ -32,7 +32,7 @@ export function configureRustErrors(gotoPosition) {
   Prism.hooks.add('after-highlight', env => {
     env.element.querySelectorAll('.error-location').forEach(link => {
       const { line, col } = link.dataset;
-      link.onclick = (e) => {
+      link.onclick = e => {
         e.preventDefault();
         gotoPosition(line, col);
       };

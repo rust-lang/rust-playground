@@ -1,18 +1,20 @@
 import React, { PropTypes } from 'react';
 import PureComponent from './PureComponent';
+import { connect } from 'react-redux';
+import { PrismCode } from "react-prism";
+
+import { changeFocus } from './actions';
 
 import Loader from './Loader';
 
-const hasProperties = (obj) => Object.values(obj).some(val => val);
+const hasProperties = obj => Object.values(obj).some(val => val);
 
-function Tab(props) {
-  const { kind, focus, label, onClick, tabProps } = props;
-
+function Tab({ kind, focus, label, onClick, tabProps }) {
   if (hasProperties(tabProps)) {
     const selected = focus === kind ? "output-tab-selected" : "";
     return (
       <button className={`output-tab ${selected}`}
-              onClick={props.onClick}>
+              onClick={onClick}>
         {label}
       </button>
     );
@@ -21,18 +23,28 @@ function Tab(props) {
   }
 }
 
-function Header(props) {
-  return <span className="output-header">{ props.label }</span>;
+Tab.propTypes = {
+  kind: PropTypes.string.isRequired,
+  focus: PropTypes.string,
+  label: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+  tabProps: PropTypes.object.isRequired,
+};
+
+function Header({ label }) {
+  return <span className="output-header">{ label }</span>;
 }
 
-function Section(props) {
-  const { kind, label, content } = props;
+Header.propTypes = {
+  label: PropTypes.string.isRequired,
+};
 
-  if (content) {
+function Section({ kind, label, children }) {
+  if (children) {
     return (
       <div className={`output-${kind}`}>
         <Header label={label} />
-        <pre><code>{content}</code></pre>
+        <pre><code>{children}</code></pre>
       </div>
     );
   } else {
@@ -40,7 +52,13 @@ function Section(props) {
   }
 }
 
-function MyLoader(props) {
+Section.propTypes = {
+  kind: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  children: PropTypes.node,
+};
+
+function MyLoader() {
   return (
     <div>
       <Header label="Progress" />
@@ -49,9 +67,7 @@ function MyLoader(props) {
   );
 }
 
-import { PrismCode } from "react-prism";
-
-export default class HighlightErrors extends PureComponent {
+class HighlightErrors extends PureComponent {
   render() {
     const { label, children } = this.props;
 
@@ -68,17 +84,15 @@ export default class HighlightErrors extends PureComponent {
   }
 }
 
-function SimplePane(props) {
-  const { focus, kind, requestsInProgress, stdout, stderr, error, children } = props;
-
+function SimplePane({ focus, kind, requestsInProgress, stdout, stderr, error, children }) {
   if (focus === kind) {
     const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
     return (
       <div className={`output-${kind}`}>
         { loader }
-        <Section kind='error' label='Errors' content={error} />
+        <Section kind='error' label='Errors'>{error}</Section>
         <HighlightErrors label="Standard Error">{stderr}</HighlightErrors>
-        <Section kind='stdout' label='Standard Output' content={stdout} />
+        <Section kind='stdout' label='Standard Output'>{stdout}</Section>
         { children }
       </div>
     );
@@ -87,19 +101,31 @@ function SimplePane(props) {
   }
 }
 
+SimplePane.propTypes = {
+  focus: PropTypes.string.isRequired,
+  kind: PropTypes.string.isRequired,
+  requestsInProgress: PropTypes.number.isRequired,
+  stdout: PropTypes.string,
+  stderr: PropTypes.string,
+  error: PropTypes.string,
+  children: PropTypes.node,
+};
+
 function PaneWithCode(props) {
   const { code, ...rest } = props;
 
   return (
     <SimplePane {...rest} >
-      <Section kind='code' label='Result' content={code} />
+      <Section kind='code' label='Result'>{code}</Section>
     </SimplePane>
   );
 }
 
-function Gist(props) {
-  const { focus, requestsInProgress, id, url } = props;
+PaneWithCode.propTypes = {
+  code: PropTypes.string,
+};
 
+function Gist({ focus, requestsInProgress, id, url }) {
   if (focus === 'gist') {
     const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
     const permalink = id ? <p><a href={`/?gist=${id}`}>Permalink to the playground</a></p> : null;
@@ -117,7 +143,14 @@ function Gist(props) {
   }
 }
 
-export default class Output extends PureComponent {
+Gist.propTypes = {
+  focus: PropTypes.string.isRequired,
+  requestsInProgress: PropTypes.number.isRequired,
+  id: PropTypes.string,
+  url: PropTypes.string,
+};
+
+class Output extends PureComponent {
   focusClose = () => this.props.changeFocus(null);
   focusExecute = () => this.props.changeFocus('execute');
   focusClippy = () => this.props.changeFocus('clippy');
@@ -127,9 +160,7 @@ export default class Output extends PureComponent {
 
   render() {
     const {
-      focusClose, focusExecute, focusClippy, focusAssembly, focusLlvmIr, focusGist,
-      output: { meta: { focus }, execute, clippy, assembly, llvmIr, gist },
-      changeFocus
+      meta: { focus }, execute, clippy, assembly, llvmIr, gist,
     } = this.props;
 
     const somethingToShow = [execute, clippy, assembly, llvmIr, gist].some(hasProperties);
@@ -138,11 +169,11 @@ export default class Output extends PureComponent {
       return null;
     }
 
-    var close = null, body = null;
+    let close = null, body = null;
     if (focus) {
       close = (
         <button className="output-tab output-tab-close"
-                onClick={focusClose}>Close</button>
+                onClick={this.focusClose}>Close</button>
       );
 
       body = (
@@ -161,24 +192,23 @@ export default class Output extends PureComponent {
         <div className="output-tabs">
           <Tab kind="execute" focus={focus}
                label="Execution"
-               onClick={focusExecute}
+               onClick={this.focusExecute}
                tabProps={execute} />
-          <Tab kind="clippy"
-               focus={focus}
+          <Tab kind="clippy" focus={focus}
                label="Clippy"
-               onClick={focusClippy}
+               onClick={this.focusClippy}
                tabProps={clippy} />
           <Tab kind ="asm" focus={focus}
                label="ASM"
-               onClick={focusAssembly}
+               onClick={this.focusAssembly}
                tabProps={assembly} />
           <Tab kind="llvm-ir" focus={focus}
                label="LLVM IR"
-               onClick={focusLlvmIr}
+               onClick={this.focusLlvmIr}
                tabProps={llvmIr} />
           <Tab kind="gist" focus={focus}
                label="Gist"
-               onClick={focusGist}
+               onClick={this.focusGist}
                tabProps={gist} />
           { close }
         </div>
@@ -186,25 +216,24 @@ export default class Output extends PureComponent {
       </div>
     );
   }
-};
+}
 
 const simpleProps = PropTypes.shape({
   stdout: PropTypes.string,
   stderr: PropTypes.string,
-  error: PropTypes.string
+  error: PropTypes.string,
 });
 
 const withCodeProps = PropTypes.shape({
   code: PropTypes.string,
   stdout: PropTypes.string,
   stderr: PropTypes.string,
-  error: PropTypes.string
+  error: PropTypes.string,
 });
 
 Output.propTypes = {
   meta: PropTypes.shape({
-    requestsInProgress: PropTypes.number.isRequired,
-    focus: PropTypes.string
+    focus: PropTypes.string,
   }),
 
   execute: simpleProps,
@@ -214,8 +243,21 @@ Output.propTypes = {
 
   gist: PropTypes.shape({
     id: PropTypes.string,
-    url: PropTypes.string
+    url: PropTypes.string,
   }),
 
-  changeFocus: PropTypes.func.isRequired
+  changeFocus: PropTypes.func.isRequired,
 };
+
+const mapStateToProps = ({ output }) => output;
+
+const mapDispatchToProps = dispatch => ({
+  changeFocus: x => dispatch(changeFocus(x)),
+});
+
+const ConnectedOutput = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Output);
+
+export default ConnectedOutput;

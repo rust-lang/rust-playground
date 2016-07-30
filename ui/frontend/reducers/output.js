@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 import * as actions from '../actions';
 
 const defaultMeta = {
-  focus: null
+  focus: null,
 };
 
 const meta = (state = defaultMeta, action) => {
@@ -48,7 +48,7 @@ const defaultClippy = {
   requestsInProgress: 0,
   stdout: null,
   stderr: null,
-  error: null
+  error: null,
 };
 
 const clippy = (state = defaultClippy, action) => {
@@ -71,13 +71,13 @@ const defaultLlvmIr = {
   code: null,
   stdout: null,
   stderr: null,
-  error: null
+  error: null,
 };
 
 const llvmIr = (state = defaultLlvmIr, action) => {
   switch (action.type) {
   case actions.REQUEST_COMPILE_LLVM_IR:
-      return start(defaultLlvmIr, state);
+    return start(defaultLlvmIr, state);
   case actions.COMPILE_LLVM_IR_SUCCEEDED: {
     const { code = "", stdout = "", stderr = "" } = action;
     return finish(state, { code, stdout, stderr });
@@ -94,7 +94,7 @@ const defaultAssembly = {
   code: null,
   stdout: null,
   stderr: null,
-  error: null
+  error: null,
 };
 
 const assembly = (state = defaultAssembly, action) => {
@@ -116,7 +116,7 @@ const defaultExecute = {
   requestsInProgress: 0,
   stdout: null,
   stderr: null,
-  error: null
+  error: null,
 };
 
 const execute = (state = defaultExecute, action) => {
@@ -125,7 +125,7 @@ const execute = (state = defaultExecute, action) => {
     return start(defaultExecute, state);
   case actions.EXECUTE_SUCCEEDED: {
     const { stdout = "", stderr = "" } = action;
-    return finish(state, {stdout, stderr });
+    return finish(state, { stdout, stderr });
   }
   case actions.EXECUTE_FAILED:
     return finish(state, { error: action.error });
@@ -138,7 +138,7 @@ const defaultGist = {
   requestsInProgress: 0,
   id: null,
   url: null,
-  error: null
+  error: null,
 };
 
 const gist = (state = defaultGist, action) => {
@@ -168,7 +168,7 @@ const output = combineReducers({
   assembly,
   llvmIr,
   execute,
-  gist
+  gist,
 });
 
 export default output;

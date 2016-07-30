@@ -6,23 +6,23 @@ export function serialize(state) {
     version: CURRENT_VERSION,
     configuration: {
       editor: state.configuration.editor,
-      theme: state.configuration.theme
+      theme: state.configuration.theme,
     },
-    code: state.code
+    code: state.code,
   });
 }
 
 export function deserialize(savedState) {
   if (!savedState) { return undefined; }
   const parsedState = JSON.parse(savedState);
-  if (parsedState.version != CURRENT_VERSION) { return undefined; }
+  if (parsedState.version !== CURRENT_VERSION) { return undefined; }
 
   return {
     configuration: {
       ...defaultConfiguration,
       editor: parsedState.configuration.editor || defaultConfiguration.editor,
-      theme: parsedState.configuration.theme || defaultConfiguration.theme
+      theme: parsedState.configuration.theme || defaultConfiguration.theme,
     },
-    code: parsedState.code
+    code: parsedState.code,
   };
 }
