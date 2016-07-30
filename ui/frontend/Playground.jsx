@@ -1,8 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 
-import { changeFocus } from './actions';
-
 import Configuration from './Configuration';
 import Header from './Header';
 import Editor from './Editor';
@@ -20,10 +18,7 @@ function ConfigurationModal() {
 
 class Playground extends React.Component {
   render() {
-    const {
-      showConfig, focus,
-      output, changeFocus
-    } = this.props;
+    const { showConfig, focus } = this.props;
 
     const config = showConfig ? <ConfigurationModal /> : null;
     const outputFocused = focus ? 'playground-output-focused' : '';
@@ -39,7 +34,7 @@ class Playground extends React.Component {
             <Editor />
           </div>
           <div className={`playground-output ${outputFocused}`}>
-            <Output output={output} changeFocus={changeFocus} />
+            <Output />
           </div>
         </div>
       </div>
@@ -65,17 +60,12 @@ Playground.propTypes = {
   showConfig: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = ({ configuration: { shown: showConfig }, output }) => (
-  { showConfig, focus: output.meta.focus, output }
+const mapStateToProps = ({ configuration: { shown: showConfig }, output: { meta: { focus } } }) => (
+  { showConfig, focus }
 );
 
-const mapDispatchToProps = (dispatch) => ({
-  changeFocus: x => dispatch(changeFocus(x)),
-});
-
 const ConnectedPlayground = connect(
-  mapStateToProps,
-  mapDispatchToProps
+  mapStateToProps
 )(Playground);
 
 export default ConnectedPlayground;

@@ -1,6 +1,9 @@
 import React, { PropTypes } from 'react';
 import PureComponent from './PureComponent';
+import { connect } from 'react-redux';
 import { PrismCode } from "react-prism";
+
+import { changeFocus } from './actions';
 
 import Loader from './Loader';
 
@@ -64,7 +67,7 @@ function MyLoader() {
   );
 }
 
-export default class HighlightErrors extends PureComponent {
+class HighlightErrors extends PureComponent {
   render() {
     const { label, children } = this.props;
 
@@ -147,7 +150,7 @@ Gist.propTypes = {
   url: PropTypes.string,
 };
 
-export default class Output extends PureComponent {
+class Output extends PureComponent {
   focusClose = () => this.props.changeFocus(null);
   focusExecute = () => this.props.changeFocus('execute');
   focusClippy = () => this.props.changeFocus('clippy');
@@ -158,7 +161,7 @@ export default class Output extends PureComponent {
   render() {
     const {
       meta: { focus }, execute, clippy, assembly, llvmIr, gist,
-    } = this.props.output;
+    } = this.props;
 
     const somethingToShow = [execute, clippy, assembly, llvmIr, gist].some(hasProperties);
 
@@ -230,7 +233,6 @@ const withCodeProps = PropTypes.shape({
 
 Output.propTypes = {
   meta: PropTypes.shape({
-    requestsInProgress: PropTypes.number.isRequired,
     focus: PropTypes.string
   }),
 
@@ -246,3 +248,16 @@ Output.propTypes = {
 
   changeFocus: PropTypes.func.isRequired
 };
+
+const mapStateToProps = ({ output }) => output;
+
+const mapDispatchToProps = dispatch => ({
+  changeFocus: x => dispatch(changeFocus(x)),
+});
+
+const ConnectedOutput = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Output);
+
+export default ConnectedOutput;
