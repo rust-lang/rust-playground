@@ -2,10 +2,17 @@
 
 import React, { PropTypes } from 'react';
 import PureComponent from './PureComponent';
+import { connect } from 'react-redux';
+
+import {
+  changeEditor,
+  changeTheme,
+  toggleConfiguration,
+} from './actions';
 
 const themeOptions = ACE_THEMES.map(t => <option value={t} key={t}>{t}</option>);
 
-export default class Configuration extends PureComponent {
+class Configuration extends PureComponent {
   onChangeEditor = e => this.props.changeEditor(e.target.value);
   onChangeTheme = e => this.props.changeTheme(e.target.value);
 
@@ -42,9 +49,26 @@ export default class Configuration extends PureComponent {
 }
 
 Configuration.propTypes = {
-  editor: PropTypes.string.isRequired,
   changeEditor: PropTypes.func.isRequired,
-  theme: PropTypes.string.isRequired,
   changeTheme: PropTypes.func.isRequired,
-  toggleConfiguration: PropTypes.func.isRequired
+  editor: PropTypes.string.isRequired,
+  theme: PropTypes.string.isRequired,
+  toggleConfiguration: PropTypes.func.isRequired,
 };
+
+const mapStateToProps = ({ configuration: { editor, theme } }) => (
+  { editor, theme }
+);
+
+const mapDispatchToProps = dispatch => ({
+  changeEditor: editor => dispatch(changeEditor(editor)),
+  changeTheme: theme => dispatch(changeTheme(theme)),
+  toggleConfiguration: () => dispatch(toggleConfiguration()),
+});
+
+const ConnectedConfiguration = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Configuration);
+
+export default ConnectedConfiguration;

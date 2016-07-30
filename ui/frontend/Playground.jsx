@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import {
-  changeEditor, changeTheme,
-  editCode, toggleConfiguration,
+  editCode,
   changeFocus
 } from './actions';
 import { connect } from 'react-redux';
@@ -11,19 +10,11 @@ import Header from './Header';
 import Editor from './Editor';
 import Output from './Output';
 
-function ConfigurationModal(props) {
-  const {
-    editor, changeEditor,
-    theme, changeTheme,
-    toggleConfiguration
-  } = props;
-
+function ConfigurationModal() {
   return (
     <div className="modal-backdrop">
       <div className="modal-content">
-        <Configuration editor={editor} changeEditor={changeEditor}
-                       theme={theme} changeTheme={changeTheme}
-                       toggleConfiguration={toggleConfiguration} />
+        <Configuration  />
       </div>
     </div>
   );
@@ -33,13 +24,11 @@ class Playground extends React.Component {
   render() {
     const { code, position,
             configuration: { editor, theme, shown: showConfig },
-            onEditCode, changeEditor, changeTheme,
-            toggleConfiguration,
+            onEditCode,
             output, changeFocus
           } = this.props;
 
-    const config = showConfig ? <ConfigurationModal editor={editor} changeEditor={changeEditor} theme={theme} changeTheme={changeTheme} toggleConfiguration={toggleConfiguration} /> : null;
-
+    const config = showConfig ? <ConfigurationModal /> : null;
     const outputFocused = output.meta.focus ? 'playground-output-focused' : '';
 
     return (
@@ -88,11 +77,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    changeEditor: (editor) => dispatch(changeEditor(editor)),
-    changeTheme: (theme) => dispatch(changeTheme(theme)),
     changeFocus: (outputPane) => dispatch(changeFocus(outputPane)),
     onEditCode: (code) => dispatch(editCode(code)),
-    toggleConfiguration: () => dispatch(toggleConfiguration()),
   };
 };
 
