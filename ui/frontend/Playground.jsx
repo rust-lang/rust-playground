@@ -57,6 +57,7 @@ class Playground extends React.Component {
 }
 
 Playground.propTypes = {
+  focus: PropTypes.string,
   showConfig: PropTypes.bool.isRequired,
 };
 
