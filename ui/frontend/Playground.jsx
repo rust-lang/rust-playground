@@ -1,8 +1,6 @@
 import React, { PropTypes } from 'react';
 import {
-  changeEditor, changeTheme, changeChannel, changeMode,
-  performExecute, performCompileToAssembly, performCompileToLLVM,
-  performFormat, performClippy, performGistSave,
+  changeEditor, changeTheme,
   editCode, toggleConfiguration,
   changeFocus
 } from './actions';
@@ -34,9 +32,8 @@ function ConfigurationModal(props) {
 class Playground extends React.Component {
   render() {
     const { code, position,
-            execute, compileToAssembly, compileToLLVM, format, clippy, gistSave,
-            configuration: { channel, mode, tests, editor, theme, shown: showConfig },
-            changeChannel, changeMode, onEditCode, changeEditor, changeTheme,
+            configuration: { editor, theme, shown: showConfig },
+            onEditCode, changeEditor, changeTheme,
             toggleConfiguration,
             output, changeFocus
           } = this.props;
@@ -50,13 +47,7 @@ class Playground extends React.Component {
         { config }
         <div className="playground">
           <div className="playground-header">
-            <Header execute={execute}
-                    compileToAssembly={compileToAssembly}
-                    compileToLLVM={compileToLLVM}
-                    format={format} clippy={clippy} gistSave={gistSave}
-                    channel={channel} changeChannel={changeChannel}
-                    mode={mode} changeMode={changeMode}
-                    tests={tests} toggleConfiguration={toggleConfiguration} />
+            <Header />
           </div>
           <div className="playground-editor">
             <Editor editor={editor} theme={theme} code={code} position={position} onEditCode={onEditCode} />
@@ -85,13 +76,7 @@ class Playground extends React.Component {
 }
 
 Playground.propTypes = {
-  execute: PropTypes.func.isRequired,
-  compileToAssembly: PropTypes.func.isRequired,
-  compileToLLVM: PropTypes.func.isRequired,
-  format: PropTypes.func.isRequired,
-  gistSave: PropTypes.func.isRequired,
   configuration: PropTypes.object.isRequired,
-  changeChannel: PropTypes.func.isRequired,
   onEditCode: PropTypes.func.isRequired,
   code: PropTypes.string.isRequired
 };
@@ -103,19 +88,11 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    toggleConfiguration: () => dispatch(toggleConfiguration()),
     changeEditor: (editor) => dispatch(changeEditor(editor)),
     changeTheme: (theme) => dispatch(changeTheme(theme)),
-    changeChannel: (channel) => dispatch(changeChannel(channel)),
-    changeMode: (mode) => dispatch(changeMode(mode)),
     changeFocus: (outputPane) => dispatch(changeFocus(outputPane)),
-    execute: () => dispatch(performExecute()),
-    compileToAssembly: () => dispatch(performCompileToAssembly()),
-    compileToLLVM: () => dispatch(performCompileToLLVM()),
-    format: () => dispatch(performFormat()),
-    clippy: () => dispatch(performClippy()),
-    gistSave: () => dispatch(performGistSave()),
-    onEditCode: (code) => dispatch(editCode(code))
+    onEditCode: (code) => dispatch(editCode(code)),
+    toggleConfiguration: () => dispatch(toggleConfiguration()),
   };
 };
 

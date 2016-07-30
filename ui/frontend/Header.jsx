@@ -1,5 +1,18 @@
 import React, { PropTypes } from 'react';
 import PureComponent from './PureComponent';
+import { connect } from 'react-redux';
+
+import {
+  changeChannel,
+  changeMode,
+  performClippy,
+  performCompileToAssembly,
+  performCompileToLLVM,
+  performExecute,
+  performFormat,
+  performGistSave,
+  toggleConfiguration,
+} from './actions';
 
 function oneRadio(name, currentValue, possibleValue, change, labelText) {
   const id = `${name}-${possibleValue}`;
@@ -10,7 +23,7 @@ function oneRadio(name, currentValue, possibleValue, change, labelText) {
   ];
 }
 
-export default class Header extends PureComponent {
+class Header extends PureComponent {
   render() {
     const {
       execute, compileToAssembly, compileToLLVM,
@@ -74,16 +87,39 @@ export default class Header extends PureComponent {
 }
 
 Header.propTypes = {
-  execute: PropTypes.func.isRequired,
+  changeChannel: PropTypes.func.isRequired,
+  changeMode: PropTypes.func.isRequired,
+  channel: PropTypes.string.isRequired,
+  clippy: PropTypes.func.isRequired,
   compileToAssembly: PropTypes.func.isRequired,
   compileToLLVM: PropTypes.func.isRequired,
+  execute: PropTypes.func.isRequired,
   format: PropTypes.func.isRequired,
-  clippy: PropTypes.func.isRequired,
   gistSave: PropTypes.func.isRequired,
-  channel: PropTypes.string.isRequired,
-  changeChannel: PropTypes.func.isRequired,
   mode: PropTypes.string.isRequired,
-  changeMode: PropTypes.func.isRequired,
   tests: PropTypes.bool.isRequired,
   toggleConfiguration: PropTypes.func.isRequired
 };
+
+const mapStateToProps = ({ configuration: { channel, mode, tests } }) => (
+  { channel, mode, tests }
+);
+
+const mapDispatchToProps = dispatch => ({
+  changeChannel: channel => dispatch(changeChannel(channel)),
+  changeMode: mode => dispatch(changeMode(mode)),
+  clippy: () => dispatch(performClippy()),
+  compileToAssembly: () => dispatch(performCompileToAssembly()),
+  compileToLLVM: () => dispatch(performCompileToLLVM()),
+  execute: () => dispatch(performExecute()),
+  format: () => dispatch(performFormat()),
+  gistSave: () => dispatch(performGistSave()),
+  toggleConfiguration: () => dispatch(toggleConfiguration()),
+});
+
+const ConnectedHeader = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Header);
+
+export default ConnectedHeader;
