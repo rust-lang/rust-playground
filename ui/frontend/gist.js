@@ -21,7 +21,7 @@ export function load(id) {
     }));
 }
 
-const gistBody = (code) => ({
+const gistBody = code => ({
   description: "Rust code shared from the playground",
   public: true,
   files: {

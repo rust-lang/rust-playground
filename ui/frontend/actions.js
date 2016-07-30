@@ -67,14 +67,14 @@ function jsonPost(urlObj, body) {
     },
     body: JSON.stringify(body),
   })
-    .catch(error => { return { error }; })
+    .catch(error => error)
     .then(response => {
       if (response.ok) {
         return response.json();
       } else {
         return response.json()
           .then(j => Promise.reject(j))
-          .catch(e => { return Promise.reject({ error: e.toString() }); });
+          .catch(e => Promise.reject({ error: e.toString() }));
       }
     });
 }

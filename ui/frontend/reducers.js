@@ -11,9 +11,9 @@ export const defaultConfiguration = {
   tests: false,
 };
 
-const hasTests = (code) => code.includes('#[test]');
-const hasMainMethod = (code) => code.includes('fn main()');
-const runAsTest = (code) => hasTests(code) && !hasMainMethod(code);
+const hasTests = code => code.includes('#[test]');
+const hasMainMethod = code => code.includes('fn main()');
+const runAsTest = code => hasTests(code) && !hasMainMethod(code);
 
 const configuration = (state = defaultConfiguration, action) => {
   switch (action.type) {

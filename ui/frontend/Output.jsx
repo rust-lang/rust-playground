@@ -7,7 +7,7 @@ import { changeFocus } from './actions';
 
 import Loader from './Loader';
 
-const hasProperties = (obj) => Object.values(obj).some(val => val);
+const hasProperties = obj => Object.values(obj).some(val => val);
 
 function Tab({ kind, focus, label, onClick, tabProps }) {
   if (hasProperties(tabProps)) {
