@@ -222,11 +222,6 @@
       "from": "babel-plugin-syntax-async-functions@>=6.8.0 <7.0.0",
       "resolved": "https://registry.npmjs.org/babel-plugin-syntax-async-functions/-/babel-plugin-syntax-async-functions-6.8.0.tgz"
     },
-    "babel-plugin-syntax-class-properties": {
-      "version": "6.8.0",
-      "from": "babel-plugin-syntax-class-properties@>=6.8.0 <7.0.0",
-      "resolved": "https://registry.npmjs.org/babel-plugin-syntax-class-properties/-/babel-plugin-syntax-class-properties-6.8.0.tgz"
-    },
     "babel-plugin-syntax-flow": {
       "version": "6.8.0",
       "from": "babel-plugin-syntax-flow@>=6.3.13 <7.0.0",
@@ -241,11 +236,6 @@
       "version": "6.8.0",
       "from": "babel-plugin-syntax-object-rest-spread@>=6.8.0 <7.0.0",
       "resolved": "https://registry.npmjs.org/babel-plugin-syntax-object-rest-spread/-/babel-plugin-syntax-object-rest-spread-6.8.0.tgz"
-    },
-    "babel-plugin-transform-class-properties": {
-      "version": "6.10.2",
-      "from": "babel-plugin-transform-class-properties@latest",
-      "resolved": "https://registry.npmjs.org/babel-plugin-transform-class-properties/-/babel-plugin-transform-class-properties-6.10.2.tgz"
     },
     "babel-plugin-transform-es2015-arrow-functions": {
       "version": "6.8.0",
@@ -705,9 +695,9 @@
       "resolved": "https://registry.npmjs.org/convert-source-map/-/convert-source-map-1.2.0.tgz"
     },
     "core-js": {
-      "version": "1.2.6",
+      "version": "1.2.7",
       "from": "core-js@>=1.0.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz"
+      "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.7.tgz"
     },
     "core-util-is": {
       "version": "1.0.2",
@@ -2243,9 +2233,9 @@
       "resolved": "https://registry.npmjs.org/lodash.deburr/-/lodash.deburr-3.2.0.tgz"
     },
     "lodash.isequal": {
-      "version": "4.2.0",
+      "version": "4.3.0",
       "from": "lodash.isequal@>=4.1.1 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.isequal/-/lodash.isequal-4.2.0.tgz"
+      "resolved": "https://registry.npmjs.org/lodash.isequal/-/lodash.isequal-4.3.0.tgz"
     },
     "lodash.keys": {
       "version": "4.0.7",
@@ -3010,29 +3000,29 @@
       "resolved": "https://registry.npmjs.org/rc/-/rc-1.1.6.tgz"
     },
     "react": {
-      "version": "15.1.0",
-      "from": "react@latest",
-      "resolved": "https://registry.npmjs.org/react/-/react-15.1.0.tgz"
+      "version": "15.3.0",
+      "from": "react@>=15.1.0 <16.0.0",
+      "resolved": "https://registry.npmjs.org/react/-/react-15.3.0.tgz"
     },
     "react-ace": {
-      "version": "3.4.1",
-      "from": "react-ace@latest",
-      "resolved": "https://registry.npmjs.org/react-ace/-/react-ace-3.4.1.tgz"
+      "version": "3.5.0",
+      "from": "react-ace@>=3.4.1 <4.0.0",
+      "resolved": "https://registry.npmjs.org/react-ace/-/react-ace-3.5.0.tgz"
     },
     "react-addons-pure-render-mixin": {
-      "version": "15.1.0",
-      "from": "react-addons-pure-render-mixin@15.1.0",
-      "resolved": "https://registry.npmjs.org/react-addons-pure-render-mixin/-/react-addons-pure-render-mixin-15.1.0.tgz"
+      "version": "15.3.0",
+      "from": "react-addons-pure-render-mixin@>=15.1.0 <16.0.0",
+      "resolved": "https://registry.npmjs.org/react-addons-pure-render-mixin/-/react-addons-pure-render-mixin-15.3.0.tgz"
     },
     "react-addons-shallow-compare": {
-      "version": "15.1.0",
-      "from": "react-addons-shallow-compare@15.1.0",
-      "resolved": "https://registry.npmjs.org/react-addons-shallow-compare/-/react-addons-shallow-compare-15.1.0.tgz"
+      "version": "15.3.0",
+      "from": "react-addons-shallow-compare@>=15.1.0 <16.0.0",
+      "resolved": "https://registry.npmjs.org/react-addons-shallow-compare/-/react-addons-shallow-compare-15.3.0.tgz"
     },
     "react-dom": {
-      "version": "15.1.0",
-      "from": "react-dom@latest",
-      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-15.1.0.tgz"
+      "version": "15.3.0",
+      "from": "react-dom@>=15.1.0 <16.0.0",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-15.3.0.tgz"
     },
     "react-prism": {
       "version": "3.2.1",
