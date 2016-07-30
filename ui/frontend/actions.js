@@ -207,7 +207,7 @@ function requestClippy() {
 }
 
 function receiveClippySuccess(json) {
-  const { stdout, stderr} = json;
+  const { stdout, stderr } = json;
   return { type: CLIPPY_SUCCEEDED, stdout, stderr };
 }
 

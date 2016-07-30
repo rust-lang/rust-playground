@@ -125,7 +125,7 @@ const execute = (state = defaultExecute, action) => {
     return start(defaultExecute, state);
   case actions.EXECUTE_SUCCEEDED: {
     const { stdout = "", stderr = "" } = action;
-    return finish(state, {stdout, stderr });
+    return finish(state, { stdout, stderr });
   }
   case actions.EXECUTE_FAILED:
     return finish(state, { error: action.error });

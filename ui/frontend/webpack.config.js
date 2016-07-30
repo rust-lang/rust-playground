@@ -73,6 +73,6 @@ if (process.env.NODE_ENV === 'production') {
       }
     }),
     new webpack.optimize.OccurrenceOrderPlugin(),
-    new CompressionPlugin({algorithm: 'zopfli'})
+    new CompressionPlugin({ algorithm: 'zopfli' })
   );
 }
