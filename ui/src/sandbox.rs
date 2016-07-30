@@ -199,6 +199,7 @@ impl Sandbox {
             .args(&["--net", "none"])
             .args(&["--memory", "256m"])
             .args(&["--memory-swap", "320m"])
+            .args(&["--pids-limit", "512"])
             .args(&["--env", "PLAYGROUND_TIMEOUT=10"])
             .args(&["--env", "RUST_NEW_ERROR_FORMAT=true"]);
 
@@ -580,7 +581,6 @@ mod test {
         let sb = Sandbox::new().expect("Unable to create sandbox");
         let resp = sb.execute(&req).expect("Unable to execute code");
 
-        println!("{:?}", resp);
         assert!(resp.stderr.contains("Killed"));
     }
 
@@ -603,7 +603,34 @@ mod test {
         let sb = Sandbox::new().expect("Unable to create sandbox");
         let resp = sb.execute(&req).expect("Unable to execute code");
 
-        println!("{:?}", resp);
         assert!(resp.stderr.contains("Killed"));
+    }
+
+    #[test]
+    fn number_of_pids_is_limited() {
+        let forkbomb = r##"
+            fn main() {
+                ::std::process::Command::new("sh").arg("-c").arg(r#"
+                    z() {
+                        z&
+                        z
+                    }
+                    z
+                "#).status().unwrap();
+            }
+        "##;
+
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            tests: false,
+            code: forkbomb.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.execute(&req).expect("Unable to execute code");
+
+        println!("{:?}", resp);
+        assert!(resp.stderr.contains("Cannot fork"));
     }
 }
