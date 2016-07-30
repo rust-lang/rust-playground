@@ -4,7 +4,6 @@ import AceEditor from 'react-ace';
 import brace from 'brace';
 
 import 'brace/mode/rust';
-import 'brace/theme/github';
 import 'brace/keybinding/emacs';
 
 class SimpleEditor extends PureComponent {
@@ -53,13 +52,16 @@ class AdvancedEditor extends PureComponent {
   trackEditor = component => this._editor = component;
 
   render() {
-    const { code, onEditCode } = this.props;
+    const { theme, code, onEditCode } = this.props;
+
+    // These are part of the vendor chunk
+    require(`brace/theme/${theme}`);
 
     return (
       <AceEditor
          ref={ this.trackEditor }
          mode="rust"
-         theme="github"
+         theme={theme}
          keyboardHandler="emacs"
          value={ code }
          onChange={ onEditCode }
@@ -90,12 +92,12 @@ class AdvancedEditor extends PureComponent {
 
 export default class Editor extends PureComponent {
   render() {
-    const { editor, code, position, onEditCode } = this.props;
+    const { editor, theme, code, position, onEditCode } = this.props;
     const SelectedEditor = editor === "simple" ? SimpleEditor : AdvancedEditor;
 
     return (
       <div className="editor">
-        <SelectedEditor code={code} position={position} onEditCode={onEditCode} />;
+        <SelectedEditor theme={theme} code={code} position={position} onEditCode={onEditCode} />;
       </div>
     );
   }
@@ -103,6 +105,7 @@ export default class Editor extends PureComponent {
 
 Editor.propTypes = {
   editor: PropTypes.string.isRequired,
+  theme: PropTypes.string.isRequired,
   onEditCode: PropTypes.func.isRequired,
   code: PropTypes.string.isRequired,
   position: PropTypes.shape({

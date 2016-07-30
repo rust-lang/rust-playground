@@ -16,12 +16,17 @@ export function toggleConfiguration() {
 }
 
 export const CHANGE_EDITOR = 'CHANGE_EDITOR';
+export const CHANGE_THEME = 'CHANGE_THEME';
 export const CHANGE_CHANNEL = 'CHANGE_CHANNEL';
 export const CHANGE_MODE = 'CHANGE_MODE';
 export const CHANGE_FOCUS = 'CHANGE_FOCUS';
 
 export function changeEditor(editor) {
   return { type: CHANGE_EDITOR, editor };
+}
+
+export function changeTheme(theme) {
+  return { type: CHANGE_THEME, theme };
 }
 
 export function changeChannel(channel) {

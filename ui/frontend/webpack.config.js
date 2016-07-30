@@ -3,9 +3,14 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var CompressionPlugin = require("compression-webpack-plugin");
 var autoprefixer = require('autoprefixer');
+var glob = require('glob');
+var basename = require('basename');
 
 const thisPackage = require('./package.json');
 const vendorLibraries = Object.keys(thisPackage.dependencies);
+
+const allThemeFiles = glob.sync('./node_modules/brace/theme/*.js');
+const allThemes = allThemeFiles.map(basename);
 
 module.exports = {
   entry: {
@@ -38,13 +43,16 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.EnvironmentPlugin(["NODE_ENV"]),
+    new webpack.DefinePlugin({
+      ACE_THEMES: JSON.stringify(allThemes),
+    }),
     new HtmlWebpackPlugin({
       title: "Rust Playground",
       template: 'index.ejs',
       chunksSortMode: 'dependency',
     }),
     new ExtractTextPlugin("styles-[chunkhash].css"),
-    new webpack.EnvironmentPlugin(["NODE_ENV"]),
     new webpack.optimize.CommonsChunkPlugin({
       names: ['vendor', 'manifest'],
     }),

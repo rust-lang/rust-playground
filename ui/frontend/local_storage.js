@@ -5,7 +5,8 @@ export function serialize(state) {
   return JSON.stringify({
     version: CURRENT_VERSION,
     configuration: {
-      editor: state.configuration.editor
+      editor: state.configuration.editor,
+      theme: state.configuration.theme
     },
     code: state.code
   });
@@ -19,7 +20,8 @@ export function deserialize(savedState) {
   return {
     configuration: {
       ...defaultConfiguration,
-      editor: parsedState.configuration.editor
+      editor: parsedState.configuration.editor || defaultConfiguration.editor,
+      theme: parsedState.configuration.theme || defaultConfiguration.theme
     },
     code: parsedState.code
   };

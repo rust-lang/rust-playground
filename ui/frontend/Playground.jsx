@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import {
-  changeEditor, changeChannel, changeMode,
+  changeEditor, changeTheme, changeChannel, changeMode,
   performExecute, performCompileToAssembly, performCompileToLLVM,
   performFormat, performClippy, performGistSave,
   editCode, toggleConfiguration,
@@ -13,17 +13,35 @@ import Header from './Header';
 import Editor from './Editor';
 import Output from './Output';
 
+function ConfigurationModal(props) {
+  const {
+    editor, changeEditor,
+    theme, changeTheme,
+    toggleConfiguration
+  } = props;
+
+  return (
+    <div className="modal-backdrop">
+      <div className="modal-content">
+        <Configuration editor={editor} changeEditor={changeEditor}
+                       theme={theme} changeTheme={changeTheme}
+                       toggleConfiguration={toggleConfiguration} />
+      </div>
+    </div>
+  );
+}
+
 class Playground extends React.Component {
   render() {
     const { code, position,
             execute, compileToAssembly, compileToLLVM, format, clippy, gistSave,
-            configuration: { channel, mode, tests, editor, shown: showConfig },
-            changeChannel, changeMode, onEditCode, changeEditor,
+            configuration: { channel, mode, tests, editor, theme, shown: showConfig },
+            changeChannel, changeMode, onEditCode, changeEditor, changeTheme,
             toggleConfiguration,
             output, changeFocus
           } = this.props;
 
-    const config = showConfig ? this.renderConfiguration() : null;
+    const config = showConfig ? <ConfigurationModal editor={editor} changeEditor={changeEditor} theme={theme} changeTheme={changeTheme} toggleConfiguration={toggleConfiguration} /> : null;
 
     const outputFocused = output.meta.focus ? 'playground-output-focused' : '';
 
@@ -41,25 +59,11 @@ class Playground extends React.Component {
                     tests={tests} toggleConfiguration={toggleConfiguration} />
           </div>
           <div className="playground-editor">
-            <Editor editor={editor} code={code} position={position} onEditCode={onEditCode} />
+            <Editor editor={editor} theme={theme} code={code} position={position} onEditCode={onEditCode} />
           </div>
           <div className={`playground-output ${outputFocused}`}>
             <Output output={output} changeFocus={changeFocus} />
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  renderConfiguration() {
-    const { configuration: { editor }, changeEditor, toggleConfiguration } = this.props;
-
-    return (
-      <div className="modal-backdrop">
-        <div className="modal-content">
-          <Configuration editor={editor}
-                         changeEditor={changeEditor}
-                         toggleConfiguration={toggleConfiguration} />
         </div>
       </div>
     );
@@ -101,6 +105,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     toggleConfiguration: () => dispatch(toggleConfiguration()),
     changeEditor: (editor) => dispatch(changeEditor(editor)),
+    changeTheme: (theme) => dispatch(changeTheme(theme)),
     changeChannel: (channel) => dispatch(changeChannel(channel)),
     changeMode: (mode) => dispatch(changeMode(mode)),
     changeFocus: (outputPane) => dispatch(changeFocus(outputPane)),
