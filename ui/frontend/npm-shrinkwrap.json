@@ -243,9 +243,9 @@
       "resolved": "https://registry.npmjs.org/babel-plugin-syntax-object-rest-spread/-/babel-plugin-syntax-object-rest-spread-6.8.0.tgz"
     },
     "babel-plugin-transform-class-properties": {
-      "version": "6.10.2",
+      "version": "6.11.5",
       "from": "babel-plugin-transform-class-properties@latest",
-      "resolved": "https://registry.npmjs.org/babel-plugin-transform-class-properties/-/babel-plugin-transform-class-properties-6.10.2.tgz"
+      "resolved": "https://registry.npmjs.org/babel-plugin-transform-class-properties/-/babel-plugin-transform-class-properties-6.11.5.tgz"
     },
     "babel-plugin-transform-es2015-arrow-functions": {
       "version": "6.8.0",
@@ -362,6 +362,11 @@
       "from": "babel-plugin-transform-react-jsx@>=6.3.13 <7.0.0",
       "resolved": "https://registry.npmjs.org/babel-plugin-transform-react-jsx/-/babel-plugin-transform-react-jsx-6.8.0.tgz"
     },
+    "babel-plugin-transform-react-jsx-self": {
+      "version": "6.11.0",
+      "from": "babel-plugin-transform-react-jsx-self@>=6.11.0 <7.0.0",
+      "resolved": "https://registry.npmjs.org/babel-plugin-transform-react-jsx-self/-/babel-plugin-transform-react-jsx-self-6.11.0.tgz"
+    },
     "babel-plugin-transform-react-jsx-source": {
       "version": "6.9.0",
       "from": "babel-plugin-transform-react-jsx-source@>=6.3.13 <7.0.0",
@@ -395,9 +400,9 @@
       "resolved": "https://registry.npmjs.org/babel-preset-es2015/-/babel-preset-es2015-6.9.0.tgz"
     },
     "babel-preset-react": {
-      "version": "6.5.0",
-      "from": "babel-preset-react@latest",
-      "resolved": "https://registry.npmjs.org/babel-preset-react/-/babel-preset-react-6.5.0.tgz"
+      "version": "6.11.1",
+      "from": "babel-preset-react@>=6.5.0 <7.0.0",
+      "resolved": "https://registry.npmjs.org/babel-preset-react/-/babel-preset-react-6.11.1.tgz"
     },
     "babel-register": {
       "version": "6.9.0",
@@ -502,7 +507,7 @@
     },
     "brace": {
       "version": "0.8.0",
-      "from": "brace@>=0.8.0 <0.9.0",
+      "from": "brace@latest",
       "resolved": "https://registry.npmjs.org/brace/-/brace-0.8.0.tgz"
     },
     "brace-expansion": {
@@ -598,9 +603,9 @@
       "resolved": "https://registry.npmjs.org/clap/-/clap-1.1.1.tgz"
     },
     "clean-css": {
-      "version": "3.4.18",
+      "version": "3.4.19",
       "from": "clean-css@>=3.4.0 <3.5.0",
-      "resolved": "https://registry.npmjs.org/clean-css/-/clean-css-3.4.18.tgz",
+      "resolved": "https://registry.npmjs.org/clean-css/-/clean-css-3.4.19.tgz",
       "dependencies": {
         "commander": {
           "version": "2.8.1",
@@ -705,9 +710,9 @@
       "resolved": "https://registry.npmjs.org/convert-source-map/-/convert-source-map-1.2.0.tgz"
     },
     "core-js": {
-      "version": "1.2.6",
+      "version": "1.2.7",
       "from": "core-js@>=1.0.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.6.tgz"
+      "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.7.tgz"
     },
     "core-util-is": {
       "version": "1.0.2",
@@ -1842,14 +1847,14 @@
       "resolved": "https://registry.npmjs.org/html-comment-regex/-/html-comment-regex-1.1.0.tgz"
     },
     "html-minifier": {
-      "version": "2.1.5",
-      "from": "html-minifier@>=2.1.3 <3.0.0",
-      "resolved": "https://registry.npmjs.org/html-minifier/-/html-minifier-2.1.5.tgz"
+      "version": "2.1.7",
+      "from": "html-minifier@>=2.1.6 <3.0.0",
+      "resolved": "https://registry.npmjs.org/html-minifier/-/html-minifier-2.1.7.tgz"
     },
     "html-webpack-plugin": {
-      "version": "2.21.0",
-      "from": "html-webpack-plugin@latest",
-      "resolved": "https://registry.npmjs.org/html-webpack-plugin/-/html-webpack-plugin-2.21.0.tgz"
+      "version": "2.22.0",
+      "from": "html-webpack-plugin@>=2.21.0 <3.0.0",
+      "resolved": "https://registry.npmjs.org/html-webpack-plugin/-/html-webpack-plugin-2.22.0.tgz"
     },
     "htmlparser2": {
       "version": "3.3.0",
@@ -2243,9 +2248,9 @@
       "resolved": "https://registry.npmjs.org/lodash.deburr/-/lodash.deburr-3.2.0.tgz"
     },
     "lodash.isequal": {
-      "version": "4.2.0",
+      "version": "4.3.0",
       "from": "lodash.isequal@>=4.1.1 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.isequal/-/lodash.isequal-4.2.0.tgz"
+      "resolved": "https://registry.npmjs.org/lodash.isequal/-/lodash.isequal-4.3.0.tgz"
     },
     "lodash.keys": {
       "version": "4.0.7",
@@ -2581,9 +2586,9 @@
       "resolved": "https://registry.npmjs.org/normalize-url/-/normalize-url-1.5.3.tgz"
     },
     "normalize.css": {
-      "version": "4.1.1",
-      "from": "normalize.css@latest",
-      "resolved": "https://registry.npmjs.org/normalize.css/-/normalize.css-4.1.1.tgz"
+      "version": "4.2.0",
+      "from": "normalize.css@>=4.1.1 <5.0.0",
+      "resolved": "https://registry.npmjs.org/normalize.css/-/normalize.css-4.2.0.tgz"
     },
     "npmlog": {
       "version": "2.0.4",
@@ -3010,29 +3015,29 @@
       "resolved": "https://registry.npmjs.org/rc/-/rc-1.1.6.tgz"
     },
     "react": {
-      "version": "15.1.0",
-      "from": "react@latest",
-      "resolved": "https://registry.npmjs.org/react/-/react-15.1.0.tgz"
+      "version": "15.3.0",
+      "from": "react@>=15.1.0 <16.0.0",
+      "resolved": "https://registry.npmjs.org/react/-/react-15.3.0.tgz"
     },
     "react-ace": {
-      "version": "3.4.1",
-      "from": "react-ace@latest",
-      "resolved": "https://registry.npmjs.org/react-ace/-/react-ace-3.4.1.tgz"
+      "version": "3.5.0",
+      "from": "react-ace@>=3.4.1 <4.0.0",
+      "resolved": "https://registry.npmjs.org/react-ace/-/react-ace-3.5.0.tgz"
     },
     "react-addons-pure-render-mixin": {
-      "version": "15.1.0",
-      "from": "react-addons-pure-render-mixin@15.1.0",
-      "resolved": "https://registry.npmjs.org/react-addons-pure-render-mixin/-/react-addons-pure-render-mixin-15.1.0.tgz"
+      "version": "15.3.0",
+      "from": "react-addons-pure-render-mixin@latest",
+      "resolved": "https://registry.npmjs.org/react-addons-pure-render-mixin/-/react-addons-pure-render-mixin-15.3.0.tgz"
     },
     "react-addons-shallow-compare": {
-      "version": "15.1.0",
-      "from": "react-addons-shallow-compare@15.1.0",
-      "resolved": "https://registry.npmjs.org/react-addons-shallow-compare/-/react-addons-shallow-compare-15.1.0.tgz"
+      "version": "15.3.0",
+      "from": "react-addons-shallow-compare@>=15.1.0 <16.0.0",
+      "resolved": "https://registry.npmjs.org/react-addons-shallow-compare/-/react-addons-shallow-compare-15.3.0.tgz"
     },
     "react-dom": {
-      "version": "15.1.0",
-      "from": "react-dom@latest",
-      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-15.1.0.tgz"
+      "version": "15.3.0",
+      "from": "react-dom@>=15.1.0 <16.0.0",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-15.3.0.tgz"
     },
     "react-prism": {
       "version": "3.2.1",
@@ -3122,7 +3127,7 @@
     },
     "redux-logger": {
       "version": "2.6.1",
-      "from": "redux-logger@latest",
+      "from": "redux-logger@>=2.6.1 <3.0.0",
       "resolved": "https://registry.npmjs.org/redux-logger/-/redux-logger-2.6.1.tgz"
     },
     "redux-thunk": {
@@ -3161,9 +3166,9 @@
       "resolved": "https://registry.npmjs.org/regjsparser/-/regjsparser-0.1.5.tgz"
     },
     "relateurl": {
-      "version": "0.2.6",
+      "version": "0.2.7",
       "from": "relateurl@>=0.2.0 <0.3.0",
-      "resolved": "https://registry.npmjs.org/relateurl/-/relateurl-0.2.6.tgz"
+      "resolved": "https://registry.npmjs.org/relateurl/-/relateurl-0.2.7.tgz"
     },
     "renderkid": {
       "version": "2.0.0",
@@ -3267,9 +3272,9 @@
       }
     },
     "sass-loader": {
-      "version": "3.2.1",
-      "from": "sass-loader@latest",
-      "resolved": "https://registry.npmjs.org/sass-loader/-/sass-loader-3.2.1.tgz",
+      "version": "3.2.3",
+      "from": "sass-loader@>=3.2.1 <4.0.0",
+      "resolved": "https://registry.npmjs.org/sass-loader/-/sass-loader-3.2.3.tgz",
       "dependencies": {
         "async": {
           "version": "1.5.2",

@@ -6,8 +6,6 @@ import brace from 'brace';
 import 'brace/mode/rust';
 import 'brace/theme/github';
 import 'brace/keybinding/emacs';
-// https://github.com/securingsincity/react-ace/issues/95
-import 'brace/ext/language_tools';
 
 class SimpleEditor extends PureComponent {
   onChange = e => this.props.onEditCode(e.target.value);
