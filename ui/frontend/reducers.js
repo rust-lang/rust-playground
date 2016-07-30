@@ -5,6 +5,7 @@ import output from './reducers/output';
 export const defaultConfiguration = {
   shown: false,
   editor: "advanced",
+  theme: "github",
   channel: "stable",
   mode: "debug",
   tests: false
@@ -20,6 +21,8 @@ const configuration = (state = defaultConfiguration, action) => {
     return { ...state, shown: !state.shown };
   case actions.CHANGE_EDITOR:
     return { ...state, editor: action.editor };
+  case actions.CHANGE_THEME:
+    return { ...state, theme: action.theme };
   case actions.CHANGE_CHANNEL:
     return { ...state, channel: action.channel };
   case actions.CHANGE_MODE:
