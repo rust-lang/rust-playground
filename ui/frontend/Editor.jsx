@@ -1,9 +1,12 @@
 import React, { PropTypes } from 'react';
 import PureComponent from './PureComponent';
 import AceEditor from 'react-ace';
+import { connect } from 'react-redux';
 
 import 'brace/mode/rust';
 import 'brace/keybinding/emacs';
+
+import { editCode } from './actions';
 
 class SimpleEditor extends PureComponent {
   onChange = e => this.props.onEditCode(e.target.value);
@@ -89,7 +92,7 @@ class AdvancedEditor extends PureComponent {
   }
 }
 
-export default class Editor extends PureComponent {
+class Editor extends PureComponent {
   render() {
     const { editor, theme, code, position, onEditCode } = this.props;
     const SelectedEditor = editor === "simple" ? SimpleEditor : AdvancedEditor;
@@ -103,12 +106,27 @@ export default class Editor extends PureComponent {
 }
 
 Editor.propTypes = {
-  editor: PropTypes.string.isRequired,
-  theme: PropTypes.string.isRequired,
-  onEditCode: PropTypes.func.isRequired,
   code: PropTypes.string.isRequired,
+  editor: PropTypes.string.isRequired,
+  onEditCode: PropTypes.func.isRequired,
   position: PropTypes.shape({
     line: PropTypes.number.isRequired,
     column: PropTypes.number.isRequired,
   }).isRequired,
+  theme: PropTypes.string.isRequired,
 };
+
+const mapStateToProps = ({ code, configuration: { editor, theme }, position }) => (
+  { code, editor, theme, position }
+);
+
+const mapDispatchToProps = dispatch => ({
+  onEditCode: code => dispatch(editCode(code)),
+});
+
+const ConnectedEditor = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Editor);
+
+export default ConnectedEditor;

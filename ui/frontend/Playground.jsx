@@ -1,9 +1,7 @@
 import React, { PropTypes } from 'react';
-import {
-  editCode,
-  changeFocus
-} from './actions';
 import { connect } from 'react-redux';
+
+import { changeFocus } from './actions';
 
 import Configuration from './Configuration';
 import Header from './Header';
@@ -22,14 +20,13 @@ function ConfigurationModal() {
 
 class Playground extends React.Component {
   render() {
-    const { code, position,
-            configuration: { editor, theme, shown: showConfig },
-            onEditCode,
-            output, changeFocus
-          } = this.props;
+    const {
+      showConfig, focus,
+      output, changeFocus
+    } = this.props;
 
     const config = showConfig ? <ConfigurationModal /> : null;
-    const outputFocused = output.meta.focus ? 'playground-output-focused' : '';
+    const outputFocused = focus ? 'playground-output-focused' : '';
 
     return (
       <div>
@@ -39,7 +36,7 @@ class Playground extends React.Component {
             <Header />
           </div>
           <div className="playground-editor">
-            <Editor editor={editor} theme={theme} code={code} position={position} onEditCode={onEditCode} />
+            <Editor />
           </div>
           <div className={`playground-output ${outputFocused}`}>
             <Output output={output} changeFocus={changeFocus} />
@@ -50,7 +47,7 @@ class Playground extends React.Component {
   }
 
   componentDidUpdate(prevProps, _prevState) {
-    if (this.props.output.meta.focus !== prevProps.output.meta.focus) {
+    if (this.props.focus !== prevProps.focus) {
       // Inform the ACE editor that its size has changed.
       try {
         window.dispatchEvent(new Event('resize'));
@@ -65,22 +62,16 @@ class Playground extends React.Component {
 }
 
 Playground.propTypes = {
-  configuration: PropTypes.object.isRequired,
-  onEditCode: PropTypes.func.isRequired,
-  code: PropTypes.string.isRequired
+  showConfig: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = (state) => {
-  const { configuration, code, position, output } = state;
-  return { configuration, code, position, output };
-};
+const mapStateToProps = ({ configuration: { shown: showConfig }, output }) => (
+  { showConfig, focus: output.meta.focus, output }
+);
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    changeFocus: (outputPane) => dispatch(changeFocus(outputPane)),
-    onEditCode: (code) => dispatch(editCode(code)),
-  };
-};
+const mapDispatchToProps = (dispatch) => ({
+  changeFocus: x => dispatch(changeFocus(x)),
+});
 
 const ConnectedPlayground = connect(
   mapStateToProps,
