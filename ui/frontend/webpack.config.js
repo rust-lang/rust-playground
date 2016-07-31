@@ -9,10 +9,20 @@ const glob = require('glob');
 const basename = require('basename');
 
 const thisPackage = require('./package.json');
-const vendorLibraries = Object.keys(thisPackage.dependencies);
+const dependencies = Object.keys(thisPackage.dependencies);
 
-const allThemeFiles = glob.sync('./node_modules/brace/theme/*.js');
-const allThemes = allThemeFiles.map(basename);
+const allKeybindingNames = glob.sync('./node_modules/brace/keybinding/*.js').map(basename);
+const allKeybindingRequires = allKeybindingNames.map(n => `brace/keybinding/${n}`);
+
+const allThemeNames = glob.sync('./node_modules/brace/theme/*.js').map(basename);
+const allThemeRequires = allThemeNames.map(n => `brace/theme/${n}`);
+
+// There's a builtin/default keybinding that we call `ace`.
+const allKeybindings = allKeybindingNames.concat(['ace']).sort();
+const allThemes = allThemeNames;
+
+// Perhaps we could place each of these in a separate chunk and load them on demand?
+const vendorLibraries = dependencies.concat(allKeybindingRequires, allThemeRequires);
 
 module.exports = {
   entry: {
@@ -47,6 +57,7 @@ module.exports = {
   plugins: [
     new webpack.EnvironmentPlugin(["NODE_ENV"]),
     new webpack.DefinePlugin({
+      ACE_KEYBINDINGS: JSON.stringify(allKeybindings),
       ACE_THEMES: JSON.stringify(allThemes),
     }),
     new HtmlWebpackPlugin({

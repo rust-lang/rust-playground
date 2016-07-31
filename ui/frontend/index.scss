@@ -47,8 +47,17 @@ body {
     width: 100%;
     height: 100%;
 
-    label {
-        margin-right: 1em;
+    &-item {
+        display: flex;
+        margin-bottom: 0.5em;
+    }
+
+    &-label {
+        flex: 1 1 100%;
+    }
+
+    &-value {
+        flex: 1 1 100%;
     }
 
     &-actions {

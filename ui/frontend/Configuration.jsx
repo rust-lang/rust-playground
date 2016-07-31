@@ -1,4 +1,4 @@
-/* global ACE_THEMES:false */
+/* global ACE_KEYBINDINGS:false, ACE_THEMES:false */
 
 import React, { PropTypes } from 'react';
 import PureComponent from './PureComponent';
@@ -6,39 +6,78 @@ import { connect } from 'react-redux';
 
 import {
   changeEditor,
+  changeKeybinding,
   changeTheme,
   toggleConfiguration,
 } from './actions';
 
+const keybindingOptions = ACE_KEYBINDINGS.map(t => <option value={t} key={t}>{t}</option>);
 const themeOptions = ACE_THEMES.map(t => <option value={t} key={t}>{t}</option>);
+
+const ConfigurationSelect = ({ what, label, defaultValue, onChange, children }) => (
+  <div className="configuration-item">
+    <label htmlFor={`config-${what}`}
+           className="configuration-label">
+      {label}
+    </label>
+    <select name={`config-${what}`}
+            className="configuration-value"
+            defaultValue={defaultValue}
+            onChange={onChange}>
+      {children}
+    </select>
+  </div>
+);
+
+ConfigurationSelect.propTypes = {
+  what: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  defaultValue: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
+};
 
 class Configuration extends PureComponent {
   onChangeEditor = e => this.props.changeEditor(e.target.value);
+  onChangeKeybinding = e => this.props.changeKeybinding(e.target.value);
   onChangeTheme = e => this.props.changeTheme(e.target.value);
 
   render() {
-    const { editor, theme, toggleConfiguration } = this.props;
+    const { editor, keybinding, theme, toggleConfiguration } = this.props;
+
+    const advancedEditor = editor === 'advanced';
+
+    const keybindingSelect = advancedEditor ? (
+      <ConfigurationSelect what="keybinding"
+                           label="Editor Keybinding"
+                           defaultValue={keybinding}
+                           onChange={this.onChangeKeybinding}>
+        { keybindingOptions }
+      </ConfigurationSelect>
+    ) : null;
+
+    const themeSelect = advancedEditor ? (
+      <ConfigurationSelect what="theme"
+                           label="Editor Theme"
+                           defaultValue={theme}
+                           onChange={this.onChangeTheme}>
+        { themeOptions }
+      </ConfigurationSelect>
+    ) : null;
 
     return (
       <div className="configuration">
-        <div>
-          <label htmlFor="config-editor">Editor Style</label>
-          <select name="config-editor"
-                  defaultValue={editor}
-                  onChange={this.onChangeEditor}>
-            <option value="simple">Simple</option>
-            <option value="advanced">Advanced</option>
-          </select>
-        </div>
+        <ConfigurationSelect what="editor"
+                             label="Editor Style"
+                             defaultValue={editor}
+                             onChange={this.onChangeEditor}>
+          <option value="simple">Simple</option>
+          <option value="advanced">Advanced</option>
+        </ConfigurationSelect>
 
-        <div>
-          <label htmlFor="config-theme">Editor Theme</label>
-          <select name="config-theme"
-                  defaultValue={theme}
-                  onChange={this.onChangeTheme}>
-            { themeOptions }
-          </select>
-        </div>
+        {keybindingSelect}
+
+        {themeSelect}
 
         <div className="configuration-actions">
           <button onClick={toggleConfiguration}>Done</button>
@@ -50,18 +89,21 @@ class Configuration extends PureComponent {
 
 Configuration.propTypes = {
   changeEditor: PropTypes.func.isRequired,
+  changeKeybinding: PropTypes.func.isRequired,
   changeTheme: PropTypes.func.isRequired,
   editor: PropTypes.string.isRequired,
+  keybinding: PropTypes.string.isRequired,
   theme: PropTypes.string.isRequired,
   toggleConfiguration: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = ({ configuration: { editor, theme } }) => (
-  { editor, theme }
+const mapStateToProps = ({ configuration: { editor, keybinding, theme } }) => (
+  { editor, keybinding, theme }
 );
 
 const mapDispatchToProps = dispatch => ({
   changeEditor: editor => dispatch(changeEditor(editor)),
+  changeKeybinding: keybinding => dispatch(changeKeybinding(keybinding)),
   changeTheme: theme => dispatch(changeTheme(theme)),
   toggleConfiguration: () => dispatch(toggleConfiguration()),
 });
