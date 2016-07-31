@@ -6,6 +6,7 @@ export function serialize(state) {
     version: CURRENT_VERSION,
     configuration: {
       editor: state.configuration.editor,
+      keybinding: state.configuration.keybinding,
       theme: state.configuration.theme,
     },
     code: state.code,
@@ -21,6 +22,7 @@ export function deserialize(savedState) {
     configuration: {
       ...defaultConfiguration,
       editor: parsedState.configuration.editor || defaultConfiguration.editor,
+      keybinding: parsedState.configuration.keybinding || defaultConfiguration.keybinding,
       theme: parsedState.configuration.theme || defaultConfiguration.theme,
     },
     code: parsedState.code,
