@@ -1,0 +1,35 @@
+language: c
+sudo: required
+services:
+  - docker
+before_install:
+ - docker pull liuchong/rustup:musl
+ - docker pull node:6.3
+ - >
+   mkdir -p
+   $HOME/cache/rust/cargo/{git,registry}
+   $HOME/cache/rust/target
+   $HOME/cache/node/node_modules
+script:
+  - >
+    docker run -it --rm
+    -v $PWD/ui:/ui
+    -v $HOME/cache/rust/cargo/git:/root/.cargo/git
+    -v $HOME/cache/rust/cargo/registry:/root/.cargo/registry
+    -v $HOME/cache/rust/target:/ui/target
+    --workdir /ui
+    liuchong/rustup:musl
+    rustup run nightly cargo build --target=x86_64-unknown-linux-musl --release
+  - >
+    docker run -it --rm
+    -v $PWD/ui/frontend:/ui
+    -v $HOME/cache/node/node_modules:/ui/node_modules
+    --workdir /ui
+    --env NODE_ENV=production
+    node:6.3
+    bash -c 'npm install && npm run build'
+  # Ignore the permissions set from running inside the container
+  - sudo chmod -R a+rw $HOME/cache
+cache:
+  directories:
+    - $HOME/cache
