@@ -14,6 +14,29 @@ import {
 const keybindingOptions = ACE_KEYBINDINGS.map(t => <option value={t} key={t}>{t}</option>);
 const themeOptions = ACE_THEMES.map(t => <option value={t} key={t}>{t}</option>);
 
+const ConfigurationSelect = ({ what, label, defaultValue, onChange, children }) => (
+  <div className="configuration-item">
+    <label htmlFor={`config-${what}`}
+           className="configuration-label">
+      {label}
+    </label>
+    <select name={`config-${what}`}
+            className="configuration-value"
+            defaultValue={defaultValue}
+            onChange={onChange}>
+      {children}
+    </select>
+  </div>
+);
+
+ConfigurationSelect.propTypes = {
+  what: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  defaultValue: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
+};
+
 class Configuration extends PureComponent {
   onChangeEditor = e => this.props.changeEditor(e.target.value);
   onChangeKeybinding = e => this.props.changeKeybinding(e.target.value);
@@ -22,35 +45,39 @@ class Configuration extends PureComponent {
   render() {
     const { editor, keybinding, theme, toggleConfiguration } = this.props;
 
+    const advancedEditor = editor === 'advanced';
+
+    const keybindingSelect = advancedEditor ? (
+      <ConfigurationSelect what="keybinding"
+                           label="Editor Keybinding"
+                           defaultValue={keybinding}
+                           onChange={this.onChangeKeybinding}>
+        { keybindingOptions }
+      </ConfigurationSelect>
+    ) : null;
+
+    const themeSelect = advancedEditor ? (
+      <ConfigurationSelect what="theme"
+                           label="Editor Theme"
+                           defaultValue={theme}
+                           onChange={this.onChangeTheme}>
+        { themeOptions }
+      </ConfigurationSelect>
+    ) : null;
+
     return (
       <div className="configuration">
-        <div>
-          <label htmlFor="config-editor">Editor Style</label>
-          <select name="config-editor"
-                  defaultValue={editor}
-                  onChange={this.onChangeEditor}>
-            <option value="simple">Simple</option>
-            <option value="advanced">Advanced</option>
-          </select>
-        </div>
+        <ConfigurationSelect what="editor"
+                             label="Editor Style"
+                             defaultValue={editor}
+                             onChange={this.onChangeEditor}>
+          <option value="simple">Simple</option>
+          <option value="advanced">Advanced</option>
+        </ConfigurationSelect>
 
-        <div>
-          <label htmlFor="config-keybinding">Editor Keybinding</label>
-          <select name="config-keybinding"
-                  defaultValue={keybinding}
-                  onChange={this.onChangeKeybinding}>
-            { keybindingOptions }
-          </select>
-        </div>
+        {keybindingSelect}
 
-        <div>
-          <label htmlFor="config-theme">Editor Theme</label>
-          <select name="config-theme"
-                  defaultValue={theme}
-                  onChange={this.onChangeTheme}>
-            { themeOptions }
-          </select>
-        </div>
+        {themeSelect}
 
         <div className="configuration-actions">
           <button onClick={toggleConfiguration}>Done</button>
