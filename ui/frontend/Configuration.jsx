@@ -37,10 +37,26 @@ ConfigurationSelect.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+const ESCAPE_KEYCODE = 27;
+
 class Configuration extends PureComponent {
   onChangeEditor = e => this.props.changeEditor(e.target.value);
   onChangeKeybinding = e => this.props.changeKeybinding(e.target.value);
   onChangeTheme = e => this.props.changeTheme(e.target.value);
+  onKeyup = e => {
+    if (e.keyCode === ESCAPE_KEYCODE && !e.defaultPrevented) {
+      e.preventDefault();
+      this.props.toggleConfiguration();
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener('keyup', this.onKeyup);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keyup', this.onKeyup);
+  }
 
   render() {
     const { editor, keybinding, theme, toggleConfiguration } = this.props;

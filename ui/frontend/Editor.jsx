@@ -6,11 +6,16 @@ import { connect } from 'react-redux';
 import 'brace/mode/rust';
 import 'brace/keybinding/emacs';
 
-import { editCode } from './actions';
+import { editCode, performExecute } from './actions';
 
 class SimpleEditor extends PureComponent {
   onChange = e => this.props.onEditCode(e.target.value);
   trackEditor = component => this._editor = component;
+  onKeyDown = e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      this.props.execute();
+    }
+  }
 
   render() {
     return (
@@ -19,7 +24,8 @@ class SimpleEditor extends PureComponent {
          className="editor-simple"
          name="editor-simple"
          value={ this.props.code }
-         onChange={ this.onChange } />
+         onChange={ this.onChange }
+         onKeyDown= { this.onKeyDown } />
     );
   }
 
@@ -77,6 +83,18 @@ class AdvancedEditor extends PureComponent {
     );
   }
 
+  componentDidMount() {
+    this._editor.editor.commands.addCommand({
+      name: 'executeCode',
+      bindKey: {
+        win: 'Ctrl-Enter',
+        mac: 'Ctrl-Enter|Command-Enter',
+      },
+      exec: this.props.execute,
+      readOnly: true
+    });
+  }
+
   componentDidUpdate(prevProps, _prevState) {
     this.gotoPosition(prevProps.position, this.props.position);
   }
@@ -97,7 +115,7 @@ class AdvancedEditor extends PureComponent {
 
 class Editor extends PureComponent {
   render() {
-    const { editor, keybinding, theme, code, position, onEditCode } = this.props;
+    const { editor, execute, keybinding, theme, code, position, onEditCode } = this.props;
     const SelectedEditor = editor === "simple" ? SimpleEditor : AdvancedEditor;
 
     return (
@@ -106,7 +124,8 @@ class Editor extends PureComponent {
                         theme={theme}
                         code={code}
                         position={position}
-                        onEditCode={onEditCode} />;
+                        onEditCode={onEditCode}
+                        execute={execute} />;
       </div>
     );
   }
@@ -115,6 +134,7 @@ class Editor extends PureComponent {
 Editor.propTypes = {
   code: PropTypes.string.isRequired,
   editor: PropTypes.string.isRequired,
+  execute: PropTypes.func.isRequired,
   keybinding: PropTypes.string.isRequired,
   onEditCode: PropTypes.func.isRequired,
   position: PropTypes.shape({
@@ -129,6 +149,7 @@ const mapStateToProps = ({ code, configuration: { editor, keybinding, theme }, p
 );
 
 const mapDispatchToProps = dispatch => ({
+  execute: () => dispatch(performExecute()),
   onEditCode: code => dispatch(editCode(code)),
 });
 
