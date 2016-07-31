@@ -11,6 +11,10 @@ const basename = require('basename');
 const thisPackage = require('./package.json');
 const vendorLibraries = Object.keys(thisPackage.dependencies);
 
+// There's a builtin/default keybinding that we call `ace`.
+const allKeybindingFiles = glob.sync('./node_modules/brace/keybinding/*.js');
+const allKeybindings = allKeybindingFiles.map(basename).concat(['ace']).sort();
+
 const allThemeFiles = glob.sync('./node_modules/brace/theme/*.js');
 const allThemes = allThemeFiles.map(basename);
 
@@ -47,6 +51,7 @@ module.exports = {
   plugins: [
     new webpack.EnvironmentPlugin(["NODE_ENV"]),
     new webpack.DefinePlugin({
+      ACE_KEYBINDINGS: JSON.stringify(allKeybindings),
       ACE_THEMES: JSON.stringify(allThemes),
     }),
     new HtmlWebpackPlugin({
