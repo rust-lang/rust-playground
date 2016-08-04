@@ -5,20 +5,20 @@ version = "0.1.0"
 build = "build.rs"
 
 [build-dependencies]
-serde_codegen = "*"
+serde_codegen = "0.7.0"
 
 [dependencies]
-bodyparser = "0.3.0"
+bodyparser = "0.4.0"
 env_logger = "0.3.3"
-iron = "0.3.0"
+iron = "0.4.0"
 log = "0.3.6"
-mktemp = "0.1.2"
-mount = "0.1.0"
+mktemp = "0.3.1"
+mount = "0.2.0"
 quick-error = "1.1.0"
-serde = "0.7.10"
-serde_json = "0.7.1"
+serde = "0.7.0"
+serde_json = "0.7.0"
 
 [dependencies.staticfile]
-git = "https://github.com/integer32llc/staticfile"
-branch = "no-nanoseconds"
+git = "https://github.com/iron/staticfile"
+rev = "0c417eb970cdd48c0dad0a273d7416031cf98d37"
 features = ["cache"]
