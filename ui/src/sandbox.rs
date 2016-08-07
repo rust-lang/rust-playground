@@ -199,10 +199,13 @@ impl Sandbox {
             .args(&["--net", "none"])
             .args(&["--memory", "256m"])
             .args(&["--memory-swap", "320m"])
-            .args(&["--pids-limit", "512"])
             .args(&["--env", "PLAYGROUND_TIMEOUT=10"])
             .args(&["--env", "RUST_NEW_ERROR_FORMAT=true"]);
 
+        if cfg!(feature = "fork-bomb-prevention") {
+            cmd.args(&["--pids-limit", "512"]);
+        }
+        
         cmd
     }
 }
