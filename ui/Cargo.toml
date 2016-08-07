@@ -4,6 +4,10 @@ name = "ui"
 version = "0.1.0"
 build = "build.rs"
 
+[features]
+default = ['fork-bomb-prevention']
+fork-bomb-prevention = []
+
 [build-dependencies]
 serde_codegen = "0.7.0"
 
