@@ -133,6 +133,7 @@ docker run -it --rm -v $PWD:/ui --workdir /ui --entrypoint /bin/bash rust-nightl
 rustup target add x86_64-unknown-linux-musl
 cargo build --target=x86_64-unknown-linux-musl --release
 # exit docker
+cd ..
 ```
 
 #### Build the UI frontend
@@ -142,6 +143,7 @@ docker run -it --rm -v $PWD:/ui --workdir /ui --entrypoint /bin/bash node
 npm install
 NODE_ENV=production npm run build
 # exit docker
+cd ../..
 ```
 
 #### Run the server
