@@ -138,6 +138,10 @@ fn unique_latest_crates(crates: Vec<Crate>) -> Vec<Crate> {
 static BLACKLIST: &'static [&'static str] = &[
     "libressl-pnacl-sys", // Fails to build
     "pnacl-build-helper", // Fails to build
+    "aster", // Not supported on stable
+    "quasi", // Not supported on stable
+    "quasi_codegen", // Not supported on stable
+    "quasi_macros", // Not supported on stable
 ];
 
 fn remove_blacklisted_crates(crates: Vec<Crate>) -> Vec<Crate> {
