@@ -87,6 +87,13 @@ body {
     }
 }
 
+@mixin body-monospace {
+    font-size: 0.9em;
+    // http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/
+    // ACE uses Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
+    font-family: monospace, monospace;
+}
+
 .header {
     $radius: 5px;
 
@@ -119,7 +126,7 @@ body {
             background-color: $rust;
 
             color: white;
-            font-size: 1.5em;
+            font-size: 1.5rem;
 
             border-top-right-radius: $radius;
             border-bottom-right-radius: $radius;
@@ -145,7 +152,7 @@ body {
         text-align: center;
         background-color: rgba(255, 255, 255, 0.5);
         border-radius: $radius $radius 0 0;
-        font-size: 70%;
+        font-size: 0.7rem;
     }
 
     &-radio {
@@ -172,6 +179,7 @@ body {
 #editor {
     position: absolute;
     // Height / width is applied to the element
+    @include body-monospace;
 }
 
 .editor {
@@ -181,7 +189,7 @@ body {
         height: 100%;
 
         border: none;
-        font-family: monospace;
+        @include body-monospace;
     }
 }
 
@@ -258,6 +266,10 @@ body {
         }
         &:before { margin-right: 2%; }
         &:after { margin-left: 2% }
+    }
+
+    code {
+        @include body-monospace;
     }
 }
 
