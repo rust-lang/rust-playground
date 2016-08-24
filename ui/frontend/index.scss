@@ -17,6 +17,7 @@ html {
 body {
     background-color: $background;
     padding: 0 1em;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .playground {
@@ -91,7 +92,7 @@ body {
     font-size: 0.9em;
     // http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/
     // ACE uses Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
-    font-family: monospace, monospace;
+    font-family: 'Source Code Pro', monospace;
 }
 
 .header {
