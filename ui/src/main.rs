@@ -30,6 +30,7 @@ use sandbox::Sandbox;
 const DEFAULT_ADDRESS: &'static str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
 
+mod logging;
 mod sandbox;
 
 const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
@@ -48,8 +49,11 @@ fn main() {
     mount.mount("/format", format);
     mount.mount("/clippy", clippy);
 
+    let mut chain = Chain::new(mount);
+    chain.link_around(logging::StatisticLogger);
+
     info!("Starting the server on {}:{}", address, port);
-    Iron::new(mount).http((&*address, port)).expect("Unable to start server");
+    Iron::new(chain).http((&*address, port)).expect("Unable to start server");
 }
 
 fn compile(req: &mut Request) -> IronResult<Response> {
