@@ -1,7 +1,10 @@
-use std::time::{Instant, Duration};
-use std::{thread, net};
-use std::sync::mpsc::{self, Sender};
+use std::fs::{File, OpenOptions};
+use std::io::{self, Write};
+use std::path::Path;
 use std::sync::Mutex;
+use std::sync::mpsc::{self, Sender};
+use std::time::{Instant, Duration};
+use std::{error, thread, net};
 
 use iron;
 use iron::prelude::*;
@@ -9,7 +12,7 @@ use iron::{Handler, AroundMiddleware};
 use iron::status::Status;
 
 #[derive(Debug)]
-struct LogPacket {
+pub struct LogPacket {
     url: iron::Url,
     ip: net::SocketAddr,
     status: Option<Status>,
@@ -21,13 +24,44 @@ pub struct StatisticLogger {
     tx: Sender<LogPacket>,
 }
 
+pub trait LogWriter {
+    type Error: error::Error;
+
+    fn log(&self, log: &LogPacket) -> Result<(), Self::Error>;
+}
+
+pub struct FileLogger(File);
+
+impl FileLogger {
+    pub fn new<P>(path: P) -> io::Result<FileLogger>
+        where P: AsRef<Path>
+    {
+        OpenOptions::new()
+            .write(true)
+            .append(true)
+            .create(true)
+            .open(path)
+            .map(FileLogger)
+    }
+}
+
+impl LogWriter for FileLogger {
+    type Error = ::std::io::Error;
+
+    fn log(&self, packet: &LogPacket) -> Result<(), Self::Error> {
+        writeln!(&self.0, "{:?}", packet)
+    }
+}
+
 impl StatisticLogger {
-    pub fn new() -> StatisticLogger {
+    pub fn new<L>(logger: L) -> StatisticLogger
+        where L: LogWriter + Send + 'static
+    {
         let (tx, rx) = mpsc::channel();
 
-        let handle = thread::spawn(|| {
+        let handle = thread::spawn(move || {
             for packet in rx {
-                println!("{:?}", packet);
+                logger.log(&packet).expect("Unable to log request");
             }
         });
 

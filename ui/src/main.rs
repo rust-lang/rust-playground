@@ -50,7 +50,9 @@ fn main() {
     mount.mount("/clippy", clippy);
 
     let mut chain = Chain::new(mount);
-    chain.link_around(logging::StatisticLogger::new());
+    let file_logger = logging::FileLogger::new("log.txt").expect("Unable to create file logger");
+    let logger = logging::StatisticLogger::new(file_logger);
+    chain.link_around(logger);
 
     info!("Starting the server on {}:{}", address, port);
     Iron::new(chain).http((&*address, port)).expect("Unable to start server");
