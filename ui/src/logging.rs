@@ -2,11 +2,11 @@ use std::fs::{File, OpenOptions};
 use std::path::Path;
 use std::sync::Mutex;
 use std::sync::mpsc::{self, Sender};
-use std::time::{Instant, Duration};
+use std::time::{Instant, SystemTime, Duration, UNIX_EPOCH};
 use std::{error, io, thread, net};
 
 use csv;
-use rustc_serialize;
+use rustc_serialize::{self, Encodable};
 use iron;
 use iron::prelude::*;
 use iron::{Handler, AroundMiddleware};
@@ -17,7 +17,12 @@ pub struct LogPacket {
     url: iron::Url,
     ip: net::SocketAddr,
     status: Option<Status>,
+    start: SystemTime,
     timing: Duration,
+}
+
+fn encode_duration<S: rustc_serialize::Encoder>(s: &mut S, duration: &Duration) -> Result<(), S::Error> {
+    format!("{}.{}", duration.as_secs(), duration.subsec_nanos()).encode(s)
 }
 
 impl rustc_serialize::Encodable for LogPacket {
@@ -25,7 +30,9 @@ impl rustc_serialize::Encodable for LogPacket {
         try!(self.url.to_string().encode(s));
         try!(self.ip.to_string().encode(s));
         try!(self.status.as_ref().map(|s| format!("{:?}", s)).encode(s));
-        format!("{}.{}", self.timing.as_secs(), self.timing.subsec_nanos()).encode(s)
+        let start = self.start.duration_since(UNIX_EPOCH).expect("Unable to calculate origin time");
+        try!(encode_duration(s, &start));
+        encode_duration(s, &self.timing)
     }
 }
 
@@ -103,7 +110,7 @@ struct LogHandler {
 
 impl Handler for LogHandler {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
-        let (timing, response_result) = time_it(|| self.handler.handle(req));
+        let (start, timing, response_result) = time_it(|| self.handler.handle(req));
 
         let status = response_result.as_ref()
             .map(|success| success.status)
@@ -118,6 +125,7 @@ impl Handler for LogHandler {
             url: req.url.clone(),
             ip: req.remote_addr,
             status: status,
+            start: start,
             timing: timing,
         }).expect("Unable to send log to logger thread");
 
@@ -125,14 +133,15 @@ impl Handler for LogHandler {
     }
 }
 
-fn time_it<F, T>(f: F) -> (Duration, T)
+fn time_it<F, T>(f: F) -> (SystemTime, Duration, T)
     where F: FnOnce() -> T
 {
+    let start = SystemTime::now();
     let before = Instant::now();
     let result = f();
     let after = Instant::now();
 
     let timing = after.duration_since(before);
 
-    (timing, result)
+    (start, timing, result)
 }
