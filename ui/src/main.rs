@@ -7,6 +7,8 @@ extern crate iron;
 extern crate mount;
 extern crate staticfile;
 extern crate bodyparser;
+extern crate csv;
+extern crate rustc_serialize;
 extern crate serde;
 extern crate serde_json;
 extern crate mktemp;

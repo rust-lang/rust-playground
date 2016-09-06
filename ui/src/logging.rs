@@ -1,11 +1,12 @@
 use std::fs::{File, OpenOptions};
-use std::io::{self, Write};
 use std::path::Path;
 use std::sync::Mutex;
 use std::sync::mpsc::{self, Sender};
 use std::time::{Instant, Duration};
-use std::{error, thread, net};
+use std::{error, io, thread, net};
 
+use csv;
+use rustc_serialize;
 use iron;
 use iron::prelude::*;
 use iron::{Handler, AroundMiddleware};
@@ -19,6 +20,15 @@ pub struct LogPacket {
     timing: Duration,
 }
 
+impl rustc_serialize::Encodable for LogPacket {
+    fn encode<S: rustc_serialize::Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
+        try!(self.url.to_string().encode(s));
+        try!(self.ip.to_string().encode(s));
+        try!(self.status.as_ref().map(|s| format!("{:?}", s)).encode(s));
+        format!("{}.{}", self.timing.as_secs(), self.timing.subsec_nanos()).encode(s)
+    }
+}
+
 pub struct StatisticLogger {
     thread: thread::JoinHandle<()>,
     tx: Sender<LogPacket>,
@@ -27,10 +37,10 @@ pub struct StatisticLogger {
 pub trait LogWriter {
     type Error: error::Error;
 
-    fn log(&self, log: &LogPacket) -> Result<(), Self::Error>;
+    fn log(&mut self, log: &LogPacket) -> Result<(), Self::Error>;
 }
 
-pub struct FileLogger(File);
+pub struct FileLogger(csv::Writer<File>);
 
 impl FileLogger {
     pub fn new<P>(path: P) -> io::Result<FileLogger>
@@ -41,20 +51,22 @@ impl FileLogger {
             .append(true)
             .create(true)
             .open(path)
+            .map(csv::Writer::from_writer)
             .map(FileLogger)
     }
 }
 
 impl LogWriter for FileLogger {
-    type Error = ::std::io::Error;
+    type Error = csv::Error;
 
-    fn log(&self, packet: &LogPacket) -> Result<(), Self::Error> {
-        writeln!(&self.0, "{:?}", packet)
+    fn log(&mut self, packet: &LogPacket) -> Result<(), Self::Error> {
+        try!(self.0.encode(packet));
+        self.0.flush()
     }
 }
 
 impl StatisticLogger {
-    pub fn new<L>(logger: L) -> StatisticLogger
+    pub fn new<L>(mut logger: L) -> StatisticLogger
         where L: LogWriter + Send + 'static
     {
         let (tx, rx) = mpsc::channel();
