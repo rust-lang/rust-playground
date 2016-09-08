@@ -7,6 +7,8 @@ extern crate iron;
 extern crate mount;
 extern crate staticfile;
 extern crate bodyparser;
+extern crate csv;
+extern crate rustc_serialize;
 extern crate serde;
 extern crate serde_json;
 extern crate mktemp;
@@ -29,7 +31,9 @@ use sandbox::Sandbox;
 
 const DEFAULT_ADDRESS: &'static str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
+const DEFAULT_LOG_FILE: &'static str = "access-log.csv";
 
+mod logging;
 mod sandbox;
 
 const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
@@ -40,6 +44,7 @@ fn main() {
     let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT").expect("Must specify PLAYGROUND_UI_ROOT").into();
     let address = env::var("PLAYGROUND_UI_ADDRESS").unwrap_or(DEFAULT_ADDRESS.to_string());
     let port = env::var("PLAYGROUND_UI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(DEFAULT_PORT);
+    let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or(DEFAULT_LOG_FILE.to_string());
 
     let mut mount = Mount::new();
     mount.mount("/", Static::new(&root).cache(Duration::from_secs(ONE_YEAR_IN_SECONDS)));
@@ -48,8 +53,13 @@ fn main() {
     mount.mount("/format", format);
     mount.mount("/clippy", clippy);
 
+    let mut chain = Chain::new(mount);
+    let file_logger = logging::FileLogger::new(logfile).expect("Unable to create file logger");
+    let logger = logging::StatisticLogger::new(file_logger);
+    chain.link_around(logger);
+
     info!("Starting the server on {}:{}", address, port);
-    Iron::new(mount).http((&*address, port)).expect("Unable to start server");
+    Iron::new(chain).http((&*address, port)).expect("Unable to start server");
 }
 
 fn compile(req: &mut Request) -> IronResult<Response> {
