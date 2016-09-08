@@ -31,6 +31,7 @@ use sandbox::Sandbox;
 
 const DEFAULT_ADDRESS: &'static str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
+const DEFAULT_LOG_FILE: &'static str = "access-log.csv";
 
 mod logging;
 mod sandbox;
@@ -43,6 +44,7 @@ fn main() {
     let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT").expect("Must specify PLAYGROUND_UI_ROOT").into();
     let address = env::var("PLAYGROUND_UI_ADDRESS").unwrap_or(DEFAULT_ADDRESS.to_string());
     let port = env::var("PLAYGROUND_UI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(DEFAULT_PORT);
+    let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or(DEFAULT_LOG_FILE.to_string());
 
     let mut mount = Mount::new();
     mount.mount("/", Static::new(&root).cache(Duration::from_secs(ONE_YEAR_IN_SECONDS)));
@@ -52,7 +54,7 @@ fn main() {
     mount.mount("/clippy", clippy);
 
     let mut chain = Chain::new(mount);
-    let file_logger = logging::FileLogger::new("log.txt").expect("Unable to create file logger");
+    let file_logger = logging::FileLogger::new(logfile).expect("Unable to create file logger");
     let logger = logging::StatisticLogger::new(file_logger);
     chain.link_around(logger);
 
