@@ -55,5 +55,9 @@
     "watch": "webpack --progress --colors --watch"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "optionalDependencies": {
+    "fsevents": "^1.0.14",
+    "node-zopfli": "^2.0.1"
+  }
 }
