@@ -32,7 +32,7 @@ module.exports = {
   },
 
   output: {
-    path: './build',
+    path: './build/assets',
     filename: '[name]-[chunkhash].js',
     chunkFilename: '[chunkhash].js',
   },
@@ -64,10 +64,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "Rust Playground",
       template: 'index.ejs',
+      filename: '../index.html',
       chunksSortMode: 'dependency',
     }),
     new CopyWebpackPlugin([
-      { from: 'robots.txt' },
+      { from: 'robots.txt', to: '..' },
     ]),
     new ExtractTextPlugin("styles-[chunkhash].css"),
     new webpack.optimize.CommonsChunkPlugin({
