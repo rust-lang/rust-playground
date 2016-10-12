@@ -140,7 +140,8 @@ cd ..
 ```
 cd ui/frontend
 docker run -it --rm -v $PWD:/ui --workdir /ui --entrypoint /bin/bash node
-npm install
+npm install -g yarn
+yarn
 NODE_ENV=production npm run build
 # exit docker
 cd ../..
@@ -163,7 +164,7 @@ sudo \
 ### Build the UI
 ```
 cd ui/frontend
-npm install
+yarn
 npm run watch # Will rebuild and watch for changes
 ```
 
