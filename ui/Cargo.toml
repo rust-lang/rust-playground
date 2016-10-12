@@ -9,7 +9,7 @@ default = ['fork-bomb-prevention']
 fork-bomb-prevention = []
 
 [build-dependencies]
-serde_codegen = "0.7.0"
+serde_codegen = "0.8.0"
 
 [dependencies]
 bodyparser = "0.4.0"
@@ -21,8 +21,8 @@ mktemp = "0.3.1"
 mount = "0.2.0"
 quick-error = "1.1.0"
 rustc-serialize = "0.3.19"
-serde = "0.7.0"
-serde_json = "0.7.0"
+serde = "0.8.0"
+serde_json = "0.8.0"
 
 [dependencies.staticfile]
 git = "https://github.com/iron/staticfile"
