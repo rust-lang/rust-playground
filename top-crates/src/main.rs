@@ -35,8 +35,8 @@ fn top_crates_to_crates(summary: serde_json::Value) -> Vec<Crate> {
 
     most_downloaded.iter().map(|krate| {
         let krate = krate.as_object().expect("crate not an object");
-        let id = krate.get("id").expect("missing id").as_string().expect("id not string");
-        let version = krate.get("max_version").expect("missing version").as_string().expect("version not string");
+        let id = krate.get("id").expect("missing id").as_str().expect("id not string");
+        let version = krate.get("max_version").expect("missing version").as_str().expect("version not string");
 
         (id.into(), version.into())
     }).collect()
