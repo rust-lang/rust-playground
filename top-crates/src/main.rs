@@ -142,6 +142,7 @@ static BLACKLIST: &'static [&'static str] = &[
     "quasi", // Not supported on stable
     "quasi_codegen", // Not supported on stable
     "quasi_macros", // Not supported on stable
+    "serde_macros", // Apparently deleted
 ];
 
 fn remove_blacklisted_crates(crates: Vec<Crate>) -> Vec<Crate> {
@@ -153,6 +154,7 @@ fn main() {
 
     let top_crates = get_top_crates();
     let crates = top_crates_to_crates(top_crates);
+    let crates = remove_blacklisted_crates(crates);
 
     let cargo_toml_rev1 = crates_to_toml(crates);
     let lockfile_path = resolve_dependencies(scratch.as_ref(), cargo_toml_rev1);
