@@ -84,6 +84,11 @@ class HighlightErrors extends PureComponent {
   }
 }
 
+HighlightErrors.propTypes = {
+  label: PropTypes.string.isRequired,
+  children: PropTypes.node,
+};
+
 function SimplePane({ focus, kind, requestsInProgress, stdout, stderr, error, children }) {
   if (focus === kind) {
     const loader = (requestsInProgress > 0) ? <MyLoader /> : null;

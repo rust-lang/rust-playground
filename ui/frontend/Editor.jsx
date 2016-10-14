@@ -57,6 +57,16 @@ class SimpleEditor extends PureComponent {
   }
 }
 
+SimpleEditor.propTypes = {
+  code: PropTypes.string.isRequired,
+  execute: PropTypes.func.isRequired,
+  onEditCode: PropTypes.func.isRequired,
+  position: PropTypes.shape({
+    line: PropTypes.number.isRequired,
+    column: PropTypes.number.isRequired,
+  }).isRequired,
+};
+
 class AdvancedEditor extends PureComponent {
   trackEditor = component => this._editor = component;
 
@@ -123,6 +133,18 @@ class AdvancedEditor extends PureComponent {
     editor.editor.focus();
   }
 }
+
+AdvancedEditor.propTypes = {
+  code: PropTypes.string.isRequired,
+  execute: PropTypes.func.isRequired,
+  keybinding: PropTypes.string.isRequired,
+  onEditCode: PropTypes.func.isRequired,
+  position: PropTypes.shape({
+    line: PropTypes.number.isRequired,
+    column: PropTypes.number.isRequired,
+  }).isRequired,
+  theme: PropTypes.string.isRequired,
+};
 
 class Editor extends PureComponent {
   render() {
