@@ -2,6 +2,7 @@
 
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const autoprefixer = require('autoprefixer');
@@ -65,6 +66,9 @@ module.exports = {
       template: 'index.ejs',
       chunksSortMode: 'dependency',
     }),
+    new CopyWebpackPlugin([
+      { from: 'robots.txt' },
+    ]),
     new ExtractTextPlugin("styles-[chunkhash].css"),
     new webpack.optimize.CommonsChunkPlugin({
       names: ['vendor', 'manifest'],
