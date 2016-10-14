@@ -1,10 +1,11 @@
+import ace from 'brace';
+
 import React, { PropTypes } from 'react';
 import PureComponent from './PureComponent';
 import AceEditor from 'react-ace';
 import { connect } from 'react-redux';
 
 import 'brace/mode/rust';
-import 'brace/keybinding/emacs';
 
 import { editCode, performExecute } from './actions';
 
@@ -65,7 +66,17 @@ class AdvancedEditor extends PureComponent {
     const realKeybinding = keybinding === 'ace' ? null : keybinding;
 
     // These are part of the vendor chunk
-    if (realKeybinding) { require(`brace/keybinding/${realKeybinding}`); }
+    if (realKeybinding) {
+      require(`brace/keybinding/${realKeybinding}`);
+
+      if (realKeybinding === 'vim') {
+        const { CodeMirror: { Vim } } = ace.acequire('ace/keyboard/vim');
+        Vim.defineEx("write", "w", (cm, _input) => {
+          cm.ace.execCommand("executeCode");
+        });
+      }
+    }
+
     require(`brace/theme/${theme}`);
 
     return (
