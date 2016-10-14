@@ -3273,9 +3273,9 @@ rc@~1.1.0:
     minimist "^1.2.0"
     strip-json-comments "~1.0.4"
 
-"react-ace@github:integer32llc/react-ace#dynamic-keyboard-handler-built":
-  version "3.5.0"
-  resolved "https://codeload.github.com/integer32llc/react-ace/tar.gz/609c7d5c838e924d54b8a3ae197cedaa6d314912"
+react-ace@^3.6.0:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/react-ace/-/react-ace-3.6.1.tgz#8ddce3e54cd06bdc92bad13b1928914f5af141f7"
   dependencies:
     brace "^0.8.0"
     lodash.isequal "^4.1.1"

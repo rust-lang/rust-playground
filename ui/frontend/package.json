@@ -9,7 +9,7 @@
     "isomorphic-fetch": "^2.2.1",
     "prismjs": "^1.5.1",
     "react": "^15.3.0",
-    "react-ace": "github:integer32llc/react-ace#dynamic-keyboard-handler-built",
+    "react-ace": "^3.6.0",
     "react-addons-pure-render-mixin": "^15.3.0",
     "react-addons-shallow-compare": "^15.3.0",
     "react-dom": "^15.3.0",
