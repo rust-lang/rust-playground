@@ -5,12 +5,12 @@ version = "0.1.0"
 
 [dependencies]
 hyper = "0.9.9"
-mktemp = "0.2.1"
-semver = "0.2.3"
-serde = "0.7.12"
-serde_json = "0.7.4"
+mktemp = "0.3.0"
+semver = "0.5.0"
+serde = "0.8.0"
+serde_json = "0.8.0"
 
 [dependencies.toml]
-version = "0.1.30"
+version = "0.2.0"
 default-features = false
 features = ["serde"]

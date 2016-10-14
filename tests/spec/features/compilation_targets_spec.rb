@@ -14,7 +14,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
       expect(page).to have_content '.text'
       expect(page).to have_content '.file'
       expect(page).to have_content '.section'
-      expect(page).to have_content '.align'
+      expect(page).to have_content '.p2align'
     end
   end
 

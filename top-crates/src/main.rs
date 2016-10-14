@@ -35,8 +35,8 @@ fn top_crates_to_crates(summary: serde_json::Value) -> Vec<Crate> {
 
     most_downloaded.iter().map(|krate| {
         let krate = krate.as_object().expect("crate not an object");
-        let id = krate.get("id").expect("missing id").as_string().expect("id not string");
-        let version = krate.get("max_version").expect("missing version").as_string().expect("version not string");
+        let id = krate.get("id").expect("missing id").as_str().expect("id not string");
+        let version = krate.get("max_version").expect("missing version").as_str().expect("version not string");
 
         (id.into(), version.into())
     }).collect()
@@ -142,6 +142,7 @@ static BLACKLIST: &'static [&'static str] = &[
     "quasi", // Not supported on stable
     "quasi_codegen", // Not supported on stable
     "quasi_macros", // Not supported on stable
+    "serde_macros", // Apparently deleted
 ];
 
 fn remove_blacklisted_crates(crates: Vec<Crate>) -> Vec<Crate> {
@@ -153,6 +154,7 @@ fn main() {
 
     let top_crates = get_top_crates();
     let crates = top_crates_to_crates(top_crates);
+    let crates = remove_blacklisted_crates(crates);
 
     let cargo_toml_rev1 = crates_to_toml(crates);
     let lockfile_path = resolve_dependencies(scratch.as_ref(), cargo_toml_rev1);

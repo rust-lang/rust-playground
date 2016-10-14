@@ -9,9 +9,9 @@ RSpec.configure do |config|
 
   config.disable_monkey_patching!
 
-  # This setting enables warnings. It's recommended, but in some cases may
-  # be too noisy due to issues in dependencies.
-  config.warnings = true
+  # We aren't really testing Ruby code, so let's assume the Ruby code
+  # of the tests is good enough
+  config.warnings = false
 
   if config.files_to_run.one?
     config.default_formatter = 'doc'
