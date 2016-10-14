@@ -15,6 +15,12 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
     expect(page).to have_link("Permalink to the playground")
   end
 
+  scenario "loading code directly from a parameter" do
+    visit '/?code=fn%20main()%20%7B%0A%20%20%20%20println!(%22Hello%2C%20world!%22)%3B%0A%7D'
+
+    expect(editor).to have_line 'println!("Hello, world!")'
+  end
+
   def editor
     Editor.new(page)
   end
