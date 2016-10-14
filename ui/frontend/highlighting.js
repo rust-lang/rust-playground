@@ -4,9 +4,9 @@ export function configureRustErrors(gotoPosition) {
   Prism.languages.rust_errors = { // eslint-disable-line camelcase
     'warning':/warning:.*\n/,
     'error': {
-      pattern: /error:.*\n/,
+      pattern: /error(\[E\d+\])?:.*\n/,
       inside: {
-        'error-explanation': /\[--explain E\d+\]/,
+        'error-explanation': /\[E\d+\]/,
       },
     },
     'error-location': /-->.*\n/,
