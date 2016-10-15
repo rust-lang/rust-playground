@@ -23,7 +23,10 @@ const meta = (state = defaultMeta, action) => {
     return { ...state, focus: 'execute' };
 
   case actions.REQUEST_FORMAT:
-    return { ...state, focus: 'format' }; // TODO: show somehow
+    return { ...state, focus: 'format' };
+  case actions.FORMAT_SUCCEEDED:
+  case actions.FORMAT_FAILED:
+    return { ...state, focus: null };
 
   case actions.REQUEST_GIST_LOAD:
   case actions.REQUEST_GIST_SAVE:
@@ -39,10 +42,26 @@ function start(zeroState, state) {
   return { ...zeroState, requestsInProgress: requestsInProgress + 1 };
 }
 
-function finish(state, newState) {
+function finish(state, newState = {}) {
   const { requestsInProgress } = state;
   return { ...state, ...newState, requestsInProgress: requestsInProgress - 1 };
 }
+
+const defaultFormat = {
+  requestsInProgress: 0,
+};
+
+const format = (state = defaultFormat, action) => {
+  switch (action.type) {
+  case actions.REQUEST_FORMAT:
+    return start(defaultFormat, state);
+  case actions.FORMAT_SUCCEEDED:
+  case actions.FORMAT_FAILED:
+    return finish(state);
+  default:
+    return state;
+  }
+};
 
 const defaultClippy = {
   requestsInProgress: 0,
@@ -164,6 +183,7 @@ const gist = (state = defaultGist, action) => {
 
 const output = combineReducers({
   meta,
+  format,
   clippy,
   assembly,
   llvmIr,

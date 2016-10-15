@@ -130,6 +130,25 @@ PaneWithCode.propTypes = {
   code: PropTypes.string,
 };
 
+function Format({ focus, requestsInProgress }) {
+  if (focus === 'format') {
+    const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
+
+    return (
+      <div className="output-format">
+        { loader }
+      </div>
+    );
+  } else {
+    return null;
+  }
+}
+
+Format.propTypes = {
+  focus: PropTypes.string.isRequired,
+  requestsInProgress: PropTypes.number.isRequired,
+};
+
 function Gist({ focus, requestsInProgress, id, url }) {
   if (focus === 'gist') {
     const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
@@ -158,6 +177,7 @@ Gist.propTypes = {
 class Output extends PureComponent {
   focusClose = () => this.props.changeFocus(null);
   focusExecute = () => this.props.changeFocus('execute');
+  focusFormat = () => this.props.changeFocus('format');
   focusClippy = () => this.props.changeFocus('clippy');
   focusAssembly = () => this.props.changeFocus('asm');
   focusLlvmIr = () => this.props.changeFocus('llvm-ir');
@@ -165,10 +185,10 @@ class Output extends PureComponent {
 
   render() {
     const {
-      meta: { focus }, execute, clippy, assembly, llvmIr, gist,
+      meta: { focus }, execute, format, clippy, assembly, llvmIr, gist,
     } = this.props;
 
-    const somethingToShow = [execute, clippy, assembly, llvmIr, gist].some(hasProperties);
+    const somethingToShow = [execute, format, clippy, assembly, llvmIr, gist].some(hasProperties);
 
     if (!somethingToShow) {
       return null;
@@ -184,6 +204,7 @@ class Output extends PureComponent {
       body = (
         <div className="output-body">
           <SimplePane {...execute} kind="execute" focus={focus} />
+          <Format {...format} kind="format" focus={focus} />
           <SimplePane {...clippy} kind="clippy" focus={focus} />
           <PaneWithCode {...assembly} kind="asm" focus={focus} />
           <PaneWithCode {...llvmIr} kind="llvm-ir" focus={focus} />
@@ -199,6 +220,10 @@ class Output extends PureComponent {
                label="Execution"
                onClick={this.focusExecute}
                tabProps={execute} />
+          <Tab kind="format" focus={focus}
+               label="Format"
+               onClick={this.focusFormat}
+               tabProps={format} />
           <Tab kind="clippy" focus={focus}
                label="Clippy"
                onClick={this.focusClippy}
@@ -224,16 +249,15 @@ class Output extends PureComponent {
 }
 
 const simpleProps = PropTypes.shape({
+  requestsInProgress: PropTypes.number,
   stdout: PropTypes.string,
   stderr: PropTypes.string,
   error: PropTypes.string,
 });
 
 const withCodeProps = PropTypes.shape({
+  ...simpleProps,
   code: PropTypes.string,
-  stdout: PropTypes.string,
-  stderr: PropTypes.string,
-  error: PropTypes.string,
 });
 
 Output.propTypes = {
@@ -242,6 +266,9 @@ Output.propTypes = {
   }),
 
   execute: simpleProps,
+  format: PropTypes.shape({
+    requestsInProgress: PropTypes.number,
+  }),
   clippy: simpleProps,
   llvmIr: withCodeProps,
   assembly: withCodeProps,
