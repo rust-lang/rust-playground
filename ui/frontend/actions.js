@@ -239,21 +239,20 @@ function requestGistLoad() {
   return { type: REQUEST_GIST_LOAD };
 }
 
-function receiveGistLoadSuccess(gist) {
-  const { id, url, code } = gist;
-  return { type: GIST_LOAD_SUCCEEDED, id, url, code };
+function receiveGistLoadSuccess({ id, url, code, channel }) {
+  return { type: GIST_LOAD_SUCCEEDED, id, url, code, channel };
 }
 
 function receiveGistLoadFailure() { // eslint-disable-line no-unused-vars
   return { type: GIST_LOAD_FAILED };
 }
 
-export function performGistLoad(id) {
+export function performGistLoad(id, channel) {
   return function (dispatch, _getState) {
     dispatch(requestGistLoad());
 
     loadGist(id)
-      .then(gist => dispatch(receiveGistLoadSuccess(gist)));
+      .then(gist => dispatch(receiveGistLoadSuccess({ ...gist, channel })));
     // TODO: Failure case
   };
 }
@@ -266,10 +265,9 @@ function requestGistSave() {
   return { type: REQUEST_GIST_SAVE };
 }
 
-function receiveGistSaveSuccess({ id, url }) {
-  return { type: GIST_SAVE_SUCCEEDED, id, url };
+function receiveGistSaveSuccess({ id, url, channel }) {
+  return { type: GIST_SAVE_SUCCEEDED, id, url, channel };
 }
-
 
 function receiveGistSaveFailure({ error }) { // eslint-disable-line no-unused-vars
   return { type: GIST_SAVE_FAILED, error };
@@ -279,10 +277,10 @@ export function performGistSave() {
   return function (dispatch, getState) {
     dispatch(requestGistSave());
 
-    const { code } = getState();
+    const { code, configuration: { channel } } = getState();
 
     return saveGist(code)
-      .then(json => dispatch(receiveGistSaveSuccess(json)));
+      .then(json => dispatch(receiveGistSaveSuccess({ ...json, channel })));
     // TODO: Failure case
   };
 }

@@ -35,7 +35,7 @@ const query = urlObj.query;
 if (query.code) {
   store.dispatch(editCode(query.code));
 } else if (query.gist) {
-  store.dispatch(performGistLoad(query.gist));
+  store.dispatch(performGistLoad(query.gist, query.version));
 }
 
 if (query.version) {
