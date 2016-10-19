@@ -14,7 +14,7 @@ import url from 'url';
 import { configureRustErrors } from './highlighting';
 import { serialize, deserialize } from './local_storage';
 import playgroundApp from './reducers';
-import { gotoPosition, editCode, performGistLoad } from './actions';
+import { gotoPosition, editCode, performGistLoad, changeChannel } from './actions';
 import Playground from './Playground';
 
 const mw = [thunk];
@@ -35,7 +35,11 @@ const query = urlObj.query;
 if (query.code) {
   store.dispatch(editCode(query.code));
 } else if (query.gist) {
-  store.dispatch(performGistLoad(query.gist));
+  store.dispatch(performGistLoad(query.gist, query.version));
+}
+
+if (query.version) {
+  store.dispatch(changeChannel(query.version));
 }
 
 ReactDOM.render(

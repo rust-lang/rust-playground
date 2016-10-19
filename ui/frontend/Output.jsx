@@ -149,10 +149,10 @@ Format.propTypes = {
   requestsInProgress: PropTypes.number.isRequired,
 };
 
-function Gist({ focus, requestsInProgress, id, url }) {
+function Gist({ focus, requestsInProgress, id, url, channel }) {
   if (focus === 'gist') {
     const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
-    const permalink = id ? <p><a href={`/?gist=${id}`}>Permalink to the playground</a></p> : null;
+    const permalink = id ? <p><a href={`/?gist=${id}&version=${channel}`}>Permalink to the playground</a></p> : null;
     const directLink = url ? (<p><a href={url}>Direct link to the gist</a></p>) : null;
 
     return (
@@ -172,6 +172,7 @@ Gist.propTypes = {
   requestsInProgress: PropTypes.number.isRequired,
   id: PropTypes.string,
   url: PropTypes.string,
+  channel: PropTypes.string,
 };
 
 class Output extends PureComponent {
@@ -276,6 +277,7 @@ Output.propTypes = {
   gist: PropTypes.shape({
     id: PropTypes.string,
     url: PropTypes.string,
+    channel: PropTypes.string,
   }),
 
   changeFocus: PropTypes.func.isRequired,

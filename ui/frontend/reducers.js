@@ -26,8 +26,14 @@ const configuration = (state = defaultConfiguration, action) => {
     return { ...state, keybinding: action.keybinding };
   case actions.CHANGE_THEME:
     return { ...state, theme: action.theme };
-  case actions.CHANGE_CHANNEL:
-    return { ...state, channel: action.channel };
+  case actions.CHANGE_CHANNEL: {
+    const { channel } = action;
+    if (["stable", "beta", "nightly"].includes(channel)) {
+      return { ...state, channel };
+    } else {
+      return state;
+    }
+  }
   case actions.CHANGE_MODE:
     return { ...state, mode: action.mode };
   case actions.EDIT_CODE:
