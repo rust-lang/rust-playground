@@ -23,8 +23,8 @@ ajv-keywords@^1.0.0:
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-1.1.1.tgz#02550bc605a3e576041565628af972e06c549d50"
 
 ajv@^4.7.0:
-  version "4.8.1"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-4.8.1.tgz#708213577289a84a8148e66daa980c32da6a562e"
+  version "4.8.2"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-4.8.2.tgz#65486936ca36fea39a1504332a78bebd5d447bdc"
   dependencies:
     co "^4.6.0"
     json-stable-stringify "^1.0.1"
@@ -1101,6 +1101,18 @@ core-js@^2.4.0:
 core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
+
+cosmiconfig@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/cosmiconfig/-/cosmiconfig-2.1.0.tgz#26e384a2055ea4e087050e5e08d53eb4eac8f86e"
+  dependencies:
+    graceful-fs "^4.1.2"
+    js-yaml "^3.4.3"
+    minimist "^1.2.0"
+    object-assign "^4.1.0"
+    os-homedir "^1.0.1"
+    parse-json "^2.2.0"
+    require-from-string "^1.1.0"
 
 cross-spawn@^3.0.0:
   version "3.0.1"
@@ -2251,7 +2263,7 @@ js-tokens@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-2.0.0.tgz#79903f5563ee778cc1162e6dcf1a0027c97f9cb5"
 
-js-yaml@^3.5.1, js-yaml@~3.6.1:
+js-yaml@^3.4.3, js-yaml@^3.5.1, js-yaml@~3.6.1:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.6.1.tgz#6e5fe67d8b205ce4d22fad05b7781e8dadcc4b30"
   dependencies:
@@ -2362,7 +2374,7 @@ load-json-file@^1.0.0:
     pinkie-promise "^2.0.0"
     strip-bom "^2.0.0"
 
-loader-utils@^0.2.11, loader-utils@^0.2.15, loader-utils@^0.2.3, loader-utils@^0.2.7, loader-utils@~0.2.2:
+loader-utils@^0.2.11, loader-utils@^0.2.15, loader-utils@^0.2.16, loader-utils@^0.2.3, loader-utils@^0.2.7, loader-utils@~0.2.2:
   version "0.2.16"
   resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-0.2.16.tgz#f08632066ed8282835dff88dfb52704765adee6d"
   dependencies:
@@ -2815,7 +2827,7 @@ os-browserify@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/os-browserify/-/os-browserify-0.1.2.tgz#49ca0293e0b19590a5f5de10c7f265a617d8fe54"
 
-os-homedir@^1.0.0:
+os-homedir@^1.0.0, os-homedir@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/os-homedir/-/os-homedir-1.0.2.tgz#ffbc4988336e0e833de0c168c7ef152121aa7fb3"
 
@@ -2994,12 +3006,37 @@ postcss-filter-plugins@^2.0.0:
     postcss "^5.0.4"
     uniqid "^4.0.0"
 
-postcss-loader@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/postcss-loader/-/postcss-loader-0.13.0.tgz#72fdaf0d29444df77d3751ce4e69dc40bc99ed85"
+postcss-load-config@^1.0.0-rc:
+  version "1.0.0-rc"
+  resolved "https://registry.yarnpkg.com/postcss-load-config/-/postcss-load-config-1.0.0-rc.tgz#8aed0d0fb94afe2c1ab0ba2ca69da3af5079e2cc"
   dependencies:
-    loader-utils "^0.2.15"
-    postcss "^5.2.0"
+    cosmiconfig "^2.1.0"
+    object-assign "^4.1.0"
+    postcss-load-options "^1.0.2"
+    postcss-load-plugins "^2.0.0-rc"
+
+postcss-load-options@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/postcss-load-options/-/postcss-load-options-1.0.2.tgz#b99eb5759a588f4b2dd8b6471c6985f72060e7b0"
+  dependencies:
+    cosmiconfig "^2.1.0"
+    object-assign "^4.1.0"
+
+postcss-load-plugins@^2.0.0-rc:
+  version "2.0.0-rc"
+  resolved "https://registry.yarnpkg.com/postcss-load-plugins/-/postcss-load-plugins-2.0.0-rc.tgz#21242fb78de4d3d8eac9d1fef3863b8b794aa522"
+  dependencies:
+    cosmiconfig "^2.1.0"
+    object-assign "^4.1.0"
+
+postcss-loader@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/postcss-loader/-/postcss-loader-1.0.0.tgz#e3b65d0c8596c1658f79d7db2d291310748d5d2a"
+  dependencies:
+    loader-utils "^0.2.16"
+    object-assign "^4.1.0"
+    postcss "^5.2.4"
+    postcss-load-config "^1.0.0-rc"
 
 postcss-merge-idents@^2.1.5:
   version "2.1.7"
@@ -3163,7 +3200,7 @@ postcss-zindex@^2.0.1:
     postcss "^5.0.4"
     uniqs "^2.0.0"
 
-postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0.14, postcss@^5.0.16, postcss@^5.0.2, postcss@^5.0.4, postcss@^5.0.5, postcss@^5.0.6, postcss@^5.0.8, postcss@^5.2.0, postcss@^5.2.4:
+postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0.14, postcss@^5.0.16, postcss@^5.0.2, postcss@^5.0.4, postcss@^5.0.5, postcss@^5.0.6, postcss@^5.0.8, postcss@^5.2.4:
   version "5.2.4"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-5.2.4.tgz#8eb4bee3e5c4e091585b116df32d8db24a535f21"
   dependencies:
@@ -3533,6 +3570,10 @@ request@^2.61.0, request@2, request@2.x:
 require-directory@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/require-directory/-/require-directory-2.1.1.tgz#8c64ad5fd30dab1c976e2344ffe7f792a6a6df42"
+
+require-from-string@^1.1.0:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/require-from-string/-/require-from-string-1.2.1.tgz#529c9ccef27380adfec9a2f965b649bbee636418"
 
 require-main-filename@^1.0.1:
   version "1.0.1"

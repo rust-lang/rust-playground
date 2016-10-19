@@ -43,7 +43,7 @@
     "node-sass": "^3.8.0",
     "node-zopfli": "^2.0.0",
     "normalize.css": "^5.0.0",
-    "postcss-loader": "^0.13.0",
+    "postcss-loader": "^1.0.0",
     "sass-loader": "^4.0.0",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.1"
