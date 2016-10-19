@@ -22,7 +22,8 @@ if (process.env.NODE_ENV !== 'production') {
   mw.push(createLogger());
 }
 const middlewares = applyMiddleware(...mw);
-const enhancers = compose(middlewares, persistState(undefined, { serialize, deserialize }));
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const enhancers = composeEnhancers(middlewares, persistState(undefined, { serialize, deserialize }));
 const store = createStore(playgroundApp, enhancers);
 
 configureRustErrors((line, col) => store.dispatch(gotoPosition(line, col)));
