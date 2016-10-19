@@ -9,11 +9,15 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
 
     within('.header') { click_on 'Gist' }
 
-    # Save the other link before we navigate away
+    # Save the links before we navigate away
+    perma_link = find_link("Permalink to the playground")[:href]
     direct_link = find_link("Direct link to the gist")[:href]
 
-    click_on "Permalink to the playground"
-    expect(page).to_not have_link("Permalink to the playground")
+    # Navigate away so we can tell that we go back to the same page
+    visit 'about:blank'
+
+    visit perma_link
+    expect(page).to have_link("Permalink to the playground")
     expect(editor).to have_line 'automated test'
 
     visit direct_link
