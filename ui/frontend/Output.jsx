@@ -249,15 +249,17 @@ class Output extends PureComponent {
   }
 }
 
-const simpleProps = PropTypes.shape({
+const simplePropsHash = {
   requestsInProgress: PropTypes.number,
   stdout: PropTypes.string,
   stderr: PropTypes.string,
   error: PropTypes.string,
-});
+};
+
+const simpleProps = PropTypes.shape(simplePropsHash);
 
 const withCodeProps = PropTypes.shape({
-  ...simpleProps,
+  ...simplePropsHash,
   code: PropTypes.string,
 });
 
