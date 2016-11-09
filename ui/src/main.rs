@@ -19,8 +19,11 @@ use std::env;
 use std::path::PathBuf;
 use std::time::Duration;
 
+use iron::headers::ContentType;
+use iron::modifiers::Header;
 use iron::prelude::*;
 use iron::status;
+
 use mount::Mount;
 use serde::{Serialize, Deserialize};
 use playground_middleware::{
@@ -125,12 +128,12 @@ fn with_sandbox<Req, Resp, F>(req: &mut Request, f: F) -> IronResult<Response>
         });
 
     match response {
-        Ok(body) => Ok(Response::with((status::Ok, body))),
+        Ok(body) => Ok(Response::with((status::Ok, Header(ContentType::json()), body))),
         Err(err) => {
             let err = ErrorJson { error: err.to_string() };
             match serde_json::ser::to_string(&err) {
-                Ok(error_str) => Ok(Response::with((status::InternalServerError, error_str))),
-                Err(_) => Ok(Response::with((status::InternalServerError, FATAL_ERROR_JSON))),
+                Ok(error_str) => Ok(Response::with((status::InternalServerError, Header(ContentType::json()), error_str))),
+                Err(_) => Ok(Response::with((status::InternalServerError, Header(ContentType::json()), FATAL_ERROR_JSON))),
             }
         },
     }
