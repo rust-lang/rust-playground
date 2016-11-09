@@ -13,18 +13,14 @@ serde_codegen = "0.8.0"
 
 [dependencies]
 bodyparser = "0.4.0"
-csv = "0.14.7"
 env_logger = "0.3.3"
 iron = "0.4.0"
 log = "0.3.6"
 mktemp = "0.3.1"
 mount = "0.2.0"
 quick-error = "1.1.0"
-rustc-serialize = "0.3.19"
 serde = "0.8.0"
 serde_json = "0.8.0"
 
-[dependencies.staticfile]
-git = "https://github.com/iron/staticfile"
-rev = "0c417eb970cdd48c0dad0a273d7416031cf98d37"
-features = ["cache"]
+[dependencies.playground-middleware]
+git = "https://github.com/integer32llc/playground-middleware"
