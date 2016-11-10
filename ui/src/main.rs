@@ -5,10 +5,8 @@ extern crate log;
 extern crate env_logger;
 extern crate iron;
 extern crate mount;
-extern crate staticfile;
+extern crate playground_middleware;
 extern crate bodyparser;
-extern crate csv;
-extern crate rustc_serialize;
 extern crate serde;
 extern crate serde_json;
 extern crate mktemp;
@@ -21,11 +19,16 @@ use std::env;
 use std::path::PathBuf;
 use std::time::Duration;
 
+use iron::headers::ContentType;
+use iron::modifiers::Header;
 use iron::prelude::*;
 use iron::status;
+
 use mount::Mount;
 use serde::{Serialize, Deserialize};
-use staticfile::Static;
+use playground_middleware::{
+    Staticfile, Cache, Prefix, ModifyWith, GuessContentType, FileLogger, StatisticLogger
+};
 
 use sandbox::Sandbox;
 
@@ -33,9 +36,9 @@ const DEFAULT_ADDRESS: &'static str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
 const DEFAULT_LOG_FILE: &'static str = "access-log.csv";
 
-mod logging;
 mod sandbox;
 
+const ONE_DAY_IN_SECONDS: u64 = 60 * 60 * 24;
 const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
 
 fn main() {
@@ -46,16 +49,25 @@ fn main() {
     let port = env::var("PLAYGROUND_UI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(DEFAULT_PORT);
     let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or(DEFAULT_LOG_FILE.to_string());
 
+    let files = Staticfile::new(&root).expect("Unable to open root directory");
+    let mut files = Chain::new(files);
+    let one_day = Duration::new(ONE_DAY_IN_SECONDS, 0);
+    let one_year = Duration::new(ONE_YEAR_IN_SECONDS, 0);
+
+    files.link_after(ModifyWith::new(Cache::new(one_day)));
+    files.link_after(Prefix::new(&["assets"], Cache::new(one_year)));
+    files.link_after(GuessContentType::new(ContentType::html().0));
+
     let mut mount = Mount::new();
-    mount.mount("/", Static::new(&root).cache(Duration::from_secs(ONE_YEAR_IN_SECONDS)));
+    mount.mount("/", files);
     mount.mount("/compile", compile);
     mount.mount("/execute", execute);
     mount.mount("/format", format);
     mount.mount("/clippy", clippy);
 
     let mut chain = Chain::new(mount);
-    let file_logger = logging::FileLogger::new(logfile).expect("Unable to create file logger");
-    let logger = logging::StatisticLogger::new(file_logger);
+    let file_logger = FileLogger::new(logfile).expect("Unable to create file logger");
+    let logger = StatisticLogger::new(file_logger);
     chain.link_around(logger);
 
     info!("Starting the server on {}:{}", address, port);
@@ -116,12 +128,12 @@ fn with_sandbox<Req, Resp, F>(req: &mut Request, f: F) -> IronResult<Response>
         });
 
     match response {
-        Ok(body) => Ok(Response::with((status::Ok, body))),
+        Ok(body) => Ok(Response::with((status::Ok, Header(ContentType::json()), body))),
         Err(err) => {
             let err = ErrorJson { error: err.to_string() };
             match serde_json::ser::to_string(&err) {
-                Ok(error_str) => Ok(Response::with((status::InternalServerError, error_str))),
-                Err(_) => Ok(Response::with((status::InternalServerError, FATAL_ERROR_JSON))),
+                Ok(error_str) => Ok(Response::with((status::InternalServerError, Header(ContentType::json()), error_str))),
+                Err(_) => Ok(Response::with((status::InternalServerError, Header(ContentType::json()), FATAL_ERROR_JSON))),
             }
         },
     }
