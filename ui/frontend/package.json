@@ -5,11 +5,11 @@
   "main": "index.js",
   "dependencies": {
     "babel-polyfill": "^6.9.1",
-    "brace": "^0.8.0",
+    "brace": "^0.9.0",
     "isomorphic-fetch": "^2.2.1",
     "prismjs": "~1.5.1",
     "react": "^15.3.0",
-    "react-ace": "^3.6.0",
+    "react-ace": "^4.1.0",
     "react-addons-pure-render-mixin": "^15.3.0",
     "react-addons-shallow-compare": "^15.3.0",
     "react-dom": "^15.3.0",
