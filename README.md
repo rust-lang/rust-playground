@@ -142,7 +142,7 @@ cd ui/frontend
 docker run -it --rm -v $PWD:/ui --workdir /ui --entrypoint /bin/bash node
 npm install -g yarn
 yarn
-NODE_ENV=production npm run build
+NODE_ENV=production yarn run build
 # exit docker
 cd ../..
 ```
@@ -165,7 +165,7 @@ sudo \
 ```
 cd ui/frontend
 yarn
-npm run watch # Will rebuild and watch for changes
+yarn run watch # Will rebuild and watch for changes
 ```
 
 If you don't need the backend running because you are only making
