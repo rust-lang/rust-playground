@@ -4,12 +4,13 @@ services:
   - docker
 before_install:
  - docker pull liuchong/rustup:musl
- - docker pull node:6.3
+ - docker pull node:7.2
  - >
    mkdir -p
    $HOME/cache/rust/cargo/{git,registry}
    $HOME/cache/rust/target
    $HOME/cache/node/node_modules
+   $HOME/cache/node/yarn-cache
 script:
   - >
     docker run -it --rm
@@ -24,10 +25,10 @@ script:
     docker run -it --rm
     -v $PWD/ui/frontend:/ui
     -v $HOME/cache/node/node_modules:/ui/node_modules
+    -v $HOME/cache/node/yarn-cache:/root/.yarn-cache
     --workdir /ui
-    --env NODE_ENV=production
-    node:6.3
-    bash -c 'npm install && npm run build'
+    node:7.2
+    bash -c 'npm install -g yarn && yarn && NODE_ENV=production yarn run build'
   # Ignore the permissions set from running inside the container
   - sudo chmod -R a+rw $HOME/cache
 cache:
