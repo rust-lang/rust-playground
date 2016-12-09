@@ -1,4 +1,5 @@
-use std::fs::File;
+use std::ffi::OsStr;
+use std::fs::{self, File};
 use std::io::prelude::*;
 use std::io::{self, BufReader, BufWriter, ErrorKind};
 use std::path::Path;
@@ -24,6 +25,10 @@ quick_error! {
             description("unable to execute the compiler")
             display("Unable to execute the compiler: {}", err)
             cause(err)
+        }
+        UnableToLocateOutput {
+            description("unable to locate output file")
+            display("Unable to locate output file")
         }
         UnableToReadOutput(err: io::Error) {
             description("unable to read output file")
@@ -68,15 +73,23 @@ impl Sandbox {
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
-        let mut result_path = self.output_dir.as_ref().to_path_buf();
-        match req.target {
-            CompileTarget::Assembly => result_path.push("compilation.s"),
-            CompileTarget::LlvmIr   => result_path.push("compilation.ll"),
-        }
+        let result_path = self.output_dir.as_ref();
+
+        // The compiler writes the file to a name like
+        // `compilation-3b75174cac3d47fb.ll`, so we just find the
+        // first with the right extension.
+        let file =
+            fs::read_dir(&result_path)
+            .map_err(Error::UnableToReadOutput)?
+            .flat_map(|entry| entry)
+            .map(|entry| entry.path())
+            .filter(|path| path.extension() == Some(req.target.extension()))
+            .next()
+            .ok_or(Error::UnableToLocateOutput)?;
 
         Ok(CompileResponse {
             success: output.status.success(),
-            code: try!(read(&result_path)).unwrap_or_else(String::new),
+            code: try!(read(&file)).unwrap_or_else(String::new),
             stdout: try!(vec_to_str(output.stdout)),
             stderr: try!(vec_to_str(output.stderr)),
         })
@@ -255,6 +268,16 @@ fn read(path: &Path) -> Result<Option<String>> {
 pub enum CompileTarget {
     Assembly,
     LlvmIr,
+}
+
+impl CompileTarget {
+    fn extension(&self) -> &'static OsStr {
+        let ext = match *self {
+            CompileTarget::Assembly => "s",
+            CompileTarget::LlvmIr   => "ll",
+        };
+        OsStr::new(ext)
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
