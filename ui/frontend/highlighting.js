@@ -34,7 +34,7 @@ export function configureRustErrors(gotoPosition) {
       env.tag = 'a';
       env.attributes.href = '#';
       env.attributes['data-line'] = line;
-      env.attributes['data-col'] = 1;
+      env.attributes['data-col'] = "1";
     }
   });
 
