@@ -78,8 +78,8 @@ function jsonPost(urlObj, body) {
         return response.json();
       } else {
         return response.json()
-          .then(j => Promise.reject(j))
-          .catch(e => Promise.reject({ error: e.toString() }));
+          .catch(e => Promise.reject({ error: e.toString() }))
+          .then(j => Promise.reject(j));
       }
     });
 }
