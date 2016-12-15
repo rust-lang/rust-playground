@@ -27,7 +27,7 @@ RSpec.feature "A backtrace is shown for certain errors", type: :feature, js: tru
   end
 
   def code
-    <<-EOF
+    <<~EOF
     fn trigger_the_problem() {
         None::<u8>.unwrap();
     }

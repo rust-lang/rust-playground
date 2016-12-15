@@ -33,7 +33,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
   end
 
   def code
-    <<-EOF
+    <<~EOF
     fn main() {
         println("Hello, world!");
     }

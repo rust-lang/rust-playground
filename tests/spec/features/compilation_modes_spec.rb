@@ -35,7 +35,7 @@ RSpec.feature "Compiling in different modes", type: :feature, js: true do
   end
 
   def compilation_mode_code
-    <<-EOF
+    <<~EOF
     #[cfg(debug_assertions)]
     fn main() {
         println!("Compiling in debug mode");

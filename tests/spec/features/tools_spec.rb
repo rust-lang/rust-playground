@@ -24,7 +24,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
   end
 
   def code_with_lint_warnings
-    <<-EOF
+    <<~EOF
     fn main() {
         let a = 0.0 / 0.0;
         println!("NaN is {}", a);

@@ -33,7 +33,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   end
 
   def code
-    <<-EOF
+    <<~EOF
     fn main() {
         println!("Hello, world!");
     }

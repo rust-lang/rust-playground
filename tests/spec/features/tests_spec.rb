@@ -5,7 +5,7 @@ RSpec.feature "Running tests", type: :feature, js: true do
   before { visit '/' }
 
   scenario "when tests are present" do
-    editor.set <<-EOF
+    editor.set <<~EOF
       #[test]
       fn awesome() {}
     EOF
@@ -21,7 +21,7 @@ RSpec.feature "Running tests", type: :feature, js: true do
   end
 
   scenario "when tests and a main method are present" do
-    editor.set <<-EOF
+    editor.set <<~EOF
       #[test]
       fn awesome() {}
 
