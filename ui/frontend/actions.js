@@ -90,8 +90,8 @@ export function performExecute() {
     dispatch(requestExecute());
 
     const state = getState();
-    const { code, configuration: { channel, mode, tests } } = state;
-    const body = { channel, mode, tests, code };
+    const { code, configuration: { channel, mode, crateType, tests } } = state;
+    const body = { channel, mode, crateType, tests, code };
 
     return jsonPost(routes.execute, body)
       .then(json => dispatch(receiveExecuteSuccess(json)))
@@ -105,8 +105,8 @@ function performCompile(target, { request, success, failure }) {
     dispatch(request());
 
     const state = getState();
-    const { code, configuration: { channel, mode, tests } } = state;
-    const body = { channel, mode, tests, code, target };
+    const { code, configuration: { channel, mode, crateType, tests } } = state;
+    const body = { channel, mode, crateType, tests, code, target };
 
     return jsonPost(routes.compile, body)
       .then(json => dispatch(success(json)))
