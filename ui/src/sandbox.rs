@@ -69,7 +69,7 @@ impl Sandbox {
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
         try!(self.write_source_code(&req.code));
 
-        let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests);
+        let mut command = self.compile_command(req.target, req.channel, req.mode, req.crate_type, req.tests);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -97,7 +97,7 @@ impl Sandbox {
 
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
         try!(self.write_source_code(&req.code));
-        let mut command = self.execute_command(req.channel, req.mode, req.tests);
+        let mut command = self.execute_command(req.channel, req.mode, req.crate_type, req.tests);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -148,10 +148,10 @@ impl Sandbox {
         Ok(())
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool) -> Command {
-        let mut cmd = self.docker_command();
+    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Command {
+        let mut cmd = self.docker_command(Some(crate_type));
 
-        let execution_cmd = build_execution_command(Some(target), mode, tests);
+        let execution_cmd = build_execution_command(Some(target), mode, crate_type, tests);
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
@@ -160,10 +160,10 @@ impl Sandbox {
         cmd
     }
 
-    fn execute_command(&self, channel: Channel, mode: Mode, tests: bool) -> Command {
-        let mut cmd = self.docker_command();
+    fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Command {
+        let mut cmd = self.docker_command(Some(crate_type));
 
-        let execution_cmd = build_execution_command(None, mode, tests);
+        let execution_cmd = build_execution_command(None, mode, crate_type, tests);
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
@@ -173,9 +173,11 @@ impl Sandbox {
     }
 
     fn format_command(&self) -> Command {
-        let mut cmd = self.docker_command();
+        let crate_type = CrateType::Binary;
 
-        cmd.arg("rustfmt").args(&["--write-mode", "overwrite", "src/main.rs"]);
+        let mut cmd = self.docker_command(Some(crate_type));
+
+        cmd.arg("rustfmt").args(&["--write-mode", "overwrite", crate_type.file_name()]);
 
         debug!("Formatting command is {:?}", cmd);
 
@@ -183,7 +185,7 @@ impl Sandbox {
     }
 
     fn clippy_command(&self) -> Command {
-        let mut cmd = self.docker_command();
+        let mut cmd = self.docker_command(None);
 
         cmd.arg("clippy").args(&["cargo", "clippy"]);
 
@@ -192,10 +194,13 @@ impl Sandbox {
         cmd
     }
 
-    fn docker_command(&self) -> Command {
+    fn docker_command(&self, crate_type: Option<CrateType>) -> Command {
+        let crate_type = crate_type.unwrap_or(CrateType::Binary);
+
         let mut mount_input_file = self.input_file.as_ref().as_os_str().to_os_string();
         mount_input_file.push(":");
-        mount_input_file.push("/playground/src/main.rs");
+        mount_input_file.push("/playground/");
+        mount_input_file.push(crate_type.file_name());
 
         let mut mount_output_dir = self.output_dir.as_ref().as_os_str().to_os_string();
         mount_output_dir.push(":");
@@ -223,16 +228,18 @@ impl Sandbox {
     }
 }
 
-fn build_execution_command(target: Option<CompileTarget>, mode: Mode, tests: bool) -> Vec<&'static str> {
+fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type: CrateType, tests: bool) -> Vec<&'static str> {
     use self::CompileTarget::*;
+    use self::CrateType::*;
     use self::Mode::*;
 
     let mut cmd = vec!["cargo"];
 
-    match (target, tests) {
-        (Some(_), _)  => cmd.push("rustc"),
-        (None, true)  => cmd.push("test"),
-        (None, false) => cmd.push("run"),
+    match (target, crate_type, tests) {
+        (Some(_), _, _) => cmd.push("rustc"),
+        (_, _, true)    => cmd.push("test"),
+        (_, Library, _) => cmd.push("build"),
+        (_, _, _)       => cmd.push("run"),
     }
 
     if mode == Release {
@@ -305,10 +312,28 @@ pub enum Mode {
     Release,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum CrateType {
+    Binary,
+    Library,
+}
+
+impl CrateType {
+    fn file_name(&self) -> &'static str {
+        use self::CrateType::*;
+
+        match *self {
+            Binary => "src/main.rs",
+            Library => "src/lib.rs",
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct CompileRequest {
     pub target: CompileTarget,
     pub channel: Channel,
+    pub crate_type: CrateType,
     pub mode: Mode,
     pub tests: bool,
     pub code: String,
@@ -326,6 +351,7 @@ pub struct CompileResponse {
 pub struct ExecuteRequest {
     pub channel: Channel,
     pub mode: Mode,
+    pub crate_type: CrateType,
     pub tests: bool,
     pub code: String,
 }
