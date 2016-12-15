@@ -299,7 +299,6 @@ fn parse_mode(s: &str) -> Result<sandbox::Mode> {
 }
 
 fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
-    println!(">{:?}<", s);
     Ok(match s {
         "bin" => sandbox::CrateType::Binary,
         _ => sandbox::CrateType::Library,
