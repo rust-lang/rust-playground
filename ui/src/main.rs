@@ -194,6 +194,7 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
             target: try!(parse_target(&me.target)),
             channel: try!(parse_channel(&me.channel)),
             mode: try!(parse_mode(&me.mode)),
+            crate_type: try!(parse_crate_type(&me.crate_type)),
             tests: me.tests,
             code: me.code,
         })
@@ -218,6 +219,7 @@ impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
         Ok(sandbox::ExecuteRequest {
             channel: try!(parse_channel(&me.channel)),
             mode: try!(parse_mode(&me.mode)),
+            crate_type: try!(parse_crate_type(&me.crate_type)),
             tests: me.tests,
             code: me.code,
         })
@@ -293,5 +295,13 @@ fn parse_mode(s: &str) -> Result<sandbox::Mode> {
         "debug" => sandbox::Mode::Debug,
         "release" => sandbox::Mode::Release,
         _ => return Err(Error::InvalidMode(s.into()))
+    })
+}
+
+fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
+    println!(">{:?}<", s);
+    Ok(match s {
+        "bin" => sandbox::CrateType::Binary,
+        _ => sandbox::CrateType::Library,
     })
 }

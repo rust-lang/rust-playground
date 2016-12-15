@@ -4,7 +4,8 @@ ARG date
 RUN rustup default "stable-${date}"
 
 RUN cd / && \
-    cargo new --bin playground
+    cargo new --bin playground && \
+    rm playground/src/*.rs
 
 WORKDIR /playground
 

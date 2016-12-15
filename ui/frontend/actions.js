@@ -78,8 +78,8 @@ function jsonPost(urlObj, body) {
         return response.json();
       } else {
         return response.json()
-          .then(j => Promise.reject(j))
-          .catch(e => Promise.reject({ error: e.toString() }));
+          .catch(e => Promise.reject({ error: e.toString() }))
+          .then(j => Promise.reject(j));
       }
     });
 }
@@ -90,8 +90,8 @@ export function performExecute() {
     dispatch(requestExecute());
 
     const state = getState();
-    const { code, configuration: { channel, mode, tests } } = state;
-    const body = { channel, mode, tests, code };
+    const { code, configuration: { channel, mode, crateType, tests } } = state;
+    const body = { channel, mode, crateType, tests, code };
 
     return jsonPost(routes.execute, body)
       .then(json => dispatch(receiveExecuteSuccess(json)))
@@ -105,8 +105,8 @@ function performCompile(target, { request, success, failure }) {
     dispatch(request());
 
     const state = getState();
-    const { code, configuration: { channel, mode, tests } } = state;
-    const body = { channel, mode, tests, code, target };
+    const { code, configuration: { channel, mode, crateType, tests } } = state;
+    const body = { channel, mode, crateType, tests, code, target };
 
     return jsonPost(routes.compile, body)
       .then(json => dispatch(success(json)))

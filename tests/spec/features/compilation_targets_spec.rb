@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'support/editor'
 
 RSpec.feature "Compiling to different formats", type: :feature, js: true do
-  before :each do
+  before do
     visit '/'
     editor.set(code)
   end
@@ -33,7 +33,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   end
 
   def code
-    <<-EOF
+    <<~EOF
     fn main() {
         println!("Hello, world!");
     }

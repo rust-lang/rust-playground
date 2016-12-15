@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'support/editor'
 
 RSpec.feature "A backtrace is shown for certain errors", type: :feature, js: true do
-  before :each do
+  before do
     visit '/'
     editor.set(code)
     within('.header') { click_on("Run") }
@@ -27,7 +27,7 @@ RSpec.feature "A backtrace is shown for certain errors", type: :feature, js: tru
   end
 
   def code
-    <<-EOF
+    <<~EOF
     fn trigger_the_problem() {
         None::<u8>.unwrap();
     }

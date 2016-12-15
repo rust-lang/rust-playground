@@ -8,6 +8,8 @@ struct CompileRequest {
     target: String,
     channel: String,
     mode: String,
+    #[serde(rename = "crateType")]
+    crate_type: String,
     tests: bool,
     code: String,
 }
@@ -24,6 +26,8 @@ struct CompileResponse {
 struct ExecuteRequest {
     channel: String,
     mode: String,
+    #[serde(rename = "crateType")]
+    crate_type: String,
     tests: bool,
     code: String,
 }

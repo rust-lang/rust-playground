@@ -5,7 +5,7 @@ require 'support/playground_actions'
 RSpec.feature "Multiple Rust versions", type: :feature, js: true do
   include PlaygroundActions
 
-  before :each do
+  before do
     visit '/'
     editor.set(version_code)
   end
@@ -48,7 +48,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
   end
 
   def version_code
-    <<-EOF
+    <<~EOF
     use std::process::Command;
 
     fn main() {

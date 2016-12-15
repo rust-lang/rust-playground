@@ -30,7 +30,7 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
   end
 
   def code
-    <<-EOF
+    <<~EOF
       // This code was saved by an automated test for the Rust Playground
     EOF
   end

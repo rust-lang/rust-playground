@@ -5,7 +5,7 @@ require 'support/playground_actions'
 RSpec.feature "Compiling in different modes", type: :feature, js: true do
   include PlaygroundActions
 
-  before :each do
+  before do
     visit '/'
     editor.set(compilation_mode_code)
   end
@@ -35,7 +35,7 @@ RSpec.feature "Compiling in different modes", type: :feature, js: true do
   end
 
   def compilation_mode_code
-    <<-EOF
+    <<~EOF
     #[cfg(debug_assertions)]
     fn main() {
         println!("Compiling in debug mode");

@@ -1,9 +1,7 @@
 require 'spec_helper'
 
 RSpec.feature "Editing in different editors", type: :feature, js: true do
-  before :each do
-    visit '/'
-  end
+  before { visit '/' }
 
   scenario "using the simple editor" do
     click_on("Config")
@@ -20,7 +18,7 @@ RSpec.feature "Editing in different editors", type: :feature, js: true do
   end
 
   def simple_editor_code
-    <<-EOF
+    <<~EOF
     fn main() {
         println!("Using the simple editor");
     }

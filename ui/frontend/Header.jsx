@@ -23,13 +23,19 @@ function oneRadio(name, currentValue, possibleValue, change, labelText) {
   ];
 }
 
+const executionLabel = (crateType, tests) => {
+  if (tests) { return "Test"; }
+  if (crateType == 'bin') { return "Run"; }
+  return "Build";
+};
+
 class Header extends PureComponent {
   render() {
     const {
       execute, compileToAssembly, compileToLLVM,
       format, clippy, gistSave,
       channel, changeChannel, mode, changeMode,
-      tests,
+      crateType, tests,
       toggleConfiguration,
     } = this.props;
 
@@ -38,13 +44,13 @@ class Header extends PureComponent {
     const oneMode = (value, labelText) =>
             oneRadio("mode", mode, value, changeMode, labelText);
 
-    const executionLabel = tests ? "Test" : "Run";
+    const primaryLabel = executionLabel(crateType, tests);
 
     return (
       <div className="header">
         <div className="header-compilation header-set">
           <button className="header-btn header-btn-primary"
-                  onClick={ execute }>{ executionLabel }</button>
+                  onClick={ execute }>{ primaryLabel }</button>
           <button className="header-btn"
                   onClick={ compileToAssembly }>ASM</button>
           <button className="header-btn"
@@ -97,12 +103,13 @@ Header.propTypes = {
   format: PropTypes.func.isRequired,
   gistSave: PropTypes.func.isRequired,
   mode: PropTypes.string.isRequired,
+  crateType: PropTypes.string.isRequired,
   tests: PropTypes.bool.isRequired,
   toggleConfiguration: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = ({ configuration: { channel, mode, tests } }) => (
-  { channel, mode, tests }
+const mapStateToProps = ({ configuration: { channel, mode, crateType, tests } }) => (
+  { channel, mode, crateType, tests }
 );
 
 const mapDispatchToProps = dispatch => ({

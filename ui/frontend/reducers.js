@@ -9,12 +9,16 @@ export const defaultConfiguration = {
   theme: "github",
   channel: "stable",
   mode: "debug",
+  crateType: "bin",
   tests: false,
 };
 
 const hasTests = code => code.includes('#[test]');
 const hasMainMethod = code => code.includes('fn main()');
 const runAsTest = code => hasTests(code) && !hasMainMethod(code);
+
+const CRATE_TYPE_RE = /^#!\[crate_type="([^"]*)"\]/;
+const crateType = code => (code.match(CRATE_TYPE_RE) || [null, 'bin'])[1];
 
 const configuration = (state = defaultConfiguration, action) => {
   switch (action.type) {
@@ -36,8 +40,10 @@ const configuration = (state = defaultConfiguration, action) => {
   }
   case actions.CHANGE_MODE:
     return { ...state, mode: action.mode };
-  case actions.EDIT_CODE:
-    return { ...state, tests: runAsTest(action.code) };
+  case actions.EDIT_CODE: {
+    const { code } = action;
+    return { ...state, crateType: crateType(code), tests: runAsTest(code) };
+  }
   default:
     return state;
   }
