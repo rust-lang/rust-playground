@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'support/editor'
 
 RSpec.feature "Compiling to different formats", type: :feature, js: true do
-  before :each do
+  before do
     visit '/'
     editor.set(code)
   end

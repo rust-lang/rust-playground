@@ -2,9 +2,7 @@ require 'spec_helper'
 require 'support/editor'
 
 RSpec.feature "Running tests", type: :feature, js: true do
-  before :each do
-    visit '/'
-  end
+  before { visit '/' }
 
   scenario "when tests are present" do
     editor.set <<-EOF
