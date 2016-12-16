@@ -123,7 +123,8 @@ cd ../
 #### Set a crontab to rebuild the containers
 
 ```
-0 0 * * * cd /home/ec2-user/rust-playground/compiler && ./build.sh && docker rmi $(docker images | grep "^<none>" | awk '{print $3}')
+0 0 * * * cd /home/ec2-user/rust-playground/compiler && ./build.sh
+0 * * * * docker images -q --filter "dangling=true" | xargs docker rmi
 ```
 
 #### Build the UI backend
