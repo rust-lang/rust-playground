@@ -4,7 +4,8 @@ name = "top-crates"
 version = "0.1.0"
 
 [dependencies]
-hyper = "0.9.9"
+hyper = "0.10.4"
+hyper-native-tls = "0.2.2"
 mktemp = "0.3.0"
 semver = "0.5.0"
 serde = "0.8.0"

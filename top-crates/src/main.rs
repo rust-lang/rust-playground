@@ -1,4 +1,5 @@
 extern crate hyper;
+extern crate hyper_native_tls;
 extern crate serde;
 extern crate serde_json;
 extern crate toml;
@@ -14,13 +15,17 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use hyper::client::Client;
+use hyper::net::HttpsConnector;
+use hyper_native_tls::NativeTlsClient;
 use mktemp::Temp;
 use semver::Version;
 
 type Crate = (String, String);
 
 fn get_top_crates() -> serde_json::Value {
-    let client = Client::new();
+    let ssl = NativeTlsClient::new().expect("Unable to build TLS client");
+    let connector = HttpsConnector::new(ssl);
+    let client = Client::with_connector(connector);
 
     let res = client.get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads").send().expect("Could not fetch top crates");
     assert_eq!(res.status, hyper::Ok);
