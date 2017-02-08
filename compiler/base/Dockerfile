@@ -1,7 +1,11 @@
 FROM ubuntu:16.04
 
+# `build-essential` and `file` is needed for backtrace-sys
+# https://github.com/alexcrichton/backtrace-rs/issues/26
 RUN apt-get update && apt-get install -y \
+    build-essential \
     curl \
+    file \
     gcc \
     jq \
     libssl-dev \
