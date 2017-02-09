@@ -63,19 +63,19 @@ fn get_top_crates() -> Vec<Crate> {
 }
 
 fn crates_to_toml(crates: Vec<Crate>) -> toml::Value {
-    use toml::Value;
+    use toml::value::{Value, Table};
 
-    let mut package = toml::Table::new();
+    let mut package = Table::new();
     package.insert("authors".into(), Value::Array(vec![Value::String("The Rust Playground".into())]));
     package.insert("name".into(), Value::String("playground".into()));
     package.insert("version".into(), Value::String("0.0.1".into()));
 
-    let mut dependencies = toml::Table::new();
+    let mut dependencies = Table::new();
     for Crate { name, version } in crates {
         dependencies.insert(name, Value::String(version));
     }
 
-    let mut result = toml::Table::new();
+    let mut result = Table::new();
     result.insert("package".into(), Value::Table(package));
     result.insert("dependencies".into(), Value::Table(dependencies));
 
@@ -87,8 +87,8 @@ fn write_cargo_toml(dir: &Path, cargo_toml: toml::Value) -> PathBuf {
 
     let f = File::create(&toml_file).expect("Unable to create Cargo.toml");
     let mut f = BufWriter::new(f);
-
-    f.write_all(toml::encode_str(&cargo_toml).as_bytes()).expect("Couldn't write Cargo.toml");
+    let data = toml::to_vec(&cargo_toml).expect("Unable to encode TOML");
+    f.write_all(&data).expect("Couldn't write Cargo.toml");
 
     toml_file
 }
@@ -119,12 +119,12 @@ fn get_lockfile(lockfile_path: &Path) -> toml::Value {
     let mut s = String::new();
     f.read_to_string(&mut s).expect("Couldn't read the lockfile");
 
-    toml::decode_str(&s).expect("Unable to parse lockfile")
+    toml::from_str(&s).expect("Unable to parse lockfile")
 }
 
 fn lockfile_to_crates(lockfile: toml::Value) -> Vec<Crate> {
-    let packages = lockfile.lookup("package").expect("Couldn't find packages");
-    let packages = packages.as_slice().expect("packages not an array");
+    let packages = lockfile.get("package").expect("Couldn't find packages");
+    let packages = packages.as_array().expect("packages not an array");
 
     packages.iter().map(|package| {
         let package = package.as_table().expect("not an object");
