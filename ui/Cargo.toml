@@ -2,14 +2,10 @@
 authors = ["Jake Goulding <jake.goulding@integer32.com>"]
 name = "ui"
 version = "0.1.0"
-build = "build.rs"
 
 [features]
 default = ['fork-bomb-prevention']
 fork-bomb-prevention = []
-
-[build-dependencies]
-serde_codegen = "0.9.0"
 
 [dependencies]
 bodyparser = "0.6.0"
@@ -20,6 +16,7 @@ mktemp = "0.3.1"
 mount = "0.3.0"
 quick-error = "1.1.0"
 serde = "0.9.6"
+serde_derive = "0.9.6"
 serde_json = "0.9.5"
 
 [dependencies.playground-middleware]
