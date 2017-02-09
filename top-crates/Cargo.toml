@@ -10,6 +10,7 @@ mktemp = "0.3.0"
 semver = "0.6.0"
 serde = "0.9.6"
 serde_json = "0.9.5"
+serde_derive = "0.9.6"
 
 [dependencies.toml]
 version = "0.2.0"
