@@ -9,6 +9,8 @@ extern crate playground_middleware;
 extern crate bodyparser;
 extern crate serde;
 extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
 extern crate mktemp;
 #[macro_use]
 extern crate quick_error;
@@ -184,7 +186,71 @@ type Result<T> = ::std::result::Result<T, Error>;
 const FATAL_ERROR_JSON: &'static str =
     r#"{"error": "Multiple cascading errors occurred, abandon all hope"}"#;
 
-include!(concat!(env!("OUT_DIR"), "/data.rs"));
+#[derive(Debug, Clone, Serialize)]
+struct ErrorJson {
+    error: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct CompileRequest {
+    target: String,
+    channel: String,
+    mode: String,
+    #[serde(rename = "crateType")]
+    crate_type: String,
+    tests: bool,
+    code: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct CompileResponse {
+    success: bool,
+    code: String,
+    stdout: String,
+    stderr: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct ExecuteRequest {
+    channel: String,
+    mode: String,
+    #[serde(rename = "crateType")]
+    crate_type: String,
+    tests: bool,
+    code: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct ExecuteResponse {
+    success: bool,
+    stdout: String,
+    stderr: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct FormatRequest {
+    code: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct FormatResponse {
+    success: bool,
+    code: String,
+    stdout: String,
+    stderr: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct ClippyRequest {
+    code: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct ClippyResponse {
+    success: bool,
+    stdout: String,
+    stderr: String,
+}
 
 impl TryFrom<CompileRequest> for sandbox::CompileRequest {
     type Err = Error;
