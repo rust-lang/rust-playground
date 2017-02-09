@@ -1,6 +1,8 @@
 extern crate cargo;
 extern crate hyper;
 extern crate hyper_native_tls;
+#[macro_use]
+extern crate lazy_static;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
@@ -11,7 +13,7 @@ use std::collections::btree_map::Entry;
 use std::fs::File;
 use std::io::Write;
 
-use cargo::core::{Dependency, Registry, Source, SourceId};
+use cargo::core::{Dependency, Registry, Source, SourceId, Summary};
 use cargo::core::resolver::{self, Method, Resolve};
 use cargo::sources::RegistrySource;
 use cargo::util::Config;
@@ -61,11 +63,24 @@ fn get_top_crates() -> TopCrates {
     serde_json::from_reader(res).expect("Invalid JSON")
 }
 
-fn decide_features() -> Method<'static> {
-    Method::Required {
-        dev_deps: false,
-        features: &[],
-        uses_default_features: true,
+fn decide_features(summary: &Summary) -> Method<'static> {
+    lazy_static! {
+        static ref PLAYGROUND_FEATURES: Vec<String> = vec!["playground".to_owned()];
+    }
+
+    // Enable `playground` feature if present.
+    if summary.features().contains_key("playground") {
+        Method::Required {
+            dev_deps: false,
+            features: &*PLAYGROUND_FEATURES,
+            uses_default_features: false,
+        }
+    } else {
+        Method::Required {
+            dev_deps: false,
+            features: &[],
+            uses_default_features: true,
+        }
     }
 }
 
@@ -147,7 +162,7 @@ fn main() {
         let summary = matches.into_iter().next().unwrap();
 
         // Add a dependency on this crate.
-        let method = decide_features();
+        let method = decide_features(&summary);
         summaries.push((summary, method));
     }
 

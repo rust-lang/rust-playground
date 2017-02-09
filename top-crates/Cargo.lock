@@ -5,6 +5,7 @@ dependencies = [
  "cargo 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.10.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper-native-tls 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lazy_static 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 0.9.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 0.9.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
