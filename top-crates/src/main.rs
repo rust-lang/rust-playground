@@ -143,6 +143,11 @@ static BLACKLIST: &'static [&'static str] = &[
     "quasi_codegen", // Not supported on stable
     "quasi_macros", // Not supported on stable
     "serde_macros", // Apparently deleted
+    "openssl", // Ecosystem is fragmented, only pull in via dependencies
+    "openssl-sys", // Ecosystem is fragmented, only pull in via dependencies
+    "openssl-sys-extras", // Ecosystem is fragmented, only pull in via dependencies
+    "openssl-verify", // Ecosystem is fragmented, only pull in via dependencies
+    "redox_syscall", // Not supported on stable
 ];
 
 fn remove_blacklisted_crates(crates: Vec<Crate>) -> Vec<Crate> {
