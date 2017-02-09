@@ -13,7 +13,7 @@ serde_codegen = "0.9.0"
 
 [dependencies]
 bodyparser = "0.6.0"
-env_logger = "0.3.3"
+env_logger = "0.4.0"
 iron = "0.5.1"
 log = "0.3.6"
 mktemp = "0.3.1"
