@@ -11,7 +11,4 @@ lazy_static = "0.2"
 serde = "0.9.6"
 serde_derive = "0.9.6"
 serde_json = "0.9.5"
-
-[dependencies.toml]
-git = "https://github.com/alexcrichton/toml-rs"
-branch = "master"
+toml = "0.3.0"
