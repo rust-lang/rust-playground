@@ -1,3 +1,8 @@
+[package]
+name = "playground"
+version = "0.0.1"
+authors = ["The Rust Playground"]
+
 [dependencies]
 advapi32-sys = "0.2.0"
 aho-corasick = "0.6.2"
@@ -58,14 +63,14 @@ quote = "0.3.12"
 rand = "0.3.15"
 regex = "0.2.1"
 regex-syntax = "0.4.0"
-rust-crypto = "0.2.36"
 rustc-serialize = "0.3.22"
 rustc_version = "0.1.7"
 semver = "0.6.0"
 semver-parser = "0.7.0"
-serde = "0.9.6"
+serde = "0.9.7"
 serde_codegen = "0.9.0"
 serde_codegen_internals = "0.13.0"
+serde_derive = "0.9.7"
 serde_json = "0.9.5"
 siphasher = "0.2.1"
 slab = "0.3.0"
@@ -86,7 +91,7 @@ toml = "0.2.1"
 traitobject = "0.1.0"
 typeable = "0.1.2"
 unicase = "1.4.0"
-unicode-bidi = "0.2.4"
+unicode-bidi = "0.2.5"
 unicode-normalization = "0.1.4"
 unicode-segmentation = "1.1.0"
 unicode-width = "0.1.4"
@@ -102,8 +107,3 @@ winapi = "0.2.8"
 winapi-build = "0.1.1"
 ws2_32-sys = "0.2.1"
 xml-rs = "0.3.5"
-
-[package]
-authors = ["The Rust Playground"]
-name = "playground"
-version = "0.0.1"

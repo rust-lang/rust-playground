@@ -4,14 +4,14 @@ name = "top-crates"
 version = "0.1.0"
 
 [dependencies]
+cargo = "0.16"
 hyper = "0.10.4"
 hyper-native-tls = "0.2.2"
-mktemp = "0.3.0"
-semver = "0.6.0"
+lazy_static = "0.2"
 serde = "0.9.6"
+serde_derive = "0.9.6"
 serde_json = "0.9.5"
 
 [dependencies.toml]
-version = "0.2.0"
-default-features = false
-features = ["serde"]
+git = "https://github.com/alexcrichton/toml-rs"
+branch = "master"
