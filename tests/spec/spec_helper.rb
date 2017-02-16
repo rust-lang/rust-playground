@@ -37,6 +37,7 @@ end
 Capybara.javascript_driver = :poltergeist
 Capybara.app_host = "http://#{ADDRESS}:#{PORT}"
 Capybara.run_server = false
+Capybara.default_max_wait_time = 5
 
 RSpec.configure do |config|
   config.before do
