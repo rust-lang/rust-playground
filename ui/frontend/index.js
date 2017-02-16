@@ -16,7 +16,7 @@ import { serialize, deserialize } from './local_storage';
 import playgroundApp from './reducers';
 import { gotoPosition, editCode, performGistLoad, changeChannel } from './actions';
 import Playground from './Playground';
-
+//asd
 const mw = [thunk];
 if (process.env.NODE_ENV !== 'production') {
   mw.push(createLogger());

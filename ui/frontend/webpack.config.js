@@ -5,7 +5,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
-const autoprefixer = require('autoprefixer');
 const glob = require('glob');
 const basename = require('basename');
 
@@ -38,25 +37,28 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['', '.js', '.jsx'],
+    extensions: ['.js', '.jsx'],
   },
 
   module: {
-    loaders: [
+    rules: [
       {
         test: [/\.js$/, /\.jsx$/],
         exclude: /node_modules/,
-        loader: 'babel',
+        use: 'babel-loader',
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract("style", ["css", "postcss", "sass"]),
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ["css-loader", "postcss-loader", "sass-loader"]
+        }),
       },
     ],
   },
 
   plugins: [
-    new webpack.EnvironmentPlugin(["NODE_ENV"]),
+    new webpack.EnvironmentPlugin({ NODE_ENV: 'development' }),
     new webpack.DefinePlugin({
       ACE_KEYBINDINGS: JSON.stringify(allKeybindings),
       ACE_THEMES: JSON.stringify(allThemes),
@@ -75,10 +77,6 @@ module.exports = {
       names: ['vendor', 'manifest'],
     }),
   ],
-
-  postcss: function () {
-    return [autoprefixer];
-  },
 };
 
 if (process.env.NODE_ENV === 'production') {
@@ -88,7 +86,6 @@ if (process.env.NODE_ENV === 'production') {
         warnings: false,
       },
     }),
-    new webpack.optimize.OccurrenceOrderPlugin(),
     new CompressionPlugin({ algorithm: 'zopfli' })
   );
 }
