@@ -2,6 +2,8 @@ require 'spec_helper'
 require 'support/editor'
 
 RSpec.feature "A backtrace is shown for certain errors", type: :feature, js: true do
+  before { pending "Backtracing has a large performance penalty" }
+
   before do
     visit '/'
     editor.set(code)
