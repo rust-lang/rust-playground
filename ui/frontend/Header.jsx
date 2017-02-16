@@ -25,7 +25,7 @@ function oneRadio(name, currentValue, possibleValue, change, labelText) {
 
 const executionLabel = (crateType, tests) => {
   if (tests) { return "Test"; }
-  if (crateType == 'bin') { return "Run"; }
+  if (crateType === 'bin') { return "Run"; }
   return "Build";
 };
 

@@ -30,6 +30,7 @@ script:
     node:7.5
     bash -c 'npm install -g yarn && \
              yarn && \
+             yarn test:lint && \
              NODE_ENV=production yarn run build'
   # Ignore the permissions set from running inside the container
   - sudo chmod -R a+rw $HOME/cache
