@@ -105,6 +105,9 @@ class AdvancedEditor extends PureComponent {
   }
 
   componentDidMount() {
+    // Auto-completing character literals interferes too much with
+    // lifetimes, and there's no finer-grained control.
+    this._editor.editor.setBehavioursEnabled(false);
     this._editor.editor.commands.addCommand({
       name: 'executeCode',
       bindKey: {
