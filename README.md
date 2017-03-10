@@ -95,17 +95,25 @@ usermod -a -G docker ec2-user
 fallocate -l 1G /swap.fs
 chmod 0600 /swap.fs
 mkswap /swap.fs
-swapon /swap.fs
 ```
 
 #### Set aside disk space (as root)
 ```
 fallocate -l 512M /playground.fs
-losetup /dev/loop0 /playground.fs
-mkfs -t ext3 -m 1 -v /dev/loop0
+device=$(losetup -f --show /playground.fs)
+mkfs -t ext3 -m 1 -v $device
 mkdir /mnt/playground
-mount -t ext3 /dev/loop0 /mnt/playground
 ```
+
+#### Configure disk mountpoints (as root)
+```
+cat >>/etc/fstab <<EOF
+/swap.fs        none            swap   sw       0   0
+/playground.fs /mnt/playground  ext3   loop     0   0
+EOF
+```
+
+Reboot the instance at this point.
 
 #### Get the code
 ```
@@ -121,6 +129,10 @@ cd ../
 ```
 
 #### Set a crontab to rebuild the containers
+
+```
+crontab -e
+```
 
 ```
 0 0 * * * cd /home/ec2-user/rust-playground/compiler && ./build.sh
