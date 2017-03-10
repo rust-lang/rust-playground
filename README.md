@@ -153,7 +153,6 @@ cd ..
 ```
 cd ui/frontend
 docker run -it --rm -v $PWD:/ui --workdir /ui --entrypoint /bin/bash node
-npm install -g yarn
 yarn
 NODE_ENV=production yarn run build
 # exit docker
