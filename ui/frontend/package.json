@@ -17,7 +17,6 @@
     "react-redux": "^5.0.0",
     "redux": "^3.5.2",
     "redux-localstorage": "^0.4.1",
-    "redux-logger": "^2.6.1",
     "redux-thunk": "^2.1.0",
     "url": "^0.11.0"
   },
