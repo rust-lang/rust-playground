@@ -4,6 +4,16 @@ This is an [alternate implementation of the Rust Playground][us].
 
 [us]: http://play.integer32.com/
 
+## What's different?
+
+This playground has two main features that differentiate it from
+the official playground:
+
+1. The top 100 popular crates (ranked by all-time downloads) and
+   their dependencies are available for use. Just add `extern foo`
+   to use them! 
+1. Clippy can be run against the code.
+
 ## Why?
 
 At one point, the [official Rust Playground][play] lost the ability to
