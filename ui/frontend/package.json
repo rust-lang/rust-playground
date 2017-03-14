@@ -32,7 +32,7 @@
     "basename": "^0.1.2",
     "compression-webpack-plugin": "^0.3.1",
     "copy-webpack-plugin": "^4.0.1",
-    "css-loader": "^0.26.1",
+    "css-loader": "^0.27.3",
     "eslint": "^3.2.0",
     "eslint-plugin-react": "^6.4.1",
     "extract-text-webpack-plugin": "^2.0.0-rc.3",
