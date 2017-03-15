@@ -87,11 +87,22 @@ const position = (state = defaultPosition, action) => {
   }
 };
 
+const page = (state = "index", action) => {
+  switch (action.type) {
+  case actions.SET_PAGE:
+    return action.page;
+
+  default:
+    return state;
+  }
+};
+
 const playgroundApp = combineReducers({
   configuration,
   code,
   position,
   output,
+  page,
 });
 
 export default playgroundApp;

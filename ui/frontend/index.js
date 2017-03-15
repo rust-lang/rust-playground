@@ -6,13 +6,13 @@ import { Provider } from 'react-redux';
 import { applyMiddleware, createStore, compose } from 'redux';
 import thunk from 'redux-thunk';
 import persistState from 'redux-localstorage';
-import url from 'url';
 
 import { configureRustErrors } from './highlighting';
 import { serialize, deserialize } from './local_storage';
 import playgroundApp from './reducers';
-import { gotoPosition, editCode, performGistLoad, changeChannel } from './actions';
-import Playground from './Playground';
+import { gotoPosition } from './actions';
+import Router from './Router';
+import PageSwitcher from './PageSwitcher';
 
 const mw = [thunk];
 const middlewares = applyMiddleware(...mw);
@@ -22,23 +22,11 @@ const store = createStore(playgroundApp, enhancers);
 
 configureRustErrors((line, col) => store.dispatch(gotoPosition(line, col)));
 
-// Process query parameters
-const urlObj = url.parse(window.location.href, true);
-const query = urlObj.query;
-
-if (query.code) {
-  store.dispatch(editCode(query.code));
-} else if (query.gist) {
-  store.dispatch(performGistLoad(query.gist, query.version));
-}
-
-if (query.version) {
-  store.dispatch(changeChannel(query.version));
-}
-
 ReactDOM.render(
   <Provider store={store}>
-    <Playground />
+    <Router store={store} reducer={playgroundApp}>
+      <PageSwitcher />
+    </Router>
   </Provider>,
   document.getElementById('playground')
 );

@@ -7,6 +7,17 @@ $unselected-radio: lighten($selected-radio, 20%);
 $border-color: #BBBBBB;
 $border: 1px solid $border-color;
 
+$primary-font: 'Open Sans', sans-serif;
+
+// Modify normalized styles
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: $primary-font;
+}
+
 html {
     box-sizing: border-box;
 }
@@ -17,7 +28,7 @@ html {
 body {
     background-color: $background;
     padding: 0 1em;
-    font-family: 'Open Sans', sans-serif;
+    font-family: $primary-font;
 }
 
 .playground {
@@ -118,6 +129,8 @@ body {
         background-color: white;
         border: $border;
         cursor: pointer;
+        text-decoration: none;
+        color: #000;
 
         &:hover {
             background-color: darken(white, 10%);
