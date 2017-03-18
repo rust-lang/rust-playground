@@ -318,3 +318,10 @@ export function indexPageLoad({ code, gist, version = 'stable', mode = 'debug' }
 export function helpPageLoad() {
   return navigateToHelp();
 }
+
+export function showExample(code) {
+  return function (dispatch) {
+    dispatch(navigateToIndex());
+    dispatch(editCode(code));
+  };
+}
