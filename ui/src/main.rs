@@ -29,7 +29,7 @@ use iron::status;
 use mount::Mount;
 use serde::{Serialize, Deserialize};
 use playground_middleware::{
-    Staticfile, Cache, Prefix, ModifyWith, GuessContentType, FileLogger, StatisticLogger
+    Staticfile, Cache, Prefix, ModifyWith, GuessContentType, FileLogger, StatisticLogger, Rewrite
 };
 
 use sandbox::Sandbox;
@@ -70,7 +70,10 @@ fn main() {
     let mut chain = Chain::new(mount);
     let file_logger = FileLogger::new(logfile).expect("Unable to create file logger");
     let logger = StatisticLogger::new(file_logger);
+    let rewrite = Rewrite::new(vec![vec!["help".into()]], "/index.html".into());
+
     chain.link_around(logger);
+    chain.link_before(rewrite);
 
     info!("Starting the server on {}:{}", address, port);
     Iron::new(chain).http((&*address, port)).expect("Unable to start server");

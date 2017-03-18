@@ -18,6 +18,7 @@ quick-error = "1.1.0"
 serde = "0.9.6"
 serde_derive = "0.9.6"
 serde_json = "0.9.5"
+url = "1.4.0"
 
 [dependencies.playground-middleware]
 git = "https://github.com/integer32llc/playground-middleware"
