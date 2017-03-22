@@ -15,6 +15,16 @@ export function toggleConfiguration() {
   return { type: TOGGLE_CONFIGURATION };
 }
 
+export const SET_PAGE = 'SET_PAGE';
+
+export function navigateToIndex() {
+  return { type: SET_PAGE, page: 'index' };
+}
+
+export function navigateToHelp() {
+  return { type: SET_PAGE, page: 'help' };
+}
+
 export const CHANGE_EDITOR = 'CHANGE_EDITOR';
 export const CHANGE_KEYBINDING = 'CHANGE_KEYBINDING';
 export const CHANGE_THEME = 'CHANGE_THEME';
@@ -239,20 +249,20 @@ function requestGistLoad() {
   return { type: REQUEST_GIST_LOAD };
 }
 
-function receiveGistLoadSuccess({ id, url, code, channel }) {
-  return { type: GIST_LOAD_SUCCEEDED, id, url, code, channel };
+function receiveGistLoadSuccess({ id, url, code }) {
+  return { type: GIST_LOAD_SUCCEEDED, id, url, code };
 }
 
 function receiveGistLoadFailure() { // eslint-disable-line no-unused-vars
   return { type: GIST_LOAD_FAILED };
 }
 
-export function performGistLoad(id, channel) {
+export function performGistLoad(id) {
   return function (dispatch, _getState) {
     dispatch(requestGistLoad());
 
     loadGist(id)
-      .then(gist => dispatch(receiveGistLoadSuccess({ ...gist, channel })));
+      .then(gist => dispatch(receiveGistLoadSuccess({ ...gist })));
     // TODO: Failure case
   };
 }
@@ -282,5 +292,36 @@ export function performGistSave() {
     return saveGist(code)
       .then(json => dispatch(receiveGistSaveSuccess({ ...json, channel })));
     // TODO: Failure case
+  };
+}
+
+export function indexPageLoad({ code, gist, version = 'stable', mode = 'debug' }) {
+  return function (dispatch) {
+    dispatch(navigateToIndex());
+
+    if (code) {
+      dispatch(editCode(code));
+    } else if (gist) {
+      dispatch(performGistLoad(gist));
+    }
+
+    if (version) {
+      dispatch(changeChannel(version));
+    }
+
+    if (mode) {
+      dispatch(changeMode(mode));
+    }
+  };
+}
+
+export function helpPageLoad() {
+  return navigateToHelp();
+}
+
+export function showExample(code) {
+  return function (dispatch) {
+    dispatch(navigateToIndex());
+    dispatch(editCode(code));
   };
 }

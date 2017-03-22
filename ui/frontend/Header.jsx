@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import PureComponent from './PureComponent';
 import { connect } from 'react-redux';
+import Link from './uss-router/Link';
 
 import {
   changeChannel,
@@ -12,6 +13,7 @@ import {
   performFormat,
   performGistSave,
   toggleConfiguration,
+  navigateToHelp,
 } from './actions';
 
 function oneRadio(name, currentValue, possibleValue, change, labelText) {
@@ -36,7 +38,7 @@ class Header extends PureComponent {
       format, clippy, gistSave,
       channel, changeChannel, mode, changeMode,
       crateType, tests,
-      toggleConfiguration,
+      toggleConfiguration, navigateToHelp,
     } = this.props;
 
     const oneChannel = (value, labelText) =>
@@ -87,6 +89,10 @@ class Header extends PureComponent {
           <button className="header-btn"
                   onClick={toggleConfiguration}>Config</button>
         </div>
+
+        <div className="header-set">
+          <Link className="header-btn" action={navigateToHelp}>?</Link>
+        </div>
       </div>
     );
   }
@@ -106,10 +112,11 @@ Header.propTypes = {
   crateType: PropTypes.string.isRequired,
   tests: PropTypes.bool.isRequired,
   toggleConfiguration: PropTypes.func.isRequired,
+  navigateToHelp: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ configuration: { channel, mode, crateType, tests } }) => (
-  { channel, mode, crateType, tests }
+  { channel, mode, crateType, tests, navigateToHelp }
 );
 
 const mapDispatchToProps = dispatch => ({

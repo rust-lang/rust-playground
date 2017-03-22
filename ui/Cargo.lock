@@ -13,6 +13,7 @@ dependencies = [
  "serde 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "url 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -280,7 +281,7 @@ dependencies = [
 [[package]]
 name = "playground-middleware"
 version = "0.1.0"
-source = "git+https://github.com/integer32llc/playground-middleware#95dff3ea845cfe3e6357cec9cb44f97f7896ed62"
+source = "git+https://github.com/integer32llc/playground-middleware#1c8b31d30cc7e1ccb10eee638bf861fc5149dada"
 dependencies = [
  "csv 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "iron 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -289,6 +290,7 @@ dependencies = [
  "mime_guess 1.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.22 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
+ "url 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
