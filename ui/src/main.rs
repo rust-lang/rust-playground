@@ -256,7 +256,7 @@ struct ClippyResponse {
 }
 
 impl TryFrom<CompileRequest> for sandbox::CompileRequest {
-    type Err = Error;
+    type Error = Error;
 
     fn try_from(me: CompileRequest) -> Result<Self> {
         Ok(sandbox::CompileRequest {
@@ -282,7 +282,7 @@ impl From<sandbox::CompileResponse> for CompileResponse {
 }
 
 impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
-    type Err = Error;
+    type Error = Error;
 
     fn try_from(me: ExecuteRequest) -> Result<Self> {
         Ok(sandbox::ExecuteRequest {

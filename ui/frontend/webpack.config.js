@@ -12,26 +12,19 @@ const thisPackage = require('./package.json');
 const dependencies = Object.keys(thisPackage.dependencies);
 
 const allKeybindingNames = glob.sync('./node_modules/brace/keybinding/*.js').map(basename);
-const allKeybindingRequires = allKeybindingNames.map(n => `brace/keybinding/${n}`);
-
 const allThemeNames = glob.sync('./node_modules/brace/theme/*.js').map(basename);
-const allThemeRequires = allThemeNames.map(n => `brace/theme/${n}`);
 
 // There's a builtin/default keybinding that we call `ace`.
 const allKeybindings = allKeybindingNames.concat(['ace']).sort();
 const allThemes = allThemeNames;
 
-// Perhaps we could place each of these in a separate chunk and load them on demand?
-const vendorLibraries = dependencies.concat(allKeybindingRequires, allThemeRequires);
-
 module.exports = {
   entry: {
     app: ['./index.js', './index.scss'],
-    vendor: vendorLibraries,
   },
 
   output: {
-    path: './build/assets',
+    path: `${__dirname}/build/assets`,
     filename: '[name]-[chunkhash].js',
     chunkFilename: '[chunkhash].js',
   },
@@ -83,7 +76,14 @@ module.exports = {
     ]),
     new ExtractTextPlugin("styles-[chunkhash].css"),
     new webpack.optimize.CommonsChunkPlugin({
-      names: ['vendor', 'manifest'],
+      name: "vendor",
+      minChunks: module => (
+        module.context && module.context.indexOf("node_modules") !== -1
+      ),
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: "manifest",
+      minChunks: Infinity
     }),
   ],
 };
