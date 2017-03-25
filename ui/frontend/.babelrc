@@ -1,4 +1,13 @@
 {
-  "presets": [["es2015", { "modules": false }], "react" ],
-  "plugins": ["transform-object-rest-spread", "transform-class-properties"]
+  "presets": [
+    [ "env", {
+      "targets": {
+        "browsers": "last 2 versions, not ie < 11",
+      },
+      "modules": false,
+      "useBuiltIns": true,
+    }],
+    "react"
+  ],
+  "plugins": ["transform-object-rest-spread", "transform-class-properties", "syntax-dynamic-import"]
 }

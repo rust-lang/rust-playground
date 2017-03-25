@@ -1,12 +1,8 @@
-import ace from 'brace';
-
 import React, { PropTypes } from 'react';
 import PureComponent from './PureComponent';
-import AceEditor from 'react-ace';
 import { connect } from 'react-redux';
 
-import 'brace/mode/rust';
-
+import AdvancedEditor from './AdvancedEditor';
 import { editCode, performExecute } from './actions';
 
 class SimpleEditor extends PureComponent {
@@ -67,101 +63,17 @@ SimpleEditor.propTypes = {
   }).isRequired,
 };
 
-class AdvancedEditor extends PureComponent {
-  trackEditor = component => this._editor = component;
-
-  render() {
-    const { keybinding, theme, code, onEditCode } = this.props;
-
-    const realKeybinding = keybinding === 'ace' ? null : keybinding;
-
-    // These are part of the vendor chunk
-    if (realKeybinding) {
-      require(`brace/keybinding/${realKeybinding}`);
-
-      if (realKeybinding === 'vim') {
-        const { CodeMirror: { Vim } } = ace.acequire('ace/keyboard/vim');
-        Vim.defineEx("write", "w", (cm, _input) => {
-          cm.ace.execCommand("executeCode");
-        });
-      }
-    }
-
-    require(`brace/theme/${theme}`);
-
-    return (
-      <AceEditor
-         ref={ this.trackEditor }
-         mode="rust"
-         keyboardHandler={realKeybinding}
-         theme={theme}
-         value={ code }
-         onChange={ onEditCode }
-         name="editor"
-         width="100%"
-         height="100%"
-         editorProps={ { $blockScrolling: true } } />
-    );
-  }
-
-  componentDidMount() {
-    // Auto-completing character literals interferes too much with
-    // lifetimes, and there's no finer-grained control.
-    this._editor.editor.setBehavioursEnabled(false);
-    this._editor.editor.commands.addCommand({
-      name: 'executeCode',
-      bindKey: {
-        win: 'Ctrl-Enter',
-        mac: 'Ctrl-Enter|Command-Enter',
-      },
-      exec: this.props.execute,
-      readOnly: true
-    });
-  }
-
-  componentDidUpdate(prevProps, _prevState) {
-    this.gotoPosition(prevProps.position, this.props.position);
-  }
-
-  gotoPosition(oldPosition, newPosition) {
-    const editor = this._editor;
-
-    if (!newPosition || !editor) { return; }
-    if (newPosition === oldPosition) { return; }
-
-    const { line, column } = newPosition;
-
-    // Columns are zero-indexed in ACE
-    editor.editor.gotoLine(line, column - 1);
-    editor.editor.focus();
-  }
-}
-
-AdvancedEditor.propTypes = {
-  code: PropTypes.string.isRequired,
-  execute: PropTypes.func.isRequired,
-  keybinding: PropTypes.string.isRequired,
-  onEditCode: PropTypes.func.isRequired,
-  position: PropTypes.shape({
-    line: PropTypes.number.isRequired,
-    column: PropTypes.number.isRequired,
-  }).isRequired,
-  theme: PropTypes.string.isRequired,
-};
-
 class Editor extends PureComponent {
   render() {
-    const { editor, execute, keybinding, theme, code, position, onEditCode } = this.props;
+    const { editor, execute, code, position, onEditCode } = this.props;
     const SelectedEditor = editor === "simple" ? SimpleEditor : AdvancedEditor;
 
     return (
       <div className="editor">
-        <SelectedEditor keybinding={keybinding}
-                        theme={theme}
-                        code={code}
+        <SelectedEditor code={code}
                         position={position}
                         onEditCode={onEditCode}
-                        execute={execute} />;
+                        execute={execute} />
       </div>
     );
   }
@@ -171,17 +83,15 @@ Editor.propTypes = {
   code: PropTypes.string.isRequired,
   editor: PropTypes.string.isRequired,
   execute: PropTypes.func.isRequired,
-  keybinding: PropTypes.string.isRequired,
   onEditCode: PropTypes.func.isRequired,
   position: PropTypes.shape({
     line: PropTypes.number.isRequired,
     column: PropTypes.number.isRequired,
   }).isRequired,
-  theme: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = ({ code, configuration: { editor, keybinding, theme }, position }) => (
-  { code, editor, keybinding, theme, position }
+const mapStateToProps = ({ code, configuration: { editor }, position }) => (
+  { code, editor, position }
 );
 
 const mapDispatchToProps = dispatch => ({
