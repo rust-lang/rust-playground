@@ -3,8 +3,8 @@ sudo: required
 services:
   - docker
 before_install:
- - docker pull liuchong/rustup:musl
- - docker pull node:7.5
+ - docker pull mackeyja92/rustup
+ - docker pull node:7.7
  - >
    mkdir -p
    $HOME/cache/rust/cargo/{git,registry}
@@ -19,17 +19,19 @@ script:
     -v $HOME/cache/rust/cargo/registry:/root/.cargo/registry
     -v $HOME/cache/rust/target:/ui/target
     --workdir /ui
-    liuchong/rustup:musl
-    rustup run nightly cargo build --target=x86_64-unknown-linux-musl --release
+    mackeyja92/rustup
+    bash -c 'rustup install nightly && \
+             rustup default nightly && \
+             rustup target add x86_64-unknown-linux-musl && \
+             cargo build --target=x86_64-unknown-linux-musl --release'
   - >
     docker run -it --rm
     -v $PWD/ui/frontend:/ui
     -v $HOME/cache/node/node_modules:/ui/node_modules
     -v $HOME/cache/node/yarn-cache:/root/.yarn-cache
     --workdir /ui
-    node:7.5
-    bash -c 'npm install -g yarn && \
-             yarn && \
+    node:7.7
+    bash -c 'yarn && \
              yarn test:lint && \
              NODE_ENV=production yarn run build'
   # Ignore the permissions set from running inside the container
