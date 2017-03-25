@@ -69,7 +69,7 @@ AdvancedEditor.propTypes = {
   AceEditor: PropTypes.func.isRequired,
   code: PropTypes.string.isRequired,
   execute: PropTypes.func.isRequired,
-  keybinding: PropTypes.string.isRequired,
+  keybinding: PropTypes.string,
   onEditCode: PropTypes.func.isRequired,
   position: PropTypes.shape({
     line: PropTypes.number.isRequired,
