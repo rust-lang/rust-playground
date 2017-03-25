@@ -24,6 +24,7 @@ module.exports = {
   },
 
   output: {
+    publicPath: 'assets/',
     path: `${__dirname}/build/assets`,
     filename: '[name]-[chunkhash].js',
     chunkFilename: '[chunkhash].js',
