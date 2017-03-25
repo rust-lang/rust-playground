@@ -1,4 +1,4 @@
-/* global process:false */
+/* global process:false, __dirname:false */
 
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
