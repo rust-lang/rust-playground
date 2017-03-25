@@ -69,7 +69,7 @@ AdvancedEditor.propTypes = {
   AceEditor: PropTypes.func.isRequired,
   code: PropTypes.string.isRequired,
   execute: PropTypes.func.isRequired,
-  keybinding: PropTypes.string.isRequired,
+  keybinding: PropTypes.string,
   onEditCode: PropTypes.func.isRequired,
   position: PropTypes.shape({
     line: PropTypes.number.isRequired,
@@ -133,17 +133,19 @@ class AdvancedEditorAsync extends React.Component {
   }
 
   loadKeybinding(keybinding) {
-    if (keybinding) {
+    if (keybinding && keybinding !== this.state.keybinding) {
       this.setState({ keybindingLoading: true });
       import(`brace/keybinding/${keybinding}`)
-        .then(() => this.setState({ keybindingLoading: false }));
+        .then(() => this.setState({ keybinding, keybindingLoading: false }));
     }
   }
 
   loadTheme(theme) {
-    this.setState({ themeLoading: true });
-    import(`brace/theme/${theme}`)
-      .then(() => this.setState({ themeLoading: false }));
+    if (theme !== this.state.theme) {
+      this.setState({ themeLoading: true });
+      import(`brace/theme/${theme}`)
+        .then(() => this.setState({ theme, themeLoading: false }));
+    }
   }
 }
 
