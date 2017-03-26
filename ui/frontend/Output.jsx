@@ -186,7 +186,7 @@ class Output extends PureComponent {
 
   render() {
     const {
-      meta: { focus }, execute, format, clippy, assembly, llvmIr, gist,
+      meta: { focus }, execute, format, clippy, assembly, llvmIr, gist, hemisphere, hemisphereEnabled,
     } = this.props;
 
     const somethingToShow = [execute, format, clippy, assembly, llvmIr, gist].some(hasProperties);
@@ -215,7 +215,7 @@ class Output extends PureComponent {
     }
 
     return (
-      <div className="output">
+      <div className={`output ${ hemisphereEnabled ? `output--${hemisphere}` : ''}`}>
         <div className="output-tabs">
           <Tab kind="execute" focus={focus}
                label="Execution"
@@ -283,9 +283,12 @@ Output.propTypes = {
   }),
 
   changeFocus: PropTypes.func.isRequired,
+
+  hemisphere: PropTypes.string.isRequired,
+  hemisphereEnabled: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = ({ output }) => output;
+const mapStateToProps = ({ configuration: { hemisphere, hemisphereEnabled }, output }) => ({ ...output, hemisphere, hemisphereEnabled });
 
 const mapDispatchToProps = dispatch => ({
   changeFocus: x => dispatch(changeFocus(x)),
