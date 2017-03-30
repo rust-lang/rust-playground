@@ -1,4 +1,6 @@
 FROM rust-stable
 
-RUN cargo install rustfmt
+ARG version
+
+RUN cargo install rustfmt --vers "${version}"
 ENTRYPOINT ["rustfmt"]

@@ -1,3 +1,5 @@
 FROM rust-nightly
 
-RUN cargo install clippy
+ARG version
+
+RUN cargo install clippy --vers "${version}"
