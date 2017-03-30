@@ -177,7 +177,9 @@ impl Sandbox {
 
         let mut cmd = self.docker_command(Some(crate_type));
 
-        cmd.arg("rustfmt").args(&["--write-mode", "overwrite", crate_type.file_name()]);
+        cmd.arg("rustfmt").args(&["cargo", "fmt", "--", "--write-mode", "overwrite"]);
+
+        cmd.args(&["--config-path", "rfc"]);
 
         debug!("Formatting command is {:?}", cmd);
 
