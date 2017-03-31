@@ -179,6 +179,29 @@ export const performCompileToLLVM = () =>
     failure: receiveCompileLlvmIrFailure,
   });
 
+export const REQUEST_COMPILE_MIR = 'REQUEST_COMPILE_MIR';
+export const COMPILE_MIR_SUCCEEDED = 'COMPILE_MIR_SUCCEEDED';
+export const COMPILE_MIR_FAILED = 'COMPILE_MIR_FAILED';
+
+function requestCompileMir() {
+  return { type: REQUEST_COMPILE_MIR };
+}
+
+function receiveCompileMirSuccess({ code, stdout, stderr }) {
+  return { type: COMPILE_MIR_SUCCEEDED, code, stdout, stderr };
+}
+
+function receiveCompileMirFailure({ error }) {
+  return { type: COMPILE_MIR_FAILED, error };
+}
+
+export const performCompileToMir = () =>
+  performCompile('mir', {
+    request: requestCompileMir,
+    success: receiveCompileMirSuccess,
+    failure: receiveCompileMirFailure,
+  });
+
 export const EDIT_CODE = 'EDIT_CODE';
 export const GOTO_POSITION = 'GOTO_POSITION';
 

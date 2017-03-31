@@ -16,6 +16,9 @@ const meta = (state = defaultMeta, action) => {
   case actions.REQUEST_COMPILE_LLVM_IR:
     return { ...state, focus: 'llvm-ir' };
 
+  case actions.REQUEST_COMPILE_MIR:
+    return { ...state, focus: 'mir' };
+
   case actions.REQUEST_COMPILE_ASSEMBLY:
     return { ...state, focus: 'asm' };
 
@@ -85,6 +88,29 @@ const clippy = (state = defaultClippy, action) => {
   }
 };
 
+const defaultAssembly = {
+  requestsInProgress: 0,
+  code: null,
+  stdout: null,
+  stderr: null,
+  error: null,
+};
+
+const assembly = (state = defaultAssembly, action) => {
+  switch (action.type) {
+  case actions.REQUEST_COMPILE_ASSEMBLY:
+    return start(defaultAssembly, state);
+  case actions.COMPILE_ASSEMBLY_SUCCEEDED: {
+    const { code = "", stdout = "", stderr = "" } = action;
+    return finish(state, { code, stdout, stderr });
+  }
+  case actions.COMPILE_ASSEMBLY_FAILED:
+    return finish(state, { error: action.error });
+  default:
+    return state;
+  }
+};
+
 const defaultLlvmIr = {
   requestsInProgress: 0,
   code: null,
@@ -108,7 +134,7 @@ const llvmIr = (state = defaultLlvmIr, action) => {
   }
 };
 
-const defaultAssembly = {
+const defaultMir = {
   requestsInProgress: 0,
   code: null,
   stdout: null,
@@ -116,15 +142,15 @@ const defaultAssembly = {
   error: null,
 };
 
-const assembly = (state = defaultAssembly, action) => {
+const mir = (state = defaultMir, action) => {
   switch (action.type) {
-  case actions.REQUEST_COMPILE_ASSEMBLY:
-    return start(defaultAssembly, state);
-  case actions.COMPILE_ASSEMBLY_SUCCEEDED: {
+  case actions.REQUEST_COMPILE_MIR:
+    return start(defaultMir, state);
+  case actions.COMPILE_MIR_SUCCEEDED: {
     const { code = "", stdout = "", stderr = "" } = action;
     return finish(state, { code, stdout, stderr });
   }
-  case actions.COMPILE_ASSEMBLY_FAILED:
+  case actions.COMPILE_MIR_FAILED:
     return finish(state, { error: action.error });
   default:
     return state;
@@ -187,6 +213,7 @@ const output = combineReducers({
   clippy,
   assembly,
   llvmIr,
+  mir,
   execute,
   gist,
 });

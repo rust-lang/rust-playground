@@ -9,6 +9,7 @@ import {
   performClippy,
   performCompileToAssembly,
   performCompileToLLVM,
+  performCompileToMir,
   performExecute,
   performFormat,
   performGistSave,
@@ -34,7 +35,7 @@ const executionLabel = (crateType, tests) => {
 class Header extends PureComponent {
   render() {
     const {
-      execute, compileToAssembly, compileToLLVM,
+      execute, compileToAssembly, compileToLLVM, compileToMir,
       format, clippy, gistSave,
       channel, changeChannel, mode, changeMode,
       crateType, tests,
@@ -48,6 +49,8 @@ class Header extends PureComponent {
 
     const primaryLabel = executionLabel(crateType, tests);
 
+    const mirAvailable = channel === 'nightly';
+
     return (
       <div className="header">
         <div className="header-compilation header-set">
@@ -58,6 +61,10 @@ class Header extends PureComponent {
                     onClick={ compileToAssembly }>ASM</button>
             <button className="header-set__btn"
                     onClick={ compileToLLVM }>LLVM IR</button>
+            { mirAvailable ?
+              <button className="header-set__btn"
+                        onClick={ compileToMir }>MIR</button>
+              : null }
           </div>
         </div>
 
@@ -123,6 +130,7 @@ Header.propTypes = {
   clippy: PropTypes.func.isRequired,
   compileToAssembly: PropTypes.func.isRequired,
   compileToLLVM: PropTypes.func.isRequired,
+  compileToMir: PropTypes.func.isRequired,
   execute: PropTypes.func.isRequired,
   format: PropTypes.func.isRequired,
   gistSave: PropTypes.func.isRequired,
@@ -188,6 +196,7 @@ const mapDispatchToProps = dispatch => ({
   clippy: () => dispatch(performClippy()),
   compileToAssembly: () => dispatch(performCompileToAssembly()),
   compileToLLVM: () => dispatch(performCompileToLLVM()),
+  compileToMir: () => dispatch(performCompileToMir()),
   execute: () => dispatch(performExecute()),
   format: style => dispatch(performFormat(style)),
   gistSave: () => dispatch(performGistSave()),
