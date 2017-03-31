@@ -17,6 +17,7 @@ const LOCALSTORAGE_URL = 'https://developer.mozilla.org/en-US/docs/Web/API/Web_S
 const OFFICIAL_URL = 'https://play.rust-lang.org/';
 const REPO_URL = 'https://github.com/integer32llc/rust-playground';
 const RUSTFMT_URL = 'https://github.com/rust-lang-nursery/rustfmt';
+const RUSTFMT_RFC_URL = 'https://github.com/rust-lang-nursery/fmt-rfcs';
 const SHEPMASTER_URL = 'https://github.com/shepmaster/';
 
 const CRATE_EXAMPLE = `extern crate rand;
@@ -135,6 +136,14 @@ const Help = ({ navigateToIndex }) => (
         </p>
 
         <Example code={RUSTFMT_EXAMPLE} />
+
+        <p>
+          The official Rust style guide is being still being decided via
+          {'  '}
+          <a href={RUSTFMT_RFC_URL}>the RFC process</a>. During this period, you
+          may format your code with the current default formatting or with the
+          proposed RFC style by using the drop-down menu.
+        </p>
       </LinkableSection>
 
       <LinkableSection id="features-sharing" header="Sharing code" level={H3}>
@@ -190,6 +199,11 @@ const Help = ({ navigateToIndex }) => (
         </p>
 
         <Example code={OUTPUT_EXAMPLE} />
+
+        <p>
+          If you select the nightly channel, you can also output the compiler's
+          internal MIR format.
+        </p>
       </LinkableSection>
 
       <LinkableSection id="features-modes" header="Compilation modes" level={H3}>
