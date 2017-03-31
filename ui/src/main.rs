@@ -351,6 +351,7 @@ fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
     Ok(match s {
         "asm" => sandbox::CompileTarget::Assembly,
         "llvm-ir" => sandbox::CompileTarget::LlvmIr,
+        "mir" => sandbox::CompileTarget::Mir,
         _ => return Err(Error::InvalidTarget(s.into()))
     })
 }
