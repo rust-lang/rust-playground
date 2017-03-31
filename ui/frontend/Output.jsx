@@ -182,14 +182,15 @@ class Output extends PureComponent {
   focusClippy = () => this.props.changeFocus('clippy');
   focusAssembly = () => this.props.changeFocus('asm');
   focusLlvmIr = () => this.props.changeFocus('llvm-ir');
+  focusMir = () => this.props.changeFocus('mir');
   focusGist = () => this.props.changeFocus('gist');
 
   render() {
     const {
-      meta: { focus }, execute, format, clippy, assembly, llvmIr, gist, hemisphere, hemisphereEnabled,
+      meta: { focus }, execute, format, clippy, assembly, llvmIr, mir, gist, hemisphere, hemisphereEnabled,
     } = this.props;
 
-    const somethingToShow = [execute, format, clippy, assembly, llvmIr, gist].some(hasProperties);
+    const somethingToShow = [execute, format, clippy, assembly, llvmIr, mir, gist].some(hasProperties);
 
     if (!somethingToShow) {
       return null;
@@ -209,6 +210,7 @@ class Output extends PureComponent {
           <SimplePane {...clippy} kind="clippy" focus={focus} />
           <PaneWithCode {...assembly} kind="asm" focus={focus} />
           <PaneWithCode {...llvmIr} kind="llvm-ir" focus={focus} />
+          <PaneWithCode {...mir} kind="mir" focus={focus} />
           <Gist {...gist} focus={focus} />
         </div>
       );
@@ -237,6 +239,10 @@ class Output extends PureComponent {
                label="LLVM IR"
                onClick={this.focusLlvmIr}
                tabProps={llvmIr} />
+          <Tab kind="mir" focus={focus}
+               label="MIR"
+               onClick={this.focusMir}
+               tabProps={mir} />
           <Tab kind="gist" focus={focus}
                label="Gist"
                onClick={this.focusGist}
@@ -273,8 +279,9 @@ Output.propTypes = {
     requestsInProgress: PropTypes.number,
   }),
   clippy: simpleProps,
-  llvmIr: withCodeProps,
   assembly: withCodeProps,
+  llvmIr: withCodeProps,
+  mir: withCodeProps,
 
   gist: PropTypes.shape({
     id: PropTypes.string,

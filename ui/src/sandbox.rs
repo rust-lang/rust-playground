@@ -254,7 +254,8 @@ fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type
 
         match target {
             Assembly => cmd.push("--emit=asm"),
-             LlvmIr  => cmd.push("--emit=llvm-ir"),
+            LlvmIr   => cmd.push("--emit=llvm-ir"),
+            Mir      => cmd.push("--emit=mir"),
          }
     }
 
@@ -278,6 +279,7 @@ fn read(path: &Path) -> Result<Option<String>> {
 pub enum CompileTarget {
     Assembly,
     LlvmIr,
+    Mir,
 }
 
 impl CompileTarget {
@@ -285,6 +287,7 @@ impl CompileTarget {
         let ext = match *self {
             CompileTarget::Assembly => "s",
             CompileTarget::LlvmIr   => "ll",
+            CompileTarget::Mir      => "mir",
         };
         OsStr::new(ext)
     }

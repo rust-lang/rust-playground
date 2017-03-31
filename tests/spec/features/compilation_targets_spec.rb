@@ -1,7 +1,10 @@
 require 'spec_helper'
 require 'support/editor'
+require 'support/playground_actions'
 
 RSpec.feature "Compiling to different formats", type: :feature, js: true do
+  include PlaygroundActions
+
   before do
     visit '/'
     editor.set(code)
@@ -25,6 +28,18 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
       expect(page).to have_content 'ModuleID'
       expect(page).to have_content 'target datalayout'
       expect(page).to have_content 'target triple'
+    end
+  end
+
+  scenario "compiling to MIR" do
+    within('.header') do
+      choose_styled("Nightly")
+      click_on("MIR")
+    end
+
+    within('.output-code') do
+      expect(page).to have_content 'StorageLive'
+      expect(page).to have_content 'StorageDead'
     end
   end
 
