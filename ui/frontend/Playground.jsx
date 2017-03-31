@@ -6,6 +6,11 @@ import Header from './Header';
 import Editor from './Editor';
 import Output from './Output';
 
+import {
+  invertHemisphere,
+  toggleConfiguration,
+} from './actions';
+
 function ConfigurationModal() {
   return (
     <div className="modal-backdrop">
@@ -18,21 +23,51 @@ function ConfigurationModal() {
 
 class Playground extends React.Component {
   render() {
-    const { showConfig, focus } = this.props;
+    const { hemisphere, hemisphereEnabled, showConfig, focus, toggleConfiguration, invertHemisphere } = this.props;
 
     const config = showConfig ? <ConfigurationModal /> : null;
     const outputFocused = focus ? 'playground-output-focused' : '';
 
+    const SaveMeNorthern = () => (
+      <span>
+        We have added a feature to help Rust programmers gain an intuition
+        about compiler errors. Unfortunately, there are some
+        issues with our implementation and we may have incorrectly guessed your
+        location. If the compiler output appears upside-down, please
+        { ' ' }
+        <a href="#" onClick={invertHemisphere}>adjust your location</a>.
+      </span>
+    );
+
+    const SaveMeSouthern = () => (
+      <span>
+        If you are tired of these shenanigans, please
+        { ' ' }
+        <a href="#" onClick={toggleConfiguration}>adjust your location</a>
+        { ' ' }
+        appropriately.
+      </span>
+    );
+
+    const SaveMe = hemisphere === 'northern' ? SaveMeNorthern : SaveMeSouthern;
+
+    const notice = focus && hemisphereEnabled ? (
+      <div className="playground-hemisphere-notice">
+ <SaveMe />
+      </div>
+    ) : null;
+
     return (
       <div>
         { config }
-        <div className="playground">
+        <div className={`playground ${hemisphereEnabled ? `playground--${hemisphere}` : ''}`}>
           <div className="playground-header">
             <Header />
           </div>
           <div className="playground-editor">
             <Editor />
           </div>
+          { notice }
           <div className={`playground-output ${outputFocused}`}>
             <Output />
           </div>
@@ -57,16 +92,25 @@ class Playground extends React.Component {
 }
 
 Playground.propTypes = {
+  hemisphere: PropTypes.string.isRequired,
+  hemisphereEnabled: PropTypes.bool.isRequired,
   focus: PropTypes.string,
   showConfig: PropTypes.bool.isRequired,
+  toggleConfiguration: PropTypes.func.isRequired,
+  invertHemisphere: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = ({ configuration: { shown: showConfig }, output: { meta: { focus } } }) => (
-  { showConfig, focus }
+const mapStateToProps = ({ configuration: { shown: showConfig, hemisphere, hemisphereEnabled }, output: { meta: { focus } } }) => (
+  { hemisphere, hemisphereEnabled, showConfig, focus }
 );
 
+const mapDispatchToProps = dispatch => ({
+  invertHemisphere: () => dispatch(invertHemisphere()),
+  toggleConfiguration: () => dispatch(toggleConfiguration()),
+});
+
 const ConnectedPlayground = connect(
-  mapStateToProps
+  mapStateToProps, mapDispatchToProps
 )(Playground);
 
 export default ConnectedPlayground;

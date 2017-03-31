@@ -11,6 +11,8 @@ export const defaultConfiguration = {
   mode: "debug",
   crateType: "bin",
   tests: false,
+  hemisphere: 'northern',
+  hemisphereEnabled: false,
 };
 
 const hasTests = code => code.includes('#[test]');
@@ -24,6 +26,13 @@ const configuration = (state = defaultConfiguration, action) => {
   switch (action.type) {
   case actions.TOGGLE_CONFIGURATION:
     return { ...state, shown: !state.shown };
+  case actions.CHANGE_HEMISPHERE:
+    return { ...state, hemisphere: action.hemisphere };
+  case 'TICK': {
+    const { date } = action;
+    const hemisphereEnabled = date.getDate() === 30 && date.getMonth() === 2;
+    return { ...state, hemisphereEnabled };
+  }
   case actions.CHANGE_EDITOR:
     return { ...state, editor: action.editor };
   case actions.CHANGE_KEYBINDING:

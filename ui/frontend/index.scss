@@ -52,6 +52,11 @@ body {
             position: relative;
         }
     }
+
+    transition: transform 2s;
+    &--southern {
+        transform: rotate(180deg);
+    }
 }
 
 .configuration {
@@ -284,6 +289,10 @@ body {
 
     code {
         @include body-monospace;
+    }
+
+    &--northern, &--southern {
+        transform: rotate(180deg);
     }
 }
 
