@@ -101,8 +101,9 @@ fn execute(req: &mut Request) -> IronResult<Response> {
 
 fn format(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: FormatRequest| {
+        let req = try!(req.try_into());
         sandbox
-            .format(&req.into())
+            .format(&req)
             .map(FormatResponse::from)
             .map_err(Error::Sandbox)
     })
@@ -233,6 +234,7 @@ struct ExecuteResponse {
 #[derive(Debug, Clone, Deserialize)]
 struct FormatRequest {
     code: String,
+    style: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -305,11 +307,14 @@ impl From<sandbox::ExecuteResponse> for ExecuteResponse {
     }
 }
 
-impl From<FormatRequest> for sandbox::FormatRequest {
-    fn from(me: FormatRequest) -> Self {
-        sandbox::FormatRequest {
+impl TryFrom<FormatRequest> for sandbox::FormatRequest {
+    type Error = Error;
+
+    fn try_from(me: FormatRequest) -> Result<Self> {
+        Ok(sandbox::FormatRequest {
             code: me.code,
-        }
+            style: try!(parse_style(&me.style)),
+        })
     }
 }
 
@@ -371,5 +376,12 @@ fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
     Ok(match s {
         "bin" => sandbox::CrateType::Binary,
         _ => sandbox::CrateType::Library,
+    })
+}
+
+fn parse_style(s: &str) -> Result<sandbox::FormatStyle> {
+    Ok(match s {
+        "rfc" => sandbox::FormatStyle::Rfc,
+        _ => sandbox::FormatStyle::Default,
     })
 }
