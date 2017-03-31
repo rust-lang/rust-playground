@@ -19,9 +19,9 @@ import {
 function oneRadio(name, currentValue, possibleValue, change, labelText) {
   const id = `${name}-${possibleValue}`;
   return [
-    <input className="header-radio" type="radio" name={name} id={id} key={`${id}-input`}
+    <input className="header-set__radio" type="radio" name={name} id={id} key={`${id}-input`}
            checked={ currentValue === possibleValue } onChange={ () => change(possibleValue) } />,
-    <label className="header-radio-label" htmlFor={id} key={`${id}-label`}>{labelText}</label>,
+    <label className="header-set__radio-label" htmlFor={id} key={`${id}-label`}>{labelText}</label>,
   ];
 }
 
@@ -51,47 +51,61 @@ class Header extends PureComponent {
     return (
       <div className="header">
         <div className="header-compilation header-set">
-          <button className="header-btn header-btn-primary"
+          <button className="header-set__btn header-set__btn--primary"
                   onClick={ execute }>{ primaryLabel }</button>
-          <button className="header-btn"
-                  onClick={ compileToAssembly }>ASM</button>
-          <button className="header-btn"
-                  onClick={ compileToLLVM }>LLVM IR</button>
+          <div className="header-set__buttons header-set__buttons--primary">
+            <button className="header-set__btn"
+                    onClick={ compileToAssembly }>ASM</button>
+            <button className="header-set__btn"
+                    onClick={ compileToLLVM }>LLVM IR</button>
+          </div>
         </div>
 
         <div className="header-tools header-set">
-          <legend className="header-title">Tools</legend>
-          <button className="header-btn"
-                  onClick={ format }>Format</button>
-          <button className="header-btn"
-                  onClick={ clippy }>Clippy</button>
+          <legend className="header-set__title">Tools</legend>
+          <div className="header-set__buttons">
+            <button className="header-set__btn"
+                    onClick={ format }>Format</button>
+            <button className="header-set__btn"
+                    onClick={ clippy }>Clippy</button>
+          </div>
         </div>
 
         <div className="header-sharing header-set">
-          <button className="header-btn"
-                  onClick={ gistSave }>Gist</button>
+          <div className="header-set__buttons">
+            <button className="header-set__btn"
+                    onClick={ gistSave }>Gist</button>
+          </div>
         </div>
 
         <div className="header-mode header-set">
-          <legend className="header-title">Mode</legend>
-          { oneMode("debug", "Debug") }
-          { oneMode("release", "Release") }
+          <legend className="header-set__title">Mode</legend>
+          <div className="header-set__buttons header-set__buttons--radio">
+            { oneMode("debug", "Debug") }
+            { oneMode("release", "Release") }
+          </div>
         </div>
 
         <div className="header-channel header-set">
-          <legend className="header-title">Channel</legend>
-          { oneChannel("stable", "Stable") }
-          { oneChannel("beta", "Beta") }
-          { oneChannel("nightly", "Nightly") }
+          <legend className="header-set__title">Channel</legend>
+          <div className="header-set__buttons header-set__buttons--radio">
+            { oneChannel("stable", "Stable") }
+            { oneChannel("beta", "Beta") }
+            { oneChannel("nightly", "Nightly") }
+          </div>
         </div>
 
         <div className="header-set">
-          <button className="header-btn"
-                  onClick={toggleConfiguration}>Config</button>
+          <div className="header-set__buttons">
+            <button className="header-set__btn"
+                    onClick={toggleConfiguration}>Config</button>
+          </div>
         </div>
 
         <div className="header-set">
-          <Link className="header-btn" action={navigateToHelp}>?</Link>
+          <div className="header-set__buttons">
+            <Link className="header-set__btn" action={navigateToHelp}>?</Link>
+          </div>
         </div>
       </div>
     );
