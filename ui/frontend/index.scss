@@ -295,6 +295,52 @@ body {
     }
 }
 
+.drop {
+    &__toggle {
+        font-size: 50%;
+        height: 100%;
+    }
+
+    &__menu {
+        display: none;
+
+        position: absolute;
+        top: 90%;
+        left: 0;
+        z-index: 1;
+
+        margin: 0;
+        padding: 0;
+
+        border: $border;
+        box-shadow: 0.5px 0.5px 10px 1px rgba(0, 0, 0, 0.2);
+
+        &--open {
+            display: inherit;
+        }
+    }
+
+    &__menu-item {
+        list-style: none;
+        white-space: nowrap;
+        border-bottom: $border;
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    &__button {
+        width: 100%;
+        background: white;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        &:hover {
+            background-color: darken(white, 10%);
+        }
+    }
+}
+
 $PHI: 2.61803398875;
 
 .modal {
