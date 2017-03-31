@@ -21,8 +21,17 @@ for channel in stable beta nightly; do
     cd ..
 done
 
+crate_api_base=https://crates.io/api/v1/crates
+
 for tool in rustfmt clippy; do
+    filename="version-${tool}.txt"
+
     cd "${tool}"
-    docker build -t "${tool}" .
+
+    curl -o "${filename}" "${crate_api_base}/${tool}"
+    version=$(jq -r '.crate.max_version' "${filename}")
+
+    docker build -t "${tool}" --build-arg version="${version}" .
+
     cd ..
 done

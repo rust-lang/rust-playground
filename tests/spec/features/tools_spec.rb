@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'spec_helper'
 require 'support/editor'
 
@@ -10,6 +12,19 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
 
     within('#editor') do
       expect(editor).to have_line '[1, 2, 3, 4];'
+    end
+  end
+
+  scenario "formatting code with the RFC format" do
+    editor.set 'fn x<T>() where T: Copy, B: Copy {println!("Hello");}'
+    within('.header') do
+      click_on("▼")
+      click_on("Proposed RFC")
+    end
+
+    within('#editor') do
+      expect(editor).to have_line 'where'
+      expect(editor).to have_line 'T: Copy,'
     end
   end
 

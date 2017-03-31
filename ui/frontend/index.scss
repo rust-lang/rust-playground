@@ -84,26 +84,6 @@ body {
     }
 }
 
-@mixin pillboxes($radius) {
-    display: block;
-    padding: 0.5em;
-    white-space: nowrap;
-
-    &:not(:first-of-type) {
-        border-left: none;
-    }
-
-    &:first-of-type {
-        border-top-left-radius: $radius;
-        border-bottom-left-radius: $radius;
-    }
-
-    &:last-of-type {
-        border-top-right-radius: $radius;
-        border-bottom-right-radius: $radius;
-    }
-}
-
 @mixin body-monospace {
     font-size: 0.9em;
     // http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/
@@ -112,43 +92,68 @@ body {
 }
 
 .header {
+    display: flex;
+    align-items: center;
+    padding: 1.25em 0;
+}
+
+.header-set {
     $radius: 5px;
 
     display: flex;
     align-items: center;
-    padding: 1.25em 0;
+    position: relative;
 
-    &-set {
+    margin-left: 1em;
+    &:first-of-type {
+        margin-left: 0;
+    }
+
+    &__buttons {
         display: flex;
-        align-items: center;
-        position: relative;
 
-        margin-left: 1em;
-        &:first-of-type {
-            margin-left: 0;
+        border-radius: $radius;
+        overflow: hidden;
+        background: white;
+        border: $border;
+
+        &--primary {
+            border-left: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        &--radio {
+            background-color: $unselected-radio;
+            border: 1px solid $rust;
         }
     }
 
-    &-btn {
-        @include pillboxes($radius);
-        background-color: white;
-        border: $border;
+    &__btn {
+        padding: 0.5em;
+        border: none;
+        border-left: $border;
+        background: none;
+
         cursor: pointer;
         text-decoration: none;
         color: #000;
+
+        &:nth-child(1) {
+            border-left: 0;
+        }
 
         &:hover {
             background-color: darken(white, 10%);
         }
 
-        &-primary {
+        &--primary {
             background-color: $rust;
 
             color: white;
             font-size: 1.5rem;
 
-            border-top-right-radius: $radius;
-            border-bottom-right-radius: $radius;
+            border-radius: $radius;
             border: none;
 
             &:after {
@@ -161,27 +166,17 @@ body {
         }
     }
 
-    &-title {
-        position: absolute;
-        width: 90%;
-        left: 50%;
-        transform: translateX(-50%);
-        bottom: 100%;
-
-        text-align: center;
-        background-color: rgba(255, 255, 255, 0.5);
-        border-radius: $radius $radius 0 0;
-        font-size: 0.7rem;
-    }
-
-    &-radio {
+    &__radio {
         display: none;
 
         &-label {
-            @include pillboxes($radius);
-            background-color: $unselected-radio;
-            border: 1px solid $rust;
+            padding: 0.5em;
             cursor: pointer;
+            border-right: 1px solid $rust;
+
+            &:last-child {
+                border-right: 0;
+            }
 
             &:hover {
                 background-color: desaturate($selected-radio, 10%);
@@ -192,6 +187,19 @@ body {
                 cursor: default;
             }
         }
+    }
+
+    &__title {
+        position: absolute;
+        width: 90%;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 100%;
+
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: $radius $radius 0 0;
+        font-size: 0.7rem;
     }
 }
 
@@ -293,6 +301,52 @@ body {
 
     &--northern, &--southern {
         transform: rotate(180deg);
+    }
+}
+
+.drop {
+    &__toggle {
+        font-size: 50%;
+        height: 100%;
+    }
+
+    &__menu {
+        display: none;
+
+        position: absolute;
+        top: 90%;
+        left: 0;
+        z-index: 1;
+
+        margin: 0;
+        padding: 0;
+
+        border: $border;
+        box-shadow: 0.5px 0.5px 10px 1px rgba(0, 0, 0, 0.2);
+
+        &--open {
+            display: inherit;
+        }
+    }
+
+    &__menu-item {
+        list-style: none;
+        white-space: nowrap;
+        border-bottom: $border;
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    &__button {
+        width: 100%;
+        background: white;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        &:hover {
+            background-color: darken(white, 10%);
+        }
     }
 }
 
