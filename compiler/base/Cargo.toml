@@ -1,7 +1,7 @@
 [package]
+authors = ["The Rust Playground"]
 name = "playground"
 version = "0.0.1"
-authors = ["The Rust Playground"]
 
 [dependencies]
 advapi32-sys = "0.2.0"
@@ -20,6 +20,7 @@ dtoa = "0.4.1"
 either = "1.1.0"
 env_logger = "0.4.2"
 flate2 = "0.2.17"
+futures = "0.1.13"
 gcc = "0.3.45"
 gdi32-sys = "0.2.0"
 getopts = "0.2.14"
