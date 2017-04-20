@@ -5,7 +5,6 @@ import PureComponent from './PureComponent';
 import { connect } from 'react-redux';
 
 import {
-  changeHemisphere,
   changeEditor,
   changeKeybinding,
   changeTheme,
@@ -41,7 +40,6 @@ ConfigurationSelect.propTypes = {
 const ESCAPE_KEYCODE = 27;
 
 class Configuration extends PureComponent {
-  onChangeHemisphere = e => this.props.changeHemisphere(e.target.value);
   onChangeEditor = e => this.props.changeEditor(e.target.value);
   onChangeKeybinding = e => this.props.changeKeybinding(e.target.value);
   onChangeTheme = e => this.props.changeTheme(e.target.value);
@@ -61,7 +59,7 @@ class Configuration extends PureComponent {
   }
 
   render() {
-    const { hemisphere, hemisphereEnabled, editor, keybinding, theme, toggleConfiguration } = this.props;
+    const { editor, keybinding, theme, toggleConfiguration } = this.props;
 
     const advancedEditor = editor === 'advanced';
 
@@ -97,17 +95,6 @@ class Configuration extends PureComponent {
 
         {themeSelect}
 
-        { hemisphereEnabled ?
-        <ConfigurationSelect what="hemisphere"
-                             label="Hemisphere"
-                             defaultValue={hemisphere}
-                             onChange={this.onChangeHemisphere}>
-          <option value="northern">Northern</option>
-          <option value="southern">Southern</option>
-          <option value="no-fun">The No-Fun Zone</option>
-        </ConfigurationSelect>
-        : null }
-
         <div className="configuration-actions">
           <button onClick={toggleConfiguration}>Done</button>
         </div>
@@ -118,23 +105,19 @@ class Configuration extends PureComponent {
 
 Configuration.propTypes = {
   changeEditor: PropTypes.func.isRequired,
-  changeHemisphere: PropTypes.func.isRequired,
   changeKeybinding: PropTypes.func.isRequired,
   changeTheme: PropTypes.func.isRequired,
-  hemisphere: PropTypes.string.isRequired,
-  hemisphereEnabled: PropTypes.bool.isRequired,
   editor: PropTypes.string.isRequired,
   keybinding: PropTypes.string.isRequired,
   theme: PropTypes.string.isRequired,
   toggleConfiguration: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = ({ configuration: { hemisphere, hemisphereEnabled, editor, keybinding, theme } }) => (
-  { hemisphere, hemisphereEnabled, editor, keybinding, theme }
+const mapStateToProps = ({ configuration: { editor, keybinding, theme } }) => (
+  { editor, keybinding, theme }
 );
 
 const mapDispatchToProps = dispatch => ({
-  changeHemisphere: hemisphere => dispatch(changeHemisphere(hemisphere)),
   changeEditor: editor => dispatch(changeEditor(editor)),
   changeKeybinding: keybinding => dispatch(changeKeybinding(keybinding)),
   changeTheme: theme => dispatch(changeTheme(theme)),
