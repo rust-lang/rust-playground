@@ -217,6 +217,8 @@ impl Sandbox {
             .arg("--rm")
             .arg("--volume").arg(&mount_input_file)
             .arg("--volume").arg(&mount_output_dir)
+            .arg("--cap-drop=ALL")
+            .arg("--security-opt=no-new-privileges")
             .args(&["--workdir", "/playground"])
             .args(&["--net", "none"])
             .args(&["--memory", "256m"])
