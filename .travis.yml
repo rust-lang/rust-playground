@@ -1,41 +1,59 @@
-language: c
+language: minimal
 sudo: required
 services:
   - docker
+
+env:
+  global:
+    - REPOSITORY="${DOCKER_USERNAME}"
+    - TOOLS_TO_BUILD=""
+    - CHANNELS_TO_BUILD=""
+
 before_install:
- - docker pull mackeyja92/rustup
- - docker pull node:7.7
- - >
-   mkdir -p
-   $HOME/cache/rust/cargo/{git,registry}
-   $HOME/cache/rust/target
-   $HOME/cache/node/node_modules
-   $HOME/cache/node/yarn-cache
-script:
-  - >
-    docker run -it --rm
-    -v $PWD/ui:/ui
-    -v $HOME/cache/rust/cargo/git:/root/.cargo/git
-    -v $HOME/cache/rust/cargo/registry:/root/.cargo/registry
-    -v $HOME/cache/rust/target:/ui/target
-    --workdir /ui
-    mackeyja92/rustup
-    bash -c 'rustup install nightly && \
-             rustup default nightly && \
-             rustup target add x86_64-unknown-linux-musl && \
-             cargo build --target=x86_64-unknown-linux-musl --release'
-  - >
-    docker run -it --rm
-    -v $PWD/ui/frontend:/ui
-    -v $HOME/cache/node/node_modules:/ui/node_modules
-    -v $HOME/cache/node/yarn-cache:/root/.yarn-cache
-    --workdir /ui
-    node:7.7
-    bash -c 'yarn && \
-             yarn test:lint && \
-             NODE_ENV=production yarn run build'
-  # Ignore the permissions set from running inside the container
-  - sudo chmod -R a+rw $HOME/cache
-cache:
-  directories:
-    - $HOME/cache
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-engine
+
+jobs:
+  include:
+    - stage: build compiler containers
+      env:
+        - CHANNELS_TO_BUILD="stable"
+      script: ./.travis/build-containers.sh
+    - env:
+        - CHANNELS_TO_BUILD="beta"
+      script: ./.travis/build-containers.sh
+    - env:
+        - CHANNELS_TO_BUILD="nightly"
+      script: ./.travis/build-containers.sh
+
+    - stage: build tools
+      env:
+        - TOOLS_TO_BUILD="rustfmt"
+      script: ./.travis/build-containers.sh
+    - env:
+        - TOOLS_TO_BUILD="clippy"
+      script: ./.travis/build-containers.sh
+
+    - stage: compile code
+      env:
+        - BUILDING="backend"
+      before_install: &prep_cache
+       - >
+         mkdir -p
+         $HOME/cache/rust/cargo/{git,registry}
+         $HOME/cache/rust/target
+         $HOME/cache/node/node_modules
+         $HOME/cache/node/yarn-cache
+      script: ./.travis/compile-backend.sh
+      before_cache: &clean_cache
+        # Ignore the permissions set from running inside the container
+        - sudo chmod -R a+rw $HOME/cache
+      cache: &cache_build
+        directories:
+          - $HOME/cache
+    - env:
+      - BUILDING="frontend"
+      before_install: *prep_cache
+      script: ./.travis/compile-frontend.sh
+      before_cache: *clean_cache
+      cache: *cache_build
