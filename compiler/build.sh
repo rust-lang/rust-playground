@@ -1,37 +1,62 @@
 #!/bin/bash
 
-set -eu -o pipefail
+set -euv -o pipefail
 
-cd base
-docker build -t 'rust-base' .
-cd ..
+channels_to_build="${CHANNELS_TO_BUILD-stable beta nightly}"
+tools_to_build="${TOOLS_TO_BUILD-rustfmt clippy}"
+perform_push="${PERFORM_PUSH-false}"
+
+repository=shepmaster
 
 date_url_base=https://static.rust-lang.org/dist
 
-for channel in stable beta nightly; do
+for channel in $channels_to_build; do
+    cd "base"
+
     filename="channel-rust-${channel}-date.txt"
-
-    cd "$channel"
-
     curl -o "${filename}" "${date_url_base}/${filename}"
     date=$(cat "${filename}")
 
-    docker build -t "rust-${channel}" --build-arg date="${date}" .
+    image_name="rust-${channel}"
+    full_name="${repository}/${image_name}"
+
+    docker pull "${full_name}"
+    docker build -t "${full_name}" \
+           --cache-from "${full_name}" \
+           --build-arg channel="${channel}" \
+           --build-arg date="${date}" \
+           .
+    docker tag "${full_name}" "${image_name}"
+
+    if [[ "${perform_push}" == 'true' ]]; then
+        docker push "${full_name}"
+    fi
 
     cd ..
 done
 
 crate_api_base=https://crates.io/api/v1/crates
 
-for tool in rustfmt clippy; do
-    filename="version-${tool}.txt"
-
+for tool in $tools_to_build; do
     cd "${tool}"
 
+    filename="version-${tool}.txt"
     curl -o "${filename}" "${crate_api_base}/${tool}"
     version=$(jq -r '.crate.max_version' "${filename}")
 
-    docker build -t "${tool}" --build-arg version="${version}" .
+    image_name="${tool}"
+    full_name="${repository}/${image_name}"
+
+    docker pull "${full_name}"
+    docker build -t "${full_name}" \
+           --cache-from "${full_name}" \
+           --build-arg version="${version}" \
+           .
+    docker tag "${full_name}" "${image_name}"
+
+    if [[ "${perform_push}" == 'true' ]]; then
+        docker push "${full_name}"
+    fi
 
     cd ..
 done

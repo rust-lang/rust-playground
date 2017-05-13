@@ -1,4 +1,4 @@
-FROM rust-stable
+FROM shepmaster/rust-stable
 
 ARG version
 

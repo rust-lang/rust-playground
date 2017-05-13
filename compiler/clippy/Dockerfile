@@ -1,4 +1,4 @@
-FROM rust-nightly
+FROM shepmaster/rust-nightly
 
 ARG version
 
