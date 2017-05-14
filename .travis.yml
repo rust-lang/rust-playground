@@ -36,9 +36,7 @@ jobs:
       script: ./.travis/build-containers.sh
     - env:
         - TOOLS_TO_BUILD="clippy"
-      script: ./.travis/build-containers.sh
-      allow_failures:
-        - TOOLS_TO_BUILD="clippy"
+      script: ./.travis/build-containers.sh || true
 
     - stage: compile code
       env:
