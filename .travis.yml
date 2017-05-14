@@ -3,6 +3,10 @@ sudo: required
 services:
   - docker
 
+branches:
+  only:
+    - master
+
 env:
   global:
     - REPOSITORY="${DOCKER_USERNAME}"
