@@ -12,6 +12,7 @@ env:
     - REPOSITORY="${DOCKER_USERNAME}"
     - TOOLS_TO_BUILD=""
     - CHANNELS_TO_BUILD=""
+    - PATH=$HOME/.local/bin:$PATH # awscli
 
 before_install:
   - sudo apt-get update
@@ -48,10 +49,13 @@ jobs:
          $HOME/cache/rust/target
          $HOME/cache/node/node_modules
          $HOME/cache/node/yarn-cache
+       - pip install --user awscli
       script: ./.travis/compile-backend.sh
       before_cache: &clean_cache
         # Ignore the permissions set from running inside the container
         - sudo chmod -R a+rw $HOME/cache
+      after_success:
+        - ./.travis/upload-compiled-artifacts.sh
       cache: &cache_build
         directories:
           - $HOME/cache
@@ -60,4 +64,6 @@ jobs:
       before_install: *prep_cache
       script: ./.travis/compile-frontend.sh
       before_cache: *clean_cache
+      after_success:
+        - ./.travis/upload-compiled-artifacts.sh
       cache: *cache_build
