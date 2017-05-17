@@ -20,10 +20,6 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const enhancers = composeEnhancers(middlewares, persistState(undefined, { serialize, deserialize }));
 const store = createStore(playgroundApp, enhancers);
 
-const tick = () => store.dispatch({ type: 'TICK', date: new Date() });
-tick();
-window.setInterval(tick, 30 * 1000);
-
 configureRustErrors((line, col) => store.dispatch(gotoPosition(line, col)));
 
 ReactDOM.render(
