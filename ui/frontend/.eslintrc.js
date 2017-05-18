@@ -31,5 +31,6 @@ module.exports = {
       }
     ],
     "object-curly-spacing": ["error", "always"],
+    "react/no-unescaped-entities": "off",
   },
 };
