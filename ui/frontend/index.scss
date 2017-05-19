@@ -39,7 +39,7 @@ body {
     padding-bottom: 1em;
 
     &-editor {
-        flex: 1 1 0%;
+        flex: 1 1 auto;
         position: relative;
 
         border: 4px solid $border-color;
@@ -48,7 +48,7 @@ body {
 
     &-output {
         &-focused {
-            flex: 1 1 0%;
+            flex: 1 1 auto;
             position: relative;
         }
     }
@@ -235,7 +235,7 @@ body {
     }
 
     &-tab {
-        flex: 1 1 0%;
+        flex: 1 1 auto;
 
         line-height: 1.5em;
         background-color: $background-tab;
@@ -283,7 +283,7 @@ body {
         &:before, &:after {
             border-top: $border;
             content: '';
-            flex: 1 1 0%;
+            flex: 1 1 auto;
             margin: auto;
         }
         &:before { margin-right: 2%; }
