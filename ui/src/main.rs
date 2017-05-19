@@ -27,7 +27,8 @@ use iron::prelude::*;
 use iron::status;
 
 use mount::Mount;
-use serde::{Serialize, Deserialize};
+use serde::Serialize;
+use serde::de::DeserializeOwned;
 use playground_middleware::{
     Staticfile, Cache, Prefix, ModifyWith, GuessContentType, FileLogger, StatisticLogger, Rewrite
 };
@@ -120,7 +121,7 @@ fn clippy(req: &mut Request) -> IronResult<Response> {
 
 fn with_sandbox<Req, Resp, F>(req: &mut Request, f: F) -> IronResult<Response>
     where F: FnOnce(Sandbox, Req) -> Result<Resp>,
-          Req: Deserialize + Clone + Any + 'static,
+          Req: DeserializeOwned + Clone + Any + 'static,
           Resp: Serialize,
 {
     let response = req.get::<bodyparser::Struct<Req>>()

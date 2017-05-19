@@ -218,6 +218,7 @@ impl Sandbox {
             .arg("--volume").arg(&mount_input_file)
             .arg("--volume").arg(&mount_output_dir)
             .arg("--cap-drop=ALL")
+            .arg("--cap-add=DAC_OVERRIDE")
             .arg("--security-opt=no-new-privileges")
             .args(&["--workdir", "/playground"])
             .args(&["--net", "none"])

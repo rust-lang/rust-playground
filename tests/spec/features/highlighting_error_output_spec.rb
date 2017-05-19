@@ -10,7 +10,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
 
   scenario "errors are highlighted" do
     within('.output-stderr') do
-      expect(page).to have_css '.error', text: 'unresolved name `println`'
+      expect(page).to have_css '.error', text: 'too many type parameters provided'
       expect(page).to have_css '.error', text: 'aborting due to previous error'
       expect(page).to have_css '.error', text: 'Could not compile `playground`'
     end
@@ -24,7 +24,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
 
   scenario "error codes link to the error page" do
     within('.output-stderr') do
-      expect(page).to have_link('E0425', href: /error-index.html#E0425/)
+      expect(page).to have_link('E0087', href: /error-index.html#E0087/)
     end
   end
 
@@ -35,7 +35,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
   def code
     <<~EOF
     fn main() {
-        println("Hello, world!");
+        drop::<u8, u8>(1);
     }
     EOF
   end
