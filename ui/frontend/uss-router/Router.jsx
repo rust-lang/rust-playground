@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 class Router extends React.Component {
   getChildContext() {
@@ -13,7 +14,7 @@ class Router extends React.Component {
 }
 
 Router.childContextTypes = {
-  router: React.PropTypes.any,
+  router: PropTypes.any,
 };
 
 Router.propTypes = {

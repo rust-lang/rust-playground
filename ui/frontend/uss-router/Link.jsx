@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 // We are passed `dispatch` anyway, so we can make use of it
@@ -23,7 +24,7 @@ const Link = ({ dispatch, action, onClick, children, ...rest }, { router }) => {
 };
 
 Link.contextTypes = {
-  router: React.PropTypes.any,
+  router: PropTypes.any,
 };
 
 Link.propTypes = {
