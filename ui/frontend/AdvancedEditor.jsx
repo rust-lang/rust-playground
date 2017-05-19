@@ -1,5 +1,3 @@
-/* global ace:false */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import PureComponent from './PureComponent';
@@ -9,7 +7,7 @@ class AdvancedEditor extends PureComponent {
   trackEditor = component => this._editor = component;
 
   render() {
-    const { AceEditor, keybinding, theme, code, onEditCode } = this.props;
+    const { ace, AceEditor, keybinding, theme, code, onEditCode } = this.props;
 
     if (keybinding === 'vim') {
       const { CodeMirror: { Vim } } = ace.acequire('ace/keyboard/vim');
@@ -67,6 +65,7 @@ class AdvancedEditor extends PureComponent {
 }
 
 AdvancedEditor.propTypes = {
+  ace: PropTypes.any.isRequired,
   AceEditor: PropTypes.func.isRequired,
   code: PropTypes.string.isRequired,
   execute: PropTypes.func.isRequired,
@@ -98,9 +97,12 @@ class AdvancedEditorAsync extends React.Component {
     super(props);
     this.state = { modeLoading: true };
 
-    import('react-ace')
-      .then(AceEditor => {
-        this.setState({ AceEditor: AceEditor.default });
+    const loadAceEditor = import('react-ace');
+    const loadAce = import('brace');
+
+    Promise.all([loadAceEditor, loadAce])
+      .then(([AceEditor, ace]) => {
+        this.setState({ AceEditor: AceEditor.default, ace });
 
         this.load(props);
         import('brace/mode/rust')
@@ -112,7 +114,8 @@ class AdvancedEditorAsync extends React.Component {
     if (this.isLoading()) {
       return <div>Loading the ACE editor...</div>;
     } else {
-      return <AdvancedEditor {...this.props} AceEditor={this.state.AceEditor}/>;
+      const { ace, AceEditor } = this.state;
+      return <AdvancedEditor {...this.props} AceEditor={AceEditor} ace={ace} />;
     }
   }
 
@@ -136,7 +139,8 @@ class AdvancedEditorAsync extends React.Component {
   loadKeybinding(keybinding) {
     if (keybinding && keybinding !== this.state.keybinding) {
       this.setState({ keybindingLoading: true });
-      import(`brace/keybinding/${keybinding}`)
+      import('brace')
+        .then(() => import(`brace/keybinding/${keybinding}`))
         .then(() => this.setState({ keybinding, keybindingLoading: false }));
     }
   }
@@ -144,7 +148,9 @@ class AdvancedEditorAsync extends React.Component {
   loadTheme(theme) {
     if (theme !== this.state.theme) {
       this.setState({ themeLoading: true });
-      import(`brace/theme/${theme}`)
+
+      import('brace')
+        .then(() => import(`brace/theme/${theme}`))
         .then(() => this.setState({ theme, themeLoading: false }));
     }
   }
