@@ -27,7 +27,7 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
-    "autoprefixer": "^6.3.7",
+    "autoprefixer": "^7.1.1",
     "babel-core": "^6.17.0",
     "babel-eslint": "^7.0.0",
     "babel-loader": "^7.0.0",
