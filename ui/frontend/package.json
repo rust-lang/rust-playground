@@ -51,7 +51,7 @@
     "normalize.css": "^5.0.0",
     "postcss-loader": "^2.0.5",
     "sass-loader": "^6.0.0",
-    "style-loader": "^0.13.1",
+    "style-loader": "^0.17.0",
     "webpack": "^2.2.0"
   },
   "scripts": {
