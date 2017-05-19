@@ -48,7 +48,7 @@
     "json-loader": "^0.5.4",
     "node-sass": "^4.5.0",
     "node-zopfli": "^2.0.0",
-    "normalize.css": "^5.0.0",
+    "normalize.css": "^7.0.0",
     "postcss-loader": "^2.0.5",
     "sass-loader": "^6.0.0",
     "style-loader": "^0.17.0",
