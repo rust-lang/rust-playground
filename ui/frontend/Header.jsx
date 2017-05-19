@@ -50,7 +50,7 @@ class Header extends PureComponent {
 
     const primaryLabel = executionLabel(crateType, tests);
 
-    const mirAvailable = channel === 'nightly';
+    const mirAvailable = channel === 'nightly' || channel === 'beta';
 
     return (
       <div className="header">
