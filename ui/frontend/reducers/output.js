@@ -194,8 +194,8 @@ const gist = (state = defaultGist, action) => {
 
   case actions.GIST_LOAD_SUCCEEDED:
   case actions.GIST_SAVE_SUCCEEDED: {
-    const { id, url } = action;
-    return finish(state, { id, url });
+    const { id, url, channel } = action;
+    return finish(state, { id, url, channel });
   }
 
   case actions.GIST_LOAD_FAILED:
