@@ -14,6 +14,7 @@ extern crate serde_derive;
 extern crate mktemp;
 #[macro_use]
 extern crate quick_error;
+extern crate corsware;
 
 use std::any::Any;
 use std::convert::{TryFrom, TryInto};
@@ -25,6 +26,8 @@ use iron::headers::ContentType;
 use iron::modifiers::Header;
 use iron::prelude::*;
 use iron::status;
+use iron::method::Method::{Get, Post};
+use corsware::{CorsMiddleware, AllowedOrigins, UniCase};
 
 use mount::Mount;
 use serde::Serialize;
@@ -41,6 +44,7 @@ const DEFAULT_LOG_FILE: &'static str = "access-log.csv";
 
 mod sandbox;
 
+const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
 const ONE_DAY_IN_SECONDS: u64 = 60 * 60 * 24;
 const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
 
@@ -51,6 +55,7 @@ fn main() {
     let address = env::var("PLAYGROUND_UI_ADDRESS").unwrap_or(DEFAULT_ADDRESS.to_string());
     let port = env::var("PLAYGROUND_UI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(DEFAULT_PORT);
     let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or(DEFAULT_LOG_FILE.to_string());
+    let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
 
     let files = Staticfile::new(&root).expect("Unable to open root directory");
     let mut files = Chain::new(files);
@@ -75,6 +80,18 @@ fn main() {
 
     chain.link_around(logger);
     chain.link_before(rewrite);
+
+    if cors_enabled {
+        chain.link_around(CorsMiddleware {
+            allowed_origins: AllowedOrigins::Any { allow_null: false },
+            allowed_headers: vec![UniCase("Content-Type".to_owned())],
+            allowed_methods: vec![Get, Post],
+            exposed_headers: vec![],
+            allow_credentials: false,
+            max_age_seconds: ONE_HOUR_IN_SECONDS,
+            prefer_wildcard: true,
+        });
+    }
 
     info!("Starting the server on {}:{}", address, port);
     Iron::new(chain).http((&*address, port)).expect("Unable to start server");
