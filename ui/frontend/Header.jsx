@@ -50,8 +50,6 @@ class Header extends PureComponent {
 
     const primaryLabel = executionLabel(crateType, tests);
 
-    const mirAvailable = channel === 'nightly' || channel === 'beta';
-
     return (
       <div className="header">
         <div className="header-compilation header-set">
@@ -62,10 +60,8 @@ class Header extends PureComponent {
                     onClick={ compileToAssembly }>ASM</button>
             <button className="header-set__btn"
                     onClick={ compileToLLVM }>LLVM IR</button>
-            { mirAvailable ?
-              <button className="header-set__btn"
-                        onClick={ compileToMir }>MIR</button>
-              : null }
+            <button className="header-set__btn"
+                    onClick={ compileToMir }>MIR</button>
           </div>
         </div>
 

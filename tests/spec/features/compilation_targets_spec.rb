@@ -32,10 +32,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   end
 
   scenario "compiling to MIR" do
-    within('.header') do
-      choose_styled("Nightly")
-      click_on("MIR")
-    end
+    within('.header') { click_on("MIR") }
 
     within('.output-code') do
       expect(page).to have_content 'StorageLive'
