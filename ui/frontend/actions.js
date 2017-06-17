@@ -220,13 +220,13 @@ function receiveFormatFailure({ error }) {
   return { type: FORMAT_FAILED, error };
 }
 
-export function performFormat(style) {
+export function performFormat() {
   // TODO: Check a cache
   return function (dispatch, getState) {
     dispatch(requestFormat());
 
     const { code } = getState();
-    const body = { code, style };
+    const body = { code };
 
     return jsonPost(routes.format, body)
       .then(json => dispatch(receiveFormatSuccess(json)))

@@ -69,11 +69,7 @@ class Header extends PureComponent {
           <legend className="header-set__title">Tools</legend>
           <div className="header-set__buttons">
             <button className="header-set__btn"
-                    onClick={() => format('default') }>Format</button>
-            <Dropdown>
-              <DropdownButton onClick={() => format('default')}>Default</DropdownButton>
-              <DropdownButton onClick={() => format('rfc')}>Proposed RFC</DropdownButton>
-            </Dropdown>
+                    onClick={ format }>Format</button>
             <button className="header-set__btn"
                     onClick={ clippy }>Clippy</button>
           </div>
@@ -138,51 +134,6 @@ Header.propTypes = {
   navigateToHelp: PropTypes.func.isRequired,
 };
 
-class Dropdown extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      open: false,
-    };
-    this.toggleOpen = () => {
-      this.setState({ open: !this.state.open });
-    };
-  }
-
-  render() {
-    const { toggleOpen } = this;
-    const { children } = this.props;
-    const { open } = this.state;
-
-    return (
-      <div>
-        <button className="header-set__btn drop" onClick={toggleOpen}>
-          <span className="drop__toggle">▼</span>
-        </button>
-        <ul className={`drop__menu ${open ? 'drop__menu--open' : ''}`}>
-          {React.Children.map(children, c => React.cloneElement(c, { toggleOpen }))}
-        </ul>
-      </div>
-    );
-  }
-}
-
-Dropdown.propTypes = {
-  children: PropTypes.node.isRequired
-};
-
-const DropdownButton = ({ onClick, toggleOpen, children }) => (
-  <li className="drop__menu-item">
-    <button onClick={e => {toggleOpen(); onClick(e);}} className="drop__button">{children}</button>
-  </li>
-);
-
-DropdownButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  toggleOpen: PropTypes.func,
-  children: PropTypes.node.isRequired,
-};
-
 const mapStateToProps = ({ configuration: { channel, mode, crateType, tests } }) => (
   { channel, mode, crateType, tests, navigateToHelp }
 );
@@ -195,7 +146,7 @@ const mapDispatchToProps = dispatch => ({
   compileToLLVM: () => dispatch(performCompileToLLVM()),
   compileToMir: () => dispatch(performCompileToMir()),
   execute: () => dispatch(performExecute()),
-  format: style => dispatch(performFormat(style)),
+  format: () => dispatch(performFormat()),
   gistSave: () => dispatch(performGistSave()),
   toggleConfiguration: () => dispatch(toggleConfiguration()),
 });
