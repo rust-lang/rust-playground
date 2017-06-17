@@ -252,7 +252,6 @@ struct ExecuteResponse {
 #[derive(Debug, Clone, Deserialize)]
 struct FormatRequest {
     code: String,
-    style: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -331,7 +330,6 @@ impl TryFrom<FormatRequest> for sandbox::FormatRequest {
     fn try_from(me: FormatRequest) -> Result<Self> {
         Ok(sandbox::FormatRequest {
             code: me.code,
-            style: try!(parse_style(&me.style)),
         })
     }
 }
@@ -395,12 +393,5 @@ fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
     Ok(match s {
         "bin" => sandbox::CrateType::Binary,
         _ => sandbox::CrateType::Library,
-    })
-}
-
-fn parse_style(s: &str) -> Result<sandbox::FormatStyle> {
-    Ok(match s {
-        "rfc" => sandbox::FormatStyle::Rfc,
-        _ => sandbox::FormatStyle::Default,
     })
 }

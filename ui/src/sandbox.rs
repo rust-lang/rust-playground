@@ -110,7 +110,7 @@ impl Sandbox {
 
     pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
         try!(self.write_source_code(&req.code));
-        let mut command = self.format_command(&req.style);
+        let mut command = self.format_command();
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -172,16 +172,12 @@ impl Sandbox {
         cmd
     }
 
-    fn format_command(&self, style: &FormatStyle) -> Command {
+    fn format_command(&self) -> Command {
         let crate_type = CrateType::Binary;
 
         let mut cmd = self.docker_command(Some(crate_type));
 
         cmd.arg("rustfmt").args(&["cargo", "fmt", "--", "--write-mode", "overwrite"]);
-
-        if *style == FormatStyle::Rfc {
-            cmd.args(&["--config-path", "rfc"]);
-        }
 
         debug!("Formatting command is {:?}", cmd);
 
@@ -338,12 +334,6 @@ impl CrateType {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub enum FormatStyle {
-    Default,
-    Rfc,
-}
-
 #[derive(Debug, Clone)]
 pub struct CompileRequest {
     pub target: CompileTarget,
@@ -381,7 +371,6 @@ pub struct ExecuteResponse {
 #[derive(Debug, Clone)]
 pub struct FormatRequest {
     pub code: String,
-    pub style: FormatStyle,
 }
 
 #[derive(Debug, Clone)]
