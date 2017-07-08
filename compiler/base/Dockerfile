@@ -16,7 +16,6 @@ ENV PATH=/root/.cargo/bin:$PATH
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y  && rustup toolchain uninstall stable
 ADD Cargo.toml /root/Cargo.toml
 ADD entrypoint.sh /root/
-ADD fix-modification-time.sh /root/
 
 # Now that we have set up our basic environment, let's set up the
 # specific channel.
@@ -34,7 +33,6 @@ RUN mv /root/Cargo.toml ./Cargo.toml && \
     cargo build && \
     cargo build --release
 
-RUN find . -name '*.json' -print0 | xargs -0 -n1 /root/fix-modification-time.sh
 RUN rm src/*.rs
 
 ENTRYPOINT ["/root/entrypoint.sh"]
