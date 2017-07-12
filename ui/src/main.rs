@@ -72,6 +72,7 @@ fn main() {
     mount.mount("/execute", execute);
     mount.mount("/format", format);
     mount.mount("/clippy", clippy);
+    mount.mount("/evaluate.json", evaluate);
 
     let mut chain = Chain::new(mount);
     let file_logger = FileLogger::new(logfile).expect("Unable to create file logger");
@@ -132,6 +133,18 @@ fn clippy(req: &mut Request) -> IronResult<Response> {
         sandbox
             .clippy(&req.into())
             .map(ClippyResponse::from)
+            .map_err(Error::Sandbox)
+    })
+}
+
+// This is a backwards compatibilty shim. The Rust homepage and the
+// documentation use this to run code in place.
+fn evaluate(req: &mut Request) -> IronResult<Response> {
+    with_sandbox(req, |sandbox, req: EvaluateRequest| {
+        let req = req.try_into()?;
+        sandbox
+            .execute(&req)
+            .map(EvaluateResponse::from)
             .map_err(Error::Sandbox)
     })
 }
@@ -274,6 +287,19 @@ struct ClippyResponse {
     stderr: String,
 }
 
+#[derive(Debug, Clone, Deserialize)]
+struct EvaluateRequest {
+    version: String,
+    optimize: String,
+    code: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct EvaluateResponse {
+    error: Option<String>,
+    result: Option<String>,
+}
+
 impl TryFrom<CompileRequest> for sandbox::CompileRequest {
     type Error = Error;
 
@@ -359,6 +385,42 @@ impl From<sandbox::ClippyResponse> for ClippyResponse {
             success: me.success,
             stdout: me.stdout,
             stderr: me.stderr,
+        }
+    }
+}
+
+impl TryFrom<EvaluateRequest> for sandbox::ExecuteRequest {
+    type Error = Error;
+
+    fn try_from(me: EvaluateRequest) -> Result<Self> {
+        Ok(sandbox::ExecuteRequest {
+            channel: parse_channel(&me.version)?,
+            mode: if me.optimize != "0" { sandbox::Mode::Release } else { sandbox::Mode::Debug },
+            crate_type: sandbox::CrateType::Binary,
+            tests: false,
+            code: me.code,
+        })
+    }
+}
+
+impl From<sandbox::ExecuteResponse> for EvaluateResponse {
+    fn from(me: sandbox::ExecuteResponse) -> Self {
+        // The old playground didn't use Cargo, so it never had the
+        // Cargo output ("Compiling playground...") which is printed
+        // to stderr. Since this endpoint is used to inline results on
+        // the page, don't include the stderr unless an error
+        // occurred.
+        if me.success {
+            EvaluateResponse {
+                result: Some(me.stdout),
+                error: None,
+            }
+        } else {
+            let result = me.stderr + &me.stdout;
+            EvaluateResponse {
+                result: None,
+                error: Some(result),
+            }
         }
     }
 }
