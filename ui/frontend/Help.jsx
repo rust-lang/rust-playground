@@ -15,7 +15,7 @@ const CRATES_URL = 'https://github.com/integer32llc/rust-playground/blob/master/
 const GIST_URL = 'https://gist.github.com/';
 const I32_URL = 'http://integer32.com/';
 const LOCALSTORAGE_URL = 'https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API';
-const OFFICIAL_URL = 'https://play.rust-lang.org/';
+const ORIGINAL_PLAYGROUND_URL = 'https://github.com/rust-lang/rust-playpen';
 const REPO_URL = 'https://github.com/integer32llc/rust-playground';
 const RUSTFMT_URL = 'https://github.com/rust-lang-nursery/rustfmt';
 const RUSTFMT_RFC_URL = 'https://github.com/rust-lang-nursery/fmt-rfcs';
@@ -69,7 +69,7 @@ fn main() {
 
 const Help = ({ navigateToIndex }) => (
   <section className="help">
-    <h1>The Alternative Rust Playground</h1>
+    <h1>The Rust Playground</h1>
     <Link action={navigateToIndex}>Return to the playground</Link>
 
     <LinkableSection id="about" header="About" level={H2}>
@@ -81,7 +81,7 @@ const Help = ({ navigateToIndex }) => (
       </p>
 
       <p>
-        This playground is modeled after the <a href={OFFICIAL_URL}>official
+        This playground is modeled after the <a href={ORIGINAL_PLAYGROUND_URL}>original
         Rust playground</a>, and we owe a great debt to every contributor to
         that project.
       </p>

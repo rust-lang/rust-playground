@@ -51,7 +51,7 @@ RSpec.feature "Navigating between pages", type: :feature, js: true do
 
     click_on '?'
     expect(page).to be_at_url('/help')
-    expect(page).to have_content('The Alternative Rust Playground')
+    expect(page).to have_content('The Rust Playground')
 
     go_back
     expect(page).to be_at_url('/')
@@ -59,7 +59,7 @@ RSpec.feature "Navigating between pages", type: :feature, js: true do
 
     go_forward
     expect(page).to be_at_url('/help')
-    expect(page).to have_content('The Alternative Rust Playground')
+    expect(page).to have_content('The Rust Playground')
 
     click_on "Return to the playground"
     expect(page).to be_at_url('/')
@@ -68,7 +68,7 @@ RSpec.feature "Navigating between pages", type: :feature, js: true do
 
   scenario "Navigating from help changes the URL" do
     visit '/help'
-    expect(page).to have_content('The Alternative Rust Playground')
+    expect(page).to have_content('The Rust Playground')
 
     click_on "Return to the playground"
     expect(page).to be_at_url('/')
