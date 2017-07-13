@@ -18,7 +18,6 @@ const LOCALSTORAGE_URL = 'https://developer.mozilla.org/en-US/docs/Web/API/Web_S
 const ORIGINAL_PLAYGROUND_URL = 'https://github.com/rust-lang/rust-playpen';
 const REPO_URL = 'https://github.com/integer32llc/rust-playground';
 const RUSTFMT_URL = 'https://github.com/rust-lang-nursery/rustfmt';
-const RUSTFMT_RFC_URL = 'https://github.com/rust-lang-nursery/fmt-rfcs';
 const SHEPMASTER_URL = 'https://github.com/shepmaster/';
 
 const CRATE_EXAMPLE = `extern crate rand;
@@ -137,14 +136,6 @@ const Help = ({ navigateToIndex }) => (
         </p>
 
         <Example code={RUSTFMT_EXAMPLE} />
-
-        <p>
-          The official Rust style guide is being still being decided via
-          {'  '}
-          <a href={RUSTFMT_RFC_URL}>the RFC process</a>. During this period, you
-          may format your code with the current default formatting or with the
-          proposed RFC style by using the drop-down menu.
-        </p>
       </LinkableSection>
 
       <LinkableSection id="features-sharing" header="Sharing code" level={H3}>
