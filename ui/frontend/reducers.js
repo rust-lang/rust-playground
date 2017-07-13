@@ -7,6 +7,7 @@ export const defaultConfiguration = {
   editor: "advanced",
   keybinding: "ace",
   theme: "github",
+  orientation: "automatic",
   channel: "stable",
   mode: "debug",
   crateType: "bin",
@@ -30,6 +31,8 @@ const configuration = (state = defaultConfiguration, action) => {
     return { ...state, keybinding: action.keybinding };
   case actions.CHANGE_THEME:
     return { ...state, theme: action.theme };
+  case actions.CHANGE_ORIENTATION:
+    return { ...state, orientation: action.orientation };
   case actions.CHANGE_CHANNEL: {
     const { channel } = action;
     if (["stable", "beta", "nightly"].includes(channel)) {

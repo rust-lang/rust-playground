@@ -28,6 +28,7 @@ export function navigateToHelp() {
 export const CHANGE_EDITOR = 'CHANGE_EDITOR';
 export const CHANGE_KEYBINDING = 'CHANGE_KEYBINDING';
 export const CHANGE_THEME = 'CHANGE_THEME';
+export const CHANGE_ORIENTATION = 'CHANGE_ORIENTATION';
 export const CHANGE_CHANNEL = 'CHANGE_CHANNEL';
 export const CHANGE_MODE = 'CHANGE_MODE';
 export const CHANGE_FOCUS = 'CHANGE_FOCUS';
@@ -42,6 +43,10 @@ export function changeKeybinding(keybinding) {
 
 export function changeTheme(theme) {
   return { type: CHANGE_THEME, theme };
+}
+
+export function changeOrientation(orientation) {
+  return { type: CHANGE_ORIENTATION, orientation }
 }
 
 export function changeChannel(channel) {

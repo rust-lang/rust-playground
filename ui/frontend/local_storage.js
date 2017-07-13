@@ -8,6 +8,7 @@ export function serialize(state) {
       editor: state.configuration.editor,
       keybinding: state.configuration.keybinding,
       theme: state.configuration.theme,
+      orientation: state.configuration.orientation,
     },
     code: state.code,
   });
@@ -24,6 +25,7 @@ export function deserialize(savedState) {
       editor: parsedState.configuration.editor || defaultConfiguration.editor,
       keybinding: parsedState.configuration.keybinding || defaultConfiguration.keybinding,
       theme: parsedState.configuration.theme || defaultConfiguration.theme,
+      orientation: parsedState.configuration.orientation || defaultConfiguration.orientation,
     },
     code: parsedState.code,
   };
