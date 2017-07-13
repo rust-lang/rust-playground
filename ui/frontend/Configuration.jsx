@@ -9,6 +9,7 @@ import {
   changeEditor,
   changeKeybinding,
   changeTheme,
+  changeOrientation,
   toggleConfiguration,
 } from './actions';
 
@@ -44,6 +45,7 @@ class Configuration extends PureComponent {
   onChangeEditor = e => this.props.changeEditor(e.target.value);
   onChangeKeybinding = e => this.props.changeKeybinding(e.target.value);
   onChangeTheme = e => this.props.changeTheme(e.target.value);
+  onChangeOrientation = e => this.props.changeOrientation(e.target.value);
   onKeyup = e => {
     if (e.keyCode === ESCAPE_KEYCODE && !e.defaultPrevented) {
       e.preventDefault();
@@ -60,7 +62,7 @@ class Configuration extends PureComponent {
   }
 
   render() {
-    const { editor, keybinding, theme, toggleConfiguration } = this.props;
+    const { editor, keybinding, theme, orientation, toggleConfiguration } = this.props;
 
     const advancedEditor = editor === 'advanced';
 
@@ -96,6 +98,15 @@ class Configuration extends PureComponent {
 
         {themeSelect}
 
+        <ConfigurationSelect what="orientation"
+                             label="Split Orientation"
+                             defaultValue={orientation}
+                             onChange={this.onChangeOrientation}>
+          <option value="automatic">Automatic</option>
+          <option value="horizontal">Horizontal</option>
+          <option value="vertical">Vertical</option>
+        </ConfigurationSelect>
+
         <div className="configuration-actions">
           <button onClick={toggleConfiguration}>Done</button>
         </div>
@@ -108,20 +119,23 @@ Configuration.propTypes = {
   changeEditor: PropTypes.func.isRequired,
   changeKeybinding: PropTypes.func.isRequired,
   changeTheme: PropTypes.func.isRequired,
+  changeOrientation: PropTypes.func.isRequired,
   editor: PropTypes.string.isRequired,
   keybinding: PropTypes.string.isRequired,
   theme: PropTypes.string.isRequired,
+  orientation: PropTypes.string.isRequired,
   toggleConfiguration: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = ({ configuration: { editor, keybinding, theme } }) => (
-  { editor, keybinding, theme }
+const mapStateToProps = ({ configuration: { editor, keybinding, theme, orientation } }) => (
+  { editor, keybinding, theme, orientation }
 );
 
 const mapDispatchToProps = dispatch => ({
   changeEditor: editor => dispatch(changeEditor(editor)),
   changeKeybinding: keybinding => dispatch(changeKeybinding(keybinding)),
   changeTheme: theme => dispatch(changeTheme(theme)),
+  changeOrientation: orientation => dispatch(changeOrientation(orientation)),
   toggleConfiguration: () => dispatch(toggleConfiguration()),
 });
 
