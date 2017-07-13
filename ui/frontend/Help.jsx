@@ -15,10 +15,9 @@ const CRATES_URL = 'https://github.com/integer32llc/rust-playground/blob/master/
 const GIST_URL = 'https://gist.github.com/';
 const I32_URL = 'http://integer32.com/';
 const LOCALSTORAGE_URL = 'https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API';
-const OFFICIAL_URL = 'https://play.rust-lang.org/';
+const ORIGINAL_PLAYGROUND_URL = 'https://github.com/rust-lang/rust-playpen';
 const REPO_URL = 'https://github.com/integer32llc/rust-playground';
 const RUSTFMT_URL = 'https://github.com/rust-lang-nursery/rustfmt';
-const RUSTFMT_RFC_URL = 'https://github.com/rust-lang-nursery/fmt-rfcs';
 const SHEPMASTER_URL = 'https://github.com/shepmaster/';
 
 const CRATE_EXAMPLE = `extern crate rand;
@@ -69,7 +68,7 @@ fn main() {
 
 const Help = ({ navigateToIndex }) => (
   <section className="help">
-    <h1>The Alternative Rust Playground</h1>
+    <h1>The Rust Playground</h1>
     <Link action={navigateToIndex}>Return to the playground</Link>
 
     <LinkableSection id="about" header="About" level={H2}>
@@ -81,7 +80,7 @@ const Help = ({ navigateToIndex }) => (
       </p>
 
       <p>
-        This playground is modeled after the <a href={OFFICIAL_URL}>official
+        This playground is modeled after the <a href={ORIGINAL_PLAYGROUND_URL}>original
         Rust playground</a>, and we owe a great debt to every contributor to
         that project.
       </p>
@@ -137,14 +136,6 @@ const Help = ({ navigateToIndex }) => (
         </p>
 
         <Example code={RUSTFMT_EXAMPLE} />
-
-        <p>
-          The official Rust style guide is being still being decided via
-          {'  '}
-          <a href={RUSTFMT_RFC_URL}>the RFC process</a>. During this period, you
-          may format your code with the current default formatting or with the
-          proposed RFC style by using the drop-down menu.
-        </p>
       </LinkableSection>
 
       <LinkableSection id="features-sharing" header="Sharing code" level={H3}>
@@ -193,18 +184,14 @@ const Help = ({ navigateToIndex }) => (
       <LinkableSection id="features-output-formats" header="Output formats" level={H3}>
         <p>
           Instead of compiling to a final binary, you can also see intermediate
-          output of the compiler as LLVM IR or x86_64 assembly. This is often used
-          in conjunction with the <a href="#features-modes">mode</a> selector set
-          to "Release" to see how the compiler has chosen to optimize some
-          specific piece of code.
+          output of the compiler as LLVM IR, x86_64 assembly, or Rust MIR. This
+          is often used in conjunction with the <a href="#features-modes">mode</a>
+          {' '}
+          selector set to "Release" to see how the compiler has chosen to optimize
+          some specific piece of code.
         </p>
 
         <Example code={OUTPUT_EXAMPLE} />
-
-        <p>
-          If you select the nightly channel, you can also output the compiler's
-          internal MIR format.
-        </p>
       </LinkableSection>
 
       <LinkableSection id="features-modes" header="Compilation modes" level={H3}>
