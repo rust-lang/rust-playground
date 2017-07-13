@@ -193,18 +193,14 @@ const Help = ({ navigateToIndex }) => (
       <LinkableSection id="features-output-formats" header="Output formats" level={H3}>
         <p>
           Instead of compiling to a final binary, you can also see intermediate
-          output of the compiler as LLVM IR or x86_64 assembly. This is often used
-          in conjunction with the <a href="#features-modes">mode</a> selector set
-          to "Release" to see how the compiler has chosen to optimize some
-          specific piece of code.
+          output of the compiler as LLVM IR, x86_64 assembly, or Rust MIR. This
+          is often used in conjunction with the <a href="#features-modes">mode</a>
+          {' '}
+          selector set to "Release" to see how the compiler has chosen to optimize
+          some specific piece of code.
         </p>
 
         <Example code={OUTPUT_EXAMPLE} />
-
-        <p>
-          If you select the nightly channel, you can also output the compiler's
-          internal MIR format.
-        </p>
       </LinkableSection>
 
       <LinkableSection id="features-modes" header="Compilation modes" level={H3}>
