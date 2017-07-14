@@ -1,4 +1,5 @@
 use std::ffi::OsStr;
+use std::fmt;
 use std::fs::{self, File};
 use std::io::prelude::*;
 use std::io::{self, BufReader, BufWriter, ErrorKind};
@@ -25,10 +26,6 @@ quick_error! {
             description("unable to execute the compiler")
             display("Unable to execute the compiler: {}", err)
             cause(err)
-        }
-        UnableToLocateOutput {
-            description("unable to locate output file")
-            display("Unable to locate output file")
         }
         UnableToReadOutput(err: io::Error) {
             description("unable to read output file")
@@ -84,14 +81,30 @@ impl Sandbox {
             .flat_map(|entry| entry)
             .map(|entry| entry.path())
             .filter(|path| path.extension() == Some(req.target.extension()))
-            .next()
-            .ok_or(Error::UnableToLocateOutput)?;
+            .next();
+
+        let stdout = vec_to_str(output.stdout)?;
+        let mut stderr = vec_to_str(output.stderr)?;
+
+        let code = match file {
+            Some(file) => read(&file)?.unwrap_or_else(String::new),
+            None => {
+                // If we didn't find the file, it's *most* likely that
+                // the user's code was invalid. Tack on our own error
+                // to the compiler's error instead of failing the
+                // request.
+                use self::fmt::Write;
+                write!(&mut stderr, "\nUnable to locate file for {} output", req.target)
+                    .expect("Unable to write to a string");
+                String::new()
+            }
+        };
 
         Ok(CompileResponse {
             success: output.status.success(),
-            code: try!(read(&file)).unwrap_or_else(String::new),
-            stdout: try!(vec_to_str(output.stdout)),
-            stderr: try!(vec_to_str(output.stderr)),
+            code,
+            stdout,
+            stderr,
         })
     }
 
@@ -289,6 +302,18 @@ impl CompileTarget {
             CompileTarget::Mir      => "mir",
         };
         OsStr::new(ext)
+    }
+}
+
+impl fmt::Display for CompileTarget {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::CompileTarget::*;
+
+        match *self {
+            Assembly => "assembly".fmt(f),
+            LlvmIr => "LLVM IR".fmt(f),
+            Mir => "Rust MIR".fmt(f),
+        }
     }
 }
 

@@ -40,6 +40,18 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     end
   end
 
+  context "when the code doesn't compile" do
+    before { editor.set("fn main() {") }
+
+    scenario "it shows the compilation error" do
+      within('.header') { click_on("MIR") }
+
+      within('.output-stderr') do
+        expect(page).to have_content 'an un-closed delimiter'
+      end
+    end
+  end
+
   def editor
     Editor.new(page)
   end
