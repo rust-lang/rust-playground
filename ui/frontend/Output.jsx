@@ -295,8 +295,8 @@ Output.propTypes = {
 
 const mapStateToProps = ({ output }) => output;
 
-const mapDispatchToProps = dispatch => ({
-  changeFocus: x => dispatch(changeFocus(x)),
+const mapDispatchToProps = ({
+  changeFocus,
 });
 
 const ConnectedOutput = connect(

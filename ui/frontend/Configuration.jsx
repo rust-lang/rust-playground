@@ -131,12 +131,12 @@ const mapStateToProps = ({ configuration: { editor, keybinding, theme, orientati
   { editor, keybinding, theme, orientation }
 );
 
-const mapDispatchToProps = dispatch => ({
-  changeEditor: editor => dispatch(changeEditor(editor)),
-  changeKeybinding: keybinding => dispatch(changeKeybinding(keybinding)),
-  changeTheme: theme => dispatch(changeTheme(theme)),
-  changeOrientation: orientation => dispatch(changeOrientation(orientation)),
-  toggleConfiguration: () => dispatch(toggleConfiguration()),
+const mapDispatchToProps = ({
+  changeEditor,
+  changeKeybinding,
+  changeTheme,
+  changeOrientation,
+  toggleConfiguration,
 });
 
 const ConnectedConfiguration = connect(

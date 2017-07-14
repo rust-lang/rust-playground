@@ -138,17 +138,17 @@ const mapStateToProps = ({ configuration: { channel, mode, crateType, tests } })
   { channel, mode, crateType, tests, navigateToHelp }
 );
 
-const mapDispatchToProps = dispatch => ({
-  changeChannel: channel => dispatch(changeChannel(channel)),
-  changeMode: mode => dispatch(changeMode(mode)),
-  clippy: () => dispatch(performClippy()),
-  compileToAssembly: () => dispatch(performCompileToAssembly()),
-  compileToLLVM: () => dispatch(performCompileToLLVM()),
-  compileToMir: () => dispatch(performCompileToMir()),
-  execute: () => dispatch(performExecute()),
-  format: () => dispatch(performFormat()),
-  gistSave: () => dispatch(performGistSave()),
-  toggleConfiguration: () => dispatch(toggleConfiguration()),
+const mapDispatchToProps = ({
+  changeChannel,
+  changeMode,
+  clippy: performClippy,
+  compileToAssembly: performCompileToAssembly,
+  compileToLLVM: performCompileToLLVM,
+  compileToMir: performCompileToMir,
+  execute: performExecute,
+  format: performFormat,
+  gistSave: performGistSave,
+  toggleConfiguration,
 });
 
 const ConnectedHeader = connect(

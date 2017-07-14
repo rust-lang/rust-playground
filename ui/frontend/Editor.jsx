@@ -95,9 +95,9 @@ const mapStateToProps = ({ code, configuration: { editor }, position }) => (
   { code, editor, position }
 );
 
-const mapDispatchToProps = dispatch => ({
-  execute: () => dispatch(performExecute()),
-  onEditCode: code => dispatch(editCode(code)),
+const mapDispatchToProps = ({
+  execute: performExecute,
+  onEditCode: editCode,
 });
 
 const ConnectedEditor = connect(
