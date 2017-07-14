@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { PrismCode } from "react-prism";
@@ -24,8 +23,8 @@ Example.propTypes = {
   showExample: PropTypes.func.isRequired,
 };
 
-const mapDispatchToProps = dispatch => bindActionCreators({
+const mapDispatchToProps = ({
   showExample,
-}, dispatch);
+});
 
 export default connect(null, mapDispatchToProps)(Example);
