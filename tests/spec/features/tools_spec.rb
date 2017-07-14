@@ -15,19 +15,6 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     end
   end
 
-  scenario "formatting code with the RFC format" do
-    editor.set 'fn x<T>() where T: Copy, B: Copy {println!("Hello");}'
-    within('.header') do
-      click_on("▼")
-      click_on("Proposed RFC")
-    end
-
-    within('#editor') do
-      expect(editor).to have_line 'where'
-      expect(editor).to have_line 'T: Copy,'
-    end
-  end
-
   scenario "linting code with Clippy" do
     editor.set code_with_lint_warnings
     within('.header') { click_on("Clippy") }
