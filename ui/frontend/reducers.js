@@ -8,6 +8,7 @@ export const defaultConfiguration = {
   keybinding: "ace",
   theme: "github",
   orientation: "automatic",
+  assemblyFlavor: "att",
   channel: "stable",
   mode: "debug",
   crateType: "bin",
@@ -33,6 +34,8 @@ const configuration = (state = defaultConfiguration, action) => {
     return { ...state, theme: action.theme };
   case actions.CHANGE_ORIENTATION:
     return { ...state, orientation: action.orientation };
+  case actions.CHANGE_ASSEMBLY_FLAVOR:
+    return { ...state, assemblyFlavor: action.assemblyFlavor };
   case actions.CHANGE_CHANNEL: {
     const { channel } = action;
     if (["stable", "beta", "nightly"].includes(channel)) {

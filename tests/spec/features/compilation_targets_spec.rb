@@ -10,14 +10,45 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     editor.set(code)
   end
 
-  scenario "compiling to assembly" do
-    within('.header') { click_on("ASM") }
+  context "when AT&T syntax is selected" do
+    before do
+      click_on("Config")
+      select("AT&T")
+      click_on("Done")
+    end
 
-    within('.output-code') do
-      expect(page).to have_content '.text'
-      expect(page).to have_content '.file'
-      expect(page).to have_content '.section'
-      expect(page).to have_content '.p2align'
+    scenario "compiling to assembly" do
+      within('.header') { click_on("ASM") }
+
+      within('.output-code') do
+        expect(page).to have_content '.text'
+        expect(page).to have_content '.file'
+        expect(page).to have_content '.section'
+        expect(page).to have_content '.p2align'
+
+        expect(page).to have_content 'movq %rdi, %rax'
+      end
+    end
+  end
+
+  context "when Intel syntax is selected" do
+    before do
+      click_on("Config")
+      select("Intel")
+      click_on("Done")
+    end
+
+    scenario "compiling to assembly" do
+      within('.header') { click_on("ASM") }
+
+      within('.output-code') do
+        expect(page).to have_content '.text'
+        expect(page).to have_content '.file'
+        expect(page).to have_content '.section'
+        expect(page).to have_content '.p2align'
+
+        expect(page).to have_content 'mov rax, rdi'
+      end
     end
   end
 

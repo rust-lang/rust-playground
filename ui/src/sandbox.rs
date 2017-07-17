@@ -265,9 +265,19 @@ fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type
         cmd.extend(&["--", "-o", "/playground-result/compilation"]);
 
         match target {
-            Assembly => cmd.push("--emit=asm"),
-            LlvmIr   => cmd.push("--emit=llvm-ir"),
-            Mir      => cmd.push("--emit=mir"),
+            Assembly(flavor) => {
+                use self::AssemblyFlavor::*;
+
+                cmd.push("--emit=asm");
+
+                cmd.push("-C");
+                match flavor {
+                    Att => cmd.push("llvm-args=-x86-asm-syntax=att"),
+                    Intel => cmd.push("llvm-args=-x86-asm-syntax=intel"),
+                }
+            },
+            LlvmIr => cmd.push("--emit=llvm-ir"),
+            Mir => cmd.push("--emit=mir"),
          }
     }
 
@@ -288,8 +298,14 @@ fn read(path: &Path) -> Result<Option<String>> {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum AssemblyFlavor {
+    Att,
+    Intel,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum CompileTarget {
-    Assembly,
+    Assembly(AssemblyFlavor),
     LlvmIr,
     Mir,
 }
@@ -297,7 +313,7 @@ pub enum CompileTarget {
 impl CompileTarget {
     fn extension(&self) -> &'static OsStr {
         let ext = match *self {
-            CompileTarget::Assembly => "s",
+            CompileTarget::Assembly(_) => "s",
             CompileTarget::LlvmIr   => "ll",
             CompileTarget::Mir      => "mir",
         };
@@ -310,7 +326,7 @@ impl fmt::Display for CompileTarget {
         use self::CompileTarget::*;
 
         match *self {
-            Assembly => "assembly".fmt(f),
+            Assembly(_) => "assembly".fmt(f),
             LlvmIr => "LLVM IR".fmt(f),
             Mir => "Rust MIR".fmt(f),
         }
