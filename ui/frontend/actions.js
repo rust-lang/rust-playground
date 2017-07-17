@@ -29,6 +29,7 @@ export const CHANGE_EDITOR = 'CHANGE_EDITOR';
 export const CHANGE_KEYBINDING = 'CHANGE_KEYBINDING';
 export const CHANGE_THEME = 'CHANGE_THEME';
 export const CHANGE_ORIENTATION = 'CHANGE_ORIENTATION';
+export const CHANGE_ASSEMBLY_FLAVOR = 'CHANGE_ASSEMBLY_FLAVOR';
 export const CHANGE_CHANNEL = 'CHANGE_CHANNEL';
 export const CHANGE_MODE = 'CHANGE_MODE';
 export const CHANGE_FOCUS = 'CHANGE_FOCUS';
@@ -46,7 +47,11 @@ export function changeTheme(theme) {
 }
 
 export function changeOrientation(orientation) {
-  return { type: CHANGE_ORIENTATION, orientation }
+  return { type: CHANGE_ORIENTATION, orientation };
+}
+
+export function changeAssemblyFlavor(assemblyFlavor) {
+  return { type: CHANGE_ASSEMBLY_FLAVOR, assemblyFlavor };
 }
 
 export function changeChannel(channel) {
@@ -120,8 +125,8 @@ function performCompile(target, { request, success, failure }) {
     dispatch(request());
 
     const state = getState();
-    const { code, configuration: { channel, mode, crateType, tests } } = state;
-    const body = { channel, mode, crateType, tests, code, target };
+    const { code, configuration: { channel, mode, crateType, tests, assemblyFlavor } } = state;
+    const body = { channel, mode, crateType, tests, code, target, assemblyFlavor };
 
     return jsonPost(routes.compile, body)
       .then(json => dispatch(success(json)))

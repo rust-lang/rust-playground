@@ -201,6 +201,10 @@ quick_error! {
             description("an invalid target was passed")
             display("The value {:?} is not a valid target", value)
         }
+        InvalidAssemblyFlavor(value: String) {
+            description("an invalid assembly flavor was passed")
+            display("The value {:?} is not a valid assembly flavor", value)
+        }
         InvalidChannel(value: String) {
             description("an invalid channel was passed")
             display("The value {:?} is not a valid channel", value,)
@@ -229,6 +233,8 @@ struct ErrorJson {
 #[derive(Debug, Clone, Deserialize)]
 struct CompileRequest {
     target: String,
+    #[serde(rename = "assemblyFlavor")]
+    assembly_flavor: Option<String>,
     channel: String,
     mode: String,
     #[serde(rename = "crateType")]
@@ -304,11 +310,23 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
     type Error = Error;
 
     fn try_from(me: CompileRequest) -> Result<Self> {
+        let target = parse_target(&me.target)?;
+        let assembly_flavor = match me.assembly_flavor {
+            Some(f) => Some(parse_assembly_flavor(&f)?),
+            None => None,
+        };
+
+        let target = match (target, assembly_flavor) {
+            (sandbox::CompileTarget::Assembly(_), Some(flavor)) =>
+                sandbox::CompileTarget::Assembly(flavor),
+            _ => target,
+        };
+
         Ok(sandbox::CompileRequest {
-            target: try!(parse_target(&me.target)),
-            channel: try!(parse_channel(&me.channel)),
-            mode: try!(parse_mode(&me.mode)),
-            crate_type: try!(parse_crate_type(&me.crate_type)),
+            target,
+            channel: parse_channel(&me.channel)?,
+            mode: parse_mode(&me.mode)?,
+            crate_type: parse_crate_type(&me.crate_type)?,
             tests: me.tests,
             code: me.code,
         })
@@ -427,10 +445,18 @@ impl From<sandbox::ExecuteResponse> for EvaluateResponse {
 
 fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
     Ok(match s {
-        "asm" => sandbox::CompileTarget::Assembly,
+        "asm" => sandbox::CompileTarget::Assembly(sandbox::AssemblyFlavor::Att),
         "llvm-ir" => sandbox::CompileTarget::LlvmIr,
         "mir" => sandbox::CompileTarget::Mir,
         _ => return Err(Error::InvalidTarget(s.into()))
+    })
+}
+
+fn parse_assembly_flavor(s: &str) -> Result<sandbox::AssemblyFlavor> {
+    Ok(match s {
+        "att" => sandbox::AssemblyFlavor::Att,
+        "intel" => sandbox::AssemblyFlavor::Intel,
+        _ => return Err(Error::InvalidAssemblyFlavor(s.into()))
     })
 }
 

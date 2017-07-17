@@ -10,6 +10,7 @@ import {
   changeKeybinding,
   changeTheme,
   changeOrientation,
+  changeAssemblyFlavor,
   toggleConfiguration,
 } from './actions';
 
@@ -46,6 +47,7 @@ class Configuration extends PureComponent {
   onChangeKeybinding = e => this.props.changeKeybinding(e.target.value);
   onChangeTheme = e => this.props.changeTheme(e.target.value);
   onChangeOrientation = e => this.props.changeOrientation(e.target.value);
+  onChangeAssemblyFlavor = e => this.props.changeAssemblyFlavor(e.target.value);
   onKeyup = e => {
     if (e.keyCode === ESCAPE_KEYCODE && !e.defaultPrevented) {
       e.preventDefault();
@@ -62,7 +64,7 @@ class Configuration extends PureComponent {
   }
 
   render() {
-    const { editor, keybinding, theme, orientation, toggleConfiguration } = this.props;
+    const { editor, keybinding, theme, orientation, assemblyFlavor, toggleConfiguration } = this.props;
 
     const advancedEditor = editor === 'advanced';
 
@@ -107,6 +109,14 @@ class Configuration extends PureComponent {
           <option value="vertical">Vertical</option>
         </ConfigurationSelect>
 
+        <ConfigurationSelect what="assemblyFlavor"
+                             label="Assembly Flavor"
+                             defaultValue={assemblyFlavor}
+                             onChange={this.onChangeAssemblyFlavor}>
+          <option value="att">AT&T</option>
+          <option value="intel">Intel</option>
+        </ConfigurationSelect>
+
         <div className="configuration-actions">
           <button onClick={toggleConfiguration}>Done</button>
         </div>
@@ -120,15 +130,17 @@ Configuration.propTypes = {
   changeKeybinding: PropTypes.func.isRequired,
   changeTheme: PropTypes.func.isRequired,
   changeOrientation: PropTypes.func.isRequired,
+  changeAssemblyFlavor: PropTypes.func.isRequired,
   editor: PropTypes.string.isRequired,
   keybinding: PropTypes.string.isRequired,
   theme: PropTypes.string.isRequired,
   orientation: PropTypes.string.isRequired,
+  assemblyFlavor: PropTypes.string.isRequired,
   toggleConfiguration: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = ({ configuration: { editor, keybinding, theme, orientation } }) => (
-  { editor, keybinding, theme, orientation }
+const mapStateToProps = ({ configuration: { editor, keybinding, theme, orientation, assemblyFlavor } }) => (
+  { editor, keybinding, theme, orientation, assemblyFlavor }
 );
 
 const mapDispatchToProps = ({
@@ -136,6 +148,7 @@ const mapDispatchToProps = ({
   changeKeybinding,
   changeTheme,
   changeOrientation,
+  changeAssemblyFlavor,
   toggleConfiguration,
 });
 

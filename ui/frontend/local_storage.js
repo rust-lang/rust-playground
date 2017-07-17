@@ -9,6 +9,7 @@ export function serialize(state) {
       keybinding: state.configuration.keybinding,
       theme: state.configuration.theme,
       orientation: state.configuration.orientation,
+      assemblyFlavor: state.configuration.assemblyFlavor,
     },
     code: state.code,
   });
@@ -26,6 +27,7 @@ export function deserialize(savedState) {
       keybinding: parsedState.configuration.keybinding || defaultConfiguration.keybinding,
       theme: parsedState.configuration.theme || defaultConfiguration.theme,
       orientation: parsedState.configuration.orientation || defaultConfiguration.orientation,
+      assemblyFlavor: parsedState.configuration.assemblyFlavor || defaultConfiguration.assemblyFlavor,
     },
     code: parsedState.code,
   };
