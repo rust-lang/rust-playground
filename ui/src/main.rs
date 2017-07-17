@@ -302,8 +302,8 @@ struct EvaluateRequest {
 
 #[derive(Debug, Clone, Serialize)]
 struct EvaluateResponse {
+    result: String,
     error: Option<String>,
-    result: Option<String>,
 }
 
 impl TryFrom<CompileRequest> for sandbox::CompileRequest {
@@ -430,13 +430,17 @@ impl From<sandbox::ExecuteResponse> for EvaluateResponse {
         // occurred.
         if me.success {
             EvaluateResponse {
-                result: Some(me.stdout),
+                result: me.stdout,
                 error: None,
             }
         } else {
+            // When an error occurs, *some* consumers check for an
+            // `error` key, others assume that the error is crammed in
+            // the `result` field and then they string search for
+            // `error:` or `warning:`. Ew. We can put it in both.
             let result = me.stderr + &me.stdout;
             EvaluateResponse {
-                result: None,
+                result: result.clone(),
                 error: Some(result),
             }
         }
