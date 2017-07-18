@@ -19,7 +19,7 @@ const hasTests = code => code.includes('#[test]');
 const hasMainMethod = code => code.includes('fn main()');
 const runAsTest = code => hasTests(code) && !hasMainMethod(code);
 
-const CRATE_TYPE_RE = /^#!\[crate_type="([^"]*)"\]/;
+const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
 const crateType = code => (code.match(CRATE_TYPE_RE) || [null, 'bin'])[1];
 
 const configuration = (state = defaultConfiguration, action) => {
