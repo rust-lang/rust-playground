@@ -8,14 +8,8 @@ perform_push="${PERFORM_PUSH-false}"
 
 repository=shepmaster
 
-date_url_base=https://static.rust-lang.org/dist
-
 for channel in $channels_to_build; do
     cd "base"
-
-    filename="channel-rust-${channel}-date.txt"
-    curl -o "${filename}" "${date_url_base}/${filename}"
-    date=$(cat "${filename}")
 
     image_name="rust-${channel}"
     full_name="${repository}/${image_name}"
@@ -24,7 +18,6 @@ for channel in $channels_to_build; do
     docker build -t "${full_name}" \
            --cache-from "${full_name}" \
            --build-arg channel="${channel}" \
-           --build-arg date="${date}" \
            .
     docker tag "${full_name}" "${image_name}"
 
