@@ -13,26 +13,26 @@ RUN apt-get update && apt-get install -y \
 
 ENV USER=root
 ENV PATH=/root/.cargo/bin:$PATH
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y  && rustup toolchain uninstall stable
-ADD Cargo.toml /root/Cargo.toml
-ADD entrypoint.sh /root/
 
-# Now that we have set up our basic environment, let's set up the
-# specific channel.
+ADD entrypoint.sh /root/
+ENTRYPOINT ["/root/entrypoint.sh"]
 
 ARG channel
-ARG date
-RUN rustup default "${channel}-${date}"
+
+# Ensure that we are using the latest stable version of rustup and the
+# latest version of the current channel. A new manifest will trigger
+# these lines to run again, forcing a new download of rustup and
+# installation of Rust.
+ADD https://static.rust-lang.org/rustup/release-stable.toml /root/rustup-manifest.toml
+ADD https://static.rust-lang.org/dist/channel-rust-${channel}-date.txt /root/rust-channel-version
+
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain "${channel}"
 
 RUN cd / && \
     cargo new playground
-
 WORKDIR /playground
 
-RUN mv /root/Cargo.toml ./Cargo.toml && \
-    cargo build && \
-    cargo build --release
-
+ADD Cargo.toml /playground/Cargo.toml
+RUN cargo build
+RUN cargo build --release
 RUN rm src/*.rs
-
-ENTRYPOINT ["/root/entrypoint.sh"]
