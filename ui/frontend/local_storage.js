@@ -1,4 +1,4 @@
-import { defaultConfiguration } from './reducers';
+import { DEFAULT as defaultConfiguration } from './reducers/configuration';
 const CURRENT_VERSION = 1;
 
 export function serialize(state) {

@@ -1,8 +1,6 @@
-import { combineReducers } from 'redux';
-import * as actions from './actions';
-import output from './reducers/output';
+import * as actions from '../actions';
 
-export const defaultConfiguration = {
+export const DEFAULT = {
   shown: false,
   editor: "advanced",
   keybinding: "ace",
@@ -22,7 +20,7 @@ const runAsTest = code => hasTests(code) && !hasMainMethod(code);
 const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
 const crateType = code => (code.match(CRATE_TYPE_RE) || [null, 'bin'])[1];
 
-const configuration = (state = defaultConfiguration, action) => {
+export default function configuration(state = DEFAULT, action) {
   switch (action.type) {
   case actions.TOGGLE_CONFIGURATION:
     return { ...state, shown: !state.shown };
@@ -53,62 +51,4 @@ const configuration = (state = defaultConfiguration, action) => {
   default:
     return state;
   }
-};
-
-const defaultCode = `fn main() {
-    println!("Hello, world!");
-}`;
-
-const code = (state = defaultCode, action) => {
-  switch (action.type) {
-  case actions.REQUEST_GIST_LOAD:
-    return "";
-  case actions.GIST_LOAD_SUCCEEDED:
-    return action.code;
-
-  case actions.EDIT_CODE:
-    return action.code;
-
-  case actions.FORMAT_SUCCEEDED:
-    return action.code;
-
-  default:
-    return state;
-  }
-};
-
-const defaultPosition = {
-  line: 0,
-  column: 0,
-};
-
-const position = (state = defaultPosition, action) => {
-  switch (action.type) {
-  case actions.GOTO_POSITION: {
-    const { line, column } = action;
-    return { ...state, line, column };
-  }
-  default:
-    return state;
-  }
-};
-
-const page = (state = "index", action) => {
-  switch (action.type) {
-  case actions.SET_PAGE:
-    return action.page;
-
-  default:
-    return state;
-  }
-};
-
-const playgroundApp = combineReducers({
-  configuration,
-  code,
-  position,
-  output,
-  page,
-});
-
-export default playgroundApp;
+}
