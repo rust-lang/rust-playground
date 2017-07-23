@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import url from 'url';
 import { load as loadGist, save as saveGist } from './gist';
+import { getCrateType, runAsTest } from './selectors';
 
 const routes = {
   compile: { pathname: '/compile' },
@@ -110,7 +111,10 @@ export function performExecute() {
     dispatch(requestExecute());
 
     const state = getState();
-    const { code, configuration: { channel, mode, crateType, tests } } = state;
+    const { code, configuration: { channel, mode } } = state;
+    const crateType = getCrateType(state);
+    const tests = runAsTest(state);
+
     const body = { channel, mode, crateType, tests, code };
 
     return jsonPost(routes.execute, body)
@@ -125,7 +129,9 @@ function performCompile(target, { request, success, failure }) {
     dispatch(request());
 
     const state = getState();
-    const { code, configuration: { channel, mode, crateType, tests, assemblyFlavor } } = state;
+    const { code, configuration: { channel, mode, assemblyFlavor } } = state;
+    const crateType = getCrateType(state);
+    const tests = runAsTest(state);
     const body = { channel, mode, crateType, tests, code, target, assemblyFlavor };
 
     return jsonPost(routes.compile, body)
