@@ -17,6 +17,7 @@ import {
   toggleConfiguration,
   navigateToHelp,
 } from './actions';
+import { getCrateType, runAsTest } from './selectors';
 
 function oneRadio(name, currentValue, possibleValue, change, labelText) {
   const id = `${name}-${possibleValue}`;
@@ -134,9 +135,17 @@ Header.propTypes = {
   navigateToHelp: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = ({ configuration: { channel, mode, crateType, tests } }) => (
-  { channel, mode, crateType, tests, navigateToHelp }
-);
+const mapStateToProps = state => {
+  const { configuration: { channel, mode } } = state;
+
+  return {
+    channel,
+    mode,
+    crateType: getCrateType(state),
+    tests: runAsTest(state),
+    navigateToHelp,
+  };
+};
 
 const mapDispatchToProps = ({
   changeChannel,
