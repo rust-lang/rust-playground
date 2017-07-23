@@ -66,13 +66,14 @@ SimpleEditor.propTypes = {
 
 class Editor extends PureComponent {
   render() {
-    const { editor, execute, code, position, onEditCode } = this.props;
+    const { editor, execute, code, crates, position, onEditCode } = this.props;
     const SelectedEditor = editor === "simple" ? SimpleEditor : AdvancedEditor;
 
     return (
       <div className="editor">
         <SelectedEditor code={code}
                         position={position}
+                        crates={crates}
                         onEditCode={onEditCode}
                         execute={execute} />
       </div>
@@ -89,10 +90,15 @@ Editor.propTypes = {
     line: PropTypes.number.isRequired,
     column: PropTypes.number.isRequired,
   }).isRequired,
+  crates: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    version: PropTypes.string.isRequired,
+  })).isRequired,
 };
 
-const mapStateToProps = ({ code, configuration: { editor }, position }) => (
-  { code, editor, position }
+const mapStateToProps = ({ code, configuration: { editor }, position, crates }) => (
+  { code, editor, position, crates }
 );
 
 const mapDispatchToProps = ({

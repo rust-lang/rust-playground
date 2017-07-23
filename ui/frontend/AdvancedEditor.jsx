@@ -3,6 +3,39 @@ import PropTypes from 'prop-types';
 import PureComponent from './PureComponent';
 import { connect } from 'react-redux';
 
+const displayExternCrateAutocomplete = editor => {
+  const { session } = editor;
+  const pos = editor.getCursorPosition();
+  const line = session.getLine(pos.row);
+  const precedingText = line.slice(0, pos.column);
+
+  return !!precedingText.match(/extern\s+crate\s*(\w+)?$/);
+};
+
+function buildCrateAutocompleter(component) {
+  function getCompletions(editor, session, pos, prefix, callback) {
+    let suggestions = [];
+
+    if (displayExternCrateAutocomplete(editor)) {
+      const { crates } = component.props;
+      const len = crates.length;
+
+      suggestions = crates.map(({ name, version, id }, i) => ({
+        caption: `${name} (${version})`,
+        value: id,
+        meta: 'crate',
+        score: len - i, // Force alphabetic order before anything is typed
+      }));
+    }
+
+    callback(null, suggestions);
+  }
+
+  return {
+    getCompletions,
+  };
+}
+
 class AdvancedEditor extends PureComponent {
   trackEditor = component => this._editor = component;
 
@@ -32,10 +65,12 @@ class AdvancedEditor extends PureComponent {
   }
 
   componentDidMount() {
+    const { _editor: { editor } } = this;
+
     // Auto-completing character literals interferes too much with
     // lifetimes, and there's no finer-grained control.
-    this._editor.editor.setBehavioursEnabled(false);
-    this._editor.editor.commands.addCommand({
+    editor.setBehavioursEnabled(false);
+    editor.commands.addCommand({
       name: 'executeCode',
       bindKey: {
         win: 'Ctrl-Enter',
@@ -44,6 +79,27 @@ class AdvancedEditor extends PureComponent {
       exec: this.props.execute,
       readOnly: true
     });
+
+    editor.setOptions({
+      enableBasicAutocompletion: true,
+    });
+
+    // When the user types `extern crate` and a space, automatically
+    // open the autocomplete. This should help people understand that
+    // there are crates available.
+    editor.commands.on('afterExec', event => {
+      const { editor, command } = event;
+
+      if (!(command.name === "backspace" || command.name === "insertstring")) {
+        return;
+      }
+
+      if (displayExternCrateAutocomplete(editor)) {
+        editor.execCommand('startAutocomplete');
+      }
+    });
+
+    editor.completers = [buildCrateAutocompleter(this)];
   }
 
   componentDidUpdate(prevProps, _prevState) {
@@ -76,6 +132,11 @@ AdvancedEditor.propTypes = {
     column: PropTypes.number.isRequired,
   }).isRequired,
   theme: PropTypes.string.isRequired,
+  crates: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    version: PropTypes.string.isRequired,
+  })).isRequired,
 };
 
 // The ACE editor weighs in at ~250K. Adding all of the themes and the
@@ -105,7 +166,9 @@ class AdvancedEditorAsync extends React.Component {
         this.setState({ AceEditor: AceEditor.default, ace });
 
         this.load(props);
-        import('brace/mode/rust')
+        const loadRustMode = import('brace/mode/rust');
+        const loadLanguageTools = import('brace/ext/language_tools');
+        Promise.all([loadRustMode, loadLanguageTools])
           .then(() => this.setState({ modeLoading: false }));
       });
   }

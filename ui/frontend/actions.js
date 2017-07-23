@@ -8,6 +8,9 @@ const routes = {
   execute: { pathname: '/execute' },
   format: { pathname: '/format' },
   clippy: { pathname: '/clippy' },
+  meta: {
+    crates: { pathname: '/meta/crates' },
+  },
 };
 
 export const TOGGLE_CONFIGURATION = 'TOGGLE_CONFIGURATION';
@@ -83,16 +86,28 @@ function receiveExecuteFailure({ error }) {
   return { type: EXECUTE_FAILED, error };
 }
 
+function jsonGet(urlObj) {
+  const urlStr = url.format(urlObj);
+
+  return fetchJson(urlStr, {
+    method: 'get',
+  });
+}
+
 function jsonPost(urlObj, body) {
   const urlStr = url.format(urlObj);
 
-  return fetch(urlStr, {
+  return fetchJson(urlStr, {
     method: 'post',
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(body),
-  })
+  });
+}
+
+function fetchJson(url, args) {
+  const { headers = {} } = args;
+  headers["Content-Type"] = "application/json";
+
+  return fetch(url, { ...args, headers })
     .catch(error => error)
     .then(response => {
       if (response.ok) {
@@ -330,6 +345,27 @@ export function performGistSave() {
 
     return saveGist(code)
       .then(json => dispatch(receiveGistSaveSuccess({ ...json, channel })));
+    // TODO: Failure case
+  };
+}
+
+export const REQUEST_CRATES_LOAD = 'REQUEST_CRATES_LOAD';
+export const CRATES_LOAD_SUCCEEDED = 'CRATES_LOAD_SUCCEEDED';
+
+function requestCratesLoad() {
+  return { type: REQUEST_CRATES_LOAD };
+}
+
+function receiveCratesLoadSuccess({ crates }) {
+  return { type: CRATES_LOAD_SUCCEEDED, crates };
+}
+
+export function performCratesLoad() {
+  return function(dispatch) {
+    dispatch(requestCratesLoad());
+
+    return jsonGet(routes.meta.crates)
+      .then(json => dispatch(receiveCratesLoadSuccess(json)));
     // TODO: Failure case
   };
 }
