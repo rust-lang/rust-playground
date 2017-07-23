@@ -22,6 +22,7 @@
     "redux": "^3.5.2",
     "redux-localstorage": "^0.4.1",
     "redux-thunk": "^2.1.0",
+    "reselect": "^3.0.1",
     "route-parser": "^0.0.5",
     "svg-url-loader": "^2.0.2",
     "url": "^0.11.0"
