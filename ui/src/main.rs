@@ -15,12 +15,15 @@ extern crate mktemp;
 #[macro_use]
 extern crate quick_error;
 extern crate corsware;
+#[macro_use]
+extern crate lazy_static;
 
 use std::any::Any;
 use std::convert::{TryFrom, TryInto};
 use std::env;
 use std::path::PathBuf;
-use std::time::Duration;
+use std::sync::Mutex;
+use std::time::{Duration, Instant};
 
 use iron::headers::ContentType;
 use iron::modifiers::Header;
@@ -47,6 +50,8 @@ mod sandbox;
 const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
 const ONE_DAY_IN_SECONDS: u64 = 60 * 60 * 24;
 const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
+
+const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
 
 fn main() {
     env_logger::init().expect("Unable to initialize logger");
@@ -140,10 +145,9 @@ fn clippy(req: &mut Request) -> IronResult<Response> {
 
 fn meta_crates(_req: &mut Request) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
-        sandbox
+        cached(sandbox)
             .crates()
             .map(MetaCratesResponse::from)
-            .map_err(Error::Sandbox)
     })
 }
 
@@ -221,6 +225,84 @@ where
     }
 }
 
+#[derive(Debug, Clone)]
+struct SandboxCacheInfo<T> {
+    value: T,
+    time: Instant,
+}
+
+/// Caches the success value of a single operation
+#[derive(Debug, Default)]
+struct SandboxCacheOne<T>(Mutex<Option<SandboxCacheInfo<T>>>);
+
+impl<T> SandboxCacheOne<T>
+where
+    T: Clone
+{
+    fn clone_or_populate<F>(&self, populator: F) -> Result<T>
+    where
+        F: FnOnce() -> sandbox::Result<T>
+    {
+        let mut cache = self.0.lock().map_err(|_| Error::CachePoisoned)?;
+
+        match cache.clone() {
+            Some(cached) => {
+                if cached.time.elapsed() > Duration::from_secs(SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS) {
+                    SandboxCacheOne::populate(&mut *cache, populator)
+                } else {
+                    Ok(cached.value)
+                }
+            },
+            None => {
+                SandboxCacheOne::populate(&mut *cache, populator)
+            }
+        }
+    }
+
+    fn populate<F>(cache: &mut Option<SandboxCacheInfo<T>>, populator: F) -> Result<T>
+    where
+        F: FnOnce() -> sandbox::Result<T>
+    {
+        let value = populator().map_err(Error::Sandbox)?;
+        *cache = Some(SandboxCacheInfo {
+            value: value.clone(),
+            time: Instant::now(),
+        });
+        Ok(value)
+    }
+}
+
+/// Caches the successful results of all sandbox operations that make
+/// sense to cache.
+#[derive(Debug, Default)]
+struct SandboxCache {
+    crates: SandboxCacheOne<Vec<sandbox::CrateInformation>>,
+}
+
+/// Provides a similar API to the Sandbox that caches the successful results.
+struct CachedSandbox<'a> {
+    sandbox: Sandbox,
+    cache: &'a SandboxCache,
+}
+
+impl<'a> CachedSandbox<'a> {
+    fn crates(&self) -> Result<Vec<sandbox::CrateInformation>> {
+        self.cache.crates.clone_or_populate(|| self.sandbox.crates())
+    }
+}
+
+/// A convenience constructor
+fn cached(sandbox: Sandbox) -> CachedSandbox<'static> {
+    lazy_static! {
+        static ref SANDBOX_CACHE: SandboxCache = Default::default();
+    }
+
+    CachedSandbox {
+        sandbox,
+        cache: &SANDBOX_CACHE,
+    }
+}
+
 quick_error! {
     #[derive(Debug)]
     pub enum Error {
@@ -261,6 +343,10 @@ quick_error! {
         RequestMissing {
             description("no request was provided")
             display("No request was provided")
+        }
+        CachePoisoned {
+            description("the cache has been poisoned")
+            display("The cache has been poisoned")
         }
     }
 }
@@ -338,14 +424,14 @@ struct ClippyResponse {
     stderr: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 struct CrateInformation {
     name: String,
     version: String,
     id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 struct MetaCratesResponse {
     crates: Vec<CrateInformation>,
 }
