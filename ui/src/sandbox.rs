@@ -7,6 +7,27 @@ use std::path::Path;
 use std::process::Command;
 use std::string;
 
+#[derive(Debug, Deserialize)]
+struct CrateInformationInner {
+    name: String,
+    version: String,
+    id: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct CrateInformation {
+    pub name: String,
+    pub version: String,
+    pub id: String,
+}
+
+impl From<CrateInformationInner> for CrateInformation {
+    fn from(me: CrateInformationInner) -> Self {
+        let CrateInformationInner { name, version, id } = me;
+        Self { name, version, id }
+    }
+}
+
 use mktemp::Temp;
 
 quick_error! {
@@ -30,6 +51,12 @@ quick_error! {
         UnableToReadOutput(err: io::Error) {
             description("unable to read output file")
             display("Unable to read output file: {}", err)
+            cause(err)
+        }
+        UnableToParseCrateInformation(err: ::serde_json::Error) {
+            from()
+            description("unable to read crate information")
+            display("Unable to read crate information: {}", err)
             cause(err)
         }
         OutputNotUtf8(err: string::FromUtf8Error) {
@@ -148,6 +175,22 @@ impl Sandbox {
         })
     }
 
+    pub fn crates(&self) -> Result<Vec<CrateInformation>> {
+        let mut command = basic_secure_docker_command();
+        command.args(&[Channel::Stable.container_name()]);
+        command.args(&["cat", "crate-information.json"]);
+
+        let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
+
+        let cargo_toml: Vec<CrateInformationInner> = ::serde_json::from_slice(&output.stdout)?;
+
+        let crates = cargo_toml.into_iter()
+            .map(Into::into)
+            .collect();
+
+        Ok(crates)
+    }
+
     fn write_source_code(&self, code: &str) -> Result<()> {
         let data = code.as_bytes();
 
@@ -219,28 +262,36 @@ impl Sandbox {
         mount_output_dir.push(":");
         mount_output_dir.push("/playground-result");
 
-        let mut cmd = Command::new("docker");
+        let mut cmd = basic_secure_docker_command();
 
         cmd
-            .arg("run")
-            .arg("--rm")
             .arg("--volume").arg(&mount_input_file)
-            .arg("--volume").arg(&mount_output_dir)
-            .arg("--cap-drop=ALL")
-            .arg("--cap-add=DAC_OVERRIDE")
-            .arg("--security-opt=no-new-privileges")
-            .args(&["--workdir", "/playground"])
-            .args(&["--net", "none"])
-            .args(&["--memory", "256m"])
-            .args(&["--memory-swap", "320m"])
-            .args(&["--env", "PLAYGROUND_TIMEOUT=10"]);
-
-        if cfg!(feature = "fork-bomb-prevention") {
-            cmd.args(&["--pids-limit", "512"]);
-        }
+            .arg("--volume").arg(&mount_output_dir);
 
         cmd
     }
+}
+
+fn basic_secure_docker_command() -> Command {
+    let mut cmd = Command::new("docker");
+
+    cmd
+        .arg("run")
+        .arg("--rm")
+        .arg("--cap-drop=ALL")
+        .arg("--cap-add=DAC_OVERRIDE")
+        .arg("--security-opt=no-new-privileges")
+        .args(&["--workdir", "/playground"])
+        .args(&["--net", "none"])
+        .args(&["--memory", "256m"])
+        .args(&["--memory-swap", "320m"])
+        .args(&["--env", "PLAYGROUND_TIMEOUT=10"]);
+
+    if cfg!(feature = "fork-bomb-prevention") {
+        cmd.args(&["--pids-limit", "512"]);
+    }
+
+    cmd
 }
 
 fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type: CrateType, tests: bool) -> Vec<&'static str> {

@@ -15,12 +15,15 @@ extern crate mktemp;
 #[macro_use]
 extern crate quick_error;
 extern crate corsware;
+#[macro_use]
+extern crate lazy_static;
 
 use std::any::Any;
 use std::convert::{TryFrom, TryInto};
 use std::env;
 use std::path::PathBuf;
-use std::time::Duration;
+use std::sync::Mutex;
+use std::time::{Duration, Instant};
 
 use iron::headers::ContentType;
 use iron::modifiers::Header;
@@ -48,6 +51,8 @@ const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
 const ONE_DAY_IN_SECONDS: u64 = 60 * 60 * 24;
 const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
 
+const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
+
 fn main() {
     env_logger::init().expect("Unable to initialize logger");
 
@@ -72,6 +77,7 @@ fn main() {
     mount.mount("/execute", execute);
     mount.mount("/format", format);
     mount.mount("/clippy", clippy);
+    mount.mount("/meta/crates", meta_crates);
     mount.mount("/evaluate.json", evaluate);
 
     let mut chain = Chain::new(mount);
@@ -137,6 +143,14 @@ fn clippy(req: &mut Request) -> IronResult<Response> {
     })
 }
 
+fn meta_crates(_req: &mut Request) -> IronResult<Response> {
+    with_sandbox_no_request(|sandbox| {
+        cached(sandbox)
+            .crates()
+            .map(MetaCratesResponse::from)
+    })
+}
+
 // This is a backwards compatibilty shim. The Rust homepage and the
 // documentation use this to run code in place.
 fn evaluate(req: &mut Request) -> IronResult<Response> {
@@ -150,19 +164,54 @@ fn evaluate(req: &mut Request) -> IronResult<Response> {
 }
 
 fn with_sandbox<Req, Resp, F>(req: &mut Request, f: F) -> IronResult<Response>
-    where F: FnOnce(Sandbox, Req) -> Result<Resp>,
-          Req: DeserializeOwned + Clone + Any + 'static,
-          Resp: Serialize,
+where
+    F: FnOnce(Sandbox, Req) -> Result<Resp>,
+    Req: DeserializeOwned + Clone + Any + 'static,
+    Resp: Serialize,
 {
-    let response = req.get::<bodyparser::Struct<Req>>()
-        .map_err(Error::Deserialization)
-        .and_then(|r| r.ok_or(Error::RequestMissing))
-        .and_then(|req| {
-            let sandbox = try!(Sandbox::new());
-            let resp = try!(f(sandbox, req));
-            let body = try!(serde_json::ser::to_string(&resp));
-            Ok(body)
-        });
+    serialize_to_response(run_handler(req, f))
+}
+
+fn with_sandbox_no_request<Resp, F>(f: F) -> IronResult<Response>
+where
+    F: FnOnce(Sandbox) -> Result<Resp>,
+    Resp: Serialize,
+{
+    serialize_to_response(run_handler_no_request(f))
+}
+
+fn run_handler<Req, Resp, F>(req: &mut Request, f: F) -> Result<Resp>
+where
+    F: FnOnce(Sandbox, Req) -> Result<Resp>,
+    Req: DeserializeOwned + Clone + Any + 'static,
+{
+    let body = req.get::<bodyparser::Struct<Req>>()
+        .map_err(Error::Deserialization)?;
+
+    let req = body.ok_or(Error::RequestMissing)?;
+
+    let sandbox = Sandbox::new()?;
+    let resp = f(sandbox, req)?;
+    Ok(resp)
+}
+
+fn run_handler_no_request<Resp, F>(f: F) -> Result<Resp>
+where
+    F: FnOnce(Sandbox) -> Result<Resp>,
+{
+    let sandbox = Sandbox::new()?;
+    let resp = f(sandbox)?;
+    Ok(resp)
+}
+
+fn serialize_to_response<Resp>(response: Result<Resp>) -> IronResult<Response>
+where
+    Resp: Serialize,
+{
+    let response = response.and_then(|resp| {
+        let resp = serde_json::ser::to_string(&resp)?;
+        Ok(resp)
+    });
 
     match response {
         Ok(body) => Ok(Response::with((status::Ok, Header(ContentType::json()), body))),
@@ -173,6 +222,84 @@ fn with_sandbox<Req, Resp, F>(req: &mut Request, f: F) -> IronResult<Response>
                 Err(_) => Ok(Response::with((status::InternalServerError, Header(ContentType::json()), FATAL_ERROR_JSON))),
             }
         },
+    }
+}
+
+#[derive(Debug, Clone)]
+struct SandboxCacheInfo<T> {
+    value: T,
+    time: Instant,
+}
+
+/// Caches the success value of a single operation
+#[derive(Debug, Default)]
+struct SandboxCacheOne<T>(Mutex<Option<SandboxCacheInfo<T>>>);
+
+impl<T> SandboxCacheOne<T>
+where
+    T: Clone
+{
+    fn clone_or_populate<F>(&self, populator: F) -> Result<T>
+    where
+        F: FnOnce() -> sandbox::Result<T>
+    {
+        let mut cache = self.0.lock().map_err(|_| Error::CachePoisoned)?;
+
+        match cache.clone() {
+            Some(cached) => {
+                if cached.time.elapsed() > Duration::from_secs(SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS) {
+                    SandboxCacheOne::populate(&mut *cache, populator)
+                } else {
+                    Ok(cached.value)
+                }
+            },
+            None => {
+                SandboxCacheOne::populate(&mut *cache, populator)
+            }
+        }
+    }
+
+    fn populate<F>(cache: &mut Option<SandboxCacheInfo<T>>, populator: F) -> Result<T>
+    where
+        F: FnOnce() -> sandbox::Result<T>
+    {
+        let value = populator().map_err(Error::Sandbox)?;
+        *cache = Some(SandboxCacheInfo {
+            value: value.clone(),
+            time: Instant::now(),
+        });
+        Ok(value)
+    }
+}
+
+/// Caches the successful results of all sandbox operations that make
+/// sense to cache.
+#[derive(Debug, Default)]
+struct SandboxCache {
+    crates: SandboxCacheOne<Vec<sandbox::CrateInformation>>,
+}
+
+/// Provides a similar API to the Sandbox that caches the successful results.
+struct CachedSandbox<'a> {
+    sandbox: Sandbox,
+    cache: &'a SandboxCache,
+}
+
+impl<'a> CachedSandbox<'a> {
+    fn crates(&self) -> Result<Vec<sandbox::CrateInformation>> {
+        self.cache.crates.clone_or_populate(|| self.sandbox.crates())
+    }
+}
+
+/// A convenience constructor
+fn cached(sandbox: Sandbox) -> CachedSandbox<'static> {
+    lazy_static! {
+        static ref SANDBOX_CACHE: SandboxCache = Default::default();
+    }
+
+    CachedSandbox {
+        sandbox,
+        cache: &SANDBOX_CACHE,
     }
 }
 
@@ -216,6 +343,10 @@ quick_error! {
         RequestMissing {
             description("no request was provided")
             display("No request was provided")
+        }
+        CachePoisoned {
+            description("the cache has been poisoned")
+            display("The cache has been poisoned")
         }
     }
 }
@@ -291,6 +422,18 @@ struct ClippyResponse {
     success: bool,
     stdout: String,
     stderr: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct CrateInformation {
+    name: String,
+    version: String,
+    id: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct MetaCratesResponse {
+    crates: Vec<CrateInformation>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -403,6 +546,18 @@ impl From<sandbox::ClippyResponse> for ClippyResponse {
             success: me.success,
             stdout: me.stdout,
             stderr: me.stderr,
+        }
+    }
+}
+
+impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
+    fn from(me: Vec<sandbox::CrateInformation>) -> Self {
+        let crates = me.into_iter()
+            .map(|cv| CrateInformation { name: cv.name, version: cv.version, id: cv.id })
+            .collect();
+
+        MetaCratesResponse {
+            crates,
         }
     }
 }

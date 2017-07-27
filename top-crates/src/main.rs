@@ -49,6 +49,14 @@ struct Package {
     authors: Vec<String>,
 }
 
+/// A mapping of a crates name to its identifier used in source code
+#[derive(Debug, Serialize)]
+struct CrateInformation {
+    name: String,
+    version: String,
+    id: String,
+}
+
 fn get_top_crates() -> TopCrates {
     let ssl = NativeTlsClient::new().expect("Unable to build TLS client");
     let connector = HttpsConnector::new(ssl);
@@ -171,17 +179,45 @@ fn main() {
         .expect("Unable to resolve dependencies");
 
     // Construct playground's Cargo.toml.
+    let unique_latest_crates = unique_latest_crates(res);
     let manifest = TomlManifest {
         package: Package {
             name: "playground".to_owned(),
             version: "0.0.1".to_owned(),
             authors: vec!["The Rust Playground".to_owned()],
         },
-        dependencies: unique_latest_crates(res),
+        dependencies: unique_latest_crates.clone(),
     };
 
     // Write manifest file.
     let cargo_toml = "result.Cargo.toml";
     write_manifest(manifest, cargo_toml);
     println!("wrote {}", cargo_toml);
+
+    let mut infos = Vec::new();
+
+    for (name, version) in unique_latest_crates {
+        let pkgid = cargo::core::PackageId::new(&name, &version, &crates_io)
+            .unwrap_or_else(|e| panic!("Unable to build PackageId for {} {}: {}", name, version, e));
+
+        let pkg = registry.download(&pkgid)
+            .unwrap_or_else(|e| panic!("Unable to download {} {}: {}", name, version, e));
+
+        for target in pkg.targets() {
+            if let cargo::core::TargetKind::Lib(_) = *target.kind() {
+                infos.push(CrateInformation {
+                    name: name.clone(),
+                    version: version.clone(),
+                    id: target.crate_name()
+                })
+            }
+        }
+    }
+
+    let path = "crate-information.json";
+    let mut f = File::create(path)
+        .unwrap_or_else(|e| panic!("Unable to create {}: {}", path, e));
+    serde_json::to_writer_pretty(&mut f, &infos)
+        .unwrap_or_else(|e| panic!("Unable to write {}: {}", path, e));
+    println!("Wrote {}", path);
 }

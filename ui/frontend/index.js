@@ -10,7 +10,7 @@ import persistState from 'redux-localstorage';
 import { configureRustErrors } from './highlighting';
 import { serialize, deserialize } from './local_storage';
 import playgroundApp from './reducers';
-import { gotoPosition } from './actions';
+import { gotoPosition, performCratesLoad } from './actions';
 import Router from './Router';
 import PageSwitcher from './PageSwitcher';
 
@@ -21,6 +21,8 @@ const enhancers = composeEnhancers(middlewares, persistState(undefined, { serial
 const store = createStore(playgroundApp, enhancers);
 
 configureRustErrors((line, col) => store.dispatch(gotoPosition(line, col)));
+
+store.dispatch(performCratesLoad());
 
 ReactDOM.render(
   <Provider store={store}>

@@ -1,0 +1,587 @@
+[
+  {
+    "name": "advapi32-sys",
+    "version": "0.2.0",
+    "id": "advapi32"
+  },
+  {
+    "name": "aho-corasick",
+    "version": "0.6.3",
+    "id": "aho_corasick"
+  },
+  {
+    "name": "ansi_term",
+    "version": "0.9.0",
+    "id": "ansi_term"
+  },
+  {
+    "name": "atty",
+    "version": "0.2.2",
+    "id": "atty"
+  },
+  {
+    "name": "base64",
+    "version": "0.6.0",
+    "id": "base64"
+  },
+  {
+    "name": "bitflags",
+    "version": "0.9.1",
+    "id": "bitflags"
+  },
+  {
+    "name": "byteorder",
+    "version": "1.1.0",
+    "id": "byteorder"
+  },
+  {
+    "name": "bytes",
+    "version": "0.4.4",
+    "id": "bytes"
+  },
+  {
+    "name": "cfg-if",
+    "version": "0.1.2",
+    "id": "cfg_if"
+  },
+  {
+    "name": "chrono",
+    "version": "0.4.0",
+    "id": "chrono"
+  },
+  {
+    "name": "clap",
+    "version": "2.25.1",
+    "id": "clap"
+  },
+  {
+    "name": "cmake",
+    "version": "0.1.24",
+    "id": "cmake"
+  },
+  {
+    "name": "cookie",
+    "version": "0.9.1",
+    "id": "cookie"
+  },
+  {
+    "name": "crossbeam",
+    "version": "0.2.10",
+    "id": "crossbeam"
+  },
+  {
+    "name": "docopt",
+    "version": "0.8.1",
+    "id": "docopt"
+  },
+  {
+    "name": "dtoa",
+    "version": "0.4.1",
+    "id": "dtoa"
+  },
+  {
+    "name": "either",
+    "version": "1.1.0",
+    "id": "either"
+  },
+  {
+    "name": "env_logger",
+    "version": "0.4.3",
+    "id": "env_logger"
+  },
+  {
+    "name": "extprim",
+    "version": "1.4.0",
+    "id": "extprim"
+  },
+  {
+    "name": "flate2",
+    "version": "0.2.19",
+    "id": "flate2"
+  },
+  {
+    "name": "futures",
+    "version": "0.1.14",
+    "id": "futures"
+  },
+  {
+    "name": "futures-cpupool",
+    "version": "0.1.5",
+    "id": "futures_cpupool"
+  },
+  {
+    "name": "gcc",
+    "version": "0.3.51",
+    "id": "gcc"
+  },
+  {
+    "name": "gdi32-sys",
+    "version": "0.2.0",
+    "id": "gdi32"
+  },
+  {
+    "name": "getopts",
+    "version": "0.2.14",
+    "id": "getopts"
+  },
+  {
+    "name": "glob",
+    "version": "0.2.11",
+    "id": "glob"
+  },
+  {
+    "name": "hpack",
+    "version": "0.3.0",
+    "id": "hpack"
+  },
+  {
+    "name": "httparse",
+    "version": "1.2.3",
+    "id": "httparse"
+  },
+  {
+    "name": "hyper",
+    "version": "0.11.1",
+    "id": "hyper"
+  },
+  {
+    "name": "idna",
+    "version": "0.1.4",
+    "id": "idna"
+  },
+  {
+    "name": "iovec",
+    "version": "0.1.0",
+    "id": "iovec"
+  },
+  {
+    "name": "itertools",
+    "version": "0.6.1",
+    "id": "itertools"
+  },
+  {
+    "name": "itoa",
+    "version": "0.3.1",
+    "id": "itoa"
+  },
+  {
+    "name": "kernel32-sys",
+    "version": "0.2.2",
+    "id": "kernel32"
+  },
+  {
+    "name": "language-tags",
+    "version": "0.2.2",
+    "id": "language_tags"
+  },
+  {
+    "name": "lazy_static",
+    "version": "0.2.8",
+    "id": "lazy_static"
+  },
+  {
+    "name": "lazycell",
+    "version": "0.4.0",
+    "id": "lazycell"
+  },
+  {
+    "name": "libc",
+    "version": "0.2.28",
+    "id": "libc"
+  },
+  {
+    "name": "libz-sys",
+    "version": "1.0.16",
+    "id": "libz_sys"
+  },
+  {
+    "name": "log",
+    "version": "0.3.8",
+    "id": "log"
+  },
+  {
+    "name": "matches",
+    "version": "0.1.6",
+    "id": "matches"
+  },
+  {
+    "name": "memchr",
+    "version": "1.0.1",
+    "id": "memchr"
+  },
+  {
+    "name": "mime",
+    "version": "0.3.2",
+    "id": "mime"
+  },
+  {
+    "name": "miniz-sys",
+    "version": "0.1.9",
+    "id": "miniz_sys"
+  },
+  {
+    "name": "mio",
+    "version": "0.6.9",
+    "id": "mio"
+  },
+  {
+    "name": "miow",
+    "version": "0.2.1",
+    "id": "miow"
+  },
+  {
+    "name": "net2",
+    "version": "0.2.30",
+    "id": "net2"
+  },
+  {
+    "name": "nix",
+    "version": "0.9.0",
+    "id": "nix"
+  },
+  {
+    "name": "nom",
+    "version": "3.2.0",
+    "id": "nom"
+  },
+  {
+    "name": "num",
+    "version": "0.1.40",
+    "id": "num"
+  },
+  {
+    "name": "num-bigint",
+    "version": "0.1.40",
+    "id": "num_bigint"
+  },
+  {
+    "name": "num-complex",
+    "version": "0.1.40",
+    "id": "num_complex"
+  },
+  {
+    "name": "num-integer",
+    "version": "0.1.35",
+    "id": "num_integer"
+  },
+  {
+    "name": "num-iter",
+    "version": "0.1.34",
+    "id": "num_iter"
+  },
+  {
+    "name": "num-rational",
+    "version": "0.1.39",
+    "id": "num_rational"
+  },
+  {
+    "name": "num-traits",
+    "version": "0.1.40",
+    "id": "num_traits"
+  },
+  {
+    "name": "num_cpus",
+    "version": "1.6.2",
+    "id": "num_cpus"
+  },
+  {
+    "name": "percent-encoding",
+    "version": "1.0.0",
+    "id": "percent_encoding"
+  },
+  {
+    "name": "pkg-config",
+    "version": "0.3.9",
+    "id": "pkg_config"
+  },
+  {
+    "name": "quote",
+    "version": "0.3.15",
+    "id": "quote"
+  },
+  {
+    "name": "rand",
+    "version": "0.3.15",
+    "id": "rand"
+  },
+  {
+    "name": "regex",
+    "version": "0.2.2",
+    "id": "regex"
+  },
+  {
+    "name": "regex-syntax",
+    "version": "0.4.1",
+    "id": "regex_syntax"
+  },
+  {
+    "name": "rustc-serialize",
+    "version": "0.3.24",
+    "id": "rustc_serialize"
+  },
+  {
+    "name": "rustc_version",
+    "version": "0.2.1",
+    "id": "rustc_version"
+  },
+  {
+    "name": "safemem",
+    "version": "0.2.0",
+    "id": "safemem"
+  },
+  {
+    "name": "scoped-tls",
+    "version": "0.1.0",
+    "id": "scoped_tls"
+  },
+  {
+    "name": "semver",
+    "version": "0.7.0",
+    "id": "semver"
+  },
+  {
+    "name": "semver-parser",
+    "version": "0.7.0",
+    "id": "semver_parser"
+  },
+  {
+    "name": "serde",
+    "version": "1.0.10",
+    "id": "serde"
+  },
+  {
+    "name": "serde_codegen",
+    "version": "0.9.0",
+    "id": "serde_codegen"
+  },
+  {
+    "name": "serde_codegen_internals",
+    "version": "0.14.2",
+    "id": "serde_codegen_internals"
+  },
+  {
+    "name": "serde_derive",
+    "version": "1.0.10",
+    "id": "serde_derive"
+  },
+  {
+    "name": "serde_derive_internals",
+    "version": "0.15.1",
+    "id": "serde_derive_internals"
+  },
+  {
+    "name": "serde_json",
+    "version": "1.0.2",
+    "id": "serde_json"
+  },
+  {
+    "name": "slab",
+    "version": "0.3.0",
+    "id": "slab"
+  },
+  {
+    "name": "smallvec",
+    "version": "0.2.1",
+    "id": "smallvec"
+  },
+  {
+    "name": "solicit",
+    "version": "0.4.4",
+    "id": "solicit"
+  },
+  {
+    "name": "strsim",
+    "version": "0.6.0",
+    "id": "strsim"
+  },
+  {
+    "name": "syn",
+    "version": "0.11.11",
+    "id": "syn"
+  },
+  {
+    "name": "synom",
+    "version": "0.11.3",
+    "id": "synom"
+  },
+  {
+    "name": "syntex",
+    "version": "0.58.1",
+    "id": "syntex"
+  },
+  {
+    "name": "syntex_errors",
+    "version": "0.59.1",
+    "id": "syntex_errors"
+  },
+  {
+    "name": "syntex_pos",
+    "version": "0.59.1",
+    "id": "syntex_pos"
+  },
+  {
+    "name": "syntex_syntax",
+    "version": "0.59.1",
+    "id": "syntex_syntax"
+  },
+  {
+    "name": "take",
+    "version": "0.1.0",
+    "id": "take"
+  },
+  {
+    "name": "tempdir",
+    "version": "0.3.5",
+    "id": "tempdir"
+  },
+  {
+    "name": "term",
+    "version": "0.4.6",
+    "id": "term"
+  },
+  {
+    "name": "term_size",
+    "version": "0.3.0",
+    "id": "term_size"
+  },
+  {
+    "name": "textwrap",
+    "version": "0.6.0",
+    "id": "textwrap"
+  },
+  {
+    "name": "thread-id",
+    "version": "3.2.0",
+    "id": "thread_id"
+  },
+  {
+    "name": "thread_local",
+    "version": "0.3.4",
+    "id": "thread_local"
+  },
+  {
+    "name": "time",
+    "version": "0.1.38",
+    "id": "time"
+  },
+  {
+    "name": "tokio-core",
+    "version": "0.1.9",
+    "id": "tokio_core"
+  },
+  {
+    "name": "tokio-io",
+    "version": "0.1.2",
+    "id": "tokio_io"
+  },
+  {
+    "name": "tokio-proto",
+    "version": "0.1.1",
+    "id": "tokio_proto"
+  },
+  {
+    "name": "tokio-service",
+    "version": "0.1.0",
+    "id": "tokio_service"
+  },
+  {
+    "name": "toml",
+    "version": "0.4.2",
+    "id": "toml"
+  },
+  {
+    "name": "traitobject",
+    "version": "0.1.0",
+    "id": "traitobject"
+  },
+  {
+    "name": "typeable",
+    "version": "0.1.2",
+    "id": "typeable"
+  },
+  {
+    "name": "unicase",
+    "version": "2.0.0",
+    "id": "unicase"
+  },
+  {
+    "name": "unicode-bidi",
+    "version": "0.3.4",
+    "id": "unicode_bidi"
+  },
+  {
+    "name": "unicode-normalization",
+    "version": "0.1.5",
+    "id": "unicode_normalization"
+  },
+  {
+    "name": "unicode-width",
+    "version": "0.1.4",
+    "id": "unicode_width"
+  },
+  {
+    "name": "unicode-xid",
+    "version": "0.1.0",
+    "id": "unicode_xid"
+  },
+  {
+    "name": "unreachable",
+    "version": "1.0.0",
+    "id": "unreachable"
+  },
+  {
+    "name": "url",
+    "version": "1.5.1",
+    "id": "url"
+  },
+  {
+    "name": "user32-sys",
+    "version": "0.2.0",
+    "id": "user32"
+  },
+  {
+    "name": "utf8-ranges",
+    "version": "1.0.0",
+    "id": "utf8_ranges"
+  },
+  {
+    "name": "uuid",
+    "version": "0.5.1",
+    "id": "uuid"
+  },
+  {
+    "name": "vcpkg",
+    "version": "0.2.2",
+    "id": "vcpkg"
+  },
+  {
+    "name": "vec_map",
+    "version": "0.8.0",
+    "id": "vec_map"
+  },
+  {
+    "name": "void",
+    "version": "1.0.2",
+    "id": "void"
+  },
+  {
+    "name": "winapi",
+    "version": "0.2.8",
+    "id": "winapi"
+  },
+  {
+    "name": "winapi-build",
+    "version": "0.1.1",
+    "id": "build"
+  },
+  {
+    "name": "ws2_32-sys",
+    "version": "0.2.1",
+    "id": "ws2_32"
+  },
+  {
+    "name": "xml-rs",
+    "version": "0.6.1",
+    "id": "xml"
+  }
+]

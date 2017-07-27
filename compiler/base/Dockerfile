@@ -36,3 +36,5 @@ ADD Cargo.toml /playground/Cargo.toml
 RUN cargo build
 RUN cargo build --release
 RUN rm src/*.rs
+
+ADD crate-information.json /playground/crate-information.json
