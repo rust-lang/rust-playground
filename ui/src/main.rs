@@ -72,6 +72,7 @@ fn main() {
     mount.mount("/execute", execute);
     mount.mount("/format", format);
     mount.mount("/clippy", clippy);
+    mount.mount("/meta/crates", meta_crates);
     mount.mount("/evaluate.json", evaluate);
 
     let mut chain = Chain::new(mount);
@@ -137,6 +138,15 @@ fn clippy(req: &mut Request) -> IronResult<Response> {
     })
 }
 
+fn meta_crates(_req: &mut Request) -> IronResult<Response> {
+    with_sandbox_no_request(|sandbox| {
+        sandbox
+            .crates()
+            .map(MetaCratesResponse::from)
+            .map_err(Error::Sandbox)
+    })
+}
+
 // This is a backwards compatibilty shim. The Rust homepage and the
 // documentation use this to run code in place.
 fn evaluate(req: &mut Request) -> IronResult<Response> {
@@ -150,19 +160,54 @@ fn evaluate(req: &mut Request) -> IronResult<Response> {
 }
 
 fn with_sandbox<Req, Resp, F>(req: &mut Request, f: F) -> IronResult<Response>
-    where F: FnOnce(Sandbox, Req) -> Result<Resp>,
-          Req: DeserializeOwned + Clone + Any + 'static,
-          Resp: Serialize,
+where
+    F: FnOnce(Sandbox, Req) -> Result<Resp>,
+    Req: DeserializeOwned + Clone + Any + 'static,
+    Resp: Serialize,
 {
-    let response = req.get::<bodyparser::Struct<Req>>()
-        .map_err(Error::Deserialization)
-        .and_then(|r| r.ok_or(Error::RequestMissing))
-        .and_then(|req| {
-            let sandbox = try!(Sandbox::new());
-            let resp = try!(f(sandbox, req));
-            let body = try!(serde_json::ser::to_string(&resp));
-            Ok(body)
-        });
+    serialize_to_response(run_handler(req, f))
+}
+
+fn with_sandbox_no_request<Resp, F>(f: F) -> IronResult<Response>
+where
+    F: FnOnce(Sandbox) -> Result<Resp>,
+    Resp: Serialize,
+{
+    serialize_to_response(run_handler_no_request(f))
+}
+
+fn run_handler<Req, Resp, F>(req: &mut Request, f: F) -> Result<Resp>
+where
+    F: FnOnce(Sandbox, Req) -> Result<Resp>,
+    Req: DeserializeOwned + Clone + Any + 'static,
+{
+    let body = req.get::<bodyparser::Struct<Req>>()
+        .map_err(Error::Deserialization)?;
+
+    let req = body.ok_or(Error::RequestMissing)?;
+
+    let sandbox = Sandbox::new()?;
+    let resp = f(sandbox, req)?;
+    Ok(resp)
+}
+
+fn run_handler_no_request<Resp, F>(f: F) -> Result<Resp>
+where
+    F: FnOnce(Sandbox) -> Result<Resp>,
+{
+    let sandbox = Sandbox::new()?;
+    let resp = f(sandbox)?;
+    Ok(resp)
+}
+
+fn serialize_to_response<Resp>(response: Result<Resp>) -> IronResult<Response>
+where
+    Resp: Serialize,
+{
+    let response = response.and_then(|resp| {
+        let resp = serde_json::ser::to_string(&resp)?;
+        Ok(resp)
+    });
 
     match response {
         Ok(body) => Ok(Response::with((status::Ok, Header(ContentType::json()), body))),
@@ -293,6 +338,18 @@ struct ClippyResponse {
     stderr: String,
 }
 
+#[derive(Debug, Serialize)]
+struct CrateInformation {
+    name: String,
+    version: String,
+    id: String,
+}
+
+#[derive(Debug, Serialize)]
+struct MetaCratesResponse {
+    crates: Vec<CrateInformation>,
+}
+
 #[derive(Debug, Clone, Deserialize)]
 struct EvaluateRequest {
     version: String,
@@ -403,6 +460,18 @@ impl From<sandbox::ClippyResponse> for ClippyResponse {
             success: me.success,
             stdout: me.stdout,
             stderr: me.stderr,
+        }
+    }
+}
+
+impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
+    fn from(me: Vec<sandbox::CrateInformation>) -> Self {
+        let crates = me.into_iter()
+            .map(|cv| CrateInformation { name: cv.name, version: cv.version, id: cv.id })
+            .collect();
+
+        MetaCratesResponse {
+            crates,
         }
     }
 }
