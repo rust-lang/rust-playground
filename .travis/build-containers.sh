@@ -10,5 +10,6 @@ then
     docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
     export PERFORM_PUSH="true"
     # Which images to build are set via .travis.yml
-    cd compiler && ./build.sh
+    cd compiler && ./build.sh && cd ..
+    cd ui && ./build.sh && cd ..
 fi
