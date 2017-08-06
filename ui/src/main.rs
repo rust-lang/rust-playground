@@ -90,7 +90,10 @@ fn main() {
 
     if cors_enabled {
         chain.link_around(CorsMiddleware {
-            allowed_origins: AllowedOrigins::Any { allow_null: false },
+            // A null origin occurs when you make a request from a
+            // page hosted on a filesystem, such as when you read the
+            // Rust book locally
+            allowed_origins: AllowedOrigins::Any { allow_null: true },
             allowed_headers: vec![UniCase("Content-Type".to_owned())],
             allowed_methods: vec![Get, Post],
             exposed_headers: vec![],
