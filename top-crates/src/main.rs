@@ -10,7 +10,7 @@ extern crate toml;
 use std::collections::BTreeMap;
 use std::collections::btree_map::Entry;
 use std::fs::File;
-use std::io::Write;
+use std::io::{Read, Write};
 
 use cargo::core::{Dependency, Registry, Source, SourceId, Summary};
 use cargo::core::resolver::{self, Method, Resolve};
@@ -53,6 +53,32 @@ struct CrateInformation {
     id: String,
 }
 
+/// Hand-curated changes to the crate list
+#[derive(Debug, Deserialize)]
+struct Modifications {
+    blacklist: Vec<String>,
+}
+
+impl Modifications {
+    fn blacklisted(&self, name: &str) -> bool {
+        self.blacklist.iter().any(|n| n == name)
+    }
+}
+
+lazy_static! {
+    static ref MODIFICATIONS: Modifications = {
+        let mut f = File::open("crate-modifications.toml")
+            .expect("unable to open crate modifications file");
+
+        let mut d = Vec::new();
+        f.read_to_end(&mut d)
+            .expect("unable to read crate modifications file");
+
+        toml::from_slice(&d)
+            .expect("unable to parse crate modifications file")
+    };
+}
+
 fn get_top_crates() -> TopCrates {
     let resp =
         reqwest::get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
@@ -86,8 +112,7 @@ fn decide_features(summary: &Summary) -> Method<'static> {
 fn unique_latest_crates(resolve: Resolve) -> BTreeMap<String, String> {
     let mut uniqs = BTreeMap::new();
     for pkg in resolve.iter() {
-        // Skip blacklisted crates.
-        if BLACKLIST.contains(&pkg.name()) {
+        if MODIFICATIONS.blacklisted(pkg.name()) {
             continue;
         }
 
@@ -116,21 +141,6 @@ fn write_manifest(manifest: TomlManifest, path: &str) {
     f.write_all(&content).expect("Couldn't write Cargo.toml");
 }
 
-static BLACKLIST: &'static [&'static str] = &[
-    "libressl-pnacl-sys", // Fails to build
-    "pnacl-build-helper", // Fails to build
-    "aster", // Not supported on stable
-    "quasi", // Not supported on stable
-    "quasi_codegen", // Not supported on stable
-    "quasi_macros", // Not supported on stable
-    "serde_macros", // Apparently deleted
-    "openssl", // Ecosystem is fragmented, only pull in via dependencies
-    "openssl-sys", // Ecosystem is fragmented, only pull in via dependencies
-    "openssl-sys-extras", // Ecosystem is fragmented, only pull in via dependencies
-    "openssl-verify", // Ecosystem is fragmented, only pull in via dependencies
-    "redox_syscall", // Not supported on stable
-];
-
 fn main() {
     // Setup to interact with cargo.
     let config = Config::default().expect("Unable to create default Cargo config");
@@ -143,8 +153,7 @@ fn main() {
 
     let mut summaries = Vec::new();
     for Crate { ref name, ref version } in top.crates {
-        // Skip blacklisted crates.
-        if BLACKLIST.contains(&&name[..]) {
+        if MODIFICATIONS.blacklisted(name) {
             continue;
         }
 

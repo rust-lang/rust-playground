@@ -1,0 +1,23 @@
+blacklist = [
+    # Requires native dependencies
+    "libressl-pnacl-sys",
+    "pnacl-build-helper",
+
+    # Not supported on stable
+    "aster",
+    "quasi",
+    "quasi_codegen",
+    "quasi_macros",
+
+    # Apparently deleted
+    "serde_macros",
+
+    # Ecosystem is fragmented, only pull in via dependencies
+    "openssl",
+    "openssl-sys",
+    "openssl-sys-extras",
+    "openssl-verify",
+
+    # Not supported on stable
+    "redox_syscall",
+]
