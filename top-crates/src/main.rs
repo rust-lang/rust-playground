@@ -1,6 +1,5 @@
 extern crate cargo;
-extern crate hyper;
-extern crate hyper_native_tls;
+extern crate reqwest;
 #[macro_use]
 extern crate lazy_static;
 extern crate serde_json;
@@ -17,9 +16,6 @@ use cargo::core::{Dependency, Registry, Source, SourceId, Summary};
 use cargo::core::resolver::{self, Method, Resolve};
 use cargo::sources::RegistrySource;
 use cargo::util::Config;
-use hyper::client::Client;
-use hyper::net::HttpsConnector;
-use hyper_native_tls::NativeTlsClient;
 
 #[derive(Debug, Deserialize)]
 struct TopCrates {
@@ -58,17 +54,12 @@ struct CrateInformation {
 }
 
 fn get_top_crates() -> TopCrates {
-    let ssl = NativeTlsClient::new().expect("Unable to build TLS client");
-    let connector = HttpsConnector::new(ssl);
-    let client = Client::with_connector(connector);
-
-    let res = client
-        .get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
-        .send()
+    let resp =
+        reqwest::get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
         .expect("Could not fetch top crates");
-    assert_eq!(res.status, hyper::Ok);
+    assert!(resp.status().is_success());
 
-    serde_json::from_reader(res).expect("Invalid JSON")
+    serde_json::from_reader(resp).expect("Invalid JSON")
 }
 
 fn decide_features(summary: &Summary) -> Method<'static> {
