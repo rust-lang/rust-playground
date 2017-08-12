@@ -51,7 +51,7 @@
   },
   {
     "name": "clap",
-    "version": "2.25.1",
+    "version": "2.26.0",
     "id": "clap"
   },
   {
@@ -60,14 +60,24 @@
     "id": "cmake"
   },
   {
+    "name": "conv",
+    "version": "0.3.3",
+    "id": "conv"
+  },
+  {
     "name": "cookie",
     "version": "0.9.1",
     "id": "cookie"
   },
   {
     "name": "crossbeam",
-    "version": "0.2.10",
+    "version": "0.3.0",
     "id": "crossbeam"
+  },
+  {
+    "name": "custom_derive",
+    "version": "0.1.7",
+    "id": "custom_derive"
   },
   {
     "name": "docopt",
@@ -141,7 +151,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.11.1",
+    "version": "0.11.2",
     "id": "hyper"
   },
   {
@@ -181,12 +191,12 @@
   },
   {
     "name": "lazycell",
-    "version": "0.4.0",
+    "version": "0.5.1",
     "id": "lazycell"
   },
   {
     "name": "libc",
-    "version": "0.2.28",
+    "version": "0.2.29",
     "id": "libc"
   },
   {
@@ -200,6 +210,16 @@
     "id": "log"
   },
   {
+    "name": "magenta",
+    "version": "0.1.1",
+    "id": "magenta"
+  },
+  {
+    "name": "magenta-sys",
+    "version": "0.1.1",
+    "id": "magenta_sys"
+  },
+  {
     "name": "matches",
     "version": "0.1.6",
     "id": "matches"
@@ -211,7 +231,7 @@
   },
   {
     "name": "mime",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "id": "mime"
   },
   {
@@ -221,7 +241,7 @@
   },
   {
     "name": "mio",
-    "version": "0.6.9",
+    "version": "0.6.10",
     "id": "mio"
   },
   {
@@ -231,7 +251,7 @@
   },
   {
     "name": "net2",
-    "version": "0.2.30",
+    "version": "0.2.31",
     "id": "net2"
   },
   {
@@ -295,13 +315,18 @@
     "id": "pkg_config"
   },
   {
+    "name": "quick-error",
+    "version": "1.2.0",
+    "id": "quick_error"
+  },
+  {
     "name": "quote",
     "version": "0.3.15",
     "id": "quote"
   },
   {
     "name": "rand",
-    "version": "0.3.15",
+    "version": "0.3.16",
     "id": "rand"
   },
   {
@@ -346,7 +371,7 @@
   },
   {
     "name": "serde",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "id": "serde"
   },
   {
@@ -361,7 +386,7 @@
   },
   {
     "name": "serde_derive",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "id": "serde_derive"
   },
   {
@@ -376,7 +401,7 @@
   },
   {
     "name": "slab",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "id": "slab"
   },
   {
@@ -446,7 +471,7 @@
   },
   {
     "name": "textwrap",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "id": "textwrap"
   },
   {
@@ -486,7 +511,7 @@
   },
   {
     "name": "toml",
-    "version": "0.4.2",
+    "version": "0.4.4",
     "id": "toml"
   },
   {
@@ -513,6 +538,11 @@
     "name": "unicode-normalization",
     "version": "0.1.5",
     "id": "unicode_normalization"
+  },
+  {
+    "name": "unicode-segmentation",
+    "version": "1.2.0",
+    "id": "unicode_segmentation"
   },
   {
     "name": "unicode-width",
