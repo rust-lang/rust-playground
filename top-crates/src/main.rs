@@ -161,7 +161,7 @@ fn main() {
         let dep = Dependency::parse_no_deprecated(name, Some(version), &crates_io)
             .unwrap_or_else(|e| panic!("Unable to parse dependency for {}:{}: {}", name, version, e));
 
-        let matches = registry.query(&dep).unwrap_or_else(|e| {
+        let matches = registry.query_vec(&dep).unwrap_or_else(|e| {
             panic!("Unable to query registry for {}:{}: {}", name, version, e);
         });
         if matches.len() != 1 {
