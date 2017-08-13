@@ -7,21 +7,30 @@ extern crate serde_json;
 extern crate serde_derive;
 extern crate toml;
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::collections::btree_map::Entry;
 use std::fs::File;
-use std::io::Write;
+use std::io::{Read, Write};
 
 use cargo::core::{Dependency, Registry, Source, SourceId, Summary};
 use cargo::core::resolver::{self, Method, Resolve};
 use cargo::sources::RegistrySource;
 use cargo::util::Config;
 
+/// The list of crates from crates.io
 #[derive(Debug, Deserialize)]
 struct TopCrates {
     crates: Vec<Crate>,
 }
 
+/// A single crate from crates.io
+#[derive(Debug, Deserialize)]
+struct OneCrate {
+    #[serde(rename="crate")]
+    krate: Crate,
+}
+
+/// The shared description of a crate
 #[derive(Debug, Deserialize)]
 struct Crate {
     #[serde(rename="id")]
@@ -53,13 +62,81 @@ struct CrateInformation {
     id: String,
 }
 
-fn get_top_crates() -> TopCrates {
-    let resp =
-        reqwest::get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
-        .expect("Could not fetch top crates");
-    assert!(resp.status().is_success());
+/// Hand-curated changes to the crate list
+#[derive(Debug, Deserialize)]
+struct Modifications {
+    #[serde(default)]
+    blacklist: Vec<String>,
+    #[serde(default)]
+    additions: BTreeSet<String>,
+}
 
-    serde_json::from_reader(resp).expect("Invalid JSON")
+impl Modifications {
+    fn blacklisted(&self, name: &str) -> bool {
+        self.blacklist.iter().any(|n| n == name)
+    }
+
+    fn additions(&self, existing_names: &[&str]) -> Vec<&str> {
+        let existing_names: BTreeSet<_> = existing_names.iter().collect();
+        self.additions.iter()
+            .map(|n| n.as_str())
+            .filter(|n| !existing_names.contains(n))
+            .collect()
+    }
+}
+
+lazy_static! {
+    static ref MODIFICATIONS: Modifications = {
+        let mut f = File::open("crate-modifications.toml")
+            .expect("unable to open crate modifications file");
+
+        let mut d = Vec::new();
+        f.read_to_end(&mut d)
+            .expect("unable to read crate modifications file");
+
+        toml::from_slice(&d)
+            .expect("unable to parse crate modifications file")
+    };
+}
+
+impl TopCrates {
+    /// List top 100 crates by number of downloads on crates.io.
+    fn download() -> TopCrates {
+        let resp =
+            reqwest::get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
+            .expect("Could not fetch top crates");
+        assert!(resp.status().is_success());
+
+        serde_json::from_reader(resp).expect("Invalid JSON")
+    }
+
+    /// Add crates that have been hand-picked
+    fn add_curated_crates(&mut self) {
+        let added_crates: Vec<_> = {
+            let names = self.names();
+            let new_names = MODIFICATIONS.additions(&names);
+
+            new_names.into_iter().map(|name| {
+                let api_url = format!("https://crates.io/api/v1/crates/{}", name);
+
+                let resp =
+                    reqwest::get(&api_url)
+                    .unwrap_or_else(|e| panic!("Could not fetch crate {}: {}", name, e));
+                assert!(resp.status().is_success());
+
+                let one: OneCrate = serde_json::from_reader(resp)
+                    .unwrap_or_else(|e| panic!("Crate {} had invalid JSON: {}", name, e));
+
+                one.krate
+            }).collect()
+        };
+
+        self.crates.extend(added_crates);
+    }
+
+    fn names(&self) -> Vec<&str> {
+        self.crates.iter().map(|c| c.name.as_str()).collect()
+    }
 }
 
 fn decide_features(summary: &Summary) -> Method<'static> {
@@ -86,8 +163,7 @@ fn decide_features(summary: &Summary) -> Method<'static> {
 fn unique_latest_crates(resolve: Resolve) -> BTreeMap<String, String> {
     let mut uniqs = BTreeMap::new();
     for pkg in resolve.iter() {
-        // Skip blacklisted crates.
-        if BLACKLIST.contains(&pkg.name()) {
+        if MODIFICATIONS.blacklisted(pkg.name()) {
             continue;
         }
 
@@ -116,21 +192,6 @@ fn write_manifest(manifest: TomlManifest, path: &str) {
     f.write_all(&content).expect("Couldn't write Cargo.toml");
 }
 
-static BLACKLIST: &'static [&'static str] = &[
-    "libressl-pnacl-sys", // Fails to build
-    "pnacl-build-helper", // Fails to build
-    "aster", // Not supported on stable
-    "quasi", // Not supported on stable
-    "quasi_codegen", // Not supported on stable
-    "quasi_macros", // Not supported on stable
-    "serde_macros", // Apparently deleted
-    "openssl", // Ecosystem is fragmented, only pull in via dependencies
-    "openssl-sys", // Ecosystem is fragmented, only pull in via dependencies
-    "openssl-sys-extras", // Ecosystem is fragmented, only pull in via dependencies
-    "openssl-verify", // Ecosystem is fragmented, only pull in via dependencies
-    "redox_syscall", // Not supported on stable
-];
-
 fn main() {
     // Setup to interact with cargo.
     let config = Config::default().expect("Unable to create default Cargo config");
@@ -138,13 +199,12 @@ fn main() {
     let mut registry = RegistrySource::remote(&crates_io, &config);
     registry.update().expect("Unable to update registry");
 
-    // List top 100 crates by number of downloads on crates.io.
-    let top = get_top_crates();
+    let mut top = TopCrates::download();
+    top.add_curated_crates();
 
     let mut summaries = Vec::new();
     for Crate { ref name, ref version } in top.crates {
-        // Skip blacklisted crates.
-        if BLACKLIST.contains(&&name[..]) {
+        if MODIFICATIONS.blacklisted(name) {
             continue;
         }
 
