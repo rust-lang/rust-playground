@@ -1,12 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import PureComponent from './PureComponent';
 import { connect } from 'react-redux';
 
 import AdvancedEditor from './AdvancedEditor';
 import { editCode, performExecute } from './actions';
 
-class SimpleEditor extends PureComponent {
+class SimpleEditor extends React.PureComponent<SimpleEditorProps> {
+  private _editor: HTMLTextAreaElement;
+
   onChange = e => this.props.onEditCode(e.target.value);
   trackEditor = component => this._editor = component;
   onKeyDown = e => {
@@ -54,17 +54,17 @@ class SimpleEditor extends PureComponent {
   }
 }
 
-SimpleEditor.propTypes = {
-  code: PropTypes.string.isRequired,
-  execute: PropTypes.func.isRequired,
-  onEditCode: PropTypes.func.isRequired,
-  position: PropTypes.shape({
-    line: PropTypes.number.isRequired,
-    column: PropTypes.number.isRequired,
-  }).isRequired,
+interface SimpleEditorProps {
+  code: string,
+  execute: () => any,
+  onEditCode: (string) => any,
+  position: {
+    line: number,
+    column: number,
+  },
 };
 
-class Editor extends PureComponent {
+class Editor extends React.PureComponent<EditorProps> {
   render() {
     const { editor, execute, code, crates, position, onEditCode } = this.props;
     const SelectedEditor = editor === "simple" ? SimpleEditor : AdvancedEditor;
@@ -81,20 +81,20 @@ class Editor extends PureComponent {
   }
 }
 
-Editor.propTypes = {
-  code: PropTypes.string.isRequired,
-  editor: PropTypes.string.isRequired,
-  execute: PropTypes.func.isRequired,
-  onEditCode: PropTypes.func.isRequired,
-  position: PropTypes.shape({
-    line: PropTypes.number.isRequired,
-    column: PropTypes.number.isRequired,
-  }).isRequired,
-  crates: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    version: PropTypes.string.isRequired,
-  })).isRequired,
+interface EditorProps {
+  code: string,
+  editor: string,
+  execute: () => any,
+  onEditCode: (string) => any,
+  position: {
+    line: number,
+    column: number,
+  },
+  crates: {
+    id: string,
+    name: string,
+    version: string,
+  }[],
 };
 
 const mapStateToProps = ({ code, configuration: { editor }, position, crates }) => (
