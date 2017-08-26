@@ -1,8 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import createHistory from 'history/createBrowserHistory';
-import UssRouter from './uss-router/Router.jsx';
+import UssRouter from './uss-router/Router';
 import { createRouter } from './uss-router';
 
 import Route from 'route-parser';
@@ -57,7 +56,9 @@ const locationToAction = location => {
   return null;
 };
 
-export default class Router extends React.Component {
+export default class Router extends React.Component<RouterProps> {
+  private router: any;
+
   constructor(props) {
     super();
 
@@ -76,8 +77,7 @@ export default class Router extends React.Component {
   }
 }
 
-Router.propTypes = {
-  store: PropTypes.any.isRequired,
-  reducer: PropTypes.any.isRequired,
-  children: PropTypes.node,
+interface RouterProps {
+  store: any,
+  reducer: any,
 };
