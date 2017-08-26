@@ -1,6 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import PureComponent from './PureComponent';
 import { connect } from 'react-redux';
 import Link from './uss-router/Link';
 
@@ -18,6 +16,7 @@ import {
   navigateToHelp,
 } from './actions';
 import { getCrateType, runAsTest } from './selectors';
+import State from './state';
 
 function oneRadio(name, currentValue, possibleValue, change, labelText) {
   const id = `${name}-${possibleValue}`;
@@ -34,7 +33,7 @@ const executionLabel = (crateType, tests) => {
   return "Build";
 };
 
-class Header extends PureComponent {
+class Header extends React.PureComponent<HeaderProps> {
   render() {
     const {
       execute, compileToAssembly, compileToLLVM, compileToMir,
@@ -117,25 +116,25 @@ class Header extends PureComponent {
   }
 }
 
-Header.propTypes = {
-  changeChannel: PropTypes.func.isRequired,
-  changeMode: PropTypes.func.isRequired,
-  channel: PropTypes.string.isRequired,
-  clippy: PropTypes.func.isRequired,
-  compileToAssembly: PropTypes.func.isRequired,
-  compileToLLVM: PropTypes.func.isRequired,
-  compileToMir: PropTypes.func.isRequired,
-  execute: PropTypes.func.isRequired,
-  format: PropTypes.func.isRequired,
-  gistSave: PropTypes.func.isRequired,
-  mode: PropTypes.string.isRequired,
-  crateType: PropTypes.string.isRequired,
-  tests: PropTypes.bool.isRequired,
-  toggleConfiguration: PropTypes.func.isRequired,
-  navigateToHelp: PropTypes.func.isRequired,
+interface HeaderProps {
+  changeChannel: (string) => any,
+  changeMode: (string) => any,
+  channel: string,
+  clippy: () => any,
+  compileToAssembly: () => any,
+  compileToLLVM: () => any,
+  compileToMir: () => any,
+  execute: () => any,
+  format: () => any,
+  gistSave: () => any,
+  mode: string,
+  crateType: string,
+  tests: boolean,
+  toggleConfiguration: () => any,
+  navigateToHelp: () => any,
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state: State) => {
   const { configuration: { channel, mode } } = state;
 
   return {
