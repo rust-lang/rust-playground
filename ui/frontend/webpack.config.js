@@ -31,7 +31,7 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
 
   module: {
@@ -40,6 +40,11 @@ module.exports = {
         test: [/\.js$/, /\.jsx$/],
         exclude: /node_modules/,
         use: 'babel-loader',
+      },
+      {
+        test: [/\.ts$/, /\.tsx$/],
+        exclude: /node_modules/,
+        use: ['babel-loader', 'ts-loader'],
       },
       {
         test: /\.scss$/,
