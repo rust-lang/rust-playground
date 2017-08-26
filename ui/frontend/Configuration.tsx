@@ -1,8 +1,6 @@
 /* global ACE_KEYBINDINGS:false, ACE_THEMES:false */
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import PureComponent from './PureComponent';
 import { connect } from 'react-redux';
 
 import {
@@ -17,7 +15,9 @@ import {
 const keybindingOptions = ACE_KEYBINDINGS.map(t => <option value={t} key={t}>{t}</option>);
 const themeOptions = ACE_THEMES.map(t => <option value={t} key={t}>{t}</option>);
 
-const ConfigurationSelect = ({ what, label, defaultValue, onChange, children }) => (
+const ConfigurationSelect: React.SFC<ConfigurationSelectProps> = ({
+    what, label, defaultValue, onChange, children
+}) => (
   <div className="configuration-item">
     <label htmlFor={`config-${what}`}
            className="configuration-label">
@@ -32,17 +32,16 @@ const ConfigurationSelect = ({ what, label, defaultValue, onChange, children }) 
   </div>
 );
 
-ConfigurationSelect.propTypes = {
-  what: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  defaultValue: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  children: PropTypes.node.isRequired,
+interface ConfigurationSelectProps {
+  what: string,
+  label: string,
+  defaultValue: string,
+  onChange: (string) => any,
 };
 
 const ESCAPE_KEYCODE = 27;
 
-class Configuration extends PureComponent {
+class Configuration extends React.PureComponent<ConfigurationProps> {
   onChangeEditor = e => this.props.changeEditor(e.target.value);
   onChangeKeybinding = e => this.props.changeKeybinding(e.target.value);
   onChangeTheme = e => this.props.changeTheme(e.target.value);
@@ -125,18 +124,18 @@ class Configuration extends PureComponent {
   }
 }
 
-Configuration.propTypes = {
-  changeEditor: PropTypes.func.isRequired,
-  changeKeybinding: PropTypes.func.isRequired,
-  changeTheme: PropTypes.func.isRequired,
-  changeOrientation: PropTypes.func.isRequired,
-  changeAssemblyFlavor: PropTypes.func.isRequired,
-  editor: PropTypes.string.isRequired,
-  keybinding: PropTypes.string.isRequired,
-  theme: PropTypes.string.isRequired,
-  orientation: PropTypes.string.isRequired,
-  assemblyFlavor: PropTypes.string.isRequired,
-  toggleConfiguration: PropTypes.func.isRequired,
+interface ConfigurationProps {
+  changeEditor: (string) => any,
+  changeKeybinding: (string) => any,
+  changeTheme: (string) => any,
+  changeOrientation: (string) => any,
+  changeAssemblyFlavor: (string) => any,
+  editor: string,
+  keybinding: string,
+  theme: string,
+  orientation: string,
+  assemblyFlavor: string,
+  toggleConfiguration: () => any,
 };
 
 const mapStateToProps = ({ configuration: { editor, keybinding, theme, orientation, assemblyFlavor } }) => (
