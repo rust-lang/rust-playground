@@ -29,6 +29,8 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
+    "@types/react-dom": "^15.5.4",
+    "@types/react-redux": "^5.0.5",
     "autoprefixer": "^7.1.1",
     "babel-core": "^6.17.0",
     "babel-eslint": "^7.0.0",
