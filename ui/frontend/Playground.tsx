@@ -1,23 +1,21 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Configuration from './Configuration';
 import Header from './Header';
 import Editor from './Editor';
 import Output from './Output';
+import State from './state';
 
-function ConfigurationModal() {
-  return (
-    <div className="modal-backdrop">
-      <div className="modal-content">
-        <Configuration  />
-      </div>
+const ConfigurationModal: React.SFC = () => (
+  <div className="modal-backdrop">
+    <div className="modal-content">
+      <Configuration />
     </div>
-  );
-}
+  </div>
+);
 
-class Playground extends React.Component {
+class Playground extends React.Component<Props> {
   render() {
     const { showConfig, focus, splitOrientation } = this.props;
 
@@ -61,18 +59,17 @@ class Playground extends React.Component {
   }
 }
 
-Playground.propTypes = {
-  focus: PropTypes.string,
-  showConfig: PropTypes.bool.isRequired,
-  splitOrientation: PropTypes.string.isRequired,
+interface Props {
+  focus?: string,
+  showConfig: boolean,
+  splitOrientation: string,
 };
 
-const mapStateToProps = ({ configuration: { shown: showConfig, orientation: splitOrientation }, output: { meta: { focus } } }) => (
+const mapStateToProps = ({
+    configuration: { shown: showConfig, orientation: splitOrientation },
+    output: { meta: { focus } }
+}: State) => (
   { showConfig, focus, splitOrientation }
 );
 
-const ConnectedPlayground = connect(
-  mapStateToProps
-)(Playground);
-
-export default ConnectedPlayground;
+export default connect(mapStateToProps, undefined)(Playground);
