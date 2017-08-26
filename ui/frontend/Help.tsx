@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import Link from './uss-router/Link';
@@ -67,7 +66,7 @@ fn main() {
     println!("{}", a_loop());
 }`;
 
-const Help = ({ navigateToIndex }) => (
+const Help = ({ navigateToIndex }: HelpProps) => (
   <section className="help">
     <h1>The Rust Playground</h1>
     <Link action={navigateToIndex}>Return to the playground</Link>
@@ -293,16 +292,16 @@ const Help = ({ navigateToIndex }) => (
   </section>
 );
 
-Help.propTypes = {
-  navigateToIndex: PropTypes.func.isRequired,
+export interface HelpProps {
+  navigateToIndex: () => void,
 };
 
-const H2 = ({ children }) => <h2>{children}</h2>;
-H2.propTypes = { children: PropTypes.node };
-const H3 = ({ children }) => <h3>{children}</h3>;
-H3.propTypes = { children: PropTypes.node };
+const H2: React.SFC = ({ children }) => <h2>{children}</h2>;
+const H3: React.SFC = ({ children }) => <h3>{children}</h3>;
 
-const LinkableSection = ({ id, header, level: Level, children }) => (
+const LinkableSection: React.SFC<LinkableSectionProps> = ({
+  id, header, level: Level, children
+}) => (
   <div id={id}>
     <Level>
       <span className="help__header">
@@ -313,20 +312,15 @@ const LinkableSection = ({ id, header, level: Level, children }) => (
   </div>
 );
 
-LinkableSection.propTypes = {
-  id: PropTypes.string.isRequired,
-  header: PropTypes.string.isRequired,
-  level: PropTypes.func.isRequired,
-  children: PropTypes.node,
+interface LinkableSectionProps {
+  id: string,
+  header: string,
+  level: (ChildrenProps) => JSX.Element,
 };
 
-const Code = ({ children }) => (
+const Code: React.SFC = ({ children }) => (
     <code className="help__code">{ children }</code>
 );
-
-Code.propTypes = {
-  children: PropTypes.node,
-};
 
 const mapStateToProps = () => ({
   navigateToIndex,

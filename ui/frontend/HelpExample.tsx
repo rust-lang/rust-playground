@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { PrismCode } from "react-prism";
@@ -7,7 +6,7 @@ import "prismjs/components/prism-rust.min";
 
 import { showExample } from './actions';
 
-const Example = ({ code, showExample }) => (
+const Example: React.SFC<Props> = ({ code, showExample }) => (
   <pre className="help__example">
     <button className="help__load_example" onClick={() => showExample(code)}>
       Load in playground
@@ -18,9 +17,9 @@ const Example = ({ code, showExample }) => (
   </pre>
 );
 
-Example.propTypes = {
-  code: PropTypes.string.isRequired,
-  showExample: PropTypes.func.isRequired,
+export interface Props {
+  code: string,
+  showExample: (code: string) => any,
 };
 
 const mapDispatchToProps = ({
