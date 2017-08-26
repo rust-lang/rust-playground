@@ -1,6 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import PureComponent from './PureComponent';
 import { connect } from 'react-redux';
 
 const displayExternCrateAutocomplete = editor => {
@@ -36,7 +34,8 @@ function buildCrateAutocompleter(component) {
   };
 }
 
-class AdvancedEditor extends PureComponent {
+class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
+  private _editor: any;
   trackEditor = component => this._editor = component;
 
   render() {
@@ -120,23 +119,23 @@ class AdvancedEditor extends PureComponent {
   }
 }
 
-AdvancedEditor.propTypes = {
-  ace: PropTypes.any.isRequired,
-  AceEditor: PropTypes.func.isRequired,
-  code: PropTypes.string.isRequired,
-  execute: PropTypes.func.isRequired,
-  keybinding: PropTypes.string,
-  onEditCode: PropTypes.func.isRequired,
-  position: PropTypes.shape({
-    line: PropTypes.number.isRequired,
-    column: PropTypes.number.isRequired,
-  }).isRequired,
-  theme: PropTypes.string.isRequired,
-  crates: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    version: PropTypes.string.isRequired,
-  })).isRequired,
+interface AdvancedEditorProps {
+  ace: any,
+  AceEditor: React.ReactType,
+  code: string,
+  execute: () => any,
+  keybinding?: string,
+  onEditCode: (string) => any,
+  position: {
+    line: number,
+    column: number,
+  },
+  theme: string,
+  crates: {
+    id: string,
+    name: string,
+    version: string,
+  }[],
 };
 
 // The ACE editor weighs in at ~250K. Adding all of the themes and the
@@ -153,7 +152,7 @@ AdvancedEditor.propTypes = {
 // There's some implicit ordering; the library must be loaded before
 // any other piece. Themes and keybindings can also be changed at
 // runtime.
-class AdvancedEditorAsync extends React.Component {
+class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedEditorAsyncState> {
   constructor(props) {
     super(props);
     this.state = { modeLoading: true };
@@ -218,6 +217,16 @@ class AdvancedEditorAsync extends React.Component {
     }
   }
 }
+
+interface AdvancedEditorAsyncState {
+  theme?: string,
+  keybinding?: string,
+  themeLoading?: boolean,
+  keybindingLoading?: boolean,
+  modeLoading: boolean,
+  AceEditor?: React.ReactType,
+  ace?: any,
+};
 
 const mapStateToProps = ({ configuration: { theme, keybinding } }) => ({
   theme,
