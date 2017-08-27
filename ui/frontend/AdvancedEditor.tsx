@@ -1,6 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import State from './state';
+import { CommonEditorProps } from './types';
+
 const displayExternCrateAutocomplete = editor => {
   const { session } = editor;
   const pos = editor.getCursorPosition();
@@ -228,9 +231,14 @@ interface AdvancedEditorAsyncState {
   ace?: any,
 };
 
-const mapStateToProps = ({ configuration: { theme, keybinding } }) => ({
+interface PropsFromState {
+  theme: string,
+  keybinding?: string,
+};
+
+const mapStateToProps = ({ configuration: { theme, keybinding } }: State) => ({
   theme,
   keybinding: keybinding === 'ace' ? null : keybinding,
 });
 
-export default connect(mapStateToProps)(AdvancedEditorAsync);
+export default connect<PropsFromState, undefined, CommonEditorProps>(mapStateToProps)(AdvancedEditorAsync);

@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 
 import AdvancedEditor from './AdvancedEditor';
 import { editCode, performExecute } from './actions';
+import { CommonEditorProps } from './types';
 
-class SimpleEditor extends React.PureComponent<SimpleEditorProps> {
+class SimpleEditor extends React.PureComponent<CommonEditorProps> {
   private _editor: HTMLTextAreaElement;
 
   onChange = e => this.props.onEditCode(e.target.value);
@@ -53,16 +54,6 @@ class SimpleEditor extends React.PureComponent<SimpleEditorProps> {
     editor.setSelectionRange(precedingBytes, precedingBytes + highlightedBytes);
   }
 }
-
-interface SimpleEditorProps {
-  code: string,
-  execute: () => any,
-  onEditCode: (string) => any,
-  position: {
-    line: number,
-    column: number,
-  },
-};
 
 class Editor extends React.PureComponent<EditorProps> {
   render() {

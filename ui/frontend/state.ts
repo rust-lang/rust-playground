@@ -4,6 +4,8 @@ export default interface State {
     orientation: string,
     channel: string,
     mode: string,
+    theme: string,
+    keybinding: string,
   },
   output: {
     meta: {
