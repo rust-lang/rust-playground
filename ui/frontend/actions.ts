@@ -45,6 +45,16 @@ export enum ActionType {
   ExecuteRequest = 'EXECUTE_REQUEST',
   ExecuteSucceeded = 'EXECUTE_SUCCEEDED',
   ExecuteFailed = 'EXECUTE_FAILED',
+  CompileAssemblyRequest = 'COMPILE_ASSEMBLY_REQUEST',
+  CompileAssemblySucceeded = 'COMPILE_ASSEMBLY_SUCCEEDED',
+  CompileAssemblyFailed = 'COMPILE_ASSEMBLY_FAILED',
+  CompileLlvmIrRequest = 'COMPILE_LLVM_IR_REQUEST',
+  CompileLlvmIrSucceeded = 'COMPILE_LLVM_IR_SUCCEEDED',
+  CompileLlvmIrFailed = 'COMPILE_LLVM_IR_FAILED',
+  CompileMirRequest = 'COMPILE_MIR_REQUEST',
+  CompileMirSucceeded = 'COMPILE_MIR_SUCCEEDED',
+  CompileMirFailed = 'COMPILE_MIR_FAILED',
+
   Other = '__never_used__',
 }
 
@@ -62,6 +72,15 @@ export type Action =
   | ExecuteRequestAction
   | ExecuteSucceededAction
   | ExecuteFailedAction
+  | CompileAssemblyRequestAction
+  | CompileAssemblySucceededAction
+  | CompileAssemblyFailedAction
+  | CompileLlvmIrRequestAction
+  | CompileLlvmIrSucceededAction
+  | CompileLlvmIrFailedAction
+  | CompileMirRequestAction
+  | CompileMirSucceededAction
+  | CompileMirFailedAction
 
   | OtherAction
 ;
@@ -247,20 +266,39 @@ function performCompile(target, { request, success, failure }): ThunkAction {
   };
 }
 
-export const REQUEST_COMPILE_ASSEMBLY = 'REQUEST_COMPILE_ASSEMBLY';
-export const COMPILE_ASSEMBLY_SUCCEEDED = 'COMPILE_ASSEMBLY_SUCCEEDED';
-export const COMPILE_ASSEMBLY_FAILED = 'COMPILE_ASSEMBLY_FAILED';
-
-function requestCompileAssembly() {
-  return { type: REQUEST_COMPILE_ASSEMBLY };
+export interface CompileRequestAction<T> {
+  type: T
 }
 
-function receiveCompileAssemblySuccess({ code, stdout, stderr }) {
-  return { type: COMPILE_ASSEMBLY_SUCCEEDED, code, stdout, stderr };
+export interface CompileSucceededAction<T> {
+  type: T;
+  code?: string;
+  stdout?: string;
+  stderr?: string;
 }
 
-function receiveCompileAssemblyFailure({ error }) {
-  return { type: COMPILE_ASSEMBLY_FAILED, error };
+export interface CompileFailedAction<T> {
+  type: T;
+  error?: string;
+}
+
+export type CompileAssemblyRequestAction =
+  CompileRequestAction<ActionType.CompileAssemblyRequest>;
+export type CompileAssemblySucceededAction =
+  CompileSucceededAction<ActionType.CompileAssemblySucceeded>;
+export type CompileAssemblyFailedAction =
+  CompileFailedAction<ActionType.CompileAssemblyFailed>;
+
+function requestCompileAssembly(): CompileAssemblyRequestAction {
+  return { type: ActionType.CompileAssemblyRequest };
+}
+
+function receiveCompileAssemblySuccess({ code, stdout, stderr }): CompileAssemblySucceededAction {
+  return { type: ActionType.CompileAssemblySucceeded, code, stdout, stderr };
+}
+
+function receiveCompileAssemblyFailure({ error }): CompileAssemblyFailedAction {
+  return { type: ActionType.CompileAssemblyFailed, error };
 }
 
 export const performCompileToAssembly = () =>
@@ -270,20 +308,23 @@ export const performCompileToAssembly = () =>
     failure: receiveCompileAssemblyFailure,
   });
 
-export const REQUEST_COMPILE_LLVM_IR = 'REQUEST_COMPILE_LLVM_IR';
-export const COMPILE_LLVM_IR_SUCCEEDED = 'COMPILE_LLVM_IR_SUCCEEDED';
-export const COMPILE_LLVM_IR_FAILED = 'COMPILE_LLVM_IR_FAILED';
+export type CompileLlvmIrRequestAction =
+  CompileRequestAction<ActionType.CompileLlvmIrRequest>;
+export type CompileLlvmIrSucceededAction =
+  CompileSucceededAction<ActionType.CompileLlvmIrSucceeded>;
+export type CompileLlvmIrFailedAction =
+  CompileFailedAction<ActionType.CompileLlvmIrFailed>;
 
-function requestCompileLlvmIr() {
-  return { type: REQUEST_COMPILE_LLVM_IR };
+function requestCompileLlvmIr(): CompileLlvmIrRequestAction {
+  return { type: ActionType.CompileLlvmIrRequest };
 }
 
-function receiveCompileLlvmIrSuccess({ code, stdout, stderr }) {
-  return { type: COMPILE_LLVM_IR_SUCCEEDED, code, stdout, stderr };
+function receiveCompileLlvmIrSuccess({ code, stdout, stderr }): CompileLlvmIrSucceededAction {
+  return { type: ActionType.CompileLlvmIrSucceeded, code, stdout, stderr };
 }
 
-function receiveCompileLlvmIrFailure({ error }) {
-  return { type: COMPILE_LLVM_IR_FAILED, error };
+function receiveCompileLlvmIrFailure({ error }): CompileLlvmIrFailedAction {
+  return { type: ActionType.CompileLlvmIrFailed, error };
 }
 
 export const performCompileToLLVM = () =>
@@ -293,20 +334,23 @@ export const performCompileToLLVM = () =>
     failure: receiveCompileLlvmIrFailure,
   });
 
-export const REQUEST_COMPILE_MIR = 'REQUEST_COMPILE_MIR';
-export const COMPILE_MIR_SUCCEEDED = 'COMPILE_MIR_SUCCEEDED';
-export const COMPILE_MIR_FAILED = 'COMPILE_MIR_FAILED';
+export type CompileMirRequestAction =
+  CompileRequestAction<ActionType.CompileMirRequest>;
+export type CompileMirSucceededAction =
+  CompileSucceededAction<ActionType.CompileMirSucceeded>;
+export type CompileMirFailedAction =
+  CompileFailedAction<ActionType.CompileMirFailed>;
 
-function requestCompileMir() {
-  return { type: REQUEST_COMPILE_MIR };
+function requestCompileMir(): CompileMirRequestAction {
+  return { type: ActionType.CompileMirRequest };
 }
 
-function receiveCompileMirSuccess({ code, stdout, stderr }) {
-  return { type: COMPILE_MIR_SUCCEEDED, code, stdout, stderr };
+function receiveCompileMirSuccess({ code, stdout, stderr }): CompileMirSucceededAction {
+  return { type: ActionType.CompileMirSucceeded, code, stdout, stderr };
 }
 
-function receiveCompileMirFailure({ error }) {
-  return { type: COMPILE_MIR_FAILED, error };
+function receiveCompileMirFailure({ error }): CompileMirFailedAction {
+  return { type: ActionType.CompileMirFailed, error };
 }
 
 export const performCompileToMir = () =>

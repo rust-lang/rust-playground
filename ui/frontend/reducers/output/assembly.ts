@@ -1,4 +1,4 @@
-import * as actions from '../../actions';
+import { Action, ActionType } from '../../actions';
 import { start, finish } from './sharedStateManagement';
 
 const DEFAULT: State = {
@@ -17,15 +17,15 @@ export interface State {
   error?: string,
 }
 
-export default function assembly(state = DEFAULT, action) {
+export default function assembly(state = DEFAULT, action: Action) {
   switch (action.type) {
-  case actions.REQUEST_COMPILE_ASSEMBLY:
+  case ActionType.CompileAssemblyRequest:
     return start(DEFAULT, state);
-  case actions.COMPILE_ASSEMBLY_SUCCEEDED: {
+  case ActionType.CompileAssemblySucceeded: {
     const { code = "", stdout = "", stderr = "" } = action;
     return finish(state, { code, stdout, stderr });
   }
-  case actions.COMPILE_ASSEMBLY_FAILED:
+  case ActionType.CompileAssemblyFailed:
     return finish(state, { error: action.error });
   default:
     return state;

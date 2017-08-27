@@ -18,13 +18,13 @@ export default function meta(state = DEFAULT, action) {
   case actions.REQUEST_CLIPPY:
     return { ...state, focus: 'clippy' };
 
-  case actions.REQUEST_COMPILE_LLVM_IR:
+  case actions.ActionType.CompileLlvmIrRequest:
     return { ...state, focus: 'llvm-ir' };
 
-  case actions.REQUEST_COMPILE_MIR:
+  case actions.ActionType.CompileMirRequest:
     return { ...state, focus: 'mir' };
 
-  case actions.REQUEST_COMPILE_ASSEMBLY:
+  case actions.ActionType.CompileAssemblyRequest:
     return { ...state, focus: 'asm' };
 
   case actions.ActionType.ExecuteRequest:

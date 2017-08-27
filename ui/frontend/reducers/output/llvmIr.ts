@@ -1,4 +1,4 @@
-import * as actions from '../../actions';
+import { Action, ActionType } from '../../actions';
 import { start, finish } from './sharedStateManagement';
 
 const DEFAULT: State = {
@@ -17,15 +17,15 @@ export interface State {
   error?: string,
 }
 
-export default function llvmIr(state = DEFAULT, action) {
+export default function llvmIr(state = DEFAULT, action: Action) {
   switch (action.type) {
-  case actions.REQUEST_COMPILE_LLVM_IR:
+  case ActionType.CompileLlvmIrRequest:
     return start(DEFAULT, state);
-  case actions.COMPILE_LLVM_IR_SUCCEEDED: {
+  case ActionType.CompileLlvmIrSucceeded: {
     const { code = "", stdout = "", stderr = "" } = action;
     return finish(state, { code, stdout, stderr });
   }
-  case actions.COMPILE_LLVM_IR_FAILED:
+  case ActionType.CompileLlvmIrFailed:
     return finish(state, { error: action.error });
   default:
     return state;
