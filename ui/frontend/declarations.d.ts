@@ -5,3 +5,7 @@ declare module "*.svg" {
 
 declare const ACE_KEYBINDINGS: string[];
 declare const ACE_THEMES: string[];
+
+interface Window {
+  __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
+}

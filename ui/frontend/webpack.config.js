@@ -20,7 +20,7 @@ const allThemes = allThemeNames;
 
 module.exports = {
   entry: {
-    app: ['./index.js', './index.scss'],
+    app: ['./index.tsx', './index.scss'],
   },
 
   output: {
