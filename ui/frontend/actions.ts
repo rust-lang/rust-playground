@@ -1,8 +1,11 @@
 import fetch from 'isomorphic-fetch';
 import url from 'url';
+import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
+
 import { load as loadGist, save as saveGist } from './gist';
 import { getCrateType, runAsTest } from './selectors';
 import { Editor, Orientation, AssemblyFlavor, Channel, Mode } from './types';
+import State from './state';
 
 const routes = {
   compile: { pathname: '/compile' },
@@ -13,6 +16,8 @@ const routes = {
     crates: { pathname: '/meta/crates' },
   },
 };
+
+type ThunkAction<T = void> = ReduxThunkAction<T, State, {}>;
 
 export const TOGGLE_CONFIGURATION = 'TOGGLE_CONFIGURATION';
 
@@ -186,7 +191,7 @@ function fetchJson(url, args) {
     });
 }
 
-export function performExecute() {
+export function performExecute(): ThunkAction {
   // TODO: Check a cache
   return function (dispatch, getState) {
     dispatch(requestExecute());
@@ -204,7 +209,7 @@ export function performExecute() {
   };
 }
 
-function performCompile(target, { request, success, failure }) {
+function performCompile(target, { request, success, failure }): ThunkAction {
   // TODO: Check a cache
   return function (dispatch, getState) {
     dispatch(request());
@@ -317,7 +322,7 @@ function receiveFormatFailure({ error }) {
   return { type: FORMAT_FAILED, error };
 }
 
-export function performFormat() {
+export function performFormat(): ThunkAction {
   // TODO: Check a cache
   return function (dispatch, getState) {
     dispatch(requestFormat());
@@ -347,7 +352,7 @@ function receiveClippyFailure({ error }) {
   return { type: CLIPPY_FAILED, error };
 }
 
-export function performClippy() {
+export function performClippy(): ThunkAction {
   // TODO: Check a cache
   return function (dispatch, getState) {
     dispatch(requestClippy());
@@ -377,7 +382,7 @@ function receiveGistLoadFailure() { // eslint-disable-line no-unused-vars
   return { type: GIST_LOAD_FAILED };
 }
 
-export function performGistLoad(id) {
+export function performGistLoad(id): ThunkAction {
   return function (dispatch, _getState) {
     dispatch(requestGistLoad());
 
@@ -404,7 +409,7 @@ function receiveGistSaveFailure({ error }) { // eslint-disable-line no-unused-va
 }
 
 export function performGistSave() {
-  return function (dispatch, getState) {
+  return function (dispatch, getState): ThunkAction {
     dispatch(requestGistSave());
 
     const { code, configuration: { channel } } = getState();
@@ -426,7 +431,7 @@ function receiveCratesLoadSuccess({ crates }) {
   return { type: CRATES_LOAD_SUCCEEDED, crates };
 }
 
-export function performCratesLoad() {
+export function performCratesLoad(): ThunkAction {
   return function(dispatch) {
     dispatch(requestCratesLoad());
 
@@ -460,7 +465,7 @@ function parseMode(s: string): Mode | null {
   }
 }
 
-export function indexPageLoad({ code, gist, version = 'stable', mode: modeString = 'debug' }) {
+export function indexPageLoad({ code, gist, version = 'stable', mode: modeString = 'debug' }): ThunkAction {
   return function (dispatch) {
     dispatch(navigateToIndex());
 
@@ -486,7 +491,7 @@ export function helpPageLoad() {
   return navigateToHelp();
 }
 
-export function showExample(code) {
+export function showExample(code): ThunkAction {
   return function (dispatch) {
     dispatch(navigateToIndex());
     dispatch(editCode(code));
