@@ -11,7 +11,8 @@ import {
   changeAssemblyFlavor,
   toggleConfiguration,
 } from './actions';
-import { Editor } from './types';
+import { Editor, Orientation } from './types';
+import State from './state';
 
 const keybindingOptions = ACE_KEYBINDINGS.map(t => <option value={t} key={t}>{t}</option>);
 const themeOptions = ACE_THEMES.map(t => <option value={t} key={t}>{t}</option>);
@@ -104,9 +105,9 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
                              label="Split Orientation"
                              defaultValue={orientation}
                              onChange={this.onChangeOrientation}>
-          <option value="automatic">Automatic</option>
-          <option value="horizontal">Horizontal</option>
-          <option value="vertical">Vertical</option>
+          <option value={Orientation.Automatic}>Automatic</option>
+          <option value={Orientation.Horizontal}>Horizontal</option>
+          <option value={Orientation.Vertical}>Vertical</option>
         </ConfigurationSelect>
 
         <ConfigurationSelect what="assemblyFlavor"
@@ -129,17 +130,17 @@ interface ConfigurationProps {
   changeEditor: (Editor) => any,
   changeKeybinding: (string) => any,
   changeTheme: (string) => any,
-  changeOrientation: (string) => any,
+  changeOrientation: (Orientation) => any,
   changeAssemblyFlavor: (string) => any,
   editor: Editor,
   keybinding: string,
   theme: string,
-  orientation: string,
+  orientation: Orientation,
   assemblyFlavor: string,
   toggleConfiguration: () => any,
 };
 
-const mapStateToProps = ({ configuration: { editor, keybinding, theme, orientation, assemblyFlavor } }) => (
+const mapStateToProps = ({ configuration: { editor, keybinding, theme, orientation, assemblyFlavor } }: State) => (
   { editor, keybinding, theme, orientation, assemblyFlavor }
 );
 

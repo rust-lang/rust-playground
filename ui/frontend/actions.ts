@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import url from 'url';
 import { load as loadGist, save as saveGist } from './gist';
 import { getCrateType, runAsTest } from './selectors';
-import { Editor, Channel, Mode } from './types';
+import { Editor, Orientation, Channel, Mode } from './types';
 
 const routes = {
   compile: { pathname: '/compile' },
@@ -77,7 +77,7 @@ export interface ChangeThemeAction {
 
 export interface ChangeOrientationAction {
   type: ActionType.ChangeOrientation;
-  orientation: string;
+  orientation: Orientation;
 }
 
 export interface ChangeAssemblyFlavorAction {

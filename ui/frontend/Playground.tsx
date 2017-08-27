@@ -6,6 +6,7 @@ import Header from './Header';
 import Editor from './Editor';
 import Output from './Output';
 import State from './state';
+import { Orientation } from './types';
 
 const ConfigurationModal: React.SFC = () => (
   <div className="modal-backdrop">
@@ -62,7 +63,7 @@ class Playground extends React.Component<Props> {
 interface Props {
   focus?: string,
   showConfig: boolean,
-  splitOrientation: string,
+  splitOrientation: Orientation,
 };
 
 const mapStateToProps = ({

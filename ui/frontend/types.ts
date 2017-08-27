@@ -20,6 +20,12 @@ export enum Editor {
   Advanced = "advanced",
 };
 
+export enum Orientation {
+  Automatic = "automatic",
+  Horizontal = "horizontal",
+  Vertical = "vertical",
+};
+
 export enum Channel {
   Stable = "stable",
   Beta = "beta",
