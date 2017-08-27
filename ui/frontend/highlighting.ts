@@ -39,7 +39,8 @@ export function configureRustErrors(gotoPosition) {
   });
 
   Prism.hooks.add('after-highlight', env => {
-    Array.from(env.element.querySelectorAll('.error-location, .stack-trace-location')).forEach(link => {
+    const links = env.element.querySelectorAll('.error-location, .stack-trace-location');
+    Array.from(links).forEach((link: HTMLAnchorElement) => {
       const { line, col } = link.dataset;
       link.onclick = e => {
         e.preventDefault();
