@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { PrismCode } from "react-prism";
 
 import { changeFocus } from './actions';
+import { Channel } from './types';
 
 import Loader from './Loader';
 
@@ -160,7 +161,7 @@ interface GistProps {
   requestsInProgress: number,
   id?: string,
   url?: string,
-  channel?: string,
+  channel?: Channel,
 };
 
 class Output extends React.PureComponent<OutputProps> {
@@ -272,7 +273,7 @@ interface OutputProps {
     requestsInProgress: number,
     id: string,
     url: string,
-    channel: string,
+    channel: Channel,
   },
 
   changeFocus: (string?) => any,

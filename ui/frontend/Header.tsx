@@ -17,8 +17,9 @@ import {
 } from './actions';
 import { getCrateType, runAsTest } from './selectors';
 import State from './state';
+import { Channel } from './types';
 
-function oneRadio(name, currentValue, possibleValue, change, labelText) {
+function oneRadio<T>(name: string, currentValue: T, possibleValue: T, change: (T) => any, labelText: string) {
   const id = `${name}-${possibleValue}`;
   return [
     <input className="header-set__radio" type="radio" name={name} id={id} key={`${id}-input`}
@@ -43,7 +44,7 @@ class Header extends React.PureComponent<HeaderProps> {
       toggleConfiguration, navigateToHelp,
     } = this.props;
 
-    const oneChannel = (value, labelText) =>
+    const oneChannel = (value: Channel, labelText) =>
             oneRadio("channel", channel, value, changeChannel, labelText);
     const oneMode = (value, labelText) =>
             oneRadio("mode", mode, value, changeMode, labelText);
@@ -93,9 +94,9 @@ class Header extends React.PureComponent<HeaderProps> {
         <div className="header-channel header-set">
           <legend className="header-set__title">Channel</legend>
           <div className="header-set__buttons header-set__buttons--radio">
-            { oneChannel("stable", "Stable") }
-            { oneChannel("beta", "Beta") }
-            { oneChannel("nightly", "Nightly") }
+            { oneChannel(Channel.Stable, "Stable") }
+            { oneChannel(Channel.Beta, "Beta") }
+            { oneChannel(Channel.Nightly, "Nightly") }
           </div>
         </div>
 
@@ -117,9 +118,9 @@ class Header extends React.PureComponent<HeaderProps> {
 }
 
 interface HeaderProps {
-  changeChannel: (string) => any,
+  changeChannel: (Channel) => any,
   changeMode: (string) => any,
-  channel: string,
+  channel: Channel,
   clippy: () => any,
   compileToAssembly: () => any,
   compileToLLVM: () => any,

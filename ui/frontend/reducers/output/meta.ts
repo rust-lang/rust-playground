@@ -6,7 +6,7 @@ const DEFAULT = {
 
 export default function meta(state = DEFAULT, action) {
   switch (action.type) {
-  case actions.CHANGE_FOCUS:
+  case actions.ActionType.ChangeFocus:
     return { ...state, focus: action.focus };
 
   case actions.REQUEST_CLIPPY:

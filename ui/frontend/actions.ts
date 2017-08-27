@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch';
 import url from 'url';
 import { load as loadGist, save as saveGist } from './gist';
 import { getCrateType, runAsTest } from './selectors';
+import { Channel } from './types';
 
 const routes = {
   compile: { pathname: '/compile' },
@@ -29,45 +30,110 @@ export function navigateToHelp() {
   return { type: SET_PAGE, page: 'help' };
 }
 
-export const CHANGE_EDITOR = 'CHANGE_EDITOR';
-export const CHANGE_KEYBINDING = 'CHANGE_KEYBINDING';
-export const CHANGE_THEME = 'CHANGE_THEME';
-export const CHANGE_ORIENTATION = 'CHANGE_ORIENTATION';
-export const CHANGE_ASSEMBLY_FLAVOR = 'CHANGE_ASSEMBLY_FLAVOR';
-export const CHANGE_CHANNEL = 'CHANGE_CHANNEL';
-export const CHANGE_MODE = 'CHANGE_MODE';
-export const CHANGE_FOCUS = 'CHANGE_FOCUS';
-
-export function changeEditor(editor) {
-  return { type: CHANGE_EDITOR, editor };
+export enum ActionType {
+  ToggleConfiguration = 'TOGGLE_CONFIGURATION',
+  ChangeEditor = 'CHANGE_EDITOR',
+  ChangeKeybinding = 'CHANGE_KEYBINDING',
+  ChangeTheme = 'CHANGE_THEME',
+  ChangeOrientation = 'CHANGE_ORIENTATION',
+  ChangeAssemblyFlavor = 'CHANGE_ASSEMBLY_FLAVOR',
+  ChangeChannel = 'CHANGE_CHANNEL',
+  ChangeMode = 'CHANGE_MODE',
+  ChangeFocus = 'CHANGE_FOCUS',
+  Other = '__never_used__',
 }
 
-export function changeKeybinding(keybinding) {
-  return { type: CHANGE_KEYBINDING, keybinding };
+export type Action =
+  | ToggleConfigurationAction
+  | ChangeAssemblyFlavorAction
+  | ChangeChannelAction
+  | ChangeEditorAction
+  | ChangeFocusAction
+  | ChangeKeybindingAction
+  | ChangeModeAction
+  | ChangeOrientationAction
+  | ChangeThemeAction
+  | OtherAction
+;
+
+export interface ToggleConfigurationAction {
+  type: ActionType.ToggleConfiguration;
 }
 
-export function changeTheme(theme) {
-  return { type: CHANGE_THEME, theme };
+export interface ChangeEditorAction {
+  type: ActionType.ChangeEditor;
+  editor: string;
 }
 
-export function changeOrientation(orientation) {
-  return { type: CHANGE_ORIENTATION, orientation };
+export interface ChangeKeybindingAction {
+  type: ActionType.ChangeKeybinding;
+  keybinding: string;
 }
 
-export function changeAssemblyFlavor(assemblyFlavor) {
-  return { type: CHANGE_ASSEMBLY_FLAVOR, assemblyFlavor };
+export interface ChangeThemeAction {
+  type: ActionType.ChangeTheme;
+  theme: string;
 }
 
-export function changeChannel(channel) {
-  return { type: CHANGE_CHANNEL, channel };
+export interface ChangeOrientationAction {
+  type: ActionType.ChangeOrientation;
+  orientation: string;
 }
 
-export function changeMode(mode) {
-  return { type: CHANGE_MODE, mode };
+export interface ChangeAssemblyFlavorAction {
+  type: ActionType.ChangeAssemblyFlavor;
+  assemblyFlavor: string;
 }
 
-export function changeFocus(focus) {
-  return { type: CHANGE_FOCUS, focus };
+export interface ChangeChannelAction {
+  type: ActionType.ChangeChannel;
+  channel: Channel;
+}
+
+export interface ChangeModeAction {
+  type: ActionType.ChangeMode;
+  mode: string;
+}
+
+export interface ChangeFocusAction {
+  type: ActionType.ChangeFocus;
+  focus: string;
+}
+
+export interface OtherAction {
+  type: ActionType.Other;
+}
+
+export function changeEditor(editor): ChangeEditorAction {
+  return { type: ActionType.ChangeEditor, editor };
+}
+
+export function changeKeybinding(keybinding): ChangeKeybindingAction {
+  return { type: ActionType.ChangeKeybinding, keybinding };
+}
+
+export function changeTheme(theme): ChangeThemeAction {
+  return { type: ActionType.ChangeTheme, theme };
+}
+
+export function changeOrientation(orientation): ChangeOrientationAction {
+  return { type: ActionType.ChangeOrientation, orientation };
+}
+
+export function changeAssemblyFlavor(assemblyFlavor): ChangeAssemblyFlavorAction {
+  return { type: ActionType.ChangeAssemblyFlavor, assemblyFlavor };
+}
+
+export function changeChannel(channel: Channel): ChangeChannelAction {
+  return { type: ActionType.ChangeChannel, channel };
+}
+
+export function changeMode(mode): ChangeModeAction {
+  return { type: ActionType.ChangeMode, mode };
+}
+
+export function changeFocus(focus): ChangeFocusAction {
+  return { type: ActionType.ChangeFocus, focus };
 }
 
 export const REQUEST_EXECUTE = 'REQUEST_EXECUTE';
@@ -370,6 +436,19 @@ export function performCratesLoad() {
   };
 }
 
+function parseChannel(s: string): Channel | null {
+  switch (s) {
+  case "stable":
+    return Channel.Stable;
+  case "beta":
+    return Channel.Beta;
+  case "nightly":
+    return Channel.Nightly;
+  default:
+    return null;
+  }
+}
+
 export function indexPageLoad({ code, gist, version = 'stable', mode = 'debug' }) {
   return function (dispatch) {
     dispatch(navigateToIndex());
@@ -381,7 +460,8 @@ export function indexPageLoad({ code, gist, version = 'stable', mode = 'debug' }
     }
 
     if (version) {
-      dispatch(changeChannel(version));
+      const channel = parseChannel(version);
+      if (channel) { dispatch(changeChannel(channel)) };
     }
 
     if (mode) {

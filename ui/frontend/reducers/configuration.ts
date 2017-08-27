@@ -1,39 +1,45 @@
-import * as actions from '../actions';
+import { Action, ActionType } from '../actions';
+import { Channel } from '../types';
 
-export const DEFAULT = {
+export interface State {
+  shown: boolean,
+  editor: string,
+  keybinding: string,
+  theme: string,
+  orientation: string,
+  assemblyFlavor: string,
+  channel: Channel,
+  mode: string,
+};
+
+export const DEFAULT: State = {
   shown: false,
   editor: "advanced",
   keybinding: "ace",
   theme: "github",
   orientation: "automatic",
   assemblyFlavor: "att",
-  channel: "stable",
+  channel: Channel.Stable,
   mode: "debug",
 };
 
-export default function configuration(state = DEFAULT, action) {
+export default function configuration(state = DEFAULT, action: Action): State {
   switch (action.type) {
-  case actions.TOGGLE_CONFIGURATION:
+  case ActionType.ToggleConfiguration:
     return { ...state, shown: !state.shown };
-  case actions.CHANGE_EDITOR:
+  case ActionType.ChangeEditor:
     return { ...state, editor: action.editor };
-  case actions.CHANGE_KEYBINDING:
+  case ActionType.ChangeKeybinding:
     return { ...state, keybinding: action.keybinding };
-  case actions.CHANGE_THEME:
+  case ActionType.ChangeTheme:
     return { ...state, theme: action.theme };
-  case actions.CHANGE_ORIENTATION:
+  case ActionType.ChangeOrientation:
     return { ...state, orientation: action.orientation };
-  case actions.CHANGE_ASSEMBLY_FLAVOR:
+  case ActionType.ChangeAssemblyFlavor:
     return { ...state, assemblyFlavor: action.assemblyFlavor };
-  case actions.CHANGE_CHANNEL: {
-    const { channel } = action;
-    if (["stable", "beta", "nightly"].includes(channel)) {
-      return { ...state, channel };
-    } else {
-      return state;
-    }
-  }
-  case actions.CHANGE_MODE:
+  case ActionType.ChangeChannel:
+    return { ...state, channel: action.channel };
+  case ActionType.ChangeMode:
     return { ...state, mode: action.mode };
   default:
     return state;
