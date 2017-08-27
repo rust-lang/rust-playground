@@ -1,4 +1,4 @@
-import * as actions from '../../actions';
+import { Action, ActionType } from '../../actions';
 import { start, finish } from './sharedStateManagement';
 
 const DEFAULT: State = {
@@ -15,15 +15,15 @@ export interface State {
   error?: string,
 }
 
-export default function execute(state = DEFAULT, action) {
+export default function execute(state = DEFAULT, action: Action) {
   switch (action.type) {
-  case actions.REQUEST_EXECUTE:
+  case ActionType.ExecuteRequest:
     return start(DEFAULT, state);
-  case actions.EXECUTE_SUCCEEDED: {
+  case ActionType.ExecuteSucceeded: {
     const { stdout = "", stderr = "" } = action;
     return finish(state, { stdout, stderr });
   }
-  case actions.EXECUTE_FAILED:
+  case ActionType.ExecuteFailed:
     return finish(state, { error: action.error });
   default:
     return state;

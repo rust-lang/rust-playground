@@ -42,6 +42,9 @@ export enum ActionType {
   ChangeChannel = 'CHANGE_CHANNEL',
   ChangeMode = 'CHANGE_MODE',
   ChangeFocus = 'CHANGE_FOCUS',
+  ExecuteRequest = 'EXECUTE_REQUEST',
+  ExecuteSucceeded = 'EXECUTE_SUCCEEDED',
+  ExecuteFailed = 'EXECUTE_FAILED',
   Other = '__never_used__',
 }
 
@@ -56,6 +59,10 @@ export type Action =
   | ChangeModeAction
   | ChangeOrientationAction
   | ChangeThemeAction
+  | ExecuteRequestAction
+  | ExecuteSucceededAction
+  | ExecuteFailedAction
+
   | OtherAction
 ;
 
@@ -144,20 +151,31 @@ export function changeFocus(focus): ChangeFocusAction {
   return { type: ActionType.ChangeFocus, focus };
 }
 
-export const REQUEST_EXECUTE = 'REQUEST_EXECUTE';
-export const EXECUTE_SUCCEEDED = 'EXECUTE_SUCCEEDED';
-export const EXECUTE_FAILED = 'EXECUTE_FAILED';
-
-function requestExecute() {
-  return { type: REQUEST_EXECUTE };
+export interface ExecuteRequestAction {
+  type: ActionType.ExecuteRequest;
 }
 
-function receiveExecuteSuccess({ stdout, stderr }) {
-  return { type: EXECUTE_SUCCEEDED, stdout, stderr };
+export interface ExecuteSucceededAction {
+  type: ActionType.ExecuteSucceeded;
+  stdout?: string;
+  stderr?: string;
 }
 
-function receiveExecuteFailure({ error }) {
-  return { type: EXECUTE_FAILED, error };
+export interface ExecuteFailedAction {
+  type: ActionType.ExecuteFailed;
+  error?: string;
+}
+
+function requestExecute(): ExecuteRequestAction {
+  return { type: ActionType.ExecuteRequest };
+}
+
+function receiveExecuteSuccess({ stdout, stderr }): ExecuteSucceededAction {
+  return { type: ActionType.ExecuteSucceeded, stdout, stderr };
+}
+
+function receiveExecuteFailure({ error }): ExecuteFailedAction {
+  return { type: ActionType.ExecuteFailed, error };
 }
 
 function jsonGet(urlObj) {

@@ -27,7 +27,7 @@ export default function meta(state = DEFAULT, action) {
   case actions.REQUEST_COMPILE_ASSEMBLY:
     return { ...state, focus: 'asm' };
 
-  case actions.REQUEST_EXECUTE:
+  case actions.ActionType.ExecuteRequest:
     return { ...state, focus: 'execute' };
 
   case actions.REQUEST_FORMAT:
