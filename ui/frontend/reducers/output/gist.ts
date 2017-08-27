@@ -1,12 +1,19 @@
 import * as actions from '../../actions';
 import { start, finish } from './sharedStateManagement';
 
-const DEFAULT = {
+const DEFAULT: State = {
   requestsInProgress: 0,
   id: null,
   url: null,
   error: null,
 };
+
+export interface State {
+  requestsInProgress: number,
+  id?: string,
+  url?: string,
+  error?: string,
+}
 
 export default function gist(state = DEFAULT, action) {
   switch (action.type) {

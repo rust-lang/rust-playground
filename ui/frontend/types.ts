@@ -1,3 +1,8 @@
+export interface Position {
+  line: number,
+  column: number,
+};
+
 export interface Crate {
   id: string,
   name: string,
@@ -8,10 +13,7 @@ export interface CommonEditorProps {
   code: string,
   execute: () => any,
   onEditCode: (string) => any,
-  position: {
-    line: number,
-    column: number,
-  },
+  position: Position,
   crates: Crate[],
 };
 

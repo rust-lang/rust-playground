@@ -1,7 +1,10 @@
 import sortBy from 'lodash.sortby';
 import * as actions from '../actions';
+import { Crate } from '../types';
 
-const DEFAULT = [];
+const DEFAULT: State = [];
+
+export type State = Crate[];
 
 export default function crates(state = DEFAULT, action) {
   switch (action.type) {

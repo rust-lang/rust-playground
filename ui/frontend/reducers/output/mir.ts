@@ -1,13 +1,21 @@
 import * as actions from '../../actions';
 import { start, finish } from './sharedStateManagement';
 
-const DEFAULT = {
+const DEFAULT: State = {
   requestsInProgress: 0,
   code: null,
   stdout: null,
   stderr: null,
   error: null,
 };
+
+export interface State {
+  requestsInProgress: number,
+  code?: string,
+  stdout?: string,
+  stderr?: string,
+  error?: string,
+}
 
 export default function mir(state = DEFAULT, action) {
   switch (action.type) {

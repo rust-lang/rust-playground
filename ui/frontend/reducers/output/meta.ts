@@ -1,7 +1,13 @@
 import * as actions from '../../actions';
 
-const DEFAULT = {
+const DEFAULT: State = {
   focus: null,
+};
+
+type Focus = 'clippy' | 'llvm-ir' | 'mir' | 'asm' | 'execute' | 'format' | 'gist';
+
+export interface State {
+  focus?: Focus,
 };
 
 export default function meta(state = DEFAULT, action) {

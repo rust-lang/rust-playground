@@ -1,8 +1,12 @@
 import * as actions from '../../actions';
 import { start, finish } from './sharedStateManagement';
 
-const DEFAULT = {
+const DEFAULT: State = {
   requestsInProgress: 0,
+};
+
+export interface State {
+  requestsInProgress: number,
 };
 
 export default function format(state = DEFAULT, action) {

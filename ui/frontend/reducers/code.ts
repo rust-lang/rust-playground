@@ -1,8 +1,10 @@
 import * as actions from '../actions';
 
-const DEFAULT = `fn main() {
+const DEFAULT: State = `fn main() {
     println!("Hello, world!");
 }`;
+
+export type State = string;
 
 export default function code(state = DEFAULT, action) {
   switch (action.type) {

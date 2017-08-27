@@ -1,12 +1,19 @@
 import * as actions from '../../actions';
 import { start, finish } from './sharedStateManagement';
 
-const DEFAULT = {
+const DEFAULT: State = {
   requestsInProgress: 0,
   stdout: null,
   stderr: null,
   error: null,
 };
+
+export interface State {
+  requestsInProgress: number,
+  stdout?: string,
+  stderr?: string,
+  error?: string,
+}
 
 export default function execute(state = DEFAULT, action) {
   switch (action.type) {
