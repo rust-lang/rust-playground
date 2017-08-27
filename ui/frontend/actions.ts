@@ -4,7 +4,7 @@ import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 
 import { load as loadGist, save as saveGist } from './gist';
 import { getCrateType, runAsTest } from './selectors';
-import { Editor, Orientation, AssemblyFlavor, Channel, Mode } from './types';
+import { Page, Editor, Orientation, AssemblyFlavor, Channel, Mode } from './types';
 import State from './state';
 
 const routes = {
@@ -19,24 +19,21 @@ const routes = {
 
 type ThunkAction<T = void> = ReduxThunkAction<T, State, {}>;
 
-export const TOGGLE_CONFIGURATION = 'TOGGLE_CONFIGURATION';
-
-export function toggleConfiguration() {
-  return { type: TOGGLE_CONFIGURATION };
+export function toggleConfiguration(): ToggleConfigurationAction {
+  return { type: ActionType.ToggleConfiguration };
 }
 
-export const SET_PAGE = 'SET_PAGE';
-
-export function navigateToIndex() {
-  return { type: SET_PAGE, page: 'index' };
+export function navigateToIndex(): SetPageAction {
+  return { type: ActionType.SetPage, page: 'index' };
 }
 
-export function navigateToHelp() {
-  return { type: SET_PAGE, page: 'help' };
+export function navigateToHelp(): SetPageAction {
+  return { type: ActionType.SetPage, page: 'help' };
 }
 
 export enum ActionType {
   ToggleConfiguration = 'TOGGLE_CONFIGURATION',
+  SetPage = 'SET_PAGE',
   ChangeEditor = 'CHANGE_EDITOR',
   ChangeKeybinding = 'CHANGE_KEYBINDING',
   ChangeTheme = 'CHANGE_THEME',
@@ -50,6 +47,7 @@ export enum ActionType {
 
 export type Action =
   | ToggleConfigurationAction
+  | SetPageAction
   | ChangeAssemblyFlavorAction
   | ChangeChannelAction
   | ChangeEditorAction
@@ -63,6 +61,11 @@ export type Action =
 
 export interface ToggleConfigurationAction {
   type: ActionType.ToggleConfiguration;
+}
+
+export interface SetPageAction {
+  type: ActionType.SetPage;
+  page: Page;
 }
 
 export interface ChangeEditorAction {
