@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import AdvancedEditor from './AdvancedEditor';
 import { editCode, performExecute } from './actions';
-import { CommonEditorProps } from './types';
+import { CommonEditorProps, Editor as EditorType } from './types';
 
 class SimpleEditor extends React.PureComponent<CommonEditorProps> {
   private _editor: HTMLTextAreaElement;
@@ -58,7 +58,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
 class Editor extends React.PureComponent<EditorProps> {
   render() {
     const { editor, execute, code, crates, position, onEditCode } = this.props;
-    const SelectedEditor = editor === "simple" ? SimpleEditor : AdvancedEditor;
+    const SelectedEditor = editor === EditorType.Simple ? SimpleEditor : AdvancedEditor;
 
     return (
       <div className="editor">
@@ -74,7 +74,7 @@ class Editor extends React.PureComponent<EditorProps> {
 
 interface EditorProps {
   code: string,
-  editor: string,
+  editor: EditorType,
   execute: () => any,
   onEditCode: (string) => any,
   position: {

@@ -1,9 +1,9 @@
 import { Action, ActionType } from '../actions';
-import { Channel, Mode } from '../types';
+import { Editor, Channel, Mode } from '../types';
 
 export interface State {
   shown: boolean,
-  editor: string,
+  editor: Editor,
   keybinding: string,
   theme: string,
   orientation: string,
@@ -14,7 +14,7 @@ export interface State {
 
 export const DEFAULT: State = {
   shown: false,
-  editor: "advanced",
+  editor: Editor.Advanced,
   keybinding: "ace",
   theme: "github",
   orientation: "automatic",

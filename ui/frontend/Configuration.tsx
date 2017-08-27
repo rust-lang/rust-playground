@@ -11,6 +11,7 @@ import {
   changeAssemblyFlavor,
   toggleConfiguration,
 } from './actions';
+import { Editor } from './types';
 
 const keybindingOptions = ACE_KEYBINDINGS.map(t => <option value={t} key={t}>{t}</option>);
 const themeOptions = ACE_THEMES.map(t => <option value={t} key={t}>{t}</option>);
@@ -65,7 +66,7 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
   render() {
     const { editor, keybinding, theme, orientation, assemblyFlavor, toggleConfiguration } = this.props;
 
-    const advancedEditor = editor === 'advanced';
+    const advancedEditor = editor === Editor.Advanced;
 
     const keybindingSelect = advancedEditor ? (
       <ConfigurationSelect what="keybinding"
@@ -91,8 +92,8 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
                              label="Editor Style"
                              defaultValue={editor}
                              onChange={this.onChangeEditor}>
-          <option value="simple">Simple</option>
-          <option value="advanced">Advanced</option>
+          <option value={Editor.Simple}>Simple</option>
+          <option value={Editor.Advanced}>Advanced</option>
         </ConfigurationSelect>
 
         {keybindingSelect}
@@ -125,12 +126,12 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
 }
 
 interface ConfigurationProps {
-  changeEditor: (string) => any,
+  changeEditor: (Editor) => any,
   changeKeybinding: (string) => any,
   changeTheme: (string) => any,
   changeOrientation: (string) => any,
   changeAssemblyFlavor: (string) => any,
-  editor: string,
+  editor: Editor,
   keybinding: string,
   theme: string,
   orientation: string,

@@ -15,6 +15,11 @@ export interface CommonEditorProps {
   crates: Crate[],
 };
 
+export enum Editor {
+  Simple = "simple",
+  Advanced = "advanced",
+};
+
 export enum Channel {
   Stable = "stable",
   Beta = "beta",

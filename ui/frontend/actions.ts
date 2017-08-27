@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import url from 'url';
 import { load as loadGist, save as saveGist } from './gist';
 import { getCrateType, runAsTest } from './selectors';
-import { Channel, Mode } from './types';
+import { Editor, Channel, Mode } from './types';
 
 const routes = {
   compile: { pathname: '/compile' },
@@ -62,7 +62,7 @@ export interface ToggleConfigurationAction {
 
 export interface ChangeEditorAction {
   type: ActionType.ChangeEditor;
-  editor: string;
+  editor: Editor;
 }
 
 export interface ChangeKeybindingAction {
