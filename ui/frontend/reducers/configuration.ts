@@ -1,5 +1,5 @@
 import { Action, ActionType } from '../actions';
-import { Editor, Orientation, Channel, Mode } from '../types';
+import { Editor, Orientation, AssemblyFlavor, Channel, Mode } from '../types';
 
 export interface State {
   shown: boolean,
@@ -7,7 +7,7 @@ export interface State {
   keybinding: string,
   theme: string,
   orientation: Orientation,
-  assemblyFlavor: string,
+  assemblyFlavor: AssemblyFlavor,
   channel: Channel,
   mode: Mode,
 };
@@ -18,7 +18,7 @@ export const DEFAULT: State = {
   keybinding: "ace",
   theme: "github",
   orientation: Orientation.Automatic,
-  assemblyFlavor: "att",
+  assemblyFlavor: AssemblyFlavor.Att,
   channel: Channel.Stable,
   mode: Mode.Debug,
 };

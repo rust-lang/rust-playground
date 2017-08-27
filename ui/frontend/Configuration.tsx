@@ -11,7 +11,7 @@ import {
   changeAssemblyFlavor,
   toggleConfiguration,
 } from './actions';
-import { Editor, Orientation } from './types';
+import { Editor, Orientation, AssemblyFlavor } from './types';
 import State from './state';
 
 const keybindingOptions = ACE_KEYBINDINGS.map(t => <option value={t} key={t}>{t}</option>);
@@ -114,8 +114,8 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
                              label="Assembly Flavor"
                              defaultValue={assemblyFlavor}
                              onChange={this.onChangeAssemblyFlavor}>
-          <option value="att">AT&T</option>
-          <option value="intel">Intel</option>
+          <option value={AssemblyFlavor.Att}>AT&T</option>
+          <option value={AssemblyFlavor.Intel}>Intel</option>
         </ConfigurationSelect>
 
         <div className="configuration-actions">
@@ -131,12 +131,12 @@ interface ConfigurationProps {
   changeKeybinding: (string) => any,
   changeTheme: (string) => any,
   changeOrientation: (Orientation) => any,
-  changeAssemblyFlavor: (string) => any,
+  changeAssemblyFlavor: (AssemblyFlavor) => any,
   editor: Editor,
   keybinding: string,
   theme: string,
   orientation: Orientation,
-  assemblyFlavor: string,
+  assemblyFlavor: AssemblyFlavor,
   toggleConfiguration: () => any,
 };
 

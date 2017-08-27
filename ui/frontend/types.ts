@@ -26,6 +26,11 @@ export enum Orientation {
   Vertical = "vertical",
 };
 
+export enum AssemblyFlavor {
+  Att = "att",
+  Intel = "intel",
+};
+
 export enum Channel {
   Stable = "stable",
   Beta = "beta",
