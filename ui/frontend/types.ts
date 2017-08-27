@@ -20,3 +20,8 @@ export enum Channel {
   Beta = "beta",
   Nightly = "nightly",
 };
+
+export enum Mode {
+  Debug = "debug",
+  Release = "release",
+};

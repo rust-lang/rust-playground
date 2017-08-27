@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import url from 'url';
 import { load as loadGist, save as saveGist } from './gist';
 import { getCrateType, runAsTest } from './selectors';
-import { Channel } from './types';
+import { Channel, Mode } from './types';
 
 const routes = {
   compile: { pathname: '/compile' },
@@ -92,7 +92,7 @@ export interface ChangeChannelAction {
 
 export interface ChangeModeAction {
   type: ActionType.ChangeMode;
-  mode: string;
+  mode: Mode;
 }
 
 export interface ChangeFocusAction {
@@ -128,7 +128,7 @@ export function changeChannel(channel: Channel): ChangeChannelAction {
   return { type: ActionType.ChangeChannel, channel };
 }
 
-export function changeMode(mode): ChangeModeAction {
+export function changeMode(mode: Mode): ChangeModeAction {
   return { type: ActionType.ChangeMode, mode };
 }
 
@@ -449,7 +449,18 @@ function parseChannel(s: string): Channel | null {
   }
 }
 
-export function indexPageLoad({ code, gist, version = 'stable', mode = 'debug' }) {
+function parseMode(s: string): Mode | null {
+  switch (s) {
+  case "debug":
+    return Mode.Debug;
+  case "release":
+    return Mode.Release;
+  default:
+    return null;
+  }
+}
+
+export function indexPageLoad({ code, gist, version = 'stable', mode: modeString = 'debug' }) {
   return function (dispatch) {
     dispatch(navigateToIndex());
 
@@ -464,8 +475,9 @@ export function indexPageLoad({ code, gist, version = 'stable', mode = 'debug' }
       if (channel) { dispatch(changeChannel(channel)) };
     }
 
-    if (mode) {
-      dispatch(changeMode(mode));
+    if (modeString) {
+      const mode = parseMode(modeString);
+      if (mode) { dispatch(changeMode(mode)) };
     }
   };
 }

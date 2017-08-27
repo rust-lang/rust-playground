@@ -1,5 +1,5 @@
 import { Action, ActionType } from '../actions';
-import { Channel } from '../types';
+import { Channel, Mode } from '../types';
 
 export interface State {
   shown: boolean,
@@ -9,7 +9,7 @@ export interface State {
   orientation: string,
   assemblyFlavor: string,
   channel: Channel,
-  mode: string,
+  mode: Mode,
 };
 
 export const DEFAULT: State = {
@@ -20,7 +20,7 @@ export const DEFAULT: State = {
   orientation: "automatic",
   assemblyFlavor: "att",
   channel: Channel.Stable,
-  mode: "debug",
+  mode: Mode.Debug,
 };
 
 export default function configuration(state = DEFAULT, action: Action): State {

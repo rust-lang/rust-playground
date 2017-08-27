@@ -17,7 +17,7 @@ import {
 } from './actions';
 import { getCrateType, runAsTest } from './selectors';
 import State from './state';
-import { Channel } from './types';
+import { Channel, Mode } from './types';
 
 function oneRadio<T>(name: string, currentValue: T, possibleValue: T, change: (T) => any, labelText: string) {
   const id = `${name}-${possibleValue}`;
@@ -46,7 +46,7 @@ class Header extends React.PureComponent<HeaderProps> {
 
     const oneChannel = (value: Channel, labelText) =>
             oneRadio("channel", channel, value, changeChannel, labelText);
-    const oneMode = (value, labelText) =>
+    const oneMode = (value: Mode, labelText) =>
             oneRadio("mode", mode, value, changeMode, labelText);
 
     const primaryLabel = executionLabel(crateType, tests);
@@ -86,8 +86,8 @@ class Header extends React.PureComponent<HeaderProps> {
         <div className="header-mode header-set">
           <legend className="header-set__title">Mode</legend>
           <div className="header-set__buttons header-set__buttons--radio">
-            { oneMode("debug", "Debug") }
-            { oneMode("release", "Release") }
+            { oneMode(Mode.Debug, "Debug") }
+            { oneMode(Mode.Release, "Release") }
           </div>
         </div>
 
@@ -119,7 +119,7 @@ class Header extends React.PureComponent<HeaderProps> {
 
 interface HeaderProps {
   changeChannel: (Channel) => any,
-  changeMode: (string) => any,
+  changeMode: (Mode) => any,
   channel: Channel,
   clippy: () => any,
   compileToAssembly: () => any,
@@ -128,7 +128,7 @@ interface HeaderProps {
   execute: () => any,
   format: () => any,
   gistSave: () => any,
-  mode: string,
+  mode: Mode,
   crateType: string,
   tests: boolean,
   toggleConfiguration: () => any,
