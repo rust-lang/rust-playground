@@ -1,5 +1,5 @@
-FROM shepmaster/rust-stable
+FROM shepmaster/rust-nightly
 
 ARG version
 
-RUN cargo install rustfmt --vers "${version}"
+RUN cargo install rustfmt-nightly --vers "${version}"

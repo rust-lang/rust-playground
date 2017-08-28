@@ -33,8 +33,13 @@ crate_api_base=https://crates.io/api/v1/crates
 for tool in $tools_to_build; do
     cd "${tool}"
 
+    crate_name="${tool}"
+    if [[ "${tool}" == 'rustfmt' ]]; then
+        crate_name=rustfmt-nightly
+    fi
+
     filename="version-${tool}.txt"
-    curl -o "${filename}" "${crate_api_base}/${tool}"
+    curl -o "${filename}" "${crate_api_base}/${crate_name}"
     version=$(jq -r '.crate.max_version' "${filename}")
 
     image_name="${tool}"
