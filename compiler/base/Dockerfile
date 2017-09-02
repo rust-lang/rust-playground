@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     jq \
     libssl-dev \
+    pkg-config \
  && rm -rf /var/lib/apt/lists/*
 
 ENV USER=root
