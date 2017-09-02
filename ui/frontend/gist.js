@@ -14,11 +14,27 @@ const FILENAME = 'playground.rs';
 export function load(id) {
   return fetch(`${baseUrlStr}/${id}`)
     .then(response => response.json())
-    .then(gist => ({
-      id: id,
-      url: gist.html_url,
-      code: gist.files[FILENAME].content,
-    }));
+    .then(gist => {
+      const filenames = Object.keys(gist.files);
+      if (filenames.length > 0) {
+        let code = gist.files[filenames[0]].content;
+        if (filenames.length > 1) {
+          code = filenames.reduce(
+                            (code, filename) => `${code}\n\n// ${filename}\n\n${gist.files[filename].content}`
+                            , '')
+                            .trimLeft();
+        }
+        return {
+          id: id,
+          url: gist.html_url,
+          code: code,
+        };
+      } else {
+        alert(`No file inside gist ${baseUrlStr}/${id}`);
+        // FIXME better errorhandling
+        return {};
+      }
+    });
 }
 
 const gistBody = code => ({
