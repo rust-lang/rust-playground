@@ -20,4 +20,53 @@ blacklist = [
 
     # Not supported on stable
     "redox_syscall",
+
+    # Not available on Linux
+    "security-framework",
+    "security-framework-sys",
+    "core-foundation",
+    "core-foundation-sys",
+]
+
+additions = [
+    # Libz Blitz alumni and in progress crates
+    "bitflags",
+    "byteorder",
+    "env_logger",
+    "error-chain",
+    "flate2",
+    "gcc",
+    "lazy_static",
+    "log",
+    "memmap",
+    "mio",
+    "num",
+    "rand",
+    "rayon",
+    "reqwest",
+    "tempdir",
+    "threadpool",
+    "url",
+    "walkdir",
+
+    # Libz Blitz todo list already available in rust-cookbook
+    "base64",
+    "chrono",
+    "clap",
+    "crossbeam",
+    "csv",
+    "data-encoding",
+    "glob",
+    "image",
+    "num_cpus",
+    "petgraph",
+    "regex",
+    "ring",
+    "select",
+    "serde",
+    "serde_derive",
+    "serde_json",
+    "syslog",
+    "tar",
+    "toml",
 ]
