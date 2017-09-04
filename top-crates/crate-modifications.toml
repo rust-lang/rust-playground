@@ -20,6 +20,12 @@ blacklist = [
 
     # Not supported on stable
     "redox_syscall",
+
+    # Not available on Linux
+    "security-framework",
+    "security-framework-sys",
+    "core-foundation",
+    "core-foundation-sys",
 ]
 
 additions = [
