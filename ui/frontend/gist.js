@@ -14,28 +14,30 @@ const FILENAME = 'playground.rs';
 export function load(id) {
   return fetch(`${baseUrlStr}/${id}`)
     .then(response => response.json())
-    .then(gist => {
-      const filenames = Object.keys(gist.files);
-      if (filenames.length > 0) {
-        let code = gist.files[filenames[0]].content;
-        if (filenames.length > 1) {
-          code = filenames.reduce(
-                            (code, filename) => `${code}\n\n// ${filename}\n\n${gist.files[filename].content}`
-                            , '')
-                            .trimLeft();
-        }
-        return {
-          id: id,
-          url: gist.html_url,
-          code: code,
-        };
-      } else {
-        alert(`No file inside gist ${baseUrlStr}/${id}`);
-        // FIXME better errorhandling
-        return {};
-      }
-    });
+    .then(convertGistResponse);
 }
+
+const convertGistResponse = gist => ({
+  id: gist.id,
+  url: gist.html_url,
+  code: codeFromGist(Object.values(gist.files)),
+});
+
+const codeFromGist = gistFiles => {
+  gistFiles.sort(f => f.filename);
+
+  switch (gistFiles.length) {
+  case 0:
+  case 1:
+    return gistFiles
+      .map(({ content }) => content)
+      .join('');
+  default:
+    return gistFiles
+      .map(({ filename, content }) => `// ${filename}\n\n${content}`)
+      .join('\n\n');
+  }
+};
 
 const gistBody = code => ({
   description: "Rust code shared from the playground",
