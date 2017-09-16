@@ -245,7 +245,7 @@ class Output extends PureComponent {
                onClick={this.focusMir}
                tabProps={mir} />
           <Tab kind="gist" focus={focus}
-               label="Gist"
+               label="Share"
                onClick={this.focusGist}
                tabProps={gist} />
           { close }

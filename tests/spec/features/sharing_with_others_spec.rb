@@ -7,7 +7,7 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
   scenario "saving to a Gist" do
     editor.set(code)
 
-    within('.header') { click_on 'Gist' }
+    within('.header') { click_on 'Share' }
 
     # Save the links before we navigate away
     perma_link = find_link("Permalink to the playground")[:href]

@@ -79,7 +79,7 @@ class Header extends PureComponent {
         <div className="header-sharing header-set">
           <div className="header-set__buttons">
             <button className="header-set__btn"
-                    onClick={ gistSave }>Gist</button>
+                    onClick={ gistSave }>Share</button>
           </div>
         </div>
 
