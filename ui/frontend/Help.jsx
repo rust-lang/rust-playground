@@ -11,6 +11,7 @@ import integer32Logo from './assets/integer32-logo.svg';
 const ACE_URL = 'https://github.com/ajaxorg/ace';
 const CLIPPY_URL = 'https://github.com/Manishearth/rust-clippy';
 const CRATES_IO_URL = 'https://crates.io/';
+const RUST_COOKBOOK_URL = 'https://rust-lang-nursery.github.io/rust-cookbook/';
 const CRATES_URL = 'https://github.com/integer32llc/rust-playground/blob/master/compiler/base/Cargo.toml';
 const GIST_URL = 'https://gist.github.com/';
 const I32_URL = 'http://integer32.com/';
@@ -101,16 +102,17 @@ const Help = ({ navigateToIndex }) => (
     <LinkableSection id="features" header="Features" level={H2}>
       <LinkableSection id="features-crates" header="Crates" level={H3}>
         <p>
-          The playground provides the top 100 most downloaded crates from
-          {' '}
-          <a href={CRATES_IO_URL}>crates.io</a>. To use a crate, add the
-          appropriate <Code>extern crate foo</Code> line to the code.
+          The playground provides the top 100 most downloaded crates
+          from <a href={CRATES_IO_URL}>crates.io</a>, the crates from
+          the <a href={RUST_COOKBOOK_URL}>Rust Cookbook</a>, and all
+          of their dependencies. To use a crate, add the appropriate
+          <Code>extern crate foo</Code> line to the code.
         </p>
 
         <Example code={CRATE_EXAMPLE} />
 
         <p>
-          See the <a href={CRATES_URL}>current list of crates</a> to know
+          See the <a href={CRATES_URL}>complete list of crates</a> to know
           what's available.
         </p>
       </LinkableSection>
