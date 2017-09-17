@@ -144,7 +144,7 @@ const Help = ({ navigateToIndex }) => (
         <p>
           Once you have some code worth saving or sharing, click on the
           {' '}
-          <strong>Gist</strong> button. This will create an anonymous <a
+          <strong>Share</strong> button. This will create an anonymous <a
           href={GIST_URL}>GitHub Gist</a>. You will also be provided with a URL
           to load that Gist back into the playground.
         </p>
