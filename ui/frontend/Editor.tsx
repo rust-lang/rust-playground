@@ -76,7 +76,7 @@ interface EditorProps {
   code: string;
   editor: EditorType;
   execute: () => any;
-  onEditCode: (string) => any;
+  onEditCode: (_: string) => any;
   position: {
     line: number,
     column: number,

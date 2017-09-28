@@ -33,7 +33,7 @@ class Link extends React.Component<LinkProps> {
 }
 
 interface LinkProps extends React.HTMLAttributes<HTMLAnchorElement> {
-  dispatch: (any) => any;
+  dispatch: (_: any) => any;
   action?: () => any;
   onClick?: () => any;
 }

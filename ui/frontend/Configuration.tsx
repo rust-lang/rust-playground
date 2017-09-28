@@ -38,7 +38,7 @@ interface ConfigurationSelectProps {
   what: string;
   label: string;
   defaultValue: string;
-  onChange: (string) => any;
+  onChange: React.ChangeEventHandler<HTMLSelectElement>;
 }
 
 const ESCAPE_KEYCODE = 27;
@@ -128,8 +128,8 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
 
 interface ConfigurationProps {
   changeEditor: (Editor) => any;
-  changeKeybinding: (string) => any;
-  changeTheme: (string) => any;
+  changeKeybinding: (_: string) => any;
+  changeTheme: (_: string) => any;
   changeOrientation: (Orientation) => any;
   changeAssemblyFlavor: (AssemblyFlavor) => any;
   editor: Editor;

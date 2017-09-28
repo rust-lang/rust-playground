@@ -128,7 +128,7 @@ interface AdvancedEditorProps {
   code: string;
   execute: () => any;
   keybinding?: string;
-  onEditCode: (string) => any;
+  onEditCode: (_: string) => any;
   position: {
     line: number,
     column: number,

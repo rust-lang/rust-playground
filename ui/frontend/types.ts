@@ -14,7 +14,7 @@ export interface Crate {
 export interface CommonEditorProps {
   code: string;
   execute: () => any;
-  onEditCode: (string) => any;
+  onEditCode: (_: string) => any;
   position: Position;
   crates: Crate[];
 }

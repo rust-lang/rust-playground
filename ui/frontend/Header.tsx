@@ -22,8 +22,15 @@ import { Channel, Mode } from './types';
 function oneRadio<T>(name: string, currentValue: T, possibleValue: T, change: (T) => any, labelText: string) {
   const id = `${name}-${possibleValue}`;
   return [
-    <input className="header-set__radio" type="radio" name={name} id={id} key={`${id}-input`}
-           checked={currentValue === possibleValue} onChange={() => change(possibleValue)} />,
+    (
+      <input className="header-set__radio"
+             type="radio"
+             name={name}
+             id={id}
+             key={`${id}-input`}
+             checked={currentValue === possibleValue}
+             onChange={() => change(possibleValue)} />
+    ),
     <label className="header-set__radio-label" htmlFor={id} key={`${id}-label`}>{labelText}</label>,
   ];
 }

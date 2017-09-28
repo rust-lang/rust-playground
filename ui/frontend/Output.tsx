@@ -185,7 +185,8 @@ class Output extends React.PureComponent<OutputProps> {
       return null;
     }
 
-    let close = null, body = null;
+    let close = null;
+    let body = null;
     if (focus) {
       close = (
         <button className="output-tab output-tab-close"
@@ -276,7 +277,7 @@ interface OutputProps {
     channel: Channel,
   };
 
-  changeFocus: (string?) => any;
+  changeFocus: (_?: string) => any;
 }
 
 const mapStateToProps = ({ output }) => output;
