@@ -1,11 +1,11 @@
 import React from 'react';
 
 import createHistory from 'history/createBrowserHistory';
-import UssRouter from './uss-router/Router';
 import { createRouter } from './uss-router';
+import UssRouter from './uss-router/Router';
 
-import Route from 'route-parser';
 import qs from 'qs';
+import Route from 'route-parser';
 
 import { helpPageLoad, indexPageLoad } from './actions';
 
@@ -17,14 +17,14 @@ const stateSelector = ({ page, configuration: { channel, mode } }) => ({
   configuration: {
     channel,
     mode,
-  }
+  },
 });
 
 const stateToLocation = ({ page, configuration }) => {
   switch (page) {
   case 'help': {
     return {
-      pathname: `/help`,
+      pathname: '/help',
     };
   }
 
@@ -72,12 +72,12 @@ export default class Router extends React.Component<RouterProps> {
     });
   }
 
-  render() {
+  public render() {
     return <UssRouter router={this.router}>{this.props.children}</UssRouter>;
   }
 }
 
 interface RouterProps {
-  store: any,
-  reducer: any,
-};
+  store: any;
+  reducer: any;
+}

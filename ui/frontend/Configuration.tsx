@@ -4,21 +4,21 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import {
+  changeAssemblyFlavor,
   changeEditor,
   changeKeybinding,
-  changeTheme,
   changeOrientation,
-  changeAssemblyFlavor,
+  changeTheme,
   toggleConfiguration,
 } from './actions';
-import { Editor, Orientation, AssemblyFlavor } from './types';
 import State from './state';
+import { AssemblyFlavor, Editor, Orientation } from './types';
 
 const keybindingOptions = ACE_KEYBINDINGS.map(t => <option value={t} key={t}>{t}</option>);
 const themeOptions = ACE_THEMES.map(t => <option value={t} key={t}>{t}</option>);
 
 const ConfigurationSelect: React.SFC<ConfigurationSelectProps> = ({
-    what, label, defaultValue, onChange, children
+    what, label, defaultValue, onChange, children,
 }) => (
   <div className="configuration-item">
     <label htmlFor={`config-${what}`}
@@ -35,36 +35,36 @@ const ConfigurationSelect: React.SFC<ConfigurationSelectProps> = ({
 );
 
 interface ConfigurationSelectProps {
-  what: string,
-  label: string,
-  defaultValue: string,
-  onChange: (string) => any,
-};
+  what: string;
+  label: string;
+  defaultValue: string;
+  onChange: (string) => any;
+}
 
 const ESCAPE_KEYCODE = 27;
 
 class Configuration extends React.PureComponent<ConfigurationProps> {
-  onChangeEditor = e => this.props.changeEditor(e.target.value);
-  onChangeKeybinding = e => this.props.changeKeybinding(e.target.value);
-  onChangeTheme = e => this.props.changeTheme(e.target.value);
-  onChangeOrientation = e => this.props.changeOrientation(e.target.value);
-  onChangeAssemblyFlavor = e => this.props.changeAssemblyFlavor(e.target.value);
-  onKeyup = e => {
+  private onChangeEditor = e => this.props.changeEditor(e.target.value);
+  private onChangeKeybinding = e => this.props.changeKeybinding(e.target.value);
+  private onChangeTheme = e => this.props.changeTheme(e.target.value);
+  private onChangeOrientation = e => this.props.changeOrientation(e.target.value);
+  private onChangeAssemblyFlavor = e => this.props.changeAssemblyFlavor(e.target.value);
+  private onKeyup = e => {
     if (e.keyCode === ESCAPE_KEYCODE && !e.defaultPrevented) {
       e.preventDefault();
       this.props.toggleConfiguration();
     }
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     window.addEventListener('keyup', this.onKeyup);
   }
 
-  componentWillUnmount() {
+  public componentWillUnmount() {
     window.removeEventListener('keyup', this.onKeyup);
   }
 
-  render() {
+  public render() {
     const { editor, keybinding, theme, orientation, assemblyFlavor, toggleConfiguration } = this.props;
 
     const advancedEditor = editor === Editor.Advanced;
@@ -74,7 +74,7 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
                            label="Editor Keybinding"
                            defaultValue={keybinding}
                            onChange={this.onChangeKeybinding}>
-        { keybindingOptions }
+        {keybindingOptions}
       </ConfigurationSelect>
     ) : null;
 
@@ -83,7 +83,7 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
                            label="Editor Theme"
                            defaultValue={theme}
                            onChange={this.onChangeTheme}>
-        { themeOptions }
+        {themeOptions}
       </ConfigurationSelect>
     ) : null;
 
@@ -127,18 +127,18 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
 }
 
 interface ConfigurationProps {
-  changeEditor: (Editor) => any,
-  changeKeybinding: (string) => any,
-  changeTheme: (string) => any,
-  changeOrientation: (Orientation) => any,
-  changeAssemblyFlavor: (AssemblyFlavor) => any,
-  editor: Editor,
-  keybinding: string,
-  theme: string,
-  orientation: Orientation,
-  assemblyFlavor: AssemblyFlavor,
-  toggleConfiguration: () => any,
-};
+  changeEditor: (Editor) => any;
+  changeKeybinding: (string) => any;
+  changeTheme: (string) => any;
+  changeOrientation: (Orientation) => any;
+  changeAssemblyFlavor: (AssemblyFlavor) => any;
+  editor: Editor;
+  keybinding: string;
+  theme: string;
+  orientation: Orientation;
+  assemblyFlavor: AssemblyFlavor;
+  toggleConfiguration: () => any;
+}
 
 const mapStateToProps = ({ configuration: { editor, keybinding, theme, orientation, assemblyFlavor } }: State) => (
   { editor, keybinding, theme, orientation, assemblyFlavor }
@@ -155,7 +155,7 @@ const mapDispatchToProps = ({
 
 const ConnectedConfiguration = connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(Configuration);
 
 export default ConnectedConfiguration;

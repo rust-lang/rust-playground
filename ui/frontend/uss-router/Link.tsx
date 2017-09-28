@@ -1,10 +1,10 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
 
 // We are passed `dispatch` anyway, so we can make use of it
 class Link extends React.Component<LinkProps> {
-  render() {
+  public render() {
     const { dispatch, action, onClick, children, ...rest } = this.props;
     const { router } = this.context;
 
@@ -27,16 +27,16 @@ class Link extends React.Component<LinkProps> {
     );
   }
 
-  static contextTypes = {
+  public static contextTypes = {
     router: PropTypes.any,
   };
-};
+}
 
 interface LinkProps extends React.HTMLAttributes<HTMLAnchorElement> {
-  dispatch: (any) => any,
-  action?: () => any,
-  onClick?: () => any,
-};
+  dispatch: (any) => any;
+  action?: () => any;
+  onClick?: () => any;
+}
 
 const LinkContainer = connect()(Link);
 

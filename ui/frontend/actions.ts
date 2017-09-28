@@ -1,11 +1,11 @@
 import fetch from 'isomorphic-fetch';
-import url from 'url';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
+import url from 'url';
 
 import { load as loadGist, save as saveGist } from './gist';
 import { getCrateType, runAsTest } from './selectors';
-import { Page, Editor, Orientation, AssemblyFlavor, Channel, Mode } from './types';
 import State from './state';
+import { AssemblyFlavor, Channel, Editor, Mode, Orientation, Page } from './types';
 
 const routes = {
   compile: { pathname: '/compile' },
@@ -216,7 +216,7 @@ function jsonPost(urlObj, body) {
 
 function fetchJson(url, args) {
   const { headers = {} } = args;
-  headers["Content-Type"] = "application/json";
+  headers['Content-Type'] = 'application/json';
 
   return fetch(url, { ...args, headers })
     .catch(error => error)
@@ -233,7 +233,7 @@ function fetchJson(url, args) {
 
 export function performExecute(): ThunkAction {
   // TODO: Check a cache
-  return function (dispatch, getState) {
+  return function(dispatch, getState) {
     dispatch(requestExecute());
 
     const state = getState();
@@ -251,7 +251,7 @@ export function performExecute(): ThunkAction {
 
 function performCompile(target, { request, success, failure }): ThunkAction {
   // TODO: Check a cache
-  return function (dispatch, getState) {
+  return function(dispatch, getState) {
     dispatch(request());
 
     const state = getState();
@@ -267,7 +267,7 @@ function performCompile(target, { request, success, failure }): ThunkAction {
 }
 
 export interface CompileRequestAction<T> {
-  type: T
+  type: T;
 }
 
 export interface CompileSucceededAction<T> {
@@ -389,7 +389,7 @@ function receiveFormatFailure({ error }) {
 
 export function performFormat(): ThunkAction {
   // TODO: Check a cache
-  return function (dispatch, getState) {
+  return function(dispatch, getState) {
     dispatch(requestFormat());
 
     const { code } = getState();
@@ -419,7 +419,7 @@ function receiveClippyFailure({ error }) {
 
 export function performClippy(): ThunkAction {
   // TODO: Check a cache
-  return function (dispatch, getState) {
+  return function(dispatch, getState) {
     dispatch(requestClippy());
 
     const { code } = getState();
@@ -448,7 +448,7 @@ function receiveGistLoadFailure() { // eslint-disable-line no-unused-vars
 }
 
 export function performGistLoad(id): ThunkAction {
-  return function (dispatch, _getState) {
+  return function(dispatch, _getState) {
     dispatch(requestGistLoad());
 
     loadGist(id)
@@ -474,7 +474,7 @@ function receiveGistSaveFailure({ error }) { // eslint-disable-line no-unused-va
 }
 
 export function performGistSave() {
-  return function (dispatch, getState): ThunkAction {
+  return function(dispatch, getState): ThunkAction {
     dispatch(requestGistSave());
 
     const { code, configuration: { channel } } = getState();
@@ -508,11 +508,11 @@ export function performCratesLoad(): ThunkAction {
 
 function parseChannel(s: string): Channel | null {
   switch (s) {
-  case "stable":
+  case 'stable':
     return Channel.Stable;
-  case "beta":
+  case 'beta':
     return Channel.Beta;
-  case "nightly":
+  case 'nightly':
     return Channel.Nightly;
   default:
     return null;
@@ -521,9 +521,9 @@ function parseChannel(s: string): Channel | null {
 
 function parseMode(s: string): Mode | null {
   switch (s) {
-  case "debug":
+  case 'debug':
     return Mode.Debug;
-  case "release":
+  case 'release':
     return Mode.Release;
   default:
     return null;
@@ -531,7 +531,7 @@ function parseMode(s: string): Mode | null {
 }
 
 export function indexPageLoad({ code, gist, version = 'stable', mode: modeString = 'debug' }): ThunkAction {
-  return function (dispatch) {
+  return function(dispatch) {
     dispatch(navigateToIndex());
 
     if (code) {
@@ -542,12 +542,12 @@ export function indexPageLoad({ code, gist, version = 'stable', mode: modeString
 
     if (version) {
       const channel = parseChannel(version);
-      if (channel) { dispatch(changeChannel(channel)) };
+      if (channel) { dispatch(changeChannel(channel)); }
     }
 
     if (modeString) {
       const mode = parseMode(modeString);
-      if (mode) { dispatch(changeMode(mode)) };
+      if (mode) { dispatch(changeMode(mode)); }
     }
   };
 }
@@ -557,7 +557,7 @@ export function helpPageLoad() {
 }
 
 export function showExample(code): ThunkAction {
-  return function (dispatch) {
+  return function(dispatch) {
     dispatch(navigateToIndex());
     dispatch(editCode(code));
   };

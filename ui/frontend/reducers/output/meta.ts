@@ -7,8 +7,8 @@ const DEFAULT: State = {
 type Focus = 'clippy' | 'llvm-ir' | 'mir' | 'asm' | 'execute' | 'format' | 'gist';
 
 export interface State {
-  focus?: Focus,
-};
+  focus?: Focus;
+}
 
 export default function meta(state = DEFAULT, action) {
   switch (action.type) {

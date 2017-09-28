@@ -40,7 +40,7 @@ const codeFromGist = gistFiles => {
 };
 
 const gistBody = code => ({
-  description: "Rust code shared from the playground",
+  description: 'Rust code shared from the playground',
   public: true,
   files: {
     [FILENAME]: {

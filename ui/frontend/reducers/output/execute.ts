@@ -1,5 +1,5 @@
 import { Action, ActionType } from '../../actions';
-import { start, finish } from './sharedStateManagement';
+import { finish, start } from './sharedStateManagement';
 
 const DEFAULT: State = {
   requestsInProgress: 0,
@@ -9,10 +9,10 @@ const DEFAULT: State = {
 };
 
 export interface State {
-  requestsInProgress: number,
-  stdout?: string,
-  stderr?: string,
-  error?: string,
+  requestsInProgress: number;
+  stdout?: string;
+  stderr?: string;
+  error?: string;
 }
 
 export default function execute(state = DEFAULT, action: Action) {
@@ -20,7 +20,7 @@ export default function execute(state = DEFAULT, action: Action) {
   case ActionType.ExecuteRequest:
     return start(DEFAULT, state);
   case ActionType.ExecuteSucceeded: {
-    const { stdout = "", stderr = "" } = action;
+    const { stdout = '', stderr = '' } = action;
     return finish(state, { stdout, stderr });
   }
   case ActionType.ExecuteFailed:

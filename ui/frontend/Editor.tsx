@@ -1,38 +1,38 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import AdvancedEditor from './AdvancedEditor';
 import { editCode, performExecute } from './actions';
+import AdvancedEditor from './AdvancedEditor';
 import { CommonEditorProps, Editor as EditorType } from './types';
 
 class SimpleEditor extends React.PureComponent<CommonEditorProps> {
   private _editor: HTMLTextAreaElement;
 
-  onChange = e => this.props.onEditCode(e.target.value);
-  trackEditor = component => this._editor = component;
-  onKeyDown = e => {
+  private onChange = e => this.props.onEditCode(e.target.value);
+  private trackEditor = component => this._editor = component;
+  private onKeyDown = e => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       this.props.execute();
     }
   }
 
-  render() {
+  public render() {
     return (
       <textarea
-         ref={ this.trackEditor }
+         ref={this.trackEditor}
          className="editor-simple"
          name="editor-simple"
-         value={ this.props.code }
-         onChange={ this.onChange }
-         onKeyDown= { this.onKeyDown } />
+         value={this.props.code}
+         onChange={this.onChange}
+         onKeyDown={this.onKeyDown} />
     );
   }
 
-  componentDidUpdate(prevProps, _prevState) {
+  public componentDidUpdate(prevProps, _prevState) {
     this.gotoPosition(prevProps.position, this.props.position);
   }
 
-  gotoPosition(oldPosition, newPosition) {
+  private gotoPosition(oldPosition, newPosition) {
     const editor = this._editor;
 
     if (!newPosition || !editor) { return; }
@@ -56,7 +56,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
 }
 
 class Editor extends React.PureComponent<EditorProps> {
-  render() {
+  public render() {
     const { editor, execute, code, crates, position, onEditCode } = this.props;
     const SelectedEditor = editor === EditorType.Simple ? SimpleEditor : AdvancedEditor;
 
@@ -73,20 +73,20 @@ class Editor extends React.PureComponent<EditorProps> {
 }
 
 interface EditorProps {
-  code: string,
-  editor: EditorType,
-  execute: () => any,
-  onEditCode: (string) => any,
+  code: string;
+  editor: EditorType;
+  execute: () => any;
+  onEditCode: (string) => any;
   position: {
     line: number,
     column: number,
-  },
-  crates: {
+  };
+  crates: Array<{
     id: string,
     name: string,
     version: string,
-  }[],
-};
+  }>;
+}
 
 const mapStateToProps = ({ code, configuration: { editor }, position, crates }) => (
   { code, editor, position, crates }
@@ -99,7 +99,7 @@ const mapDispatchToProps = ({
 
 const ConnectedEditor = connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(Editor);
 
 export default ConnectedEditor;

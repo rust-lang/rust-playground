@@ -1,8 +1,8 @@
-import Prism from "prismjs";
+import Prism from 'prismjs';
 
 export function configureRustErrors(gotoPosition) {
   Prism.languages.rust_errors = { // eslint-disable-line camelcase
-    'warning':/warning:.*\n/,
+    'warning': /warning:.*\n/,
     'error': {
       pattern: /error(\[E\d+\])?:.*\n/,
       inside: {
@@ -34,7 +34,7 @@ export function configureRustErrors(gotoPosition) {
       env.tag = 'a';
       env.attributes.href = '#';
       env.attributes['data-line'] = line;
-      env.attributes['data-col'] = "1";
+      env.attributes['data-col'] = '1';
     }
   });
 

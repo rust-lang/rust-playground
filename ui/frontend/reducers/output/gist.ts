@@ -1,5 +1,5 @@
 import * as actions from '../../actions';
-import { start, finish } from './sharedStateManagement';
+import { finish, start } from './sharedStateManagement';
 
 const DEFAULT: State = {
   requestsInProgress: 0,
@@ -9,10 +9,10 @@ const DEFAULT: State = {
 };
 
 export interface State {
-  requestsInProgress: number,
-  id?: string,
-  url?: string,
-  error?: string,
+  requestsInProgress: number;
+  id?: string;
+  url?: string;
+  error?: string;
 }
 
 export default function gist(state = DEFAULT, action) {
@@ -29,7 +29,7 @@ export default function gist(state = DEFAULT, action) {
 
   case actions.GIST_LOAD_FAILED:
   case actions.GIST_SAVE_FAILED:
-    return finish(state, { error: "Some kind of error" });
+    return finish(state, { error: 'Some kind of error' });
 
   default:
     return state;

@@ -60,7 +60,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:lint": "tslint --config tslint.json --exclude './**/node_modules/**/*' './**/*.ts?(x)'",
-    "test:lint:fix": "tslint --config tslint.json --fix",
     "build": "webpack --progress --colors",
     "watch": "webpack --progress --colors --watch"
   },

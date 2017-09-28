@@ -1,5 +1,5 @@
-import { createStore } from 'redux';
 import isEqual from 'lodash.isequal';
+import { createStore } from 'redux';
 
 export function createRouter({
   store,
@@ -59,6 +59,6 @@ export function createRouter({
       tempStore.dispatch(a);
       const maybeState = tempStore.getState();
       return stateToLocation(maybeState);
-    }
+    },
   };
 }

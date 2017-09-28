@@ -1,5 +1,5 @@
 import { Action, ActionType } from '../../actions';
-import { start, finish } from './sharedStateManagement';
+import { finish, start } from './sharedStateManagement';
 
 const DEFAULT: State = {
   requestsInProgress: 0,
@@ -10,11 +10,11 @@ const DEFAULT: State = {
 };
 
 export interface State {
-  requestsInProgress: number,
-  code?: string,
-  stdout?: string,
-  stderr?: string,
-  error?: string,
+  requestsInProgress: number;
+  code?: string;
+  stdout?: string;
+  stderr?: string;
+  error?: string;
 }
 
 export default function llvmIr(state = DEFAULT, action: Action) {
@@ -22,7 +22,7 @@ export default function llvmIr(state = DEFAULT, action: Action) {
   case ActionType.CompileLlvmIrRequest:
     return start(DEFAULT, state);
   case ActionType.CompileLlvmIrSucceeded: {
-    const { code = "", stdout = "", stderr = "" } = action;
+    const { code = '', stdout = '', stderr = '' } = action;
     return finish(state, { code, stdout, stderr });
   }
   case ActionType.CompileLlvmIrFailed:

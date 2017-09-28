@@ -1,18 +1,18 @@
-import "babel-polyfill";
+import 'babel-polyfill';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { applyMiddleware, createStore, compose } from 'redux';
-import thunk from 'redux-thunk';
+import { applyMiddleware, compose, createStore } from 'redux';
 import persistState from 'redux-localstorage';
+import thunk from 'redux-thunk';
 
-import { configureRustErrors } from './highlighting';
-import { serialize, deserialize } from './local_storage';
-import playgroundApp from './reducers';
 import { gotoPosition, performCratesLoad } from './actions';
-import Router from './Router';
+import { configureRustErrors } from './highlighting';
+import { deserialize, serialize } from './local_storage';
 import PageSwitcher from './PageSwitcher';
+import playgroundApp from './reducers';
+import Router from './Router';
 
 const mw = [thunk];
 const middlewares = applyMiddleware(...mw);
@@ -30,5 +30,5 @@ ReactDOM.render(
       <PageSwitcher />
     </Router>
   </Provider>,
-  document.getElementById('playground')
+  document.getElementById('playground'),
 );

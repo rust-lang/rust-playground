@@ -2,8 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import Configuration from './Configuration';
-import Header from './Header';
 import Editor from './Editor';
+import Header from './Header';
 import Output from './Output';
 import State from './state';
 import { Orientation } from './types';
@@ -17,7 +17,7 @@ const ConfigurationModal: React.SFC = () => (
 );
 
 class Playground extends React.Component<Props> {
-  render() {
+  public render() {
     const { showConfig, focus, splitOrientation } = this.props;
 
     const config = showConfig ? <ConfigurationModal /> : null;
@@ -27,7 +27,7 @@ class Playground extends React.Component<Props> {
 
     return (
       <div>
-        { config }
+        {config}
         <div className="playground">
           <div className="playground-header">
             <Header />
@@ -45,7 +45,7 @@ class Playground extends React.Component<Props> {
     );
   }
 
-  componentDidUpdate(prevProps, _prevState) {
+  public componentDidUpdate(prevProps, _prevState) {
     if (this.props.focus !== prevProps.focus) {
       // Inform the ACE editor that its size has changed.
       try {
@@ -61,14 +61,14 @@ class Playground extends React.Component<Props> {
 }
 
 interface Props {
-  focus?: string,
-  showConfig: boolean,
-  splitOrientation: Orientation,
-};
+  focus?: string;
+  showConfig: boolean;
+  splitOrientation: Orientation;
+}
 
 const mapStateToProps = ({
     configuration: { shown: showConfig, orientation: splitOrientation },
-    output: { meta: { focus } }
+    output: { meta: { focus } },
 }: State) => (
   { showConfig, focus, splitOrientation }
 );

@@ -1,24 +1,24 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 class Router extends React.Component<RouterProps> {
-  getChildContext() {
+  public getChildContext() {
     return {
       router: this.props.router,
     };
   }
 
-  render() {
+  public render() {
     return React.Children.only(this.props.children);
   }
 
-  static childContextTypes = {
+  public static childContextTypes = {
     router: PropTypes.any,
   };
 }
 
 interface RouterProps {
-  router: any,
-};
+  router: any;
+}
 
 export default Router;

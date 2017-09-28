@@ -39,15 +39,15 @@ function buildCrateAutocompleter(component) {
 
 class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
   private _editor: any;
-  trackEditor = component => this._editor = component;
+  private trackEditor = component => this._editor = component;
 
-  render() {
+  public render() {
     const { ace, AceEditor, keybinding, theme, code, onEditCode } = this.props;
 
     if (keybinding === 'vim') {
       const { CodeMirror: { Vim } } = ace.acequire('ace/keyboard/vim');
-      Vim.defineEx("write", "w", (cm, _input) => {
-        cm.ace.execCommand("executeCode");
+      Vim.defineEx('write', 'w', (cm, _input) => {
+        cm.ace.execCommand('executeCode');
       });
     }
 
@@ -66,7 +66,7 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
     );
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     const { _editor: { editor } } = this;
 
     // Auto-completing character literals interferes too much with
@@ -79,7 +79,7 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
         mac: 'Ctrl-Enter|Command-Enter',
       },
       exec: this.props.execute,
-      readOnly: true
+      readOnly: true,
     });
 
     editor.setOptions({
@@ -92,7 +92,7 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
     editor.commands.on('afterExec', event => {
       const { editor, command } = event;
 
-      if (!(command.name === "backspace" || command.name === "insertstring")) {
+      if (!(command.name === 'backspace' || command.name === 'insertstring')) {
         return;
       }
 
@@ -104,11 +104,11 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
     editor.completers = [buildCrateAutocompleter(this)];
   }
 
-  componentDidUpdate(prevProps, _prevState) {
+  public componentDidUpdate(prevProps, _prevState) {
     this.gotoPosition(prevProps.position, this.props.position);
   }
 
-  gotoPosition(oldPosition, newPosition) {
+  private gotoPosition(oldPosition, newPosition) {
     const editor = this._editor;
 
     if (!newPosition || !editor) { return; }
@@ -123,23 +123,23 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
 }
 
 interface AdvancedEditorProps {
-  ace: any,
-  AceEditor: React.ReactType,
-  code: string,
-  execute: () => any,
-  keybinding?: string,
-  onEditCode: (string) => any,
+  ace: any;
+  AceEditor: React.ReactType;
+  code: string;
+  execute: () => any;
+  keybinding?: string;
+  onEditCode: (string) => any;
   position: {
     line: number,
     column: number,
-  },
-  theme: string,
-  crates: {
+  };
+  theme: string;
+  crates: Array<{
     id: string,
     name: string,
     version: string,
-  }[],
-};
+  }>;
+}
 
 // The ACE editor weighs in at ~250K. Adding all of the themes and the
 // (surprisingly chunky) keybindings, it's not that far off from 500K!
@@ -175,7 +175,7 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedE
       });
   }
 
-  render() {
+  public render() {
     if (this.isLoading()) {
       return <div>Loading the ACE editor...</div>;
     } else {
@@ -184,24 +184,24 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedE
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  public componentWillReceiveProps(nextProps) {
     this.load(nextProps);
   }
 
-  isLoading() {
+  private isLoading() {
     return this.state.themeLoading ||
       this.state.keybindingLoading ||
       this.state.modeLoading ||
       this.state.AceEditor === null;
   }
 
-  load(props) {
+  private load(props) {
     const { keybinding, theme } = props;
     this.loadTheme(theme);
     this.loadKeybinding(keybinding);
   }
 
-  loadKeybinding(keybinding) {
+  private loadKeybinding(keybinding) {
     if (keybinding && keybinding !== this.state.keybinding) {
       this.setState({ keybindingLoading: true });
       import('brace')
@@ -210,7 +210,7 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedE
     }
   }
 
-  loadTheme(theme) {
+  private loadTheme(theme) {
     if (theme !== this.state.theme) {
       this.setState({ themeLoading: true });
 
@@ -222,19 +222,19 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedE
 }
 
 interface AdvancedEditorAsyncState {
-  theme?: string,
-  keybinding?: string,
-  themeLoading?: boolean,
-  keybindingLoading?: boolean,
-  modeLoading: boolean,
-  AceEditor?: React.ReactType,
-  ace?: any,
-};
+  theme?: string;
+  keybinding?: string;
+  themeLoading?: boolean;
+  keybindingLoading?: boolean;
+  modeLoading: boolean;
+  AceEditor?: React.ReactType;
+  ace?: any;
+}
 
 interface PropsFromState {
-  theme: string,
-  keybinding?: string,
-};
+  theme: string;
+  keybinding?: string;
+}
 
 const mapStateToProps = ({ configuration: { theme, keybinding } }: State) => ({
   theme,

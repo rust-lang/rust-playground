@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { PrismCode } from "react-prism";
-import "prismjs/components/prism-rust.min";
+import 'prismjs/components/prism-rust.min';
+import { PrismCode } from 'react-prism';
 
 import { showExample } from './actions';
 
@@ -18,9 +18,9 @@ const Example: React.SFC<Props> = ({ code, showExample }) => (
 );
 
 export interface Props {
-  code: string,
-  showExample: (code: string) => any,
-};
+  code: string;
+  showExample: (code: string) => any;
+}
 
 const mapDispatchToProps = ({
   showExample,

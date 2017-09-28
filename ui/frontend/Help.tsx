@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Link from './uss-router/Link';
-import Example from './HelpExample';
 import { navigateToIndex } from './actions';
+import Example from './HelpExample';
+import Link from './uss-router/Link';
 
 import integer32Logo from './assets/integer32-logo.svg';
 
@@ -40,7 +40,7 @@ fn main ()
 { struct Foo { a: u8, b: String, }
 match 4 {2=>{},_=>{}} }`;
 
-const LINK_EXAMPLE='http://play.integer32.com/?code=fn main() { println!("hello world!"); }';
+const LINK_EXAMPLE = 'http://play.integer32.com/?code=fn main() { println!("hello world!"); }';
 
 const TEST_EXAMPLE = `#[test]
 fn test_something() {
@@ -96,7 +96,6 @@ const Help = ({ navigateToIndex }: HelpProps) => (
         </a>
       </p>
     </LinkableSection>
-
 
     <LinkableSection id="features" header="Features" level={H2}>
       <LinkableSection id="features-crates" header="Crates" level={H3}>
@@ -158,7 +157,7 @@ const Help = ({ navigateToIndex }: HelpProps) => (
           limitations on the maximum length.
         </p>
 
-        <pre className="help__code"><code>{ LINK_EXAMPLE }</code></pre>
+        <pre className="help__code"><code>{LINK_EXAMPLE}</code></pre>
       </LinkableSection>
 
       <LinkableSection id="features-tests" header="Executing tests" level={H3}>
@@ -293,14 +292,14 @@ const Help = ({ navigateToIndex }: HelpProps) => (
 );
 
 export interface HelpProps {
-  navigateToIndex: () => void,
-};
+  navigateToIndex: () => void;
+}
 
 const H2: React.SFC = ({ children }) => <h2>{children}</h2>;
 const H3: React.SFC = ({ children }) => <h3>{children}</h3>;
 
 const LinkableSection: React.SFC<LinkableSectionProps> = ({
-  id, header, level: Level, children
+  id, header, level: Level, children,
 }) => (
   <div id={id}>
     <Level>
@@ -313,13 +312,13 @@ const LinkableSection: React.SFC<LinkableSectionProps> = ({
 );
 
 interface LinkableSectionProps {
-  id: string,
-  header: string,
-  level: (ChildrenProps) => JSX.Element,
-};
+  id: string;
+  header: string;
+  level: (ChildrenProps) => JSX.Element;
+}
 
 const Code: React.SFC = ({ children }) => (
-    <code className="help__code">{ children }</code>
+    <code className="help__code">{children}</code>
 );
 
 const mapStateToProps = () => ({
