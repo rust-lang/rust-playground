@@ -226,7 +226,7 @@ fn main() {
     }
 
     // Resolve transitive dependencies.
-    let res = resolver::resolve(&summaries, &[], &mut registry)
+    let res = resolver::resolve(&summaries, &[], &mut registry, None)
         .expect("Unable to resolve dependencies");
 
     // Construct playground's Cargo.toml.
