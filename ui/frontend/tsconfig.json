@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "alwaysStrict": true,
+    "target": "ES2017",
+    "module": "esnext",
+    "allowJs": true,
+    "jsx": "preserve"
+  }
+}

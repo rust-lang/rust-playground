@@ -15,8 +15,6 @@
     "qs": "^6.4.0",
     "react": "^15.3.0",
     "react-ace": "^4.1.0",
-    "react-addons-pure-render-mixin": "^15.3.0",
-    "react-addons-shallow-compare": "^15.3.0",
     "react-dom": "^15.3.0",
     "react-prism": "^4.0.0",
     "react-redux": "^5.0.0",
@@ -29,9 +27,10 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
+    "@types/react-dom": "^15.5.4",
+    "@types/react-redux": "^5.0.5",
     "autoprefixer": "^7.1.1",
     "babel-core": "^6.17.0",
-    "babel-eslint": "^7.0.0",
     "babel-loader": "^7.0.0",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-plugin-transform-class-properties": "^6.11.5",
@@ -42,8 +41,6 @@
     "compression-webpack-plugin": "^0.4.0",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.0",
-    "eslint": "^3.2.0",
-    "eslint-plugin-react": "^7.0.0",
     "extract-text-webpack-plugin": "^3.0.0",
     "glob": "^7.0.5",
     "html-webpack-plugin": "^2.22.0",
@@ -54,12 +51,15 @@
     "postcss-loader": "^2.0.5",
     "sass-loader": "^6.0.0",
     "style-loader": "^0.18.2",
+    "ts-loader": "^2.3.4",
+    "tslint": "^5.7.0",
+    "tslint-react": "^3.2.0",
+    "typescript": "^2.4.2",
     "webpack": "^3.2.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:lint": "eslint . --ext .js --ext .jsx --cache --ignore-path .gitignore",
-    "test:lint:fix": "eslint . --ext .js --ext .jsx --cache --ignore-path .gitignore --fix",
+    "test:lint": "tslint --config tslint.json --exclude './**/node_modules/**/*' './**/*.ts?(x)'",
     "build": "webpack --progress --colors",
     "watch": "webpack --progress --colors --watch"
   },
