@@ -20,6 +20,7 @@ blacklist = [
 
     # Not supported on stable
     "redox_syscall",
+    "redox_termios",
 
     # Not available on Linux
     "security-framework",

@@ -27,6 +27,7 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
+    "@types/react": "^15.5.4",
     "@types/react-dom": "^15.5.4",
     "@types/react-redux": "^5.0.5",
     "autoprefixer": "^7.1.1",
@@ -54,8 +55,11 @@
     "ts-loader": "^2.3.4",
     "tslint": "^5.7.0",
     "tslint-react": "^3.2.0",
-    "typescript": "^2.4.2",
+    "typescript": "~2.4.2",
     "webpack": "^3.2.0"
+  },
+  "resolutions": {
+    "@types/react": "^15.5.4"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
