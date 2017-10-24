@@ -11,6 +11,12 @@ export interface Crate {
   version: string;
 }
 
+export interface Version {
+  version: string;
+  hash: string;
+  date: string;
+}
+
 export interface CommonEditorProps {
   code: string;
   execute: () => any;

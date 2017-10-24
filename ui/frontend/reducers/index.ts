@@ -6,6 +6,7 @@ import crates, { State as CratesState } from './crates';
 import output, { State as OutputState } from './output';
 import page, { State as PageState } from './page';
 import position, { State as PositionState } from './position';
+import versions, { State as VersionsState } from './versions';
 
 export interface State {
   configuration: ConfigurationState;
@@ -14,6 +15,7 @@ export interface State {
   position: PositionState;
   output: OutputState;
   page: PageState;
+  versions: VersionsState;
 }
 
 const playgroundApp = combineReducers({
@@ -23,6 +25,7 @@ const playgroundApp = combineReducers({
   position,
   output,
   page,
+  versions,
 });
 
 export default playgroundApp;

@@ -15,23 +15,42 @@ import {
   performGistSave,
   toggleConfiguration,
 } from './actions';
-import { getCrateType, runAsTest } from './selectors';
+import {
+  betaVersionText, getCrateType, nightlyVersionText, runAsTest, stableVersionText,
+} from './selectors';
 import State from './state';
 import { Channel, Mode } from './types';
 
-function oneRadio<T>(name: string, currentValue: T, possibleValue: T, change: (T) => any, labelText: string) {
+function oneRadio<T>(
+  name: string,
+  currentValue: T,
+  possibleValue: T,
+  change: (T) => any,
+  labelText: string,
+  extra?: any,
+) {
   const id = `${name}-${possibleValue}`;
   return [
     (
-      <input className="header-set__radio"
-             type="radio"
-             name={name}
-             id={id}
-             key={`${id}-input`}
-             checked={currentValue === possibleValue}
-             onChange={() => change(possibleValue)} />
+      <input
+        className="header-set__radio"
+        type="radio"
+        name={name}
+        id={id}
+        key={`${id}-input`}
+        checked={currentValue === possibleValue}
+        onChange={() => change(possibleValue)} />
     ),
-    <label className="header-set__radio-label" htmlFor={id} key={`${id}-label`}>{labelText}</label>,
+    (
+      <label
+        {...extra}
+        className="header-set__radio-label"
+        htmlFor={id}
+        key={`${id}-label`}
+      >
+        {labelText}
+      </label>
+    ),
   ];
 }
 
@@ -49,12 +68,13 @@ class Header extends React.PureComponent<HeaderProps> {
       channel, changeChannel, mode, changeMode,
       crateType, tests,
       toggleConfiguration, navigateToHelp,
+      stableVersion, betaVersion, nightlyVersion,
     } = this.props;
 
-    const oneChannel = (value: Channel, labelText) =>
-            oneRadio('channel', channel, value, changeChannel, labelText);
+    const oneChannel = (value: Channel, labelText, extras) =>
+      oneRadio('channel', channel, value, changeChannel, labelText, extras);
     const oneMode = (value: Mode, labelText) =>
-            oneRadio('mode', mode, value, changeMode, labelText);
+      oneRadio('mode', mode, value, changeMode, labelText);
 
     const primaryLabel = executionLabel(crateType, tests);
 
@@ -62,14 +82,14 @@ class Header extends React.PureComponent<HeaderProps> {
       <div className="header">
         <div className="header-compilation header-set">
           <button className="header-set__btn header-set__btn--primary"
-                  onClick={execute}>{primaryLabel}</button>
+            onClick={execute}>{primaryLabel}</button>
           <div className="header-set__buttons header-set__buttons--primary">
             <button className="header-set__btn"
-                    onClick={compileToAssembly}>ASM</button>
+              onClick={compileToAssembly}>ASM</button>
             <button className="header-set__btn"
-                    onClick={compileToLLVM}>LLVM IR</button>
+              onClick={compileToLLVM}>LLVM IR</button>
             <button className="header-set__btn"
-                    onClick={compileToMir}>MIR</button>
+              onClick={compileToMir}>MIR</button>
           </div>
         </div>
 
@@ -77,16 +97,16 @@ class Header extends React.PureComponent<HeaderProps> {
           <legend className="header-set__title">Tools</legend>
           <div className="header-set__buttons">
             <button className="header-set__btn"
-                    onClick={format}>Format</button>
+              onClick={format}>Format</button>
             <button className="header-set__btn"
-                    onClick={clippy}>Clippy</button>
+              onClick={clippy}>Clippy</button>
           </div>
         </div>
 
         <div className="header-sharing header-set">
           <div className="header-set__buttons">
             <button className="header-set__btn"
-                    onClick={gistSave}>Share</button>
+              onClick={gistSave}>Share</button>
           </div>
         </div>
 
@@ -101,16 +121,16 @@ class Header extends React.PureComponent<HeaderProps> {
         <div className="header-channel header-set">
           <legend className="header-set__title">Channel</legend>
           <div className="header-set__buttons header-set__buttons--radio">
-            {oneChannel(Channel.Stable, 'Stable')}
-            {oneChannel(Channel.Beta, 'Beta')}
-            {oneChannel(Channel.Nightly, 'Nightly')}
+            {oneChannel(Channel.Stable, 'Stable', { title: stableVersion })}
+            {oneChannel(Channel.Beta, 'Beta', { title: betaVersion })}
+            {oneChannel(Channel.Nightly, 'Nightly', { title: nightlyVersion })}
           </div>
         </div>
 
         <div className="header-set">
           <div className="header-set__buttons">
             <button className="header-set__btn"
-                    onClick={toggleConfiguration}>Config</button>
+              onClick={toggleConfiguration}>Config</button>
           </div>
         </div>
 
@@ -140,6 +160,9 @@ interface HeaderProps {
   tests: boolean;
   toggleConfiguration: () => any;
   navigateToHelp: () => any;
+  stableVersion: string;
+  betaVersion: string;
+  nightlyVersion: string;
 }
 
 const mapStateToProps = (state: State) => {
@@ -151,6 +174,9 @@ const mapStateToProps = (state: State) => {
     crateType: getCrateType(state),
     tests: runAsTest(state),
     navigateToHelp,
+    stableVersion: stableVersionText(state),
+    betaVersion: betaVersionText(state),
+    nightlyVersion: nightlyVersionText(state),
   };
 };
 

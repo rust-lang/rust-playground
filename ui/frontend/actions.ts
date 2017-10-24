@@ -14,6 +14,11 @@ const routes = {
   clippy: { pathname: '/clippy' },
   meta: {
     crates: { pathname: '/meta/crates' },
+    version: {
+      stable: '/meta/version/stable',
+      beta: '/meta/version/beta',
+      nightly: '/meta/version/nightly',
+    },
   },
 };
 
@@ -83,7 +88,7 @@ export type Action =
   | CompileMirFailedAction
 
   | OtherAction
-;
+  ;
 
 export interface ToggleConfigurationAction {
   type: ActionType.ToggleConfiguration;
@@ -506,27 +511,58 @@ export function performCratesLoad(): ThunkAction {
   };
 }
 
+export const REQUEST_VERSIONS_LOAD = 'REQUEST_VERSIONS_LOAD';
+export const VERSIONS_LOAD_SUCCEEDED = 'VERSIONS_LOAD_SUCCEEDED';
+
+function requestVersionsLoad() {
+  return { type: REQUEST_VERSIONS_LOAD };
+}
+
+function receiveVersionsLoadSuccess({ stable, beta, nightly }) {
+  return { type: VERSIONS_LOAD_SUCCEEDED, stable, beta, nightly };
+}
+
+export function performVersionsLoad(): ThunkAction {
+  return function(dispatch) {
+    dispatch(requestVersionsLoad());
+
+    const stable = jsonGet(routes.meta.version.stable);
+    const beta = jsonGet(routes.meta.version.beta);
+    const nightly = jsonGet(routes.meta.version.nightly);
+
+    const all = Promise.all([stable, beta, nightly]);
+
+    return all
+      .then(([stable, beta, nightly]) => dispatch(receiveVersionsLoadSuccess({
+        stable,
+        beta,
+        nightly,
+      })));
+    // TODO: Failure case
+  };
+}
+
 function parseChannel(s: string): Channel | null {
   switch (s) {
-  case 'stable':
-    return Channel.Stable;
-  case 'beta':
-    return Channel.Beta;
-  case 'nightly':
-    return Channel.Nightly;
-  default:
-    return null;
+    case 'stable':
+      return Channel.Stable;
+    case 'beta':
+      return Channel.Beta;
+    case 'nightly':
+      return Channel.Nightly;
+    default:
+      return null;
   }
 }
 
 function parseMode(s: string): Mode | null {
   switch (s) {
-  case 'debug':
-    return Mode.Debug;
-  case 'release':
-    return Mode.Release;
-  default:
-    return null;
+    case 'debug':
+      return Mode.Debug;
+    case 'release':
+      return Mode.Release;
+    default:
+      return null;
   }
 }
 
