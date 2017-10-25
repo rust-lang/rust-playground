@@ -4,7 +4,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const CompressionPlugin = require("compression-webpack-plugin");
+const ZopfliPlugin = require("zopfli-webpack-plugin");
 const glob = require('glob');
 const basename = require('basename');
 
@@ -111,6 +111,6 @@ if (process.env.NODE_ENV === 'production') {
         warnings: false,
       },
     }),
-    new CompressionPlugin({ algorithm: 'zopfli' })
+    new ZopfliPlugin(),
   );
 }

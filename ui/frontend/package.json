@@ -39,7 +39,6 @@
     "babel-preset-env": "^1.2.2",
     "babel-preset-react": "^6.11.1",
     "basename": "^0.1.2",
-    "compression-webpack-plugin": "^0.4.0",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.0",
     "extract-text-webpack-plugin": "^3.0.0",
@@ -56,7 +55,8 @@
     "tslint": "^5.7.0",
     "tslint-react": "^3.2.0",
     "typescript": "~2.4.2",
-    "webpack": "^3.2.0"
+    "webpack": "^3.2.0",
+    "zopfli-webpack-plugin": "^0.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
