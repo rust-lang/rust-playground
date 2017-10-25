@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::ffi::OsStr;
 use std::fmt;
 use std::fs::{self, File};
@@ -26,6 +27,13 @@ impl From<CrateInformationInner> for CrateInformation {
         let CrateInformationInner { name, version, id } = me;
         Self { name, version, id }
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct Version {
+    pub release: String,
+    pub commit_hash: String,
+    pub commit_date: String,
 }
 
 use mktemp::Temp;
@@ -67,6 +75,18 @@ quick_error! {
         OutputMissing {
             description("output was missing")
             display("Output was missing")
+        }
+        VersionReleaseMissing {
+            description("release was missing from the version output")
+            display("Release was missing from the version output")
+        }
+        VersionHashMissing {
+            description("commit hash was missing from the version output")
+            display("Commit hash was missing from the version output")
+        }
+        VersionDateMissing {
+            description("commit date was missing from the version output")
+            display("Commit date was missing from the version output")
         }
     }
 }
@@ -189,6 +209,29 @@ impl Sandbox {
             .collect();
 
         Ok(crates)
+    }
+
+    pub fn version(&self, channel: Channel) -> Result<Version> {
+        let mut command = basic_secure_docker_command();
+        command.args(&[channel.container_name()]);
+        command.args(&["rustc", "--version", "--verbose"]);
+
+        let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
+        let version_output = vec_to_str(output.stdout)?;
+
+        let mut info: BTreeMap<String, String> = version_output.lines().skip(1).filter_map(|line| {
+            let mut pieces = line.splitn(2, ":").fuse();
+            match (pieces.next(), pieces.next()) {
+                (Some(name), Some(value)) => Some((name.trim().into(), value.trim().into())),
+                _ => None
+            }
+        }).collect();
+
+        let release = info.remove("release").ok_or(Error::VersionReleaseMissing)?;
+        let commit_hash = info.remove("commit-hash").ok_or(Error::VersionHashMissing)?;
+        let commit_date = info.remove("commit-date").ok_or(Error::VersionDateMissing)?;
+
+        Ok(Version { release, commit_hash, commit_date })
     }
 
     fn write_source_code(&self, code: &str) -> Result<()> {

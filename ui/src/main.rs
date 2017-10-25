@@ -78,6 +78,9 @@ fn main() {
     mount.mount("/format", format);
     mount.mount("/clippy", clippy);
     mount.mount("/meta/crates", meta_crates);
+    mount.mount("/meta/version/stable", meta_version_stable);
+    mount.mount("/meta/version/beta", meta_version_beta);
+    mount.mount("/meta/version/nightly", meta_version_nightly);
     mount.mount("/evaluate.json", evaluate);
 
     let mut chain = Chain::new(mount);
@@ -151,6 +154,30 @@ fn meta_crates(_req: &mut Request) -> IronResult<Response> {
         cached(sandbox)
             .crates()
             .map(MetaCratesResponse::from)
+    })
+}
+
+fn meta_version_stable(_req: &mut Request) -> IronResult<Response> {
+    with_sandbox_no_request(|sandbox| {
+        cached(sandbox)
+            .version_stable()
+            .map(MetaVersionResponse::from)
+    })
+}
+
+fn meta_version_beta(_req: &mut Request) -> IronResult<Response> {
+    with_sandbox_no_request(|sandbox| {
+        cached(sandbox)
+            .version_beta()
+            .map(MetaVersionResponse::from)
+    })
+}
+
+fn meta_version_nightly(_req: &mut Request) -> IronResult<Response> {
+    with_sandbox_no_request(|sandbox| {
+        cached(sandbox)
+            .version_nightly()
+            .map(MetaVersionResponse::from)
     })
 }
 
@@ -235,8 +262,12 @@ struct SandboxCacheInfo<T> {
 }
 
 /// Caches the success value of a single operation
-#[derive(Debug, Default)]
+#[derive(Debug)]
 struct SandboxCacheOne<T>(Mutex<Option<SandboxCacheInfo<T>>>);
+
+impl<T> Default for SandboxCacheOne<T> {
+    fn default() -> Self { SandboxCacheOne(Mutex::default()) }
+}
 
 impl<T> SandboxCacheOne<T>
 where
@@ -280,6 +311,9 @@ where
 #[derive(Debug, Default)]
 struct SandboxCache {
     crates: SandboxCacheOne<Vec<sandbox::CrateInformation>>,
+    version_stable: SandboxCacheOne<sandbox::Version>,
+    version_beta: SandboxCacheOne<sandbox::Version>,
+    version_nightly: SandboxCacheOne<sandbox::Version>,
 }
 
 /// Provides a similar API to the Sandbox that caches the successful results.
@@ -291,6 +325,24 @@ struct CachedSandbox<'a> {
 impl<'a> CachedSandbox<'a> {
     fn crates(&self) -> Result<Vec<sandbox::CrateInformation>> {
         self.cache.crates.clone_or_populate(|| self.sandbox.crates())
+    }
+
+    fn version_stable(&self) -> Result<sandbox::Version> {
+        self.cache.version_stable.clone_or_populate(|| {
+            self.sandbox.version(sandbox::Channel::Stable)
+        })
+    }
+
+    fn version_beta(&self) -> Result<sandbox::Version> {
+        self.cache.version_beta.clone_or_populate(|| {
+            self.sandbox.version(sandbox::Channel::Beta)
+        })
+    }
+
+    fn version_nightly(&self) -> Result<sandbox::Version> {
+        self.cache.version_nightly.clone_or_populate(|| {
+            self.sandbox.version(sandbox::Channel::Nightly)
+        })
     }
 }
 
@@ -439,6 +491,13 @@ struct MetaCratesResponse {
     crates: Vec<CrateInformation>,
 }
 
+#[derive(Debug, Clone, Serialize)]
+struct MetaVersionResponse {
+    version: String,
+    hash: String,
+    date: String,
+}
+
 #[derive(Debug, Clone, Deserialize)]
 struct EvaluateRequest {
     version: String,
@@ -561,6 +620,16 @@ impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
 
         MetaCratesResponse {
             crates,
+        }
+    }
+}
+
+impl From<sandbox::Version> for MetaVersionResponse {
+    fn from(me: sandbox::Version) -> Self {
+        MetaVersionResponse {
+            version: me.release,
+            hash: me.commit_hash,
+            date: me.commit_date,
         }
     }
 }

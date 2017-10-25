@@ -7,7 +7,7 @@ import { applyMiddleware, compose, createStore } from 'redux';
 import persistState from 'redux-localstorage';
 import thunk from 'redux-thunk';
 
-import { gotoPosition, performCratesLoad } from './actions';
+import { gotoPosition, performCratesLoad, performVersionsLoad } from './actions';
 import { configureRustErrors } from './highlighting';
 import { deserialize, serialize } from './local_storage';
 import PageSwitcher from './PageSwitcher';
@@ -23,6 +23,7 @@ const store = createStore(playgroundApp, enhancers);
 configureRustErrors((line, col) => store.dispatch(gotoPosition(line, col)));
 
 store.dispatch(performCratesLoad());
+store.dispatch(performVersionsLoad());
 
 ReactDOM.render(
   <Provider store={store}>
