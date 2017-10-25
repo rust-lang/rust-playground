@@ -5,6 +5,7 @@ import Configuration from './Configuration';
 import Editor from './Editor';
 import Header from './Header';
 import Output from './Output';
+import { Focus } from './reducers/output/meta';
 import State from './state';
 import { Orientation } from './types';
 
@@ -43,16 +44,15 @@ const Playground: React.SFC<Props> = ({ showConfig, focus, splitOrientation }) =
 };
 
 interface Props {
-  focus?: string;
+  focus?: Focus;
   showConfig: boolean;
   splitOrientation: Orientation;
 }
 
-const mapStateToProps = ({
-    configuration: { shown: showConfig, orientation: splitOrientation },
-  output: { meta: { focus } },
-}: State) => (
-    { showConfig, focus, splitOrientation }
-  );
+const mapStateToProps = (state: State) => ({
+  showConfig: state.configuration.shown,
+  focus: state.output.meta.focus,
+  splitOrientation: state.configuration.orientation,
+});
 
-export default connect(mapStateToProps, undefined)(Playground);
+export default connect(mapStateToProps)(Playground);

@@ -3,6 +3,8 @@ import { PrismCode } from 'react-prism';
 import { connect } from 'react-redux';
 
 import { changeFocus } from './actions';
+import { State } from './reducers';
+import { State as OutputState } from './reducers/output';
 import { Channel } from './types';
 
 import Loader from './Loader';
@@ -14,7 +16,7 @@ const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => 
     const selected = focus === kind ? 'output-tab-selected' : '';
     return (
       <button className={`output-tab ${selected}`}
-              onClick={onClick}>
+        onClick={onClick}>
         {label}
       </button>
     );
@@ -59,8 +61,8 @@ interface SectionProps {
 
 const MyLoader: React.SFC = () => (
   <div>
-      <Header label="Progress" />
-      <Loader />
+    <Header label="Progress" />
+    <Loader />
   </div>
 );
 
@@ -190,7 +192,7 @@ class Output extends React.PureComponent<OutputProps> {
     if (focus) {
       close = (
         <button className="output-tab output-tab-close"
-                onClick={this.focusClose}>Close</button>
+          onClick={this.focusClose}>Close</button>
       );
 
       body = (
@@ -210,33 +212,33 @@ class Output extends React.PureComponent<OutputProps> {
       <div className="output">
         <div className="output-tabs">
           <Tab kind="execute" focus={focus}
-               label="Execution"
-               onClick={this.focusExecute}
-               tabProps={execute} />
+            label="Execution"
+            onClick={this.focusExecute}
+            tabProps={execute} />
           <Tab kind="format" focus={focus}
-               label="Format"
-               onClick={this.focusFormat}
-               tabProps={format} />
+            label="Format"
+            onClick={this.focusFormat}
+            tabProps={format} />
           <Tab kind="clippy" focus={focus}
-               label="Clippy"
-               onClick={this.focusClippy}
-               tabProps={clippy} />
+            label="Clippy"
+            onClick={this.focusClippy}
+            tabProps={clippy} />
           <Tab kind="asm" focus={focus}
-               label="ASM"
-               onClick={this.focusAssembly}
-               tabProps={assembly} />
+            label="ASM"
+            onClick={this.focusAssembly}
+            tabProps={assembly} />
           <Tab kind="llvm-ir" focus={focus}
-               label="LLVM IR"
-               onClick={this.focusLlvmIr}
-               tabProps={llvmIr} />
+            label="LLVM IR"
+            onClick={this.focusLlvmIr}
+            tabProps={llvmIr} />
           <Tab kind="mir" focus={focus}
-               label="MIR"
-               onClick={this.focusMir}
-               tabProps={mir} />
+            label="MIR"
+            onClick={this.focusMir}
+            tabProps={mir} />
           <Tab kind="gist" focus={focus}
-               label="Share"
-               onClick={this.focusGist}
-               tabProps={gist} />
+            label="Share"
+            onClick={this.focusGist}
+            tabProps={gist} />
           {close}
         </div>
         {body}
@@ -256,31 +258,11 @@ interface WithCodeProps extends SimpleProps {
   code: string;
 }
 
-interface OutputProps {
-  meta: {
-    focus: string,
-  };
-
-  execute: SimpleProps;
-  format: {
-    requestsInProgress: number,
-  };
-  clippy: SimpleProps;
-  assembly: WithCodeProps;
-  llvmIr: WithCodeProps;
-  mir: WithCodeProps;
-
-  gist: {
-    requestsInProgress: number,
-    id: string,
-    url: string,
-    channel: Channel,
-  };
-
+interface OutputProps extends OutputState {
   changeFocus: (_?: string) => any;
 }
 
-const mapStateToProps = ({ output }) => output;
+const mapStateToProps = (state: State) => state.output;
 
 const mapDispatchToProps = ({
   changeFocus,

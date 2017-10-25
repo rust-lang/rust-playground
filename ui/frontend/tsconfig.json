@@ -1,4 +1,7 @@
 {
+  "exclude": [
+    "build",
+  ],
   "compilerOptions": {
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,

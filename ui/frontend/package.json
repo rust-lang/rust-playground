@@ -54,7 +54,7 @@
     "ts-loader": "^3.0.0",
     "tslint": "^5.7.0",
     "tslint-react": "^3.2.0",
-    "typescript": "~2.4.2",
+    "typescript": "^2.5.3",
     "webpack": "^3.2.0",
     "zopfli-webpack-plugin": "^0.1.0"
   },
