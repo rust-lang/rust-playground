@@ -22,19 +22,25 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 end
 
-require 'capybara/rspec'
-require 'capybara/poltergeist'
 require 'capybara-screenshot/rspec'
-require 'phantomjs'
+require 'capybara/rspec'
+require 'webdrivers'
 
 ADDRESS = ENV.fetch('PLAYGROUND_UI_ADDRESS', '127.0.0.1')
 PORT = ENV.fetch('PLAYGROUND_UI_PORT', '5000')
 
-Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(app, phantomjs: Phantomjs.path)
+Capybara.register_driver :firefox do |app|
+  browser_options = ::Selenium::WebDriver::Firefox::Options.new
+  browser_options.args << '--headless'
+
+  Capybara::Selenium::Driver.new(
+    app,
+    browser: :firefox,
+    options: browser_options,
+  )
 end
 
-Capybara.javascript_driver = :poltergeist
+Capybara.default_driver = :firefox
 Capybara.app_host = "http://#{ADDRESS}:#{PORT}"
 Capybara.run_server = false
 Capybara.default_max_wait_time = 5
