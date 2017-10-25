@@ -1,9 +1,6 @@
 {
   "presets": [
     [ "env", {
-      "targets": {
-        "browsers": "last 2 versions, not ie < 11",
-      },
       "modules": false,
       "useBuiltIns": true,
     }],
