@@ -10,7 +10,7 @@ docker \
     -v $HOME/cache/node/node_modules:/ui/node_modules \
     -v $HOME/cache/node/yarn-cache:/root/.yarn-cache \
     --workdir /ui \
-    node:7.7 \
+    node:8.7 \
     bash -c 'yarn && \
              yarn test:lint && \
              NODE_ENV=production yarn run build'
