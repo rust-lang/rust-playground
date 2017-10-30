@@ -53,16 +53,16 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
 
     return (
       <AceEditor
-         ref={this.trackEditor}
-         mode="rust"
-         keyboardHandler={keybinding}
-         theme={theme}
-         value={code}
-         onChange={onEditCode}
-         name="editor"
-         width="100%"
-         height="100%"
-         editorProps={{ $blockScrolling: true }} />
+        ref={this.trackEditor}
+        mode="rust"
+        keyboardHandler={keybinding}
+        theme={theme}
+        value={code}
+        onChange={onEditCode}
+        name="editor"
+        width="100%"
+        height="100%"
+        editorProps={{ $blockScrolling: true }} />
     );
   }
 
@@ -81,6 +81,17 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
       exec: this.props.execute,
       readOnly: true,
     });
+
+    // The default keybinding of control/command-l interferes with
+    // the browser's "edit the location" keycommand which I think
+    // is way more common.
+    const gotoCommand = editor.commands.byName.gotoline;
+    gotoCommand.bindKey = {
+      win: 'Ctrl-Shift-L',
+      mac: 'Command-Shift-L',
+    };
+    editor.commands.removeCommand(gotoCommand.name);
+    editor.commands.addCommand(gotoCommand);
 
     editor.setOptions({
       enableBasicAutocompletion: true,
