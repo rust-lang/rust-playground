@@ -55,7 +55,7 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
     return (
       <AceEditor
         ref={this.trackEditor}
-        mode="rust"
+        mode="rust-playground"
         keyboardHandler={keybinding}
         theme={theme}
         value={code}
@@ -194,7 +194,7 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedE
         this.setState({ AceEditor: AceEditor.default, ace });
 
         this.load(props);
-        const loadRustMode = import('brace/mode/rust');
+        const loadRustMode = import('./rust-playground-mode');
         const loadLanguageTools = import('brace/ext/language_tools');
         Promise.all([loadRustMode, loadLanguageTools])
           .then(() => this.setState({ modeLoading: false }));
