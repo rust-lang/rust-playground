@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { Focus } from './reducers/output/meta';
 import State from './state';
 import { CommonEditorProps } from './types';
 
@@ -116,6 +117,19 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
   }
 
   public componentDidUpdate(prevProps, _prevState) {
+    // There's a tricky bug with Ace:
+    //
+    // 1. Open the page
+    // 2. Fill up the page with text but do not cause scrolling
+    // 3. Run the code (causing the pane to cover some of the text
+    // 4. Try to scroll
+    //
+    // Ace doesn't know that we changed the visible area and so
+    // doesn't recalculate. Knowing if the focus changed is enough
+    // to force such a recalculation.
+    if (this.props.focus !== prevProps.focus) {
+      this._editor.editor.resize();
+    }
     this.gotoPosition(prevProps.position, this.props.position);
   }
 
@@ -150,6 +164,7 @@ interface AdvancedEditorProps {
     name: string,
     version: string,
   }>;
+  focus?: Focus;
 }
 
 // The ACE editor weighs in at ~250K. Adding all of the themes and the
@@ -245,11 +260,17 @@ interface AdvancedEditorAsyncState {
 interface PropsFromState {
   theme: string;
   keybinding?: string;
+  focus?: Focus;
 }
 
-const mapStateToProps = ({ configuration: { theme, keybinding } }: State) => ({
-  theme,
-  keybinding: keybinding === 'ace' ? null : keybinding,
-});
+const mapStateToProps = (state: State) => {
+  const { configuration: { theme, keybinding } } = state;
+
+  return {
+    theme,
+    keybinding: keybinding === 'ace' ? null : keybinding,
+    focus: state.output.meta.focus,
+  };
+};
 
 export default connect<PropsFromState, undefined, CommonEditorProps>(mapStateToProps)(AdvancedEditorAsync);
