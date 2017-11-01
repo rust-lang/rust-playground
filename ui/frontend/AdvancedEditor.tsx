@@ -55,7 +55,7 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
     return (
       <AceEditor
         ref={this.trackEditor}
-        mode="rust"
+        mode="rust-playground"
         keyboardHandler={keybinding}
         theme={theme}
         value={code}
@@ -178,26 +178,16 @@ interface AdvancedEditorProps {
 // This also has some benefit if you choose to use the simple editor,
 // as ACE should never be loaded.
 //
-// There's some implicit ordering; the library must be loaded before
-// any other piece. Themes and keybindings can also be changed at
-// runtime.
+// Themes and keybindings can be changed at runtime.
 class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedEditorAsyncState> {
   constructor(props) {
     super(props);
     this.state = { modeLoading: true };
 
-    const loadAceEditor = import('react-ace');
-    const loadAce = import('brace');
-
-    Promise.all([loadAceEditor, loadAce])
-      .then(([AceEditor, ace]) => {
-        this.setState({ AceEditor: AceEditor.default, ace });
-
+    this.requireLibraries()
+      .then(({ default: { AceEditor, ace } }) => {
         this.load(props);
-        const loadRustMode = import('brace/mode/rust');
-        const loadLanguageTools = import('brace/ext/language_tools');
-        Promise.all([loadRustMode, loadLanguageTools])
-          .then(() => this.setState({ modeLoading: false }));
+        this.setState({ AceEditor, ace, modeLoading: false });
       });
   }
 
@@ -230,8 +220,12 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedE
   private loadKeybinding(keybinding) {
     if (keybinding && keybinding !== this.state.keybinding) {
       this.setState({ keybindingLoading: true });
-      import('brace')
-        .then(() => import(`brace/keybinding/${keybinding}`))
+
+      this.requireLibraries()
+        .then(() => import(
+          /* webpackChunkName: "brace-keybinding-[request]" */
+          `brace/keybinding/${keybinding}`,
+        ))
         .then(() => this.setState({ keybinding, keybindingLoading: false }));
     }
   }
@@ -240,10 +234,20 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedE
     if (theme !== this.state.theme) {
       this.setState({ themeLoading: true });
 
-      import('brace')
-        .then(() => import(`brace/theme/${theme}`))
+      this.requireLibraries()
+        .then(() => import(
+          /* webpackChunkName: "brace-theme-[request]" */
+          `brace/theme/${theme}`,
+        ))
         .then(() => this.setState({ theme, themeLoading: false }));
     }
+  }
+
+  private requireLibraries() {
+    return import(
+      /* webpackChunkName: "advanced-editor" */
+      './advanced-editor',
+    );
   }
 }
 
