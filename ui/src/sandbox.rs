@@ -133,7 +133,7 @@ impl Sandbox {
         let stdout = vec_to_str(output.stdout)?;
         let mut stderr = vec_to_str(output.stderr)?;
 
-        let code = match file {
+        let mut code = match file {
             Some(file) => read(&file)?.unwrap_or_else(String::new),
             None => {
                 // If we didn't find the file, it's *most* likely that
@@ -146,6 +146,20 @@ impl Sandbox {
                 String::new()
             }
         };
+
+        match req.target {
+            CompileTarget::Assembly(_, demangle, directive) => {
+
+                if directive == HideAssemblerDirectives::Hide {
+                    code = super::asm_cleanup::remove_assembler_directives(&code);
+                }
+
+                if demangle == DemangleAssembly::Demangle {
+                    code = super::asm_cleanup::demangle_asm(&code);
+                }
+            },
+            _ => {},
+        }
 
         Ok(CompileResponse {
             success: output.status.success(),
@@ -359,7 +373,7 @@ fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type
         cmd.extend(&["--", "-o", "/playground-result/compilation"]);
 
         match target {
-            Assembly(flavor) => {
+            Assembly(flavor, _, _) => {
                 use self::AssemblyFlavor::*;
 
                 cmd.push("--emit=asm");
@@ -398,8 +412,19 @@ pub enum AssemblyFlavor {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum DemangleAssembly {
+    Demangle,
+    Mangle,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum HideAssemblerDirectives {
+    Hide,
+    Show,
+}
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum CompileTarget {
-    Assembly(AssemblyFlavor),
+    Assembly(AssemblyFlavor, DemangleAssembly, HideAssemblerDirectives),
     LlvmIr,
     Mir,
 }
@@ -407,7 +432,7 @@ pub enum CompileTarget {
 impl CompileTarget {
     fn extension(&self) -> &'static OsStr {
         let ext = match *self {
-            CompileTarget::Assembly(_) => "s",
+            CompileTarget::Assembly(_, _, _) => "s",
             CompileTarget::LlvmIr   => "ll",
             CompileTarget::Mir      => "mir",
         };
@@ -420,7 +445,7 @@ impl fmt::Display for CompileTarget {
         use self::CompileTarget::*;
 
         match *self {
-            Assembly(_) => "assembly".fmt(f),
+            Assembly(_, _, _) => "assembly".fmt(f),
             LlvmIr => "LLVM IR".fmt(f),
             Mir => "Rust MIR".fmt(f),
         }
@@ -542,6 +567,7 @@ mod test {
     fn basic_functionality() {
         let req = ExecuteRequest {
             channel: Channel::Stable,
+            crate_type: CrateType::Binary,
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
@@ -569,6 +595,7 @@ mod test {
     fn debug_mode() {
         let req = ExecuteRequest {
             channel: Channel::Stable,
+            crate_type: CrateType::Binary,
             mode: Mode::Debug,
             tests: false,
             code: COMPILATION_MODE_CODE.to_string(),
@@ -584,6 +611,7 @@ mod test {
     fn release_mode() {
         let req = ExecuteRequest {
             channel: Channel::Stable,
+            crate_type: CrateType::Binary,
             mode: Mode::Release,
             tests: false,
             code: COMPILATION_MODE_CODE.to_string(),
@@ -609,6 +637,7 @@ mod test {
     fn stable_channel() {
         let req = ExecuteRequest {
             channel: Channel::Stable,
+            crate_type: CrateType::Binary,
             mode: Mode::Debug,
             tests: false,
             code: VERSION_CODE.to_string(),
@@ -626,6 +655,7 @@ mod test {
     fn beta_channel() {
         let req = ExecuteRequest {
             channel: Channel::Beta,
+            crate_type: CrateType::Binary,
             mode: Mode::Debug,
             tests: false,
             code: VERSION_CODE.to_string(),
@@ -643,6 +673,7 @@ mod test {
     fn nightly_channel() {
         let req = ExecuteRequest {
             channel: Channel::Nightly,
+            crate_type: CrateType::Binary,
             mode: Mode::Debug,
             tests: false,
             code: VERSION_CODE.to_string(),
@@ -661,6 +692,7 @@ mod test {
         let req = CompileRequest {
             target: CompileTarget::LlvmIr,
             channel: Channel::Stable,
+            crate_type: CrateType::Binary,
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
@@ -677,8 +709,9 @@ mod test {
     #[test]
     fn output_assembly() {
         let req = CompileRequest {
-            target: CompileTarget::Assembly,
+            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, HideAssemblerDirectives::Show),
             channel: Channel::Stable,
+            crate_type: CrateType::Binary,
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
@@ -690,7 +723,44 @@ mod test {
         assert!(resp.code.contains(".text"));
         assert!(resp.code.contains(".file"));
         assert!(resp.code.contains(".section"));
-        assert!(resp.code.contains(".align"));
+        assert!(resp.code.contains(".p2align"));
+    }
+
+    #[test]
+    fn output_demangled_assembly() {
+        let req = CompileRequest {
+            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Demangle, HideAssemblerDirectives::Show),
+            channel: Channel::Stable,
+            crate_type: CrateType::Binary,
+            mode: Mode::Debug,
+            tests: false,
+            code: HELLO_WORLD_CODE.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.compile(&req).expect("Unable to compile code");
+
+        assert!(resp.code.contains("core::fmt::Arguments::new_v1"));
+        assert!(resp.code.contains("std::io::stdio::_print@PLT"));
+    }
+
+    #[test]
+    #[should_panic]
+    fn output_asm_dir_hidden_assembly() {
+        let req = CompileRequest {
+            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, HideAssemblerDirectives::Hide),
+            channel: Channel::Stable,
+            crate_type: CrateType::Binary,
+            mode: Mode::Debug,
+            tests: false,
+            code: HELLO_WORLD_CODE.to_string(),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.compile(&req).expect("Unable to compile code");
+
+        assert!(resp.code.contains(".text"));
+        assert!(resp.code.contains(".file"));
     }
 
     #[test]
@@ -743,6 +813,7 @@ mod test {
         let req = ExecuteRequest {
             channel: Channel::Stable,
             mode: Mode::Debug,
+            crate_type: CrateType::Binary,
             tests: false,
             code: code.to_string(),
         };
@@ -766,6 +837,7 @@ mod test {
         let req = ExecuteRequest {
             channel: Channel::Stable,
             mode: Mode::Debug,
+            crate_type: CrateType::Binary,
             tests: false,
             code: code.to_string(),
         };
@@ -788,6 +860,7 @@ mod test {
         let req = ExecuteRequest {
             channel: Channel::Stable,
             mode: Mode::Debug,
+            crate_type: CrateType::Binary,
             tests: false,
             code: code.to_string(),
         };
@@ -815,6 +888,7 @@ mod test {
         let req = ExecuteRequest {
             channel: Channel::Stable,
             mode: Mode::Debug,
+            crate_type: CrateType::Binary,
             tests: false,
             code: forkbomb.to_string(),
         };
