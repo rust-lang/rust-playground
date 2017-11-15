@@ -5,7 +5,16 @@ import url from 'url';
 import { load as loadGist, save as saveGist } from './gist';
 import { getCrateType, runAsTest } from './selectors';
 import State from './state';
-import { AssemblyFlavor, Channel, DemangleAssembly, Editor, HideAssemblerDirectives, Mode, Orientation, Page } from './types';
+import { 
+  AssemblyFlavor, 
+  Channel, 
+  DemangleAssembly, 
+  Editor, 
+  HideAssemblerDirectives, 
+  Mode, 
+  Orientation, 
+  Page 
+} from './types';
 
 const routes = {
   compile: { pathname: '/compile' },
@@ -282,10 +291,26 @@ function performCompile(target, { request, success, failure }): ThunkAction {
     dispatch(request());
 
     const state = getState();
-    const { code, configuration: { channel, mode, assemblyFlavor, demangleAssembly, hideAssemblerDirectives } } = state;
+    const { code, configuration: { 
+      channel, 
+      mode, 
+      assemblyFlavor, 
+      demangleAssembly, 
+      hideAssemblerDirectives 
+    } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
-    const body = { channel, mode, crateType, tests, code, target, assemblyFlavor, demangleAssembly, hideAssemblerDirectives };
+    const body = { 
+      channel, 
+      mode, 
+      crateType, 
+      tests, 
+      code, 
+      target, 
+      assemblyFlavor, 
+      demangleAssembly, 
+      hideAssemblerDirectives 
+    };
 
     return jsonPost(routes.compile, body)
       .then(json => dispatch(success(json)))

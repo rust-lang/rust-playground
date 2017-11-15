@@ -1,5 +1,13 @@
 import { Action, ActionType } from '../actions';
-import { AssemblyFlavor, Channel, DemangleAssembly, Editor, HideAssemblerDirectives, Mode, Orientation } from '../types';
+import { 
+  AssemblyFlavor, 
+  Channel, 
+  DemangleAssembly, 
+  Editor, 
+  HideAssemblerDirectives, 
+  Mode, 
+  Orientation 
+} from '../types';
 
 export interface State {
   shown: boolean;
