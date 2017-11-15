@@ -31,7 +31,7 @@ export function deserialize(savedState) {
       orientation: parsedState.configuration.orientation || defaultConfiguration.orientation,
       assemblyFlavor: parsedState.configuration.assemblyFlavor || defaultConfiguration.assemblyFlavor,
       demangleAssembly: parsedState.configuration.demangleAssembly || defaultConfiguration.demangleAssembly,
-      hideAssemblerDirectives: 
+      hideAssemblerDirectives:
         parsedState.configuration.hideAssemblerDirectives || defaultConfiguration.hideAssemblerDirectives,
     },
     code: parsedState.code,

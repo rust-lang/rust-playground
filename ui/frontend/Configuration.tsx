@@ -69,14 +69,14 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
   }
 
   public render() {
-    const { editor, 
-      keybinding, 
-      theme, 
-      orientation, 
-      assemblyFlavor, 
-      demangleAssembly, 
-      hideAssemblerDirectives, 
-      toggleConfiguration 
+    const { editor,
+      keybinding,
+      theme,
+      orientation,
+      assemblyFlavor,
+      demangleAssembly,
+      hideAssemblerDirectives,
+      toggleConfiguration,
     } = this.props;
 
     const advancedEditor = editor === Editor.Advanced;
@@ -172,23 +172,23 @@ interface ConfigurationProps {
   toggleConfiguration: () => any;
 }
 
-const mapStateToProps = ({ configuration: { 
-  editor, 
-  keybinding, 
-  theme, 
-  orientation, 
-  assemblyFlavor, 
-  demangleAssembly, 
-  hideAssemblerDirectives } 
+const mapStateToProps = ({ configuration: {
+  editor,
+  keybinding,
+  theme,
+  orientation,
+  assemblyFlavor,
+  demangleAssembly,
+  hideAssemblerDirectives},
 }: State) => (
-  { 
-    editor, 
-    keybinding, 
-    theme, 
-    orientation, 
-    assemblyFlavor, 
-    demangleAssembly, 
-    hideAssemblerDirectives 
+  {
+    editor,
+    keybinding,
+    theme,
+    orientation,
+    assemblyFlavor,
+    demangleAssembly,
+    hideAssemblerDirectives,
   }
 );
 
