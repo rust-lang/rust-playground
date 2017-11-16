@@ -41,6 +41,16 @@ export enum AssemblyFlavor {
   Intel = 'intel',
 }
 
+export enum DemangleAssembly {
+  Demangle = 'demangle',
+  Mangle = 'mangle',
+}
+
+export enum HideAssemblerDirectives {
+  Hide = 'hide',
+  Show = 'show',
+}
+
 export enum Channel {
   Stable = 'stable',
   Beta = 'beta',

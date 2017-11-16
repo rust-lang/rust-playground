@@ -17,6 +17,8 @@ extern crate quick_error;
 extern crate corsware;
 #[macro_use]
 extern crate lazy_static;
+extern crate regex;
+extern crate rustc_demangle;
 
 use std::any::Any;
 use std::convert::{TryFrom, TryInto};
@@ -46,6 +48,7 @@ const DEFAULT_PORT: u16 = 5000;
 const DEFAULT_LOG_FILE: &'static str = "access-log.csv";
 
 mod sandbox;
+mod asm_cleanup;
 
 const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
 const ONE_DAY_IN_SECONDS: u64 = 60 * 60 * 24;
@@ -387,6 +390,14 @@ quick_error! {
             description("an invalid assembly flavor was passed")
             display("The value {:?} is not a valid assembly flavor", value)
         }
+        InvalidDemangleAssembly(value: String) {
+            description("an invalid demangling option was passed")
+            display("The value {:?} is not a valid demangle option", value)
+        }
+        InvalidHideAssemblerDirectives(value: String) {
+            description("an invalid assembler directive option was passed")
+            display("The value {:?} is not a valid assembler directive option", value)
+        }
         InvalidChannel(value: String) {
             description("an invalid channel was passed")
             display("The value {:?} is not a valid channel", value,)
@@ -421,6 +432,10 @@ struct CompileRequest {
     target: String,
     #[serde(rename = "assemblyFlavor")]
     assembly_flavor: Option<String>,
+    #[serde(rename = "demangleAssembly")]
+    demangle_assembly: Option<String>,
+    #[serde(rename = "hideAssemblerDirectives")]
+    hide_assembler_directives: Option<String>,
     channel: String,
     mode: String,
     #[serde(rename = "crateType")]
@@ -521,9 +536,19 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
             None => None,
         };
 
-        let target = match (target, assembly_flavor) {
-            (sandbox::CompileTarget::Assembly(_), Some(flavor)) =>
-                sandbox::CompileTarget::Assembly(flavor),
+        let demangle = match me.demangle_assembly {
+            Some(f) => Some(parse_demangle_assembly(&f)?),
+            None => None,
+        };
+
+        let hide_assembler_directives = match me.hide_assembler_directives {
+            Some(f) => Some(parse_hide_assembler_directives(&f)?),
+            None => None,
+        };
+
+        let target = match (target, assembly_flavor, demangle, hide_assembler_directives) {
+            (sandbox::CompileTarget::Assembly(_, _, _), Some(flavor), Some(demangle), Some(directives)) =>
+                sandbox::CompileTarget::Assembly(flavor, demangle, directives),
             _ => target,
         };
 
@@ -676,7 +701,9 @@ impl From<sandbox::ExecuteResponse> for EvaluateResponse {
 
 fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
     Ok(match s {
-        "asm" => sandbox::CompileTarget::Assembly(sandbox::AssemblyFlavor::Att),
+        "asm" => sandbox::CompileTarget::Assembly(sandbox::AssemblyFlavor::Att,
+                                                  sandbox::DemangleAssembly::Demangle,
+                                                  sandbox::HideAssemblerDirectives::Hide),
         "llvm-ir" => sandbox::CompileTarget::LlvmIr,
         "mir" => sandbox::CompileTarget::Mir,
         _ => return Err(Error::InvalidTarget(s.into()))
@@ -688,6 +715,22 @@ fn parse_assembly_flavor(s: &str) -> Result<sandbox::AssemblyFlavor> {
         "att" => sandbox::AssemblyFlavor::Att,
         "intel" => sandbox::AssemblyFlavor::Intel,
         _ => return Err(Error::InvalidAssemblyFlavor(s.into()))
+    })
+}
+
+fn parse_demangle_assembly(s: &str) -> Result<sandbox::DemangleAssembly> {
+    Ok(match s {
+        "demangle" => sandbox::DemangleAssembly::Demangle,
+        "mangle" => sandbox::DemangleAssembly::Mangle,
+        _ => return Err(Error::InvalidDemangleAssembly(s.into()))
+    })
+}
+
+fn parse_hide_assembler_directives(s: &str) -> Result<sandbox::HideAssemblerDirectives> {
+    Ok(match s {
+        "hide" => sandbox::HideAssemblerDirectives::Hide,
+        "show" => sandbox::HideAssemblerDirectives::Show,
+        _ => return Err(Error::InvalidHideAssemblerDirectives(s.into()))
     })
 }
 

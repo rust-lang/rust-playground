@@ -5,14 +5,16 @@ import { connect } from 'react-redux';
 
 import {
   changeAssemblyFlavor,
+  changeDemangleAssembly,
   changeEditor,
+  changeHideAssemblerDirectives,
   changeKeybinding,
   changeOrientation,
   changeTheme,
   toggleConfiguration,
 } from './actions';
 import State from './state';
-import { AssemblyFlavor, Editor, Orientation } from './types';
+import { AssemblyFlavor, DemangleAssembly, Editor, HideAssemblerDirectives, Orientation } from './types';
 
 const keybindingOptions = ACE_KEYBINDINGS.map(t => <option value={t} key={t}>{t}</option>);
 const themeOptions = ACE_THEMES.map(t => <option value={t} key={t}>{t}</option>);
@@ -49,6 +51,8 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
   private onChangeTheme = e => this.props.changeTheme(e.target.value);
   private onChangeOrientation = e => this.props.changeOrientation(e.target.value);
   private onChangeAssemblyFlavor = e => this.props.changeAssemblyFlavor(e.target.value);
+  private onChangeDemangleAssembly = e => this.props.changeDemangleAssembly(e.target.value);
+  private onChangeHideAssemblerDirectives = e => this.props.changeHideAssemblerDirectives(e.target.value);
   private onKeyup = e => {
     if (e.keyCode === ESCAPE_KEYCODE && !e.defaultPrevented) {
       e.preventDefault();
@@ -65,7 +69,15 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
   }
 
   public render() {
-    const { editor, keybinding, theme, orientation, assemblyFlavor, toggleConfiguration } = this.props;
+    const { editor,
+      keybinding,
+      theme,
+      orientation,
+      assemblyFlavor,
+      demangleAssembly,
+      hideAssemblerDirectives,
+      toggleConfiguration,
+    } = this.props;
 
     const advancedEditor = editor === Editor.Advanced;
 
@@ -118,6 +130,22 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
           <option value={AssemblyFlavor.Intel}>Intel</option>
         </ConfigurationSelect>
 
+        <ConfigurationSelect what="demangleAssembly"
+                             label="Demangle Symbols"
+                             defaultValue={demangleAssembly}
+                             onChange={this.onChangeDemangleAssembly}>
+          <option value={DemangleAssembly.Demangle}>Demangled</option>
+          <option value={DemangleAssembly.Mangle}>Mangled</option>
+        </ConfigurationSelect>
+
+        <ConfigurationSelect what="hideAssemblerDirectives"
+                             label="Assembler Directives"
+                             defaultValue={hideAssemblerDirectives}
+                             onChange={this.onChangeHideAssemblerDirectives}>
+          <option value={HideAssemblerDirectives.Hide}>Remove</option>
+          <option value={HideAssemblerDirectives.Show}>Display</option>
+        </ConfigurationSelect>
+
         <div className="configuration-actions">
           <button onClick={toggleConfiguration}>Done</button>
         </div>
@@ -132,16 +160,36 @@ interface ConfigurationProps {
   changeTheme: (_: string) => any;
   changeOrientation: (Orientation) => any;
   changeAssemblyFlavor: (AssemblyFlavor) => any;
+  changeDemangleAssembly: (DemangleAssembly) => any;
+  changeHideAssemblerDirectives: (HideAssemblerDirectives) => any;
   editor: Editor;
   keybinding: string;
   theme: string;
   orientation: Orientation;
   assemblyFlavor: AssemblyFlavor;
+  demangleAssembly: DemangleAssembly;
+  hideAssemblerDirectives: HideAssemblerDirectives;
   toggleConfiguration: () => any;
 }
 
-const mapStateToProps = ({ configuration: { editor, keybinding, theme, orientation, assemblyFlavor } }: State) => (
-  { editor, keybinding, theme, orientation, assemblyFlavor }
+const mapStateToProps = ({ configuration: {
+  editor,
+  keybinding,
+  theme,
+  orientation,
+  assemblyFlavor,
+  demangleAssembly,
+  hideAssemblerDirectives},
+}: State) => (
+  {
+    editor,
+    keybinding,
+    theme,
+    orientation,
+    assemblyFlavor,
+    demangleAssembly,
+    hideAssemblerDirectives,
+  }
 );
 
 const mapDispatchToProps = ({
@@ -150,6 +198,8 @@ const mapDispatchToProps = ({
   changeTheme,
   changeOrientation,
   changeAssemblyFlavor,
+  changeDemangleAssembly,
+  changeHideAssemblerDirectives,
   toggleConfiguration,
 });
 

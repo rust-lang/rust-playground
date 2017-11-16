@@ -5,7 +5,16 @@ import url from 'url';
 import { load as loadGist, save as saveGist } from './gist';
 import { getCrateType, runAsTest } from './selectors';
 import State from './state';
-import { AssemblyFlavor, Channel, Editor, Mode, Orientation, Page } from './types';
+import {
+  AssemblyFlavor,
+  Channel,
+  DemangleAssembly,
+  Editor,
+  HideAssemblerDirectives,
+  Mode,
+  Orientation,
+  Page,
+} from './types';
 
 const routes = {
   compile: { pathname: '/compile' },
@@ -45,6 +54,8 @@ export enum ActionType {
   ChangeOrientation = 'CHANGE_ORIENTATION',
   ChangeAssemblyFlavor = 'CHANGE_ASSEMBLY_FLAVOR',
   ChangeChannel = 'CHANGE_CHANNEL',
+  ChangeDemangleAssembly = 'CHANGE_DEMANGLE_ASSEMBLY',
+  ChangeHideAssemblerDirectives = 'CHANGE_HIDE_ASSEMBLER_DIRECTIVES',
   ChangeMode = 'CHANGE_MODE',
   ChangeFocus = 'CHANGE_FOCUS',
   ExecuteRequest = 'EXECUTE_REQUEST',
@@ -68,8 +79,10 @@ export type Action =
   | SetPageAction
   | ChangeAssemblyFlavorAction
   | ChangeChannelAction
+  | ChangeDemangleAssemblyAction
   | ChangeEditorAction
   | ChangeFocusAction
+  | ChangeHideAssemblerDirectivesAction
   | ChangeKeybindingAction
   | ChangeModeAction
   | ChangeOrientationAction
@@ -124,6 +137,16 @@ export interface ChangeAssemblyFlavorAction {
   assemblyFlavor: AssemblyFlavor;
 }
 
+export interface ChangeDemangleAssemblyAction {
+  type: ActionType.ChangeDemangleAssembly;
+  demangleAssembly: DemangleAssembly;
+}
+
+export interface ChangeHideAssemblerDirectivesAction {
+  type: ActionType.ChangeHideAssemblerDirectives;
+  hideAssemblerDirectives: HideAssemblerDirectives;
+}
+
 export interface ChangeChannelAction {
   type: ActionType.ChangeChannel;
   channel: Channel;
@@ -161,6 +184,14 @@ export function changeOrientation(orientation): ChangeOrientationAction {
 
 export function changeAssemblyFlavor(assemblyFlavor): ChangeAssemblyFlavorAction {
   return { type: ActionType.ChangeAssemblyFlavor, assemblyFlavor };
+}
+
+export function changeDemangleAssembly(demangleAssembly): ChangeDemangleAssemblyAction {
+  return { type: ActionType.ChangeDemangleAssembly, demangleAssembly };
+}
+
+export function changeHideAssemblerDirectives(hideAssemblerDirectives): ChangeHideAssemblerDirectivesAction {
+  return { type: ActionType.ChangeHideAssemblerDirectives, hideAssemblerDirectives };
 }
 
 export function changeChannel(channel: Channel): ChangeChannelAction {
@@ -260,10 +291,26 @@ function performCompile(target, { request, success, failure }): ThunkAction {
     dispatch(request());
 
     const state = getState();
-    const { code, configuration: { channel, mode, assemblyFlavor } } = state;
+    const { code, configuration: {
+      channel,
+      mode,
+      assemblyFlavor,
+      demangleAssembly,
+      hideAssemblerDirectives,
+    } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
-    const body = { channel, mode, crateType, tests, code, target, assemblyFlavor };
+    const body = {
+      channel,
+      mode,
+      crateType,
+      tests,
+      code,
+      target,
+      assemblyFlavor,
+      demangleAssembly,
+      hideAssemblerDirectives,
+    };
 
     return jsonPost(routes.compile, body)
       .then(json => dispatch(success(json)))
