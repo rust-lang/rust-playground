@@ -11,6 +11,8 @@ blacklist = [
 
     # Apparently deleted
     "serde_macros",
+    # Deprecated, causes old versions
+    "serde_codegen",
 
     # Ecosystem is fragmented, only pull in via dependencies
     "openssl",
