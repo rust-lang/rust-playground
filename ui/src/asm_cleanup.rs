@@ -4,7 +4,7 @@ use rustc_demangle::demangle;
 
 pub fn remove_assembler_directives(block: &str) -> String {
     lazy_static! {
-        static ref ASM_DIR_REGEX: Regex = Regex::new(r"(?m)^\s*\..*$").expect("Failed to create ASM_DIR_REGEX");
+        static ref ASM_DIR_REGEX: Regex = Regex::new(r"(?m)^\s*\..*[^:]$").expect("Failed to create ASM_DIR_REGEX");
     }
 
     let mut filtered_asm = String::new();
@@ -49,8 +49,16 @@ mod test {
     #[test]
     fn many_directives_removed() {
         assert_eq!(
-            super::remove_assembler_directives(" .cfi_def_cfa_register %rbp\n subq$80, %rsp\n .Ltmp2:"),
+            super::remove_assembler_directives(" .cfi_def_cfa_register %rbp\n subq$80, %rsp\n .text\n"),
             " subq$80, %rsp\n");
+    }
+
+    #[test]
+    fn labels_not_removed() {
+        assert_eq!(
+            super::remove_assembler_directives(
+      ".type core::fmt::Arguments::new_v1,@function\n core::fmt::Arguments::new_v1:\n .Lfunc_begin0:\n"),
+             " core::fmt::Arguments::new_v1:\n .Lfunc_begin0:\n");
     }
 
     #[test]
