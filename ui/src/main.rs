@@ -706,6 +706,7 @@ fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
                                                   sandbox::HideAssemblerDirectives::Hide),
         "llvm-ir" => sandbox::CompileTarget::LlvmIr,
         "mir" => sandbox::CompileTarget::Mir,
+        "wasm" => sandbox::CompileTarget::Wasm,
         _ => return Err(Error::InvalidTarget(s.into()))
     })
 }
