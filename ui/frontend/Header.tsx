@@ -10,13 +10,19 @@ import {
   performCompileToAssembly,
   performCompileToLLVM,
   performCompileToMir,
+  performCompileToWasm,
   performExecute,
   performFormat,
   performGistSave,
   toggleConfiguration,
 } from './actions';
 import {
-  betaVersionText, getCrateType, nightlyVersionText, runAsTest, stableVersionText,
+  betaVersionText,
+  getCrateType,
+  isWasmAvailable,
+  nightlyVersionText,
+  runAsTest,
+  stableVersionText,
 } from './selectors';
 import State from './state';
 import { Channel, Mode } from './types';
@@ -63,12 +69,13 @@ const executionLabel = (crateType, tests) => {
 class Header extends React.PureComponent<HeaderProps> {
   public render() {
     const {
-      execute, compileToAssembly, compileToLLVM, compileToMir,
+      execute, compileToAssembly, compileToLLVM, compileToMir, compileToWasm,
       format, clippy, gistSave,
       channel, changeChannel, mode, changeMode,
       crateType, tests,
       toggleConfiguration, navigateToHelp,
       stableVersion, betaVersion, nightlyVersion,
+      wasmAvailable,
     } = this.props;
 
     const oneChannel = (value: Channel, labelText, extras) =>
@@ -77,6 +84,11 @@ class Header extends React.PureComponent<HeaderProps> {
       oneRadio('mode', mode, value, changeMode, labelText);
 
     const primaryLabel = executionLabel(crateType, tests);
+
+    const mirButton = (
+      <button className="header-set__btn"
+        onClick={compileToWasm}>WASM</button>
+    );
 
     return (
       <div className="header">
@@ -90,6 +102,7 @@ class Header extends React.PureComponent<HeaderProps> {
               onClick={compileToLLVM}>LLVM IR</button>
             <button className="header-set__btn"
               onClick={compileToMir}>MIR</button>
+            {wasmAvailable && mirButton}
           </div>
         </div>
 
@@ -152,6 +165,7 @@ interface HeaderProps {
   compileToAssembly: () => any;
   compileToLLVM: () => any;
   compileToMir: () => any;
+  compileToWasm: () => any;
   execute: () => any;
   format: () => any;
   gistSave: () => any;
@@ -163,6 +177,7 @@ interface HeaderProps {
   stableVersion: string;
   betaVersion: string;
   nightlyVersion: string;
+  wasmAvailable: boolean;
 }
 
 const mapStateToProps = (state: State) => {
@@ -177,6 +192,7 @@ const mapStateToProps = (state: State) => {
     stableVersion: stableVersionText(state),
     betaVersion: betaVersionText(state),
     nightlyVersion: nightlyVersionText(state),
+    wasmAvailable: isWasmAvailable(state),
   };
 };
 
@@ -187,6 +203,7 @@ const mapDispatchToProps = ({
   compileToAssembly: performCompileToAssembly,
   compileToLLVM: performCompileToLLVM,
   compileToMir: performCompileToMir,
+  compileToWasm: performCompileToWasm,
   execute: performExecute,
   format: performFormat,
   gistSave: performGistSave,

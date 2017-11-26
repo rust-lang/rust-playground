@@ -174,14 +174,15 @@ class Output extends React.PureComponent<OutputProps> {
   private focusAssembly = () => this.props.changeFocus('asm');
   private focusLlvmIr = () => this.props.changeFocus('llvm-ir');
   private focusMir = () => this.props.changeFocus('mir');
+  private focusWasm = () => this.props.changeFocus('wasm');
   private focusGist = () => this.props.changeFocus('gist');
 
   public render() {
     const {
-      meta: { focus }, execute, format, clippy, assembly, llvmIr, mir, gist,
+      meta: { focus }, execute, format, clippy, assembly, llvmIr, mir, wasm, gist,
     } = this.props;
 
-    const somethingToShow = [execute, format, clippy, assembly, llvmIr, mir, gist].some(hasProperties);
+    const somethingToShow = [execute, format, clippy, assembly, llvmIr, mir, wasm, gist].some(hasProperties);
 
     if (!somethingToShow) {
       return null;
@@ -203,6 +204,7 @@ class Output extends React.PureComponent<OutputProps> {
           <PaneWithCode {...assembly} kind="asm" focus={focus} />
           <PaneWithCode {...llvmIr} kind="llvm-ir" focus={focus} />
           <PaneWithCode {...mir} kind="mir" focus={focus} />
+          <PaneWithCode {...wasm} kind="wasm" focus={focus} />
           <Gist {...gist} focus={focus} />
         </div>
       );
@@ -235,6 +237,10 @@ class Output extends React.PureComponent<OutputProps> {
             label="MIR"
             onClick={this.focusMir}
             tabProps={mir} />
+          <Tab kind="wasm" focus={focus}
+            label="WASM"
+            onClick={this.focusWasm}
+            tabProps={wasm} />
           <Tab kind="gist" focus={focus}
             label="Share"
             onClick={this.focusGist}

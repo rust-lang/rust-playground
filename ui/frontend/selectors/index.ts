@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import { State } from '../reducers';
+import { Channel } from '../types';
 
 const getCode = state => state.code;
 
@@ -21,3 +22,7 @@ export const stableVersionText = createSelector([getStable], v => v ? v.version 
 const nonStable = v => v ? `${v.version} (${v.date} ${v.hash})` : '';
 export const betaVersionText = createSelector([getBeta], nonStable);
 export const nightlyVersionText = createSelector([getNightly], nonStable);
+
+export const isWasmAvailable = (state: State) => (
+  state.configuration.channel === Channel.Nightly
+);

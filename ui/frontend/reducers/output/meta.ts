@@ -4,7 +4,7 @@ const DEFAULT: State = {
   focus: null,
 };
 
-export type Focus = 'clippy' | 'llvm-ir' | 'mir' | 'asm' | 'execute' | 'format' | 'gist';
+export type Focus = 'clippy' | 'llvm-ir' | 'mir' | 'wasm' | 'asm' | 'execute' | 'format' | 'gist';
 
 export interface State {
   focus?: Focus;
@@ -23,6 +23,9 @@ export default function meta(state = DEFAULT, action) {
 
     case actions.ActionType.CompileMirRequest:
       return { ...state, focus: 'mir' };
+
+    case actions.ActionType.CompileWasmRequest:
+      return { ...state, focus: 'wasm' };
 
     case actions.ActionType.CompileAssemblyRequest:
       return { ...state, focus: 'asm' };
