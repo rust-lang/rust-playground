@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+set -eu
+
+# Rewrite our arguments to be `cargo build` instead of `cargo wasm`;
+# this assumes that the command will always be `cargo wasm ...`. We
+# capture the output directory in order to place the result file.
+shift # Ignore "wasm"
+args=()
+while (( "$#" )); do
+    if [[ "$1" == "--" ]] ; then
+        : # Ignore
+    elif [[ "$1" == "-o" ]] ; then
+        shift
+        output="$1"
+    else
+        args+="$1"
+    fi
+
+    shift
+done
+
+# Remove all dependencies from the Cargo.toml
+cp Cargo.toml.original Cargo.toml
+
+# Configure Cargo to use the supplied crate type
+# TODO: This should apply to everything, not just WASM!
+crate_type=$(sed -n -E 's/^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/\1/p' src/*.rs | head -n1)
+if [[ -n "${crate_type}" ]]; then
+    cat >> Cargo.toml <<EOF
+[lib]
+crate-type = ["${crate_type}"]
+EOF
+fi
+
+# Perform our build
+# https://stackoverflow.com/a/7577209/155423
+cargo "build" "--target=wasm32-unknown-unknown" ${args[@]+"${args[@]}"}
+
+for wasm in $(find target/ -name '*wasm' -not -path '*/deps/*'); do
+    # Garbage collect to make it tidier
+    wasm-gc "${wasm}" "${wasm}.gc"
+
+    # Convert to textual format
+    wasm2wat \
+        --fold-exprs \
+        --generate-names \
+        --inline-exports \
+        -o "${output}.wat" \
+        "${wasm}.gc"
+done

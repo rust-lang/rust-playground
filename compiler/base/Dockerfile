@@ -1,15 +1,17 @@
 FROM ubuntu:16.04
 
-# `build-essential` and `file` is needed for backtrace-sys
-# https://github.com/alexcrichton/backtrace-rs/issues/26
+# `build-essential` and `file` are needed for backtrace-sys
+# `cmake`, `git`, `python` are needed for wasm tools
 RUN apt-get update && apt-get install -y \
     build-essential \
+    cmake \
     curl \
     file \
     gcc \
-    jq \
+    git \
     libssl-dev \
     pkg-config \
+    python \
  && rm -rf /var/lib/apt/lists/*
 
 ENV USER=root
@@ -33,9 +35,14 @@ RUN cd / && \
     cargo new playground
 WORKDIR /playground
 
+RUN mv Cargo.toml Cargo.toml.original
 ADD Cargo.toml /playground/Cargo.toml
 RUN cargo build
 RUN cargo build --release
 RUN rm src/*.rs
 
 ADD crate-information.json /playground/crate-information.json
+
+ADD postinstall.sh /root/
+RUN /root/postinstall.sh ${channel}
+ADD cargo-wasm /root/.cargo/bin/

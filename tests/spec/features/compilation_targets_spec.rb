@@ -71,6 +71,18 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     end
   end
 
+  scenario "compiling to WebAssembly" do
+    within('.header') do
+      choose_styled("Nightly")
+      click_on("WASM")
+    end
+
+    within('.output-code') do
+      expect(page).to have_content '(module'
+      expect(page).to have_content '(block'
+    end
+  end
+
   context "when the code doesn't compile" do
     before { editor.set("fn main() {") }
 

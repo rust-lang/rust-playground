@@ -8,6 +8,7 @@ import gist, { State as GistState } from './gist';
 import llvmIr, { State as LlvmIrState } from './llvmIr';
 import meta, { State as MetaState } from './meta';
 import mir, { State as MirState } from './mir';
+import wasm, { State as WasmState } from './wasm';
 
 export interface State {
   meta: MetaState;
@@ -16,6 +17,7 @@ export interface State {
   assembly: AssemblyState;
   llvmIr: LlvmIrState;
   mir: MirState;
+  wasm: WasmState;
   execute: ExecuteState;
   gist: GistState;
 }
@@ -27,6 +29,7 @@ const output = combineReducers({
   assembly,
   llvmIr,
   mir,
+  wasm,
   execute,
   gist,
 });

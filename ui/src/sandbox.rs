@@ -359,10 +359,11 @@ fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type
     let mut cmd = vec!["cargo"];
 
     match (target, crate_type, tests) {
-        (Some(_), _, _) => cmd.push("rustc"),
-        (_, _, true)    => cmd.push("test"),
-        (_, Library, _) => cmd.push("build"),
-        (_, _, _)       => cmd.push("run"),
+        (Some(Wasm), _, _) => cmd.push("wasm"),
+        (Some(_), _, _)    => cmd.push("rustc"),
+        (_, _, true)       => cmd.push("test"),
+        (_, Library, _)    => cmd.push("build"),
+        (_, _, _)          => cmd.push("run"),
     }
 
     if mode == Release {
@@ -386,6 +387,7 @@ fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type
             },
             LlvmIr => cmd.push("--emit=llvm-ir"),
             Mir => cmd.push("--emit=mir"),
+            Wasm => { /* handled by cargo-wasm wrapper */ },
          }
     }
 
@@ -427,14 +429,16 @@ pub enum CompileTarget {
     Assembly(AssemblyFlavor, DemangleAssembly, HideAssemblerDirectives),
     LlvmIr,
     Mir,
+    Wasm,
 }
 
 impl CompileTarget {
     fn extension(&self) -> &'static OsStr {
         let ext = match *self {
             CompileTarget::Assembly(_, _, _) => "s",
-            CompileTarget::LlvmIr   => "ll",
-            CompileTarget::Mir      => "mir",
+            CompileTarget::LlvmIr            => "ll",
+            CompileTarget::Mir               => "mir",
+            CompileTarget::Wasm              => "wat",
         };
         OsStr::new(ext)
     }
@@ -446,8 +450,9 @@ impl fmt::Display for CompileTarget {
 
         match *self {
             Assembly(_, _, _) => "assembly".fmt(f),
-            LlvmIr => "LLVM IR".fmt(f),
-            Mir => "Rust MIR".fmt(f),
+            LlvmIr            => "LLVM IR".fmt(f),
+            Mir               => "Rust MIR".fmt(f),
+            Wasm              => "WebAssembly".fmt(f),
         }
     }
 }

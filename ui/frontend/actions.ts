@@ -70,6 +70,9 @@ export enum ActionType {
   CompileMirRequest = 'COMPILE_MIR_REQUEST',
   CompileMirSucceeded = 'COMPILE_MIR_SUCCEEDED',
   CompileMirFailed = 'COMPILE_MIR_FAILED',
+  CompileWasmRequest = 'COMPILE_WASM_REQUEST',
+  CompileWasmSucceeded = 'COMPILE_WASM_SUCCEEDED',
+  CompileWasmFailed = 'COMPILE_WASM_FAILED',
 
   Other = '__never_used__',
 }
@@ -99,6 +102,9 @@ export type Action =
   | CompileMirRequestAction
   | CompileMirSucceededAction
   | CompileMirFailedAction
+  | CompileWasmRequestAction
+  | CompileWasmSucceededAction
+  | CompileWasmFailedAction
 
   | OtherAction
   ;
@@ -410,6 +416,32 @@ export const performCompileToMir = () =>
     request: requestCompileMir,
     success: receiveCompileMirSuccess,
     failure: receiveCompileMirFailure,
+  });
+
+export type CompileWasmRequestAction =
+  CompileRequestAction<ActionType.CompileWasmRequest>;
+export type CompileWasmSucceededAction =
+  CompileSucceededAction<ActionType.CompileWasmSucceeded>;
+export type CompileWasmFailedAction =
+  CompileFailedAction<ActionType.CompileWasmFailed>;
+
+function requestCompileWasm(): CompileWasmRequestAction {
+  return { type: ActionType.CompileWasmRequest };
+}
+
+function receiveCompileWasmSuccess({ code, stdout, stderr }): CompileWasmSucceededAction {
+  return { type: ActionType.CompileWasmSucceeded, code, stdout, stderr };
+}
+
+function receiveCompileWasmFailure({ error }): CompileWasmFailedAction {
+  return { type: ActionType.CompileWasmFailed, error };
+}
+
+export const performCompileToWasm = () =>
+  performCompile('wasm', {
+    request: requestCompileWasm,
+    success: receiveCompileWasmSuccess,
+    failure: receiveCompileWasmFailure,
   });
 
 export const EDIT_CODE = 'EDIT_CODE';
