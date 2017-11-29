@@ -85,11 +85,6 @@ class Header extends React.PureComponent<HeaderProps> {
 
     const primaryLabel = executionLabel(crateType, tests);
 
-    const mirButton = (
-      <button className="header-set__btn"
-        onClick={compileToWasm}>WASM</button>
-    );
-
     return (
       <div className="header">
         <div className="header-compilation header-set">
@@ -102,7 +97,10 @@ class Header extends React.PureComponent<HeaderProps> {
               onClick={compileToLLVM}>LLVM IR</button>
             <button className="header-set__btn"
               onClick={compileToMir}>MIR</button>
-            {wasmAvailable && mirButton}
+            <button className="header-set__btn"
+              disabled={!wasmAvailable}
+              title={!wasmAvailable && 'Compilation to WASM requires a Nightly channel'}
+              onClick={compileToWasm}>WASM</button>
           </div>
         </div>
 
