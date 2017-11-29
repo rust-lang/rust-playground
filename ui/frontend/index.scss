@@ -227,7 +227,7 @@ body {
                 content: " ▶";
             }
 
-            &:hover {
+            &:hover:enabled {
                 background-color: darken($rust, 10%);
             }
         }
