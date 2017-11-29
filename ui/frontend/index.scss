@@ -195,7 +195,10 @@ body {
         border-left: $border;
         background: none;
 
-        cursor: pointer;
+        &:enabled {
+            cursor: pointer;
+        }
+
         text-decoration: none;
         color: #000;
 
@@ -203,8 +206,12 @@ body {
             border-left: 0;
         }
 
-        &:hover {
+        &:hover:enabled {
             background-color: darken(white, 10%);
+        }
+
+        &:disabled {
+            color: rgba(0, 0, 0, 0.5);
         }
 
         &--primary {
