@@ -99,7 +99,7 @@ class Header extends React.PureComponent<HeaderProps> {
               onClick={compileToMir}>MIR</button>
             <button className="header-set__btn"
               disabled={!wasmAvailable}
-              title={!wasmAvailable && 'Compilation to WASM requires the nightly channel'}
+              title={wasmAvailable ? undefined : 'Compilation to WASM requires the nightly channel'}
               onClick={compileToWasm}>WASM</button>
           </div>
         </div>
