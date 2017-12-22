@@ -5,9 +5,14 @@ ace.define('ace/mode/rust-playground', function(require, exports, module) {
   const oop = require('ace/lib/oop');
   const { Mode: RustMode } = require('ace/mode/rust');
   const { RustPlaygroundHighlightRules } = require('ace/mode/rust_playground_highlight_rules');
+  const { FoldMode } = require('ace/mode/folding/cstyle');
 
   const Mode = function() {
+    // It's unclear what is inherited and what isn't, but these
+    // all seem to need to be copied from the real Rust mode
     this.HighlightRules = RustPlaygroundHighlightRules;
+    this.foldingRules = new FoldMode();
+    this.$behaviour = this.$defaultBehaviour;
   };
   oop.inherits(Mode, RustMode);
 
