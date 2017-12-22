@@ -60,7 +60,7 @@ export default class Router extends React.Component<RouterProps> {
   private router: any;
 
   constructor(props) {
-    super();
+    super(props);
 
     const history = createHistory();
 

@@ -21,10 +21,8 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
       within('.header') { click_on("ASM") }
 
       within('.output-code') do
-        expect(page).to have_content '.text'
-        expect(page).to have_content '.file'
-        expect(page).to have_content '.section'
-        expect(page).to have_content '.p2align'
+        # We demangle the symbols
+        expect(page).to have_content 'playground::main:'
 
         expect(page).to have_content 'movq %rdi, %rax'
       end
@@ -42,10 +40,8 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
       within('.header') { click_on("ASM") }
 
       within('.output-code') do
-        expect(page).to have_content '.text'
-        expect(page).to have_content '.file'
-        expect(page).to have_content '.section'
-        expect(page).to have_content '.p2align'
+        # We demangle the symbols
+        expect(page).to have_content 'playground::main:'
 
         expect(page).to have_content 'mov rax, rdi'
       end
