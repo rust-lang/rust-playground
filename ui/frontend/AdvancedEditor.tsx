@@ -70,9 +70,6 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
   public componentDidMount() {
     const { _editor: { editor } } = this;
 
-    // Auto-completing character literals interferes too much with
-    // lifetimes, and there's no finer-grained control.
-    editor.setBehavioursEnabled(false);
     editor.commands.addCommand({
       name: 'executeCode',
       bindKey: {
