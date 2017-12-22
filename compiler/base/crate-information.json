@@ -11,7 +11,7 @@
   },
   {
     "name": "aho-corasick",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "id": "aho_corasick"
   },
   {
@@ -21,7 +21,7 @@
   },
   {
     "name": "atty",
-    "version": "0.2.3",
+    "version": "0.2.6",
     "id": "atty"
   },
   {
@@ -36,7 +36,7 @@
   },
   {
     "name": "base64",
-    "version": "0.7.0",
+    "version": "0.9.0",
     "id": "base64"
   },
   {
@@ -61,7 +61,7 @@
   },
   {
     "name": "byteorder",
-    "version": "1.1.0",
+    "version": "1.2.1",
     "id": "byteorder"
   },
   {
@@ -86,12 +86,12 @@
   },
   {
     "name": "clap",
-    "version": "2.27.1",
+    "version": "2.29.0",
     "id": "clap"
   },
   {
     "name": "cmake",
-    "version": "0.1.28",
+    "version": "0.1.29",
     "id": "cmake"
   },
   {
@@ -111,13 +111,8 @@
   },
   {
     "name": "crc",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "id": "crc"
-  },
-  {
-    "name": "crc-core",
-    "version": "0.1.0",
-    "id": "crc_core"
   },
   {
     "name": "crossbeam",
@@ -141,7 +136,7 @@
   },
   {
     "name": "data-encoding",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "id": "data_encoding"
   },
   {
@@ -181,7 +176,7 @@
   },
   {
     "name": "env_logger",
-    "version": "0.4.3",
+    "version": "0.5.0-rc.1",
     "id": "env_logger"
   },
   {
@@ -206,22 +201,27 @@
   },
   {
     "name": "flate2",
-    "version": "0.2.20",
+    "version": "1.0.1",
     "id": "flate2"
   },
   {
     "name": "foreign-types",
-    "version": "0.2.0",
+    "version": "0.3.2",
     "id": "foreign_types"
   },
   {
+    "name": "foreign-types-shared",
+    "version": "0.1.1",
+    "id": "foreign_types_shared"
+  },
+  {
     "name": "fuchsia-zircon",
-    "version": "0.2.1",
+    "version": "0.3.2",
     "id": "fuchsia_zircon"
   },
   {
     "name": "fuchsia-zircon-sys",
-    "version": "0.2.0",
+    "version": "0.3.2",
     "id": "fuchsia_zircon_sys"
   },
   {
@@ -276,7 +276,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.11.7",
+    "version": "0.11.9",
     "id": "hyper"
   },
   {
@@ -291,7 +291,7 @@
   },
   {
     "name": "image",
-    "version": "0.17.0",
+    "version": "0.18.0",
     "id": "image"
   },
   {
@@ -306,7 +306,7 @@
   },
   {
     "name": "itertools",
-    "version": "0.7.2",
+    "version": "0.7.4",
     "id": "itertools"
   },
   {
@@ -331,7 +331,7 @@
   },
   {
     "name": "lazy_static",
-    "version": "0.2.10",
+    "version": "1.0.0",
     "id": "lazy_static"
   },
   {
@@ -341,7 +341,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.33",
+    "version": "0.2.34",
     "id": "libc"
   },
   {
@@ -356,7 +356,7 @@
   },
   {
     "name": "log",
-    "version": "0.3.8",
+    "version": "0.4.0-rc.1",
     "id": "log"
   },
   {
@@ -381,7 +381,7 @@
   },
   {
     "name": "memchr",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "id": "memchr"
   },
   {
@@ -396,7 +396,7 @@
   },
   {
     "name": "mime_guess",
-    "version": "2.0.0-alpha.2",
+    "version": "2.0.0-alpha.3",
     "id": "mime_guess"
   },
   {
@@ -431,17 +431,17 @@
   },
   {
     "name": "num",
-    "version": "0.1.40",
+    "version": "0.1.41",
     "id": "num"
   },
   {
     "name": "num-bigint",
-    "version": "0.1.40",
+    "version": "0.1.41",
     "id": "num_bigint"
   },
   {
     "name": "num-complex",
-    "version": "0.1.40",
+    "version": "0.1.41",
     "id": "num_complex"
   },
   {
@@ -461,7 +461,7 @@
   },
   {
     "name": "num-traits",
-    "version": "0.1.40",
+    "version": "0.1.41",
     "id": "num_traits"
   },
   {
@@ -471,7 +471,7 @@
   },
   {
     "name": "ordermap",
-    "version": "0.3.0",
+    "version": "0.3.2",
     "id": "ordermap"
   },
   {
@@ -520,18 +520,13 @@
     "id": "precomputed_hash"
   },
   {
-    "name": "quick-error",
-    "version": "1.2.1",
-    "id": "quick_error"
-  },
-  {
     "name": "quote",
     "version": "0.3.15",
     "id": "quote"
   },
   {
     "name": "rand",
-    "version": "0.3.18",
+    "version": "0.4.1",
     "id": "rand"
   },
   {
@@ -546,7 +541,7 @@
   },
   {
     "name": "regex",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "id": "regex"
   },
   {
@@ -561,13 +556,8 @@
   },
   {
     "name": "reqwest",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "id": "reqwest"
-  },
-  {
-    "name": "ring",
-    "version": "0.12.1",
-    "id": "ring"
   },
   {
     "name": "rustc-demangle",
@@ -596,7 +586,7 @@
   },
   {
     "name": "schannel",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "id": "schannel"
   },
   {
@@ -636,7 +626,7 @@
   },
   {
     "name": "serde",
-    "version": "1.0.20",
+    "version": "1.0.24",
     "id": "serde"
   },
   {
@@ -646,17 +636,17 @@
   },
   {
     "name": "serde_derive",
-    "version": "1.0.20",
+    "version": "1.0.24",
     "id": "serde_derive"
   },
   {
     "name": "serde_derive_internals",
-    "version": "0.17.0",
+    "version": "0.18.0",
     "id": "serde_derive_internals"
   },
   {
     "name": "serde_json",
-    "version": "1.0.6",
+    "version": "1.0.8",
     "id": "serde_json"
   },
   {
@@ -741,7 +731,7 @@
   },
   {
     "name": "tar",
-    "version": "0.4.13",
+    "version": "0.4.14",
     "id": "tar"
   },
   {
@@ -761,8 +751,13 @@
   },
   {
     "name": "term_size",
-    "version": "0.3.1",
+    "version": "1.0.0-beta1",
     "id": "term_size"
+  },
+  {
+    "name": "termcolor",
+    "version": "0.3.3",
+    "id": "termcolor"
   },
   {
     "name": "termion",
@@ -781,7 +776,7 @@
   },
   {
     "name": "thread_local",
-    "version": "0.3.4",
+    "version": "0.3.5",
     "id": "thread_local"
   },
   {
@@ -796,7 +791,7 @@
   },
   {
     "name": "tokio-core",
-    "version": "0.1.10",
+    "version": "0.1.11",
     "id": "tokio_core"
   },
   {
@@ -836,7 +831,7 @@
   },
   {
     "name": "unicase",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "id": "unicase"
   },
   {
@@ -875,19 +870,9 @@
     "id": "unreachable"
   },
   {
-    "name": "untrusted",
-    "version": "0.5.1",
-    "id": "untrusted"
-  },
-  {
     "name": "url",
     "version": "1.6.0",
     "id": "url"
-  },
-  {
-    "name": "user32-sys",
-    "version": "0.2.0",
-    "id": "user32"
   },
   {
     "name": "utf-8",
@@ -931,13 +916,28 @@
   },
   {
     "name": "winapi",
-    "version": "0.2.8",
+    "version": "0.3.2",
     "id": "winapi"
   },
   {
     "name": "winapi-build",
     "version": "0.1.1",
     "id": "build"
+  },
+  {
+    "name": "winapi-i686-pc-windows-gnu",
+    "version": "0.3.1",
+    "id": "winapi_i686_pc_windows_gnu"
+  },
+  {
+    "name": "winapi-x86_64-pc-windows-gnu",
+    "version": "0.3.1",
+    "id": "winapi_x86_64_pc_windows_gnu"
+  },
+  {
+    "name": "wincolor",
+    "version": "0.1.4",
+    "id": "wincolor"
   },
   {
     "name": "ws2_32-sys",
