@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/shepmaster/webdrivers
-  revision: 567fc974b441b0306564d12f6cd3b5580a74f8fe
-  branch: geckodriver-decompress
+  revision: dc66e7717c0e68df66f7d04087396301b0ccf986
+  branch: geckodriver-scraping
   specs:
-    webdrivers (3.2.1)
+    webdrivers (3.2.2)
       nokogiri (~> 1.6)
       rubyzip (~> 1.0)
       selenium-webdriver (~> 3.0)
