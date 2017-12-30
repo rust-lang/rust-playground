@@ -139,7 +139,7 @@ cd rust-playground
 ```
 cd compiler/
 ./build.sh
-cd ../
+cd ..
 ```
 
 #### Set a crontab to rebuild the containers
@@ -153,36 +153,20 @@ crontab -e
 0 * * * * docker images -q --filter "dangling=true" | xargs docker rmi
 ```
 
-#### Build the UI backend
+#### Build the UI frontend and backend
 ```
 cd ui
-docker run -it --rm -v $PWD:/ui --workdir /ui --entrypoint /bin/bash rust-nightly
-rustup target add x86_64-unknown-linux-musl
-cargo build --target=x86_64-unknown-linux-musl --release
-# exit docker
+./build.sh
 cd ..
-```
-
-#### Build the UI frontend
-```
-cd ui/frontend
-docker run -it --rm -v $PWD:/ui --workdir /ui --entrypoint /bin/bash node
-yarn
-NODE_ENV=production yarn run build
-# exit docker
-cd ../..
 ```
 
 #### Run the server
 ```
-cd ui
-sudo \
-  TMPDIR=/mnt/playground \
-  RUST_LOG=info \
-  PLAYGROUND_UI_ADDRESS=0.0.0.0 \
-  PLAYGROUND_UI_PORT=80 \
-  PLAYGROUND_UI_ROOT=$PWD/frontend/build \
-  ./target/x86_64-unknown-linux-musl/release/ui
+docker run -it --rm \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume /mnt/playground:/mnt/playground \
+    --publish 80:80 \
+    playground
 ```
 
 ## Development
@@ -210,6 +194,7 @@ cargo run
 ```
 cd compiler
 ./build.sh
+cd ..
 ```
 
 ## License
