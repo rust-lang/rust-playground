@@ -82,109 +82,6 @@ If you'd like to perform tests that you think might disrupt service of
 the Playground, get in touch and we can create an isolated clone to
 perform tests on! Once fixed, you can choose to be credited here.
 
-## Deployment
-
-### Amazon EC2 (Amazon Linux)
-
-Here's an example session. This could definitely be improved and
-automated.
-
-#### Dependencies (as root)
-
-```
-yum update -y
-yum install -y docker git
-
-# Use a production-quality storage driver that doesn't leak disk space
-vim /etc/sysconfig/docker
-# Add to OPTIONS: --storage-driver=overlay
-
-# Allow controlling the PID limit
-vim /etc/cgconfig.conf
-# Add:    pids       = /cgroup/pids;
-
-service docker start
-usermod -a -G docker ec2-user
-
-fallocate -l 1G /swap.fs
-chmod 0600 /swap.fs
-mkswap /swap.fs
-```
-
-#### Set aside disk space (as root)
-```
-fallocate -l 512M /playground.fs
-device=$(losetup -f --show /playground.fs)
-mkfs -t ext3 -m 1 -v $device
-mkdir /mnt/playground
-```
-
-#### Configure disk mountpoints (as root)
-```
-cat >>/etc/fstab <<EOF
-/swap.fs        none            swap   sw       0   0
-/playground.fs /mnt/playground  ext3   loop     0   0
-EOF
-```
-
-Reboot the instance at this point.
-
-#### Get the code
-```
-git clone https://github.com/integer32llc/rust-playground.git
-cd rust-playground
-```
-
-#### Build the containers
-```
-cd compiler/
-./build.sh
-cd ../
-```
-
-#### Set a crontab to rebuild the containers
-
-```
-crontab -e
-```
-
-```
-0 0 * * * cd /home/ec2-user/rust-playground/compiler && ./build.sh
-0 * * * * docker images -q --filter "dangling=true" | xargs docker rmi
-```
-
-#### Build the UI backend
-```
-cd ui
-docker run -it --rm -v $PWD:/ui --workdir /ui --entrypoint /bin/bash rust-nightly
-rustup target add x86_64-unknown-linux-musl
-cargo build --target=x86_64-unknown-linux-musl --release
-# exit docker
-cd ..
-```
-
-#### Build the UI frontend
-```
-cd ui/frontend
-docker run -it --rm -v $PWD:/ui --workdir /ui --entrypoint /bin/bash node
-yarn
-NODE_ENV=production yarn run build
-# exit docker
-cd ../..
-```
-
-#### Run the server
-```
-cd ui
-sudo \
-  TMPDIR=/mnt/playground \
-  RUST_LOG=info \
-  PLAYGROUND_UI_ADDRESS=0.0.0.0 \
-  PLAYGROUND_UI_PORT=80 \
-  PLAYGROUND_UI_ROOT=$PWD/frontend/build \
-  ./target/x86_64-unknown-linux-musl/release/ui
-```
-
 ## Development
 
 ### Build the UI
@@ -211,6 +108,10 @@ cargo run
 cd compiler
 ./build.sh
 ```
+
+## Deployment
+
+* [Amazon EC2 (Ubuntu)](deployment/ubuntu.md)
 
 ## License
 
