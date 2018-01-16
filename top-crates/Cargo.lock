@@ -91,12 +91,12 @@ dependencies = [
 
 [[package]]
 name = "cargo"
-version = "0.23.0"
+version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "atty 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "core-foundation 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "crates-io 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "crates-io 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "crossbeam 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "crypto-hash 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "curl 0.4.11 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -206,7 +206,7 @@ dependencies = [
 
 [[package]]
 name = "crates-io"
-version = "0.12.0"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "curl 0.4.11 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1221,7 +1221,7 @@ dependencies = [
 name = "top-crates"
 version = "0.1.0"
 dependencies = [
- "cargo 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cargo 0.24.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "reqwest 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.27 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1389,7 +1389,7 @@ dependencies = [
 "checksum build_const 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e90dc84f5e62d2ebe7676b83c22d33b6db8bd27340fb6ffbff0a364efa0cb9c9"
 "checksum byteorder 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "652805b7e73fada9d85e9a6682a4abd490cb52d96aeecc12e33a0de34dfd0d23"
 "checksum bytes 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)" = "1b7db437d718977f6dc9b2e3fd6fc343c02ac6b899b73fdd2179163447bd9ce9"
-"checksum cargo 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)" = "6e901b12ae1f05f21a53fc511000d66cdfa453af3e4746d881cb6913bc97e2e6"
+"checksum cargo 0.24.0 (registry+https://github.com/rust-lang/crates.io-index)" = "11bae52b8d1073f11a8b4f532ff09e6521d9e7d8908aacd3410542a2953ccd00"
 "checksum cc 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)" = "deaf9ec656256bb25b404c51ef50097207b9cbb29c933d31f92cae5a8a0ffee0"
 "checksum cfg-if 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d4c819a1287eb618df47cc647173c5c4c66ba19d888a6e50d605672aed3140de"
 "checksum cmake 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)" = "56d741ea7a69e577f6d06b36b7dff4738f680593dc27a701ffa8506b73ce28bb"
@@ -1399,7 +1399,7 @@ dependencies = [
 "checksum core-foundation 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)" = "8047f547cd6856d45b1cdd75ef8d2f21f3d0e4bf1dab0a0041b0ae9a5dda9c0e"
 "checksum core-foundation-sys 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "065a5d7ffdcbc8fa145d6f0746f3555025b9097a9e9cda59f7467abae670c78d"
 "checksum core-foundation-sys 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)" = "152195421a2e6497a8179195672e9d4ee8e45ed8c465b626f1606d27a08ebcd5"
-"checksum crates-io 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)" = "cda354a5308128bd20a74e0019b7c75a16fbf26785ec22db38c3ac0b3d691573"
+"checksum crates-io 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)" = "6f674c5442534ff590d03226dbe18058939d2c45a9072bb8a2fc82f135aa5d53"
 "checksum crc 1.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "bd5d02c0aac6bd68393ed69e00bbc2457f3e89075c6349db7189618dc4ddc1d7"
 "checksum crossbeam 0.2.12 (registry+https://github.com/rust-lang/crates.io-index)" = "bd66663db5a988098a89599d4857919b3acf7f61402e61365acfd3919857b9be"
 "checksum crossbeam 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "24ce9782d4d5c53674646a6a4c1863a21a8fc0cb649b3c94dfc16e45071dea19"
