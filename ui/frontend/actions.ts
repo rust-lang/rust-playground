@@ -10,10 +10,10 @@ import {
   Channel,
   DemangleAssembly,
   Editor,
-  HideAssemblerDirectives,
   Mode,
   Orientation,
   Page,
+  ProcessAssembly,
 } from './types';
 
 const routes = {
@@ -55,7 +55,7 @@ export enum ActionType {
   ChangeAssemblyFlavor = 'CHANGE_ASSEMBLY_FLAVOR',
   ChangeChannel = 'CHANGE_CHANNEL',
   ChangeDemangleAssembly = 'CHANGE_DEMANGLE_ASSEMBLY',
-  ChangeHideAssemblerDirectives = 'CHANGE_HIDE_ASSEMBLER_DIRECTIVES',
+  ChangeProcessAssembly = 'CHANGE_PROCESS_ASSEMBLY',
   ChangeMode = 'CHANGE_MODE',
   ChangeFocus = 'CHANGE_FOCUS',
   ExecuteRequest = 'EXECUTE_REQUEST',
@@ -85,7 +85,7 @@ export type Action =
   | ChangeDemangleAssemblyAction
   | ChangeEditorAction
   | ChangeFocusAction
-  | ChangeHideAssemblerDirectivesAction
+  | ChangeProcessAssemblyAction
   | ChangeKeybindingAction
   | ChangeModeAction
   | ChangeOrientationAction
@@ -148,9 +148,9 @@ export interface ChangeDemangleAssemblyAction {
   demangleAssembly: DemangleAssembly;
 }
 
-export interface ChangeHideAssemblerDirectivesAction {
-  type: ActionType.ChangeHideAssemblerDirectives;
-  hideAssemblerDirectives: HideAssemblerDirectives;
+export interface ChangeProcessAssemblyAction {
+  type: ActionType.ChangeProcessAssembly;
+  processAssembly: ProcessAssembly;
 }
 
 export interface ChangeChannelAction {
@@ -196,8 +196,8 @@ export function changeDemangleAssembly(demangleAssembly): ChangeDemangleAssembly
   return { type: ActionType.ChangeDemangleAssembly, demangleAssembly };
 }
 
-export function changeHideAssemblerDirectives(hideAssemblerDirectives): ChangeHideAssemblerDirectivesAction {
-  return { type: ActionType.ChangeHideAssemblerDirectives, hideAssemblerDirectives };
+export function changeProcessAssembly(processAssembly): ChangeProcessAssemblyAction {
+  return { type: ActionType.ChangeProcessAssembly, processAssembly };
 }
 
 export function changeChannel(channel: Channel): ChangeChannelAction {
@@ -302,7 +302,7 @@ function performCompile(target, { request, success, failure }): ThunkAction {
       mode,
       assemblyFlavor,
       demangleAssembly,
-      hideAssemblerDirectives,
+      processAssembly,
     } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
@@ -315,7 +315,7 @@ function performCompile(target, { request, success, failure }): ThunkAction {
       target,
       assemblyFlavor,
       demangleAssembly,
-      hideAssemblerDirectives,
+      processAssembly,
     };
 
     return jsonPost(routes.compile, body)

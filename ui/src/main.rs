@@ -394,9 +394,9 @@ quick_error! {
             description("an invalid demangling option was passed")
             display("The value {:?} is not a valid demangle option", value)
         }
-        InvalidHideAssemblerDirectives(value: String) {
-            description("an invalid assembler directive option was passed")
-            display("The value {:?} is not a valid assembler directive option", value)
+        InvalidProcessAssembly(value: String) {
+            description("an invalid assembly processing option was passed")
+            display("The value {:?} is not a valid assembly processing option", value)
         }
         InvalidChannel(value: String) {
             description("an invalid channel was passed")
@@ -434,8 +434,8 @@ struct CompileRequest {
     assembly_flavor: Option<String>,
     #[serde(rename = "demangleAssembly")]
     demangle_assembly: Option<String>,
-    #[serde(rename = "hideAssemblerDirectives")]
-    hide_assembler_directives: Option<String>,
+    #[serde(rename = "processAssembly")]
+    process_assembly: Option<String>,
     channel: String,
     mode: String,
     #[serde(rename = "crateType")]
@@ -541,14 +541,14 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
             None => None,
         };
 
-        let hide_assembler_directives = match me.hide_assembler_directives {
-            Some(f) => Some(parse_hide_assembler_directives(&f)?),
+        let process_assembly = match me.process_assembly {
+            Some(f) => Some(parse_process_assembly(&f)?),
             None => None,
         };
 
-        let target = match (target, assembly_flavor, demangle, hide_assembler_directives) {
-            (sandbox::CompileTarget::Assembly(_, _, _), Some(flavor), Some(demangle), Some(directives)) =>
-                sandbox::CompileTarget::Assembly(flavor, demangle, directives),
+        let target = match (target, assembly_flavor, demangle, process_assembly) {
+            (sandbox::CompileTarget::Assembly(_, _, _), Some(flavor), Some(demangle), Some(process)) =>
+                sandbox::CompileTarget::Assembly(flavor, demangle, process),
             _ => target,
         };
 
@@ -703,7 +703,7 @@ fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
     Ok(match s {
         "asm" => sandbox::CompileTarget::Assembly(sandbox::AssemblyFlavor::Att,
                                                   sandbox::DemangleAssembly::Demangle,
-                                                  sandbox::HideAssemblerDirectives::Hide),
+                                                  sandbox::ProcessAssembly::Filter),
         "llvm-ir" => sandbox::CompileTarget::LlvmIr,
         "mir" => sandbox::CompileTarget::Mir,
         "wasm" => sandbox::CompileTarget::Wasm,
@@ -727,11 +727,11 @@ fn parse_demangle_assembly(s: &str) -> Result<sandbox::DemangleAssembly> {
     })
 }
 
-fn parse_hide_assembler_directives(s: &str) -> Result<sandbox::HideAssemblerDirectives> {
+fn parse_process_assembly(s: &str) -> Result<sandbox::ProcessAssembly> {
     Ok(match s {
-        "hide" => sandbox::HideAssemblerDirectives::Hide,
-        "show" => sandbox::HideAssemblerDirectives::Show,
-        _ => return Err(Error::InvalidHideAssemblerDirectives(s.into()))
+        "filter" => sandbox::ProcessAssembly::Filter,
+        "raw" => sandbox::ProcessAssembly::Raw,
+        _ => return Err(Error::InvalidProcessAssembly(s.into()))
     })
 }
 

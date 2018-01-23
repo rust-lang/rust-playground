@@ -148,15 +148,16 @@ impl Sandbox {
         };
 
         match req.target {
-            CompileTarget::Assembly(_, demangle, directive) => {
-
-                if directive == HideAssemblerDirectives::Hide {
-                    code = super::asm_cleanup::remove_assembler_directives(&code);
-                }
+            CompileTarget::Assembly(_, demangle, process) => {
 
                 if demangle == DemangleAssembly::Demangle {
                     code = super::asm_cleanup::demangle_asm(&code);
                 }
+
+                if process == ProcessAssembly::Filter {
+                    code = super::asm_cleanup::filter_asm(&code);
+                }
+
             },
             _ => {},
         }
@@ -420,13 +421,13 @@ pub enum DemangleAssembly {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub enum HideAssemblerDirectives {
-    Hide,
-    Show,
+pub enum ProcessAssembly {
+    Filter,
+    Raw,
 }
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum CompileTarget {
-    Assembly(AssemblyFlavor, DemangleAssembly, HideAssemblerDirectives),
+    Assembly(AssemblyFlavor, DemangleAssembly, ProcessAssembly),
     LlvmIr,
     Mir,
     Wasm,
@@ -714,7 +715,7 @@ mod test {
     #[test]
     fn output_assembly() {
         let req = CompileRequest {
-            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, HideAssemblerDirectives::Show),
+            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Raw),
             channel: Channel::Stable,
             crate_type: CrateType::Binary,
             mode: Mode::Debug,
@@ -734,7 +735,7 @@ mod test {
     #[test]
     fn output_demangled_assembly() {
         let req = CompileRequest {
-            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Demangle, HideAssemblerDirectives::Show),
+            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Demangle, ProcessAssembly::Raw),
             channel: Channel::Stable,
             crate_type: CrateType::Binary,
             mode: Mode::Debug,
@@ -751,9 +752,9 @@ mod test {
 
     #[test]
     #[should_panic]
-    fn output_asm_dir_hidden_assembly() {
+    fn output_filtered_assembly() {
         let req = CompileRequest {
-            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, HideAssemblerDirectives::Hide),
+            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Filter),
             channel: Channel::Stable,
             crate_type: CrateType::Binary,
             mode: Mode::Debug,
@@ -763,7 +764,7 @@ mod test {
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
         let resp = sb.compile(&req).expect("Unable to compile code");
-
+        
         assert!(resp.code.contains(".text"));
         assert!(resp.code.contains(".file"));
     }
@@ -901,7 +902,6 @@ mod test {
         let sb = Sandbox::new().expect("Unable to create sandbox");
         let resp = sb.execute(&req).expect("Unable to execute code");
 
-        println!("{:?}", resp);
         assert!(resp.stderr.contains("Cannot fork"));
     }
 }

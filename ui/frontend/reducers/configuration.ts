@@ -4,9 +4,9 @@ import {
   Channel,
   DemangleAssembly,
   Editor,
-  HideAssemblerDirectives,
   Mode,
   Orientation,
+  ProcessAssembly,
 } from '../types';
 
 export interface State {
@@ -17,7 +17,7 @@ export interface State {
   orientation: Orientation;
   assemblyFlavor: AssemblyFlavor;
   demangleAssembly: DemangleAssembly;
-  hideAssemblerDirectives: HideAssemblerDirectives;
+  processAssembly: ProcessAssembly;
   channel: Channel;
   mode: Mode;
 }
@@ -30,7 +30,7 @@ export const DEFAULT: State = {
   orientation: Orientation.Automatic,
   assemblyFlavor: AssemblyFlavor.Att,
   demangleAssembly: DemangleAssembly.Demangle,
-  hideAssemblerDirectives: HideAssemblerDirectives.Hide,
+  processAssembly: ProcessAssembly.Filter,
   channel: Channel.Stable,
   mode: Mode.Debug,
 };
@@ -51,8 +51,8 @@ export default function configuration(state = DEFAULT, action: Action): State {
     return { ...state, assemblyFlavor: action.assemblyFlavor };
   case ActionType.ChangeDemangleAssembly:
     return { ...state, demangleAssembly: action.demangleAssembly };
-  case ActionType.ChangeHideAssemblerDirectives:
-    return { ...state, hideAssemblerDirectives: action.hideAssemblerDirectives };
+  case ActionType.ChangeProcessAssembly:
+    return { ...state, processAssembly: action.processAssembly };
   case ActionType.ChangeChannel:
     return { ...state, channel: action.channel };
   case ActionType.ChangeMode:

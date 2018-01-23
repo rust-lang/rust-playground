@@ -7,14 +7,14 @@ import {
   changeAssemblyFlavor,
   changeDemangleAssembly,
   changeEditor,
-  changeHideAssemblerDirectives,
   changeKeybinding,
   changeOrientation,
+  changeProcessAssembly,
   changeTheme,
   toggleConfiguration,
 } from './actions';
 import State from './state';
-import { AssemblyFlavor, DemangleAssembly, Editor, HideAssemblerDirectives, Orientation } from './types';
+import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, ProcessAssembly} from './types';
 
 const keybindingOptions = ACE_KEYBINDINGS.map(t => <option value={t} key={t}>{t}</option>);
 const themeOptions = ACE_THEMES.map(t => <option value={t} key={t}>{t}</option>);
@@ -52,7 +52,7 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
   private onChangeOrientation = e => this.props.changeOrientation(e.target.value);
   private onChangeAssemblyFlavor = e => this.props.changeAssemblyFlavor(e.target.value);
   private onChangeDemangleAssembly = e => this.props.changeDemangleAssembly(e.target.value);
-  private onChangeHideAssemblerDirectives = e => this.props.changeHideAssemblerDirectives(e.target.value);
+  private onChangeProcessAssembly = e => this.props.changeProcessAssembly(e.target.value);
   private onKeyup = e => {
     if (e.keyCode === ESCAPE_KEYCODE && !e.defaultPrevented) {
       e.preventDefault();
@@ -75,7 +75,7 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
       orientation,
       assemblyFlavor,
       demangleAssembly,
-      hideAssemblerDirectives,
+      processAssembly,
       toggleConfiguration,
     } = this.props;
 
@@ -138,12 +138,12 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
           <option value={DemangleAssembly.Mangle}>Mangled</option>
         </ConfigurationSelect>
 
-        <ConfigurationSelect what="hideAssemblerDirectives"
-                             label="Assembler Directives"
-                             defaultValue={hideAssemblerDirectives}
-                             onChange={this.onChangeHideAssemblerDirectives}>
-          <option value={HideAssemblerDirectives.Hide}>Remove</option>
-          <option value={HideAssemblerDirectives.Show}>Display</option>
+        <ConfigurationSelect what="processAssembly"
+                             label="Assembly View"
+                             defaultValue={processAssembly}
+                             onChange={this.onChangeProcessAssembly}>
+          <option value={ProcessAssembly.Filter}>Filtered</option>
+          <option value={ProcessAssembly.Raw}>Raw</option>
         </ConfigurationSelect>
 
         <div className="configuration-actions">
@@ -161,14 +161,14 @@ interface ConfigurationProps {
   changeOrientation: (Orientation) => any;
   changeAssemblyFlavor: (AssemblyFlavor) => any;
   changeDemangleAssembly: (DemangleAssembly) => any;
-  changeHideAssemblerDirectives: (HideAssemblerDirectives) => any;
+  changeProcessAssembly: (ProcessAssembly) => any;
   editor: Editor;
   keybinding: string;
   theme: string;
   orientation: Orientation;
   assemblyFlavor: AssemblyFlavor;
   demangleAssembly: DemangleAssembly;
-  hideAssemblerDirectives: HideAssemblerDirectives;
+  processAssembly: ProcessAssembly;
   toggleConfiguration: () => any;
 }
 
@@ -179,7 +179,7 @@ const mapStateToProps = ({ configuration: {
   orientation,
   assemblyFlavor,
   demangleAssembly,
-  hideAssemblerDirectives},
+  processAssembly},
 }: State) => (
   {
     editor,
@@ -188,7 +188,7 @@ const mapStateToProps = ({ configuration: {
     orientation,
     assemblyFlavor,
     demangleAssembly,
-    hideAssemblerDirectives,
+    processAssembly,
   }
 );
 
@@ -199,7 +199,7 @@ const mapDispatchToProps = ({
   changeOrientation,
   changeAssemblyFlavor,
   changeDemangleAssembly,
-  changeHideAssemblerDirectives,
+  changeProcessAssembly,
   toggleConfiguration,
 });
 
