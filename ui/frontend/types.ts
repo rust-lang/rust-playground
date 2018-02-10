@@ -46,9 +46,9 @@ export enum DemangleAssembly {
   Mangle = 'mangle',
 }
 
-export enum HideAssemblerDirectives {
-  Hide = 'hide',
-  Show = 'show',
+export enum ProcessAssembly {
+  Filter = 'filter',
+  Raw = 'raw',
 }
 
 export enum Channel {
