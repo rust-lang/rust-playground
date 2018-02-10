@@ -43,6 +43,7 @@ struct Crate {
 #[derive(Serialize)]
 struct TomlManifest {
     package: Package,
+    profile: Profiles,
     dependencies: BTreeMap<String, String>,
 }
 
@@ -69,6 +70,20 @@ struct Modifications {
     blacklist: Vec<String>,
     #[serde(default)]
     additions: BTreeSet<String>,
+}
+
+/// A profile section in a Cargo.toml file
+#[derive(Serialize)]
+#[serde(rename_all="kebab-case")]
+struct Profile {
+    codegen_units: u32,
+}
+
+/// Available profile types
+#[derive(Serialize)]
+struct Profiles {
+    dev: Profile,
+    release: Profile,
 }
 
 impl Modifications {
@@ -236,6 +251,10 @@ fn main() {
             name: "playground".to_owned(),
             version: "0.0.1".to_owned(),
             authors: vec!["The Rust Playground".to_owned()],
+        },
+        profile: Profiles {
+            dev: Profile { codegen_units: 1 },
+            release: Profile { codegen_units: 1 },
         },
         dependencies: unique_latest_crates.clone(),
     };
