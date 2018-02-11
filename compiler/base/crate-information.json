@@ -266,7 +266,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.11.17",
+    "version": "0.11.18",
     "id": "hyper"
   },
   {
@@ -421,17 +421,17 @@
   },
   {
     "name": "num",
-    "version": "0.1.41",
+    "version": "0.1.42",
     "id": "num"
   },
   {
     "name": "num-bigint",
-    "version": "0.1.41",
+    "version": "0.1.43",
     "id": "num_bigint"
   },
   {
     "name": "num-complex",
-    "version": "0.1.41",
+    "version": "0.1.42",
     "id": "num_complex"
   },
   {
@@ -446,7 +446,7 @@
   },
   {
     "name": "num-rational",
-    "version": "0.1.41",
+    "version": "0.1.42",
     "id": "num_rational"
   },
   {
@@ -536,7 +536,7 @@
   },
   {
     "name": "regex",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "id": "regex"
   },
   {
@@ -791,7 +791,7 @@
   },
   {
     "name": "tokio-io",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "id": "tokio_io"
   },
   {
@@ -886,7 +886,7 @@
   },
   {
     "name": "uuid",
-    "version": "0.5.1",
+    "version": "0.6.0-beta",
     "id": "uuid"
   },
   {
