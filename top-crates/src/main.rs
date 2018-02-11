@@ -77,6 +77,7 @@ struct Modifications {
 #[serde(rename_all="kebab-case")]
 struct Profile {
     codegen_units: u32,
+    incremental: bool,
 }
 
 /// Available profile types
@@ -253,8 +254,8 @@ fn main() {
             authors: vec!["The Rust Playground".to_owned()],
         },
         profile: Profiles {
-            dev: Profile { codegen_units: 1 },
-            release: Profile { codegen_units: 1 },
+            dev: Profile { codegen_units: 1, incremental: false },
+            release: Profile { codegen_units: 1, incremental: false },
         },
         dependencies: unique_latest_crates.clone(),
     };
