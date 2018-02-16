@@ -17,6 +17,7 @@ extern crate quick_error;
 extern crate corsware;
 #[macro_use]
 extern crate lazy_static;
+extern crate petgraph;
 extern crate regex;
 extern crate rustc_demangle;
 

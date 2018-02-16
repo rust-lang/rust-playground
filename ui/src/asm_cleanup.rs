@@ -1,10 +1,10 @@
 // Thanks to Matt Godbolt for creating the amazing Compiler Explorer https://www.godbolt.org
 // This aims to provide similar assembly cleanup to what Godbolt does
 
-use regex::Regex;
-use regex::Captures;
+use regex::{Captures, Regex};
 use rustc_demangle::demangle;
 use std::collections::HashSet;
+use petgraph::prelude::*;
 
 pub fn demangle_asm(block: &str) -> String {
     lazy_static! {
@@ -40,7 +40,7 @@ pub fn filter_asm(block: &str) -> String {
         // Example:.Lfunc_end7:
         // Finds label declarations
         // Include in results only if it is referenced by an opcode, or is a function
-        static ref LABEL_DECL_REGEX: Regex = Regex::new(r"([a-zA-Z_.<][a-zA-Z0-9$&_.<>\[\]{}:' ]*):$").unwrap();
+        static ref LABEL_DECL_REGEX: Regex = Regex::new(r"([a-zA-Z_.<][a-zA-Z0-9$&_.,<>\[\]{}:' ]*):$").unwrap();
     }
     lazy_static! {
         // Example:    mov lea rdi, [rip + str.0] // str.0 is the referenced label
@@ -70,10 +70,11 @@ pub fn filter_asm(block: &str) -> String {
         static ref BLANK_REGEX: Regex = Regex::new(r"^\s*$").unwrap();
     }
 
-    let mut current_label: &str = "";
-    let mut line_info: Vec<LineType> = Vec::new();
-    let mut labels: HashSet<&str> = HashSet::new();
-    let mut opcode_operands: HashSet<&str> = HashSet::new();
+    let mut current_label = "";
+    let mut line_info = Vec::new();
+    let mut labels = HashSet::new();
+    let mut opcode_operands = HashSet::new();
+    let mut label_graph = DiGraphMap::new();
 
     // Note the type of data held on each line of the block
     for line in block.lines() {
@@ -89,9 +90,11 @@ pub fn filter_asm(block: &str) -> String {
             current_label = label_decl_cap.as_str(); 
         } else if DATA_REGEX.is_match(line) && current_label != "" { 
             line_info.push(Data(current_label));
-            // Skip the data directive, just add operands
+            // These will be checked for references to other labels later on
+            // Skip the data type, just capture its reference
             for label_ref_cap in LABEL_REF_REGEX.captures_iter(line).skip(1).filter_map(|cap| cap.get(1)) {
-                opcode_operands.insert(label_ref_cap.as_str());
+                // Create a graph of how data labels reference each other
+                label_graph.add_edge(current_label, label_ref_cap.as_str(), 1);
             }
         } else if let Some(function_cap) = FUNCTION_REGEX.captures(line).map_or(None, |cap| cap.get(1)) { 
             line_info.push(FunctionDecl); 
@@ -107,7 +110,20 @@ pub fn filter_asm(block: &str) -> String {
         }
     }
 
-    let used_labels: HashSet<_> = labels.intersection(&opcode_operands).collect();
+    let mut data_labels = Vec::new();
+    let mut used_labels: HashSet<_> = labels.intersection(&opcode_operands).collect();
+
+    // We only include labels ref'd by data dirs if directly or indirectly used by an opcode
+    for label in &used_labels {
+        if label_graph.contains_node(label) {
+            let mut label_search = Dfs::new(&label_graph, label);
+            while let Some(next_label) = label_search.next(&label_graph) {
+                data_labels.push(next_label);
+            }
+        }
+    }
+
+    used_labels.extend(&data_labels);
 
     let mut filtered_asm = String::new();
     for (line, line_type) in block.lines().zip(&line_info) {
@@ -206,5 +222,20 @@ mod test {
     fn functions_kept() {
         assert_eq!(super::filter_asm("  .type main,@function\n  main:\n  pushq %rax\n"),
         "\n  main:\n  pushq %rax\n");
+    }
+    #[test]
+    fn used_data_ref_label_kept() {
+        assert_eq!(super::filter_asm(".Lcfi0:\n  .quad .Lcfi1\n  mov .Lcfi0\n.Lcfi1:\n  addq $16, %rsp\n"),
+        "\n.Lcfi0:\n  .quad .Lcfi1\n  mov .Lcfi0\n\n.Lcfi1:\n  addq $16, %rsp\n");
+    }
+    #[test]
+    fn unused_data_ref_label_removed() {
+        assert_eq!(super::filter_asm(".Lcfi0:\n  .quad 1\n  mov .Lcfi0\n.Lcfi1:\n  addq $16, %rsp\n"),
+        "\n.Lcfi0:\n  .quad 1\n  mov .Lcfi0\n  addq $16, %rsp\n");
+    }
+    #[test]
+    fn used_data_ref_label_graph_walk() {
+        assert_eq!(super::filter_asm("main:\n  .quad ref.1\n  mov main\nref.1:\n  .quad ref.2\nref.2:\n  .quad 1"),
+        "\nmain:\n  .quad ref.1\n  mov main\n\nref.1:\n  .quad ref.2\n\nref.2:\n  .quad 1\n");
     }
 }
