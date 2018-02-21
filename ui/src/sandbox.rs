@@ -127,8 +127,7 @@ impl Sandbox {
             .map_err(Error::UnableToReadOutput)?
             .flat_map(|entry| entry)
             .map(|entry| entry.path())
-            .filter(|path| path.extension() == Some(req.target.extension()))
-            .next();
+            .find(|path| path.extension() == Some(req.target.extension()));
 
         let stdout = vec_to_str(output.stdout)?;
         let mut stderr = vec_to_str(output.stderr)?;
@@ -147,19 +146,15 @@ impl Sandbox {
             }
         };
 
-        match req.target {
-            CompileTarget::Assembly(_, demangle, process) => {
+        if let CompileTarget::Assembly(_, demangle, process) = req.target {
 
-                if demangle == DemangleAssembly::Demangle {
-                    code = super::asm_cleanup::demangle_asm(&code);
-                }
+            if demangle == DemangleAssembly::Demangle {
+                code = super::asm_cleanup::demangle_asm(&code);
+            }
 
-                if process == ProcessAssembly::Filter {
-                    code = super::asm_cleanup::filter_asm(&code);
-                }
-
-            },
-            _ => {},
+            if process == ProcessAssembly::Filter {
+                code = super::asm_cleanup::filter_asm(&code);
+            }
         }
 
         Ok(CompileResponse {
@@ -235,7 +230,7 @@ impl Sandbox {
         let version_output = vec_to_str(output.stdout)?;
 
         let mut info: BTreeMap<String, String> = version_output.lines().skip(1).filter_map(|line| {
-            let mut pieces = line.splitn(2, ":").fuse();
+            let mut pieces = line.splitn(2, ':').fuse();
             match (pieces.next(), pieces.next()) {
                 (Some(name), Some(value)) => Some((name.trim().into(), value.trim().into())),
                 _ => None

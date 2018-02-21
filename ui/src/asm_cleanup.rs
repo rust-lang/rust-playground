@@ -84,7 +84,7 @@ pub fn filter_asm(block: &str) -> String {
             for label_ref_cap in LABEL_REF_REGEX.captures_iter(line).skip(1).filter_map(|cap| cap.get(1)) {
                 opcode_operands.insert(label_ref_cap.as_str());
             }
-        } else if let Some(label_decl_cap) = LABEL_DECL_REGEX.captures(line).map_or(None, |cap| cap.get(1)) {
+        } else if let Some(label_decl_cap) = LABEL_DECL_REGEX.captures(line).and_then(|cap| cap.get(1)) {
             line_info.push(LabelDecl(label_decl_cap.as_str()));
             labels.insert(label_decl_cap.as_str());
             current_label = label_decl_cap.as_str(); 
@@ -96,7 +96,7 @@ pub fn filter_asm(block: &str) -> String {
                 // Create a graph of how data labels reference each other
                 label_graph.add_edge(current_label, label_ref_cap.as_str(), 1);
             }
-        } else if let Some(function_cap) = FUNCTION_REGEX.captures(line).map_or(None, |cap| cap.get(1)) { 
+        } else if let Some(function_cap) = FUNCTION_REGEX.captures(line).and_then(|cap| cap.get(1)) { 
             line_info.push(FunctionDecl); 
             opcode_operands.insert(function_cap.as_str());
         // DIRECTIVE_REGEX must be checked after FUNCTION_REGEX and DATA_REGEX, matches them too
@@ -127,16 +127,16 @@ pub fn filter_asm(block: &str) -> String {
 
     let mut filtered_asm = String::new();
     for (line, line_type) in block.lines().zip(&line_info) {
-        match line_type {
-            &Opcode | &Misc => { 
+        match *line_type {
+            Opcode | Misc => { 
                 filtered_asm.push_str(line);
                 filtered_asm.push('\n');
             },
-            &Data(ref data) if used_labels.contains(data) => { 
+            Data(data) if used_labels.contains(&data) => { 
                 filtered_asm.push_str(line);
                 filtered_asm.push('\n');
             },
-            &LabelDecl(ref label) if used_labels.contains(label) => {
+            LabelDecl(label) if used_labels.contains(&label) => {
                 filtered_asm.push('\n');
                 filtered_asm.push_str(line);
                 filtered_asm.push('\n');

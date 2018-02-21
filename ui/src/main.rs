@@ -44,9 +44,9 @@ use playground_middleware::{
 
 use sandbox::Sandbox;
 
-const DEFAULT_ADDRESS: &'static str = "127.0.0.1";
+const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
-const DEFAULT_LOG_FILE: &'static str = "access-log.csv";
+const DEFAULT_LOG_FILE: &str = "access-log.csv";
 
 mod sandbox;
 mod asm_cleanup;
@@ -61,9 +61,9 @@ fn main() {
     env_logger::init().expect("Unable to initialize logger");
 
     let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT").expect("Must specify PLAYGROUND_UI_ROOT").into();
-    let address = env::var("PLAYGROUND_UI_ADDRESS").unwrap_or(DEFAULT_ADDRESS.to_string());
+    let address = env::var("PLAYGROUND_UI_ADDRESS").unwrap_or_else(|_| DEFAULT_ADDRESS.to_string());
     let port = env::var("PLAYGROUND_UI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(DEFAULT_PORT);
-    let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or(DEFAULT_LOG_FILE.to_string());
+    let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or_else(|_| DEFAULT_LOG_FILE.to_string());
     let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
 
     let files = Staticfile::new(&root).expect("Unable to open root directory");
@@ -420,7 +420,7 @@ quick_error! {
 
 type Result<T> = ::std::result::Result<T, Error>;
 
-const FATAL_ERROR_JSON: &'static str =
+const FATAL_ERROR_JSON: &str =
     r#"{"error": "Multiple cascading errors occurred, abandon all hope"}"#;
 
 #[derive(Debug, Clone, Serialize)]
