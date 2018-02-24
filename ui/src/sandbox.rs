@@ -372,6 +372,7 @@ fn basic_secure_docker_command() -> Command {
         .arg("run")
         .arg("--rm")
         .arg("--cap-drop=ALL")
+        // Needed to allow overwriting the file
         .arg("--cap-add=DAC_OVERRIDE")
         .arg("--security-opt=no-new-privileges")
         .args(&["--workdir", "/playground"])
