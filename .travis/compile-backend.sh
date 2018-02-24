@@ -15,4 +15,4 @@ docker \
     bash -c 'rustup install nightly && \
              rustup default nightly && \
              rustup target add x86_64-unknown-linux-musl && \
-             cargo build --target=x86_64-unknown-linux-musl --release'
+             cargo build --locked --target=x86_64-unknown-linux-musl --release'
