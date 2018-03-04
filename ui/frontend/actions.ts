@@ -2,7 +2,6 @@ import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url from 'url';
 
-import { load as loadGist, save as saveGist } from './gist';
 import { getCrateType, runAsTest } from './selectors';
 import State from './state';
 import {
@@ -28,6 +27,7 @@ const routes = {
       beta: '/meta/version/beta',
       nightly: '/meta/version/nightly',
     },
+    gist: { pathname: '/meta/gist/' },
   },
 };
 
@@ -534,8 +534,8 @@ function receiveGistLoadFailure() { // eslint-disable-line no-unused-vars
 export function performGistLoad(id): ThunkAction {
   return function(dispatch, _getState) {
     dispatch(requestGistLoad());
-
-    loadGist(id)
+    const u = url.resolve(routes.meta.gist.pathname, id);
+    jsonGet(u)
       .then(gist => dispatch(receiveGistLoadSuccess({ ...gist })));
     // TODO: Failure case
   };
@@ -563,7 +563,7 @@ export function performGistSave() {
 
     const { code, configuration: { channel } } = getState();
 
-    return saveGist(code)
+    return jsonPost(routes.meta.gist, { code })
       .then(json => dispatch(receiveGistSaveSuccess({ ...json, channel })));
     // TODO: Failure case
   };
