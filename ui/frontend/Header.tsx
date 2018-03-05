@@ -5,6 +5,7 @@ import Link from './uss-router/Link';
 import {
   changeChannel,
   changeMode,
+  editCompilerFlags,
   navigateToHelp,
   performClippy,
   performCompileToAssembly,
@@ -67,6 +68,8 @@ const executionLabel = (crateType, tests) => {
 };
 
 class Header extends React.PureComponent<HeaderProps> {
+  private onChange = e => this.props.onEditCompilerFlags(e.target.value);
+
   public render() {
     const {
       execute, compileToAssembly, compileToLLVM, compileToMir, compileToWasm,
@@ -75,7 +78,7 @@ class Header extends React.PureComponent<HeaderProps> {
       crateType, tests,
       toggleConfiguration, navigateToHelp,
       stableVersion, betaVersion, nightlyVersion,
-      wasmAvailable,
+      wasmAvailable, compilerFlags, onEditCompilerFlags,
     } = this.props;
 
     const oneChannel = (value: Channel, labelText, extras) =>
@@ -138,6 +141,16 @@ class Header extends React.PureComponent<HeaderProps> {
           </div>
         </div>
 
+        <div className="header-flags header-set">
+          <legend className="header-set__title">Compiler Options</legend>
+          <div className="editor">
+            <input
+              value={this.props.compilerFlags}
+              onChange={this.onChange}
+              placeholder="-C or -Z"/>
+          </div>
+         </div>
+
         <div className="header-set">
           <div className="header-set__buttons">
             <button className="header-set__btn"
@@ -164,6 +177,8 @@ interface HeaderProps {
   compileToLLVM: () => any;
   compileToMir: () => any;
   compileToWasm: () => any;
+  compilerFlags: string;
+  onEditCompilerFlags: (_: string) => any;
   execute: () => any;
   format: () => any;
   gistSave: () => any;
@@ -179,9 +194,10 @@ interface HeaderProps {
 }
 
 const mapStateToProps = (state: State) => {
-  const { configuration: { channel, mode } } = state;
+  const { compilerFlags, configuration: { channel, mode } } = state;
 
   return {
+    compilerFlags,
     channel,
     mode,
     crateType: getCrateType(state),
@@ -205,6 +221,7 @@ const mapDispatchToProps = ({
   execute: performExecute,
   format: performFormat,
   gistSave: performGistSave,
+  onEditCompilerFlags: editCompilerFlags,
   toggleConfiguration,
 });
 

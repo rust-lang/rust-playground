@@ -13,6 +13,8 @@ const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
 const getCrateTypeRaw = code => (code.match(CRATE_TYPE_RE) || [null, 'bin'])[1];
 export const getCrateType = createSelector([getCode], getCrateTypeRaw);
 
+export const getCompilerFlags = state => state.compilerFlags;
+
 const getStable = (state: State) => state.versions && state.versions.stable;
 const getBeta = (state: State) => state.versions && state.versions.beta;
 const getNightly = (state: State) => state.versions && state.versions.nightly;
