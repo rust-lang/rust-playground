@@ -17,7 +17,7 @@ function install_wasm2wat() {
 }
 
 function install_wasm_gc() {
-    cargo install --git https://github.com/alexcrichton/wasm-gc
+    cargo install wasm-gc
 }
 
 if [[ $1 == "nightly" ]]; then

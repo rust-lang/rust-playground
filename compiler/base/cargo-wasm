@@ -30,6 +30,9 @@ if [[ -n "${crate_type}" ]]; then
     cat >> Cargo.toml <<EOF
 [lib]
 crate-type = ["${crate_type}"]
+
+[profile.release]
+lto = true
 EOF
 fi
 
