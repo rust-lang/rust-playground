@@ -6,4 +6,4 @@ gem "capybara"
 gem "rspec"
 gem 'capybara-screenshot'
 gem 'selenium-webdriver'
-gem 'webdrivers', git: 'https://github.com/shepmaster/webdrivers', branch: 'geckodriver-scraping'
+gem 'webdrivers'

@@ -1,13 +1,3 @@
-GIT
-  remote: https://github.com/shepmaster/webdrivers
-  revision: dc66e7717c0e68df66f7d04087396301b0ccf986
-  branch: geckodriver-scraping
-  specs:
-    webdrivers (3.2.2)
-      nokogiri (~> 1.6)
-      rubyzip (~> 1.0)
-      selenium-webdriver (~> 3.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -54,6 +44,10 @@ GEM
     selenium-webdriver (3.10.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.2)
+    webdrivers (3.2.4)
+      nokogiri (~> 1.6)
+      rubyzip (~> 1.0)
+      selenium-webdriver (~> 3.0)
     xpath (3.0.0)
       nokogiri (~> 1.8)
 
@@ -65,7 +59,7 @@ DEPENDENCIES
   capybara-screenshot
   rspec
   selenium-webdriver
-  webdrivers!
+  webdrivers
 
 RUBY VERSION
    ruby 2.4.1p111
