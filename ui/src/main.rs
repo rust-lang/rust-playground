@@ -41,6 +41,7 @@ use serde::de::DeserializeOwned;
 use playground_middleware::{
     Staticfile, Cache, Prefix, ModifyWith, GuessContentType, FileLogger, StatisticLogger, Rewrite
 };
+use regex::Regex;
 
 use sandbox::Sandbox;
 
@@ -429,20 +430,18 @@ struct ErrorJson {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all="camelCase")]
 struct CompileRequest {
     target: String,
-    #[serde(rename = "assemblyFlavor")]
     assembly_flavor: Option<String>,
-    #[serde(rename = "demangleAssembly")]
     demangle_assembly: Option<String>,
-    #[serde(rename = "processAssembly")]
     process_assembly: Option<String>,
     channel: String,
     mode: String,
-    #[serde(rename = "crateType")]
     crate_type: String,
     tests: bool,
     code: String,
+    compiler_flags: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -553,6 +552,12 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
             _ => target,
         };
 
+        let compiler_flags = if me.compiler_flags.is_empty() {
+            None
+        } else {
+            Some(parse_compiler_flags(&me.compiler_flags)?)
+        };
+
         Ok(sandbox::CompileRequest {
             target,
             channel: parse_channel(&me.channel)?,
@@ -560,6 +565,7 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
             crate_type: parse_crate_type(&me.crate_type)?,
             tests: me.tests,
             code: me.code,
+            compiler_flags,
         })
     }
 }
@@ -758,4 +764,18 @@ fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
         "bin" => sandbox::CrateType::Binary,
         _ => sandbox::CrateType::Library,
     })
+}
+
+fn parse_compiler_flags(s: &str) -> Result<Vec<String>> {
+    lazy_static! {
+        static ref PARSE_FLAG_REGEX: Regex = Regex::new(r"\s*(?P<type>-[ZC])\s+(?P<flag>([-a-z]+)(=[a-z0-9]+)?)").unwrap();
+    }
+
+    let mut flags = Vec::new(); 
+    for cap in PARSE_FLAG_REGEX.captures_iter(s) {
+        flags.push(String::from(&cap["type"]));
+        flags.push(String::from(&cap["flag"]));
+    }
+
+    Ok(flags)
 }

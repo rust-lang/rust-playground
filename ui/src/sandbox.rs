@@ -113,7 +113,7 @@ impl Sandbox {
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
         try!(self.write_source_code(&req.code));
 
-        let mut command = self.compile_command(req.target, req.channel, req.mode, req.crate_type, req.tests);
+        let mut command = self.compile_command(req.target, req.channel, req.mode, req.crate_type, req.tests, &req.compiler_flags);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -257,10 +257,10 @@ impl Sandbox {
         Ok(())
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Command {
+    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, flags: &Option<Vec<String>>) -> Command {
         let mut cmd = self.docker_command(Some(crate_type));
 
-        let execution_cmd = build_execution_command(Some(target), mode, crate_type, tests);
+        let execution_cmd = build_execution_command(Some(target), mode, crate_type, tests, &flags);
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
@@ -272,7 +272,7 @@ impl Sandbox {
     fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Command {
         let mut cmd = self.docker_command(Some(crate_type));
 
-        let execution_cmd = build_execution_command(None, mode, crate_type, tests);
+        let execution_cmd = build_execution_command(None, mode, crate_type, tests, &None);
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
@@ -347,7 +347,7 @@ fn basic_secure_docker_command() -> Command {
     cmd
 }
 
-fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type: CrateType, tests: bool) -> Vec<&'static str> {
+fn build_execution_command<'a>(target: Option<CompileTarget>, mode: Mode, crate_type: CrateType, tests: bool, compiler_flags: &'a Option<Vec<String>>) -> Vec<&str> {
     use self::CompileTarget::*;
     use self::CrateType::*;
     use self::Mode::*;
@@ -385,6 +385,12 @@ fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type
             Mir => cmd.push("--emit=mir"),
             Wasm => { /* handled by cargo-wasm wrapper */ },
          }
+    }
+
+    if let Some(ref flags) = *compiler_flags {
+        for f in flags {
+            cmd.push(f.as_str());
+        }
     }
 
     cmd
@@ -503,6 +509,7 @@ pub struct CompileRequest {
     pub mode: Mode,
     pub tests: bool,
     pub code: String,
+    pub compiler_flags: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone)]
@@ -697,6 +704,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
+            compiler_flags: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -716,6 +724,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
+            compiler_flags: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -736,6 +745,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
+            compiler_flags: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -755,6 +765,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
+            compiler_flags: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -898,5 +909,24 @@ mod test {
         let resp = sb.execute(&req).expect("Unable to execute code");
 
         assert!(resp.stderr.contains("Cannot fork"));
+    }
+
+    #[test]
+    fn compiler_flags() {
+        let req = CompileRequest {
+            target: CompileTarget::LlvmIr,
+            channel: Channel::Nightly,
+            crate_type: CrateType::Binary,
+            mode: Mode::Debug,
+            tests: false,
+            code: HELLO_WORLD_CODE.to_string(),
+            compiler_flags: Some(vec![String::from("-Z"), String::from("time-passes")]),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.compile(&req).expect("Unable to execute code");
+
+        assert!(resp.stdout.contains("time:"));
+        assert!(resp.stdout.contains("rss:"));
     }
 }

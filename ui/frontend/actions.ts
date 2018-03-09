@@ -3,7 +3,7 @@ import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url from 'url';
 
 import { load as loadGist, save as saveGist } from './gist';
-import { getCrateType, runAsTest } from './selectors';
+import { getCompilerFlags, getCrateType, runAsTest } from './selectors';
 import State from './state';
 import {
   AssemblyFlavor,
@@ -304,6 +304,7 @@ function performCompile(target, { request, success, failure }): ThunkAction {
       demangleAssembly,
       processAssembly,
     } } = state;
+    const compilerFlags = getCompilerFlags(state);
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
     const body = {
@@ -312,6 +313,7 @@ function performCompile(target, { request, success, failure }): ThunkAction {
       crateType,
       tests,
       code,
+      compilerFlags,
       target,
       assemblyFlavor,
       demangleAssembly,
@@ -449,6 +451,12 @@ export const GOTO_POSITION = 'GOTO_POSITION';
 
 export function editCode(code) {
   return { type: EDIT_CODE, code };
+}
+
+export const EDIT_COMPILER_FLAGS = 'EDIT_COMPILER_FLAGS';
+
+export function editCompilerFlags(compilerFlags) {
+  return { type: EDIT_COMPILER_FLAGS, compilerFlags };
 }
 
 export function gotoPosition(line, column) {
