@@ -5,6 +5,7 @@ extern crate log;
 extern crate env_logger;
 extern crate iron;
 extern crate mount;
+extern crate router;
 extern crate playground_middleware;
 extern crate bodyparser;
 extern crate serde;
@@ -20,27 +21,32 @@ extern crate lazy_static;
 extern crate petgraph;
 extern crate regex;
 extern crate rustc_demangle;
+extern crate hubcaps;
+extern crate tokio_core;
+extern crate hyper;
+extern crate hyper_tls;
 
 use std::any::Any;
 use std::convert::{TryFrom, TryInto};
 use std::env;
 use std::path::PathBuf;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use corsware::{CorsMiddleware, AllowedOrigins, UniCase};
 use iron::headers::ContentType;
+use iron::method::Method::{Get, Post};
 use iron::modifiers::Header;
 use iron::prelude::*;
 use iron::status;
-use iron::method::Method::{Get, Post};
-use corsware::{CorsMiddleware, AllowedOrigins, UniCase};
-
 use mount::Mount;
-use serde::Serialize;
-use serde::de::DeserializeOwned;
 use playground_middleware::{
     Staticfile, Cache, Prefix, ModifyWith, GuessContentType, FileLogger, StatisticLogger, Rewrite
 };
+use router::Router;
+
+use serde::Serialize;
+use serde::de::DeserializeOwned;
 
 use sandbox::Sandbox;
 
@@ -50,6 +56,7 @@ const DEFAULT_LOG_FILE: &str = "access-log.csv";
 
 mod sandbox;
 mod asm_cleanup;
+mod gist;
 
 const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
 const ONE_DAY_IN_SECONDS: u64 = 60 * 60 * 24;
@@ -58,9 +65,11 @@ const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
 const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
 
 fn main() {
-    env_logger::init().expect("Unable to initialize logger");
+    env_logger::init();
 
     let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT").expect("Must specify PLAYGROUND_UI_ROOT").into();
+    let gh_token = env::var("PLAYGROUND_GITHUB_TOKEN").expect("Must specify PLAYGROUND_GITHUB_TOKEN");
+
     let address = env::var("PLAYGROUND_UI_ADDRESS").unwrap_or_else(|_| DEFAULT_ADDRESS.to_string());
     let port = env::var("PLAYGROUND_UI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(DEFAULT_PORT);
     let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or_else(|_| DEFAULT_LOG_FILE.to_string());
@@ -75,6 +84,10 @@ fn main() {
     files.link_after(Prefix::new(&["assets"], Cache::new(one_year)));
     files.link_after(GuessContentType::new(ContentType::html().0));
 
+    let mut gist_router = Router::new();
+    gist_router.post("/", meta_gist_create, "gist_create");
+    gist_router.get("/:id", meta_gist_get, "gist_get");
+
     let mut mount = Mount::new();
     mount.mount("/", files);
     mount.mount("/compile", compile);
@@ -85,15 +98,18 @@ fn main() {
     mount.mount("/meta/version/stable", meta_version_stable);
     mount.mount("/meta/version/beta", meta_version_beta);
     mount.mount("/meta/version/nightly", meta_version_nightly);
+    mount.mount("/meta/gist", gist_router);
     mount.mount("/evaluate.json", evaluate);
 
     let mut chain = Chain::new(mount);
     let file_logger = FileLogger::new(logfile).expect("Unable to create file logger");
     let logger = StatisticLogger::new(file_logger);
     let rewrite = Rewrite::new(vec![vec!["help".into()]], "/index.html".into());
+    let gh_token = GhToken::new(gh_token);
 
     chain.link_around(logger);
     chain.link_before(rewrite);
+    chain.link_before(gh_token);
 
     if cors_enabled {
         chain.link_around(CorsMiddleware {
@@ -112,6 +128,26 @@ fn main() {
 
     info!("Starting the server on {}:{}", address, port);
     Iron::new(chain).http((&*address, port)).expect("Unable to start server");
+}
+
+#[derive(Debug, Clone)]
+struct GhToken(Arc<String>);
+
+impl GhToken {
+    fn new(token: String) -> Self {
+        GhToken(Arc::new(token))
+    }
+}
+
+impl iron::BeforeMiddleware for GhToken {
+    fn before(&self, req: &mut Request) -> IronResult<()> {
+        req.extensions.insert::<Self>(self.clone());
+        Ok(())
+    }
+}
+
+impl iron::typemap::Key for GhToken {
+    type Value = Self;
 }
 
 fn compile(req: &mut Request) -> IronResult<Response> {
@@ -185,6 +221,27 @@ fn meta_version_nightly(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
+fn meta_gist_create(req: &mut Request) -> IronResult<Response> {
+    let token = req.extensions.get::<GhToken>().unwrap().0.as_ref().clone();
+    serialize_to_response(deserialize_from_request(req, |r: MetaGistCreateRequest| {
+        let gist = gist::create(token, r.code);
+        Ok(MetaGistResponse::from(gist))
+    }))
+}
+
+fn meta_gist_get(req: &mut Request) -> IronResult<Response> {
+    match req.extensions.get::<Router>().unwrap().find("id") {
+        Some(id) => {
+            let token = req.extensions.get::<GhToken>().unwrap().0.as_ref().clone();
+            let gist = gist::load(token, id);
+            serialize_to_response(Ok(MetaGistResponse::from(gist)))
+        }
+        None => {
+            Ok(Response::with(status::UnprocessableEntity))
+        }
+    }
+}
+
 // This is a backwards compatibilty shim. The Rust homepage and the
 // documentation use this to run code in place.
 fn evaluate(req: &mut Request) -> IronResult<Response> {
@@ -219,13 +276,24 @@ where
     F: FnOnce(Sandbox, Req) -> Result<Resp>,
     Req: DeserializeOwned + Clone + Any + 'static,
 {
+    deserialize_from_request(req, |req| {
+        let sandbox = Sandbox::new()?;
+        f(sandbox, req)
+    })
+}
+
+fn deserialize_from_request<Req, Resp, F>(req: &mut Request, f: F) -> Result<Resp>
+where
+    F: FnOnce(Req) -> Result<Resp>,
+    Req: DeserializeOwned + Clone + Any + 'static,
+{
     let body = req.get::<bodyparser::Struct<Req>>()
         .map_err(Error::Deserialization)?;
 
     let req = body.ok_or(Error::RequestMissing)?;
 
-    let sandbox = Sandbox::new()?;
-    let resp = f(sandbox, req)?;
+    let resp = f(req)?;
+
     Ok(resp)
 }
 
@@ -515,6 +583,18 @@ struct MetaVersionResponse {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+struct MetaGistCreateRequest {
+    code: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct MetaGistResponse {
+    id: String,
+    url: String,
+    code: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
 struct EvaluateRequest {
     version: String,
     optimize: String,
@@ -656,6 +736,16 @@ impl From<sandbox::Version> for MetaVersionResponse {
             version: me.release,
             hash: me.commit_hash,
             date: me.commit_date,
+        }
+    }
+}
+
+impl From<gist::Gist> for MetaGistResponse {
+    fn from(me: gist::Gist) -> Self {
+        MetaGistResponse {
+            id: me.id,
+            url: me.url,
+            code: me.code,
         }
     }
 }

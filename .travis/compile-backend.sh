@@ -2,17 +2,16 @@
 
 set -euv -o pipefail
 
+cache_dir=${CACHE_DIR:-$HOME/cache}
+
 docker \
     run \
     -it \
     --rm \
     -v $PWD/ui:/ui \
-    -v $HOME/cache/rust/cargo/git:/root/.cargo/git \
-    -v $HOME/cache/rust/cargo/registry:/root/.cargo/registry \
-    -v $HOME/cache/rust/target:/ui/target \
+    -v $cache_dir/rust/cargo/git:/home/rust/.cargo/git \
+    -v $cache_dir/rust/cargo/registry:/home/rust/.cargo/registry \
+    -v $cache_dir/rust/target:/ui/target \
     --workdir /ui \
-    mackeyja92/rustup \
-    bash -c 'rustup install nightly && \
-             rustup default nightly && \
-             rustup target add x86_64-unknown-linux-musl && \
-             cargo build --locked --target=x86_64-unknown-linux-musl --release'
+    ekidd/rust-musl-builder:nightly \
+    bash -c 'cargo build --locked --target=x86_64-unknown-linux-musl --release'
