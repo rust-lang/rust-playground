@@ -14,4 +14,5 @@ docker \
     -v $cache_dir/rust/target:/ui/target \
     --workdir /ui \
     ekidd/rust-musl-builder:nightly \
-    bash -c 'cargo build --locked --target=x86_64-unknown-linux-musl --release'
+    bash -c 'sudo chown -R rust:rust /home/rust/.cargo /ui/target; \
+             cargo build --locked --target=x86_64-unknown-linux-musl --release'
