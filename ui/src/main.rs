@@ -25,6 +25,7 @@ extern crate hubcaps;
 extern crate tokio_core;
 extern crate hyper;
 extern crate hyper_tls;
+extern crate openssl_probe;
 
 use std::any::Any;
 use std::convert::{TryFrom, TryInto};
@@ -65,6 +66,7 @@ const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
 const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
 
 fn main() {
+    openssl_probe::init_ssl_cert_env_vars();
     env_logger::init();
 
     let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT").expect("Must specify PLAYGROUND_UI_ROOT").into();
