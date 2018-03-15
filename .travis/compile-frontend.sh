@@ -13,4 +13,4 @@ docker \
     node:8.7 \
     bash -c 'yarn && \
              yarn test:lint && \
-             NODE_ENV=production yarn run build'
+             yarn run build:production'

@@ -9,7 +9,7 @@ import { Channel } from './types';
 
 import Loader from './Loader';
 
-const hasProperties = obj => Object.values(obj).some(val => val);
+const hasProperties = obj => Object.values(obj).some(val => !!val);
 
 const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
   if (hasProperties(tabProps)) {
