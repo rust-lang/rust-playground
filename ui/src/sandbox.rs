@@ -286,7 +286,7 @@ impl Sandbox {
 
         let mut cmd = self.docker_command(Some(crate_type));
 
-        cmd.arg("rustfmt").args(&["cargo", "fmt", "--", "--write-mode", "overwrite"]);
+        cmd.arg("rustfmt").args(&["cargo", "fmt"]);
 
         debug!("Formatting command is {:?}", cmd);
 
