@@ -525,3 +525,31 @@ $PHI: 2.61803398875;
         opacity: 1;
     }
 }
+
+.popper {
+  z-index: 10;
+
+  $fg-color: #222;
+  $bg-color: white;
+  $arrow-size: 10px;
+
+  &__arrow {
+    position: absolute;
+    margin: $arrow-size;
+    border: $arrow-size solid transparent;
+  }
+
+  &[data-placement^="bottom"] &__arrow {
+    margin-top: 0;
+    border-top-width: 0;
+    border-bottom-color: $bg-color;
+  }
+
+  &__content {
+    background: $bg-color;
+    color: $fg-color;
+    border-radius: 2px;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    margin: $arrow-size;
+  }
+}
