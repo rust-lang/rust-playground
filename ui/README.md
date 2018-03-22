@@ -1,5 +1,8 @@
 ## Configuration
 
+When developing, you can place these in a [`.env`][dotenv] file on
+disk in this directory.
+
 In production, these should be set according to your deployment method
 of choice.
 
@@ -12,4 +15,5 @@ of choice.
 | `PLAYGROUND_LOG_FILE`     | No       |  access-log.csv | The file to record accesses                                             |
 | `TMPDIR`                  | No       | system-provided | Where compilation artifacts will be saved. Must be accessible to Docker |
 
+[dotenv]: https://crates.io/crates/dotenv
 [gist]: https://developer.github.com/v3/gists/#authentication

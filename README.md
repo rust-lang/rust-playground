@@ -96,11 +96,11 @@ basic HTML/CSS/JS changes, directly open in your browser the built
 `ui/frontend/build/index.html`.
 
 ### Build and run the server
+
+Configure your `.env` file as described in the [ui README](./ui/README.md).
+
 ```
 cd ui
-RUST_LOG=ui=debug \
-PLAYGROUND_UI_ROOT=$PWD/frontend/build/ \
-PLAYGROUND_GITHUB_TOKEN=YOUR_TOKEN \
 cargo run
 ```
 
