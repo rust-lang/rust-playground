@@ -26,10 +26,15 @@ const PopButtonPopper = ({ children }) => (
 
 interface PopButtonProps {
   text: string;
+  children: React.ReactNode | ((_: PopButtonEnhancements) => React.ReactNode);
 }
 
 interface PopButtonState {
   isOpen: boolean;
+}
+
+export interface PopButtonEnhancements {
+  popButtonClose: () => void;
 }
 
 class PopButton extends React.Component<PopButtonProps, PopButtonState> {
@@ -44,15 +49,26 @@ class PopButton extends React.Component<PopButtonProps, PopButtonState> {
     this.setState({ isOpen: !this.state.isOpen });
   }
 
+  private close = () => {
+    this.setState({ isOpen: false });
+  }
+
   public render() {
     const { isOpen } = this.state;
     const { text, children } = this.props;
+
+    const enhancedProps = { popButtonClose: this.close };
+    const enhancedChildren =
+      typeof children === 'function' ?
+        children(enhancedProps) :
+        children;
+
     return (
       <PopButtonStateless
         text={text}
         isOpen={isOpen}
         onClick={this.handleToggleVisibility}>
-        {children}
+        {enhancedChildren}
       </PopButtonStateless>
     );
   }
