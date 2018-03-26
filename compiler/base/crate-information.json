@@ -16,7 +16,7 @@
   },
   {
     "name": "ansi_term",
-    "version": "0.10.2",
+    "version": "0.11.0",
     "id": "ansi_term"
   },
   {
@@ -26,7 +26,7 @@
   },
   {
     "name": "atty",
-    "version": "0.2.6",
+    "version": "0.2.8",
     "id": "atty"
   },
   {
@@ -76,7 +76,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.4",
+    "version": "1.0.9",
     "id": "cc"
   },
   {
@@ -91,7 +91,7 @@
   },
   {
     "name": "clap",
-    "version": "2.30.0",
+    "version": "2.31.2",
     "id": "clap"
   },
   {
@@ -121,17 +121,17 @@
   },
   {
     "name": "crossbeam-deque",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "id": "crossbeam_deque"
   },
   {
     "name": "crossbeam-epoch",
-    "version": "0.3.0",
+    "version": "0.4.1",
     "id": "crossbeam_epoch"
   },
   {
     "name": "crossbeam-utils",
-    "version": "0.2.2",
+    "version": "0.3.2",
     "id": "crossbeam_utils"
   },
   {
@@ -156,7 +156,7 @@
   },
   {
     "name": "deflate",
-    "version": "0.7.17",
+    "version": "0.7.18",
     "id": "deflate"
   },
   {
@@ -171,7 +171,7 @@
   },
   {
     "name": "either",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "id": "either"
   },
   {
@@ -186,7 +186,7 @@
   },
   {
     "name": "env_logger",
-    "version": "0.5.4",
+    "version": "0.5.6",
     "id": "env_logger"
   },
   {
@@ -206,7 +206,7 @@
   },
   {
     "name": "fixedbitset",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "id": "fixedbitset"
   },
   {
@@ -241,13 +241,48 @@
   },
   {
     "name": "futures",
-    "version": "0.1.18",
+    "version": "0.2.0-beta",
     "id": "futures"
+  },
+  {
+    "name": "futures-channel",
+    "version": "0.2.0-beta",
+    "id": "futures_channel"
+  },
+  {
+    "name": "futures-core",
+    "version": "0.2.0-beta",
+    "id": "futures_core"
   },
   {
     "name": "futures-cpupool",
     "version": "0.1.8",
     "id": "futures_cpupool"
+  },
+  {
+    "name": "futures-executor",
+    "version": "0.2.0-beta",
+    "id": "futures_executor"
+  },
+  {
+    "name": "futures-io",
+    "version": "0.2.0-beta",
+    "id": "futures_io"
+  },
+  {
+    "name": "futures-sink",
+    "version": "0.2.0-beta",
+    "id": "futures_sink"
+  },
+  {
+    "name": "futures-stable",
+    "version": "0.2.0-beta",
+    "id": "futures_stable"
+  },
+  {
+    "name": "futures-util",
+    "version": "0.2.0-beta",
+    "id": "futures_util"
   },
   {
     "name": "gcc",
@@ -270,11 +305,6 @@
     "id": "glob"
   },
   {
-    "name": "hpack",
-    "version": "0.2.0",
-    "id": "hpack"
-  },
-  {
     "name": "html5ever",
     "version": "0.18.0",
     "id": "html5ever"
@@ -291,12 +321,12 @@
   },
   {
     "name": "hyper",
-    "version": "0.11.21",
+    "version": "0.11.24",
     "id": "hyper"
   },
   {
     "name": "hyper-tls",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "id": "hyper_tls"
   },
   {
@@ -321,12 +351,12 @@
   },
   {
     "name": "itertools",
-    "version": "0.7.6",
+    "version": "0.7.8",
     "id": "itertools"
   },
   {
     "name": "itoa",
-    "version": "0.3.4",
+    "version": "0.4.1",
     "id": "itoa"
   },
   {
@@ -356,7 +386,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.37",
+    "version": "0.2.40",
     "id": "libc"
   },
   {
@@ -426,7 +456,7 @@
   },
   {
     "name": "mio",
-    "version": "0.6.13",
+    "version": "0.6.14",
     "id": "mio"
   },
   {
@@ -466,7 +496,7 @@
   },
   {
     "name": "num-complex",
-    "version": "0.1.42",
+    "version": "0.1.43",
     "id": "num_complex"
   },
   {
@@ -486,7 +516,7 @@
   },
   {
     "name": "num-traits",
-    "version": "0.2.0",
+    "version": "0.2.2",
     "id": "num_traits"
   },
   {
@@ -506,7 +536,7 @@
   },
   {
     "name": "petgraph",
-    "version": "0.4.11",
+    "version": "0.4.12",
     "id": "petgraph"
   },
   {
@@ -528,6 +558,11 @@
     "name": "phf_shared",
     "version": "0.7.21",
     "id": "phf_shared"
+  },
+  {
+    "name": "pin-api",
+    "version": "0.2.1",
+    "id": "pin_api"
   },
   {
     "name": "pkg-config",
@@ -566,7 +601,7 @@
   },
   {
     "name": "rayon",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "rayon"
   },
   {
@@ -576,12 +611,12 @@
   },
   {
     "name": "regex",
-    "version": "0.2.6",
+    "version": "0.2.10",
     "id": "regex"
   },
   {
     "name": "regex-syntax",
-    "version": "0.4.2",
+    "version": "0.5.3",
     "id": "regex_syntax"
   },
   {
@@ -591,7 +626,7 @@
   },
   {
     "name": "remove_dir_all",
-    "version": "0.3.0",
+    "version": "0.5.0",
     "id": "remove_dir_all"
   },
   {
@@ -631,12 +666,12 @@
   },
   {
     "name": "schannel",
-    "version": "0.1.10",
+    "version": "0.1.11",
     "id": "schannel"
   },
   {
     "name": "scoped-tls",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "id": "scoped_tls"
   },
   {
@@ -666,22 +701,22 @@
   },
   {
     "name": "serde",
-    "version": "1.0.27",
+    "version": "1.0.35",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.27",
+    "version": "1.0.35",
     "id": "serde_derive"
   },
   {
     "name": "serde_derive_internals",
-    "version": "0.19.0",
+    "version": "0.22.1",
     "id": "serde_derive_internals"
   },
   {
     "name": "serde_json",
-    "version": "1.0.10",
+    "version": "1.0.13",
     "id": "serde_json"
   },
   {
@@ -705,11 +740,6 @@
     "id": "smallvec"
   },
   {
-    "name": "solicit",
-    "version": "0.4.4",
-    "id": "solicit"
-  },
-  {
     "name": "string_cache",
     "version": "0.6.2",
     "id": "string_cache"
@@ -731,7 +761,7 @@
   },
   {
     "name": "syn",
-    "version": "0.12.13",
+    "version": "0.12.14",
     "id": "syn"
   },
   {
@@ -771,7 +801,7 @@
   },
   {
     "name": "tempdir",
-    "version": "0.3.6",
+    "version": "0.3.7",
     "id": "tempdir"
   },
   {
@@ -806,7 +836,7 @@
   },
   {
     "name": "thread-id",
-    "version": "3.2.0",
+    "version": "3.3.0",
     "id": "thread_id"
   },
   {
@@ -825,13 +855,23 @@
     "id": "time"
   },
   {
+    "name": "tokio",
+    "version": "0.1.4",
+    "id": "tokio"
+  },
+  {
     "name": "tokio-core",
-    "version": "0.1.12",
+    "version": "0.1.16",
     "id": "tokio_core"
   },
   {
+    "name": "tokio-executor",
+    "version": "0.1.1",
+    "id": "tokio_executor"
+  },
+  {
     "name": "tokio-io",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "id": "tokio_io"
   },
   {
@@ -840,14 +880,34 @@
     "id": "tokio_proto"
   },
   {
+    "name": "tokio-reactor",
+    "version": "0.1.1",
+    "id": "tokio_reactor"
+  },
+  {
     "name": "tokio-service",
     "version": "0.1.0",
     "id": "tokio_service"
   },
   {
+    "name": "tokio-tcp",
+    "version": "0.1.0",
+    "id": "tokio_tcp"
+  },
+  {
+    "name": "tokio-threadpool",
+    "version": "0.1.1",
+    "id": "tokio_threadpool"
+  },
+  {
     "name": "tokio-tls",
     "version": "0.1.4",
     "id": "tokio_tls"
+  },
+  {
+    "name": "tokio-udp",
+    "version": "0.1.0",
+    "id": "tokio_udp"
   },
   {
     "name": "toml",
@@ -863,6 +923,11 @@
     "name": "typeable",
     "version": "0.1.2",
     "id": "typeable"
+  },
+  {
+    "name": "ucd-util",
+    "version": "0.1.1",
+    "id": "ucd_util"
   },
   {
     "name": "unicase",
@@ -926,7 +991,7 @@
   },
   {
     "name": "uuid",
-    "version": "0.6.0",
+    "version": "0.6.2",
     "id": "uuid"
   },
   {
