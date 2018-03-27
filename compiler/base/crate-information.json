@@ -95,6 +95,11 @@
     "id": "clap"
   },
   {
+    "name": "cloudabi",
+    "version": "0.0.3",
+    "id": "cloudabi"
+  },
+  {
     "name": "cmake",
     "version": "0.1.29",
     "id": "cmake"
@@ -560,11 +565,6 @@
     "id": "phf_shared"
   },
   {
-    "name": "pin-api",
-    "version": "0.2.1",
-    "id": "pin_api"
-  },
-  {
     "name": "pkg-config",
     "version": "0.3.9",
     "id": "pkg_config"
@@ -596,8 +596,13 @@
   },
   {
     "name": "rand",
-    "version": "0.4.2",
+    "version": "0.5.0-pre.0",
     "id": "rand"
+  },
+  {
+    "name": "rand_core",
+    "version": "0.1.0-pre.0",
+    "id": "rand_core"
   },
   {
     "name": "rayon",
@@ -701,17 +706,17 @@
   },
   {
     "name": "serde",
-    "version": "1.0.35",
+    "version": "1.0.36",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.35",
+    "version": "1.0.36",
     "id": "serde_derive"
   },
   {
     "name": "serde_derive_internals",
-    "version": "0.22.1",
+    "version": "0.22.2",
     "id": "serde_derive_internals"
   },
   {
@@ -821,7 +826,7 @@
   },
   {
     "name": "termcolor",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "id": "termcolor"
   },
   {
