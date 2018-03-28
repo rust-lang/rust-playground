@@ -29,6 +29,9 @@ blacklist = [
     "security-framework-sys",
     "core-foundation",
     "core-foundation-sys",
+
+    # Not supported on stable
+    "pin-api",
 ]
 
 additions = [
