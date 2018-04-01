@@ -1,6 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Link from './uss-router/Link';
+
+import BuildMenu from './BuildMenu';
+import ChannelMenu from './ChannelMenu';
+import ConfigMenu from './ConfigMenu';
+import HeaderButton, { RightIcon as RightIconButton } from './HeaderButton';
+import { BuildIcon, ConfigIcon, HelpIcon, MoreOptionsIcon } from './Icon';
+import ModeMenu from './ModeMenu';
+import PopButton, { PopButtonEnhancements } from './PopButton';
+import { SegmentedButton, SegmentedButtonSet, SegmentedLink } from './SegmentedButton';
+import ToolsMenu from './ToolsMenu';
 
 import {
   changeChannel,
@@ -18,7 +27,10 @@ import {
 } from './actions';
 import {
   betaVersionText,
+  getChannelLabel,
   getCrateType,
+  getExecutionLabel,
+  getModeLabel,
   isWasmAvailable,
   nightlyVersionText,
   runAsTest,
@@ -27,190 +39,128 @@ import {
 import State from './state';
 import { Channel, Mode } from './types';
 
-function oneRadio<T>(
-  name: string,
-  currentValue: T,
-  possibleValue: T,
-  change: (T) => any,
-  labelText: string,
-  extra?: any,
-) {
-  const id = `${name}-${possibleValue}`;
-  return [
-    (
-      <input
-        className="header-set__radio"
-        type="radio"
-        name={name}
-        id={id}
-        key={`${id}-input`}
-        checked={currentValue === possibleValue}
-        onChange={() => change(possibleValue)} />
-    ),
-    (
-      <label
-        {...extra}
-        className="header-set__radio-label"
-        htmlFor={id}
-        key={`${id}-label`}
-      >
-        {labelText}
-      </label>
-    ),
-  ];
-}
-
-const executionLabel = (crateType, tests) => {
-  if (tests) { return 'Test'; }
-  if (crateType === 'bin') { return 'Run'; }
-  return 'Build';
-};
-
-class Header extends React.PureComponent<HeaderProps> {
-  public render() {
-    const {
-      execute, compileToAssembly, compileToLLVM, compileToMir, compileToWasm,
-      format, clippy, gistSave,
-      channel, changeChannel, mode, changeMode,
-      crateType, tests,
-      toggleConfiguration, navigateToHelp,
-      stableVersion, betaVersion, nightlyVersion,
-      wasmAvailable,
-    } = this.props;
-
-    const oneChannel = (value: Channel, labelText, extras) =>
-      oneRadio('channel', channel, value, changeChannel, labelText, extras);
-    const oneMode = (value: Mode, labelText) =>
-      oneRadio('mode', mode, value, changeMode, labelText);
-
-    const primaryLabel = executionLabel(crateType, tests);
-
-    return (
-      <div className="header">
-        <div className="header-compilation header-set">
-          <button className="header-set__btn header-set__btn--primary"
-            onClick={execute}>{primaryLabel}</button>
-          <div className="header-set__buttons header-set__buttons--primary">
-            <button className="header-set__btn"
-              onClick={compileToAssembly}>ASM</button>
-            <button className="header-set__btn"
-              onClick={compileToLLVM}>LLVM IR</button>
-            <button className="header-set__btn"
-              onClick={compileToMir}>MIR</button>
-            <button className="header-set__btn"
-              disabled={!wasmAvailable}
-              title={wasmAvailable ? undefined : 'Compilation to WASM requires the nightly channel'}
-              onClick={compileToWasm}>WASM</button>
-          </div>
-        </div>
-
-        <div className="header-tools header-set">
-          <legend className="header-set__title">Tools</legend>
-          <div className="header-set__buttons">
-            <button className="header-set__btn"
-              onClick={format}>Format</button>
-            <button className="header-set__btn"
-              onClick={clippy}>Clippy</button>
-          </div>
-        </div>
-
-        <div className="header-sharing header-set">
-          <div className="header-set__buttons">
-            <button className="header-set__btn"
-              onClick={gistSave}>Share</button>
-          </div>
-        </div>
-
-        <div className="header-mode header-set">
-          <legend className="header-set__title">Mode</legend>
-          <div className="header-set__buttons header-set__buttons--radio">
-            {oneMode(Mode.Debug, 'Debug')}
-            {oneMode(Mode.Release, 'Release')}
-          </div>
-        </div>
-
-        <div className="header-channel header-set">
-          <legend className="header-set__title">Channel</legend>
-          <div className="header-set__buttons header-set__buttons--radio">
-            {oneChannel(Channel.Stable, 'Stable', { title: stableVersion })}
-            {oneChannel(Channel.Beta, 'Beta', { title: betaVersion })}
-            {oneChannel(Channel.Nightly, 'Nightly', { title: nightlyVersion })}
-          </div>
-        </div>
-
-        <div className="header-set">
-          <div className="header-set__buttons">
-            <button className="header-set__btn"
-              onClick={toggleConfiguration}>Config</button>
-          </div>
-        </div>
-
-        <div className="header-set">
-          <div className="header-set__buttons">
-            <Link className="header-set__btn" action={navigateToHelp}>?</Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
 interface HeaderProps {
-  changeChannel: (Channel) => any;
-  changeMode: (Mode) => any;
-  channel: Channel;
-  clippy: () => any;
-  compileToAssembly: () => any;
-  compileToLLVM: () => any;
-  compileToMir: () => any;
-  compileToWasm: () => any;
-  execute: () => any;
-  format: () => any;
-  gistSave: () => any;
-  mode: Mode;
-  crateType: string;
-  tests: boolean;
-  toggleConfiguration: () => any;
+  executionLabel: string;
+  modeLabel: string;
+  channelLabel: string;
   navigateToHelp: () => any;
-  stableVersion: string;
-  betaVersion: string;
-  nightlyVersion: string;
-  wasmAvailable: boolean;
+  execute: () => any;
+  gistSave: () => any;
 }
 
-const mapStateToProps = (state: State) => {
-  const { configuration: { channel, mode } } = state;
+const Header: React.SFC<HeaderProps> = props => (
+  <div className="header">
+    <HeaderSet id="build">
+      <SegmentedButtonSet>
+        <SegmentedButton isBuild onClick={props.execute}>
+          <RightIconButton icon={<BuildIcon />}>
+            {props.executionLabel}
+          </RightIconButton>
+        </SegmentedButton>
+        <PopButton button={BuildMenuButton}>
+          <BuildMenu />
+        </PopButton>
+      </SegmentedButtonSet>
+    </HeaderSet>
+    <HeaderSet id="channel-mode">
+      <SegmentedButtonSet>
+        <PopButton
+          button={p => <ModeMenuButton label={props.modeLabel} {...p} />}>
+          <ModeMenu />
+        </PopButton>
+        <PopButton
+          button={p => <ChannelMenuButton label={props.channelLabel}{...p} />}>
+          <ChannelMenu />
+        </PopButton>
+      </SegmentedButtonSet>
+    </HeaderSet>
+    <HeaderSet id="share">
+      <SegmentedButtonSet>
+        <SegmentedButton title="Create shareable links to this code" onClick={props.gistSave}>
+          <HeaderButton >Share</HeaderButton>
+        </SegmentedButton>
+      </SegmentedButtonSet>
+    </HeaderSet>
+    <HeaderSet id="tools">
+      <SegmentedButtonSet>
+        <PopButton button={ToolsMenuButton}>
+          <ToolsMenu />
+        </PopButton>
+      </SegmentedButtonSet>
+    </HeaderSet>
+    <HeaderSet id="config">
+      <SegmentedButtonSet>
+        <PopButton button={ConfigMenuButton}>
+          <ConfigMenu />
+        </PopButton>
+      </SegmentedButtonSet>
+    </HeaderSet>
+    <HeaderSet id="help">
+      <SegmentedButtonSet>
+        <SegmentedLink title="View help" action={props.navigateToHelp}>
+          <HeaderButton icon={<HelpIcon />} />
+        </SegmentedLink>
+      </SegmentedButtonSet>
+    </HeaderSet>
+  </div >
+);
 
-  return {
-    channel,
-    mode,
-    crateType: getCrateType(state),
-    tests: runAsTest(state),
-    navigateToHelp,
-    stableVersion: stableVersionText(state),
-    betaVersion: betaVersionText(state),
-    nightlyVersion: nightlyVersionText(state),
-    wasmAvailable: isWasmAvailable(state),
-  };
-};
+interface HeaderSetProps {
+  id: string;
+}
 
-const mapDispatchToProps = ({
-  changeChannel,
-  changeMode,
-  clippy: performClippy,
-  compileToAssembly: performCompileToAssembly,
-  compileToLLVM: performCompileToLLVM,
-  compileToMir: performCompileToMir,
-  compileToWasm: performCompileToWasm,
-  execute: performExecute,
-  format: performFormat,
-  gistSave: performGistSave,
-  toggleConfiguration,
+const HeaderSet: React.SFC<HeaderSetProps> = ({ id, children }) => (
+  <div className={`header__set header__set--${id}`}>{children}</div>
+);
+
+const BuildMenuButton: React.SFC<PopButtonEnhancements> = ({ popButtonProps }) => (
+  <SegmentedButton title="Select what to build" {...popButtonProps}>
+    <HeaderButton icon={<MoreOptionsIcon />} />
+  </SegmentedButton>
+);
+
+interface ModeMenuButtonProps extends PopButtonEnhancements {
+  label: string;
+}
+
+const ModeMenuButton: React.SFC<ModeMenuButtonProps> = ({ label, popButtonProps }) => (
+  <SegmentedButton title="Mode &mdash; Choose the optimization level" {...popButtonProps}>
+    <HeaderButton isExpandable>{label}</HeaderButton>
+  </SegmentedButton>
+);
+
+interface ChannelMenuButtonProps extends PopButtonEnhancements {
+  label: string;
+}
+
+const ChannelMenuButton: React.SFC<ChannelMenuButtonProps> = ({ label, popButtonProps }) => (
+  <SegmentedButton title="Channel &mdash; Choose the Rust version"  {...popButtonProps}>
+    <HeaderButton isExpandable>{label}</HeaderButton>
+  </SegmentedButton>
+);
+
+const ToolsMenuButton: React.SFC<PopButtonEnhancements> = ({ popButtonProps }) => (
+  <SegmentedButton title="Run extra tools on the source code" {...popButtonProps}>
+    <HeaderButton isExpandable>Tools</HeaderButton>
+  </SegmentedButton>
+);
+
+const ConfigMenuButton: React.SFC<PopButtonEnhancements> = ({ popButtonProps }) => (
+  <SegmentedButton title="Show the configuration options" {...popButtonProps}>
+    <HeaderButton icon={<ConfigIcon />} isExpandable>Config</HeaderButton>
+  </SegmentedButton>
+);
+
+const mapStateToProps = (state: State) => ({
+  executionLabel: getExecutionLabel(state),
+  modeLabel: getModeLabel(state),
+  channelLabel: getChannelLabel(state),
+  navigateToHelp,
 });
 
-const ConnectedHeader = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Header);
+const mapDispatchToProps = ({
+  execute: performExecute,
+  gistSave: performGistSave,
+});
 
-export default ConnectedHeader;
+export default connect(mapStateToProps, mapDispatchToProps)(Header);
