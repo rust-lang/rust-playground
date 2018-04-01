@@ -572,6 +572,70 @@ $header-transition: 0.2s ease-in-out;
   }
 }
 
+.menu-group {
+  width: 27em;
+  padding: 0.75em 1em 0 1em;
+
+  &:last-child {
+    padding-bottom: 0.75em;
+  }
+
+  line-height: normal;
+
+  &__title {
+    margin: 0;
+
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 11px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid $header-main-border;
+  }
+
+  &__content {
+    padding: 1em 0.25em;
+  }
+}
+
+.menu-item {
+  margin-bottom: 1em;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@mixin menu-item-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.button-menu-item {
+  @include button-reset;
+
+  transition: color $header-transition;
+
+  &:hover {
+    color: $header-tint;
+  }
+
+  &__name {
+    @include menu-item-title;
+    margin: 0;
+  }
+
+  &__description {
+    margin: 0;
+  }
+}
+
+.build-menu {
+  &__aside {
+    margin: 0.25em 0 0 0;
+    color: #888;
+  }
+}
+
 .header-button {
   height: 3em;
   padding: 0 1.25em;

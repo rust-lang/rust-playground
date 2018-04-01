@@ -12,18 +12,9 @@ import { SegmentedButton, SegmentedButtonSet, SegmentedLink } from './SegmentedB
 import ToolsMenu from './ToolsMenu';
 
 import {
-  changeChannel,
-  changeMode,
   navigateToHelp,
-  performClippy,
-  performCompileToAssembly,
-  performCompileToLLVM,
-  performCompileToMir,
-  performCompileToWasm,
   performExecute,
-  performFormat,
   performGistSave,
-  toggleConfiguration,
 } from './actions';
 import {
   betaVersionText,
@@ -37,7 +28,6 @@ import {
   stableVersionText,
 } from './selectors';
 import State from './state';
-import { Channel, Mode } from './types';
 
 interface HeaderProps {
   executionLabel: string;
@@ -57,9 +47,9 @@ const Header: React.SFC<HeaderProps> = props => (
             {props.executionLabel}
           </RightIconButton>
         </SegmentedButton>
-        <PopButton button={BuildMenuButton}>
-          <BuildMenu />
-        </PopButton>
+        <PopButton button={BuildMenuButton}>{({ popButtonClose }) => (
+          <BuildMenu close={popButtonClose} />
+        )}</PopButton>
       </SegmentedButtonSet>
     </HeaderSet>
     <HeaderSet id="channel-mode">

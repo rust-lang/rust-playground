@@ -444,6 +444,11 @@ export const performCompileToWasm = () =>
     failure: receiveCompileWasmFailure,
   });
 
+export const performCompileToNightlyWasm: ThunkAction = () => dispatch => {
+  dispatch(changeChannel(Channel.Nightly));
+  dispatch(performCompileToWasm());
+};
+
 export const EDIT_CODE = 'EDIT_CODE';
 export const GOTO_POSITION = 'GOTO_POSITION';
 
