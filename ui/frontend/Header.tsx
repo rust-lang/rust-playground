@@ -80,9 +80,9 @@ const Header: React.SFC<HeaderProps> = props => (
     </HeaderSet>
     <HeaderSet id="config">
       <SegmentedButtonSet>
-        <PopButton button={ConfigMenuButton}>
-          <ConfigMenu />
-        </PopButton>
+        <PopButton button={ConfigMenuButton}>{({ popButtonClose }) => (
+          <ConfigMenu close={popButtonClose} />
+        )}</PopButton>
       </SegmentedButtonSet>
     </HeaderSet>
     <HeaderSet id="help">

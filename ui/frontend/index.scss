@@ -689,6 +689,72 @@ $header-transition: 0.2s ease-in-out;
   }
 }
 
+.config-element {
+  display: flex;
+  align-items: center;
+
+  &__name {
+    flex: 1;
+    font-size: 13px;
+  }
+
+  &__value {
+    flex: 1;
+  }
+
+  &__select {
+    width: 100%;
+  }
+
+  &__toggle {
+    display: flex;
+
+    input {
+      display: none;
+    }
+
+    label {
+      $border: 1px solid #bbb;
+
+      flex: 1;
+      padding: 0 1em;
+
+      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 600;
+      color: #777;
+      text-align: center;
+
+      cursor: pointer;
+
+      border: $border;
+      border-top-left-radius: $header-border-radius;
+      border-bottom-left-radius: $header-border-radius;
+      border-right-width: 0;
+
+      ~ label {
+        border-right-width: 1px;
+        border-left: $border;
+        border-radius: 0 $header-border-radius $header-border-radius 0;
+      }
+
+      &:hover {
+        background: hsla(208, 100%, 43%, 0.1);
+      }
+    }
+
+    :checked + label {
+      border-color: $header-tint;
+      background: $header-tint;
+      color: #fff;
+
+      ~ label {
+        border-left-width: 0;
+      }
+    }
+  }
+}
+
 .header-button {
   height: 3em;
   padding: 0 1.25em;
