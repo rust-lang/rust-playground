@@ -100,6 +100,7 @@ basic HTML/CSS/JS changes, directly open in your browser the built
 cd ui
 RUST_LOG=ui=debug \
 PLAYGROUND_UI_ROOT=$PWD/frontend/build/ \
+PLAYGROUND_GITHUB_TOKEN=YOUR_TOKEN \
 cargo run
 ```
 
