@@ -6,6 +6,7 @@ import {
   Editor,
   Mode,
   Orientation,
+  PageMode,
   ProcessAssembly,
 } from '../types';
 
@@ -20,6 +21,7 @@ export interface State {
   processAssembly: ProcessAssembly;
   channel: Channel;
   mode: Mode;
+  pageMode: PageMode
 }
 
 export const DEFAULT: State = {
@@ -33,12 +35,15 @@ export const DEFAULT: State = {
   processAssembly: ProcessAssembly.Filter,
   channel: Channel.Stable,
   mode: Mode.Debug,
+  pageMode: PageMode.Normal
 };
 
 export default function configuration(state = DEFAULT, action: Action): State {
   switch (action.type) {
   case ActionType.ToggleConfiguration:
     return { ...state, shown: !state.shown };
+  case ActionType.ChangePageMode:
+    return { ...state, pageMode: action.pageMode };
   case ActionType.ChangeEditor:
     return { ...state, editor: action.editor };
   case ActionType.ChangeKeybinding:

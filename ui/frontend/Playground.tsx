@@ -7,7 +7,7 @@ import Header from './Header';
 import Output from './Output';
 import { Focus } from './reducers/output/meta';
 import State from './state';
-import { Orientation } from './types';
+import { Orientation, PageMode } from './types';
 
 const ConfigurationModal: React.SFC = () => (
   <div className="modal-backdrop">
@@ -17,14 +17,14 @@ const ConfigurationModal: React.SFC = () => (
   </div>
 );
 
-const Playground: React.SFC<Props> = ({ showConfig, focus, splitOrientation }) => {
+const Playground: React.SFC<Props> = ({ showConfig, focus, splitOrientation, pageMode }) => {
   const config = showConfig ? <ConfigurationModal /> : null;
   const outputFocused = focus ? 'playground-output-focused' : '';
   const splitClass = 'playground-split';
   const orientation = splitClass + '-' + splitOrientation;
 
   return (
-    <div>
+    <div className={`playground-mode-${pageMode}`}>
       {config}
       <div className="playground">
         <div className="playground-header">
@@ -45,11 +45,13 @@ const Playground: React.SFC<Props> = ({ showConfig, focus, splitOrientation }) =
 
 interface Props {
   focus?: Focus;
+  pageMode: PageMode;
   showConfig: boolean;
   splitOrientation: Orientation;
 }
 
 const mapStateToProps = (state: State) => ({
+  pageMode: state.configuration.pageMode,
   showConfig: state.configuration.shown,
   focus: state.output.meta.focus,
   splitOrientation: state.configuration.orientation,

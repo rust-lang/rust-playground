@@ -25,7 +25,7 @@ import {
   stableVersionText,
 } from './selectors';
 import State from './state';
-import { Channel, Mode } from './types';
+import { Channel, Mode, PageMode } from './types';
 
 function oneRadio<T>(
   name: string,
@@ -71,7 +71,7 @@ class Header extends React.PureComponent<HeaderProps> {
     const {
       execute, compileToAssembly, compileToLLVM, compileToMir, compileToWasm,
       format, clippy, gistSave,
-      channel, changeChannel, mode, changeMode,
+      channel, changeChannel, mode, changeMode, pageMode,
       crateType, tests,
       toggleConfiguration, navigateToHelp,
       stableVersion, betaVersion, nightlyVersion,
@@ -84,6 +84,15 @@ class Header extends React.PureComponent<HeaderProps> {
       oneRadio('mode', mode, value, changeMode, labelText);
 
     const primaryLabel = executionLabel(crateType, tests);
+
+
+      const share = pageMode === PageMode.Presentation ? '' : <div className="header-sharing header-set">
+        <div className="header-set__buttons">
+          <button className="header-set__btn"
+            onClick={gistSave}>Share</button>
+          </div>
+        </div>;
+
 
     return (
       <div className="header">
@@ -108,40 +117,35 @@ class Header extends React.PureComponent<HeaderProps> {
           <legend className="header-set__title">Tools</legend>
           <div className="header-set__buttons">
             <button className="header-set__btn"
-              onClick={format}>Format</button>
+              onClick={format}>{pageMode === PageMode.Presentation ? 'F' : 'Format'}</button>
             <button className="header-set__btn"
-              onClick={clippy}>Clippy</button>
+              onClick={clippy}>{pageMode === PageMode.Presentation ? 'C' : 'Format'}</button>
           </div>
         </div>
 
-        <div className="header-sharing header-set">
-          <div className="header-set__buttons">
-            <button className="header-set__btn"
-              onClick={gistSave}>Share</button>
-          </div>
-        </div>
+        {share}
 
         <div className="header-mode header-set">
           <legend className="header-set__title">Mode</legend>
           <div className="header-set__buttons header-set__buttons--radio">
-            {oneMode(Mode.Debug, 'Debug')}
-            {oneMode(Mode.Release, 'Release')}
+            {oneMode(Mode.Debug, pageMode === PageMode.Presentation ? 'D' : 'Debug')}
+            {oneMode(Mode.Release, pageMode === PageMode.Presentation ? 'R' : 'Release')}
           </div>
         </div>
 
         <div className="header-channel header-set">
           <legend className="header-set__title">Channel</legend>
           <div className="header-set__buttons header-set__buttons--radio">
-            {oneChannel(Channel.Stable, 'Stable', { title: stableVersion })}
-            {oneChannel(Channel.Beta, 'Beta', { title: betaVersion })}
-            {oneChannel(Channel.Nightly, 'Nightly', { title: nightlyVersion })}
+            {oneChannel(Channel.Stable, pageMode === PageMode.Presentation ? 'S' : 'Stable', { title: stableVersion })}
+            {oneChannel(Channel.Beta, pageMode === PageMode.Presentation ? 'B' : 'Beta', { title: betaVersion })}
+            {oneChannel(Channel.Nightly, pageMode === PageMode.Presentation ? 'N' : 'Nightly', { title: nightlyVersion })}
           </div>
         </div>
 
         <div className="header-set">
           <div className="header-set__buttons">
             <button className="header-set__btn"
-              onClick={toggleConfiguration}>Config</button>
+              onClick={toggleConfiguration}>{pageMode === PageMode.Presentation ? 'C' : 'Config'}</button>
           </div>
         </div>
 
@@ -168,6 +172,7 @@ interface HeaderProps {
   format: () => any;
   gistSave: () => any;
   mode: Mode;
+  pageMode: PageMode;
   crateType: string;
   tests: boolean;
   toggleConfiguration: () => any;
@@ -179,11 +184,12 @@ interface HeaderProps {
 }
 
 const mapStateToProps = (state: State) => {
-  const { configuration: { channel, mode } } = state;
+  const { configuration: { channel, mode, pageMode } } = state;
 
   return {
     channel,
     mode,
+    pageMode,
     crateType: getCrateType(state),
     tests: runAsTest(state),
     navigateToHelp,
