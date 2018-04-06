@@ -22,7 +22,6 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 end
 
-require 'capybara-screenshot/rspec'
 require 'capybara/rspec'
 require 'webdrivers'
 
@@ -44,7 +43,6 @@ Capybara.default_driver = :firefox
 Capybara.app_host = "http://#{ADDRESS}:#{PORT}"
 Capybara.run_server = false
 Capybara.default_max_wait_time = 5
-Capybara.save_path = File.join(Dir.pwd, "screenshots")
 
 RSpec.configure do |config|
   config.before do
