@@ -29,6 +29,7 @@ body {
     background-color: $background;
     padding: 0 1em;
     font-family: $primary-font;
+    overflow-y: hidden;
 }
 
 @mixin split-first-child() {
