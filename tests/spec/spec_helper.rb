@@ -43,6 +43,7 @@ Capybara.default_driver = :firefox
 Capybara.app_host = "http://#{ADDRESS}:#{PORT}"
 Capybara.run_server = false
 Capybara.default_max_wait_time = 5
+Capybara.automatic_label_click = true
 
 RSpec.configure do |config|
   config.before do

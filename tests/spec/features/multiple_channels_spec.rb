@@ -11,7 +11,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
   end
 
   scenario "using stable Rust" do
-    choose_styled("Stable")
+    in_channel_menu { click_on("Stable") }
     click_on("Run")
 
     within('.output-stdout') do
@@ -22,7 +22,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
   end
 
   scenario "using beta Rust" do
-    choose_styled("Beta")
+    in_channel_menu { click_on("Beta") }
     click_on("Run")
 
     within('.output-stdout') do
@@ -33,7 +33,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
   end
 
   scenario "using nightly Rust" do
-    choose_styled("Nightly")
+    in_channel_menu { click_on("Nightly") }
     click_on("Run")
 
     within('.output-stdout') do
