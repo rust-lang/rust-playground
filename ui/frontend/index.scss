@@ -683,6 +683,12 @@ $header-transition: 0.2s ease-in-out;
   }
 }
 
+.channel-menu {
+  &__description {
+    margin: 0;
+  }
+}
+
 .header-button {
   height: 3em;
   padding: 0 1.25em;

@@ -23,11 +23,14 @@ const getStable = (state: State) => state.versions && state.versions.stable;
 const getBeta = (state: State) => state.versions && state.versions.beta;
 const getNightly = (state: State) => state.versions && state.versions.nightly;
 
-export const stableVersionText = createSelector([getStable], v => v ? v.version : '');
+const versionNumber = v => v ? v.version : '';
+export const stableVersionText = createSelector([getStable], versionNumber);
+export const betaVersionText = createSelector([getBeta], versionNumber);
+export const nightlyVersionText = createSelector([getNightly], versionNumber);
 
-const nonStable = v => v ? `${v.version} (${v.date} ${v.hash})` : '';
-export const betaVersionText = createSelector([getBeta], nonStable);
-export const nightlyVersionText = createSelector([getNightly], nonStable);
+const versionDetails = v => v ? `${v.date} ${v.hash.slice(0, 20)}` : '';
+export const betaVersionDetailsText = createSelector([getBeta], versionDetails);
+export const nightlyVersionDetailsText = createSelector([getNightly], versionDetails);
 
 export const isWasmAvailable = (state: State) => (
   state.configuration.channel === Channel.Nightly
