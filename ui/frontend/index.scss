@@ -629,6 +629,53 @@ $header-transition: 0.2s ease-in-out;
   }
 }
 
+// TODO: add 'menu'?
+.selectable-item {
+  width: 100%;
+  @include button-reset;
+
+  transition: color $header-transition;
+
+  &__header {
+    display: flex;
+    align-items: center;
+  }
+
+  &__name {
+    @include menu-item-title;
+  }
+
+  &__description {
+    padding-left: 2em;
+  }
+
+  &:hover {
+    color: $header-tint;
+  }
+
+  &--selected {
+    font-weight: 600;
+    color: $header-tint;
+  }
+
+  &__checkmark {
+    margin-right: 0.5em;
+
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  &:hover &__checkmark {
+    opacity: 0.5;
+    color: $header-tint;
+  }
+
+  &--selected &__checkmark,
+  &--selected:hover &__checkmark {
+    opacity: 1;
+  }
+}
+
 .build-menu {
   &__aside {
     margin: 0.25em 0 0 0;

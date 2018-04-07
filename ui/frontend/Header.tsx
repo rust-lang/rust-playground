@@ -55,9 +55,9 @@ const Header: React.SFC<HeaderProps> = props => (
     <HeaderSet id="channel-mode">
       <SegmentedButtonSet>
         <PopButton
-          button={p => <ModeMenuButton label={props.modeLabel} {...p} />}>
-          <ModeMenu />
-        </PopButton>
+          button={p => <ModeMenuButton label={props.modeLabel} {...p} />}>{({ popButtonClose }) => (
+            <ModeMenu close={popButtonClose} />
+          )}</PopButton>
         <PopButton
           button={p => <ChannelMenuButton label={props.channelLabel}{...p} />}>
           <ChannelMenu />
