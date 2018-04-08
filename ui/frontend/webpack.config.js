@@ -23,7 +23,6 @@ const developmentFilenameTemplate = '[name]-[chunkhash]';
 const productionFilenameTemplate = '[chunkhash]';
 
 module.exports = function(_, argv) {
-  console.log(argv.mode);
   const isProduction = argv.mode === 'production';
   const filenameTemplate =
         isProduction ?
