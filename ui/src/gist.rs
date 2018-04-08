@@ -28,7 +28,7 @@ impl From<gists::Gist> for Gist {
             _ => {
                 files
                     .into_iter()
-                    .map(|(name, content)| format!("// ${}\n\n{}\n\n", name, content))
+                    .map(|(name, content)| format!("// {}\n\n{}\n\n", name, content))
                     .collect()
             }
         };

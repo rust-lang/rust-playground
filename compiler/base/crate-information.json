@@ -66,7 +66,7 @@
   },
   {
     "name": "byteorder",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "id": "byteorder"
   },
   {
@@ -86,7 +86,7 @@
   },
   {
     "name": "chrono",
-    "version": "0.4.0",
+    "version": "0.4.2",
     "id": "chrono"
   },
   {
@@ -101,7 +101,7 @@
   },
   {
     "name": "cmake",
-    "version": "0.1.29",
+    "version": "0.1.30",
     "id": "cmake"
   },
   {
@@ -246,17 +246,17 @@
   },
   {
     "name": "futures",
-    "version": "0.2.0-beta",
+    "version": "0.2.0",
     "id": "futures"
   },
   {
     "name": "futures-channel",
-    "version": "0.2.0-beta",
+    "version": "0.2.0",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.2.0-beta",
+    "version": "0.2.0",
     "id": "futures_core"
   },
   {
@@ -266,27 +266,27 @@
   },
   {
     "name": "futures-executor",
-    "version": "0.2.0-beta",
+    "version": "0.2.0",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.2.0-beta",
+    "version": "0.2.0",
     "id": "futures_io"
   },
   {
     "name": "futures-sink",
-    "version": "0.2.0-beta",
+    "version": "0.2.0",
     "id": "futures_sink"
   },
   {
     "name": "futures-stable",
-    "version": "0.2.0-beta",
+    "version": "0.2.0",
     "id": "futures_stable"
   },
   {
     "name": "futures-util",
-    "version": "0.2.0-beta",
+    "version": "0.2.0",
     "id": "futures_util"
   },
   {
@@ -326,7 +326,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.11.24",
+    "version": "0.11.25",
     "id": "hyper"
   },
   {
@@ -581,7 +581,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "0.2.3",
+    "version": "0.3.6",
     "id": "proc_macro2"
   },
   {
@@ -591,7 +591,7 @@
   },
   {
     "name": "quote",
-    "version": "0.4.2",
+    "version": "0.5.1",
     "id": "quote"
   },
   {
@@ -706,17 +706,17 @@
   },
   {
     "name": "serde",
-    "version": "1.0.36",
+    "version": "1.0.37",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.36",
+    "version": "1.0.37",
     "id": "serde_derive"
   },
   {
     "name": "serde_derive_internals",
-    "version": "0.22.2",
+    "version": "0.23.0",
     "id": "serde_derive_internals"
   },
   {
@@ -766,7 +766,7 @@
   },
   {
     "name": "syn",
-    "version": "0.12.14",
+    "version": "0.13.1",
     "id": "syn"
   },
   {
@@ -791,7 +791,7 @@
   },
   {
     "name": "syslog",
-    "version": "3.3.0",
+    "version": "4.0.0",
     "id": "syslog"
   },
   {
@@ -861,7 +861,7 @@
   },
   {
     "name": "tokio",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "id": "tokio"
   },
   {
@@ -871,7 +871,7 @@
   },
   {
     "name": "tokio-executor",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "id": "tokio_executor"
   },
   {
@@ -901,8 +901,13 @@
   },
   {
     "name": "tokio-threadpool",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "id": "tokio_threadpool"
+  },
+  {
+    "name": "tokio-timer",
+    "version": "0.2.1",
+    "id": "tokio_timer"
   },
   {
     "name": "tokio-tls",
@@ -916,7 +921,7 @@
   },
   {
     "name": "toml",
-    "version": "0.4.5",
+    "version": "0.4.6",
     "id": "toml"
   },
   {
@@ -1058,10 +1063,5 @@
     "name": "xattr",
     "version": "0.1.11",
     "id": "xattr"
-  },
-  {
-    "name": "xml-rs",
-    "version": "0.7.0",
-    "id": "xml"
   }
 ]

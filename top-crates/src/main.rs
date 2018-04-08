@@ -261,7 +261,7 @@ fn main() {
     };
 
     // Write manifest file.
-    let cargo_toml = "result.Cargo.toml";
+    let cargo_toml = "../compiler/base/Cargo.toml";
     write_manifest(manifest, cargo_toml);
     println!("wrote {}", cargo_toml);
 
@@ -285,7 +285,7 @@ fn main() {
         }
     }
 
-    let path = "crate-information.json";
+    let path = "../compiler/base/crate-information.json";
     let mut f = File::create(path)
         .unwrap_or_else(|e| panic!("Unable to create {}: {}", path, e));
     serde_json::to_writer_pretty(&mut f, &infos)
