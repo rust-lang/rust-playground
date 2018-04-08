@@ -20,7 +20,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     within('.header') { click_on("Clippy") }
 
     within(".output-stderr") do
-      expect(page).to have_content 'warn(eq_op)'
+      expect(page).to have_content 'deny(eq_op)'
       expect(page).to have_content 'warn(zero_divided_by_zero)'
     end
   end
