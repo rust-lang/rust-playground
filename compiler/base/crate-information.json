@@ -95,11 +95,6 @@
     "id": "clap"
   },
   {
-    "name": "cloudabi",
-    "version": "0.0.3",
-    "id": "cloudabi"
-  },
-  {
     "name": "cmake",
     "version": "0.1.30",
     "id": "cmake"
@@ -598,16 +593,6 @@
     "name": "quote",
     "version": "0.5.1",
     "id": "quote"
-  },
-  {
-    "name": "rand",
-    "version": "0.5.0-pre.0",
-    "id": "rand"
-  },
-  {
-    "name": "rand_core",
-    "version": "0.1.0",
-    "id": "rand_core"
   },
   {
     "name": "rayon",
