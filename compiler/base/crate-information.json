@@ -31,7 +31,7 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "id": "backtrace"
   },
   {
@@ -61,7 +61,7 @@
   },
   {
     "name": "build_const",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "id": "build_const"
   },
   {
@@ -76,7 +76,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "id": "cc"
   },
   {
@@ -191,7 +191,7 @@
   },
   {
     "name": "env_logger",
-    "version": "0.5.6",
+    "version": "0.5.7",
     "id": "env_logger"
   },
   {
@@ -206,7 +206,7 @@
   },
   {
     "name": "filetime",
-    "version": "0.1.15",
+    "version": "0.2.0",
     "id": "filetime"
   },
   {
@@ -430,6 +430,11 @@
     "id": "matches"
   },
   {
+    "name": "md5",
+    "version": "0.3.7",
+    "id": "md5"
+  },
+  {
     "name": "memchr",
     "version": "2.0.1",
     "id": "memchr"
@@ -601,7 +606,7 @@
   },
   {
     "name": "rand_core",
-    "version": "0.1.0-pre.0",
+    "version": "0.1.0",
     "id": "rand_core"
   },
   {
@@ -621,7 +626,7 @@
   },
   {
     "name": "regex-syntax",
-    "version": "0.5.3",
+    "version": "0.5.5",
     "id": "regex_syntax"
   },
   {
@@ -706,28 +711,33 @@
   },
   {
     "name": "serde",
-    "version": "1.0.37",
+    "version": "1.0.38",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.37",
+    "version": "1.0.38",
     "id": "serde_derive"
   },
   {
     "name": "serde_derive_internals",
-    "version": "0.23.0",
+    "version": "0.23.1",
     "id": "serde_derive_internals"
   },
   {
     "name": "serde_json",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "id": "serde_json"
   },
   {
     "name": "serde_urlencoded",
     "version": "0.5.1",
     "id": "serde_urlencoded"
+  },
+  {
+    "name": "sha1",
+    "version": "0.6.0",
+    "id": "sha1"
   },
   {
     "name": "siphasher",
@@ -751,7 +761,7 @@
   },
   {
     "name": "string_cache_codegen",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "id": "string_cache_codegen"
   },
   {
@@ -801,7 +811,7 @@
   },
   {
     "name": "tar",
-    "version": "0.4.14",
+    "version": "0.4.15",
     "id": "tar"
   },
   {
@@ -866,7 +876,7 @@
   },
   {
     "name": "tokio-core",
-    "version": "0.1.16",
+    "version": "0.1.17",
     "id": "tokio_core"
   },
   {
@@ -1001,12 +1011,12 @@
   },
   {
     "name": "uuid",
-    "version": "0.6.2",
+    "version": "0.6.3",
     "id": "uuid"
   },
   {
     "name": "vcpkg",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "id": "vcpkg"
   },
   {
@@ -1061,7 +1071,7 @@
   },
   {
     "name": "xattr",
-    "version": "0.1.11",
+    "version": "0.2.1",
     "id": "xattr"
   }
 ]
