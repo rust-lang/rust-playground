@@ -32,7 +32,9 @@ class Link extends React.Component<LinkProps> {
   };
 }
 
-interface LinkProps extends React.HTMLAttributes<HTMLAnchorElement> {
+type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
+
+export interface LinkProps extends Omit<React.HTMLProps<HTMLAnchorElement>, 'action'> {
   dispatch: (_: any) => any;
   action?: () => any;
   onClick?: () => any;

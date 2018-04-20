@@ -12,13 +12,11 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
 
   context "when AT&T syntax is selected" do
     before do
-      click_on("Config")
-      select("AT&T")
-      click_on("Done")
+      in_config_menu { choose("AT&T") }
     end
 
     scenario "compiling to assembly" do
-      within('.header') { click_on("ASM") }
+      in_build_menu { click_on("assembly") }
 
       within('.output-code') do
         # We demangle the symbols
@@ -31,13 +29,11 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
 
   context "when Intel syntax is selected" do
     before do
-      click_on("Config")
-      select("Intel")
-      click_on("Done")
+      in_config_menu { choose("Intel") }
     end
 
     scenario "compiling to assembly" do
-      within('.header') { click_on("ASM") }
+      in_build_menu { click_on("assembly") }
 
       within('.output-code') do
         # We demangle the symbols
@@ -49,7 +45,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   end
 
   scenario "compiling to LLVM IR" do
-    within('.header') { click_on("LLVM IR") }
+    in_build_menu { click_on("LLVM IR") }
 
     within('.output-code') do
       expect(page).to have_content 'ModuleID'
@@ -59,7 +55,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   end
 
   scenario "compiling to MIR" do
-    within('.header') { click_on("MIR") }
+    in_build_menu { click_on("MIR") }
 
     within('.output-code') do
       expect(page).to have_content 'StorageLive'
@@ -68,10 +64,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   end
 
   scenario "compiling to WebAssembly" do
-    within('.header') do
-      choose_styled("Nightly")
-      click_on("WASM")
-    end
+    in_build_menu { click_on("WASM") }
 
     within('.output-code') do
       expect(page).to have_content '(module'
@@ -83,7 +76,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     before { editor.set("fn main() {") }
 
     scenario "it shows the compilation error" do
-      within('.header') { click_on("MIR") }
+      in_build_menu { click_on("MIR") }
 
       within('.output-stderr') do
         expect(page).to have_content 'an un-closed delimiter'

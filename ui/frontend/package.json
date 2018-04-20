@@ -16,6 +16,8 @@
     "react": "^16.0.0",
     "react-ace": "^5.4.0",
     "react-dom": "^16.0.0",
+    "react-popper": "^0.9.5",
+    "react-portal": "^4.1.4",
     "react-prism": "^4.0.0",
     "react-redux": "^5.0.0",
     "redux": "^3.5.2",

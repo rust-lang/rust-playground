@@ -1,12 +1,22 @@
+# coding: utf-8
+
 require 'spec_helper'
 require 'support/editor'
 
 RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
-  # Our headers hide the radio button proper, so we need to enable
-  # looking for invisible elements.
-  RSpec::Matchers.define :have_checked_header do |expected|
+  RSpec::Matchers.define :have_mode do |expected|
     match do |actual|
-      expect(actual).to have_checked_field(expected, visible: false)
+      within actual.find_button("Mode — Choose the optimization level") do |page|
+        expect(page).to have_text(expected)
+      end
+    end
+  end
+
+  RSpec::Matchers.define :have_channel do |expected|
+    match do |actual|
+      within actual.find_button("Channel — Choose the Rust version") do |page|
+        expect(page).to have_text(expected)
+      end
     end
   end
 
@@ -26,7 +36,7 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
   scenario "loading from a Gist with a channel preserves the channel" do
     visit '/?gist=20fb1e0475f890d0fdb7864e3ad0820c&version=beta'
 
-    expect(page).to have_checked_header('Beta')
+    expect(page).to have_channel('Beta')
   end
 
   scenario "loading code directly from a parameter" do
@@ -38,13 +48,13 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
   scenario "loading with a channel" do
     visit '/?version=nightly'
 
-    expect(page).to have_checked_header('Nightly')
+    expect(page).to have_channel('Nightly')
   end
 
   scenario "loading with a mode" do
     visit '/?mode=release'
 
-    expect(page).to have_checked_header('Release')
+    expect(page).to have_mode('Release')
   end
 
   def editor
