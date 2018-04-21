@@ -29,7 +29,6 @@ body {
     background-color: $background;
     padding: 0 1em;
     font-family: $primary-font;
-    overflow-y: hidden;
 }
 
 @mixin split-first-child() {
@@ -534,6 +533,11 @@ $header-transition: 0.2s ease-in-out;
 .popper {
   z-index: 10;
   font-size: 12px;
+
+  // Prevents the popper from shifting when adding it to the DOM
+  // triggers showing the scrollbars.
+  // https://github.com/FezVrasta/popper.js/issues/457#issuecomment-367692177
+  top: 0;
 
   $fg-color: #222;
   $bg-color: white;
