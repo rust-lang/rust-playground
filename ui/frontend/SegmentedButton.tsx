@@ -6,12 +6,11 @@ export const SegmentedButtonSet: React.SFC<{}> = ({ children }) => (
   <div className="segmented-button">{children}</div>
 );
 
-interface SegmentedButtonProps extends React.HTMLProps<HTMLButtonElement> {
-  isBuild?: boolean;
-  innerRef: React.Ref<HTMLElement>;
+interface SegmentedButtonInnerProps extends SegmentedButtonProps {
+  innerRef: React.Ref<HTMLButtonElement>;
 }
 
-const SegmentedButtonInner: React.SFC<SegmentedButtonProps> = ({ innerRef, isBuild, children, ...props }) => (
+const SegmentedButtonInner: React.SFC<SegmentedButtonInnerProps> = ({ innerRef, isBuild, children, ...props }) => (
   <button
     ref={innerRef}
     {...props}
@@ -20,16 +19,20 @@ const SegmentedButtonInner: React.SFC<SegmentedButtonProps> = ({ innerRef, isBui
   </button>
 );
 
-export const SegmentedButton = React.forwardRef((props, ref) => (
+interface SegmentedButtonProps extends React.HTMLProps<HTMLButtonElement> {
+  isBuild?: boolean;
+}
+
+export const SegmentedButton = React.forwardRef<HTMLButtonElement, SegmentedButtonProps>((props, ref) => (
   <SegmentedButtonInner innerRef={ref} {...props} />
 ));
 
-interface SegmentedLinkProps {
-  title?: string;
-  innerRef: React.Ref<any>;
+interface SegmentedLinkInnerProps extends LinkProps {
+  // I can't figure out how to make these types line up
+  innerRef: any;
 }
 
-const SegmentedLinkInner: React.SFC<SegmentedLinkProps> = ({ innerRef, children, ...props }) => (
+const SegmentedLinkInner: React.SFC<SegmentedLinkInnerProps> = ({ innerRef, children, ...props }) => (
   <Link
     ref={innerRef}
     {...props}
@@ -38,6 +41,6 @@ const SegmentedLinkInner: React.SFC<SegmentedLinkProps> = ({ innerRef, children,
   </Link>
 );
 
-export const SegmentedLink = React.forwardRef((props, ref) => (
+export const SegmentedLink = React.forwardRef<typeof Link, LinkProps>((props, ref) => (
   <SegmentedLinkInner innerRef={ref} {...props} />
 ));
