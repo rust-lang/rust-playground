@@ -51,7 +51,7 @@ interface PopButtonPopperProps {
 const PopButtonPopper: React.SFC<PopButtonPopperProps> = ({ setPopperRef, children }) => (
   <Portal>
     <div ref={setPopperRef}>
-      <Popper className="popper" placement="bottom">
+      <Popper className="popper" placement="bottom" modifiers={{ computeStyle: { gpuAcceleration: false } }}>
         <Arrow className="popper__arrow" />
         <div className="popper__content">{children}</div>
       </Popper>
