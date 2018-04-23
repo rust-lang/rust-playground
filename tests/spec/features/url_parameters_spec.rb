@@ -39,6 +39,12 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
     expect(page).to have_channel('Beta')
   end
 
+  scenario "loading from a Gist with a mode preserves the mode" do
+    visit '/?gist=20fb1e0475f890d0fdb7864e3ad0820c&mode=release'
+
+    expect(page).to have_mode('Release')
+  end
+
   scenario "loading code directly from a parameter" do
     visit '/?code=fn%20main()%20%7B%0A%20%20%20%20println!(%22Hello%2C%20world!%22)%3B%0A%7D'
 
