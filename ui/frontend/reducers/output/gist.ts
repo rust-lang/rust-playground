@@ -23,8 +23,8 @@ export default function gist(state = DEFAULT, action) {
 
   case actions.GIST_LOAD_SUCCEEDED:
   case actions.GIST_SAVE_SUCCEEDED: {
-    const { id, url, channel } = action;
-    return finish(state, { id, url, channel });
+    const { id, url, channel, mode } = action;
+    return finish(state, { id, url, channel, mode });
   }
 
   case actions.GIST_LOAD_FAILED:
