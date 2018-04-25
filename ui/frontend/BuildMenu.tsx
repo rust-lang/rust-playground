@@ -10,12 +10,14 @@ import {
   performExecute,
 } from './actions';
 
-import { Channel } from './types';
+import { isWasmAvailable } from './selectors';
+import State from './state';
 
 import ButtonMenuItem from './ButtonMenuItem';
 import MenuGroup from './MenuGroup';
 
 interface BuildMenuProps {
+  isWasmAvailable: boolean;
   compileToAssembly: () => any;
   compileToLLVM: () => any;
   compileToMir: () => any;
@@ -23,6 +25,13 @@ interface BuildMenuProps {
   execute: () => any;
   close: () => void;
 }
+
+const WasmAside: React.SFC<{}> = props => (
+  <p className="build-menu__aside">
+     Note: WASM currently requires using the Nightly channel, selecting this
+     option will switch to Nightly.
+  </p>
+);
 
 const BuildMenu: React.SFC<BuildMenuProps> = props => (
   <MenuGroup title="What do you want to do?">
@@ -40,13 +49,16 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => (
     </ButtonMenuItem>
     <ButtonMenuItem name="WASM" onClick={() => { props.compileToWasm(); props.close(); }}>
       Build a WebAssembly module for web browsers, in the .WAT textual representation.
-      <p className="build-menu__aside">
-        Note: WASM currently requires using the Nightly channel, selecting this
-        option will switch to Nightly.
-      </p>
+      {!props.isWasmAvailable && <WasmAside />}
     </ButtonMenuItem>
   </MenuGroup >
 );
+
+const mapStateToProps = (state: State) => {
+  return {
+    isWasmAvailable: isWasmAvailable(state),
+  };
+};
 
 const mapDispatchToProps = ({
   compileToAssembly: performCompileToAssembly,
@@ -56,4 +68,4 @@ const mapDispatchToProps = ({
   execute: performExecute,
 });
 
-export default connect(undefined, mapDispatchToProps)(BuildMenu);
+export default connect(mapStateToProps, mapDispatchToProps)(BuildMenu);
