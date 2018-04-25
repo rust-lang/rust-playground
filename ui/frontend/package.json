@@ -60,7 +60,7 @@
     "webpack-cli": "^2.0.12"
   },
   "scripts": {
-    "test:lint": "tslint --config tslint.json --exclude './**/node_modules/**/*' './**/*.ts?(x)'",
+    "test:lint": "tslint --config tslint.json --exclude \"./**/node_modules/**/*\" \"./**/*.ts?(x)\"",
     "build": "webpack --progress --colors --mode development",
     "build:production": "webpack --progress --colors --mode production",
     "watch": "yarn run build --watch"
