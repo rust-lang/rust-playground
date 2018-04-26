@@ -20,12 +20,14 @@ export function configureRustErrors({ gotoPosition, getChannel }) {
       const [errorCode] = errorMatch;
       env.tag = 'a';
       env.attributes.href = `https://doc.rust-lang.org/${getChannel()}/error-index.html#${errorCode}`;
+      env.attributes.target = '_blank';
     }
     if (env.type === 'see-issue') {
       const errorMatch = /\d+/.exec(env.content);
       const [errorCode] = errorMatch;
       env.tag = 'a';
       env.attributes.href = `https://github.com/rust-lang/rust/issues/${errorCode}`;
+      env.attributes.target = '_blank';
     }
     if (env.type === 'error-location') {
       const errorMatch = /(\d+):(\d+)/.exec(env.content);
