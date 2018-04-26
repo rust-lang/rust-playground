@@ -1,6 +1,6 @@
 import Prism from 'prismjs';
 
-export function configureRustErrors(gotoPosition) {
+export function configureRustErrors({ gotoPosition, getChannel }) {
   Prism.languages.rust_errors = { // eslint-disable-line camelcase
     'warning': /warning:.*\n/,
     'error': {
@@ -19,13 +19,15 @@ export function configureRustErrors(gotoPosition) {
       const errorMatch = /E\d+/.exec(env.content);
       const [errorCode] = errorMatch;
       env.tag = 'a';
-      env.attributes.href = `https://doc.rust-lang.org/error-index.html#${errorCode}`;
+      env.attributes.href = `https://doc.rust-lang.org/${getChannel()}/error-index.html#${errorCode}`;
+      env.attributes.target = '_blank';
     }
     if (env.type === 'see-issue') {
       const errorMatch = /\d+/.exec(env.content);
       const [errorCode] = errorMatch;
       env.tag = 'a';
       env.attributes.href = `https://github.com/rust-lang/rust/issues/${errorCode}`;
+      env.attributes.target = '_blank';
     }
     if (env.type === 'error-location') {
       const errorMatch = /(\d+):(\d+)/.exec(env.content);

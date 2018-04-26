@@ -20,7 +20,10 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const enhancers = composeEnhancers(middlewares, persistState(undefined, { serialize, deserialize }));
 const store = createStore(playgroundApp, enhancers);
 
-configureRustErrors((line, col) => store.dispatch(gotoPosition(line, col)));
+configureRustErrors({
+  gotoPosition: (line, col) => store.dispatch(gotoPosition(line, col)),
+  getChannel: () => store.getState().configuration.channel,
+});
 
 store.dispatch(performCratesLoad());
 store.dispatch(performVersionsLoad());
