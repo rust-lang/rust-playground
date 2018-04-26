@@ -7,6 +7,7 @@ export function configureRustErrors(gotoPosition) {
       pattern: /error(\[E\d+\])?:.*\n/,
       inside: {
         'error-explanation': /\[E\d+\]/,
+        'see-issue': /see issue #\d+/,
       },
     },
     'error-location': /-->.*\n/,
@@ -19,6 +20,12 @@ export function configureRustErrors(gotoPosition) {
       const [errorCode] = errorMatch;
       env.tag = 'a';
       env.attributes.href = `https://doc.rust-lang.org/error-index.html#${errorCode}`;
+    }
+    if (env.type === 'see-issue') {
+      const errorMatch = /\d+/.exec(env.content);
+      const [errorCode] = errorMatch;
+      env.tag = 'a';
+      env.attributes.href = `https://github.com/rust-lang/rust/issues/${errorCode}`;
     }
     if (env.type === 'error-location') {
       const errorMatch = /(\d+):(\d+)/.exec(env.content);
