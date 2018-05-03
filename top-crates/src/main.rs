@@ -35,8 +35,6 @@ struct OneCrate {
 struct Crate {
     #[serde(rename="id")]
     name: String,
-    #[serde(rename="max_version")]
-    version: String,
 }
 
 /// A Cargo.toml file.
@@ -91,14 +89,6 @@ impl Modifications {
     fn blacklisted(&self, name: &str) -> bool {
         self.blacklist.iter().any(|n| n == name)
     }
-
-    fn additions(&self, existing_names: &[&str]) -> Vec<&str> {
-        let existing_names: BTreeSet<_> = existing_names.iter().collect();
-        self.additions.iter()
-            .map(|n| n.as_str())
-            .filter(|n| !existing_names.contains(n))
-            .collect()
-    }
 }
 
 lazy_static! {
@@ -128,30 +118,13 @@ impl TopCrates {
 
     /// Add crates that have been hand-picked
     fn add_curated_crates(&mut self) {
-        let added_crates: Vec<_> = {
-            let names = self.names();
-            let new_names = MODIFICATIONS.additions(&names);
-
-            new_names.into_iter().map(|name| {
-                let api_url = format!("https://crates.io/api/v1/crates/{}", name);
-
-                let resp =
-                    reqwest::get(&api_url)
-                    .unwrap_or_else(|e| panic!("Could not fetch crate {}: {}", name, e));
-                assert!(resp.status().is_success());
-
-                let one: OneCrate = serde_json::from_reader(resp)
-                    .unwrap_or_else(|e| panic!("Crate {} had invalid JSON: {}", name, e));
-
-                one.krate
-            }).collect()
-        };
-
-        self.crates.extend(added_crates);
-    }
-
-    fn names(&self) -> Vec<&str> {
-        self.crates.iter().map(|c| c.name.as_str()).collect()
+        self.crates.extend({
+            MODIFICATIONS
+                .additions
+                .iter()
+                .cloned()
+                .map(|name| Crate { name })
+        });
     }
 }
 
@@ -218,23 +191,28 @@ fn main() {
     let mut top = TopCrates::download();
     top.add_curated_crates();
 
+    // Find the newest (non-prerelease, non-yanked) versions of all
+    // the interesting crates.
     let mut summaries = Vec::new();
-    for Crate { ref name, ref version } in top.crates {
+    for Crate { ref name } in top.crates {
         if MODIFICATIONS.blacklisted(name) {
             continue;
         }
 
-        // Query the registry for summary of this crate.
-        let dep = Dependency::parse_no_deprecated(name, Some(version), &crates_io)
-            .unwrap_or_else(|e| panic!("Unable to parse dependency for {}:{}: {}", name, version, e));
+        // Query the registry for a summary of this crate.
+        // Usefully, this doesn't seem to include yanked versions
+        let dep = Dependency::parse_no_deprecated(name, None, &crates_io)
+            .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
         let matches = registry.query_vec(&dep).unwrap_or_else(|e| {
-            panic!("Unable to query registry for {}:{}: {}", name, version, e);
+            panic!("Unable to query registry for {}: {}", name, e);
         });
-        if matches.len() != 1 {
-            panic!("expected one registry match for `{}:{}`", name, version);
-        }
-        let summary = matches.into_iter().next().unwrap();
+
+        // Find the newest non-prelease version
+        let summary = matches.into_iter()
+            .filter(|summary| !summary.version().is_prerelease())
+            .max_by_key(|summary| summary.version().clone())
+            .unwrap_or_else(|| panic!("Registry has no viable versions of {}", name));
 
         // Add a dependency on this crate.
         let method = decide_features(&summary);
