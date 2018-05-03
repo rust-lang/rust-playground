@@ -90,6 +90,7 @@ module.exports = function(_, argv) {
         chunksSortMode: 'dependency',
       }),
       new CopyPlugin([
+        { from: 'favicon.ico', to: '..' },
         { from: 'robots.txt', to: '..' },
       ]),
       new MiniCssExtractPlugin({
