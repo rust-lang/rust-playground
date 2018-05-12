@@ -95,11 +95,6 @@
     "id": "clap"
   },
   {
-    "name": "cmake",
-    "version": "0.1.31",
-    "id": "cmake"
-  },
-  {
     "name": "color_quant",
     "version": "1.0.0",
     "id": "color_quant"
@@ -506,12 +501,12 @@
   },
   {
     "name": "num-integer",
-    "version": "0.1.36",
+    "version": "0.1.38",
     "id": "num_integer"
   },
   {
     "name": "num-iter",
-    "version": "0.1.35",
+    "version": "0.1.37",
     "id": "num_iter"
   },
   {
@@ -521,7 +516,7 @@
   },
   {
     "name": "num-traits",
-    "version": "0.2.2",
+    "version": "0.2.4",
     "id": "num_traits"
   },
   {
@@ -701,12 +696,12 @@
   },
   {
     "name": "serde",
-    "version": "1.0.53",
+    "version": "1.0.54",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.53",
+    "version": "1.0.54",
     "id": "serde_derive"
   },
   {
@@ -766,7 +761,7 @@
   },
   {
     "name": "syn",
-    "version": "0.13.7",
+    "version": "0.13.9",
     "id": "syn"
   },
   {
@@ -851,7 +846,7 @@
   },
   {
     "name": "time",
-    "version": "0.1.39",
+    "version": "0.1.40",
     "id": "time"
   },
   {
@@ -1011,7 +1006,7 @@
   },
   {
     "name": "vec_map",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "id": "vec_map"
   },
   {
