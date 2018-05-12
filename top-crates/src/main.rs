@@ -12,7 +12,7 @@ use std::collections::btree_map::Entry;
 use std::fs::File;
 use std::io::{Read, Write};
 
-use cargo::core::{Dependency, Source, SourceId, Summary};
+use cargo::core::{Dependency, Package, Source, SourceId, Summary};
 use cargo::core::registry::PackageRegistry;
 use cargo::core::resolver::{self, Method, Resolve};
 use cargo::sources::RegistrySource;
@@ -41,14 +41,15 @@ struct Crate {
 /// A Cargo.toml file.
 #[derive(Serialize)]
 struct TomlManifest {
-    package: Package,
+    package: TomlPackage,
     profile: Profiles,
-    dependencies: BTreeMap<String, String>,
+    #[serde(serialize_with = "toml::ser::tables_last")]
+    dependencies: BTreeMap<String, DependencySpec>,
 }
 
 /// Header of Cargo.toml file.
 #[derive(Serialize)]
-struct Package {
+struct TomlPackage {
     name: String,
     version: String,
     authors: Vec<String>,
@@ -84,6 +85,34 @@ struct Profile {
 struct Profiles {
     dev: Profile,
     release: Profile,
+}
+
+/// `"1.0.0"` or `{ version = "1.0.0", features = ["..."] }`
+#[derive(Serialize, Clone)]
+#[serde(untagged)]
+enum DependencySpec {
+    String(String),
+    #[serde(rename_all = "kebab-case")]
+    Explicit {
+        version: String,
+        #[serde(skip_serializing_if = "Vec::is_empty")]
+        features: Vec<String>,
+        #[serde(skip_serializing_if = "is_true")]
+        default_features: bool,
+    }
+}
+
+impl DependencySpec {
+    fn version(&self) -> String {
+        match *self {
+            DependencySpec::String(ref version) |
+            DependencySpec::Explicit { ref version, .. } => version.clone(),
+        }
+    }
+}
+
+fn is_true(b: &bool) -> bool {
+    *b
 }
 
 impl Modifications {
@@ -152,7 +181,7 @@ fn decide_features(summary: &Summary) -> Method<'static> {
     }
 }
 
-fn unique_latest_crates(resolve: Resolve) -> BTreeMap<String, String> {
+fn unique_latest_crates(resolve: Resolve) -> BTreeMap<String, DependencySpec> {
     let mut uniqs = BTreeMap::new();
     for pkg in resolve.iter() {
         if MODIFICATIONS.blacklisted(pkg.name().as_str()) {
@@ -174,8 +203,89 @@ fn unique_latest_crates(resolve: Resolve) -> BTreeMap<String, String> {
     }
 
     uniqs.into_iter()
-         .map(|(name, version)| (name.to_string(), version.to_string()))
+         .map(|(name, version)| (
+             name.to_string(),
+             DependencySpec::String(version.to_string()),
+         ))
          .collect()
+}
+
+/// Updates `dep` to include features specified by the custom metadata of `pkg`.
+///
+/// Our custom metadata format looks like:
+///
+///     [package.metadata.playground]
+///     default-features = true
+///     features = ["std", "extra-traits"]
+///     all-features = false
+///
+/// All fields are optional.
+fn fill_playground_metadata_features(dep: &mut DependencySpec, pkg: &Package) {
+    let custom_metadata = match pkg.manifest().custom_metadata() {
+        Some(custom_metadata) => custom_metadata,
+        None => return,
+    };
+
+    let playground_metadata = match custom_metadata.get("playground") {
+        Some(playground_metadata) => playground_metadata,
+        None => return,
+    };
+
+    #[derive(Deserialize)]
+    #[serde(default, rename_all = "kebab-case")]
+    struct Metadata {
+        features: Vec<String>,
+        default_features: bool,
+        all_features: bool,
+    }
+
+    impl Default for Metadata {
+        fn default() -> Self {
+            Metadata {
+                features: Vec::new(),
+                default_features: true,
+                all_features: false,
+            }
+        }
+    }
+
+    let metadata = match playground_metadata.clone().try_into::<Metadata>() {
+        Ok(metadata) => metadata,
+        Err(err) => {
+            eprintln!(
+                "Failed to parse custom metadata for {} {}: {}",
+                pkg.name(), pkg.version(), err);
+            return;
+        }
+    };
+
+    // If `all-features` is set then we ignore `features`.
+    let summary = pkg.summary();
+    let mut enabled_features: BTreeSet<String> = if metadata.all_features {
+        summary.features().keys().cloned().collect()
+    } else {
+        metadata.features.into_iter().collect()
+    };
+
+    // If not opting out of default features, remove default features from the
+    // explicit features list. This avoids ongoing spurious diffs in our
+    // generated Cargo.toml as default features are added to a library.
+    if metadata.default_features {
+        if let Some(default_feature_names) = summary.features().get("default") {
+            enabled_features.remove("default");
+            for feature in default_feature_names {
+                enabled_features.remove(&feature.to_string(summary));
+            }
+        }
+    }
+
+    if !enabled_features.is_empty() || !metadata.default_features {
+        *dep = DependencySpec::Explicit {
+            version: dep.version(),
+            features: enabled_features.into_iter().collect(),
+            default_features: metadata.default_features,
+        };
+    }
 }
 
 fn write_manifest(manifest: TomlManifest, path: &str) {
@@ -231,28 +341,13 @@ fn main() {
         .expect("Unable to resolve dependencies");
 
     // Construct playground's Cargo.toml.
-    let unique_latest_crates = unique_latest_crates(res);
-    let manifest = TomlManifest {
-        package: Package {
-            name: "playground".to_owned(),
-            version: "0.0.1".to_owned(),
-            authors: vec!["The Rust Playground".to_owned()],
-        },
-        profile: Profiles {
-            dev: Profile { codegen_units: 1, incremental: false },
-            release: Profile { codegen_units: 1, incremental: false },
-        },
-        dependencies: unique_latest_crates.clone(),
-    };
-
-    // Write manifest file.
-    let cargo_toml = "../compiler/base/Cargo.toml";
-    write_manifest(manifest, cargo_toml);
-    println!("wrote {}", cargo_toml);
+    let mut unique_latest_crates = unique_latest_crates(res);
 
     let mut infos = Vec::new();
 
-    for (name, version) in unique_latest_crates {
+    for (name, spec) in &mut unique_latest_crates {
+        let version = spec.version();
+
         let pkgid = cargo::core::PackageId::new(&name, &version, &crates_io)
             .unwrap_or_else(|e| panic!("Unable to build PackageId for {} {}: {}", name, version, e));
 
@@ -268,7 +363,27 @@ fn main() {
                 })
             }
         }
+
+        fill_playground_metadata_features(spec, &pkg);
     }
+
+    let manifest = TomlManifest {
+        package: TomlPackage {
+            name: "playground".to_owned(),
+            version: "0.0.1".to_owned(),
+            authors: vec!["The Rust Playground".to_owned()],
+        },
+        profile: Profiles {
+            dev: Profile { codegen_units: 1, incremental: false },
+            release: Profile { codegen_units: 1, incremental: false },
+        },
+        dependencies: unique_latest_crates,
+    };
+
+    // Write manifest file.
+    let cargo_toml = "../compiler/base/Cargo.toml";
+    write_manifest(manifest, cargo_toml);
+    println!("wrote {}", cargo_toml);
 
     let path = "../compiler/base/crate-information.json";
     let mut f = File::create(path)
