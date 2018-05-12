@@ -12,7 +12,7 @@ use std::collections::btree_map::Entry;
 use std::fs::File;
 use std::io::{Read, Write};
 
-use cargo::core::{Dependency, Package, Source, SourceId, Summary};
+use cargo::core::{Dependency, Package, Source, SourceId};
 use cargo::core::registry::PackageRegistry;
 use cargo::core::resolver::{self, Method, Resolve};
 use cargo::sources::RegistrySource;
@@ -155,29 +155,6 @@ impl TopCrates {
                 .cloned()
                 .map(|name| Crate { name })
         });
-    }
-}
-
-fn decide_features(summary: &Summary) -> Method<'static> {
-    // Enable `playground` feature if present.
-    if summary.features().contains_key("playground") {
-        // Would put this in a lazy_static, but its type is Vec<InternedString>
-        // and InternedString is not publicly nameable.
-        let features = Method::split_features(&["playground".to_owned()]);
-
-        Method::Required {
-            dev_deps: false,
-            features: Box::leak(Box::new(features)),
-            uses_default_features: false,
-            all_features: false,
-        }
-    } else {
-        Method::Required {
-            dev_deps: false,
-            features: &[],
-            uses_default_features: true,
-            all_features: false,
-        }
     }
 }
 
@@ -328,8 +305,12 @@ fn main() {
             .unwrap_or_else(|| panic!("Registry has no viable versions of {}", name));
 
         // Add a dependency on this crate.
-        let method = decide_features(&summary);
-        summaries.push((summary, method));
+        summaries.push((summary, Method::Required {
+            dev_deps: false,
+            features: &[],
+            uses_default_features: true,
+            all_features: false,
+        }));
     }
 
     // Resolve transitive dependencies.
