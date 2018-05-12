@@ -7,12 +7,13 @@ extern crate serde_json;
 extern crate serde_derive;
 extern crate toml;
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::collections::btree_map::Entry;
 use std::fs::File;
 use std::io::{Read, Write};
 
-use cargo::core::{Dependency, Registry, Source, SourceId, Summary};
+use cargo::core::{Dependency, Source, SourceId, Summary};
+use cargo::core::registry::PackageRegistry;
 use cargo::core::resolver::{self, Method, Resolve};
 use cargo::sources::RegistrySource;
 use cargo::util::Config;
@@ -129,22 +130,24 @@ impl TopCrates {
 }
 
 fn decide_features(summary: &Summary) -> Method<'static> {
-    lazy_static! {
-        static ref PLAYGROUND_FEATURES: Vec<String> = vec!["playground".to_owned()];
-    }
-
     // Enable `playground` feature if present.
     if summary.features().contains_key("playground") {
+        // Would put this in a lazy_static, but its type is Vec<InternedString>
+        // and InternedString is not publicly nameable.
+        let features = Method::split_features(&["playground".to_owned()]);
+
         Method::Required {
             dev_deps: false,
-            features: &*PLAYGROUND_FEATURES,
+            features: Box::leak(Box::new(features)),
             uses_default_features: false,
+            all_features: false,
         }
     } else {
         Method::Required {
             dev_deps: false,
             features: &[],
             uses_default_features: true,
+            all_features: false,
         }
     }
 }
@@ -152,7 +155,7 @@ fn decide_features(summary: &Summary) -> Method<'static> {
 fn unique_latest_crates(resolve: Resolve) -> BTreeMap<String, String> {
     let mut uniqs = BTreeMap::new();
     for pkg in resolve.iter() {
-        if MODIFICATIONS.blacklisted(pkg.name()) {
+        if MODIFICATIONS.blacklisted(pkg.name().as_str()) {
             continue;
         }
 
@@ -185,8 +188,8 @@ fn main() {
     // Setup to interact with cargo.
     let config = Config::default().expect("Unable to create default Cargo config");
     let crates_io = SourceId::crates_io(&config).expect("Unable to create crates.io source ID");
-    let mut registry = RegistrySource::remote(&crates_io, &config);
-    registry.update().expect("Unable to update registry");
+    let mut source = RegistrySource::remote(&crates_io, &config);
+    source.update().expect("Unable to update registry");
 
     let mut top = TopCrates::download();
     top.add_curated_crates();
@@ -204,7 +207,7 @@ fn main() {
         let dep = Dependency::parse_no_deprecated(name, None, &crates_io)
             .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
-        let matches = registry.query_vec(&dep).unwrap_or_else(|e| {
+        let matches = source.query_vec(&dep).unwrap_or_else(|e| {
             panic!("Unable to query registry for {}: {}", name, e);
         });
 
@@ -220,7 +223,11 @@ fn main() {
     }
 
     // Resolve transitive dependencies.
-    let res = resolver::resolve(&summaries, &[], &mut registry, None, true)
+    let mut registry = PackageRegistry::new(&config)
+        .expect("Unable to create package registry");
+    registry.lock_patches();
+    let try_to_use = HashSet::new();
+    let res = resolver::resolve(&summaries, &[], &mut registry, &try_to_use, None, true)
         .expect("Unable to resolve dependencies");
 
     // Construct playground's Cargo.toml.
@@ -249,7 +256,7 @@ fn main() {
         let pkgid = cargo::core::PackageId::new(&name, &version, &crates_io)
             .unwrap_or_else(|e| panic!("Unable to build PackageId for {} {}: {}", name, version, e));
 
-        let pkg = registry.download(&pkgid)
+        let pkg = source.download(&pkgid)
             .unwrap_or_else(|e| panic!("Unable to download {} {}: {}", name, version, e));
 
         for target in pkg.targets() {
