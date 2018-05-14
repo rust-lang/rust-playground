@@ -57,13 +57,6 @@ body {
     font-family: 'Source Code Pro', monospace;
 }
 
-@mixin body-monospace {
-    font-size: 0.9em;
-    // http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/
-    // ACE uses Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
-    font-family: 'Source Code Pro', monospace;
-}
-
 .playground-mode-presentation {
 
     &:hover {
