@@ -10,6 +10,8 @@
     "interface-name": [true, "never-prefix"],
     "jsx-alignment": false,
     "jsx-no-lambda": false,
+    "jsx-no-multiline-js": false,
+    "jsx-boolean-value": [true, "never"],
     "max-classes-per-file": false,
     "member-ordering": false,
     "no-shadowed-variable": false,

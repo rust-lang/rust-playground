@@ -1,2 +1,3 @@
-target
+.env
 access-log.csv
+target

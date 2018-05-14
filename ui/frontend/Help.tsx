@@ -40,7 +40,7 @@ fn main ()
 { struct Foo { a: u8, b: String, }
 match 4 {2=>{},_=>{}} }`;
 
-const LINK_EXAMPLE = 'http://play.integer32.com/?code=fn main() { println!("hello world!"); }';
+const LINK_EXAMPLE = 'https://play.integer32.com/?code=fn main() { println!("hello world!"); }';
 
 const TEST_EXAMPLE = `#[test]
 fn test_something() {
@@ -104,6 +104,7 @@ const Help = ({ navigateToIndex }: HelpProps) => (
           from <a href={CRATES_IO_URL}>crates.io</a>, the crates from
           the <a href={RUST_COOKBOOK_URL}>Rust Cookbook</a>, and all
           of their dependencies. To use a crate, add the appropriate
+          {' '}
           <Code>extern crate foo</Code> line to the code.
         </p>
 
@@ -118,9 +119,9 @@ const Help = ({ navigateToIndex }: HelpProps) => (
       <LinkableSection id="features-linting" header="Linting code" level={H3}>
         <p>
           <a href={CLIPPY_URL}>Clippy</a> is a collection of lints to catch common
-          mistakes and improve your Rust code. Click on the
+          mistakes and improve your Rust code. Click on the <strong>Clippy</strong>
           {' '}
-          <strong>Clippy</strong> button to see possible improvements to your
+          button in the <strong>Tools</strong> menu to see possible improvements to your
           code.
         </p>
 
@@ -130,9 +131,9 @@ const Help = ({ navigateToIndex }: HelpProps) => (
       <LinkableSection id="features-formatting" header="Formatting code" level={H3}>
         <p>
           <a href={RUSTFMT_URL}>rustfmt</a> is a tool for formatting Rust code
-          according to the Rust style guidelines. Click on the
+          according to the Rust style guidelines. Click on the <strong>Format</strong>
           {' '}
-          <strong>Format</strong> button to automatically reformat your code.
+          button in the <strong>Tools</strong> menu to automatically reformat your code.
         </p>
 
         <Example code={RUSTFMT_EXAMPLE} />
@@ -142,9 +143,10 @@ const Help = ({ navigateToIndex }: HelpProps) => (
         <p>
           Once you have some code worth saving or sharing, click on the
           {' '}
-          <strong>Share</strong> button. This will create an anonymous <a
-          href={GIST_URL}>GitHub Gist</a>. You will also be provided with a URL
-          to load that Gist back into the playground.
+          <strong>Share</strong> button. This will create a
+          {' '}
+          <a href={GIST_URL}>GitHub Gist</a>. You will also be provided with
+          a URL to load that Gist back into the playground.
         </p>
       </LinkableSection>
 
@@ -183,12 +185,12 @@ const Help = ({ navigateToIndex }: HelpProps) => (
 
       <LinkableSection id="features-output-formats" header="Output formats" level={H3}>
         <p>
-          Instead of compiling to a final binary, you can also see intermediate
-          output of the compiler as LLVM IR, x86_64 assembly, or Rust MIR. This
-          is often used in conjunction with the <a href="#features-modes">mode</a>
+          Instead of executing the code, you can also see intermediate
+          output of the compiler as x86_64 assembly, LLVM IR, Rust MIR, or
+          WebAssembly. This is often used in conjunction with the
           {' '}
-          selector set to "Release" to see how the compiler has chosen to optimize
-          some specific piece of code.
+          <a href="#features-modes">mode</a> set to "Release" to see how the
+          compiler has chosen to optimize some specific piece of code.
         </p>
 
         <Example code={OUTPUT_EXAMPLE} />
@@ -204,7 +206,8 @@ const Help = ({ navigateToIndex }: HelpProps) => (
 
         <p>
           You can choose which mode to compile in using the <strong>Mode</strong>
-          selector.
+          {' '}
+          menu.
         </p>
       </LinkableSection>
 
@@ -219,7 +222,7 @@ const Help = ({ navigateToIndex }: HelpProps) => (
         <p>
           You can choose which channel to compile with using the
           {' '}
-          <strong>Channel</strong> selector.
+          <strong>Channel</strong> menu.
         </p>
       </LinkableSection>
 
@@ -237,7 +240,7 @@ const Help = ({ navigateToIndex }: HelpProps) => (
         </p>
 
         <p>
-          These options can be configured via <strong>Config</strong>.
+          These options can be configured via the <strong>Config</strong> menu.
         </p>
       </LinkableSection>
 
@@ -301,15 +304,15 @@ const H3: React.SFC = ({ children }) => <h3>{children}</h3>;
 const LinkableSection: React.SFC<LinkableSectionProps> = ({
   id, header, level: Level, children,
 }) => (
-  <div id={id}>
-    <Level>
-      <span className="help__header">
-        <a className="help__header-link" href={`#${id}`}>{header}</a>
-      </span>
-    </Level>
-    {children}
-  </div>
-);
+    <div id={id}>
+      <Level>
+        <span className="help__header">
+          <a className="help__header-link" href={`#${id}`}>{header}</a>
+        </span>
+      </Level>
+      {children}
+    </div>
+  );
 
 interface LinkableSectionProps {
   id: string;
@@ -318,7 +321,7 @@ interface LinkableSectionProps {
 }
 
 const Code: React.SFC = ({ children }) => (
-    <code className="help__code">{children}</code>
+  <code className="help__code">{children}</code>
 );
 
 const mapStateToProps = () => ({

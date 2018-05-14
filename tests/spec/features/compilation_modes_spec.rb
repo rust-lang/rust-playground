@@ -11,7 +11,7 @@ RSpec.feature "Compiling in different modes", type: :feature, js: true do
   end
 
   scenario "compiling in debug mode" do
-    choose_styled("Debug")
+    in_mode_menu { click_on("Debug") }
     click_on("Run")
 
     within('.output-stdout') do
@@ -21,7 +21,7 @@ RSpec.feature "Compiling in different modes", type: :feature, js: true do
   end
 
   scenario "compiling in release mode" do
-    choose_styled("Release")
+    in_mode_menu { click_on("Release") }
     click_on("Run")
 
     within('.output-stdout') do

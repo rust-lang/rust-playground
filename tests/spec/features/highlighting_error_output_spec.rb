@@ -11,7 +11,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
   scenario "errors are highlighted" do
     within('.output-stderr') do
       expect(page).to have_css '.error', text: 'too many type parameters provided'
-      expect(page).to have_css '.error', text: 'aborting due to previous error'
+      expect(page).to have_css '.error', text: 'aborting due to 2 previous errors'
       expect(page).to have_css '.error', text: 'Could not compile `playground`'
     end
   end
@@ -19,6 +19,12 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
   scenario "error locations are links" do
     within('.output-stderr') do
       expect(page).to have_link('src/main.rs')
+    end
+  end
+
+  scenario "github see-issues are links" do
+    within('.output-stderr') do
+      expect(page).to have_link('see issue #27812', href: 'https://github.com/rust-lang/rust/issues/27812')
     end
   end
 
@@ -34,6 +40,8 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
 
   def code
     <<~EOF
+    extern crate syntax;
+
     fn main() {
         drop::<u8, u8>(1);
     }

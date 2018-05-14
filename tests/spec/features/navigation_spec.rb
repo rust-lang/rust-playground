@@ -25,19 +25,19 @@ RSpec.feature "Navigating between pages", type: :feature, js: true do
 
   scenario "Mode and channel buttons update the URL" do
     visit '/'
-    expect(page).to have_content('Run')
+    expect(page).to have_content('RUN')
 
     editor.set("dummy")
     expect(page).to be_at_url('/')
 
-    choose_styled('Release')
+    in_mode_menu { click_on('Release') }
     expect(page).to be_at_url('/', version: 'stable', mode: 'release')
 
     go_back
     expect(page).to be_at_url('/')
 
-    choose_styled('Release')
-    choose_styled('Beta')
+    in_mode_menu { click_on('Release') }
+    in_channel_menu { click_on('Beta') }
     expect(page).to be_at_url('/', version: 'beta', mode: 'release')
 
     go_back
@@ -47,15 +47,15 @@ RSpec.feature "Navigating between pages", type: :feature, js: true do
 
   scenario "Navigating to help changes the URL" do
     visit '/'
-    expect(page).to have_content('Run')
+    expect(page).to have_content('RUN')
 
-    click_on '?'
+    click_on 'View help'
     expect(page).to be_at_url('/help')
     expect(page).to have_content('The Rust Playground')
 
     go_back
     expect(page).to be_at_url('/')
-    expect(page).to have_content('Run')
+    expect(page).to have_content('RUN')
 
     go_forward
     expect(page).to be_at_url('/help')
@@ -63,7 +63,7 @@ RSpec.feature "Navigating between pages", type: :feature, js: true do
 
     click_on "Return to the playground"
     expect(page).to be_at_url('/')
-    expect(page).to have_content('Run')
+    expect(page).to have_content('RUN')
   end
 
   scenario "Navigating from help changes the URL" do
@@ -72,7 +72,7 @@ RSpec.feature "Navigating between pages", type: :feature, js: true do
 
     click_on "Return to the playground"
     expect(page).to be_at_url('/')
-    expect(page).to have_content('Run')
+    expect(page).to have_content('RUN')
   end
 
   def editor

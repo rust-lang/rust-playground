@@ -2,8 +2,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 
+type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
+
+interface LinkInnerProps extends LinkProps {
+  dispatch: (_: any) => any;
+}
+
 // We are passed `dispatch` anyway, so we can make use of it
-class Link extends React.Component<LinkProps> {
+class LinkInner extends React.Component<LinkInnerProps> {
   public render() {
     const { dispatch, action, onClick, children, ...rest } = this.props;
     const { router } = this.context;
@@ -32,12 +38,11 @@ class Link extends React.Component<LinkProps> {
   };
 }
 
-interface LinkProps extends React.HTMLAttributes<HTMLAnchorElement> {
-  dispatch: (_: any) => any;
+export interface LinkProps extends Omit<React.HTMLProps<HTMLAnchorElement>, 'action' | 'onClick'> {
   action?: () => any;
   onClick?: () => any;
 }
 
-const LinkContainer = connect()(Link);
+const LinkContainer = connect()(LinkInner);
 
 export default LinkContainer;

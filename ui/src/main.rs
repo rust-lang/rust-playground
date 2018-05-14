@@ -3,6 +3,7 @@
 #[macro_use]
 extern crate log;
 extern crate env_logger;
+extern crate dotenv;
 extern crate iron;
 extern crate mount;
 extern crate router;
@@ -66,6 +67,7 @@ const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
 const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
 
 fn main() {
+    dotenv::dotenv().unwrap();
     openssl_probe::init_ssl_cert_env_vars();
     env_logger::init();
 

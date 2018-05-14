@@ -7,12 +7,13 @@ extern crate serde_json;
 extern crate serde_derive;
 extern crate toml;
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::collections::btree_map::Entry;
 use std::fs::File;
 use std::io::{Read, Write};
 
-use cargo::core::{Dependency, Registry, Source, SourceId, Summary};
+use cargo::core::{Dependency, Package, Source, SourceId};
+use cargo::core::registry::PackageRegistry;
 use cargo::core::resolver::{self, Method, Resolve};
 use cargo::sources::RegistrySource;
 use cargo::util::Config;
@@ -35,21 +36,20 @@ struct OneCrate {
 struct Crate {
     #[serde(rename="id")]
     name: String,
-    #[serde(rename="max_version")]
-    version: String,
 }
 
 /// A Cargo.toml file.
 #[derive(Serialize)]
 struct TomlManifest {
-    package: Package,
+    package: TomlPackage,
     profile: Profiles,
-    dependencies: BTreeMap<String, String>,
+    #[serde(serialize_with = "toml::ser::tables_last")]
+    dependencies: BTreeMap<String, DependencySpec>,
 }
 
 /// Header of Cargo.toml file.
 #[derive(Serialize)]
-struct Package {
+struct TomlPackage {
     name: String,
     version: String,
     authors: Vec<String>,
@@ -87,17 +87,37 @@ struct Profiles {
     release: Profile,
 }
 
+/// `"1.0.0"` or `{ version = "1.0.0", features = ["..."] }`
+#[derive(Serialize, Clone)]
+#[serde(untagged)]
+enum DependencySpec {
+    String(String),
+    #[serde(rename_all = "kebab-case")]
+    Explicit {
+        version: String,
+        #[serde(skip_serializing_if = "Vec::is_empty")]
+        features: Vec<String>,
+        #[serde(skip_serializing_if = "is_true")]
+        default_features: bool,
+    }
+}
+
+impl DependencySpec {
+    fn version(&self) -> String {
+        match *self {
+            DependencySpec::String(ref version) |
+            DependencySpec::Explicit { ref version, .. } => version.clone(),
+        }
+    }
+}
+
+fn is_true(b: &bool) -> bool {
+    *b
+}
+
 impl Modifications {
     fn blacklisted(&self, name: &str) -> bool {
         self.blacklist.iter().any(|n| n == name)
-    }
-
-    fn additions(&self, existing_names: &[&str]) -> Vec<&str> {
-        let existing_names: BTreeSet<_> = existing_names.iter().collect();
-        self.additions.iter()
-            .map(|n| n.as_str())
-            .filter(|n| !existing_names.contains(n))
-            .collect()
     }
 }
 
@@ -128,58 +148,20 @@ impl TopCrates {
 
     /// Add crates that have been hand-picked
     fn add_curated_crates(&mut self) {
-        let added_crates: Vec<_> = {
-            let names = self.names();
-            let new_names = MODIFICATIONS.additions(&names);
-
-            new_names.into_iter().map(|name| {
-                let api_url = format!("https://crates.io/api/v1/crates/{}", name);
-
-                let resp =
-                    reqwest::get(&api_url)
-                    .unwrap_or_else(|e| panic!("Could not fetch crate {}: {}", name, e));
-                assert!(resp.status().is_success());
-
-                let one: OneCrate = serde_json::from_reader(resp)
-                    .unwrap_or_else(|e| panic!("Crate {} had invalid JSON: {}", name, e));
-
-                one.krate
-            }).collect()
-        };
-
-        self.crates.extend(added_crates);
-    }
-
-    fn names(&self) -> Vec<&str> {
-        self.crates.iter().map(|c| c.name.as_str()).collect()
+        self.crates.extend({
+            MODIFICATIONS
+                .additions
+                .iter()
+                .cloned()
+                .map(|name| Crate { name })
+        });
     }
 }
 
-fn decide_features(summary: &Summary) -> Method<'static> {
-    lazy_static! {
-        static ref PLAYGROUND_FEATURES: Vec<String> = vec!["playground".to_owned()];
-    }
-
-    // Enable `playground` feature if present.
-    if summary.features().contains_key("playground") {
-        Method::Required {
-            dev_deps: false,
-            features: &*PLAYGROUND_FEATURES,
-            uses_default_features: false,
-        }
-    } else {
-        Method::Required {
-            dev_deps: false,
-            features: &[],
-            uses_default_features: true,
-        }
-    }
-}
-
-fn unique_latest_crates(resolve: Resolve) -> BTreeMap<String, String> {
+fn unique_latest_crates(resolve: Resolve) -> BTreeMap<String, DependencySpec> {
     let mut uniqs = BTreeMap::new();
     for pkg in resolve.iter() {
-        if MODIFICATIONS.blacklisted(pkg.name()) {
+        if MODIFICATIONS.blacklisted(pkg.name().as_str()) {
             continue;
         }
 
@@ -198,8 +180,89 @@ fn unique_latest_crates(resolve: Resolve) -> BTreeMap<String, String> {
     }
 
     uniqs.into_iter()
-         .map(|(name, version)| (name.to_string(), version.to_string()))
+         .map(|(name, version)| (
+             name.to_string(),
+             DependencySpec::String(version.to_string()),
+         ))
          .collect()
+}
+
+/// Updates `dep` to include features specified by the custom metadata of `pkg`.
+///
+/// Our custom metadata format looks like:
+///
+///     [package.metadata.playground]
+///     default-features = true
+///     features = ["std", "extra-traits"]
+///     all-features = false
+///
+/// All fields are optional.
+fn fill_playground_metadata_features(dep: &mut DependencySpec, pkg: &Package) {
+    let custom_metadata = match pkg.manifest().custom_metadata() {
+        Some(custom_metadata) => custom_metadata,
+        None => return,
+    };
+
+    let playground_metadata = match custom_metadata.get("playground") {
+        Some(playground_metadata) => playground_metadata,
+        None => return,
+    };
+
+    #[derive(Deserialize)]
+    #[serde(default, rename_all = "kebab-case")]
+    struct Metadata {
+        features: Vec<String>,
+        default_features: bool,
+        all_features: bool,
+    }
+
+    impl Default for Metadata {
+        fn default() -> Self {
+            Metadata {
+                features: Vec::new(),
+                default_features: true,
+                all_features: false,
+            }
+        }
+    }
+
+    let metadata = match playground_metadata.clone().try_into::<Metadata>() {
+        Ok(metadata) => metadata,
+        Err(err) => {
+            eprintln!(
+                "Failed to parse custom metadata for {} {}: {}",
+                pkg.name(), pkg.version(), err);
+            return;
+        }
+    };
+
+    // If `all-features` is set then we ignore `features`.
+    let summary = pkg.summary();
+    let mut enabled_features: BTreeSet<String> = if metadata.all_features {
+        summary.features().keys().cloned().collect()
+    } else {
+        metadata.features.into_iter().collect()
+    };
+
+    // If not opting out of default features, remove default features from the
+    // explicit features list. This avoids ongoing spurious diffs in our
+    // generated Cargo.toml as default features are added to a library.
+    if metadata.default_features {
+        if let Some(default_feature_names) = summary.features().get("default") {
+            enabled_features.remove("default");
+            for feature in default_feature_names {
+                enabled_features.remove(&feature.to_string(summary));
+            }
+        }
+    }
+
+    if !enabled_features.is_empty() || !metadata.default_features {
+        *dep = DependencySpec::Explicit {
+            version: dep.version(),
+            features: enabled_features.into_iter().collect(),
+            default_features: metadata.default_features,
+        };
+    }
 }
 
 fn write_manifest(manifest: TomlManifest, path: &str) {
@@ -212,66 +275,64 @@ fn main() {
     // Setup to interact with cargo.
     let config = Config::default().expect("Unable to create default Cargo config");
     let crates_io = SourceId::crates_io(&config).expect("Unable to create crates.io source ID");
-    let mut registry = RegistrySource::remote(&crates_io, &config);
-    registry.update().expect("Unable to update registry");
+    let mut source = RegistrySource::remote(&crates_io, &config);
+    source.update().expect("Unable to update registry");
 
     let mut top = TopCrates::download();
     top.add_curated_crates();
 
+    // Find the newest (non-prerelease, non-yanked) versions of all
+    // the interesting crates.
     let mut summaries = Vec::new();
-    for Crate { ref name, ref version } in top.crates {
+    for Crate { ref name } in top.crates {
         if MODIFICATIONS.blacklisted(name) {
             continue;
         }
 
-        // Query the registry for summary of this crate.
-        let dep = Dependency::parse_no_deprecated(name, Some(version), &crates_io)
-            .unwrap_or_else(|e| panic!("Unable to parse dependency for {}:{}: {}", name, version, e));
+        // Query the registry for a summary of this crate.
+        // Usefully, this doesn't seem to include yanked versions
+        let dep = Dependency::parse_no_deprecated(name, None, &crates_io)
+            .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
-        let matches = registry.query_vec(&dep).unwrap_or_else(|e| {
-            panic!("Unable to query registry for {}:{}: {}", name, version, e);
+        let matches = source.query_vec(&dep).unwrap_or_else(|e| {
+            panic!("Unable to query registry for {}: {}", name, e);
         });
-        if matches.len() != 1 {
-            panic!("expected one registry match for `{}:{}`", name, version);
-        }
-        let summary = matches.into_iter().next().unwrap();
+
+        // Find the newest non-prelease version
+        let summary = matches.into_iter()
+            .filter(|summary| !summary.version().is_prerelease())
+            .max_by_key(|summary| summary.version().clone())
+            .unwrap_or_else(|| panic!("Registry has no viable versions of {}", name));
 
         // Add a dependency on this crate.
-        let method = decide_features(&summary);
-        summaries.push((summary, method));
+        summaries.push((summary, Method::Required {
+            dev_deps: false,
+            features: &[],
+            uses_default_features: true,
+            all_features: false,
+        }));
     }
 
     // Resolve transitive dependencies.
-    let res = resolver::resolve(&summaries, &[], &mut registry, None, true)
+    let mut registry = PackageRegistry::new(&config)
+        .expect("Unable to create package registry");
+    registry.lock_patches();
+    let try_to_use = HashSet::new();
+    let res = resolver::resolve(&summaries, &[], &mut registry, &try_to_use, None, true)
         .expect("Unable to resolve dependencies");
 
     // Construct playground's Cargo.toml.
-    let unique_latest_crates = unique_latest_crates(res);
-    let manifest = TomlManifest {
-        package: Package {
-            name: "playground".to_owned(),
-            version: "0.0.1".to_owned(),
-            authors: vec!["The Rust Playground".to_owned()],
-        },
-        profile: Profiles {
-            dev: Profile { codegen_units: 1, incremental: false },
-            release: Profile { codegen_units: 1, incremental: false },
-        },
-        dependencies: unique_latest_crates.clone(),
-    };
-
-    // Write manifest file.
-    let cargo_toml = "result.Cargo.toml";
-    write_manifest(manifest, cargo_toml);
-    println!("wrote {}", cargo_toml);
+    let mut unique_latest_crates = unique_latest_crates(res);
 
     let mut infos = Vec::new();
 
-    for (name, version) in unique_latest_crates {
+    for (name, spec) in &mut unique_latest_crates {
+        let version = spec.version();
+
         let pkgid = cargo::core::PackageId::new(&name, &version, &crates_io)
             .unwrap_or_else(|e| panic!("Unable to build PackageId for {} {}: {}", name, version, e));
 
-        let pkg = registry.download(&pkgid)
+        let pkg = source.download(&pkgid)
             .unwrap_or_else(|e| panic!("Unable to download {} {}: {}", name, version, e));
 
         for target in pkg.targets() {
@@ -283,9 +344,29 @@ fn main() {
                 })
             }
         }
+
+        fill_playground_metadata_features(spec, &pkg);
     }
 
-    let path = "crate-information.json";
+    let manifest = TomlManifest {
+        package: TomlPackage {
+            name: "playground".to_owned(),
+            version: "0.0.1".to_owned(),
+            authors: vec!["The Rust Playground".to_owned()],
+        },
+        profile: Profiles {
+            dev: Profile { codegen_units: 1, incremental: false },
+            release: Profile { codegen_units: 1, incremental: false },
+        },
+        dependencies: unique_latest_crates,
+    };
+
+    // Write manifest file.
+    let cargo_toml = "../compiler/base/Cargo.toml";
+    write_manifest(manifest, cargo_toml);
+    println!("wrote {}", cargo_toml);
+
+    let path = "../compiler/base/crate-information.json";
     let mut f = File::create(path)
         .unwrap_or_else(|e| panic!("Unable to create {}: {}", path, e));
     serde_json::to_writer_pretty(&mut f, &infos)
