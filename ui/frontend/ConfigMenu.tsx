@@ -12,12 +12,13 @@ import {
   changeEditor,
   changeKeybinding,
   changeOrientation,
+  changePageMode,
   changeProcessAssembly,
   changeTheme,
   toggleConfiguration,
 } from './actions';
 import State from './state';
-import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, ProcessAssembly } from './types';
+import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, PageMode, ProcessAssembly } from './types';
 
 interface ConfigMenuProps {
   assemblyFlavor: AssemblyFlavor;
@@ -26,12 +27,14 @@ interface ConfigMenuProps {
   changeEditorStyle: (_: Editor) => any;
   changeKeybinding: (_: string) => any;
   changeOrientation: (_: Orientation) => any;
+  changePageMode: (_: PageMode) => any;
   changeProcessAssembly: (_: ProcessAssembly) => any;
   changeTheme: (_: string) => any;
   demangleAssembly: DemangleAssembly;
   editorStyle: Editor;
   keybinding: string;
   orientation: Orientation;
+  pageMode: PageMode;
   processAssembly: ProcessAssembly;
   theme: string;
   close: () => void;
@@ -70,6 +73,15 @@ const ConfigMenu: React.SFC<ConfigMenuProps> = props => (
     </MenuGroup>
 
     <MenuGroup title="UI">
+      <SelectConfig
+        name="Mode"
+        value={props.pageMode}
+        onChange={props.changePageMode}
+      >
+        <option value={PageMode.Normal}>Normal</option>
+        <option value={PageMode.Presentation}>Presentation</option>
+      </SelectConfig>
+
       <SelectConfig
         name="Orientation"
         value={props.orientation}
@@ -121,6 +133,7 @@ const mapStateToProps = (state: State) => ({
   keybinding: state.configuration.keybinding,
   theme: state.configuration.theme,
   orientation: state.configuration.orientation,
+  pageMode: state.configuration.pageMode,
   editorStyle: state.configuration.editor,
   assemblyFlavor: state.configuration.assemblyFlavor,
   demangleAssembly: state.configuration.demangleAssembly,
@@ -131,6 +144,7 @@ const mapDispatchToProps = ({
   changeTheme,
   changeKeybinding,
   changeOrientation,
+  changePageMode,
   changeEditorStyle: changeEditor,
   changeAssemblyFlavor,
   changeProcessAssembly,

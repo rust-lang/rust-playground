@@ -21,7 +21,7 @@ export interface State {
   processAssembly: ProcessAssembly;
   channel: Channel;
   mode: Mode;
-  pageMode: PageMode
+  pageMode: PageMode;
 }
 
 export const DEFAULT: State = {
@@ -35,7 +35,7 @@ export const DEFAULT: State = {
   processAssembly: ProcessAssembly.Filter,
   channel: Channel.Stable,
   mode: Mode.Debug,
-  pageMode: PageMode.Normal
+  pageMode: PageMode.Normal,
 };
 
 export default function configuration(state = DEFAULT, action: Action): State {

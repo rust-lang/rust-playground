@@ -662,7 +662,13 @@ function parseMode(s: string): Mode | null {
   }
 }
 
-export function indexPageLoad({ code, gist, version = 'stable', mode: modeString = 'debug', pageMode = PageMode.Normal }): ThunkAction {
+export function indexPageLoad({
+  code,
+  gist,
+  version = 'stable',
+  mode: modeString = 'debug',
+  pageMode = PageMode.Normal,
+}): ThunkAction {
   return function(dispatch) {
     dispatch(navigateToIndex());
 
