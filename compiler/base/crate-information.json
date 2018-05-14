@@ -66,7 +66,7 @@
   },
   {
     "name": "byteorder",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "id": "byteorder"
   },
   {
@@ -131,8 +131,13 @@
   },
   {
     "name": "csv",
-    "version": "0.15.0",
+    "version": "1.0.0",
     "id": "csv"
+  },
+  {
+    "name": "csv-core",
+    "version": "0.1.4",
+    "id": "csv_core"
   },
   {
     "name": "data-encoding",
@@ -151,7 +156,7 @@
   },
   {
     "name": "docopt",
-    "version": "0.8.3",
+    "version": "1.0.0",
     "id": "docopt"
   },
   {
@@ -181,7 +186,7 @@
   },
   {
     "name": "extprim",
-    "version": "1.5.1",
+    "version": "1.6.0",
     "id": "extprim"
   },
   {
@@ -413,11 +418,6 @@
     "name": "matches",
     "version": "0.1.6",
     "id": "matches"
-  },
-  {
-    "name": "md5",
-    "version": "0.3.7",
-    "id": "md5"
   },
   {
     "name": "memchr",
@@ -696,12 +696,12 @@
   },
   {
     "name": "serde",
-    "version": "1.0.54",
+    "version": "1.0.55",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.54",
+    "version": "1.0.55",
     "id": "serde_derive"
   },
   {
@@ -718,11 +718,6 @@
     "name": "serde_urlencoded",
     "version": "0.5.1",
     "id": "serde_urlencoded"
-  },
-  {
-    "name": "sha1",
-    "version": "0.6.0",
-    "id": "sha1"
   },
   {
     "name": "siphasher",
@@ -761,7 +756,7 @@
   },
   {
     "name": "syn",
-    "version": "0.13.9",
+    "version": "0.13.10",
     "id": "syn"
   },
   {
