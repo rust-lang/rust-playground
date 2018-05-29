@@ -130,7 +130,7 @@ fn main() {
         });
     }
 
-    info!("Starting the server on {}:{}", address, port);
+    info!("Starting the server on http://{}:{}", address, port);
     Iron::new(chain).http((&*address, port)).expect("Unable to start server");
 }
 
