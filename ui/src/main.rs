@@ -67,7 +67,8 @@ const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
 const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
 
 fn main() {
-    dotenv::dotenv().unwrap();
+    // Dotenv may be unable to load environment variables, but that's ok in production
+    let _ = dotenv::dotenv();
     openssl_probe::init_ssl_cert_env_vars();
     env_logger::init();
 
@@ -130,7 +131,7 @@ fn main() {
         });
     }
 
-    info!("Starting the server on {}:{}", address, port);
+    info!("Starting the server on http://{}:{}", address, port);
     Iron::new(chain).http((&*address, port)).expect("Unable to start server");
 }
 
