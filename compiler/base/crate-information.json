@@ -5,11 +5,6 @@
     "id": "adler32"
   },
   {
-    "name": "advapi32-sys",
-    "version": "0.2.0",
-    "id": "advapi32"
-  },
-  {
     "name": "aho-corasick",
     "version": "0.6.4",
     "id": "aho_corasick"
@@ -31,12 +26,12 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.7",
+    "version": "0.3.8",
     "id": "backtrace"
   },
   {
     "name": "backtrace-sys",
-    "version": "0.1.16",
+    "version": "0.1.22",
     "id": "backtrace_sys"
   },
   {
@@ -71,7 +66,7 @@
   },
   {
     "name": "bytes",
-    "version": "0.4.7",
+    "version": "0.4.8",
     "id": "bytes"
   },
   {
@@ -93,6 +88,11 @@
     "name": "clap",
     "version": "2.31.2",
     "id": "clap"
+  },
+  {
+    "name": "cloudabi",
+    "version": "0.0.3",
+    "id": "cloudabi"
   },
   {
     "name": "color_quant",
@@ -316,7 +316,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.11.26",
+    "version": "0.11.27",
     "id": "hyper"
   },
   {
@@ -371,7 +371,7 @@
   },
   {
     "name": "lazy_static",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "lazy_static"
   },
   {
@@ -381,7 +381,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.40",
+    "version": "0.2.41",
     "id": "libc"
   },
   {
@@ -486,17 +486,17 @@
   },
   {
     "name": "num-bigint",
-    "version": "0.1.43",
+    "version": "0.2.0",
     "id": "num_bigint"
   },
   {
     "name": "num-complex",
-    "version": "0.1.43",
+    "version": "0.2.0",
     "id": "num_complex"
   },
   {
     "name": "num-derive",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "id": "num_derive"
   },
   {
@@ -576,23 +576,28 @@
   },
   {
     "name": "proc-macro2",
-    "version": "0.3.8",
+    "version": "0.4.4",
     "id": "proc_macro2"
   },
   {
     "name": "quick-error",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "id": "quick_error"
   },
   {
     "name": "quote",
-    "version": "0.5.2",
+    "version": "0.6.3",
     "id": "quote"
   },
   {
     "name": "rand",
-    "version": "0.4.2",
+    "version": "0.5.0",
     "id": "rand"
+  },
+  {
+    "name": "rand_core",
+    "version": "0.2.0",
+    "id": "rand_core"
   },
   {
     "name": "rayon",
@@ -696,12 +701,12 @@
   },
   {
     "name": "serde",
-    "version": "1.0.55",
+    "version": "1.0.63",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.55",
+    "version": "1.0.63",
     "id": "serde_derive"
   },
   {
@@ -711,12 +716,12 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.17",
+    "version": "1.0.18",
     "id": "serde_json"
   },
   {
     "name": "serde_urlencoded",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "id": "serde_urlencoded"
   },
   {
@@ -756,7 +761,7 @@
   },
   {
     "name": "syn",
-    "version": "0.13.10",
+    "version": "0.14.1",
     "id": "syn"
   },
   {
@@ -920,6 +925,11 @@
     "id": "traitobject"
   },
   {
+    "name": "try-lock",
+    "version": "0.1.0",
+    "id": "try_lock"
+  },
+  {
     "name": "typeable",
     "version": "0.1.2",
     "id": "typeable"
@@ -951,7 +961,7 @@
   },
   {
     "name": "unicode-width",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "id": "unicode_width"
   },
   {
@@ -991,7 +1001,7 @@
   },
   {
     "name": "uuid",
-    "version": "0.6.3",
+    "version": "0.6.5",
     "id": "uuid"
   },
   {
@@ -1018,6 +1028,11 @@
     "name": "walkdir",
     "version": "2.1.4",
     "id": "walkdir"
+  },
+  {
+    "name": "want",
+    "version": "0.0.4",
+    "id": "want"
   },
   {
     "name": "winapi",
