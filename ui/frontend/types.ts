@@ -29,6 +29,10 @@ export enum Editor {
   Simple = 'simple',
   Advanced = 'advanced',
 }
+export enum PageMode {
+  Normal = 'normal',
+  Presentation = 'presentation',
+}
 
 export enum Orientation {
   Automatic = 'automatic',

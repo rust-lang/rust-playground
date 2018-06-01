@@ -27,7 +27,6 @@ html {
 
 body {
     background-color: $background;
-    padding: 0 1em;
     font-family: $primary-font;
 }
 
@@ -51,12 +50,86 @@ body {
     margin-bottom: 4px;
 }
 
+@mixin body-monospace-presentation {
+    font-size: 1.9em;
+    // http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/
+    // ACE uses Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
+    font-family: 'Source Code Pro', monospace;
+}
+
+.playground-mode-presentation {
+
+    &:hover {
+        .playground-header {
+            display:block;
+        }
+    }
+
+    .playground-header {
+        display:none;
+        z-index: 20;
+        position: absolute;
+        top: 3px;
+        right: 3px;
+    }
+
+    #editor {
+        @include body-monospace-presentation;
+    }
+
+    .editor {
+        &-simple {
+            @include body-monospace-presentation;
+        }
+    }
+
+    .output {
+        .code {
+            @include body-monospace-presentation;
+        }
+    }
+
+    .playground {
+        padding: 0;
+
+        &-editor {
+            border:none;
+        }
+    }
+
+    .header {
+        padding:0;
+
+        .header-set {
+            margin-left:0.3em;
+        }
+
+        .header-set__btn--primary {
+            font-size: 0.7rem;
+        }
+
+        .header-set__btn {
+            font-size: 0.7rem;
+        }
+
+        .header-set__radio-label {
+            font-size: 0.7rem;
+            padding: 0.12em;
+        }
+
+        .header-set__title {
+            display:none;
+        }
+    }
+
+}
+
 .playground {
     display: flex;
     height: 100vh;
     flex-direction: column;
 
-    padding-bottom: 1em;
+    padding: 0 1em 1em 1em;
 
     &-split {
         display: flex;

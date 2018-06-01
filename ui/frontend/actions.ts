@@ -12,6 +12,7 @@ import {
   Mode,
   Orientation,
   Page,
+  PageMode,
   ProcessAssembly,
 } from './types';
 
@@ -49,6 +50,7 @@ export enum ActionType {
   ToggleConfiguration = 'TOGGLE_CONFIGURATION',
   SetPage = 'SET_PAGE',
   ChangeEditor = 'CHANGE_EDITOR',
+  ChangePageMode = 'CHANGE_PAGE_MODE',
   ChangeKeybinding = 'CHANGE_KEYBINDING',
   ChangeTheme = 'CHANGE_THEME',
   ChangeOrientation = 'CHANGE_ORIENTATION',
@@ -84,6 +86,7 @@ export type Action =
   | ChangeChannelAction
   | ChangeDemangleAssemblyAction
   | ChangeEditorAction
+  | ChangePageModeAction
   | ChangeFocusAction
   | ChangeProcessAssemblyAction
   | ChangeKeybindingAction
@@ -121,6 +124,11 @@ export interface SetPageAction {
 export interface ChangeEditorAction {
   type: ActionType.ChangeEditor;
   editor: Editor;
+}
+
+export interface ChangePageModeAction {
+  type: ActionType.ChangePageMode;
+  pageMode: PageMode;
 }
 
 export interface ChangeKeybindingAction {
@@ -178,6 +186,10 @@ export function changeEditor(editor): ChangeEditorAction {
 
 export function changeKeybinding(keybinding): ChangeKeybindingAction {
   return { type: ActionType.ChangeKeybinding, keybinding };
+}
+
+export function changePageMode(pageMode): ChangePageModeAction {
+  return { type: ActionType.ChangePageMode, pageMode };
 }
 
 export function changeTheme(theme): ChangeThemeAction {
@@ -650,9 +662,17 @@ function parseMode(s: string): Mode | null {
   }
 }
 
-export function indexPageLoad({ code, gist, version = 'stable', mode: modeString = 'debug' }): ThunkAction {
+export function indexPageLoad({
+  code,
+  gist,
+  version = 'stable',
+  mode: modeString = 'debug',
+  pageMode = PageMode.Normal,
+}): ThunkAction {
   return function(dispatch) {
     dispatch(navigateToIndex());
+
+    dispatch(changePageMode(pageMode));
 
     if (code) {
       dispatch(editCode(code));

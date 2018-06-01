@@ -14,7 +14,7 @@ import {
   toggleConfiguration,
 } from './actions';
 import State from './state';
-import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, ProcessAssembly} from './types';
+import {AssemblyFlavor, DemangleAssembly, Editor, Orientation, ProcessAssembly} from './types';
 
 const keybindingOptions = ACE_KEYBINDINGS.map(t => <option value={t} key={t}>{t}</option>);
 const themeOptions = ACE_THEMES.map(t => <option value={t} key={t}>{t}</option>);
