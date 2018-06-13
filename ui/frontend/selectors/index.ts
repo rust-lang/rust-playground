@@ -136,3 +136,12 @@ export const urloUrlSelector = createSelector(
     return url.format(newUsersPostUrl);
   },
 );
+
+export const issueUrlSelector = createSelector(
+  snippetSelector,
+  snippet => {
+    const newIssueUrl = url.parse('https://github.com/rust-lang/rust/issues/new', true);
+    newIssueUrl.query = { body: snippet };
+    return url.format(newIssueUrl);
+  },
+);
