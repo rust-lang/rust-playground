@@ -22,6 +22,10 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
          ref={this.trackEditor}
          className="editor-simple"
          name="editor-simple"
+         autoCapitalize="none"
+         autoComplete="off"
+         autoCorrect="off"
+         spellCheck={false}
          value={this.props.code}
          onChange={this.onChange}
          onKeyDown={this.onKeyDown} />
