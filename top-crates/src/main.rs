@@ -2,6 +2,7 @@ extern crate cargo;
 extern crate reqwest;
 #[macro_use]
 extern crate lazy_static;
+extern crate serde;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
@@ -17,6 +18,8 @@ use cargo::core::registry::PackageRegistry;
 use cargo::core::resolver::{self, Method, Resolve};
 use cargo::sources::RegistrySource;
 use cargo::util::Config;
+
+use serde::Serialize;
 
 /// The list of crates from crates.io
 #[derive(Debug, Deserialize)]
@@ -91,9 +94,11 @@ struct Profiles {
 #[derive(Serialize, Clone)]
 #[serde(untagged)]
 enum DependencySpec {
+    #[serde(serialize_with = "exact_version")]
     String(String),
     #[serde(rename_all = "kebab-case")]
     Explicit {
+        #[serde(serialize_with = "exact_version")]
         version: String,
         #[serde(skip_serializing_if = "Vec::is_empty")]
         features: Vec<String>,
@@ -109,6 +114,13 @@ impl DependencySpec {
             DependencySpec::Explicit { ref version, .. } => version.clone(),
         }
     }
+}
+
+fn exact_version<S>(version: &String, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    format!("={}", version).serialize(serializer)
 }
 
 fn is_true(b: &bool) -> bool {
