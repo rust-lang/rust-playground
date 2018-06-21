@@ -24,7 +24,7 @@ function buildCrateAutocompleter(component) {
 
       suggestions = crates.map(({ name, version, id }, i) => ({
         caption: `${name} (${version})`,
-        value: id,
+        value: `${id}; // ${version}`,
         meta: 'crate',
         score: len - i, // Force alphabetic order before anything is typed
       }));
