@@ -212,9 +212,9 @@ impl Sandbox {
 
         let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
 
-        let cargo_toml: Vec<CrateInformationInner> = ::serde_json::from_slice(&output.stdout)?;
+        let crate_info: Vec<CrateInformationInner> = ::serde_json::from_slice(&output.stdout)?;
 
-        let crates = cargo_toml.into_iter()
+        let crates = crate_info.into_iter()
             .map(Into::into)
             .collect();
 
@@ -259,6 +259,7 @@ impl Sandbox {
 
     fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Command {
         let mut cmd = self.docker_command(Some(crate_type));
+        set_execution_environment(&mut cmd, Some(target), crate_type);
 
         let execution_cmd = build_execution_command(Some(target), mode, crate_type, tests);
 
@@ -271,6 +272,7 @@ impl Sandbox {
 
     fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Command {
         let mut cmd = self.docker_command(Some(crate_type));
+        set_execution_environment(&mut cmd, None, crate_type);
 
         let execution_cmd = build_execution_command(None, mode, crate_type, tests);
 
@@ -358,7 +360,7 @@ fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type
         (Some(Wasm), _, _) => cmd.push("wasm"),
         (Some(_), _, _)    => cmd.push("rustc"),
         (_, _, true)       => cmd.push("test"),
-        (_, Library, _)    => cmd.push("build"),
+        (_, Library(_), _) => cmd.push("build"),
         (_, _, _)          => cmd.push("run"),
     }
 
@@ -388,6 +390,20 @@ fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type
     }
 
     cmd
+}
+
+fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, crate_type: CrateType) {
+    use self::CompileTarget::*;
+    use self::CrateType::*;
+
+    if let Some(Wasm) = target {
+        cmd.args(&["--env", "PLAYGROUND_NO_DEPENDENCIES=true"]);
+        cmd.args(&["--env", "PLAYGROUND_RELEASE_LTO=true"]);
+    }
+
+    if let Library(lib) = crate_type {
+        cmd.args(&["--env", &format!("PLAYGROUND_CRATE_TYPE={}", lib.cargo_ident())]);
+    }
 }
 
 fn read(path: &Path) -> Result<Option<String>> {
@@ -481,7 +497,7 @@ pub enum Mode {
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum CrateType {
     Binary,
-    Library,
+    Library(LibraryType),
 }
 
 impl CrateType {
@@ -490,7 +506,32 @@ impl CrateType {
 
         match *self {
             Binary => "src/main.rs",
-            Library => "src/lib.rs",
+            Library(_) => "src/lib.rs",
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum LibraryType {
+    Lib,
+    Dylib,
+    Rlib,
+    Staticlib,
+    Cdylib,
+    ProcMacro
+}
+
+impl LibraryType {
+    fn cargo_ident(&self) -> &'static str {
+        use self::LibraryType::*;
+
+        match *self {
+            Lib => "lib",
+            Dylib => "dylib",
+            Rlib => "rlib",
+            Staticlib => "staticlib",
+            Cdylib => "cdylib",
+            ProcMacro => "proc-macro",
         }
     }
 }
@@ -759,7 +800,7 @@ mod test {
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
         let resp = sb.compile(&req).expect("Unable to compile code");
-        
+
         assert!(resp.code.contains(".text"));
         assert!(resp.code.contains(".file"));
     }

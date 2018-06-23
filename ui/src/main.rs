@@ -480,6 +480,10 @@ quick_error! {
             description("an invalid mode was passed")
             display("The value {:?} is not a valid mode", value)
         }
+        InvalidCrateType(value: String) {
+            description("an invalid crate type was passed")
+            display("The value {:?} is not a valid crate type", value)
+        }
         RequestMissing {
             description("no request was provided")
             display("No request was provided")
@@ -849,8 +853,15 @@ fn parse_mode(s: &str) -> Result<sandbox::Mode> {
 }
 
 fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
+    use sandbox::{CrateType::*, LibraryType::*};
     Ok(match s {
-        "bin" => sandbox::CrateType::Binary,
-        _ => sandbox::CrateType::Library,
+        "bin" => Binary,
+        "lib" => Library(Lib),
+        "dylib" => Library(Dylib),
+        "rlib" => Library(Rlib),
+        "staticlib" => Library(Staticlib),
+        "cdylib" => Library(Cdylib),
+        "proc-macro" => Library(ProcMacro),
+        _ => return Err(Error::InvalidCrateType(s.into()))
     })
 }
