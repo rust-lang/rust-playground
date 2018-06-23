@@ -212,9 +212,9 @@ impl Sandbox {
 
         let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
 
-        let cargo_toml: Vec<CrateInformationInner> = ::serde_json::from_slice(&output.stdout)?;
+        let crate_info: Vec<CrateInformationInner> = ::serde_json::from_slice(&output.stdout)?;
 
-        let crates = cargo_toml.into_iter()
+        let crates = crate_info.into_iter()
             .map(Into::into)
             .collect();
 
