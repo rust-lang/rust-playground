@@ -39,7 +39,6 @@ RUN cd / && \
     cargo new playground
 WORKDIR /playground
 
-RUN mv Cargo.toml Cargo.toml.original
 ADD Cargo.toml /playground/Cargo.toml
 RUN cargo build
 RUN cargo build --release

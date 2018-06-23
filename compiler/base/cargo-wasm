@@ -20,24 +20,6 @@ while (( "$#" )); do
     shift
 done
 
-# Remove all dependencies from the Cargo.toml
-cp Cargo.toml.original Cargo.toml
-
-# Configure Cargo to use the supplied crate type
-# TODO: This should apply to everything, not just WASM!
-crate_type=$(sed -n -E 's/^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/\1/p' src/*.rs | head -n1)
-if [[ -n "${crate_type}" ]]; then
-    cat >> Cargo.toml <<EOF
-[lib]
-crate-type = ["${crate_type}"]
-EOF
-fi
-
-cat >> Cargo.toml <<EOF
-[profile.release]
-lto = true
-EOF
-
 # Perform our build
 # https://stackoverflow.com/a/7577209/155423
 cargo "build" "--target=wasm32-unknown-unknown" ${args[@]+"${args[@]}"}
