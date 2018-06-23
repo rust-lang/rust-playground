@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:16.04 as toolchain
 
 # `build-essential` and `file` are needed for backtrace-sys
 # `cmake`, `git`, `python` are needed for wasm tools
@@ -31,6 +31,10 @@ ADD https://static.rust-lang.org/dist/channel-rust-${channel}-date.txt /root/rus
 
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain "${channel}"
 
+# Prebuild the playground's dependencies
+
+FROM toolchain as dependencies
+
 RUN cd / && \
     cargo new playground
 WORKDIR /playground
@@ -41,8 +45,23 @@ RUN cargo build
 RUN cargo build --release
 RUN rm src/*.rs
 
+# Build our tool for modifying Cargo.toml at runtime
+
+FROM dependencies as munge
+
+ADD modify-cargo-toml /modify-cargo-toml
+RUN cd /modify-cargo-toml && \
+    cargo build --release
+
+# Put everything together
+
+FROM dependencies
+
+ARG channel
+
 ADD crate-information.json /playground/crate-information.json
 
 ADD postinstall.sh /root/
 RUN /root/postinstall.sh ${channel}
 ADD cargo-wasm /root/.cargo/bin/
+COPY --from=munge /modify-cargo-toml/target/release/modify-cargo-toml /root/.cargo/bin
