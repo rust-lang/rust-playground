@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import AdvancedOptionsMenu from './AdvancedOptionsMenu';
 import BuildMenu from './BuildMenu';
 import ChannelMenu from './ChannelMenu';
 import ConfigMenu from './ConfigMenu';
@@ -62,6 +63,9 @@ const Header: React.SFC<HeaderProps> = props => (
           button={p => <ChannelMenuButton label={props.channelLabel}{...p} />}>{({ popButtonClose }) => (
             <ChannelMenu close={popButtonClose} />
           )}</PopButton>
+        <PopButton button={AdvancedOptionsMenuButton}>
+          <AdvancedOptionsMenu />
+        </PopButton>
       </SegmentedButtonSet>
     </HeaderSet>
     <HeaderSet id="share">
@@ -127,6 +131,12 @@ const ChannelMenuButton: React.SFC<ChannelMenuButtonProps> = ({ label, popButton
   <SegmentedButton title="Channel &mdash; Choose the Rust version"  {...popButtonProps}>
     <HeaderButton isExpandable>{label}</HeaderButton>
   </SegmentedButton>
+);
+
+const AdvancedOptionsMenuButton: React.SFC<PopButtonEnhancements> = ({ popButtonProps }) => (
+  <SegmentedButton title="Advanced compilation flags" {...popButtonProps}>
+    <HeaderButton icon={<MoreOptionsIcon />} />
+  </SegmentedButton >
 );
 
 const ToolsMenuButton: React.SFC<PopButtonEnhancements> = ({ popButtonProps }) => (

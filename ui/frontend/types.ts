@@ -61,3 +61,8 @@ export enum Mode {
   Debug = 'debug',
   Release = 'release',
 }
+
+export enum Edition {
+  Rust2015 = '2015',
+  Rust2018 = '2018',
+}

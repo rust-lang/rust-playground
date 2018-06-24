@@ -8,6 +8,7 @@ import {
   AssemblyFlavor,
   Channel,
   DemangleAssembly,
+  Edition,
   Editor,
   Mode,
   Orientation,
@@ -57,6 +58,7 @@ export enum ActionType {
   ChangeDemangleAssembly = 'CHANGE_DEMANGLE_ASSEMBLY',
   ChangeProcessAssembly = 'CHANGE_PROCESS_ASSEMBLY',
   ChangeMode = 'CHANGE_MODE',
+  ChangeEdition = 'CHANGE_EDITION',
   ChangeFocus = 'CHANGE_FOCUS',
   ExecuteRequest = 'EXECUTE_REQUEST',
   ExecuteSucceeded = 'EXECUTE_SUCCEEDED',
@@ -88,6 +90,7 @@ export type Action =
   | ChangeProcessAssemblyAction
   | ChangeKeybindingAction
   | ChangeModeAction
+  | ChangeEditionAction
   | ChangeOrientationAction
   | ChangeThemeAction
   | ExecuteRequestAction
@@ -163,6 +166,11 @@ export interface ChangeModeAction {
   mode: Mode;
 }
 
+export interface ChangeEditionAction {
+  type: ActionType.ChangeEdition;
+  edition: Edition;
+}
+
 export interface ChangeFocusAction {
   type: ActionType.ChangeFocus;
   focus: string;
@@ -206,6 +214,10 @@ export function changeChannel(channel: Channel): ChangeChannelAction {
 
 export function changeMode(mode: Mode): ChangeModeAction {
   return { type: ActionType.ChangeMode, mode };
+}
+
+export function changeEdition(edition: Edition): ChangeEditionAction {
+  return { type: ActionType.ChangeEdition, edition };
 }
 
 export function changeFocus(focus): ChangeFocusAction {
