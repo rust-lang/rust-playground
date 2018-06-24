@@ -700,6 +700,11 @@ $header-transition: 0.2s ease-in-out;
   &__name {
     flex: 1;
     font-size: 13px;
+
+    &--not-default {
+      font-weight: 600;
+      color: $header-tint;
+    }
   }
 
   &__value {
