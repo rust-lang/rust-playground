@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url from 'url';
 
-import { getCrateType, runAsTest } from './selectors';
+import { getCrateType, isEditionAvailable, runAsTest } from './selectors';
 import State from './state';
 import {
   AssemblyFlavor,
@@ -290,22 +290,41 @@ function fetchJson(url, args) {
     });
 }
 
+interface ExecuteRequestBody {
+  channel: string;
+  mode: string;
+  crateType: string;
+  tests: boolean;
+  code: string;
+  edition?: string;
+}
+
 export function performExecute(): ThunkAction {
   // TODO: Check a cache
   return function(dispatch, getState) {
     dispatch(requestExecute());
 
     const state = getState();
-    const { code, configuration: { channel, mode } } = state;
+    const { code, configuration: { channel, mode, edition } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
 
-    const body = { channel, mode, crateType, tests, code };
+    const body: ExecuteRequestBody = { channel, mode, crateType, tests, code };
+    if (isEditionAvailable(state)) {
+      body.edition = edition;
+    }
 
     return jsonPost(routes.execute, body)
       .then(json => dispatch(receiveExecuteSuccess(json)))
       .catch(json => dispatch(receiveExecuteFailure(json)));
   };
+}
+
+interface CompileRequestBody extends ExecuteRequestBody {
+  target: string;
+  assemblyFlavor: string;
+  demangleAssembly: string;
+  processAssembly: string;
 }
 
 function performCompile(target, { request, success, failure }): ThunkAction {
@@ -317,13 +336,14 @@ function performCompile(target, { request, success, failure }): ThunkAction {
     const { code, configuration: {
       channel,
       mode,
+      edition,
       assemblyFlavor,
       demangleAssembly,
       processAssembly,
     } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
-    const body = {
+    const body: CompileRequestBody = {
       channel,
       mode,
       crateType,
@@ -334,6 +354,9 @@ function performCompile(target, { request, success, failure }): ThunkAction {
       demangleAssembly,
       processAssembly,
     };
+    if (isEditionAvailable(state)) {
+      body.edition = edition;
+    }
 
     return jsonPost(routes.compile, body)
       .then(json => dispatch(success(json)))
