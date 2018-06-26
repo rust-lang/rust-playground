@@ -220,6 +220,11 @@ export function changeEdition(edition: Edition): ChangeEditionAction {
   return { type: ActionType.ChangeEdition, edition };
 }
 
+export const changeNightlyEdition: ThunkAction = (edition: Edition) => dispatch => {
+  dispatch(changeChannel(Channel.Nightly));
+  dispatch(changeEdition(edition));
+};
+
 export function changeFocus(focus): ChangeFocusAction {
   return { type: ActionType.ChangeFocus, focus };
 }

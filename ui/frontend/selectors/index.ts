@@ -36,6 +36,10 @@ export const isWasmAvailable = (state: State) => (
   state.configuration.channel === Channel.Nightly
 );
 
+export const isEditionAvailable = (state: State) => (
+  state.configuration.channel === Channel.Nightly
+);
+
 export const getModeLabel = (state: State) => {
   const { configuration: { mode } } = state;
   return `${mode}`;
