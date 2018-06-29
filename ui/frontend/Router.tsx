@@ -12,31 +12,33 @@ import { helpPageLoad, indexPageLoad } from './actions';
 const homeRoute = new Route('/');
 const helpRoute = new Route('/help');
 
-const stateSelector = ({ page, configuration: { channel, mode } }) => ({
+const stateSelector = ({ page, configuration: { channel, mode, edition } }) => ({
   page,
   configuration: {
     channel,
     mode,
+    edition,
   },
 });
 
 const stateToLocation = ({ page, configuration }) => {
   switch (page) {
-  case 'help': {
-    return {
-      pathname: '/help',
-    };
-  }
+    case 'help': {
+      return {
+        pathname: '/help',
+      };
+    }
 
-  default: {
-    const query = {
-      version: configuration.channel,
-      mode: configuration.mode,
-    };
-    return {
-      pathname: `/?${qs.stringify(query)}`,
-    };
-  }
+    default: {
+      const query = {
+        version: configuration.channel,
+        mode: configuration.mode,
+        edition: configuration.edition,
+      };
+      return {
+        pathname: `/?${qs.stringify(query)}`,
+      };
+    }
   }
 };
 

@@ -690,7 +690,24 @@ function parseMode(s: string): Mode | null {
   }
 }
 
-export function indexPageLoad({ code, gist, version = 'stable', mode: modeString = 'debug' }): ThunkAction {
+function parseEdition(s: string): Edition | null {
+  switch (s) {
+    case '2015':
+      return Edition.Rust2015;
+    case '2018':
+      return Edition.Rust2018;
+    default:
+      return null;
+  }
+}
+
+export function indexPageLoad({
+  code,
+  gist,
+  version = 'stable',
+  mode: modeString = 'debug',
+  edition: editionString,
+}): ThunkAction {
   return function(dispatch) {
     dispatch(navigateToIndex());
 
@@ -708,6 +725,16 @@ export function indexPageLoad({ code, gist, version = 'stable', mode: modeString
     if (modeString) {
       const mode = parseMode(modeString);
       if (mode) { dispatch(changeMode(mode)); }
+    }
+
+    if (editionString) {
+      const edition = parseEdition(editionString);
+      if (edition) { dispatch(changeEdition(edition)); }
+    } else if (code || gist) {
+      // We need to ensure that any links that predate the existence
+      // of editions will *forever* pick 2015. However, if we aren't
+      // loading code, then allow the edition to remain the default.
+      dispatch(changeEdition(Edition.Rust2015));
     }
   };
 }
