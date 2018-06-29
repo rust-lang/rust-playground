@@ -594,8 +594,8 @@ function requestGistSave() {
   return { type: REQUEST_GIST_SAVE };
 }
 
-function receiveGistSaveSuccess({ id, url, channel, mode }) {
-  return { type: GIST_SAVE_SUCCEEDED, id, url, channel, mode };
+function receiveGistSaveSuccess({ id, url, channel, mode, edition }) {
+  return { type: GIST_SAVE_SUCCEEDED, id, url, channel, mode, edition };
 }
 
 function receiveGistSaveFailure({ error }) { // eslint-disable-line no-unused-vars
@@ -606,10 +606,10 @@ export function performGistSave() {
   return function(dispatch, getState): ThunkAction {
     dispatch(requestGistSave());
 
-    const { code, configuration: { channel, mode } } = getState();
+    const { code, configuration: { channel, mode, edition } } = getState();
 
     return jsonPost(routes.meta.gist, { code })
-      .then(json => dispatch(receiveGistSaveSuccess({ ...json, channel, mode })));
+      .then(json => dispatch(receiveGistSaveSuccess({ ...json, channel, mode, edition })));
     // TODO: Failure case
   };
 }
