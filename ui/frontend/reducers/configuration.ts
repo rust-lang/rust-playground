@@ -56,12 +56,25 @@ export default function configuration(state = DEFAULT, action: Action): State {
       return { ...state, demangleAssembly: action.demangleAssembly };
     case ActionType.ChangeProcessAssembly:
       return { ...state, processAssembly: action.processAssembly };
-    case ActionType.ChangeChannel:
-      return { ...state, channel: action.channel };
+    case ActionType.ChangeChannel: {
+      // Extra logic can be removed when stable understands
+      // `cargo-features = ["edition"]`
+      let { edition } = state;
+      if (action.channel !== Channel.Nightly) {
+        edition = Edition.Rust2015;
+      }
+      return { ...state, channel: action.channel, edition };
+    }
     case ActionType.ChangeMode:
       return { ...state, mode: action.mode };
-    case ActionType.ChangeEdition:
+    case ActionType.ChangeEdition: {
+      // Extra logic can be removed when stable understands
+      // `cargo-features = ["edition"]`
+      if (state.channel !== Channel.Nightly) {
+        return state;
+      }
       return { ...state, edition: action.edition };
+    }
     default:
       return state;
   }
