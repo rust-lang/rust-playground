@@ -4,6 +4,7 @@
 
 import ace from 'brace';
 import 'brace/ext/language_tools';
+import 'brace/ext/searchbox';
 import AceEditor from 'react-ace';
 import './rust-playground-mode';
 
