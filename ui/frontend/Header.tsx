@@ -6,7 +6,7 @@ import BuildMenu from './BuildMenu';
 import ChannelMenu from './ChannelMenu';
 import ConfigMenu from './ConfigMenu';
 import HeaderButton, { RightIcon as RightIconButton } from './HeaderButton';
-import { BuildIcon, ConfigIcon, HelpIcon, MoreOptionsIcon } from './Icon';
+import { BuildIcon, ConfigIcon, HelpIcon, MoreOptionsActiveIcon, MoreOptionsIcon } from './Icon';
 import ModeMenu from './ModeMenu';
 import PopButton, { PopButtonEnhancements } from './PopButton';
 import { SegmentedButton, SegmentedButtonSet, SegmentedLink } from './SegmentedButton';
@@ -19,6 +19,7 @@ import {
 } from './actions';
 import {
   betaVersionText,
+  getAdvancedOptionsSet,
   getChannelLabel,
   getCrateType,
   getExecutionLabel,
@@ -37,6 +38,7 @@ interface HeaderProps {
   navigateToHelp: () => any;
   execute: () => any;
   gistSave: () => any;
+  advancedOptionsSet: boolean;
 }
 
 const Header: React.SFC<HeaderProps> = props => (
@@ -63,7 +65,9 @@ const Header: React.SFC<HeaderProps> = props => (
           button={p => <ChannelMenuButton label={props.channelLabel}{...p} />}>{({ popButtonClose }) => (
             <ChannelMenu close={popButtonClose} />
           )}</PopButton>
-        <PopButton button={AdvancedOptionsMenuButton}>
+        <PopButton
+          button={({ ...p }) => <AdvancedOptionsMenuButton advancedOptionsSet={props.advancedOptionsSet} {...p} />}
+        >
           <AdvancedOptionsMenu />
         </PopButton>
       </SegmentedButtonSet>
@@ -133,10 +137,16 @@ const ChannelMenuButton: React.SFC<ChannelMenuButtonProps> = ({ label, popButton
   </SegmentedButton>
 );
 
-const AdvancedOptionsMenuButton: React.SFC<PopButtonEnhancements> = ({ popButtonProps }) => (
-  <SegmentedButton title="Advanced compilation flags" {...popButtonProps}>
-    <HeaderButton icon={<MoreOptionsIcon />} />
-  </SegmentedButton >
+interface AdvancedOptionsMenuButtonProps extends PopButtonEnhancements {
+  advancedOptionsSet: boolean;
+}
+
+const AdvancedOptionsMenuButton: React.SFC<AdvancedOptionsMenuButtonProps> = props => (
+  <SegmentedButton
+    title="Advanced compilation flags"
+    {...props.popButtonProps}>
+    <HeaderButton icon={props.advancedOptionsSet ? <MoreOptionsActiveIcon /> : <MoreOptionsIcon />} />
+  </SegmentedButton>
 );
 
 const ToolsMenuButton: React.SFC<PopButtonEnhancements> = ({ popButtonProps }) => (
@@ -156,6 +166,7 @@ const mapStateToProps = (state: State) => ({
   modeLabel: getModeLabel(state),
   channelLabel: getChannelLabel(state),
   navigateToHelp,
+  advancedOptionsSet: getAdvancedOptionsSet(state),
 });
 
 const mapDispatchToProps = ({

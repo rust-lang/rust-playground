@@ -5,10 +5,12 @@ import { changeEdition } from './actions';
 import { Either as EitherConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
 import { State } from './reducers';
+import { getEditionSet } from './selectors';
 import { Edition } from './types';
 
 interface AdvancedOptionsMenuProps {
   edition: Edition;
+  isEditionSet: boolean;
   changeEdition: (_: Edition) => any;
 }
 
@@ -21,12 +23,14 @@ const AdvancedOptionsMenu: React.SFC<AdvancedOptionsMenuProps> = props => (
         a={Edition.Rust2015}
         b={Edition.Rust2018}
         value={props.edition}
+        isNotDefault={props.isEditionSet}
         onChange={props.changeEdition} />
     </MenuGroup>
   </Fragment>
 );
 
 const mapStateToProps = (state: State) => ({
+  isEditionSet: getEditionSet(state),
   edition: state.configuration.edition,
 });
 

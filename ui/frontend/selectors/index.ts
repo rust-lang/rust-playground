@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { State } from '../reducers';
-import { Channel } from '../types';
+import { Channel, Edition } from '../types';
 
 const getCode = state => state.code;
 
@@ -45,3 +45,11 @@ export const getChannelLabel = (state: State) => {
   const { configuration: { channel } } = state;
   return `${channel}`;
 };
+
+export const getAdvancedOptionsSet = (state: State) => (
+  getEditionSet(state)
+);
+
+export const getEditionSet = (state: State) => (
+  state.configuration.edition !== Edition.Rust2015
+);
