@@ -693,6 +693,13 @@ $header-transition: 0.2s ease-in-out;
   }
 }
 
+.advanced-options-menu {
+  &__aside {
+    margin: 0.25em 0 1em 0;
+    color: #888;
+  }
+}
+
 .config-element {
   display: flex;
   align-items: center;
@@ -700,6 +707,11 @@ $header-transition: 0.2s ease-in-out;
   &__name {
     flex: 1;
     font-size: 13px;
+
+    &--not-default {
+      font-weight: 600;
+      color: $header-tint;
+    }
   }
 
   &__value {

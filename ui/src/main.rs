@@ -480,6 +480,10 @@ quick_error! {
             description("an invalid mode was passed")
             display("The value {:?} is not a valid mode", value)
         }
+        InvalidEdition(value: String) {
+            description("an invalid edition was passed")
+            display("The value {:?} is not a valid edition", value)
+        }
         InvalidCrateType(value: String) {
             description("an invalid crate type was passed")
             display("The value {:?} is not a valid crate type", value)
@@ -516,6 +520,8 @@ struct CompileRequest {
     process_assembly: Option<String>,
     channel: String,
     mode: String,
+    #[serde(default)]
+    edition: String,
     #[serde(rename = "crateType")]
     crate_type: String,
     tests: bool,
@@ -534,6 +540,8 @@ struct CompileResponse {
 struct ExecuteRequest {
     channel: String,
     mode: String,
+    #[serde(default)]
+    edition: String,
     #[serde(rename = "crateType")]
     crate_type: String,
     tests: bool,
@@ -646,6 +654,7 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
             target,
             channel: parse_channel(&me.channel)?,
             mode: parse_mode(&me.mode)?,
+            edition: parse_edition(&me.edition)?,
             crate_type: parse_crate_type(&me.crate_type)?,
             tests: me.tests,
             code: me.code,
@@ -671,6 +680,7 @@ impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
         Ok(sandbox::ExecuteRequest {
             channel: try!(parse_channel(&me.channel)),
             mode: try!(parse_mode(&me.mode)),
+            edition: parse_edition(&me.edition)?,
             crate_type: try!(parse_crate_type(&me.crate_type)),
             tests: me.tests,
             code: me.code,
@@ -766,6 +776,7 @@ impl TryFrom<EvaluateRequest> for sandbox::ExecuteRequest {
         Ok(sandbox::ExecuteRequest {
             channel: parse_channel(&me.version)?,
             mode: if me.optimize != "0" { sandbox::Mode::Release } else { sandbox::Mode::Debug },
+            edition: None, // FIXME: What should this be?
             crate_type: sandbox::CrateType::Binary,
             tests: false,
             code: me.code,
@@ -849,6 +860,15 @@ fn parse_mode(s: &str) -> Result<sandbox::Mode> {
         "debug" => sandbox::Mode::Debug,
         "release" => sandbox::Mode::Release,
         _ => return Err(Error::InvalidMode(s.into()))
+    })
+}
+
+fn parse_edition(s: &str) -> Result<Option<sandbox::Edition>> {
+    Ok(match s {
+        "" => None,
+        "2015" => Some(sandbox::Edition::Rust2015),
+        "2018" => Some(sandbox::Edition::Rust2018),
+        _ => return Err(Error::InvalidEdition(s.into()))
     })
 }
 

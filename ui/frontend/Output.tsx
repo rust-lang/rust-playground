@@ -1,3 +1,4 @@
+import * as qs from 'qs';
 import React from 'react';
 import { PrismCode } from 'react-prism';
 import { connect } from 'react-redux';
@@ -5,7 +6,7 @@ import { connect } from 'react-redux';
 import { changeFocus } from './actions';
 import { State } from './reducers';
 import { State as OutputState } from './reducers/output';
-import { Channel, Mode } from './types';
+import { Channel, Edition, Mode } from './types';
 
 import Loader from './Loader';
 
@@ -140,11 +141,27 @@ interface FormatProps {
   requestsInProgress: number;
 }
 
-const Gist: React.SFC<GistProps> = ({ focus, requestsInProgress, id, url, channel, mode }) => {
+const Gist: React.SFC<GistProps> = ({
+  focus,
+  requestsInProgress,
+  id,
+  url,
+  channel,
+  mode,
+  edition,
+}) => {
   if (focus === 'gist') {
     const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
-    const permalink = id ?
-      <p><a href={`/?gist=${id}&version=${channel}&mode=${mode}`}>Permalink to the playground</a></p> : null;
+    let permalink = null;
+    if (id) {
+      const q = {
+        gist: id,
+        version: channel,
+        mode,
+        edition,
+      };
+      permalink = <p><a href={`/?${qs.stringify(q)}`}>Permalink to the playground</a></p>;
+    }
     const directLink = url ? (<p><a href={url}>Direct link to the gist</a></p>) : null;
 
     return (
@@ -166,6 +183,7 @@ interface GistProps {
   url?: string;
   channel?: Channel;
   mode?: Mode;
+  edition?: Edition;
 }
 
 class Output extends React.PureComponent<OutputProps> {

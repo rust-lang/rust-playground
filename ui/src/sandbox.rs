@@ -113,7 +113,7 @@ impl Sandbox {
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
         try!(self.write_source_code(&req.code));
 
-        let mut command = self.compile_command(req.target, req.channel, req.mode, req.crate_type, req.tests);
+        let mut command = self.compile_command(req.target, req.channel, req.mode, req.crate_type, req.tests, req.edition);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -167,7 +167,7 @@ impl Sandbox {
 
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
         try!(self.write_source_code(&req.code));
-        let mut command = self.execute_command(req.channel, req.mode, req.crate_type, req.tests);
+        let mut command = self.execute_command(req.channel, req.mode, req.crate_type, req.tests, req.edition);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -257,9 +257,9 @@ impl Sandbox {
         Ok(())
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Command {
+    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, edition: Option<Edition>) -> Command {
         let mut cmd = self.docker_command(Some(crate_type));
-        set_execution_environment(&mut cmd, Some(target), crate_type);
+        set_execution_environment(&mut cmd, Some(target), crate_type, edition);
 
         let execution_cmd = build_execution_command(Some(target), mode, crate_type, tests);
 
@@ -270,9 +270,9 @@ impl Sandbox {
         cmd
     }
 
-    fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Command {
+    fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, edition: Option<Edition>) -> Command {
         let mut cmd = self.docker_command(Some(crate_type));
-        set_execution_environment(&mut cmd, None, crate_type);
+        set_execution_environment(&mut cmd, None, crate_type, edition);
 
         let execution_cmd = build_execution_command(None, mode, crate_type, tests);
 
@@ -392,7 +392,7 @@ fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type
     cmd
 }
 
-fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, crate_type: CrateType) {
+fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, crate_type: CrateType, edition: Option<Edition>) {
     use self::CompileTarget::*;
     use self::CrateType::*;
 
@@ -403,6 +403,10 @@ fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, c
 
     if let Library(lib) = crate_type {
         cmd.args(&["--env", &format!("PLAYGROUND_CRATE_TYPE={}", lib.cargo_ident())]);
+    }
+
+    if let Some(edition) = edition {
+        cmd.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
     }
 }
 
@@ -495,6 +499,23 @@ pub enum Mode {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum Edition {
+    Rust2015,
+    Rust2018,
+}
+
+impl Edition {
+    fn cargo_ident(&self) -> &'static str {
+        use self::Edition::*;
+
+        match *self {
+            Rust2015 => "2015",
+            Rust2018 => "2018",
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum CrateType {
     Binary,
     Library(LibraryType),
@@ -542,6 +563,7 @@ pub struct CompileRequest {
     pub channel: Channel,
     pub crate_type: CrateType,
     pub mode: Mode,
+    pub edition: Option<Edition>,
     pub tests: bool,
     pub code: String,
 }
@@ -558,6 +580,7 @@ pub struct CompileResponse {
 pub struct ExecuteRequest {
     pub channel: Channel,
     pub mode: Mode,
+    pub edition: Option<Edition>,
     pub crate_type: CrateType,
     pub tests: bool,
     pub code: String,

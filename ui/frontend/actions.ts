@@ -2,12 +2,13 @@ import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url from 'url';
 
-import { getCrateType, runAsTest } from './selectors';
+import { getCrateType, isEditionAvailable, runAsTest } from './selectors';
 import State from './state';
 import {
   AssemblyFlavor,
   Channel,
   DemangleAssembly,
+  Edition,
   Editor,
   Mode,
   Orientation,
@@ -57,6 +58,7 @@ export enum ActionType {
   ChangeDemangleAssembly = 'CHANGE_DEMANGLE_ASSEMBLY',
   ChangeProcessAssembly = 'CHANGE_PROCESS_ASSEMBLY',
   ChangeMode = 'CHANGE_MODE',
+  ChangeEdition = 'CHANGE_EDITION',
   ChangeFocus = 'CHANGE_FOCUS',
   ExecuteRequest = 'EXECUTE_REQUEST',
   ExecuteSucceeded = 'EXECUTE_SUCCEEDED',
@@ -88,6 +90,7 @@ export type Action =
   | ChangeProcessAssemblyAction
   | ChangeKeybindingAction
   | ChangeModeAction
+  | ChangeEditionAction
   | ChangeOrientationAction
   | ChangeThemeAction
   | ExecuteRequestAction
@@ -163,6 +166,11 @@ export interface ChangeModeAction {
   mode: Mode;
 }
 
+export interface ChangeEditionAction {
+  type: ActionType.ChangeEdition;
+  edition: Edition;
+}
+
 export interface ChangeFocusAction {
   type: ActionType.ChangeFocus;
   focus: string;
@@ -207,6 +215,15 @@ export function changeChannel(channel: Channel): ChangeChannelAction {
 export function changeMode(mode: Mode): ChangeModeAction {
   return { type: ActionType.ChangeMode, mode };
 }
+
+export function changeEdition(edition: Edition): ChangeEditionAction {
+  return { type: ActionType.ChangeEdition, edition };
+}
+
+export const changeNightlyEdition: ThunkAction = (edition: Edition) => dispatch => {
+  dispatch(changeChannel(Channel.Nightly));
+  dispatch(changeEdition(edition));
+};
 
 export function changeFocus(focus): ChangeFocusAction {
   return { type: ActionType.ChangeFocus, focus };
@@ -273,22 +290,41 @@ function fetchJson(url, args) {
     });
 }
 
+interface ExecuteRequestBody {
+  channel: string;
+  mode: string;
+  crateType: string;
+  tests: boolean;
+  code: string;
+  edition?: string;
+}
+
 export function performExecute(): ThunkAction {
   // TODO: Check a cache
   return function(dispatch, getState) {
     dispatch(requestExecute());
 
     const state = getState();
-    const { code, configuration: { channel, mode } } = state;
+    const { code, configuration: { channel, mode, edition } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
 
-    const body = { channel, mode, crateType, tests, code };
+    const body: ExecuteRequestBody = { channel, mode, crateType, tests, code };
+    if (isEditionAvailable(state)) {
+      body.edition = edition;
+    }
 
     return jsonPost(routes.execute, body)
       .then(json => dispatch(receiveExecuteSuccess(json)))
       .catch(json => dispatch(receiveExecuteFailure(json)));
   };
+}
+
+interface CompileRequestBody extends ExecuteRequestBody {
+  target: string;
+  assemblyFlavor: string;
+  demangleAssembly: string;
+  processAssembly: string;
 }
 
 function performCompile(target, { request, success, failure }): ThunkAction {
@@ -300,13 +336,14 @@ function performCompile(target, { request, success, failure }): ThunkAction {
     const { code, configuration: {
       channel,
       mode,
+      edition,
       assemblyFlavor,
       demangleAssembly,
       processAssembly,
     } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
-    const body = {
+    const body: CompileRequestBody = {
       channel,
       mode,
       crateType,
@@ -317,6 +354,9 @@ function performCompile(target, { request, success, failure }): ThunkAction {
       demangleAssembly,
       processAssembly,
     };
+    if (isEditionAvailable(state)) {
+      body.edition = edition;
+    }
 
     return jsonPost(routes.compile, body)
       .then(json => dispatch(success(json)))
@@ -554,8 +594,8 @@ function requestGistSave() {
   return { type: REQUEST_GIST_SAVE };
 }
 
-function receiveGistSaveSuccess({ id, url, channel, mode }) {
-  return { type: GIST_SAVE_SUCCEEDED, id, url, channel, mode };
+function receiveGistSaveSuccess({ id, url, channel, mode, edition }) {
+  return { type: GIST_SAVE_SUCCEEDED, id, url, channel, mode, edition };
 }
 
 function receiveGistSaveFailure({ error }) { // eslint-disable-line no-unused-vars
@@ -566,10 +606,10 @@ export function performGistSave() {
   return function(dispatch, getState): ThunkAction {
     dispatch(requestGistSave());
 
-    const { code, configuration: { channel, mode } } = getState();
+    const { code, configuration: { channel, mode, edition } } = getState();
 
     return jsonPost(routes.meta.gist, { code })
-      .then(json => dispatch(receiveGistSaveSuccess({ ...json, channel, mode })));
+      .then(json => dispatch(receiveGistSaveSuccess({ ...json, channel, mode, edition })));
     // TODO: Failure case
   };
 }
@@ -650,7 +690,24 @@ function parseMode(s: string): Mode | null {
   }
 }
 
-export function indexPageLoad({ code, gist, version = 'stable', mode: modeString = 'debug' }): ThunkAction {
+function parseEdition(s: string): Edition | null {
+  switch (s) {
+    case '2015':
+      return Edition.Rust2015;
+    case '2018':
+      return Edition.Rust2018;
+    default:
+      return null;
+  }
+}
+
+export function indexPageLoad({
+  code,
+  gist,
+  version = 'stable',
+  mode: modeString = 'debug',
+  edition: editionString,
+}): ThunkAction {
   return function(dispatch) {
     dispatch(navigateToIndex());
 
@@ -668,6 +725,16 @@ export function indexPageLoad({ code, gist, version = 'stable', mode: modeString
     if (modeString) {
       const mode = parseMode(modeString);
       if (mode) { dispatch(changeMode(mode)); }
+    }
+
+    if (editionString) {
+      const edition = parseEdition(editionString);
+      if (edition) { dispatch(changeEdition(edition)); }
+    } else if (code || gist) {
+      // We need to ensure that any links that predate the existence
+      // of editions will *forever* pick 2015. However, if we aren't
+      // loading code, then allow the edition to remain the default.
+      dispatch(changeEdition(Edition.Rust2015));
     }
   };
 }

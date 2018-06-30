@@ -12,8 +12,9 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
   scenario "saving to a Gist" do
     editor.set(code)
 
-    in_channel_menu { click_on("Beta") }
+    in_channel_menu { click_on("Nightly") }
     in_mode_menu { click_on("Release") }
+    in_advanced_options_menu { choose("2018") }
 
     within('.header') { click_on 'Share' }
 
@@ -28,7 +29,8 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
     expect(page).to have_link("Permalink to the playground")
     expect(editor).to have_line 'automated test'
     expect(perma_link).to match(/mode=release/)
-    expect(perma_link).to match(/version=beta/)
+    expect(perma_link).to match(/version=nightly/)
+    expect(perma_link).to match(/edition=2018/)
 
     visit direct_link
     expect(page).to have_content 'All gists'

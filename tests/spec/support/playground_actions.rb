@@ -13,6 +13,10 @@ module PlaygroundActions
     in_menu("Channel — Choose the Rust version", &block)
   end
 
+  def in_advanced_options_menu(&block)
+    in_menu("Advanced compilation flags", &block)
+  end
+
   def in_tools_menu(&block)
     in_menu("Tools", &block)
   end

@@ -20,6 +20,10 @@ fn main() {
     let mut cargo_toml: Value = toml::from_str(&input)
         .unwrap_or_else(|e| panic!("Cannot parse {} as TOML: {}", input_filename.display(), e));
 
+    if let Ok(edition) = env::var("PLAYGROUND_EDITION") {
+        cargo_toml = set_edition(cargo_toml, &edition);
+    }
+
     if env::var_os("PLAYGROUND_NO_DEPENDENCIES").is_some() {
         cargo_toml = remove_dependencies(cargo_toml);
     }
@@ -56,6 +60,33 @@ fn ensure_string_in_vec(values: &mut Vec<String>, val: &str) {
     if !values.iter().any(|f| f == val) {
         values.push(val.into());
     }
+}
+
+fn set_edition(cargo_toml: Value, edition: &str) -> Value {
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "kebab-case")]
+    struct CargoToml {
+        #[serde(default)]
+        cargo_features: Vec<String>,
+        package: Package,
+        #[serde(flatten)]
+        other: Other,
+    }
+
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "kebab-case")]
+    struct Package {
+        #[serde(default)]
+        edition: String,
+        #[serde(flatten)]
+        other: Other,
+    }
+
+    modify(cargo_toml, |mut cargo_toml: CargoToml| {
+        ensure_string_in_vec(&mut cargo_toml.cargo_features, "edition");
+        cargo_toml.package.edition = edition.into();
+        cargo_toml
+    })
 }
 
 fn remove_dependencies(cargo_toml: Value) -> Value {
