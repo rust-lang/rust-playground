@@ -375,18 +375,18 @@ export function performClippy(): ThunkAction {
 const requestGistLoad = () =>
   createAction(ActionType.RequestGistLoad);
 
-const receiveGistLoadSuccess = ({ id, url, code }) =>
-  createAction(ActionType.GistLoadSucceeded, { id, url, code });
+const receiveGistLoadSuccess = ({ id, url, code, channel, mode, edition }) =>
+  createAction(ActionType.GistLoadSucceeded, { id, url, code, channel, mode, edition });
 
 const receiveGistLoadFailure = () => // eslint-disable-line no-unused-vars
   createAction(ActionType.GistLoadFailed);
 
-export function performGistLoad(id): ThunkAction {
+export function performGistLoad({ id, channel, mode, edition }): ThunkAction {
   return function(dispatch, _getState) {
     dispatch(requestGistLoad());
     const u = url.resolve(routes.meta.gist.pathname, id);
     jsonGet(u)
-      .then(gist => dispatch(receiveGistLoadSuccess({ ...gist })));
+      .then(gist => dispatch(receiveGistLoadSuccess({ channel, mode, edition, ...gist })));
     // TODO: Failure case
   };
 }
@@ -497,27 +497,28 @@ export function indexPageLoad({
   edition: editionString,
 }): ThunkAction {
   return function(dispatch) {
+    const channel = parseChannel(version);
+    const mode = parseMode(modeString);
+    const edition = parseEdition(editionString);
+
     dispatch(navigateToIndex());
 
     if (code) {
       dispatch(editCode(code));
     } else if (gist) {
-      dispatch(performGistLoad(gist));
+      dispatch(performGistLoad({ id: gist, channel, mode, edition }));
     }
 
-    if (version) {
-      const channel = parseChannel(version);
-      if (channel) { dispatch(changeChannel(channel)); }
+    if (channel) {
+      dispatch(changeChannel(channel));
     }
 
-    if (modeString) {
-      const mode = parseMode(modeString);
-      if (mode) { dispatch(changeMode(mode)); }
+    if (mode) {
+      dispatch(changeMode(mode));
     }
 
-    if (editionString) {
-      const edition = parseEdition(editionString);
-      if (edition) { dispatch(changeEdition(edition)); }
+    if (edition) {
+      dispatch(changeEdition(edition));
     } else if (code || gist) {
       // We need to ensure that any links that predate the existence
       // of editions will *forever* pick 2015. However, if we aren't

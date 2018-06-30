@@ -15,7 +15,7 @@ export interface State {
   error?: string;
 }
 
-export default function gist(state = DEFAULT, action) {
+export default function gist(state = DEFAULT, action: Action) {
   switch (action.type) {
     case ActionType.RequestGistLoad:
     case ActionType.RequestGistSave:
