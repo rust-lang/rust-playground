@@ -6,7 +6,7 @@
   },
   {
     "name": "aho-corasick",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "id": "aho_corasick"
   },
   {
@@ -26,7 +26,7 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.8",
+    "version": "0.3.9",
     "id": "backtrace"
   },
   {
@@ -76,17 +76,17 @@
   },
   {
     "name": "cfg-if",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "id": "cfg_if"
   },
   {
     "name": "chrono",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "id": "chrono"
   },
   {
     "name": "clap",
-    "version": "2.31.2",
+    "version": "2.32.0",
     "id": "clap"
   },
   {
@@ -181,7 +181,7 @@
   },
   {
     "name": "error-chain",
-    "version": "0.11.0",
+    "version": "0.12.0",
     "id": "error_chain"
   },
   {
@@ -236,53 +236,13 @@
   },
   {
     "name": "futures",
-    "version": "0.2.1",
+    "version": "0.1.21",
     "id": "futures"
-  },
-  {
-    "name": "futures-async-runtime",
-    "version": "0.2.1",
-    "id": "futures_async_runtime"
-  },
-  {
-    "name": "futures-channel",
-    "version": "0.2.1",
-    "id": "futures_channel"
-  },
-  {
-    "name": "futures-core",
-    "version": "0.2.1",
-    "id": "futures_core"
   },
   {
     "name": "futures-cpupool",
     "version": "0.1.8",
     "id": "futures_cpupool"
-  },
-  {
-    "name": "futures-executor",
-    "version": "0.2.1",
-    "id": "futures_executor"
-  },
-  {
-    "name": "futures-io",
-    "version": "0.2.1",
-    "id": "futures_io"
-  },
-  {
-    "name": "futures-sink",
-    "version": "0.2.1",
-    "id": "futures_sink"
-  },
-  {
-    "name": "futures-stable",
-    "version": "0.2.1",
-    "id": "futures_stable"
-  },
-  {
-    "name": "futures-util",
-    "version": "0.2.1",
-    "id": "futures_util"
   },
   {
     "name": "gcc",
@@ -316,12 +276,12 @@
   },
   {
     "name": "http",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "id": "http"
   },
   {
     "name": "httparse",
-    "version": "1.2.4",
+    "version": "1.3.2",
     "id": "httparse"
   },
   {
@@ -331,7 +291,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.12.2",
+    "version": "0.12.5",
     "id": "hyper"
   },
   {
@@ -356,7 +316,7 @@
   },
   {
     "name": "inflate",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "id": "inflate"
   },
   {
@@ -416,7 +376,7 @@
   },
   {
     "name": "log",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "id": "log"
   },
   {
@@ -461,7 +421,7 @@
   },
   {
     "name": "mime_guess",
-    "version": "2.0.0-alpha.4",
+    "version": "2.0.0-alpha.5",
     "id": "mime_guess"
   },
   {
@@ -486,7 +446,7 @@
   },
   {
     "name": "net2",
-    "version": "0.2.32",
+    "version": "0.2.33",
     "id": "net2"
   },
   {
@@ -521,7 +481,7 @@
   },
   {
     "name": "num-integer",
-    "version": "0.1.38",
+    "version": "0.1.39",
     "id": "num_integer"
   },
   {
@@ -531,7 +491,7 @@
   },
   {
     "name": "num-rational",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "id": "num_rational"
   },
   {
@@ -611,7 +571,7 @@
   },
   {
     "name": "rand",
-    "version": "0.5.2",
+    "version": "0.5.3",
     "id": "rand"
   },
   {
@@ -686,7 +646,7 @@
   },
   {
     "name": "schannel",
-    "version": "0.1.12",
+    "version": "0.1.13",
     "id": "schannel"
   },
   {
@@ -721,12 +681,12 @@
   },
   {
     "name": "serde",
-    "version": "1.0.66",
+    "version": "1.0.68",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.66",
+    "version": "1.0.68",
     "id": "serde_derive"
   },
   {
@@ -736,7 +696,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.21",
+    "version": "1.0.22",
     "id": "serde_json"
   },
   {
@@ -821,7 +781,7 @@
   },
   {
     "name": "tar",
-    "version": "0.4.15",
+    "version": "0.4.16",
     "id": "tar"
   },
   {
@@ -851,7 +811,7 @@
   },
   {
     "name": "textwrap",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "id": "textwrap"
   },
   {
