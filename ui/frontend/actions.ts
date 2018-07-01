@@ -67,34 +67,25 @@ export enum ActionType {
   CompileWasmRequest = 'COMPILE_WASM_REQUEST',
   CompileWasmSucceeded = 'COMPILE_WASM_SUCCEEDED',
   CompileWasmFailed = 'COMPILE_WASM_FAILED',
-
-  Other = '__never_used__',
+  EditCode = 'EDIT_CODE',
+  GotoPosition = 'GOTO_POSITION',
+  RequestFormat = 'REQUEST_FORMAT',
+  FormatSucceeded = 'FORMAT_SUCCEEDED',
+  FormatFailed = 'FORMAT_FAILED',
+  RequestClippy = 'REQUEST_CLIPPY',
+  ClippySucceeded = 'CLIPPY_SUCCEEDED',
+  ClippyFailed = 'CLIPPY_FAILED',
+  RequestGistLoad = 'REQUEST_GIST_LOAD',
+  GistLoadSucceeded = 'GIST_LOAD_SUCCEEDED',
+  GistLoadFailed = 'GIST_LOAD_FAILED',
+  RequestGistSave = 'REQUEST_GIST_SAVE',
+  GistSaveSucceeded = 'GIST_SAVE_SUCCEEDED',
+  GistSaveFailed = 'GIST_SAVE_FAILED',
+  RequestCratesLoad = 'REQUEST_CRATES_LOAD',
+  CratesLoadSucceeded = 'CRATES_LOAD_SUCCEEDED',
+  RequestVersionsLoad = 'REQUEST_VERSIONS_LOAD',
+  VersionsLoadSucceeded = 'VERSIONS_LOAD_SUCCEEDED',
 }
-
-export const EDIT_CODE = 'EDIT_CODE';
-export const GOTO_POSITION = 'GOTO_POSITION';
-
-export const REQUEST_FORMAT = 'REQUEST_FORMAT';
-export const FORMAT_SUCCEEDED = 'FORMAT_SUCCEEDED';
-export const FORMAT_FAILED = 'FORMAT_FAILED';
-
-export const REQUEST_CLIPPY = 'REQUEST_CLIPPY';
-export const CLIPPY_SUCCEEDED = 'CLIPPY_SUCCEEDED';
-export const CLIPPY_FAILED = 'CLIPPY_FAILED';
-
-export const REQUEST_GIST_LOAD = 'REQUEST_GIST_LOAD';
-export const GIST_LOAD_SUCCEEDED = 'GIST_LOAD_SUCCEEDED';
-export const GIST_LOAD_FAILED = 'GIST_LOAD_FAILED';
-
-export const REQUEST_GIST_SAVE = 'REQUEST_GIST_SAVE';
-export const GIST_SAVE_SUCCEEDED = 'GIST_SAVE_SUCCEEDED';
-export const GIST_SAVE_FAILED = 'GIST_SAVE_FAILED';
-
-export const REQUEST_CRATES_LOAD = 'REQUEST_CRATES_LOAD';
-export const CRATES_LOAD_SUCCEEDED = 'CRATES_LOAD_SUCCEEDED';
-
-export const REQUEST_VERSIONS_LOAD = 'REQUEST_VERSIONS_LOAD';
-export const VERSIONS_LOAD_SUCCEEDED = 'VERSIONS_LOAD_SUCCEEDED';
 
 export const toggleConfiguration = () =>
   createAction(ActionType.ToggleConfiguration);
@@ -330,19 +321,19 @@ export const performCompileToNightlyWasm: ThunkAction = () => dispatch => {
 };
 
 export const editCode = code =>
-  createAction(EDIT_CODE, { code });
+  createAction(ActionType.EditCode, { code });
 
 export const gotoPosition = (line, column) =>
-  createAction(GOTO_POSITION, { line: +line, column: +column });
+  createAction(ActionType.GotoPosition, { line: +line, column: +column });
 
 const requestFormat = () =>
-  createAction(REQUEST_FORMAT);
+  createAction(ActionType.RequestFormat);
 
 const receiveFormatSuccess = ({ code }) =>
-  createAction(FORMAT_SUCCEEDED, { code });
+  createAction(ActionType.FormatSucceeded, { code });
 
 const receiveFormatFailure = ({ error }) =>
-  createAction(FORMAT_FAILED, { error });
+  createAction(ActionType.FormatFailed, { error });
 
 export function performFormat(): ThunkAction {
   // TODO: Check a cache
@@ -359,13 +350,13 @@ export function performFormat(): ThunkAction {
 }
 
 const requestClippy = () =>
-  createAction(REQUEST_CLIPPY);
+  createAction(ActionType.RequestClippy);
 
 const receiveClippySuccess = ({ stdout, stderr }) =>
-  createAction(CLIPPY_SUCCEEDED, { stdout, stderr });
+  createAction(ActionType.ClippySucceeded, { stdout, stderr });
 
 const receiveClippyFailure = ({ error }) =>
-  createAction(CLIPPY_FAILED, { error });
+  createAction(ActionType.ClippyFailed, { error });
 
 export function performClippy(): ThunkAction {
   // TODO: Check a cache
@@ -382,13 +373,13 @@ export function performClippy(): ThunkAction {
 }
 
 const requestGistLoad = () =>
-  createAction(REQUEST_GIST_LOAD);
+  createAction(ActionType.RequestGistLoad);
 
 const receiveGistLoadSuccess = ({ id, url, code }) =>
-  createAction(GIST_LOAD_SUCCEEDED, { id, url, code });
+  createAction(ActionType.GistLoadSucceeded, { id, url, code });
 
 const receiveGistLoadFailure = () => // eslint-disable-line no-unused-vars
-  createAction(GIST_LOAD_FAILED);
+  createAction(ActionType.GistLoadFailed);
 
 export function performGistLoad(id): ThunkAction {
   return function(dispatch, _getState) {
@@ -401,13 +392,13 @@ export function performGistLoad(id): ThunkAction {
 }
 
 const requestGistSave = () =>
-  createAction(REQUEST_GIST_SAVE);
+  createAction(ActionType.RequestGistSave);
 
 const receiveGistSaveSuccess = ({ id, url, channel, mode, edition }) =>
-  createAction(GIST_SAVE_SUCCEEDED, { id, url, channel, mode, edition });
+  createAction(ActionType.GistSaveSucceeded, { id, url, channel, mode, edition });
 
 const receiveGistSaveFailure = ({ error }) => // eslint-disable-line no-unused-vars
-  createAction(GIST_SAVE_FAILED, { error });
+  createAction(ActionType.GistSaveFailed, { error });
 
 export function performGistSave() {
   return function(dispatch, getState): ThunkAction {
@@ -422,10 +413,10 @@ export function performGistSave() {
 }
 
 const requestCratesLoad = () =>
-  createAction(REQUEST_CRATES_LOAD);
+  createAction(ActionType.RequestCratesLoad);
 
 const receiveCratesLoadSuccess = ({ crates }) =>
-  createAction(CRATES_LOAD_SUCCEEDED, { crates });
+  createAction(ActionType.CratesLoadSucceeded, { crates });
 
 export function performCratesLoad(): ThunkAction {
   return function(dispatch) {
@@ -438,10 +429,10 @@ export function performCratesLoad(): ThunkAction {
 }
 
 const requestVersionsLoad = () =>
-  createAction(REQUEST_VERSIONS_LOAD);
+  createAction(ActionType.RequestVersionsLoad);
 
 const receiveVersionsLoadSuccess = ({ stable, beta, nightly }) =>
-  createAction(VERSIONS_LOAD_SUCCEEDED, { stable, beta, nightly });
+  createAction(ActionType.VersionsLoadSucceeded, { stable, beta, nightly });
 
 export function performVersionsLoad(): ThunkAction {
   return function(dispatch) {

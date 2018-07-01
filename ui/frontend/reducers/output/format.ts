@@ -1,4 +1,4 @@
-import * as actions from '../../actions';
+import { ActionType } from '../../actions';
 import { finish, start } from './sharedStateManagement';
 
 const DEFAULT: State = {
@@ -11,12 +11,12 @@ export interface State {
 
 export default function format(state = DEFAULT, action) {
   switch (action.type) {
-  case actions.REQUEST_FORMAT:
-    return start(DEFAULT, state);
-  case actions.FORMAT_SUCCEEDED:
-  case actions.FORMAT_FAILED:
-    return finish(state);
-  default:
-    return state;
+    case ActionType.RequestFormat:
+      return start(DEFAULT, state);
+    case ActionType.FormatSucceeded:
+    case ActionType.FormatFailed:
+      return finish(state);
+    default:
+      return state;
   }
 }

@@ -1,4 +1,4 @@
-import * as actions from '../actions';
+import { ActionType } from '../actions';
 
 const DEFAULT: State = `fn main() {
     println!("Hello, world!");
@@ -8,18 +8,18 @@ export type State = string;
 
 export default function code(state = DEFAULT, action) {
   switch (action.type) {
-  case actions.REQUEST_GIST_LOAD:
-    return '';
-  case actions.GIST_LOAD_SUCCEEDED:
-    return action.code;
+    case ActionType.RequestGistLoad:
+      return '';
+    case ActionType.GistLoadSucceeded:
+      return action.code;
 
-  case actions.EDIT_CODE:
-    return action.code;
+    case ActionType.EditCode:
+      return action.code;
 
-  case actions.FORMAT_SUCCEEDED:
-    return action.code;
+    case ActionType.FormatSucceeded:
+      return action.code;
 
-  default:
-    return state;
+    default:
+      return state;
   }
 }

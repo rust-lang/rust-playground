@@ -1,4 +1,4 @@
-import * as actions from '../../actions';
+import { ActionType } from '../../actions';
 
 const DEFAULT: State = {
   focus: null,
@@ -12,35 +12,35 @@ export interface State {
 
 export default function meta(state = DEFAULT, action) {
   switch (action.type) {
-    case actions.ActionType.ChangeFocus:
+    case ActionType.ChangeFocus:
       return { ...state, focus: action.focus };
 
-    case actions.REQUEST_CLIPPY:
+    case ActionType.RequestClippy:
       return { ...state, focus: 'clippy' };
 
-    case actions.ActionType.CompileLlvmIrRequest:
+    case ActionType.CompileLlvmIrRequest:
       return { ...state, focus: 'llvm-ir' };
 
-    case actions.ActionType.CompileMirRequest:
+    case ActionType.CompileMirRequest:
       return { ...state, focus: 'mir' };
 
-    case actions.ActionType.CompileWasmRequest:
+    case ActionType.CompileWasmRequest:
       return { ...state, focus: 'wasm' };
 
-    case actions.ActionType.CompileAssemblyRequest:
+    case ActionType.CompileAssemblyRequest:
       return { ...state, focus: 'asm' };
 
-    case actions.ActionType.ExecuteRequest:
+    case ActionType.ExecuteRequest:
       return { ...state, focus: 'execute' };
 
-    case actions.REQUEST_FORMAT:
+    case ActionType.RequestFormat:
       return { ...state, focus: 'format' };
-    case actions.FORMAT_SUCCEEDED:
-    case actions.FORMAT_FAILED:
+    case ActionType.FormatSucceeded:
+    case ActionType.FormatFailed:
       return { ...state, focus: null };
 
-    case actions.REQUEST_GIST_LOAD:
-    case actions.REQUEST_GIST_SAVE:
+    case ActionType.RequestGistLoad:
+    case ActionType.RequestGistSave:
       return { ...state, focus: 'gist' };
 
     default:

@@ -1,4 +1,4 @@
-import * as actions from '../../actions';
+import { ActionType } from '../../actions';
 import { finish, start } from './sharedStateManagement';
 
 const DEFAULT: State = {
@@ -17,15 +17,15 @@ export interface State {
 
 export default function clippy(state = DEFAULT, action) {
   switch (action.type) {
-  case actions.REQUEST_CLIPPY:
-    return start(DEFAULT, state);
-  case actions.CLIPPY_SUCCEEDED: {
-    const { stdout = '', stderr = '' } = action;
-    return finish(state, { stdout, stderr });
-  }
-  case actions.CLIPPY_FAILED:
-    return finish(state, { error: action.error });
-  default:
-    return state;
+    case ActionType.RequestClippy:
+      return start(DEFAULT, state);
+    case ActionType.ClippySucceeded: {
+      const { stdout = '', stderr = '' } = action;
+      return finish(state, { stdout, stderr });
+    }
+    case ActionType.ClippyFailed:
+      return finish(state, { error: action.error });
+    default:
+      return state;
   }
 }

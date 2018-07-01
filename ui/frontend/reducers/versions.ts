@@ -1,4 +1,4 @@
-import * as actions from '../actions';
+import { ActionType } from '../actions';
 import { Version } from '../types';
 
 const DEFAULT: State = {
@@ -15,7 +15,7 @@ export interface State {
 
 export default function crates(state = DEFAULT, action) {
   switch (action.type) {
-    case actions.VERSIONS_LOAD_SUCCEEDED: {
+    case ActionType.VersionsLoadSucceeded: {
       const { stable, beta, nightly } = action;
       return { stable, beta, nightly };
     }
