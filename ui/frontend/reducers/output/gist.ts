@@ -1,5 +1,6 @@
 import { Action, ActionType } from '../../actions';
-import { finish, start } from './sharedStateManagement';
+import { Channel, Edition, Mode } from '../../types';
+import { finish, RequestsInProgress, start } from './sharedStateManagement';
 
 const DEFAULT: State = {
   requestsInProgress: 0,
@@ -8,14 +9,16 @@ const DEFAULT: State = {
   error: null,
 };
 
-export interface State {
-  requestsInProgress: number;
+export interface State extends RequestsInProgress {
   id?: string;
   url?: string;
+  channel?: Channel;
+  mode?: Mode;
+  edition?: Edition;
   error?: string;
 }
 
-export default function gist(state = DEFAULT, action: Action) {
+export default function gist(state = DEFAULT, action: Action): State {
   switch (action.type) {
     case ActionType.RequestGistLoad:
     case ActionType.RequestGistSave:
