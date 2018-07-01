@@ -1,4 +1,4 @@
-import { ActionType } from '../../actions';
+import { Action, ActionType } from '../../actions';
 
 const DEFAULT: State = {
   focus: null,
@@ -10,7 +10,7 @@ export interface State {
   focus?: Focus;
 }
 
-export default function meta(state = DEFAULT, action) {
+export default function meta(state = DEFAULT, action: Action) {
   switch (action.type) {
     case ActionType.ChangeFocus:
       return { ...state, focus: action.focus };

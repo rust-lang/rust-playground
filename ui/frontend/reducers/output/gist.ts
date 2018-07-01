@@ -1,4 +1,4 @@
-import { ActionType } from '../../actions';
+import { Action, ActionType } from '../../actions';
 import { finish, start } from './sharedStateManagement';
 
 const DEFAULT: State = {

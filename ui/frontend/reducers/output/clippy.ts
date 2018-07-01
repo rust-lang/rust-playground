@@ -1,4 +1,4 @@
-import { ActionType } from '../../actions';
+import { Action, ActionType } from '../../actions';
 import { finish, start } from './sharedStateManagement';
 
 const DEFAULT: State = {
@@ -15,7 +15,7 @@ export interface State {
   error?: string;
 }
 
-export default function clippy(state = DEFAULT, action) {
+export default function clippy(state = DEFAULT, action: Action) {
   switch (action.type) {
     case ActionType.RequestClippy:
       return start(DEFAULT, state);

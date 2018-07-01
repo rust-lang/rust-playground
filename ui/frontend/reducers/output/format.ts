@@ -1,4 +1,4 @@
-import { ActionType } from '../../actions';
+import { Action, ActionType } from '../../actions';
 import { finish, start } from './sharedStateManagement';
 
 const DEFAULT: State = {
@@ -9,7 +9,7 @@ export interface State {
   requestsInProgress: number;
 }
 
-export default function format(state = DEFAULT, action) {
+export default function format(state = DEFAULT, action: Action) {
   switch (action.type) {
     case ActionType.RequestFormat:
       return start(DEFAULT, state);

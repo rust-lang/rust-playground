@@ -1,4 +1,4 @@
-import { ActionType } from '../actions';
+import { Action, ActionType } from '../actions';
 
 const DEFAULT: State = `fn main() {
     println!("Hello, world!");
@@ -6,7 +6,7 @@ const DEFAULT: State = `fn main() {
 
 export type State = string;
 
-export default function code(state = DEFAULT, action) {
+export default function code(state = DEFAULT, action: Action) {
   switch (action.type) {
     case ActionType.RequestGistLoad:
       return '';
