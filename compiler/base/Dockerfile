@@ -18,7 +18,6 @@ ENV USER=root
 ENV PATH=/root/.cargo/bin:$PATH
 
 ADD entrypoint.sh /root/
-ENTRYPOINT ["/root/entrypoint.sh"]
 
 ARG channel
 
@@ -55,6 +54,8 @@ RUN cd /modify-cargo-toml && \
 # Put everything together
 
 FROM dependencies
+
+ENTRYPOINT ["/root/entrypoint.sh"]
 
 ARG channel
 
