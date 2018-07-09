@@ -636,6 +636,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -664,6 +665,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: COMPILATION_MODE_CODE.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -680,6 +682,7 @@ mod test {
             mode: Mode::Release,
             tests: false,
             code: COMPILATION_MODE_CODE.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -706,6 +709,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: VERSION_CODE.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -724,6 +728,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: VERSION_CODE.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -742,6 +747,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: VERSION_CODE.to_string(),
+            edition: Some(Edition::Rust2018),
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -761,6 +767,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -780,6 +787,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -800,6 +808,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -819,6 +828,7 @@ mod test {
             mode: Mode::Debug,
             tests: false,
             code: HELLO_WORLD_CODE.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -860,7 +870,7 @@ mod test {
         let sb = Sandbox::new().expect("Unable to create sandbox");
         let resp = sb.clippy(&req).expect("Unable to lint code");
 
-        assert!(resp.stderr.contains("warn(eq_op)"));
+        assert!(resp.stderr.contains("deny(eq_op)"));
         assert!(resp.stderr.contains("warn(zero_divided_by_zero)"));
     }
 
@@ -881,6 +891,7 @@ mod test {
             crate_type: CrateType::Binary,
             tests: false,
             code: code.to_string(),
+            edition: None
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -905,6 +916,7 @@ mod test {
             crate_type: CrateType::Binary,
             tests: false,
             code: code.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -928,6 +940,7 @@ mod test {
             crate_type: CrateType::Binary,
             tests: false,
             code: code.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -956,6 +969,7 @@ mod test {
             crate_type: CrateType::Binary,
             tests: false,
             code: forkbomb.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
