@@ -499,9 +499,18 @@ export function indexPageLoad({
   return function(dispatch) {
     const channel = parseChannel(version);
     const mode = parseMode(modeString);
-    const edition = parseEdition(editionString);
+    let edition = parseEdition(editionString);
 
     dispatch(navigateToIndex());
+
+    if (code || gist) {
+      // We need to ensure that any links that predate the existence
+      // of editions will *forever* pick 2015. However, if we aren't
+      // loading code, then allow the edition to remain the default.
+      if (!edition) {
+        edition = Edition.Rust2015;
+      }
+    }
 
     if (code) {
       dispatch(editCode(code));
@@ -519,11 +528,6 @@ export function indexPageLoad({
 
     if (edition) {
       dispatch(changeEdition(edition));
-    } else if (code || gist) {
-      // We need to ensure that any links that predate the existence
-      // of editions will *forever* pick 2015. However, if we aren't
-      // loading code, then allow the edition to remain the default.
-      dispatch(changeEdition(Edition.Rust2015));
     }
   };
 }

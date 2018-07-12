@@ -69,6 +69,7 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
     visit '/?gist=20fb1e0475f890d0fdb7864e3ad0820c&version=nightly'
 
     expect(page).to have_edition('2015')
+    expect(page).to have_link("Permalink to the playground", href: /edition=2015/)
   end
 
   scenario "loading code directly from a parameter" do
