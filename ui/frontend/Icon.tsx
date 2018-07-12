@@ -22,7 +22,7 @@ export const MoreOptionsIcon = () => (
 
 export const MoreOptionsActiveIcon = () => (
   <svg className="icon" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg">
-    <g fill-rule="evenodd" fill="#428bca">
+    <g fillRule="evenodd" fill="#428bca">
 
       <path d="M4,5 h16 a3,3 0 0,1 3,3 v8 a3,3 0 0,1 -3,3 h-16 a3,3 0 0,1 -3,-3 v-8 a3,3 0 0,1 3,-3 Z
                M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
