@@ -34,17 +34,9 @@ const routes = {
 
 type ThunkAction<T = void> = ReduxThunkAction<T, State, {}>;
 
-export function toggleConfiguration(): ToggleConfigurationAction {
-  return { type: ActionType.ToggleConfiguration };
-}
-
-export function navigateToIndex(): SetPageAction {
-  return { type: ActionType.SetPage, page: 'index' };
-}
-
-export function navigateToHelp(): SetPageAction {
-  return { type: ActionType.SetPage, page: 'help' };
-}
+const createAction = <T extends string, P extends {}>(type: T, props?: P) => (
+  Object.assign({ type }, props)
+);
 
 export enum ActionType {
   ToggleConfiguration = 'TOGGLE_CONFIGURATION',
@@ -75,186 +67,81 @@ export enum ActionType {
   CompileWasmRequest = 'COMPILE_WASM_REQUEST',
   CompileWasmSucceeded = 'COMPILE_WASM_SUCCEEDED',
   CompileWasmFailed = 'COMPILE_WASM_FAILED',
-
-  Other = '__never_used__',
+  EditCode = 'EDIT_CODE',
+  GotoPosition = 'GOTO_POSITION',
+  RequestFormat = 'REQUEST_FORMAT',
+  FormatSucceeded = 'FORMAT_SUCCEEDED',
+  FormatFailed = 'FORMAT_FAILED',
+  RequestClippy = 'REQUEST_CLIPPY',
+  ClippySucceeded = 'CLIPPY_SUCCEEDED',
+  ClippyFailed = 'CLIPPY_FAILED',
+  RequestGistLoad = 'REQUEST_GIST_LOAD',
+  GistLoadSucceeded = 'GIST_LOAD_SUCCEEDED',
+  GistLoadFailed = 'GIST_LOAD_FAILED',
+  RequestGistSave = 'REQUEST_GIST_SAVE',
+  GistSaveSucceeded = 'GIST_SAVE_SUCCEEDED',
+  GistSaveFailed = 'GIST_SAVE_FAILED',
+  RequestCratesLoad = 'REQUEST_CRATES_LOAD',
+  CratesLoadSucceeded = 'CRATES_LOAD_SUCCEEDED',
+  RequestVersionsLoad = 'REQUEST_VERSIONS_LOAD',
+  VersionsLoadSucceeded = 'VERSIONS_LOAD_SUCCEEDED',
 }
 
-export type Action =
-  | ToggleConfigurationAction
-  | SetPageAction
-  | ChangeAssemblyFlavorAction
-  | ChangeChannelAction
-  | ChangeDemangleAssemblyAction
-  | ChangeEditorAction
-  | ChangeFocusAction
-  | ChangeProcessAssemblyAction
-  | ChangeKeybindingAction
-  | ChangeModeAction
-  | ChangeEditionAction
-  | ChangeOrientationAction
-  | ChangeThemeAction
-  | ExecuteRequestAction
-  | ExecuteSucceededAction
-  | ExecuteFailedAction
-  | CompileAssemblyRequestAction
-  | CompileAssemblySucceededAction
-  | CompileAssemblyFailedAction
-  | CompileLlvmIrRequestAction
-  | CompileLlvmIrSucceededAction
-  | CompileLlvmIrFailedAction
-  | CompileMirRequestAction
-  | CompileMirSucceededAction
-  | CompileMirFailedAction
-  | CompileWasmRequestAction
-  | CompileWasmSucceededAction
-  | CompileWasmFailedAction
+export const toggleConfiguration = () =>
+  createAction(ActionType.ToggleConfiguration);
 
-  | OtherAction
-  ;
+const setPage = (page: Page) =>
+  createAction(ActionType.SetPage, { page });
 
-export interface ToggleConfigurationAction {
-  type: ActionType.ToggleConfiguration;
-}
+export const navigateToIndex = () => setPage('index');
+export const navigateToHelp = () => setPage('help');
 
-export interface SetPageAction {
-  type: ActionType.SetPage;
-  page: Page;
-}
+export const changeEditor = (editor: Editor) =>
+  createAction(ActionType.ChangeEditor, { editor });
 
-export interface ChangeEditorAction {
-  type: ActionType.ChangeEditor;
-  editor: Editor;
-}
+export const changeKeybinding = (keybinding: string) =>
+  createAction(ActionType.ChangeKeybinding, { keybinding });
 
-export interface ChangeKeybindingAction {
-  type: ActionType.ChangeKeybinding;
-  keybinding: string;
-}
+export const changeTheme = (theme: string) =>
+  createAction(ActionType.ChangeTheme, { theme });
 
-export interface ChangeThemeAction {
-  type: ActionType.ChangeTheme;
-  theme: string;
-}
+export const changeOrientation = (orientation: Orientation) =>
+  createAction(ActionType.ChangeOrientation, { orientation });
 
-export interface ChangeOrientationAction {
-  type: ActionType.ChangeOrientation;
-  orientation: Orientation;
-}
+export const changeAssemblyFlavor = (assemblyFlavor: AssemblyFlavor) =>
+  createAction(ActionType.ChangeAssemblyFlavor, { assemblyFlavor });
 
-export interface ChangeAssemblyFlavorAction {
-  type: ActionType.ChangeAssemblyFlavor;
-  assemblyFlavor: AssemblyFlavor;
-}
+export const changeDemangleAssembly = (demangleAssembly: DemangleAssembly) =>
+  createAction(ActionType.ChangeDemangleAssembly, { demangleAssembly });
 
-export interface ChangeDemangleAssemblyAction {
-  type: ActionType.ChangeDemangleAssembly;
-  demangleAssembly: DemangleAssembly;
-}
+export const changeProcessAssembly = (processAssembly: ProcessAssembly) =>
+  createAction(ActionType.ChangeProcessAssembly, { processAssembly });
 
-export interface ChangeProcessAssemblyAction {
-  type: ActionType.ChangeProcessAssembly;
-  processAssembly: ProcessAssembly;
-}
+export const changeChannel = (channel: Channel) =>
+  createAction(ActionType.ChangeChannel, { channel });
 
-export interface ChangeChannelAction {
-  type: ActionType.ChangeChannel;
-  channel: Channel;
-}
+export const changeMode = (mode: Mode) =>
+  createAction(ActionType.ChangeMode, { mode });
 
-export interface ChangeModeAction {
-  type: ActionType.ChangeMode;
-  mode: Mode;
-}
-
-export interface ChangeEditionAction {
-  type: ActionType.ChangeEdition;
-  edition: Edition;
-}
-
-export interface ChangeFocusAction {
-  type: ActionType.ChangeFocus;
-  focus: string;
-}
-
-export interface OtherAction {
-  type: ActionType.Other;
-}
-
-export function changeEditor(editor): ChangeEditorAction {
-  return { type: ActionType.ChangeEditor, editor };
-}
-
-export function changeKeybinding(keybinding): ChangeKeybindingAction {
-  return { type: ActionType.ChangeKeybinding, keybinding };
-}
-
-export function changeTheme(theme): ChangeThemeAction {
-  return { type: ActionType.ChangeTheme, theme };
-}
-
-export function changeOrientation(orientation): ChangeOrientationAction {
-  return { type: ActionType.ChangeOrientation, orientation };
-}
-
-export function changeAssemblyFlavor(assemblyFlavor): ChangeAssemblyFlavorAction {
-  return { type: ActionType.ChangeAssemblyFlavor, assemblyFlavor };
-}
-
-export function changeDemangleAssembly(demangleAssembly): ChangeDemangleAssemblyAction {
-  return { type: ActionType.ChangeDemangleAssembly, demangleAssembly };
-}
-
-export function changeProcessAssembly(processAssembly): ChangeProcessAssemblyAction {
-  return { type: ActionType.ChangeProcessAssembly, processAssembly };
-}
-
-export function changeChannel(channel: Channel): ChangeChannelAction {
-  return { type: ActionType.ChangeChannel, channel };
-}
-
-export function changeMode(mode: Mode): ChangeModeAction {
-  return { type: ActionType.ChangeMode, mode };
-}
-
-export function changeEdition(edition: Edition): ChangeEditionAction {
-  return { type: ActionType.ChangeEdition, edition };
-}
+export const changeEdition = (edition: Edition) =>
+  createAction(ActionType.ChangeEdition, { edition });
 
 export const changeNightlyEdition: ThunkAction = (edition: Edition) => dispatch => {
   dispatch(changeChannel(Channel.Nightly));
   dispatch(changeEdition(edition));
 };
 
-export function changeFocus(focus): ChangeFocusAction {
-  return { type: ActionType.ChangeFocus, focus };
-}
+export const changeFocus = focus =>
+  createAction(ActionType.ChangeFocus, { focus });
 
-export interface ExecuteRequestAction {
-  type: ActionType.ExecuteRequest;
-}
+const requestExecute = () =>
+  createAction(ActionType.ExecuteRequest);
 
-export interface ExecuteSucceededAction {
-  type: ActionType.ExecuteSucceeded;
-  stdout?: string;
-  stderr?: string;
-}
+const receiveExecuteSuccess = ({ stdout, stderr }) =>
+  createAction(ActionType.ExecuteSucceeded, { stdout, stderr });
 
-export interface ExecuteFailedAction {
-  type: ActionType.ExecuteFailed;
-  error?: string;
-}
-
-function requestExecute(): ExecuteRequestAction {
-  return { type: ActionType.ExecuteRequest };
-}
-
-function receiveExecuteSuccess({ stdout, stderr }): ExecuteSucceededAction {
-  return { type: ActionType.ExecuteSucceeded, stdout, stderr };
-}
-
-function receiveExecuteFailure({ error }): ExecuteFailedAction {
-  return { type: ActionType.ExecuteFailed, error };
-}
+const receiveExecuteFailure = ({ error }) =>
+  createAction(ActionType.ExecuteFailed, { error });
 
 function jsonGet(urlObj) {
   const urlStr = url.format(urlObj);
@@ -364,40 +251,14 @@ function performCompile(target, { request, success, failure }): ThunkAction {
   };
 }
 
-export interface CompileRequestAction<T> {
-  type: T;
-}
+const requestCompileAssembly = () =>
+  createAction(ActionType.CompileAssemblyRequest);
 
-export interface CompileSucceededAction<T> {
-  type: T;
-  code?: string;
-  stdout?: string;
-  stderr?: string;
-}
+const receiveCompileAssemblySuccess = ({ code, stdout, stderr }) =>
+  createAction(ActionType.CompileAssemblySucceeded, { code, stdout, stderr });
 
-export interface CompileFailedAction<T> {
-  type: T;
-  error?: string;
-}
-
-export type CompileAssemblyRequestAction =
-  CompileRequestAction<ActionType.CompileAssemblyRequest>;
-export type CompileAssemblySucceededAction =
-  CompileSucceededAction<ActionType.CompileAssemblySucceeded>;
-export type CompileAssemblyFailedAction =
-  CompileFailedAction<ActionType.CompileAssemblyFailed>;
-
-function requestCompileAssembly(): CompileAssemblyRequestAction {
-  return { type: ActionType.CompileAssemblyRequest };
-}
-
-function receiveCompileAssemblySuccess({ code, stdout, stderr }): CompileAssemblySucceededAction {
-  return { type: ActionType.CompileAssemblySucceeded, code, stdout, stderr };
-}
-
-function receiveCompileAssemblyFailure({ error }): CompileAssemblyFailedAction {
-  return { type: ActionType.CompileAssemblyFailed, error };
-}
+const receiveCompileAssemblyFailure = ({ error }) =>
+  createAction(ActionType.CompileAssemblyFailed, { error });
 
 export const performCompileToAssembly = () =>
   performCompile('asm', {
@@ -406,24 +267,14 @@ export const performCompileToAssembly = () =>
     failure: receiveCompileAssemblyFailure,
   });
 
-export type CompileLlvmIrRequestAction =
-  CompileRequestAction<ActionType.CompileLlvmIrRequest>;
-export type CompileLlvmIrSucceededAction =
-  CompileSucceededAction<ActionType.CompileLlvmIrSucceeded>;
-export type CompileLlvmIrFailedAction =
-  CompileFailedAction<ActionType.CompileLlvmIrFailed>;
+const requestCompileLlvmIr = () =>
+  createAction(ActionType.CompileLlvmIrRequest);
 
-function requestCompileLlvmIr(): CompileLlvmIrRequestAction {
-  return { type: ActionType.CompileLlvmIrRequest };
-}
+const receiveCompileLlvmIrSuccess = ({ code, stdout, stderr }) =>
+  createAction(ActionType.CompileLlvmIrSucceeded, { code, stdout, stderr });
 
-function receiveCompileLlvmIrSuccess({ code, stdout, stderr }): CompileLlvmIrSucceededAction {
-  return { type: ActionType.CompileLlvmIrSucceeded, code, stdout, stderr };
-}
-
-function receiveCompileLlvmIrFailure({ error }): CompileLlvmIrFailedAction {
-  return { type: ActionType.CompileLlvmIrFailed, error };
-}
+const receiveCompileLlvmIrFailure = ({ error }) =>
+  createAction(ActionType.CompileLlvmIrFailed, { error });
 
 export const performCompileToLLVM = () =>
   performCompile('llvm-ir', {
@@ -432,24 +283,14 @@ export const performCompileToLLVM = () =>
     failure: receiveCompileLlvmIrFailure,
   });
 
-export type CompileMirRequestAction =
-  CompileRequestAction<ActionType.CompileMirRequest>;
-export type CompileMirSucceededAction =
-  CompileSucceededAction<ActionType.CompileMirSucceeded>;
-export type CompileMirFailedAction =
-  CompileFailedAction<ActionType.CompileMirFailed>;
+const requestCompileMir = () =>
+  createAction(ActionType.CompileMirRequest);
 
-function requestCompileMir(): CompileMirRequestAction {
-  return { type: ActionType.CompileMirRequest };
-}
+const receiveCompileMirSuccess = ({ code, stdout, stderr }) =>
+  createAction(ActionType.CompileMirSucceeded, { code, stdout, stderr });
 
-function receiveCompileMirSuccess({ code, stdout, stderr }): CompileMirSucceededAction {
-  return { type: ActionType.CompileMirSucceeded, code, stdout, stderr };
-}
-
-function receiveCompileMirFailure({ error }): CompileMirFailedAction {
-  return { type: ActionType.CompileMirFailed, error };
-}
+const receiveCompileMirFailure = ({ error }) =>
+  createAction(ActionType.CompileMirFailed, { error });
 
 export const performCompileToMir = () =>
   performCompile('mir', {
@@ -458,24 +299,14 @@ export const performCompileToMir = () =>
     failure: receiveCompileMirFailure,
   });
 
-export type CompileWasmRequestAction =
-  CompileRequestAction<ActionType.CompileWasmRequest>;
-export type CompileWasmSucceededAction =
-  CompileSucceededAction<ActionType.CompileWasmSucceeded>;
-export type CompileWasmFailedAction =
-  CompileFailedAction<ActionType.CompileWasmFailed>;
+const requestCompileWasm = () =>
+  createAction(ActionType.CompileWasmRequest);
 
-function requestCompileWasm(): CompileWasmRequestAction {
-  return { type: ActionType.CompileWasmRequest };
-}
+const receiveCompileWasmSuccess = ({ code, stdout, stderr }) =>
+  createAction(ActionType.CompileWasmSucceeded, { code, stdout, stderr });
 
-function receiveCompileWasmSuccess({ code, stdout, stderr }): CompileWasmSucceededAction {
-  return { type: ActionType.CompileWasmSucceeded, code, stdout, stderr };
-}
-
-function receiveCompileWasmFailure({ error }): CompileWasmFailedAction {
-  return { type: ActionType.CompileWasmFailed, error };
-}
+const receiveCompileWasmFailure = ({ error }) =>
+  createAction(ActionType.CompileWasmFailed, { error });
 
 export const performCompileToWasm = () =>
   performCompile('wasm', {
@@ -489,32 +320,20 @@ export const performCompileToNightlyWasm: ThunkAction = () => dispatch => {
   dispatch(performCompileToWasm());
 };
 
-export const EDIT_CODE = 'EDIT_CODE';
-export const GOTO_POSITION = 'GOTO_POSITION';
+export const editCode = code =>
+  createAction(ActionType.EditCode, { code });
 
-export function editCode(code) {
-  return { type: EDIT_CODE, code };
-}
+export const gotoPosition = (line, column) =>
+  createAction(ActionType.GotoPosition, { line: +line, column: +column });
 
-export function gotoPosition(line, column) {
-  return { type: GOTO_POSITION, line: +line, column: +column };
-}
+const requestFormat = () =>
+  createAction(ActionType.RequestFormat);
 
-export const REQUEST_FORMAT = 'REQUEST_FORMAT';
-export const FORMAT_SUCCEEDED = 'FORMAT_SUCCEEDED';
-export const FORMAT_FAILED = 'FORMAT_FAILED';
+const receiveFormatSuccess = ({ code }) =>
+  createAction(ActionType.FormatSucceeded, { code });
 
-function requestFormat() {
-  return { type: REQUEST_FORMAT };
-}
-
-function receiveFormatSuccess({ code }) {
-  return { type: FORMAT_SUCCEEDED, code };
-}
-
-function receiveFormatFailure({ error }) {
-  return { type: FORMAT_FAILED, error };
-}
+const receiveFormatFailure = ({ error }) =>
+  createAction(ActionType.FormatFailed, { error });
 
 export function performFormat(): ThunkAction {
   // TODO: Check a cache
@@ -530,21 +349,14 @@ export function performFormat(): ThunkAction {
   };
 }
 
-export const REQUEST_CLIPPY = 'REQUEST_CLIPPY';
-export const CLIPPY_SUCCEEDED = 'CLIPPY_SUCCEEDED';
-export const CLIPPY_FAILED = 'CLIPPY_FAILED';
+const requestClippy = () =>
+  createAction(ActionType.RequestClippy);
 
-function requestClippy() {
-  return { type: REQUEST_CLIPPY };
-}
+const receiveClippySuccess = ({ stdout, stderr }) =>
+  createAction(ActionType.ClippySucceeded, { stdout, stderr });
 
-function receiveClippySuccess({ stdout, stderr }) {
-  return { type: CLIPPY_SUCCEEDED, stdout, stderr };
-}
-
-function receiveClippyFailure({ error }) {
-  return { type: CLIPPY_FAILED, error };
-}
+const receiveClippyFailure = ({ error }) =>
+  createAction(ActionType.ClippyFailed, { error });
 
 export function performClippy(): ThunkAction {
   // TODO: Check a cache
@@ -560,47 +372,33 @@ export function performClippy(): ThunkAction {
   };
 }
 
-export const REQUEST_GIST_LOAD = 'REQUEST_GIST_LOAD';
-export const GIST_LOAD_SUCCEEDED = 'GIST_LOAD_SUCCEEDED';
-export const GIST_LOAD_FAILED = 'GIST_LOAD_FAILED';
+const requestGistLoad = () =>
+  createAction(ActionType.RequestGistLoad);
 
-function requestGistLoad() {
-  return { type: REQUEST_GIST_LOAD };
-}
+const receiveGistLoadSuccess = ({ id, url, code, channel, mode, edition }) =>
+  createAction(ActionType.GistLoadSucceeded, { id, url, code, channel, mode, edition });
 
-function receiveGistLoadSuccess({ id, url, code }) {
-  return { type: GIST_LOAD_SUCCEEDED, id, url, code };
-}
+const receiveGistLoadFailure = () => // eslint-disable-line no-unused-vars
+  createAction(ActionType.GistLoadFailed);
 
-function receiveGistLoadFailure() { // eslint-disable-line no-unused-vars
-  return { type: GIST_LOAD_FAILED };
-}
-
-export function performGistLoad(id): ThunkAction {
+export function performGistLoad({ id, channel, mode, edition }): ThunkAction {
   return function(dispatch, _getState) {
     dispatch(requestGistLoad());
     const u = url.resolve(routes.meta.gist.pathname, id);
     jsonGet(u)
-      .then(gist => dispatch(receiveGistLoadSuccess({ ...gist })));
+      .then(gist => dispatch(receiveGistLoadSuccess({ channel, mode, edition, ...gist })));
     // TODO: Failure case
   };
 }
 
-export const REQUEST_GIST_SAVE = 'REQUEST_GIST_SAVE';
-export const GIST_SAVE_SUCCEEDED = 'GIST_SAVE_SUCCEEDED';
-export const GIST_SAVE_FAILED = 'GIST_SAVE_FAILED';
+const requestGistSave = () =>
+  createAction(ActionType.RequestGistSave);
 
-function requestGistSave() {
-  return { type: REQUEST_GIST_SAVE };
-}
+const receiveGistSaveSuccess = ({ id, url, channel, mode, edition }) =>
+  createAction(ActionType.GistSaveSucceeded, { id, url, channel, mode, edition });
 
-function receiveGistSaveSuccess({ id, url, channel, mode, edition }) {
-  return { type: GIST_SAVE_SUCCEEDED, id, url, channel, mode, edition };
-}
-
-function receiveGistSaveFailure({ error }) { // eslint-disable-line no-unused-vars
-  return { type: GIST_SAVE_FAILED, error };
-}
+const receiveGistSaveFailure = ({ error }) => // eslint-disable-line no-unused-vars
+  createAction(ActionType.GistSaveFailed, { error });
 
 export function performGistSave() {
   return function(dispatch, getState): ThunkAction {
@@ -614,16 +412,11 @@ export function performGistSave() {
   };
 }
 
-export const REQUEST_CRATES_LOAD = 'REQUEST_CRATES_LOAD';
-export const CRATES_LOAD_SUCCEEDED = 'CRATES_LOAD_SUCCEEDED';
+const requestCratesLoad = () =>
+  createAction(ActionType.RequestCratesLoad);
 
-function requestCratesLoad() {
-  return { type: REQUEST_CRATES_LOAD };
-}
-
-function receiveCratesLoadSuccess({ crates }) {
-  return { type: CRATES_LOAD_SUCCEEDED, crates };
-}
+const receiveCratesLoadSuccess = ({ crates }) =>
+  createAction(ActionType.CratesLoadSucceeded, { crates });
 
 export function performCratesLoad(): ThunkAction {
   return function(dispatch) {
@@ -635,16 +428,11 @@ export function performCratesLoad(): ThunkAction {
   };
 }
 
-export const REQUEST_VERSIONS_LOAD = 'REQUEST_VERSIONS_LOAD';
-export const VERSIONS_LOAD_SUCCEEDED = 'VERSIONS_LOAD_SUCCEEDED';
+const requestVersionsLoad = () =>
+  createAction(ActionType.RequestVersionsLoad);
 
-function requestVersionsLoad() {
-  return { type: REQUEST_VERSIONS_LOAD };
-}
-
-function receiveVersionsLoadSuccess({ stable, beta, nightly }) {
-  return { type: VERSIONS_LOAD_SUCCEEDED, stable, beta, nightly };
-}
+const receiveVersionsLoadSuccess = ({ stable, beta, nightly }) =>
+  createAction(ActionType.VersionsLoadSucceeded, { stable, beta, nightly });
 
 export function performVersionsLoad(): ThunkAction {
   return function(dispatch) {
@@ -709,27 +497,28 @@ export function indexPageLoad({
   edition: editionString,
 }): ThunkAction {
   return function(dispatch) {
+    const channel = parseChannel(version);
+    const mode = parseMode(modeString);
+    const edition = parseEdition(editionString);
+
     dispatch(navigateToIndex());
 
     if (code) {
       dispatch(editCode(code));
     } else if (gist) {
-      dispatch(performGistLoad(gist));
+      dispatch(performGistLoad({ id: gist, channel, mode, edition }));
     }
 
-    if (version) {
-      const channel = parseChannel(version);
-      if (channel) { dispatch(changeChannel(channel)); }
+    if (channel) {
+      dispatch(changeChannel(channel));
     }
 
-    if (modeString) {
-      const mode = parseMode(modeString);
-      if (mode) { dispatch(changeMode(mode)); }
+    if (mode) {
+      dispatch(changeMode(mode));
     }
 
-    if (editionString) {
-      const edition = parseEdition(editionString);
-      if (edition) { dispatch(changeEdition(edition)); }
+    if (edition) {
+      dispatch(changeEdition(edition));
     } else if (code || gist) {
       // We need to ensure that any links that predate the existence
       // of editions will *forever* pick 2015. However, if we aren't
@@ -749,3 +538,52 @@ export function showExample(code): ThunkAction {
     dispatch(editCode(code));
   };
 }
+
+export type Action =
+  | ReturnType<typeof toggleConfiguration>
+  | ReturnType<typeof setPage>
+  | ReturnType<typeof changeAssemblyFlavor>
+  | ReturnType<typeof changeChannel>
+  | ReturnType<typeof changeDemangleAssembly>
+  | ReturnType<typeof changeEditor>
+  | ReturnType<typeof changeFocus>
+  | ReturnType<typeof changeProcessAssembly>
+  | ReturnType<typeof changeKeybinding>
+  | ReturnType<typeof changeMode>
+  | ReturnType<typeof changeEdition>
+  | ReturnType<typeof changeOrientation>
+  | ReturnType<typeof changeTheme>
+  | ReturnType<typeof requestExecute>
+  | ReturnType<typeof receiveExecuteSuccess>
+  | ReturnType<typeof receiveExecuteFailure>
+  | ReturnType<typeof requestCompileAssembly>
+  | ReturnType<typeof receiveCompileAssemblySuccess>
+  | ReturnType<typeof receiveCompileAssemblyFailure>
+  | ReturnType<typeof requestCompileLlvmIr>
+  | ReturnType<typeof receiveCompileLlvmIrSuccess>
+  | ReturnType<typeof receiveCompileLlvmIrFailure>
+  | ReturnType<typeof requestCompileMir>
+  | ReturnType<typeof receiveCompileMirSuccess>
+  | ReturnType<typeof receiveCompileMirFailure>
+  | ReturnType<typeof requestCompileWasm>
+  | ReturnType<typeof receiveCompileWasmSuccess>
+  | ReturnType<typeof receiveCompileWasmFailure>
+  | ReturnType<typeof editCode>
+  | ReturnType<typeof gotoPosition>
+  | ReturnType<typeof requestFormat>
+  | ReturnType<typeof receiveFormatSuccess>
+  | ReturnType<typeof receiveFormatFailure>
+  | ReturnType<typeof requestClippy>
+  | ReturnType<typeof receiveClippySuccess>
+  | ReturnType<typeof receiveClippyFailure>
+  | ReturnType<typeof requestGistLoad>
+  | ReturnType<typeof receiveGistLoadSuccess>
+  | ReturnType<typeof receiveGistLoadFailure>
+  | ReturnType<typeof requestGistSave>
+  | ReturnType<typeof receiveGistSaveSuccess>
+  | ReturnType<typeof receiveGistSaveFailure>
+  | ReturnType<typeof requestCratesLoad>
+  | ReturnType<typeof receiveCratesLoadSuccess>
+  | ReturnType<typeof requestVersionsLoad>
+  | ReturnType<typeof receiveVersionsLoadSuccess>
+  ;

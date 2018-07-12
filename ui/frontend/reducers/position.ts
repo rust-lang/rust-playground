@@ -1,4 +1,4 @@
-import * as actions from '../actions';
+import { Action, ActionType } from '../actions';
 import { Position } from '../types';
 
 const DEFAULT: Position = {
@@ -8,13 +8,13 @@ const DEFAULT: Position = {
 
 export type State = Position;
 
-export default function position(state = DEFAULT, action) {
+export default function position(state = DEFAULT, action: Action) {
   switch (action.type) {
-  case actions.GOTO_POSITION: {
-    const { line, column } = action;
-    return { ...state, line, column };
-  }
-  default:
-    return state;
+    case ActionType.GotoPosition: {
+      const { line, column } = action;
+      return { ...state, line, column };
+    }
+    default:
+      return state;
   }
 }
