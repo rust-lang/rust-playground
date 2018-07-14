@@ -6,6 +6,9 @@ const DEFAULT: State = {
   requestsInProgress: 0,
   id: null,
   url: null,
+  channel: null,
+  mode: null,
+  edition: null,
   error: null,
 };
 

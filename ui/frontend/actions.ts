@@ -372,16 +372,27 @@ export function performClippy(): ThunkAction {
   };
 }
 
+interface GistSuccessProps {
+  id: string;
+  url: string;
+  code: string;
+  channel: Channel;
+  mode: Mode;
+  edition: Edition;
+}
+
 const requestGistLoad = () =>
   createAction(ActionType.RequestGistLoad);
 
-const receiveGistLoadSuccess = ({ id, url, code, channel, mode, edition }) =>
-  createAction(ActionType.GistLoadSucceeded, { id, url, code, channel, mode, edition });
+const receiveGistLoadSuccess = (props: GistSuccessProps) =>
+  createAction(ActionType.GistLoadSucceeded, props);
 
 const receiveGistLoadFailure = () => // eslint-disable-line no-unused-vars
   createAction(ActionType.GistLoadFailed);
 
-export function performGistLoad({ id, channel, mode, edition }): ThunkAction {
+type PerformGistLoadProps = Pick<GistSuccessProps, Exclude<keyof GistSuccessProps, 'url' | 'code'>>;
+
+export function performGistLoad({ id, channel, mode, edition }: PerformGistLoadProps): ThunkAction {
   return function(dispatch, _getState) {
     dispatch(requestGistLoad());
     const u = url.resolve(routes.meta.gist.pathname, id);
