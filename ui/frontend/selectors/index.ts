@@ -1,4 +1,6 @@
 import { createSelector } from 'reselect';
+import * as url from 'url';
+
 import { State } from '../reducers';
 import { Channel, Edition } from '../types';
 
@@ -56,4 +58,27 @@ export const getAdvancedOptionsSet = (state: State) => (
 
 export const getEditionSet = (state: State) => (
   state.configuration.edition !== Edition.Rust2015
+);
+
+const gistSelector = (state: State) =>
+  state.output.gist;
+
+export const showGistLoaderSelector = createSelector(
+  gistSelector,
+  gist => gist.requestsInProgress > 0,
+);
+
+export const permalinkSelector = createSelector(
+  gistSelector,
+  gist => (
+    url.format({
+      pathname: '/',
+      query: {
+        gist: gist.id,
+        version: gist.channel,
+        mode: gist.mode,
+        edition: gist.edition,
+      },
+    })
+  ),
 );

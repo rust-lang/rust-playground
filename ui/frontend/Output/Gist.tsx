@@ -1,44 +1,35 @@
-import * as qs from 'qs';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 
 import { State } from '../reducers';
+import { permalinkSelector, showGistLoaderSelector } from '../selectors';
 import { Channel, Edition, Mode } from '../types';
 
 import Loader from './Loader';
 
 interface GistProps {
-  requestsInProgress: number;
-  id?: string;
-  url?: string;
-  channel?: Channel;
-  mode?: Mode;
-  edition?: Edition;
+  gistUrl?: string;
+  permalink?: string;
+  showLoader: boolean;
 }
 
-const Gist: React.SFC<GistProps> = props => {
-  const loader = (props.requestsInProgress > 0) ? <Loader /> : null;
-  let permalink = null;
-  if (props.id) {
-    const q = {
-      gist: props.id,
-      version: props.channel,
-      mode: props.mode,
-      edition: props.edition,
-    };
-    permalink = <p><a href={`/?${qs.stringify(q)}`}>Permalink to the playground</a></p>;
-  }
-  const directLink = props.url ? (<p><a href={props.url}>Direct link to the gist</a></p>) : null;
+const Gist: React.SFC<GistProps> = props => (
+  <div className="output-gist">
+    {props.showLoader ? <Loader /> : <Links {...props} />}
+  </div>
+);
 
-  return (
-    <div className="output-gist">
-      {loader}
-      {permalink}
-      {directLink}
-    </div>
-  );
-};
+const Links: React.SFC<GistProps> = props => (
+  <Fragment>
+    <p><a href={props.permalink}>Permalink to the playground</a></p>
+    <p><a href={props.gistUrl}>Direct link to the gist</a></p>
+  </Fragment>
+);
 
-const mapStateToProps = (state: State) => state.output.gist;
+const mapStateToProps = (state: State) => ({
+  gistUrl: state.output.gist.url,
+  permalink: permalinkSelector(state),
+  showLoader: showGistLoaderSelector(state),
+});
 
 export default connect(mapStateToProps)(Gist);
