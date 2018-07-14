@@ -1,6 +1,8 @@
 import * as qs from 'qs';
 import React from 'react';
+import { connect } from 'react-redux';
 
+import { State } from '../reducers';
 import { Channel, Edition, Mode } from '../types';
 
 import Loader from './Loader';
@@ -37,4 +39,6 @@ const Gist: React.SFC<GistProps> = props => {
   );
 };
 
-export default Gist;
+const mapStateToProps = (state: State) => state.output.gist;
+
+export default connect(mapStateToProps)(Gist);

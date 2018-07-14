@@ -167,7 +167,7 @@ class Output extends React.PureComponent<OutputProps> {
           <PaneWithCode {...llvmIr} kind="llvm-ir" focus={focus} />
           <PaneWithCode {...mir} kind="mir" focus={focus} />
           <PaneWithCode {...wasm} kind="wasm" focus={focus} />
-          {focus === 'gist' && <Gist {...gist} />}
+          {focus === 'gist' && <Gist />}
         </div>
       );
     }
