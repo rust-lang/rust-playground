@@ -60,6 +60,9 @@ export const getEditionSet = (state: State) => (
   state.configuration.edition !== Edition.Rust2015
 );
 
+const baseUrlSelector = (state: State) =>
+  state.globalConfiguration.baseUrl;
+
 const gistSelector = (state: State) =>
   state.output.gist;
 
@@ -69,16 +72,15 @@ export const showGistLoaderSelector = createSelector(
 );
 
 export const permalinkSelector = createSelector(
-  gistSelector,
-  gist => (
-    url.format({
-      pathname: '/',
-      query: {
-        gist: gist.id,
-        version: gist.channel,
-        mode: gist.mode,
-        edition: gist.edition,
-      },
-    })
-  ),
+  baseUrlSelector, gistSelector,
+  (baseUrl, gist) => {
+    const u = url.parse(baseUrl, true);
+    u.query = {
+      gist: gist.id,
+      version: gist.channel,
+      mode: gist.mode,
+      edition: gist.edition,
+    };
+    return url.format(u);
+  },
 );
