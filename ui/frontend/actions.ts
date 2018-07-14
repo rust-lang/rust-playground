@@ -376,6 +376,8 @@ interface GistSuccessProps {
   id: string;
   url: string;
   code: string;
+  stdout: string;
+  stderr: string;
   channel: Channel;
   mode: Mode;
   edition: Edition;
@@ -390,7 +392,8 @@ const receiveGistLoadSuccess = (props: GistSuccessProps) =>
 const receiveGistLoadFailure = () => // eslint-disable-line no-unused-vars
   createAction(ActionType.GistLoadFailed);
 
-type PerformGistLoadProps = Pick<GistSuccessProps, Exclude<keyof GistSuccessProps, 'url' | 'code'>>;
+type PerformGistLoadProps =
+  Pick<GistSuccessProps, Exclude<keyof GistSuccessProps, 'url' | 'code' | 'stdout' | 'stderr'>>;
 
 export function performGistLoad({ id, channel, mode, edition }: PerformGistLoadProps): ThunkAction {
   return function(dispatch, _getState) {
@@ -405,20 +408,20 @@ export function performGistLoad({ id, channel, mode, edition }: PerformGistLoadP
 const requestGistSave = () =>
   createAction(ActionType.RequestGistSave);
 
-const receiveGistSaveSuccess = ({ id, url, channel, mode, edition }) =>
-  createAction(ActionType.GistSaveSucceeded, { id, url, channel, mode, edition });
+const receiveGistSaveSuccess = (props: GistSuccessProps) =>
+  createAction(ActionType.GistSaveSucceeded, props);
 
 const receiveGistSaveFailure = ({ error }) => // eslint-disable-line no-unused-vars
   createAction(ActionType.GistSaveFailed, { error });
 
-export function performGistSave() {
-  return function(dispatch, getState): ThunkAction {
+export function performGistSave(): ThunkAction {
+  return function(dispatch, getState) {
     dispatch(requestGistSave());
 
-    const { code, configuration: { channel, mode, edition } } = getState();
+    const { code, configuration: { channel, mode, edition }, output: { execute: { stdout, stderr } } } = getState();
 
     return jsonPost(routes.meta.gist, { code })
-      .then(json => dispatch(receiveGistSaveSuccess({ ...json, channel, mode, edition })));
+      .then(json => dispatch(receiveGistSaveSuccess({ ...json, code, stdout, stderr, channel, mode, edition })));
     // TODO: Failure case
   };
 }

@@ -1,3 +1,4 @@
+import { source } from 'common-tags';
 import { createSelector } from 'reselect';
 import * as url from 'url';
 
@@ -82,5 +83,56 @@ export const permalinkSelector = createSelector(
       edition: gist.edition,
     };
     return url.format(u);
+  },
+);
+
+const codeBlock = (code: string, language = '') =>
+  '```' + language + `\n${code}\n` + '```';
+
+const maybeOutput = (code: string, whenPresent: (_: string) => void) => {
+  const val = (code || '').trim();
+  if (val.length !== 0) { whenPresent(code); }
+};
+
+const snippetSelector = createSelector(
+  gistSelector, permalinkSelector,
+  (gist, permalink) => {
+    let snippet =
+      source`
+        ${codeBlock(gist.code, 'rust')}
+
+        ([Playground](${permalink}))
+      `;
+
+    maybeOutput(gist.stdout, stdout => {
+      snippet += '\n\n';
+      snippet +=
+        source`
+          Output:
+
+          ${codeBlock(stdout)}
+        `;
+    });
+
+    maybeOutput(gist.stderr, stderr => {
+      snippet += '\n\n';
+      snippet +=
+        source`
+          Errors:
+
+          ${codeBlock(stderr)}
+        `;
+    });
+
+    return snippet;
+  },
+);
+
+export const urloUrlSelector = createSelector(
+  snippetSelector,
+  snippet => {
+    const newUsersPostUrl = url.parse('https://users.rust-lang.org/new-topic', true);
+    newUsersPostUrl.query = { body: snippet };
+    return url.format(newUsersPostUrl);
   },
 );

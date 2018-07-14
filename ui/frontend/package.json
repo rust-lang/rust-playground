@@ -6,6 +6,7 @@
   "dependencies": {
     "babel-polyfill": "^6.9.1",
     "brace": "^0.11.0",
+    "common-tags": "^1.8.0",
     "history": "^4.6.0",
     "isomorphic-fetch": "^2.2.1",
     "lodash.isequal": "^4.5.0",
