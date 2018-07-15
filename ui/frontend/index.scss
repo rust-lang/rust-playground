@@ -51,6 +51,15 @@ body {
     margin-bottom: 4px;
 }
 
+@mixin button-reset {
+  border: none;
+  padding: 0;
+  text-align: inherit;
+  line-height: inherit;
+  background: inherit;
+  background-color: transparent; // IE 11
+}
+
 .playground {
     display: flex;
     height: 100vh;
@@ -434,15 +443,6 @@ $header-transition: 0.2s ease-in-out;
   button:enabled {
     cursor: pointer;
   }
-}
-
-@mixin button-reset {
-  border: none;
-  padding: 0;
-  text-align: inherit;
-  line-height: inherit;
-  background: inherit;
-  background-color: transparent; // IE 11
 }
 
 @mixin active-button($bg-dark) {
