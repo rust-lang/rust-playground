@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { connect } from 'react-redux';
 
+import { ClipboardIcon } from '../Icon';
 import { State } from '../reducers';
 import { issueUrlSelector, permalinkSelector, showGistLoaderSelector, urloUrlSelector } from '../selectors';
 import { Channel, Edition, Mode } from '../types';
@@ -23,12 +25,46 @@ const Gist: React.SFC<GistProps> = props => (
 
 const Links: React.SFC<GistProps> = props => (
   <Fragment>
-    <p><a href={props.permalink}>Permalink to the playground</a></p>
-    <p><a href={props.gistUrl}>Direct link to the gist</a></p>
+    <Copied href={props.permalink}>Permalink to the playground</Copied>
+    <Copied href={props.gistUrl}>Direct link to the gist</Copied>
     <p><a href={props.urloUrl} target="_blank">Open a new thread in the Rust user forum</a></p>
     <p><a href={props.issueUrl} target="_blank"> Open an issue on the Rust GitHub repository </a></p>
   </Fragment>
 );
+
+interface CopiedProps {
+  href: string;
+}
+
+interface CopiedState {
+  copied: boolean;
+}
+
+class Copied extends React.PureComponent<CopiedProps, CopiedState> {
+  constructor(props) {
+    super(props);
+    this.state = { copied: false };
+  }
+
+  public render() {
+    const copiedClass = this.state.copied ? 'output-gist-copy--active' : '';
+
+    return (
+      <p className={`output-gist-copy ${copiedClass}`}>
+        <a href={this.props.href} className="output-gist-copy-link">{this.props.children}</a>
+        <CopyToClipboard text={this.props.href} onCopy={this.copied}>
+          <button className="output-gist-copy-button"><ClipboardIcon /></button>
+        </CopyToClipboard>
+        <span className="output-gist-copy-text">Copied!</span>
+      </p>
+    );
+  }
+
+  private copied = () => {
+    this.setState({ copied: true });
+    setTimeout(() => { this.setState({ copied: false }); }, 1000);
+  }
+}
 
 const mapStateToProps = (state: State) => ({
   gistUrl: state.output.gist.url,

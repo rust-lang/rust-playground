@@ -255,6 +255,38 @@ body {
     code {
         @include body-monospace;
     }
+
+    &-gist-copy {
+        display: flex;
+
+        $copied-duration: 1s ease-in-out;
+
+        &-button {
+            @include button-reset;
+            cursor: pointer;
+            margin: 0 0.25em 0 0.5em;
+            transition: color $copied-duration;
+        }
+
+        &-text {
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility $copied-duration, opacity $copied-duration, color $copied-duration;
+        }
+
+        &--active &-button {
+            color: green;
+            transition: color 0s;
+        }
+
+        &--active &-text {
+            color: green;
+
+            visibility: visible;
+            opacity: 1;
+            transition: visibility 0s, opacity 0s, color 0s;
+        }
+    }
 }
 
 .drop {
