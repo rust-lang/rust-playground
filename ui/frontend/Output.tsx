@@ -8,7 +8,9 @@ import { State } from './reducers';
 import { State as OutputState } from './reducers/output';
 import { Channel, Edition, Mode } from './types';
 
-import Loader from './Loader';
+import Gist from './Output/Gist';
+import Header from './Output/Header';
+import MyLoader from './Output/Loader';
 
 const hasProperties = obj => Object.values(obj).some(val => !!val);
 
@@ -34,14 +36,6 @@ interface TabProps {
   tabProps: object;
 }
 
-const Header: React.SFC<HeaderProps> = ({ label }) => (
-  <span className="output-header">{label}</span>
-);
-
-interface HeaderProps {
-  label: string;
-}
-
 const Section: React.SFC<SectionProps> = ({ kind, label, children }) => {
   if (children) {
     return (
@@ -59,13 +53,6 @@ interface SectionProps {
   kind: string;
   label: string;
 }
-
-const MyLoader: React.SFC = () => (
-  <div>
-    <Header label="Progress" />
-    <Loader />
-  </div>
-);
 
 class HighlightErrors extends React.PureComponent<HighlightErrorsProps> {
   public render() {
@@ -141,51 +128,6 @@ interface FormatProps {
   requestsInProgress: number;
 }
 
-const Gist: React.SFC<GistProps> = ({
-  focus,
-  requestsInProgress,
-  id,
-  url,
-  channel,
-  mode,
-  edition,
-}) => {
-  if (focus === 'gist') {
-    const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
-    let permalink = null;
-    if (id) {
-      const q = {
-        gist: id,
-        version: channel,
-        mode,
-        edition,
-      };
-      permalink = <p><a href={`/?${qs.stringify(q)}`}>Permalink to the playground</a></p>;
-    }
-    const directLink = url ? (<p><a href={url}>Direct link to the gist</a></p>) : null;
-
-    return (
-      <div className="output-gist">
-        {loader}
-        {permalink}
-        {directLink}
-      </div>
-    );
-  } else {
-    return null;
-  }
-};
-
-interface GistProps {
-  focus: string;
-  requestsInProgress: number;
-  id?: string;
-  url?: string;
-  channel?: Channel;
-  mode?: Mode;
-  edition?: Edition;
-}
-
 class Output extends React.PureComponent<OutputProps> {
   private focusClose = () => this.props.changeFocus(null);
   private focusExecute = () => this.props.changeFocus('execute');
@@ -225,7 +167,7 @@ class Output extends React.PureComponent<OutputProps> {
           <PaneWithCode {...llvmIr} kind="llvm-ir" focus={focus} />
           <PaneWithCode {...mir} kind="mir" focus={focus} />
           <PaneWithCode {...wasm} kind="wasm" focus={focus} />
-          <Gist {...gist} focus={focus} />
+          {focus === 'gist' && <Gist />}
         </div>
       );
     }
