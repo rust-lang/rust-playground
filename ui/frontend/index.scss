@@ -51,6 +51,15 @@ body {
     margin-bottom: 4px;
 }
 
+@mixin button-reset {
+  border: none;
+  padding: 0;
+  text-align: inherit;
+  line-height: inherit;
+  background: inherit;
+  background-color: transparent; // IE 11
+}
+
 .playground {
     display: flex;
     height: 100vh;
@@ -246,6 +255,38 @@ body {
     code {
         @include body-monospace;
     }
+
+    &-gist-copy {
+        display: flex;
+
+        $copied-duration: 1s ease-in-out;
+
+        &-button {
+            @include button-reset;
+            cursor: pointer;
+            margin: 0 0.25em 0 0.5em;
+            transition: color $copied-duration;
+        }
+
+        &-text {
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility $copied-duration, opacity $copied-duration, color $copied-duration;
+        }
+
+        &--active &-button {
+            color: green;
+            transition: color 0s;
+        }
+
+        &--active &-text {
+            color: green;
+
+            visibility: visible;
+            opacity: 1;
+            transition: visibility 0s, opacity 0s, color 0s;
+        }
+    }
 }
 
 .drop {
@@ -434,15 +475,6 @@ $header-transition: 0.2s ease-in-out;
   button:enabled {
     cursor: pointer;
   }
-}
-
-@mixin button-reset {
-  border: none;
-  padding: 0;
-  text-align: inherit;
-  line-height: inherit;
-  background: inherit;
-  background-color: transparent; // IE 11
 }
 
 @mixin active-button($bg-dark) {
