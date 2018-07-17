@@ -6,6 +6,9 @@ const DEFAULT: State = {
   requestsInProgress: 0,
   id: null,
   url: null,
+  code: null,
+  stdout: null,
+  stderr: null,
   channel: null,
   mode: null,
   edition: null,
@@ -15,6 +18,9 @@ const DEFAULT: State = {
 export interface State extends RequestsInProgress {
   id?: string;
   url?: string;
+  code?: string;
+  stdout?: string;
+  stderr?: string;
   channel?: Channel;
   mode?: Mode;
   edition?: Edition;
@@ -29,8 +35,8 @@ export default function gist(state = DEFAULT, action: Action): State {
 
     case ActionType.GistLoadSucceeded:
     case ActionType.GistSaveSucceeded: {
-      const { id, url, channel, mode, edition } = action;
-      return finish(state, { id, url, channel, mode, edition });
+      const { id, url, code, stdout, stderr, channel, mode, edition } = action;
+      return finish(state, { id, url, code, stdout, stderr, channel, mode, edition });
     }
 
     case ActionType.GistLoadFailed:
