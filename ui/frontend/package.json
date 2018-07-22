@@ -15,7 +15,7 @@
     "prop-types": "^15.5.10",
     "qs": "^6.4.0",
     "react": "^16.0.0",
-    "react-ace": "^5.4.0",
+    "react-ace": "^6.1.4",
     "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.0.0",
     "react-popper": "^0.9.5",
