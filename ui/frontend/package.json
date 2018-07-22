@@ -59,7 +59,7 @@
     "tslint-react": "^3.2.0",
     "typescript": "^2.5.3",
     "webpack": "^4.1.0",
-    "webpack-cli": "^2.0.12"
+    "webpack-cli": "^3.1.0"
   },
   "scripts": {
     "test:lint": "tslint --config tslint.json --exclude \"./**/node_modules/**/*\" \"./**/*.ts?(x)\"",
