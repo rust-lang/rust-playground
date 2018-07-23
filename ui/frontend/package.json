@@ -61,6 +61,9 @@
     "webpack": "^4.1.0",
     "webpack-cli": "^3.1.0"
   },
+  "engines": {
+    "node": "^10.7.0"
+  },
   "scripts": {
     "test:lint": "tslint --config tslint.json --exclude \"./**/node_modules/**/*\" \"./**/*.ts?(x)\"",
     "build": "webpack --progress --colors --mode development",
