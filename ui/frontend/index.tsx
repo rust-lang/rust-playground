@@ -3,16 +3,17 @@ import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { applyMiddleware, compose, createStore } from 'redux';
+import { AnyAction, applyMiddleware, compose, createStore } from 'redux';
 import persistState from 'redux-localstorage';
-import thunk from 'redux-thunk';
+import thunk, { ThunkDispatch } from 'redux-thunk';
 import * as url from 'url';
 
-import { gotoPosition, performCratesLoad, performVersionsLoad } from './actions';
+import { Action, gotoPosition, performCratesLoad, performVersionsLoad } from './actions';
 import { configureRustErrors } from './highlighting';
 import { deserialize, serialize } from './local_storage';
 import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
+import { State } from './reducers';
 import Router from './Router';
 
 const baseUrl = url.resolve(window.location.href, '/');
@@ -23,9 +24,8 @@ const initialState = {
   },
 };
 
-const mw = [thunk];
-const middlewares = applyMiddleware(...mw);
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const middlewares = applyMiddleware<ThunkDispatch<State, {}, Action>, {}>(thunk);
+const composeEnhancers: typeof compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const enhancers = composeEnhancers(middlewares, persistState(undefined, { serialize, deserialize }));
 const store = createStore(playgroundApp, initialState, enhancers);
 

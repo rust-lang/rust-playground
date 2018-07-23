@@ -32,7 +32,7 @@ const routes = {
   },
 };
 
-type ThunkAction<T = void> = ReduxThunkAction<T, State, {}>;
+type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, Action>;
 
 const createAction = <T extends string, P extends {}>(type: T, props?: P) => (
   Object.assign({ type }, props)
@@ -126,7 +126,7 @@ export const changeMode = (mode: Mode) =>
 export const changeEdition = (edition: Edition) =>
   createAction(ActionType.ChangeEdition, { edition });
 
-export const changeNightlyEdition: ThunkAction = (edition: Edition) => dispatch => {
+export const changeNightlyEdition = (edition: Edition): ThunkAction => dispatch => {
   dispatch(changeChannel(Channel.Nightly));
   dispatch(changeEdition(edition));
 };
