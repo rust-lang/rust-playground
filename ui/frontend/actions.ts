@@ -136,6 +136,11 @@ export const changeNightlyEdition = (edition: Edition): ThunkAction => dispatch 
 export const changeBacktrace = (backtrace: Backtrace) =>
   createAction(ActionType.ChangeBacktrace, { backtrace });
 
+export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
+  dispatch(changeBacktrace(Backtrace.Enabled));
+  dispatch(performExecute());
+};
+
 export const changeFocus = focus =>
   createAction(ActionType.ChangeFocus, { focus });
 

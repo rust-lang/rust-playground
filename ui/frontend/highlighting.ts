@@ -1,6 +1,6 @@
 import Prism from 'prismjs';
 
-export function configureRustErrors({ gotoPosition, getChannel }) {
+export function configureRustErrors({ gotoPosition, reExecuteWithBacktrace, getChannel }) {
   Prism.languages.rust_errors = { // eslint-disable-line camelcase
     'warning': /^warning:.*$/m,
     'error': {
@@ -17,6 +17,7 @@ export function configureRustErrors({ gotoPosition, getChannel }) {
         'backtrace-location': /src\/main.rs:(\d+)/,
       },
     },
+    'backtrace-enable': /Run with `RUST_BACKTRACE=1` for a backtrace/,
   };
 
   Prism.hooks.add('wrap', env => {
@@ -42,6 +43,11 @@ export function configureRustErrors({ gotoPosition, getChannel }) {
       env.attributes['data-line'] = line;
       env.attributes['data-col'] = col;
     }
+    if (env.type === 'backtrace-enable') {
+      env.tag = 'a';
+      env.attributes.href = '#';
+      env.attributes['data-backtrace-enable'] = 'true';
+    }
     if (env.type === 'backtrace-location') {
       const errorMatch = /:(\d+)/.exec(env.content);
       const [_, line] = errorMatch;
@@ -59,6 +65,14 @@ export function configureRustErrors({ gotoPosition, getChannel }) {
       link.onclick = e => {
         e.preventDefault();
         gotoPosition(line, col);
+      };
+    });
+
+    const backtraceEnablers = env.element.querySelectorAll('.backtrace-enable');
+    Array.from(backtraceEnablers).forEach((link: HTMLAnchorElement) => {
+      link.onclick = e => {
+        e.preventDefault();
+        reExecuteWithBacktrace();
       };
     });
   });
