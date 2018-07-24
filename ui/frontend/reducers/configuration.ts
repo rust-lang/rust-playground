@@ -1,6 +1,7 @@
 import { Action, ActionType } from '../actions';
 import {
   AssemblyFlavor,
+  Backtrace,
   Channel,
   DemangleAssembly,
   Edition,
@@ -22,6 +23,7 @@ export interface State {
   channel: Channel;
   mode: Mode;
   edition: Edition;
+  backtrace: Backtrace;
 }
 
 export const DEFAULT: State = {
@@ -36,6 +38,7 @@ export const DEFAULT: State = {
   channel: Channel.Stable,
   mode: Mode.Debug,
   edition: Edition.Rust2015,
+  backtrace: Backtrace.Disabled,
 };
 
 export default function configuration(state = DEFAULT, action: Action): State {
@@ -75,6 +78,8 @@ export default function configuration(state = DEFAULT, action: Action): State {
       }
       return { ...state, edition: action.edition };
     }
+    case ActionType.ChangeBacktrace:
+      return { ...state, backtrace: action.backtrace };
     default:
       return state;
   }

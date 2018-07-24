@@ -1,19 +1,22 @@
 import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 
-import { changeEdition } from './actions';
+import { changeBacktrace, changeEdition } from './actions';
 import { changeNightlyEdition } from './actions';
 import { Either as EitherConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
 import { State } from './reducers';
-import { getEditionSet, isEditionAvailable } from './selectors';
-import { Edition } from './types';
+import { getBacktraceSet, getEditionSet, isEditionAvailable } from './selectors';
+import { Backtrace, Edition } from './types';
 
 interface AdvancedOptionsMenuProps {
   edition: Edition;
   isEditionSet: boolean;
   isEditionAvailable: boolean;
   changeEdition: (_: Edition) => any;
+  backtrace: Backtrace;
+  isBacktraceSet: boolean;
+  changeBacktrace: (_: Backtrace) => any;
 }
 
 const AdvancedOptionsMenu: React.SFC<AdvancedOptionsMenuProps> = props => (
@@ -28,6 +31,15 @@ const AdvancedOptionsMenu: React.SFC<AdvancedOptionsMenuProps> = props => (
         isNotDefault={props.isEditionSet}
         onChange={props.changeEdition} />
       {!props.isEditionAvailable && <EditionAside />}
+
+      <EitherConfig
+        id="backtrace"
+        name="Backtrace"
+        a={Backtrace.Disabled}
+        b={Backtrace.Enabled}
+        value={props.backtrace}
+        isNotDefault={props.isBacktraceSet}
+        onChange={props.changeBacktrace} />
     </MenuGroup>
   </Fragment>
 );
@@ -43,10 +55,13 @@ const mapStateToProps = (state: State) => ({
   isEditionSet: getEditionSet(state),
   edition: state.configuration.edition,
   isEditionAvailable: isEditionAvailable(state),
+  isBacktraceSet: getBacktraceSet(state),
+  backtrace: state.configuration.backtrace,
 });
 
 const mapDispatchToProps = ({
   changeEdition: changeNightlyEdition,
+  changeBacktrace,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AdvancedOptionsMenu);

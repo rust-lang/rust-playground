@@ -66,3 +66,8 @@ export enum Edition {
   Rust2015 = '2015',
   Rust2018 = '2018',
 }
+
+export enum Backtrace {
+  Disabled = 'disabled',
+  Enabled = 'enabled',
+}

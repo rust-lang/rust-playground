@@ -6,6 +6,7 @@ import { getCrateType, isEditionAvailable, runAsTest } from './selectors';
 import State from './state';
 import {
   AssemblyFlavor,
+  Backtrace,
   Channel,
   DemangleAssembly,
   Edition,
@@ -51,6 +52,7 @@ export enum ActionType {
   ChangeProcessAssembly = 'CHANGE_PROCESS_ASSEMBLY',
   ChangeMode = 'CHANGE_MODE',
   ChangeEdition = 'CHANGE_EDITION',
+  ChangeBacktrace = 'CHANGE_BACKTRACE',
   ChangeFocus = 'CHANGE_FOCUS',
   ExecuteRequest = 'EXECUTE_REQUEST',
   ExecuteSucceeded = 'EXECUTE_SUCCEEDED',
@@ -130,6 +132,9 @@ export const changeNightlyEdition = (edition: Edition): ThunkAction => dispatch 
   dispatch(changeChannel(Channel.Nightly));
   dispatch(changeEdition(edition));
 };
+
+export const changeBacktrace = (backtrace: Backtrace) =>
+  createAction(ActionType.ChangeBacktrace, { backtrace });
 
 export const changeFocus = focus =>
   createAction(ActionType.ChangeFocus, { focus });
@@ -569,6 +574,7 @@ export type Action =
   | ReturnType<typeof changeKeybinding>
   | ReturnType<typeof changeMode>
   | ReturnType<typeof changeEdition>
+  | ReturnType<typeof changeBacktrace>
   | ReturnType<typeof changeOrientation>
   | ReturnType<typeof changeTheme>
   | ReturnType<typeof requestExecute>
