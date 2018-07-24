@@ -11,7 +11,12 @@ export function configureRustErrors({ gotoPosition, getChannel }) {
       },
     },
     'error-location': /-->.*\n/,
-    'stack-trace-location': /at \/playground.*\n/,
+    'backtrace': {
+      pattern: /at src\/.*\n/,
+      inside: {
+        'backtrace-location': /src\/main.rs:(\d+)/,
+      },
+    },
   };
 
   Prism.hooks.add('wrap', env => {
@@ -37,8 +42,8 @@ export function configureRustErrors({ gotoPosition, getChannel }) {
       env.attributes['data-line'] = line;
       env.attributes['data-col'] = col;
     }
-    if (env.type === 'stack-trace-location') {
-      const errorMatch = /main.rs:(\d+)/.exec(env.content);
+    if (env.type === 'backtrace-location') {
+      const errorMatch = /:(\d+)/.exec(env.content);
       const [_, line] = errorMatch;
       env.tag = 'a';
       env.attributes.href = '#';
@@ -48,7 +53,7 @@ export function configureRustErrors({ gotoPosition, getChannel }) {
   });
 
   Prism.hooks.add('after-highlight', env => {
-    const links = env.element.querySelectorAll('.error-location, .stack-trace-location');
+    const links = env.element.querySelectorAll('.error-location, .backtrace-location');
     Array.from(links).forEach((link: HTMLAnchorElement) => {
       const { line, col } = link.dataset;
       link.onclick = e => {
