@@ -189,6 +189,7 @@ interface ExecuteRequestBody {
   tests: boolean;
   code: string;
   edition?: string;
+  backtrace: boolean;
 }
 
 export function performExecute(): ThunkAction {
@@ -200,8 +201,9 @@ export function performExecute(): ThunkAction {
     const { code, configuration: { channel, mode, edition } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
+    const backtrace = state.configuration.backtrace === Backtrace.Enabled;
 
-    const body: ExecuteRequestBody = { channel, mode, crateType, tests, code };
+    const body: ExecuteRequestBody = { channel, mode, crateType, tests, code, backtrace };
     if (isEditionAvailable(state)) {
       body.edition = edition;
     }
@@ -235,6 +237,7 @@ function performCompile(target, { request, success, failure }): ThunkAction {
     } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
+    const backtrace = state.configuration.backtrace === Backtrace.Enabled;
     const body: CompileRequestBody = {
       channel,
       mode,
@@ -245,6 +248,7 @@ function performCompile(target, { request, success, failure }): ThunkAction {
       assemblyFlavor,
       demangleAssembly,
       processAssembly,
+      backtrace,
     };
     if (isEditionAvailable(state)) {
       body.edition = edition;
