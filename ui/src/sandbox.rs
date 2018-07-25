@@ -628,16 +628,36 @@ mod test {
     }
     "#;
 
+    impl Default for ExecuteRequest {
+        fn default() -> Self {
+            ExecuteRequest {
+                channel: Channel::Stable,
+                crate_type: CrateType::Binary,
+                mode: Mode::Debug,
+                tests: false,
+                code: HELLO_WORLD_CODE.to_string(),
+                edition: None,
+            }
+        }
+    }
+
+    impl Default for CompileRequest {
+        fn default() -> Self {
+            CompileRequest {
+                target: CompileTarget::LlvmIr,
+                channel: Channel::Stable,
+                crate_type: CrateType::Binary,
+                mode: Mode::Debug,
+                tests: false,
+                code: HELLO_WORLD_CODE.to_string(),
+                edition: None,
+            }
+        }
+    }
+
     #[test]
     fn basic_functionality() {
-        let req = ExecuteRequest {
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
-            code: HELLO_WORLD_CODE.to_string(),
-            edition: None,
-        };
+        let req = ExecuteRequest::default();
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
         let resp = sb.execute(&req).expect("Unable to execute code");
@@ -660,12 +680,8 @@ mod test {
     #[test]
     fn debug_mode() {
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
             code: COMPILATION_MODE_CODE.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -677,12 +693,9 @@ mod test {
     #[test]
     fn release_mode() {
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
             mode: Mode::Release,
-            tests: false,
             code: COMPILATION_MODE_CODE.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -705,11 +718,8 @@ mod test {
     fn stable_channel() {
         let req = ExecuteRequest {
             channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
             code: VERSION_CODE.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -724,11 +734,8 @@ mod test {
     fn beta_channel() {
         let req = ExecuteRequest {
             channel: Channel::Beta,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
             code: VERSION_CODE.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -743,11 +750,8 @@ mod test {
     fn nightly_channel() {
         let req = ExecuteRequest {
             channel: Channel::Nightly,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
             code: VERSION_CODE.to_string(),
-            edition: Some(Edition::Rust2018),
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -762,12 +766,7 @@ mod test {
     fn output_llvm_ir() {
         let req = CompileRequest {
             target: CompileTarget::LlvmIr,
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
-            code: HELLO_WORLD_CODE.to_string(),
-            edition: None,
+            ..CompileRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -782,12 +781,7 @@ mod test {
     fn output_assembly() {
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Raw),
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
-            code: HELLO_WORLD_CODE.to_string(),
-            edition: None,
+            ..CompileRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -803,12 +797,7 @@ mod test {
     fn output_demangled_assembly() {
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Demangle, ProcessAssembly::Raw),
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
-            code: HELLO_WORLD_CODE.to_string(),
-            edition: None,
+            ..CompileRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -823,12 +812,7 @@ mod test {
     fn output_filtered_assembly() {
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Filter),
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
-            code: HELLO_WORLD_CODE.to_string(),
-            edition: None,
+            ..CompileRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -886,12 +870,8 @@ mod test {
         "#;
 
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            mode: Mode::Debug,
-            crate_type: CrateType::Binary,
-            tests: false,
             code: code.to_string(),
-            edition: None
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -911,12 +891,8 @@ mod test {
         "#;
 
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            mode: Mode::Debug,
-            crate_type: CrateType::Binary,
-            tests: false,
             code: code.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -935,12 +911,8 @@ mod test {
         "#;
 
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            mode: Mode::Debug,
-            crate_type: CrateType::Binary,
-            tests: false,
             code: code.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -964,12 +936,8 @@ mod test {
         "##;
 
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            mode: Mode::Debug,
-            crate_type: CrateType::Binary,
-            tests: false,
             code: forkbomb.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
