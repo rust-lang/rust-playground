@@ -762,6 +762,63 @@ mod test {
         assert!(resp.stdout.contains("nightly"));
     }
 
+    const EDITION_CODE: &str = r#"
+    mod foo {
+        pub fn bar() {}
+    }
+
+    fn main() {
+        crate::foo::bar();
+    }
+    "#;
+
+    #[test]
+    fn rust_edition_default() -> Result<()> {
+        let req = ExecuteRequest {
+            channel: Channel::Nightly,
+            code: EDITION_CODE.to_string(),
+            ..ExecuteRequest::default()
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.execute(&req)?;
+
+        assert!(resp.stderr.contains("`crate` in paths is experimental"));
+        Ok(())
+    }
+
+    #[test]
+    fn rust_edition_2015() -> Result<()> {
+        let req = ExecuteRequest {
+            channel: Channel::Nightly,
+            code: EDITION_CODE.to_string(),
+            edition: Some(Edition::Rust2015),
+            ..ExecuteRequest::default()
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.execute(&req)?;
+
+        assert!(resp.stderr.contains("`crate` in paths is experimental"));
+        Ok(())
+    }
+
+    #[test]
+    fn rust_edition_2018() -> Result<()> {
+        let req = ExecuteRequest {
+            channel: Channel::Nightly,
+            code: EDITION_CODE.to_string(),
+            edition: Some(Edition::Rust2018),
+            ..ExecuteRequest::default()
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.execute(&req)?;
+
+        assert!(!resp.stderr.contains("`crate` in paths is experimental"));
+        Ok(())
+    }
+
     #[test]
     fn output_llvm_ir() {
         let req = CompileRequest {
