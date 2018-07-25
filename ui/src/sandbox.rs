@@ -886,7 +886,7 @@ mod test {
             fn main() {
                 let megabyte = 1024 * 1024;
                 let mut big = vec![0u8; 384 * megabyte];
-                *big.last_mut().unwrap() += 1;
+                for i in &mut big { *i += 1; }
             }
         "#;
 
