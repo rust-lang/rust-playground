@@ -19,6 +19,7 @@ aws s3 sync \
     --exclude='*' \
     --include=ui \
     --include=build/index.html \
+    --include=build/index.html.gz \
     --include=build/robots.txt \
     --exact-timestamps \
     s3://playground-artifacts-i32 $root/playground-artifacts
