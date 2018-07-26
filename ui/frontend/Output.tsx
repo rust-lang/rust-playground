@@ -11,8 +11,7 @@ import { Channel, Edition, Focus, Mode } from './types';
 import Gist from './Output/Gist';
 import Header from './Output/Header';
 import MyLoader from './Output/Loader';
-
-const hasProperties = obj => Object.values(obj).some(val => !!val);
+import { getSomethingToShow, hasProperties } from './selectors';
 
 const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
   if (hasProperties(tabProps)) {
@@ -121,11 +120,8 @@ interface FormatProps {
 const Output: React.SFC<OutputProps> = ({
   // https://github.com/palantir/tslint/issues/3960
   // tslint:disable-next-line:trailing-comma
-  meta: { focus }, execute, format, clippy, assembly, llvmIr, mir, wasm, gist, ...props
+  somethingToShow, meta: { focus }, execute, format, clippy, assembly, llvmIr, mir, wasm, gist, ...props
 }) => {
-
-  const somethingToShow = [execute, format, clippy, assembly, llvmIr, mir, wasm, gist].some(hasProperties);
-
   if (!somethingToShow) {
     return null;
   }
@@ -206,6 +202,7 @@ interface WithCodeProps extends SimpleProps {
 }
 
 interface OutputProps extends OutputState {
+  somethingToShow: boolean;
   changeFocus: (_?: Focus) => any;
   focusClose: () => void;
   focusExecute: () => void;
@@ -218,7 +215,10 @@ interface OutputProps extends OutputState {
   focusGist: () => void;
 }
 
-const mapStateToProps = (state: State) => state.output;
+const mapStateToProps = (state: State) => ({
+  somethingToShow: getSomethingToShow(state),
+  ...state.output,
+});
 
 const mapDispatchToProps = ({
   focusClose: () => changeFocus(null),

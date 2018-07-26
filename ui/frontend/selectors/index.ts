@@ -68,6 +68,24 @@ export const getAdvancedOptionsSet = createSelector(
   ),
 );
 
+export const hasProperties = obj => Object.values(obj).some(val => !!val);
+
+const getOutputs = (state: State) => [
+  state.output.assembly,
+  state.output.clippy,
+  state.output.execute,
+  state.output.format,
+  state.output.gist,
+  state.output.llvmIr,
+  state.output.mir,
+  state.output.wasm,
+];
+
+export const getSomethingToShow = createSelector(
+  getOutputs,
+  a => a.some(hasProperties),
+);
+
 const baseUrlSelector = (state: State) =>
   state.globalConfiguration.baseUrl;
 
