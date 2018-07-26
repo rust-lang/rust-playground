@@ -118,92 +118,81 @@ interface FormatProps {
   requestsInProgress: number;
 }
 
-class Output extends React.PureComponent<OutputProps> {
-  private focusClose = () => this.props.changeFocus(null);
-  private focusExecute = () => this.props.changeFocus(Focus.Execute);
-  private focusFormat = () => this.props.changeFocus(Focus.Format);
-  private focusClippy = () => this.props.changeFocus(Focus.Clippy);
-  private focusAssembly = () => this.props.changeFocus(Focus.Asm);
-  private focusLlvmIr = () => this.props.changeFocus(Focus.LlvmIr);
-  private focusMir = () => this.props.changeFocus(Focus.Mir);
-  private focusWasm = () => this.props.changeFocus(Focus.Wasm);
-  private focusGist = () => this.props.changeFocus(Focus.Gist);
+const Output: React.SFC<OutputProps> = ({
+  // https://github.com/palantir/tslint/issues/3960
+  // tslint:disable-next-line:trailing-comma
+  meta: { focus }, execute, format, clippy, assembly, llvmIr, mir, wasm, gist, ...props
+}) => {
 
-  public render() {
-    const {
-      meta: { focus }, execute, format, clippy, assembly, llvmIr, mir, wasm, gist,
-    } = this.props;
+  const somethingToShow = [execute, format, clippy, assembly, llvmIr, mir, wasm, gist].some(hasProperties);
 
-    const somethingToShow = [execute, format, clippy, assembly, llvmIr, mir, wasm, gist].some(hasProperties);
+  if (!somethingToShow) {
+    return null;
+  }
 
-    if (!somethingToShow) {
-      return null;
-    }
+  let close = null;
+  let body = null;
+  if (focus) {
+    close = (
+      <button className="output-tab output-tab-close"
+        onClick={props.focusClose}>Close</button>
+    );
 
-    let close = null;
-    let body = null;
-    if (focus) {
-      close = (
-        <button className="output-tab output-tab-close"
-          onClick={this.focusClose}>Close</button>
-      );
-
-      body = (
-        <div className="output-body">
-          {focus === Focus.Execute && <SimplePane {...execute} kind="execute" />}
-          {focus === Focus.Format && <Format {...format} />}
-          {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
-          {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
-          {focus === Focus.LlvmIr && <PaneWithCode {...llvmIr} kind="llvm-ir" />}
-          {focus === Focus.Mir && <PaneWithCode {...mir} kind="mir" />}
-          {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
-          {focus === Focus.Gist && <Gist />}
-        </div>
-      );
-    }
-
-    return (
-      <div className="output">
-        <div className="output-tabs">
-          <Tab kind={Focus.Execute} focus={focus}
-            label="Execution"
-            onClick={this.focusExecute}
-            tabProps={execute} />
-          <Tab kind={Focus.Format} focus={focus}
-            label="Format"
-            onClick={this.focusFormat}
-            tabProps={format} />
-          <Tab kind={Focus.Clippy} focus={focus}
-            label="Clippy"
-            onClick={this.focusClippy}
-            tabProps={clippy} />
-          <Tab kind={Focus.Asm} focus={focus}
-            label="ASM"
-            onClick={this.focusAssembly}
-            tabProps={assembly} />
-          <Tab kind={Focus.LlvmIr} focus={focus}
-            label="LLVM IR"
-            onClick={this.focusLlvmIr}
-            tabProps={llvmIr} />
-          <Tab kind={Focus.Mir} focus={focus}
-            label="MIR"
-            onClick={this.focusMir}
-            tabProps={mir} />
-          <Tab kind={Focus.Wasm} focus={focus}
-            label="WASM"
-            onClick={this.focusWasm}
-            tabProps={wasm} />
-          <Tab kind={Focus.Gist} focus={focus}
-            label="Share"
-            onClick={this.focusGist}
-            tabProps={gist} />
-          {close}
-        </div>
-        {body}
+    body = (
+      <div className="output-body">
+        {focus === Focus.Execute && <SimplePane {...execute} kind="execute" />}
+        {focus === Focus.Format && <Format {...format} />}
+        {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
+        {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
+        {focus === Focus.LlvmIr && <PaneWithCode {...llvmIr} kind="llvm-ir" />}
+        {focus === Focus.Mir && <PaneWithCode {...mir} kind="mir" />}
+        {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
+        {focus === Focus.Gist && <Gist />}
       </div>
     );
   }
-}
+
+  return (
+    <div className="output">
+      <div className="output-tabs">
+        <Tab kind={Focus.Execute} focus={focus}
+          label="Execution"
+          onClick={props.focusExecute}
+          tabProps={execute} />
+        <Tab kind={Focus.Format} focus={focus}
+          label="Format"
+          onClick={props.focusFormat}
+          tabProps={format} />
+        <Tab kind={Focus.Clippy} focus={focus}
+          label="Clippy"
+          onClick={props.focusClippy}
+          tabProps={clippy} />
+        <Tab kind={Focus.Asm} focus={focus}
+          label="ASM"
+          onClick={props.focusAssembly}
+          tabProps={assembly} />
+        <Tab kind={Focus.LlvmIr} focus={focus}
+          label="LLVM IR"
+          onClick={props.focusLlvmIr}
+          tabProps={llvmIr} />
+        <Tab kind={Focus.Mir} focus={focus}
+          label="MIR"
+          onClick={props.focusMir}
+          tabProps={mir} />
+        <Tab kind={Focus.Wasm} focus={focus}
+          label="WASM"
+          onClick={props.focusWasm}
+          tabProps={wasm} />
+        <Tab kind={Focus.Gist} focus={focus}
+          label="Share"
+          onClick={props.focusGist}
+          tabProps={gist} />
+        {close}
+      </div>
+      {body}
+    </div>
+  );
+};
 
 interface SimpleProps {
   requestsInProgress: number;
@@ -218,12 +207,29 @@ interface WithCodeProps extends SimpleProps {
 
 interface OutputProps extends OutputState {
   changeFocus: (_?: Focus) => any;
+  focusClose: () => void;
+  focusExecute: () => void;
+  focusFormat: () => void;
+  focusClippy: () => void;
+  focusAssembly: () => void;
+  focusLlvmIr: () => void;
+  focusMir: () => void;
+  focusWasm: () => void;
+  focusGist: () => void;
 }
 
 const mapStateToProps = (state: State) => state.output;
 
 const mapDispatchToProps = ({
-  changeFocus,
+  focusClose: () => changeFocus(null),
+  focusExecute: () => changeFocus(Focus.Execute),
+  focusFormat: () => changeFocus(Focus.Format),
+  focusClippy: () => changeFocus(Focus.Clippy),
+  focusAssembly: () => changeFocus(Focus.Asm),
+  focusLlvmIr: () => changeFocus(Focus.LlvmIr),
+  focusMir: () => changeFocus(Focus.Mir),
+  focusWasm: () => changeFocus(Focus.Wasm),
+  focusGist: () => changeFocus(Focus.Gist),
 });
 
 const ConnectedOutput = connect(
