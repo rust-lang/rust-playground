@@ -9,7 +9,7 @@ const DEFAULT: State = {
   error: null,
 };
 
-export interface State {
+interface State {
   requestsInProgress: number;
   code?: string;
   stdout?: string;

@@ -6,7 +6,7 @@ const DEFAULT: State = {
 
 export type Focus = 'clippy' | 'llvm-ir' | 'mir' | 'wasm' | 'asm' | 'execute' | 'format' | 'gist';
 
-export interface State {
+interface State {
   focus?: Focus;
 }
 
