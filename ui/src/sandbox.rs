@@ -205,6 +205,19 @@ impl Sandbox {
         })
     }
 
+    pub fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
+        self.write_source_code(&req.code)?;
+        let mut command = self.miri_command();
+
+        let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
+
+        Ok(MiriResponse {
+            success: output.status.success(),
+            stdout: vec_to_str(output.stdout)?,
+            stderr: vec_to_str(output.stderr)?,
+        })
+    }
+
     pub fn crates(&self) -> Result<Vec<CrateInformation>> {
         let mut command = basic_secure_docker_command();
         command.args(&[Channel::Stable.container_name()]);
@@ -301,6 +314,16 @@ impl Sandbox {
         cmd.arg("clippy").args(&["cargo", "clippy"]);
 
         debug!("Clippy command is {:?}", cmd);
+
+        cmd
+    }
+
+    fn miri_command(&self) -> Command {
+        let mut cmd = self.docker_command(None);
+
+        cmd.arg("miri").args(&["cargo", "miri-playground"]);
+
+        debug!("Miri command is {:?}", cmd);
 
         cmd
     }
@@ -619,6 +642,18 @@ pub struct ClippyRequest {
 
 #[derive(Debug, Clone)]
 pub struct ClippyResponse {
+    pub success: bool,
+    pub stdout: String,
+    pub stderr: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct MiriRequest {
+    pub code: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct MiriResponse {
     pub success: bool,
     pub stdout: String,
     pub stderr: String,
@@ -965,6 +1000,28 @@ mod test {
 
         assert!(resp.stderr.contains("deny(eq_op)"));
         assert!(resp.stderr.contains("warn(zero_divided_by_zero)"));
+    }
+
+    #[test]
+    fn interpreting_code() -> Result<()> {
+        let code = r#"
+        fn main() {
+            let mut a: [u8; 0] = [];
+            unsafe { *a.get_unchecked_mut(1) = 1; }
+        }
+        "#;
+
+        let req = MiriRequest {
+            code: code.to_string(),
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.miri(&req)?;
+
+        assert!(resp.stderr.contains("pointer computed at offset 1"));
+        assert!(resp.stderr.contains("outside bounds of allocation"));
+        assert!(resp.stderr.contains("which has size 0"));
+        Ok(())
     }
 
     #[test]
