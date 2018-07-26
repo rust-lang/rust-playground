@@ -1,10 +1,9 @@
 import { Action, ActionType } from '../../actions';
+import { Focus } from '../../types';
 
 const DEFAULT: State = {
   focus: null,
 };
-
-export type Focus = 'clippy' | 'llvm-ir' | 'mir' | 'wasm' | 'asm' | 'execute' | 'format' | 'gist';
 
 interface State {
   focus?: Focus;
@@ -16,32 +15,32 @@ export default function meta(state = DEFAULT, action: Action) {
       return { ...state, focus: action.focus };
 
     case ActionType.RequestClippy:
-      return { ...state, focus: 'clippy' };
+      return { ...state, focus: Focus.Clippy };
 
     case ActionType.CompileLlvmIrRequest:
-      return { ...state, focus: 'llvm-ir' };
+      return { ...state, focus: Focus.LlvmIr };
 
     case ActionType.CompileMirRequest:
-      return { ...state, focus: 'mir' };
+      return { ...state, focus: Focus.Mir };
 
     case ActionType.CompileWasmRequest:
-      return { ...state, focus: 'wasm' };
+      return { ...state, focus: Focus.Wasm };
 
     case ActionType.CompileAssemblyRequest:
-      return { ...state, focus: 'asm' };
+      return { ...state, focus: Focus.Asm };
 
     case ActionType.ExecuteRequest:
-      return { ...state, focus: 'execute' };
+      return { ...state, focus: Focus.Execute };
 
     case ActionType.RequestFormat:
-      return { ...state, focus: 'format' };
+      return { ...state, focus: Focus.Format };
     case ActionType.FormatSucceeded:
     case ActionType.FormatFailed:
       return { ...state, focus: null };
 
     case ActionType.RequestGistLoad:
     case ActionType.RequestGistSave:
-      return { ...state, focus: 'gist' };
+      return { ...state, focus: Focus.Gist };
 
     default:
       return state;

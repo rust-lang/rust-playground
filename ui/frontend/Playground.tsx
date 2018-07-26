@@ -5,9 +5,8 @@ import Configuration from './Configuration';
 import Editor from './Editor';
 import Header from './Header';
 import Output from './Output';
-import { Focus } from './reducers/output/meta';
 import State from './state';
-import { Orientation } from './types';
+import { Focus, Orientation } from './types';
 
 const ConfigurationModal: React.SFC = () => (
   <div className="modal-backdrop">

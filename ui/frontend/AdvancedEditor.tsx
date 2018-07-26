@@ -1,9 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { Focus } from './reducers/output/meta';
 import State from './state';
-import { CommonEditorProps } from './types';
+import { CommonEditorProps, Focus } from './types';
 
 const displayExternCrateAutocomplete = editor => {
   const { session } = editor;

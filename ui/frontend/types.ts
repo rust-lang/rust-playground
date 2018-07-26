@@ -71,3 +71,14 @@ export enum Backtrace {
   Disabled = 'disabled',
   Enabled = 'enabled',
 }
+
+export enum Focus {
+  Clippy = 'clippy',
+  LlvmIr = 'llvm-ir',
+  Mir = 'mir',
+  Wasm = 'wasm',
+  Asm = 'asm',
+  Execute = 'execute',
+  Format = 'format',
+  Gist = 'gist',
+}

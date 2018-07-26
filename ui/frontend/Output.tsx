@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { changeFocus } from './actions';
 import { State } from './reducers';
 import { State as OutputState } from './reducers/output';
-import { Channel, Edition, Mode } from './types';
+import { Channel, Edition, Focus, Mode } from './types';
 
 import Gist from './Output/Gist';
 import Header from './Output/Header';
@@ -29,8 +29,8 @@ const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => 
 };
 
 interface TabProps {
-  kind: string;
-  focus?: string;
+  kind: Focus;
+  focus?: Focus;
   label: string;
   onClick: () => any;
   tabProps: object;
@@ -76,26 +76,21 @@ interface HighlightErrorsProps {
 }
 
 const SimplePane: React.SFC<SimplePaneProps> = ({
-  focus, kind, requestsInProgress, stdout, stderr, error, children,
+  kind, requestsInProgress, stdout, stderr, error, children,
 }) => {
-  if (focus === kind) {
-    const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
-    return (
-      <div className={`output-${kind}`}>
-        {loader}
-        <Section kind="error" label="Errors">{error}</Section>
-        <HighlightErrors label="Standard Error">{stderr}</HighlightErrors>
-        <Section kind="stdout" label="Standard Output">{stdout}</Section>
-        {children}
-      </div>
-    );
-  } else {
-    return null;
-  }
+  const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
+  return (
+    <div className={`output-${kind}`}>
+      {loader}
+      <Section kind="error" label="Errors">{error}</Section>
+      <HighlightErrors label="Standard Error">{stderr}</HighlightErrors>
+      <Section kind="stdout" label="Standard Output">{stdout}</Section>
+      {children}
+    </div>
+  );
 };
 
 interface SimplePaneProps extends SimpleProps {
-  focus: string;
   kind: string;
 }
 
@@ -109,35 +104,30 @@ interface PaneWithCodeProps extends SimplePaneProps {
   code?: string;
 }
 
-const Format: React.SFC<FormatProps> = ({ focus, requestsInProgress }) => {
-  if (focus === 'format') {
-    const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
+const Format: React.SFC<FormatProps> = ({ requestsInProgress }) => {
+  const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
 
-    return (
-      <div className="output-format">
-        {loader}
-      </div>
-    );
-  } else {
-    return null;
-  }
+  return (
+    <div className="output-format">
+      {loader}
+    </div>
+  );
 };
 
 interface FormatProps {
-  focus: string;
   requestsInProgress: number;
 }
 
 class Output extends React.PureComponent<OutputProps> {
   private focusClose = () => this.props.changeFocus(null);
-  private focusExecute = () => this.props.changeFocus('execute');
-  private focusFormat = () => this.props.changeFocus('format');
-  private focusClippy = () => this.props.changeFocus('clippy');
-  private focusAssembly = () => this.props.changeFocus('asm');
-  private focusLlvmIr = () => this.props.changeFocus('llvm-ir');
-  private focusMir = () => this.props.changeFocus('mir');
-  private focusWasm = () => this.props.changeFocus('wasm');
-  private focusGist = () => this.props.changeFocus('gist');
+  private focusExecute = () => this.props.changeFocus(Focus.Execute);
+  private focusFormat = () => this.props.changeFocus(Focus.Format);
+  private focusClippy = () => this.props.changeFocus(Focus.Clippy);
+  private focusAssembly = () => this.props.changeFocus(Focus.Asm);
+  private focusLlvmIr = () => this.props.changeFocus(Focus.LlvmIr);
+  private focusMir = () => this.props.changeFocus(Focus.Mir);
+  private focusWasm = () => this.props.changeFocus(Focus.Wasm);
+  private focusGist = () => this.props.changeFocus(Focus.Gist);
 
   public render() {
     const {
@@ -160,14 +150,14 @@ class Output extends React.PureComponent<OutputProps> {
 
       body = (
         <div className="output-body">
-          <SimplePane {...execute} kind="execute" focus={focus} />
-          <Format {...format} focus={focus} />
-          <SimplePane {...clippy} kind="clippy" focus={focus} />
-          <PaneWithCode {...assembly} kind="asm" focus={focus} />
-          <PaneWithCode {...llvmIr} kind="llvm-ir" focus={focus} />
-          <PaneWithCode {...mir} kind="mir" focus={focus} />
-          <PaneWithCode {...wasm} kind="wasm" focus={focus} />
-          {focus === 'gist' && <Gist />}
+          {focus === Focus.Execute && <SimplePane {...execute} kind="execute" />}
+          {focus === Focus.Format && <Format {...format} />}
+          {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
+          {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
+          {focus === Focus.LlvmIr && <PaneWithCode {...llvmIr} kind="llvm-ir" />}
+          {focus === Focus.Mir && <PaneWithCode {...mir} kind="mir" />}
+          {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
+          {focus === Focus.Gist && <Gist />}
         </div>
       );
     }
@@ -175,35 +165,35 @@ class Output extends React.PureComponent<OutputProps> {
     return (
       <div className="output">
         <div className="output-tabs">
-          <Tab kind="execute" focus={focus}
+          <Tab kind={Focus.Execute} focus={focus}
             label="Execution"
             onClick={this.focusExecute}
             tabProps={execute} />
-          <Tab kind="format" focus={focus}
+          <Tab kind={Focus.Format} focus={focus}
             label="Format"
             onClick={this.focusFormat}
             tabProps={format} />
-          <Tab kind="clippy" focus={focus}
+          <Tab kind={Focus.Clippy} focus={focus}
             label="Clippy"
             onClick={this.focusClippy}
             tabProps={clippy} />
-          <Tab kind="asm" focus={focus}
+          <Tab kind={Focus.Asm} focus={focus}
             label="ASM"
             onClick={this.focusAssembly}
             tabProps={assembly} />
-          <Tab kind="llvm-ir" focus={focus}
+          <Tab kind={Focus.LlvmIr} focus={focus}
             label="LLVM IR"
             onClick={this.focusLlvmIr}
             tabProps={llvmIr} />
-          <Tab kind="mir" focus={focus}
+          <Tab kind={Focus.Mir} focus={focus}
             label="MIR"
             onClick={this.focusMir}
             tabProps={mir} />
-          <Tab kind="wasm" focus={focus}
+          <Tab kind={Focus.Wasm} focus={focus}
             label="WASM"
             onClick={this.focusWasm}
             tabProps={wasm} />
-          <Tab kind="gist" focus={focus}
+          <Tab kind={Focus.Gist} focus={focus}
             label="Share"
             onClick={this.focusGist}
             tabProps={gist} />
@@ -227,7 +217,7 @@ interface WithCodeProps extends SimpleProps {
 }
 
 interface OutputProps extends OutputState {
-  changeFocus: (_?: string) => any;
+  changeFocus: (_?: Focus) => any;
 }
 
 const mapStateToProps = (state: State) => state.output;
