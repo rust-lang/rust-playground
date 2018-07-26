@@ -8,13 +8,14 @@ import persistState from 'redux-localstorage';
 import thunk, { ThunkDispatch } from 'redux-thunk';
 import * as url from 'url';
 
-import { Action, gotoPosition, performCratesLoad, performVersionsLoad } from './actions';
+import { Action, gotoPosition, performCratesLoad, performVersionsLoad, reExecuteWithBacktrace } from './actions';
 import { configureRustErrors } from './highlighting';
 import { deserialize, serialize } from './local_storage';
 import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
 import { State } from './reducers';
 import Router from './Router';
+import { Backtrace } from './types';
 
 const baseUrl = url.resolve(window.location.href, '/');
 
@@ -31,6 +32,7 @@ const store = createStore(playgroundApp, initialState, enhancers);
 
 configureRustErrors({
   gotoPosition: (line, col) => store.dispatch(gotoPosition(line, col)),
+  reExecuteWithBacktrace: () => store.dispatch(reExecuteWithBacktrace()),
   getChannel: () => store.getState().configuration.channel,
 });
 

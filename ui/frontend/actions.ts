@@ -6,6 +6,7 @@ import { getCrateType, isEditionAvailable, runAsTest } from './selectors';
 import State from './state';
 import {
   AssemblyFlavor,
+  Backtrace,
   Channel,
   DemangleAssembly,
   Edition,
@@ -51,6 +52,7 @@ export enum ActionType {
   ChangeProcessAssembly = 'CHANGE_PROCESS_ASSEMBLY',
   ChangeMode = 'CHANGE_MODE',
   ChangeEdition = 'CHANGE_EDITION',
+  ChangeBacktrace = 'CHANGE_BACKTRACE',
   ChangeFocus = 'CHANGE_FOCUS',
   ExecuteRequest = 'EXECUTE_REQUEST',
   ExecuteSucceeded = 'EXECUTE_SUCCEEDED',
@@ -131,6 +133,14 @@ export const changeNightlyEdition = (edition: Edition): ThunkAction => dispatch 
   dispatch(changeEdition(edition));
 };
 
+export const changeBacktrace = (backtrace: Backtrace) =>
+  createAction(ActionType.ChangeBacktrace, { backtrace });
+
+export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
+  dispatch(changeBacktrace(Backtrace.Enabled));
+  dispatch(performExecute());
+};
+
 export const changeFocus = focus =>
   createAction(ActionType.ChangeFocus, { focus });
 
@@ -184,6 +194,7 @@ interface ExecuteRequestBody {
   tests: boolean;
   code: string;
   edition?: string;
+  backtrace: boolean;
 }
 
 export function performExecute(): ThunkAction {
@@ -195,8 +206,9 @@ export function performExecute(): ThunkAction {
     const { code, configuration: { channel, mode, edition } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
+    const backtrace = state.configuration.backtrace === Backtrace.Enabled;
 
-    const body: ExecuteRequestBody = { channel, mode, crateType, tests, code };
+    const body: ExecuteRequestBody = { channel, mode, crateType, tests, code, backtrace };
     if (isEditionAvailable(state)) {
       body.edition = edition;
     }
@@ -230,6 +242,7 @@ function performCompile(target, { request, success, failure }): ThunkAction {
     } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
+    const backtrace = state.configuration.backtrace === Backtrace.Enabled;
     const body: CompileRequestBody = {
       channel,
       mode,
@@ -240,6 +253,7 @@ function performCompile(target, { request, success, failure }): ThunkAction {
       assemblyFlavor,
       demangleAssembly,
       processAssembly,
+      backtrace,
     };
     if (isEditionAvailable(state)) {
       body.edition = edition;
@@ -569,6 +583,7 @@ export type Action =
   | ReturnType<typeof changeKeybinding>
   | ReturnType<typeof changeMode>
   | ReturnType<typeof changeEdition>
+  | ReturnType<typeof changeBacktrace>
   | ReturnType<typeof changeOrientation>
   | ReturnType<typeof changeTheme>
   | ReturnType<typeof requestExecute>

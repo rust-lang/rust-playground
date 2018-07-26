@@ -113,7 +113,7 @@ impl Sandbox {
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
         try!(self.write_source_code(&req.code));
 
-        let mut command = self.compile_command(req.target, req.channel, req.mode, req.crate_type, req.tests, req.edition);
+        let mut command = self.compile_command(req.target, req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req.edition);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -167,7 +167,7 @@ impl Sandbox {
 
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
         try!(self.write_source_code(&req.code));
-        let mut command = self.execute_command(req.channel, req.mode, req.crate_type, req.tests, req.edition);
+        let mut command = self.execute_command(req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req.edition);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -257,9 +257,9 @@ impl Sandbox {
         Ok(())
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, edition: Option<Edition>) -> Command {
+    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, edition: Option<Edition>) -> Command {
         let mut cmd = self.docker_command(Some(crate_type));
-        set_execution_environment(&mut cmd, Some(target), crate_type, edition);
+        set_execution_environment(&mut cmd, Some(target), crate_type, edition, backtrace);
 
         let execution_cmd = build_execution_command(Some(target), mode, crate_type, tests);
 
@@ -270,9 +270,9 @@ impl Sandbox {
         cmd
     }
 
-    fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, edition: Option<Edition>) -> Command {
+    fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, edition: Option<Edition>) -> Command {
         let mut cmd = self.docker_command(Some(crate_type));
-        set_execution_environment(&mut cmd, None, crate_type, edition);
+        set_execution_environment(&mut cmd, None, crate_type, edition, backtrace);
 
         let execution_cmd = build_execution_command(None, mode, crate_type, tests);
 
@@ -392,7 +392,7 @@ fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type
     cmd
 }
 
-fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, crate_type: CrateType, edition: Option<Edition>) {
+fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, crate_type: CrateType, edition: Option<Edition>, backtrace: bool) {
     use self::CompileTarget::*;
     use self::CrateType::*;
 
@@ -407,6 +407,10 @@ fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, c
 
     if let Some(edition) = edition {
         cmd.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
+    }
+
+    if backtrace {
+        cmd.args(&["--env", "RUST_BACKTRACE=1"]);
     }
 }
 
@@ -565,6 +569,7 @@ pub struct CompileRequest {
     pub mode: Mode,
     pub edition: Option<Edition>,
     pub tests: bool,
+    pub backtrace: bool,
     pub code: String,
 }
 
@@ -583,6 +588,7 @@ pub struct ExecuteRequest {
     pub edition: Option<Edition>,
     pub crate_type: CrateType,
     pub tests: bool,
+    pub backtrace: bool,
     pub code: String,
 }
 
@@ -628,16 +634,38 @@ mod test {
     }
     "#;
 
+    impl Default for ExecuteRequest {
+        fn default() -> Self {
+            ExecuteRequest {
+                channel: Channel::Stable,
+                crate_type: CrateType::Binary,
+                mode: Mode::Debug,
+                tests: false,
+                code: HELLO_WORLD_CODE.to_string(),
+                edition: None,
+                backtrace: false,
+            }
+        }
+    }
+
+    impl Default for CompileRequest {
+        fn default() -> Self {
+            CompileRequest {
+                target: CompileTarget::LlvmIr,
+                channel: Channel::Stable,
+                crate_type: CrateType::Binary,
+                mode: Mode::Debug,
+                tests: false,
+                code: HELLO_WORLD_CODE.to_string(),
+                edition: None,
+                backtrace: false,
+            }
+        }
+    }
+
     #[test]
     fn basic_functionality() {
-        let req = ExecuteRequest {
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
-            code: HELLO_WORLD_CODE.to_string(),
-            edition: None,
-        };
+        let req = ExecuteRequest::default();
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
         let resp = sb.execute(&req).expect("Unable to execute code");
@@ -660,12 +688,8 @@ mod test {
     #[test]
     fn debug_mode() {
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
             code: COMPILATION_MODE_CODE.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -677,12 +701,9 @@ mod test {
     #[test]
     fn release_mode() {
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
             mode: Mode::Release,
-            tests: false,
             code: COMPILATION_MODE_CODE.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -705,11 +726,8 @@ mod test {
     fn stable_channel() {
         let req = ExecuteRequest {
             channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
             code: VERSION_CODE.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -724,11 +742,8 @@ mod test {
     fn beta_channel() {
         let req = ExecuteRequest {
             channel: Channel::Beta,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
             code: VERSION_CODE.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -743,11 +758,8 @@ mod test {
     fn nightly_channel() {
         let req = ExecuteRequest {
             channel: Channel::Nightly,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
             code: VERSION_CODE.to_string(),
-            edition: Some(Edition::Rust2018),
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -758,16 +770,112 @@ mod test {
         assert!(resp.stdout.contains("nightly"));
     }
 
+    const EDITION_CODE: &str = r#"
+    mod foo {
+        pub fn bar() {}
+    }
+
+    fn main() {
+        crate::foo::bar();
+    }
+    "#;
+
+    #[test]
+    fn rust_edition_default() -> Result<()> {
+        let req = ExecuteRequest {
+            channel: Channel::Nightly,
+            code: EDITION_CODE.to_string(),
+            ..ExecuteRequest::default()
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.execute(&req)?;
+
+        assert!(resp.stderr.contains("`crate` in paths is experimental"));
+        Ok(())
+    }
+
+    #[test]
+    fn rust_edition_2015() -> Result<()> {
+        let req = ExecuteRequest {
+            channel: Channel::Nightly,
+            code: EDITION_CODE.to_string(),
+            edition: Some(Edition::Rust2015),
+            ..ExecuteRequest::default()
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.execute(&req)?;
+
+        assert!(resp.stderr.contains("`crate` in paths is experimental"));
+        Ok(())
+    }
+
+    #[test]
+    fn rust_edition_2018() -> Result<()> {
+        let req = ExecuteRequest {
+            channel: Channel::Nightly,
+            code: EDITION_CODE.to_string(),
+            edition: Some(Edition::Rust2018),
+            ..ExecuteRequest::default()
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.execute(&req)?;
+
+        assert!(!resp.stderr.contains("`crate` in paths is experimental"));
+        Ok(())
+    }
+
+    const BACKTRACE_CODE: &str = r#"
+    fn trigger_the_problem() {
+        None::<u8>.unwrap();
+    }
+
+    fn main() {
+        trigger_the_problem()
+    }
+    "#;
+
+    #[test]
+    fn backtrace_disabled() -> Result<()> {
+        let req = ExecuteRequest {
+            code: BACKTRACE_CODE.to_string(),
+            backtrace: false,
+            ..ExecuteRequest::default()
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.execute(&req)?;
+
+        assert!(resp.stderr.contains("Run with `RUST_BACKTRACE=1` for a backtrace"));
+        assert!(!resp.stderr.contains("stack backtrace:"));
+
+        Ok(())
+    }
+
+    #[test]
+    fn backtrace_enabled() -> Result<()> {
+        let req = ExecuteRequest {
+            code: BACKTRACE_CODE.to_string(),
+            backtrace: true,
+            ..ExecuteRequest::default()
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.execute(&req)?;
+
+        assert!(!resp.stderr.contains("Run with `RUST_BACKTRACE=1` for a backtrace"));
+        assert!(resp.stderr.contains("stack backtrace:"));
+
+        Ok(())
+    }
+
     #[test]
     fn output_llvm_ir() {
         let req = CompileRequest {
             target: CompileTarget::LlvmIr,
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
-            code: HELLO_WORLD_CODE.to_string(),
-            edition: None,
+            ..CompileRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -782,12 +890,7 @@ mod test {
     fn output_assembly() {
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Raw),
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
-            code: HELLO_WORLD_CODE.to_string(),
-            edition: None,
+            ..CompileRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -803,12 +906,7 @@ mod test {
     fn output_demangled_assembly() {
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Demangle, ProcessAssembly::Raw),
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
-            code: HELLO_WORLD_CODE.to_string(),
-            edition: None,
+            ..CompileRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -823,12 +921,7 @@ mod test {
     fn output_filtered_assembly() {
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Filter),
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Debug,
-            tests: false,
-            code: HELLO_WORLD_CODE.to_string(),
-            edition: None,
+            ..CompileRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -886,12 +979,8 @@ mod test {
         "#;
 
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            mode: Mode::Debug,
-            crate_type: CrateType::Binary,
-            tests: false,
             code: code.to_string(),
-            edition: None
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -906,17 +995,13 @@ mod test {
             fn main() {
                 let megabyte = 1024 * 1024;
                 let mut big = vec![0u8; 384 * megabyte];
-                *big.last_mut().unwrap() += 1;
+                for i in &mut big { *i += 1; }
             }
         "#;
 
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            mode: Mode::Debug,
-            crate_type: CrateType::Binary,
-            tests: false,
             code: code.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -935,12 +1020,8 @@ mod test {
         "#;
 
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            mode: Mode::Debug,
-            crate_type: CrateType::Binary,
-            tests: false,
             code: code.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -964,12 +1045,8 @@ mod test {
         "##;
 
         let req = ExecuteRequest {
-            channel: Channel::Stable,
-            mode: Mode::Debug,
-            crate_type: CrateType::Binary,
-            tests: false,
             code: forkbomb.to_string(),
-            edition: None,
+            ..ExecuteRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");

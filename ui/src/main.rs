@@ -525,6 +525,7 @@ struct CompileRequest {
     #[serde(rename = "crateType")]
     crate_type: String,
     tests: bool,
+    backtrace: bool,
     code: String,
 }
 
@@ -545,6 +546,7 @@ struct ExecuteRequest {
     #[serde(rename = "crateType")]
     crate_type: String,
     tests: bool,
+    backtrace: bool,
     code: String,
 }
 
@@ -657,6 +659,7 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
             edition: parse_edition(&me.edition)?,
             crate_type: parse_crate_type(&me.crate_type)?,
             tests: me.tests,
+            backtrace: me.backtrace,
             code: me.code,
         })
     }
@@ -683,6 +686,7 @@ impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
             edition: parse_edition(&me.edition)?,
             crate_type: try!(parse_crate_type(&me.crate_type)),
             tests: me.tests,
+            backtrace: me.backtrace,
             code: me.code,
         })
     }
@@ -779,6 +783,7 @@ impl TryFrom<EvaluateRequest> for sandbox::ExecuteRequest {
             edition: None, // FIXME: What should this be?
             crate_type: sandbox::CrateType::Binary,
             tests: false,
+            backtrace: false,
             code: me.code,
         })
     }

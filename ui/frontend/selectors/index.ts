@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 import * as url from 'url';
 
 import { State } from '../reducers';
-import { Channel, Edition } from '../types';
+import { Backtrace, Channel, Edition } from '../types';
 
 const getCode = state => state.code;
 
@@ -53,12 +53,19 @@ export const getChannelLabel = (state: State) => {
   return `${channel}`;
 };
 
-export const getAdvancedOptionsSet = (state: State) => (
-  getEditionSet(state)
-);
-
 export const getEditionSet = (state: State) => (
   state.configuration.edition !== Edition.Rust2015
+);
+
+export const getBacktraceSet = (state: State) => (
+  state.configuration.backtrace !== Backtrace.Disabled
+);
+
+export const getAdvancedOptionsSet = createSelector(
+  getEditionSet, getBacktraceSet,
+  (editionSet, backtraceSet) => (
+    editionSet || backtraceSet
+  ),
 );
 
 const baseUrlSelector = (state: State) =>
