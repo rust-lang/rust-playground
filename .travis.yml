@@ -38,6 +38,9 @@ jobs:
     - env:
         - TOOLS_TO_BUILD="clippy"
       script: ./.travis/build-containers.sh || true
+    - env:
+        - TOOLS_TO_BUILD="miri"
+      script: ./.travis/build-containers.sh || true
 
     - stage: compile code
       env:
