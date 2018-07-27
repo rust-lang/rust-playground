@@ -10,7 +10,7 @@ export function configureRustErrors({ gotoPosition, reExecuteWithBacktrace, getC
         'see-issue': /see issue #\d+/,
       },
     },
-    'error-location': /-->.*\n/,
+    'error-location': /-->\s+src\/.*\n/,
     'backtrace': {
       pattern: /at src\/.*\n/,
       inside: {
