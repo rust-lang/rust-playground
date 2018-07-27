@@ -116,6 +116,17 @@ const Help = ({ navigateToIndex }: HelpProps) => (
         </p>
       </LinkableSection>
 
+      <LinkableSection id="features-formatting" header="Formatting code" level={H3}>
+        <p>
+          <a href={RUSTFMT_URL}>rustfmt</a> is a tool for formatting Rust code
+          according to the Rust style guidelines. Click on the <strong>Format</strong>
+          {' '}
+          button in the <strong>Tools</strong> menu to automatically reformat your code.
+        </p>
+
+        <Example code={RUSTFMT_EXAMPLE} />
+      </LinkableSection>
+
       <LinkableSection id="features-linting" header="Linting code" level={H3}>
         <p>
           <a href={CLIPPY_URL}>Clippy</a> is a collection of lints to catch common
@@ -126,17 +137,6 @@ const Help = ({ navigateToIndex }: HelpProps) => (
         </p>
 
         <Example code={CLIPPY_EXAMPLE} />
-      </LinkableSection>
-
-      <LinkableSection id="features-formatting" header="Formatting code" level={H3}>
-        <p>
-          <a href={RUSTFMT_URL}>rustfmt</a> is a tool for formatting Rust code
-          according to the Rust style guidelines. Click on the <strong>Format</strong>
-          {' '}
-          button in the <strong>Tools</strong> menu to automatically reformat your code.
-        </p>
-
-        <Example code={RUSTFMT_EXAMPLE} />
       </LinkableSection>
 
       <LinkableSection id="features-sharing" header="Sharing code" level={H3}>
