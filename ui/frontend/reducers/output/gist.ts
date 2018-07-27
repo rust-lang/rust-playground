@@ -15,7 +15,7 @@ const DEFAULT: State = {
   error: null,
 };
 
-export interface State extends RequestsInProgress {
+interface State extends RequestsInProgress {
   id?: string;
   url?: string;
   code?: string;

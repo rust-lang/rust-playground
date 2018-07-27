@@ -11,6 +11,7 @@ import {
   DemangleAssembly,
   Edition,
   Editor,
+  Focus,
   Mode,
   Orientation,
   Page,
@@ -141,7 +142,7 @@ export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
   dispatch(performExecute());
 };
 
-export const changeFocus = focus =>
+export const changeFocus = (focus: Focus) =>
   createAction(ActionType.ChangeFocus, { focus });
 
 const requestExecute = () =>

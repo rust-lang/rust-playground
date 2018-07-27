@@ -5,7 +5,7 @@ const DEFAULT: State = {
   requestsInProgress: 0,
 };
 
-export interface State {
+interface State {
   requestsInProgress: number;
 }
 

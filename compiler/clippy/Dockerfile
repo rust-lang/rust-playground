@@ -1,8 +1,6 @@
 FROM shepmaster/rust-nightly
 
-ARG version
-
-RUN cargo install clippy --vers "${version}"
+RUN rustup component add clippy-preview
 
 # TODO: Now that Clippy uses `cargo check`, we don't need to build on
 # top of the nightly image with pre-built crates. Evaluate if it's
