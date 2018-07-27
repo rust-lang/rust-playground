@@ -120,7 +120,7 @@ interface FormatProps {
 const Output: React.SFC<OutputProps> = ({
   // https://github.com/palantir/tslint/issues/3960
   // tslint:disable-next-line:trailing-comma
-  somethingToShow, meta: { focus }, execute, format, clippy, assembly, llvmIr, mir, wasm, gist, ...props
+  somethingToShow, meta: { focus }, execute, format, clippy, miri, assembly, llvmIr, mir, wasm, gist, ...props
 }) => {
   if (!somethingToShow) {
     return null;
@@ -139,6 +139,7 @@ const Output: React.SFC<OutputProps> = ({
         {focus === Focus.Execute && <SimplePane {...execute} kind="execute" />}
         {focus === Focus.Format && <Format {...format} />}
         {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
+        {focus === Focus.Miri && <SimplePane {...miri} kind="miri" />}
         {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
         {focus === Focus.LlvmIr && <PaneWithCode {...llvmIr} kind="llvm-ir" />}
         {focus === Focus.Mir && <PaneWithCode {...mir} kind="mir" />}
@@ -163,6 +164,10 @@ const Output: React.SFC<OutputProps> = ({
           label="Clippy"
           onClick={props.focusClippy}
           tabProps={clippy} />
+        <Tab kind={Focus.Miri} focus={focus}
+          label="Miri"
+          onClick={props.focusMiri}
+          tabProps={miri} />
         <Tab kind={Focus.Asm} focus={focus}
           label="ASM"
           onClick={props.focusAssembly}
@@ -208,6 +213,7 @@ interface OutputProps extends OutputState {
   focusExecute: () => void;
   focusFormat: () => void;
   focusClippy: () => void;
+  focusMiri: () => void;
   focusAssembly: () => void;
   focusLlvmIr: () => void;
   focusMir: () => void;
@@ -225,6 +231,7 @@ const mapDispatchToProps = ({
   focusExecute: () => changeFocus(Focus.Execute),
   focusFormat: () => changeFocus(Focus.Format),
   focusClippy: () => changeFocus(Focus.Clippy),
+  focusMiri: () => changeFocus(Focus.Miri),
   focusAssembly: () => changeFocus(Focus.Asm),
   focusLlvmIr: () => changeFocus(Focus.LlvmIr),
   focusMir: () => changeFocus(Focus.Mir),

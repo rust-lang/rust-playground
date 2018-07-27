@@ -23,6 +23,7 @@ const routes = {
   execute: { pathname: '/execute' },
   format: { pathname: '/format' },
   clippy: { pathname: '/clippy' },
+  miri: { pathname: '/miri' },
   meta: {
     crates: { pathname: '/meta/crates' },
     version: {
@@ -78,6 +79,9 @@ export enum ActionType {
   RequestClippy = 'REQUEST_CLIPPY',
   ClippySucceeded = 'CLIPPY_SUCCEEDED',
   ClippyFailed = 'CLIPPY_FAILED',
+  RequestMiri = 'REQUEST_MIRI',
+  MiriSucceeded = 'MIRI_SUCCEEDED',
+  MiriFailed = 'MIRI_FAILED',
   RequestGistLoad = 'REQUEST_GIST_LOAD',
   GistLoadSucceeded = 'GIST_LOAD_SUCCEEDED',
   GistLoadFailed = 'GIST_LOAD_FAILED',
@@ -387,6 +391,29 @@ export function performClippy(): ThunkAction {
   };
 }
 
+const requestMiri = () =>
+  createAction(ActionType.RequestMiri);
+
+const receiveMiriSuccess = ({ stdout, stderr }) =>
+  createAction(ActionType.MiriSucceeded, { stdout, stderr });
+
+const receiveMiriFailure = ({ error }) =>
+  createAction(ActionType.MiriFailed, { error });
+
+export function performMiri(): ThunkAction {
+  // TODO: Check a cache
+  return function(dispatch, getState) {
+    dispatch(requestMiri());
+
+    const { code } = getState();
+    const body = { code };
+
+    return jsonPost(routes.miri, body)
+      .then(json => dispatch(receiveMiriSuccess(json)))
+      .catch(json => dispatch(receiveMiriFailure(json)));
+  };
+}
+
 interface GistSuccessProps {
   id: string;
   url: string;
@@ -610,6 +637,9 @@ export type Action =
   | ReturnType<typeof requestClippy>
   | ReturnType<typeof receiveClippySuccess>
   | ReturnType<typeof receiveClippyFailure>
+  | ReturnType<typeof requestMiri>
+  | ReturnType<typeof receiveMiriSuccess>
+  | ReturnType<typeof receiveMiriFailure>
   | ReturnType<typeof requestGistLoad>
   | ReturnType<typeof receiveGistLoadSuccess>
   | ReturnType<typeof receiveGistLoadFailure>

@@ -8,12 +8,14 @@ import gist from './gist';
 import llvmIr from './llvmIr';
 import meta from './meta';
 import mir from './mir';
+import miri from './miri';
 import wasm from './wasm';
 
 const output = combineReducers({
   meta,
   format,
   clippy,
+  miri,
   assembly,
   llvmIr,
   mir,

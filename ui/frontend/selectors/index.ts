@@ -78,6 +78,7 @@ const getOutputs = (state: State) => [
   state.output.gist,
   state.output.llvmIr,
   state.output.mir,
+  state.output.miri,
   state.output.wasm,
 ];
 
