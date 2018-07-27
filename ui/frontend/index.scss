@@ -646,10 +646,15 @@ $header-transition: 0.2s ease-in-out;
   font-weight: 600;
 }
 
-.button-menu-item {
+@mixin full-menu-button {
   @include button-reset;
 
+  width: 100%;
   transition: color $header-transition;
+}
+
+.button-menu-item {
+  @include full-menu-button;
 
   &:hover {
     color: $header-tint;
@@ -665,12 +670,8 @@ $header-transition: 0.2s ease-in-out;
   }
 }
 
-// TODO: add 'menu'?
 .selectable-item {
-  width: 100%;
-  @include button-reset;
-
-  transition: color $header-transition;
+  @include full-menu-button;
 
   &__header {
     display: flex;
