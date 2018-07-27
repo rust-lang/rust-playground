@@ -37,6 +37,24 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     EOF
   end
 
+  scenario "sanitize code with Miri" do
+    editor.set code_with_undefined_behavior
+    in_tools_menu { click_on("Miri") }
+
+    within(".output-stderr") do
+      expect(page).to have_content /pointer computed at offset 1, outside bounds of allocation \d+ which has size 0/
+    end
+  end
+
+  def code_with_undefined_behavior
+    <<~EOF
+    fn main() {
+        let mut a: [u8; 0] = [];
+        unsafe { *a.get_unchecked_mut(1) = 1; }
+    }
+    EOF
+  end
+
   def editor
     Editor.new(page)
   end
