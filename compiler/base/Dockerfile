@@ -1,4 +1,4 @@
-FROM ubuntu:16.04 as toolchain
+FROM ubuntu:18.04 as toolchain
 
 # `build-essential` and `file` are needed for backtrace-sys
 # `cmake`, `git`, `python` are needed for wasm tools
