@@ -525,6 +525,7 @@ struct CompileRequest {
     #[serde(rename = "crateType")]
     crate_type: String,
     tests: bool,
+    #[serde(default)]
     backtrace: bool,
     code: String,
 }
@@ -546,6 +547,7 @@ struct ExecuteRequest {
     #[serde(rename = "crateType")]
     crate_type: String,
     tests: bool,
+    #[serde(default)]
     backtrace: bool,
     code: String,
 }
