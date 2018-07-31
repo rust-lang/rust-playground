@@ -46,7 +46,7 @@ Capybara.default_max_wait_time = 5
 Capybara.automatic_label_click = true
 
 RSpec.configure do |config|
-  config.before do
+  config.before(type: :feature) do
     visit '/'
     page.execute_script 'localStorage.clear();'
   end
