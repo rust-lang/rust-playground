@@ -9,6 +9,7 @@ import integer32Logo from './assets/integer32-logo.svg';
 
 const ACE_URL = 'https://github.com/ajaxorg/ace';
 const CLIPPY_URL = 'https://github.com/Manishearth/rust-clippy';
+const MIRI_URL = 'https://github.com/solson/miri';
 const CRATES_IO_URL = 'https://crates.io/';
 const RUST_COOKBOOK_URL = 'https://rust-lang-nursery.github.io/rust-cookbook/';
 const CRATES_URL = 'https://github.com/integer32llc/rust-playground/blob/master/compiler/base/Cargo.toml';
@@ -32,6 +33,13 @@ const CLIPPY_EXAMPLE = `fn main() {
     match true {
         true => println!("true"),
         false => println!("false"),
+    }
+}`;
+
+const MIRI_EXAMPLE = `fn main() {
+    let mut a: [u8; 0] = [];
+    unsafe {
+        *a.get_unchecked_mut(1) = 1;
     }
 }`;
 
@@ -116,6 +124,17 @@ const Help = ({ navigateToIndex }: HelpProps) => (
         </p>
       </LinkableSection>
 
+      <LinkableSection id="features-formatting" header="Formatting code" level={H3}>
+        <p>
+          <a href={RUSTFMT_URL}>rustfmt</a> is a tool for formatting Rust code
+          according to the Rust style guidelines. Click on the <strong>Format</strong>
+          {' '}
+          button in the <strong>Tools</strong> menu to automatically reformat your code.
+        </p>
+
+        <Example code={RUSTFMT_EXAMPLE} />
+      </LinkableSection>
+
       <LinkableSection id="features-linting" header="Linting code" level={H3}>
         <p>
           <a href={CLIPPY_URL}>Clippy</a> is a collection of lints to catch common
@@ -128,15 +147,15 @@ const Help = ({ navigateToIndex }: HelpProps) => (
         <Example code={CLIPPY_EXAMPLE} />
       </LinkableSection>
 
-      <LinkableSection id="features-formatting" header="Formatting code" level={H3}>
+      <LinkableSection id="features-miri" header="Checking code for undefined behavior" level={H3}>
         <p>
-          <a href={RUSTFMT_URL}>rustfmt</a> is a tool for formatting Rust code
-          according to the Rust style guidelines. Click on the <strong>Format</strong>
-          {' '}
-          button in the <strong>Tools</strong> menu to automatically reformat your code.
+          <a href={MIRI_URL}>Miri</a> is an interpreter for Rust's mid-level intermediate
+          representation (MIR) and can be used to detect certain kinds of undefined behavior
+          in your unsafe Rust code. Click on the <strong>Miri</strong> button in
+          the <strong>Tools</strong> menu to check.
         </p>
 
-        <Example code={RUSTFMT_EXAMPLE} />
+        <Example code={MIRI_EXAMPLE} />
       </LinkableSection>
 
       <LinkableSection id="features-sharing" header="Sharing code" level={H3}>

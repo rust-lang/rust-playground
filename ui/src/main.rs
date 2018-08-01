@@ -99,6 +99,7 @@ fn main() {
     mount.mount("/execute", execute);
     mount.mount("/format", format);
     mount.mount("/clippy", clippy);
+    mount.mount("/miri", miri);
     mount.mount("/meta/crates", meta_crates);
     mount.mount("/meta/version/stable", meta_version_stable);
     mount.mount("/meta/version/beta", meta_version_beta);
@@ -190,6 +191,15 @@ fn clippy(req: &mut Request) -> IronResult<Response> {
         sandbox
             .clippy(&req.into())
             .map(ClippyResponse::from)
+            .map_err(Error::Sandbox)
+    })
+}
+
+fn miri(req: &mut Request) -> IronResult<Response> {
+    with_sandbox(req, |sandbox, req: MiriRequest| {
+        sandbox
+            .miri(&req.into())
+            .map(MiriResponse::from)
             .map_err(Error::Sandbox)
     })
 }
@@ -584,6 +594,18 @@ struct ClippyResponse {
     stderr: String,
 }
 
+#[derive(Debug, Clone, Deserialize)]
+struct MiriRequest {
+    code: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct MiriResponse {
+    success: bool,
+    stdout: String,
+    stderr: String,
+}
+
 #[derive(Debug, Clone, Serialize)]
 struct CrateInformation {
     name: String,
@@ -736,6 +758,24 @@ impl From<ClippyRequest> for sandbox::ClippyRequest {
 impl From<sandbox::ClippyResponse> for ClippyResponse {
     fn from(me: sandbox::ClippyResponse) -> Self {
         ClippyResponse {
+            success: me.success,
+            stdout: me.stdout,
+            stderr: me.stderr,
+        }
+    }
+}
+
+impl From<MiriRequest> for sandbox::MiriRequest {
+    fn from(me: MiriRequest) -> Self {
+        sandbox::MiriRequest {
+            code: me.code,
+        }
+    }
+}
+
+impl From<sandbox::MiriResponse> for MiriResponse {
+    fn from(me: sandbox::MiriResponse) -> Self {
+        MiriResponse {
             success: me.success,
             stdout: me.stdout,
             stderr: me.stderr,

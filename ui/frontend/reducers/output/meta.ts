@@ -17,6 +17,9 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.RequestClippy:
       return { ...state, focus: Focus.Clippy };
 
+    case ActionType.RequestMiri:
+      return { ...state, focus: Focus.Miri };
+
     case ActionType.CompileLlvmIrRequest:
       return { ...state, focus: Focus.LlvmIr };
 
