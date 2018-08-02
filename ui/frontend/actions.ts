@@ -339,7 +339,7 @@ export const performCompileToNightlyWasm: ThunkAction = () => dispatch => {
   dispatch(performCompileToWasm());
 };
 
-export const editCode = code =>
+export const editCode = (code: string) =>
   createAction(ActionType.EditCode, { code });
 
 export const gotoPosition = (line, column) =>
@@ -348,7 +348,11 @@ export const gotoPosition = (line, column) =>
 const requestFormat = () =>
   createAction(ActionType.RequestFormat);
 
-const receiveFormatSuccess = ({ code }) =>
+interface FormatResponseBody {
+  code: string;
+}
+
+const receiveFormatSuccess = ({ code }: FormatResponseBody) =>
   createAction(ActionType.FormatSucceeded, { code });
 
 const receiveFormatFailure = ({ error }) =>
