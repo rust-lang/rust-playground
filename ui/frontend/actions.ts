@@ -350,13 +350,16 @@ const requestFormat = () =>
 
 interface FormatResponseBody {
   code: string;
+  stdout: string;
+  stderr: string;
+  error: string;
 }
 
-const receiveFormatSuccess = ({ code }: FormatResponseBody) =>
-  createAction(ActionType.FormatSucceeded, { code });
+const receiveFormatSuccess = (body: FormatResponseBody) =>
+  createAction(ActionType.FormatSucceeded, body);
 
-const receiveFormatFailure = ({ error }) =>
-  createAction(ActionType.FormatFailed, { error });
+const receiveFormatFailure = (body: FormatResponseBody) =>
+  createAction(ActionType.FormatFailed, body);
 
 export function performFormat(): ThunkAction {
   // TODO: Check a cache
@@ -367,7 +370,13 @@ export function performFormat(): ThunkAction {
     const body = { code };
 
     return jsonPost(routes.format, body)
-      .then(json => dispatch(receiveFormatSuccess(json)))
+      .then(json => {
+        if (json.success) {
+          dispatch(receiveFormatSuccess(json));
+        } else {
+          dispatch(receiveFormatFailure(json));
+        }
+      })
       .catch(json => dispatch(receiveFormatFailure(json)));
   };
 }
