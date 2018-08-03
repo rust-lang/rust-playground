@@ -8,6 +8,7 @@
     "alwaysStrict": true,
     "target": "ES2017",
     "module": "esnext",
+    "sourceMap": true,
     "allowJs": true,
     "jsx": "preserve"
   }
