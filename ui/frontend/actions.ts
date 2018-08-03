@@ -339,7 +339,7 @@ export const performCompileToNightlyWasm: ThunkAction = () => dispatch => {
   dispatch(performCompileToWasm());
 };
 
-export const editCode = code =>
+export const editCode = (code: string) =>
   createAction(ActionType.EditCode, { code });
 
 export const gotoPosition = (line, column) =>
@@ -348,11 +348,18 @@ export const gotoPosition = (line, column) =>
 const requestFormat = () =>
   createAction(ActionType.RequestFormat);
 
-const receiveFormatSuccess = ({ code }) =>
-  createAction(ActionType.FormatSucceeded, { code });
+interface FormatResponseBody {
+  code: string;
+  stdout: string;
+  stderr: string;
+  error: string;
+}
 
-const receiveFormatFailure = ({ error }) =>
-  createAction(ActionType.FormatFailed, { error });
+const receiveFormatSuccess = (body: FormatResponseBody) =>
+  createAction(ActionType.FormatSucceeded, body);
+
+const receiveFormatFailure = (body: FormatResponseBody) =>
+  createAction(ActionType.FormatFailed, body);
 
 export function performFormat(): ThunkAction {
   // TODO: Check a cache
@@ -363,7 +370,13 @@ export function performFormat(): ThunkAction {
     const body = { code };
 
     return jsonPost(routes.format, body)
-      .then(json => dispatch(receiveFormatSuccess(json)))
+      .then(json => {
+        if (json.success) {
+          dispatch(receiveFormatSuccess(json));
+        } else {
+          dispatch(receiveFormatFailure(json));
+        }
+      })
       .catch(json => dispatch(receiveFormatFailure(json)));
   };
 }

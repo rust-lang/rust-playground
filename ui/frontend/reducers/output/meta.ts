@@ -38,7 +38,6 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.RequestFormat:
       return { ...state, focus: Focus.Format };
     case ActionType.FormatSucceeded:
-    case ActionType.FormatFailed:
       return { ...state, focus: null };
 
     case ActionType.RequestGistLoad:

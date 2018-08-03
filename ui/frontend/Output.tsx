@@ -137,7 +137,7 @@ const Output: React.SFC<OutputProps> = ({
     body = (
       <div className="output-body">
         {focus === Focus.Execute && <SimplePane {...execute} kind="execute" />}
-        {focus === Focus.Format && <Format {...format} />}
+        {focus === Focus.Format && <SimplePane {...format} kind="format" />}
         {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
         {focus === Focus.Miri && <SimplePane {...miri} kind="miri" />}
         {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
