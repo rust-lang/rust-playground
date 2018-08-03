@@ -163,6 +163,12 @@ interface AdvancedEditorProps {
   focus?: Focus;
 }
 
+enum LoadState {
+  Unloaded,
+  Loading,
+  Loaded,
+}
+
 // The ACE editor weighs in at ~250K. Adding all of the themes and the
 // (surprisingly chunky) keybindings, it's not that far off from 500K!
 //
@@ -178,68 +184,120 @@ interface AdvancedEditorProps {
 class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedEditorAsyncState> {
   constructor(props) {
     super(props);
-    this.state = { modeLoading: true };
-
-    this.requireLibraries()
-      .then(({ default: { AceEditor, ace } }) => {
-        this.load(props);
-        this.setState({ AceEditor, ace, modeLoading: false });
-      });
+    this.state = {
+      modeState: LoadState.Unloaded,
+      themeState: LoadState.Unloaded,
+      keybindingState: LoadState.Unloaded,
+    };
   }
 
   public render() {
-    if (this.isLoading()) {
-      return <div>Loading the ACE editor...</div>;
+    if (this.isLoaded()) {
+      const { ace, AceEditor, theme, keybinding } = this.state;
+      return <AdvancedEditor {...this.props} AceEditor={AceEditor} ace={ace} theme={theme} keybinding={keybinding} />;
     } else {
-      const { ace, AceEditor } = this.state;
-      return <AdvancedEditor {...this.props} AceEditor={AceEditor} ace={ace} />;
+      return <div>Loading the ACE editor...</div>;
     }
   }
 
-  public componentWillReceiveProps(nextProps) {
-    this.load(nextProps);
+  public componentDidMount() {
+    this.load();
   }
 
-  private isLoading() {
-    return this.state.themeLoading ||
-      this.state.keybindingLoading ||
-      this.state.modeLoading ||
-      this.state.AceEditor === null;
-  }
-
-  private load(props) {
-    const { keybinding, theme } = props;
-    this.loadTheme(theme);
-    this.loadKeybinding(keybinding);
-  }
-
-  private loadKeybinding(keybinding) {
-    if (keybinding && keybinding !== this.state.keybinding) {
-      this.setState({ keybindingLoading: true });
-
-      this.requireLibraries()
-        .then(() => import(
-          /* webpackChunkName: "brace-keybinding-[request]" */
-          `brace/keybinding/${keybinding}`,
-        ))
-        .then(() => this.setState({ keybinding, keybindingLoading: false }));
+  public componentDidUpdate(prevProps, prevState) {
+    if (this.isLoadNeeded()) {
+      this.load();
     }
   }
 
-  private loadTheme(theme) {
-    if (theme !== this.state.theme) {
-      this.setState({ themeLoading: true });
-
-      this.requireLibraries()
-        .then(() => import(
-          /* webpackChunkName: "brace-theme-[request]" */
-          `brace/theme/${theme}`,
-        ))
-        .then(() => this.setState({ theme, themeLoading: false }));
-    }
+  private isLoaded() {
+    const { modeState, themeState, keybindingState } = this.state;
+    return modeState === LoadState.Loaded &&
+      themeState === LoadState.Loaded &&
+      keybindingState === LoadState.Loaded;
   }
 
-  private requireLibraries() {
+  private isLoadNeeded() {
+    return this.isAceLoadNeeded() ||
+      this.isThemeLoadNeeded() ||
+      this.isKeybindingLoadNeeded();
+  }
+
+  private async load() {
+    return Promise.all([
+      this.loadAce(),
+      this.loadTheme(),
+      this.loadKeybinding(),
+    ]);
+  }
+
+  private isAceLoadNeeded() {
+    const { AceEditor, modeState } = this.state;
+    return !AceEditor && modeState !== LoadState.Loading;
+  }
+
+  private async loadAce() {
+    if (!this.isAceLoadNeeded()) { return; }
+
+    this.setState({ modeState: LoadState.Loading });
+
+    const { default: { AceEditor, ace } } = await this.requireLibraries();
+
+    this.setState({ AceEditor, ace, modeState: LoadState.Loaded });
+  }
+
+  private isKeybindingBuiltin() {
+    return this.props.keybinding === null;
+  }
+
+  private isKeybindingLoadNeeded() {
+    const { keybinding, keybindingState } = this.state;
+    return this.props.keybinding !== keybinding && keybindingState !== LoadState.Loading;
+  }
+
+  private async loadKeybinding() {
+    if (!this.isKeybindingLoadNeeded()) { return; }
+
+    const { keybinding } = this.props;
+
+    if (this.isKeybindingBuiltin()) {
+      this.setState({ keybinding, keybindingState: LoadState.Loaded });
+      return;
+    }
+
+    this.setState({ keybindingState: LoadState.Loading });
+
+    await this.requireLibraries();
+    await import(
+      /* webpackChunkName: "brace-keybinding-[request]" */
+      `brace/keybinding/${keybinding}`,
+    );
+
+    this.setState({ keybinding, keybindingState: LoadState.Loaded });
+  }
+
+  private isThemeLoadNeeded() {
+    const { theme, themeState } = this.state;
+    return this.props.theme !== theme && themeState !== LoadState.Loading;
+  }
+
+  private async loadTheme() {
+    if (!this.isThemeLoadNeeded()) { return; }
+
+    const { theme } = this.props;
+
+    this.setState({ themeState: LoadState.Loading });
+
+    await this.requireLibraries();
+    await import(
+      /* webpackChunkName: "brace-theme-[request]" */
+      `brace/theme/${theme}`,
+    );
+
+    this.setState({ theme, themeState: LoadState.Loaded });
+  }
+
+  private async requireLibraries() {
     return import(
       /* webpackChunkName: "advanced-editor" */
       './advanced-editor',
@@ -250,9 +308,9 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedE
 interface AdvancedEditorAsyncState {
   theme?: string;
   keybinding?: string;
-  themeLoading?: boolean;
-  keybindingLoading?: boolean;
-  modeLoading: boolean;
+  themeState: LoadState;
+  keybindingState: LoadState;
+  modeState: LoadState;
   AceEditor?: React.ReactType;
   ace?: any;
 }
