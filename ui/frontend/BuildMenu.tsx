@@ -27,8 +27,8 @@ interface BuildMenuProps {
 
 const WasmAside: React.SFC<{}> = props => (
   <p className="build-menu__aside">
-     Note: WASM currently requires using the Nightly channel, selecting this
-     option will switch to Nightly.
+    Note: WASM currently requires using the Nightly channel, selecting this
+    option will switch to Nightly.
   </p>
 );
 

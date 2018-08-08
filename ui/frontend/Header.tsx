@@ -14,8 +14,8 @@ import ToolsMenu from './ToolsMenu';
 
 import {
   navigateToHelp,
-  performExecute,
   performGistSave,
+  performPrimaryAction,
 } from './actions';
 import {
   getAdvancedOptionsSet,
@@ -164,7 +164,7 @@ const mapStateToProps = (state: State) => ({
 });
 
 const mapDispatchToProps = ({
-  execute: performExecute,
+  execute: performPrimaryAction,
   gistSave: performGistSave,
 });
 
