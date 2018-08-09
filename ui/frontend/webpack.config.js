@@ -29,10 +29,17 @@ module.exports = function(_, argv) {
         productionFilenameTemplate :
         developmentFilenameTemplate;
 
+  const devtool =
+        isProduction ?
+        false :
+        'inline-source-map';
+
   return {
     entry: {
       app: ['./index.tsx', './index.scss'],
     },
+
+    devtool,
 
     output: {
       publicPath: 'assets/',

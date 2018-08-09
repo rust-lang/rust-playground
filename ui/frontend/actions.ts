@@ -175,21 +175,36 @@ function jsonPost(urlObj, body) {
   });
 }
 
-function fetchJson(url, args) {
+async function fetchJson(url, args) {
   const { headers = {} } = args;
   headers['Content-Type'] = 'application/json';
 
-  return fetch(url, { ...args, headers })
-    .catch(error => error)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        return response.json()
-          .catch(e => Promise.reject({ error: e.toString() }))
-          .then(j => Promise.reject(j));
-      }
+  let response;
+  try {
+    response = await fetch(url, { ...args, headers });
+  } catch (networkError) {
+    // e.g. server unreachable
+    throw ({
+      error: `Network error: ${networkError.toString()}`,
     });
+  }
+
+  let body;
+  try {
+    body = await response.json();
+  } catch (convertError) {
+    throw ({
+      error: `Response was not JSON: ${convertError.toString()}`,
+    });
+  }
+
+  if (response.ok) {
+    // HTTP 2xx
+    return body;
+  } else {
+    // HTTP 4xx, 5xx (e.g. malformed JSON request)
+    throw body;
+  }
 }
 
 interface ExecuteRequestBody {
