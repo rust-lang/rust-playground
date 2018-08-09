@@ -224,27 +224,36 @@ interface ExecuteRequestBody {
   backtrace: boolean;
 }
 
-function performExecuteOnly(): ThunkAction {
-  // TODO: Check a cache
-  return function(dispatch, getState) {
-    dispatch(requestExecute());
+const performCommonExecute = (crateType, tests): ThunkAction => (dispatch, getState) => {
+  dispatch(requestExecute());
 
+  const state = getState();
+  const { code, configuration: { channel, mode, edition } } = state;
+  const backtrace = state.configuration.backtrace === Backtrace.Enabled;
+
+  const body: ExecuteRequestBody = { channel, mode, crateType, tests, code, backtrace };
+  if (isEditionAvailable(state)) {
+    body.edition = edition;
+  }
+
+  return jsonPost(routes.execute, body)
+    .then(json => dispatch(receiveExecuteSuccess(json)))
+    .catch(json => dispatch(receiveExecuteFailure(json)));
+};
+
+function performAutoOnly(): ThunkAction {
+  return function(dispatch, getState) {
     const state = getState();
-    const { code, configuration: { channel, mode, edition } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
-    const backtrace = state.configuration.backtrace === Backtrace.Enabled;
 
-    const body: ExecuteRequestBody = { channel, mode, crateType, tests, code, backtrace };
-    if (isEditionAvailable(state)) {
-      body.edition = edition;
-    }
-
-    return jsonPost(routes.execute, body)
-      .then(json => dispatch(receiveExecuteSuccess(json)))
-      .catch(json => dispatch(receiveExecuteFailure(json)));
+    return dispatch(performCommonExecute(crateType, tests));
   };
 }
+
+const performExecuteOnly = (): ThunkAction => performCommonExecute('bin', false);
+const performCompileOnly = (): ThunkAction => performCommonExecute('lib', false);
+const performTestOnly = (): ThunkAction => performCommonExecute('lib', true);
 
 interface CompileRequestBody extends ExecuteRequestBody {
   target: string;
@@ -253,7 +262,7 @@ interface CompileRequestBody extends ExecuteRequestBody {
   processAssembly: string;
 }
 
-function performCompile(target, { request, success, failure }): ThunkAction {
+function performCompileShow(target, { request, success, failure }): ThunkAction {
   // TODO: Check a cache
   return function(dispatch, getState) {
     dispatch(request());
@@ -302,7 +311,7 @@ const receiveCompileAssemblyFailure = ({ error }) =>
   createAction(ActionType.CompileAssemblyFailed, { error });
 
 const performCompileToAssemblyOnly = () =>
-  performCompile('asm', {
+  performCompileShow('asm', {
     request: requestCompileAssembly,
     success: receiveCompileAssemblySuccess,
     failure: receiveCompileAssemblyFailure,
@@ -318,7 +327,7 @@ const receiveCompileLlvmIrFailure = ({ error }) =>
   createAction(ActionType.CompileLlvmIrFailed, { error });
 
 const performCompileToLLVMOnly = () =>
-  performCompile('llvm-ir', {
+  performCompileShow('llvm-ir', {
     request: requestCompileLlvmIr,
     success: receiveCompileLlvmIrSuccess,
     failure: receiveCompileLlvmIrFailure,
@@ -334,7 +343,7 @@ const receiveCompileMirFailure = ({ error }) =>
   createAction(ActionType.CompileMirFailed, { error });
 
 const performCompileToMirOnly = () =>
-  performCompile('mir', {
+  performCompileShow('mir', {
     request: requestCompileMir,
     success: receiveCompileMirSuccess,
     failure: receiveCompileMirFailure,
@@ -350,7 +359,7 @@ const receiveCompileWasmFailure = ({ error }) =>
   createAction(ActionType.CompileWasmFailed, { error });
 
 const performCompileToWasm = () =>
-  performCompile('wasm', {
+  performCompileShow('wasm', {
     request: requestCompileWasm,
     success: receiveCompileWasmSuccess,
     failure: receiveCompileWasmFailure,
@@ -361,9 +370,12 @@ const performCompileToNightlyWasmOnly = (): ThunkAction => dispatch => {
   dispatch(performCompileToWasm());
 };
 
-const PRIMARY_ACTIONS = {
+const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Asm]: performCompileToAssemblyOnly,
-  [PrimaryActionAuto.Auto]: performExecuteOnly,
+  [PrimaryActionCore.Compile]: performCompileOnly,
+  [PrimaryActionCore.Execute]: performExecuteOnly,
+  [PrimaryActionCore.Test]: performTestOnly,
+  [PrimaryActionAuto.Auto]: performAutoOnly,
   [PrimaryActionCore.LlvmIr]: performCompileToLLVMOnly,
   [PrimaryActionCore.Mir]: performCompileToMirOnly,
   [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
@@ -381,7 +393,11 @@ const performAndSwitchPrimaryAction = (inner: () => ThunkAction, id: PrimaryActi
 };
 
 export const performExecute =
-  performAndSwitchPrimaryAction(performExecuteOnly, PrimaryActionAuto.Auto);
+  performAndSwitchPrimaryAction(performExecuteOnly, PrimaryActionCore.Execute);
+export const performCompile =
+  performAndSwitchPrimaryAction(performCompileOnly, PrimaryActionCore.Compile);
+export const performTest =
+  performAndSwitchPrimaryAction(performTestOnly, PrimaryActionCore.Test);
 export const performCompileToAssembly =
   performAndSwitchPrimaryAction(performCompileToAssemblyOnly, PrimaryActionCore.Asm);
 export const performCompileToLLVM =
