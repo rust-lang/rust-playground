@@ -14,7 +14,6 @@ import {
   changeOrientation,
   changeProcessAssembly,
   changeTheme,
-  toggleConfiguration,
 } from './actions';
 import State from './state';
 import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, ProcessAssembly } from './types';

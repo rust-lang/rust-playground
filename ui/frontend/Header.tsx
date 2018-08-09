@@ -18,16 +18,10 @@ import {
   performGistSave,
 } from './actions';
 import {
-  betaVersionText,
   getAdvancedOptionsSet,
   getChannelLabel,
-  getCrateType,
   getExecutionLabel,
   getModeLabel,
-  isWasmAvailable,
-  nightlyVersionText,
-  runAsTest,
-  stableVersionText,
 } from './selectors';
 import State from './state';
 

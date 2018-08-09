@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 
-import { changeBacktrace, changeEdition } from './actions';
+import { changeBacktrace } from './actions';
 import { changeNightlyEdition } from './actions';
 import { Either as EitherConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';

@@ -9,7 +9,6 @@ import {
   performFormat,
   performMiri,
 } from './actions';
-import State from './state';
 
 interface ToolsMenuProps {
   clippy: () => any;

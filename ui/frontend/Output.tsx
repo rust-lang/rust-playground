@@ -1,4 +1,3 @@
-import * as qs from 'qs';
 import React from 'react';
 import { PrismCode } from 'react-prism';
 import { connect } from 'react-redux';
@@ -6,7 +5,7 @@ import { connect } from 'react-redux';
 import { changeFocus } from './actions';
 import { State } from './reducers';
 import { State as OutputState } from './reducers/output';
-import { Channel, Edition, Focus, Mode } from './types';
+import { Focus } from './types';
 
 import Gist from './Output/Gist';
 import Header from './Output/Header';
@@ -103,20 +102,6 @@ interface PaneWithCodeProps extends SimplePaneProps {
   code?: string;
 }
 
-const Format: React.SFC<FormatProps> = ({ requestsInProgress }) => {
-  const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
-
-  return (
-    <div className="output-format">
-      {loader}
-    </div>
-  );
-};
-
-interface FormatProps {
-  requestsInProgress: number;
-}
-
 const Output: React.SFC<OutputProps> = ({
   // https://github.com/palantir/tslint/issues/3960
   // tslint:disable-next-line:trailing-comma
@@ -200,10 +185,6 @@ interface SimpleProps {
   stdout?: string;
   stderr?: string;
   error?: string;
-}
-
-interface WithCodeProps extends SimpleProps {
-  code: string;
 }
 
 interface OutputProps extends OutputState {
