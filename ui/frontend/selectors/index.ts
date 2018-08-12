@@ -5,25 +5,47 @@ import * as url from 'url';
 import { State } from '../reducers';
 import { Backtrace, Channel, Edition, PrimaryActionAuto, PrimaryActionCore } from '../types';
 
-const getCode = state => state.code;
+const codeSelector = (state: State) => state.code;
 
-const hasTests = (code: string) => code.includes('#[test]');
-const hasMainMethod = (code: string) => code.includes('fn main()');
-const runAsTestRaw = (code: string) => hasTests(code) && !hasMainMethod(code);
-export const runAsTest = createSelector([getCode], runAsTestRaw);
+const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
+const hasTestsSelector = createSelector(codeSelector, code => !!code.match(HAS_TESTS_RE));
+
+const HAS_MAIN_FUNCTION_RE = /^\s*fn\s+main\s*\(\)/m;
+const hasMainFunctionSelector = createSelector(codeSelector, code => !!code.match(HAS_MAIN_FUNCTION_RE));
 
 const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
-const getCrateTypeRaw = (code: string) => (code.match(CRATE_TYPE_RE) || [null, 'bin'])[1];
-export const getCrateType = createSelector([getCode], getCrateTypeRaw);
+const crateTypeSelector = createSelector(codeSelector, code => (code.match(CRATE_TYPE_RE) || [])[1]);
 
 const autoPrimaryActionSelector = createSelector(
-  runAsTest,
-  getCrateType,
-  (tests, crateType) => {
-    if (tests) { return PrimaryActionCore.Test; }
-    if (crateType === 'bin') { return PrimaryActionCore.Execute; }
-    return PrimaryActionCore.Compile;
+  crateTypeSelector,
+  hasTestsSelector,
+  hasMainFunctionSelector,
+  (crateType, hasTests, hasMainFunction) => {
+    if (crateType) {
+      if (crateType === 'bin') {
+        return PrimaryActionCore.Execute;
+      } else {
+        return PrimaryActionCore.Compile;
+      }
+    } else {
+      if (hasTests) {
+        return PrimaryActionCore.Test;
+      } else if (hasMainFunction) {
+        return PrimaryActionCore.Execute;
+      } else {
+        return PrimaryActionCore.Compile;
+      }
+    }
   },
+);
+
+export const runAsTest = createSelector(
+  autoPrimaryActionSelector,
+  primaryAction => primaryAction === PrimaryActionCore.Test,
+);
+export const getCrateType = createSelector(
+  autoPrimaryActionSelector,
+  primaryAction => primaryAction === PrimaryActionCore.Execute ? 'bin' : 'lib',
 );
 
 const rawPrimaryActionSelector = (state: State) => state.configuration.primaryAction;
