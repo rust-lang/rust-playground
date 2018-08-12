@@ -6,6 +6,7 @@ import { State } from './reducers';
 import { State as OutputState } from './reducers/output';
 import { Focus } from './types';
 
+import Execute from './Output/Execute';
 import Gist from './Output/Gist';
 import Section from './Output/Section';
 import SimplePane, { SimplePaneProps } from './Output/SimplePane';
@@ -62,7 +63,7 @@ const Output: React.SFC<OutputProps> = ({
 
     body = (
       <div className="output-body">
-        {focus === Focus.Execute && <SimplePane {...execute} kind="execute" />}
+        {focus === Focus.Execute && <Execute />}
         {focus === Focus.Format && <SimplePane {...format} kind="format" />}
         {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
         {focus === Focus.Miri && <SimplePane {...miri} kind="miri" />}
