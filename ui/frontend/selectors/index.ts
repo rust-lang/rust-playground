@@ -50,6 +50,14 @@ export const getCrateType = createSelector(
 
 const rawPrimaryActionSelector = (state: State) => state.configuration.primaryAction;
 
+export const isAutoBuildSelector = createSelector(
+  rawPrimaryActionSelector,
+  autoPrimaryActionSelector,
+  (primaryAction, autoPrimaryAction) => (
+    primaryAction === PrimaryActionAuto.Auto && autoPrimaryAction === PrimaryActionCore.Compile
+  ),
+);
+
 const primaryActionSelector = createSelector(
   rawPrimaryActionSelector,
   autoPrimaryActionSelector,

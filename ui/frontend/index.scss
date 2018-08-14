@@ -55,9 +55,18 @@ body {
   border: none;
   padding: 0;
   text-align: inherit;
+  font: inherit;
   line-height: inherit;
   background: inherit;
   background-color: transparent; // IE 11
+}
+
+@mixin button-as-link {
+  @include button-reset;
+  user-select: text;
+  cursor: pointer;
+  text-decoration: underline;
+  color: #0000EE;
 }
 
 .playground {
@@ -286,6 +295,10 @@ body {
             opacity: 1;
             transition: visibility 0s, opacity 0s, color 0s;
         }
+    }
+
+    &-add-main {
+      @include button-as-link;
     }
 }
 

@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url from 'url';
 
-import { getCrateType, isEditionAvailable, runAsTest } from './selectors';
+import { getCrateType, isAutoBuildSelector, isEditionAvailable, runAsTest } from './selectors';
 import State from './state';
 import {
   AssemblyFlavor,
@@ -76,6 +76,7 @@ export enum ActionType {
   CompileWasmSucceeded = 'COMPILE_WASM_SUCCEEDED',
   CompileWasmFailed = 'COMPILE_WASM_FAILED',
   EditCode = 'EDIT_CODE',
+  AddMainFunction = 'ADD_MAIN_FUNCTION',
   GotoPosition = 'GOTO_POSITION',
   RequestFormat = 'REQUEST_FORMAT',
   FormatSucceeded = 'FORMAT_SUCCEEDED',
@@ -159,11 +160,11 @@ export const changeFocus = (focus: Focus) =>
 const requestExecute = () =>
   createAction(ActionType.ExecuteRequest);
 
-const receiveExecuteSuccess = ({ stdout, stderr }) =>
-  createAction(ActionType.ExecuteSucceeded, { stdout, stderr });
+const receiveExecuteSuccess = ({ stdout, stderr, isAutoBuild }) =>
+  createAction(ActionType.ExecuteSucceeded, { stdout, stderr, isAutoBuild });
 
-const receiveExecuteFailure = ({ error }) =>
-  createAction(ActionType.ExecuteFailed, { error });
+const receiveExecuteFailure = ({ error, isAutoBuild }) =>
+  createAction(ActionType.ExecuteFailed, { error, isAutoBuild });
 
 function jsonGet(urlObj) {
   const urlStr = url.format(urlObj);
@@ -230,6 +231,7 @@ const performCommonExecute = (crateType, tests): ThunkAction => (dispatch, getSt
   const state = getState();
   const { code, configuration: { channel, mode, edition } } = state;
   const backtrace = state.configuration.backtrace === Backtrace.Enabled;
+  const isAutoBuild = isAutoBuildSelector(state);
 
   const body: ExecuteRequestBody = { channel, mode, crateType, tests, code, backtrace };
   if (isEditionAvailable(state)) {
@@ -237,8 +239,8 @@ const performCommonExecute = (crateType, tests): ThunkAction => (dispatch, getSt
   }
 
   return jsonPost(routes.execute, body)
-    .then(json => dispatch(receiveExecuteSuccess(json)))
-    .catch(json => dispatch(receiveExecuteFailure(json)));
+    .then(json => dispatch(receiveExecuteSuccess({ ...json, isAutoBuild })))
+    .catch(json => dispatch(receiveExecuteFailure({ ...json, isAutoBuild })));
 };
 
 function performAutoOnly(): ThunkAction {
@@ -409,6 +411,9 @@ export const performCompileToNightlyWasm =
 
 export const editCode = (code: string) =>
   createAction(ActionType.EditCode, { code });
+
+export const addMainFunction = () =>
+  createAction(ActionType.AddMainFunction);
 
 export const gotoPosition = (line, column) =>
   createAction(ActionType.GotoPosition, { line: +line, column: +column });
@@ -712,6 +717,7 @@ export type Action =
   | ReturnType<typeof receiveCompileWasmSuccess>
   | ReturnType<typeof receiveCompileWasmFailure>
   | ReturnType<typeof editCode>
+  | ReturnType<typeof addMainFunction>
   | ReturnType<typeof gotoPosition>
   | ReturnType<typeof requestFormat>
   | ReturnType<typeof receiveFormatSuccess>
