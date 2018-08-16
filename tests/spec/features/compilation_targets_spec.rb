@@ -10,6 +10,38 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     editor.set(code)
   end
 
+  context "ignoring automatic primary actions" do
+    before do
+      code = <<~EOF
+        #[test]
+        fn a_test() { assert!(false); }
+        fn main() { println!("Hello, world!"); }
+      EOF
+      editor.set(code)
+    end
+
+    scenario "choosing to run the code" do
+      in_build_menu { click_on(build_button: "Run") }
+      within('.output-stdout') do
+        expect(page).to have_content 'Hello, world!'
+      end
+    end
+
+    scenario "choosing to build the code" do
+      in_build_menu { click_on(build_button: "Build") }
+      within('.output-stderr') do
+        expect(page).to have_content 'function is never used: `main`'
+      end
+    end
+
+    scenario "choosing to test the code" do
+      in_build_menu { click_on(build_button: "Test") }
+      within('.output-stdout') do
+        expect(page).to have_content "'a_test' panicked at 'assertion failed: false'"
+      end
+    end
+  end
+
   context "when AT&T syntax is selected" do
     before do
       in_config_menu { choose("AT&T") }
