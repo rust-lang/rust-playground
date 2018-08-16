@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url from 'url';
 
-import { getCrateType, isEditionAvailable, runAsTest } from './selectors';
+import { getCrateType, isAutoBuildSelector, isEditionAvailable, runAsTest } from './selectors';
 import State from './state';
 import {
   AssemblyFlavor,
@@ -15,6 +15,9 @@ import {
   Mode,
   Orientation,
   Page,
+  PrimaryAction,
+  PrimaryActionAuto,
+  PrimaryActionCore,
   ProcessAssembly,
 } from './types';
 
@@ -49,6 +52,7 @@ export enum ActionType {
   ChangeTheme = 'CHANGE_THEME',
   ChangeOrientation = 'CHANGE_ORIENTATION',
   ChangeAssemblyFlavor = 'CHANGE_ASSEMBLY_FLAVOR',
+  ChangePrimaryAction = 'CHANGE_PRIMARY_ACTION',
   ChangeChannel = 'CHANGE_CHANNEL',
   ChangeDemangleAssembly = 'CHANGE_DEMANGLE_ASSEMBLY',
   ChangeProcessAssembly = 'CHANGE_PROCESS_ASSEMBLY',
@@ -72,6 +76,7 @@ export enum ActionType {
   CompileWasmSucceeded = 'COMPILE_WASM_SUCCEEDED',
   CompileWasmFailed = 'COMPILE_WASM_FAILED',
   EditCode = 'EDIT_CODE',
+  AddMainFunction = 'ADD_MAIN_FUNCTION',
   GotoPosition = 'GOTO_POSITION',
   RequestFormat = 'REQUEST_FORMAT',
   FormatSucceeded = 'FORMAT_SUCCEEDED',
@@ -124,6 +129,9 @@ export const changeDemangleAssembly = (demangleAssembly: DemangleAssembly) =>
 export const changeProcessAssembly = (processAssembly: ProcessAssembly) =>
   createAction(ActionType.ChangeProcessAssembly, { processAssembly });
 
+const changePrimaryAction = (primaryAction: PrimaryAction) =>
+  createAction(ActionType.ChangePrimaryAction, { primaryAction });
+
 export const changeChannel = (channel: Channel) =>
   createAction(ActionType.ChangeChannel, { channel });
 
@@ -143,7 +151,7 @@ export const changeBacktrace = (backtrace: Backtrace) =>
 
 export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
   dispatch(changeBacktrace(Backtrace.Enabled));
-  dispatch(performExecute());
+  dispatch(performExecuteOnly());
 };
 
 export const changeFocus = (focus: Focus) =>
@@ -152,11 +160,11 @@ export const changeFocus = (focus: Focus) =>
 const requestExecute = () =>
   createAction(ActionType.ExecuteRequest);
 
-const receiveExecuteSuccess = ({ stdout, stderr }) =>
-  createAction(ActionType.ExecuteSucceeded, { stdout, stderr });
+const receiveExecuteSuccess = ({ stdout, stderr, isAutoBuild }) =>
+  createAction(ActionType.ExecuteSucceeded, { stdout, stderr, isAutoBuild });
 
-const receiveExecuteFailure = ({ error }) =>
-  createAction(ActionType.ExecuteFailed, { error });
+const receiveExecuteFailure = ({ error, isAutoBuild }) =>
+  createAction(ActionType.ExecuteFailed, { error, isAutoBuild });
 
 function jsonGet(urlObj) {
   const urlStr = url.format(urlObj);
@@ -217,27 +225,37 @@ interface ExecuteRequestBody {
   backtrace: boolean;
 }
 
-export function performExecute(): ThunkAction {
-  // TODO: Check a cache
-  return function(dispatch, getState) {
-    dispatch(requestExecute());
+const performCommonExecute = (crateType, tests): ThunkAction => (dispatch, getState) => {
+  dispatch(requestExecute());
 
+  const state = getState();
+  const { code, configuration: { channel, mode, edition } } = state;
+  const backtrace = state.configuration.backtrace === Backtrace.Enabled;
+  const isAutoBuild = isAutoBuildSelector(state);
+
+  const body: ExecuteRequestBody = { channel, mode, crateType, tests, code, backtrace };
+  if (isEditionAvailable(state)) {
+    body.edition = edition;
+  }
+
+  return jsonPost(routes.execute, body)
+    .then(json => dispatch(receiveExecuteSuccess({ ...json, isAutoBuild })))
+    .catch(json => dispatch(receiveExecuteFailure({ ...json, isAutoBuild })));
+};
+
+function performAutoOnly(): ThunkAction {
+  return function(dispatch, getState) {
     const state = getState();
-    const { code, configuration: { channel, mode, edition } } = state;
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
-    const backtrace = state.configuration.backtrace === Backtrace.Enabled;
 
-    const body: ExecuteRequestBody = { channel, mode, crateType, tests, code, backtrace };
-    if (isEditionAvailable(state)) {
-      body.edition = edition;
-    }
-
-    return jsonPost(routes.execute, body)
-      .then(json => dispatch(receiveExecuteSuccess(json)))
-      .catch(json => dispatch(receiveExecuteFailure(json)));
+    return dispatch(performCommonExecute(crateType, tests));
   };
 }
+
+const performExecuteOnly = (): ThunkAction => performCommonExecute('bin', false);
+const performCompileOnly = (): ThunkAction => performCommonExecute('lib', false);
+const performTestOnly = (): ThunkAction => performCommonExecute('lib', true);
 
 interface CompileRequestBody extends ExecuteRequestBody {
   target: string;
@@ -246,7 +264,7 @@ interface CompileRequestBody extends ExecuteRequestBody {
   processAssembly: string;
 }
 
-function performCompile(target, { request, success, failure }): ThunkAction {
+function performCompileShow(target, { request, success, failure }): ThunkAction {
   // TODO: Check a cache
   return function(dispatch, getState) {
     dispatch(request());
@@ -294,8 +312,8 @@ const receiveCompileAssemblySuccess = ({ code, stdout, stderr }) =>
 const receiveCompileAssemblyFailure = ({ error }) =>
   createAction(ActionType.CompileAssemblyFailed, { error });
 
-export const performCompileToAssembly = () =>
-  performCompile('asm', {
+const performCompileToAssemblyOnly = () =>
+  performCompileShow('asm', {
     request: requestCompileAssembly,
     success: receiveCompileAssemblySuccess,
     failure: receiveCompileAssemblyFailure,
@@ -310,8 +328,8 @@ const receiveCompileLlvmIrSuccess = ({ code, stdout, stderr }) =>
 const receiveCompileLlvmIrFailure = ({ error }) =>
   createAction(ActionType.CompileLlvmIrFailed, { error });
 
-export const performCompileToLLVM = () =>
-  performCompile('llvm-ir', {
+const performCompileToLLVMOnly = () =>
+  performCompileShow('llvm-ir', {
     request: requestCompileLlvmIr,
     success: receiveCompileLlvmIrSuccess,
     failure: receiveCompileLlvmIrFailure,
@@ -326,8 +344,8 @@ const receiveCompileMirSuccess = ({ code, stdout, stderr }) =>
 const receiveCompileMirFailure = ({ error }) =>
   createAction(ActionType.CompileMirFailed, { error });
 
-export const performCompileToMir = () =>
-  performCompile('mir', {
+const performCompileToMirOnly = () =>
+  performCompileShow('mir', {
     request: requestCompileMir,
     success: receiveCompileMirSuccess,
     failure: receiveCompileMirFailure,
@@ -342,20 +360,60 @@ const receiveCompileWasmSuccess = ({ code, stdout, stderr }) =>
 const receiveCompileWasmFailure = ({ error }) =>
   createAction(ActionType.CompileWasmFailed, { error });
 
-export const performCompileToWasm = () =>
-  performCompile('wasm', {
+const performCompileToWasm = () =>
+  performCompileShow('wasm', {
     request: requestCompileWasm,
     success: receiveCompileWasmSuccess,
     failure: receiveCompileWasmFailure,
   });
 
-export const performCompileToNightlyWasm: ThunkAction = () => dispatch => {
+const performCompileToNightlyWasmOnly = (): ThunkAction => dispatch => {
   dispatch(changeChannel(Channel.Nightly));
   dispatch(performCompileToWasm());
 };
 
+const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
+  [PrimaryActionCore.Asm]: performCompileToAssemblyOnly,
+  [PrimaryActionCore.Compile]: performCompileOnly,
+  [PrimaryActionCore.Execute]: performExecuteOnly,
+  [PrimaryActionCore.Test]: performTestOnly,
+  [PrimaryActionAuto.Auto]: performAutoOnly,
+  [PrimaryActionCore.LlvmIr]: performCompileToLLVMOnly,
+  [PrimaryActionCore.Mir]: performCompileToMirOnly,
+  [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
+};
+
+export const performPrimaryAction = (): ThunkAction => (dispatch, getState) => {
+  const state = getState();
+  const primaryAction = PRIMARY_ACTIONS[state.configuration.primaryAction];
+  dispatch(primaryAction());
+};
+
+const performAndSwitchPrimaryAction = (inner: () => ThunkAction, id: PrimaryAction) => (): ThunkAction => dispatch => {
+  dispatch(changePrimaryAction(id));
+  dispatch(inner());
+};
+
+export const performExecute =
+  performAndSwitchPrimaryAction(performExecuteOnly, PrimaryActionCore.Execute);
+export const performCompile =
+  performAndSwitchPrimaryAction(performCompileOnly, PrimaryActionCore.Compile);
+export const performTest =
+  performAndSwitchPrimaryAction(performTestOnly, PrimaryActionCore.Test);
+export const performCompileToAssembly =
+  performAndSwitchPrimaryAction(performCompileToAssemblyOnly, PrimaryActionCore.Asm);
+export const performCompileToLLVM =
+  performAndSwitchPrimaryAction(performCompileToLLVMOnly, PrimaryActionCore.LlvmIr);
+export const performCompileToMir =
+  performAndSwitchPrimaryAction(performCompileToMirOnly, PrimaryActionCore.Mir);
+export const performCompileToNightlyWasm =
+  performAndSwitchPrimaryAction(performCompileToNightlyWasmOnly, PrimaryActionCore.Wasm);
+
 export const editCode = (code: string) =>
   createAction(ActionType.EditCode, { code });
+
+export const addMainFunction = () =>
+  createAction(ActionType.AddMainFunction);
 
 export const gotoPosition = (line, column) =>
   createAction(ActionType.GotoPosition, { line: +line, column: +column });
@@ -631,16 +689,17 @@ export type Action =
   | ReturnType<typeof toggleConfiguration>
   | ReturnType<typeof setPage>
   | ReturnType<typeof changeAssemblyFlavor>
+  | ReturnType<typeof changeBacktrace>
   | ReturnType<typeof changeChannel>
   | ReturnType<typeof changeDemangleAssembly>
+  | ReturnType<typeof changeEdition>
   | ReturnType<typeof changeEditor>
   | ReturnType<typeof changeFocus>
-  | ReturnType<typeof changeProcessAssembly>
   | ReturnType<typeof changeKeybinding>
   | ReturnType<typeof changeMode>
-  | ReturnType<typeof changeEdition>
-  | ReturnType<typeof changeBacktrace>
   | ReturnType<typeof changeOrientation>
+  | ReturnType<typeof changePrimaryAction>
+  | ReturnType<typeof changeProcessAssembly>
   | ReturnType<typeof changeTheme>
   | ReturnType<typeof requestExecute>
   | ReturnType<typeof receiveExecuteSuccess>
@@ -658,6 +717,7 @@ export type Action =
   | ReturnType<typeof receiveCompileWasmSuccess>
   | ReturnType<typeof receiveCompileWasmFailure>
   | ReturnType<typeof editCode>
+  | ReturnType<typeof addMainFunction>
   | ReturnType<typeof gotoPosition>
   | ReturnType<typeof requestFormat>
   | ReturnType<typeof receiveFormatSuccess>

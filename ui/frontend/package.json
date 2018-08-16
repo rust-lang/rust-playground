@@ -65,7 +65,7 @@
     "node": "^10.7.0"
   },
   "scripts": {
-    "test:lint": "tslint --config tslint.json --exclude \"./**/node_modules/**/*\" \"./**/*.ts?(x)\"",
+    "test:lint": "tslint --project tsconfig.json --config tslint.json",
     "build": "webpack --progress --colors --mode development",
     "build:production": "webpack --progress --colors --mode production",
     "watch": "yarn run build --watch"

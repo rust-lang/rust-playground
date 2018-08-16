@@ -14,20 +14,14 @@ import ToolsMenu from './ToolsMenu';
 
 import {
   navigateToHelp,
-  performExecute,
   performGistSave,
+  performPrimaryAction,
 } from './actions';
 import {
-  betaVersionText,
   getAdvancedOptionsSet,
   getChannelLabel,
-  getCrateType,
   getExecutionLabel,
   getModeLabel,
-  isWasmAvailable,
-  nightlyVersionText,
-  runAsTest,
-  stableVersionText,
 } from './selectors';
 import State from './state';
 
@@ -170,7 +164,7 @@ const mapStateToProps = (state: State) => ({
 });
 
 const mapDispatchToProps = ({
-  execute: performExecute,
+  execute: performPrimaryAction,
   gistSave: performGistSave,
 });
 

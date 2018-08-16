@@ -3,24 +3,80 @@ import { createSelector } from 'reselect';
 import * as url from 'url';
 
 import { State } from '../reducers';
-import { Backtrace, Channel, Edition } from '../types';
+import { Backtrace, Channel, Edition, PrimaryActionAuto, PrimaryActionCore } from '../types';
 
-const getCode = state => state.code;
+const codeSelector = (state: State) => state.code;
 
-const hasTests = code => code.includes('#[test]');
-const hasMainMethod = code => code.includes('fn main()');
-const runAsTestRaw = code => hasTests(code) && !hasMainMethod(code);
-export const runAsTest = createSelector([getCode], runAsTestRaw);
+const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
+const hasTestsSelector = createSelector(codeSelector, code => !!code.match(HAS_TESTS_RE));
+
+const HAS_MAIN_FUNCTION_RE = /^\s*fn\s+main\s*\(\)/m;
+const hasMainFunctionSelector = createSelector(codeSelector, code => !!code.match(HAS_MAIN_FUNCTION_RE));
 
 const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
-const getCrateTypeRaw = code => (code.match(CRATE_TYPE_RE) || [null, 'bin'])[1];
-export const getCrateType = createSelector([getCode], getCrateTypeRaw);
+const crateTypeSelector = createSelector(codeSelector, code => (code.match(CRATE_TYPE_RE) || [])[1]);
 
-export const getExecutionLabel = createSelector([runAsTest, getCrateType], (tests, crateType) => {
-  if (tests) { return 'Test'; }
-  if (crateType === 'bin') { return 'Run'; }
-  return 'Build';
-});
+const autoPrimaryActionSelector = createSelector(
+  crateTypeSelector,
+  hasTestsSelector,
+  hasMainFunctionSelector,
+  (crateType, hasTests, hasMainFunction) => {
+    if (crateType) {
+      if (crateType === 'bin') {
+        return PrimaryActionCore.Execute;
+      } else {
+        return PrimaryActionCore.Compile;
+      }
+    } else {
+      if (hasTests) {
+        return PrimaryActionCore.Test;
+      } else if (hasMainFunction) {
+        return PrimaryActionCore.Execute;
+      } else {
+        return PrimaryActionCore.Compile;
+      }
+    }
+  },
+);
+
+export const runAsTest = createSelector(
+  autoPrimaryActionSelector,
+  primaryAction => primaryAction === PrimaryActionCore.Test,
+);
+export const getCrateType = createSelector(
+  autoPrimaryActionSelector,
+  primaryAction => primaryAction === PrimaryActionCore.Execute ? 'bin' : 'lib',
+);
+
+const rawPrimaryActionSelector = (state: State) => state.configuration.primaryAction;
+
+export const isAutoBuildSelector = createSelector(
+  rawPrimaryActionSelector,
+  autoPrimaryActionSelector,
+  (primaryAction, autoPrimaryAction) => (
+    primaryAction === PrimaryActionAuto.Auto && autoPrimaryAction === PrimaryActionCore.Compile
+  ),
+);
+
+const primaryActionSelector = createSelector(
+  rawPrimaryActionSelector,
+  autoPrimaryActionSelector,
+  (primaryAction, autoPrimaryAction): PrimaryActionCore => (
+    primaryAction === PrimaryActionAuto.Auto ? autoPrimaryAction : primaryAction
+  ),
+);
+
+const LABELS: { [index in PrimaryActionCore]: string } = {
+  [PrimaryActionCore.Asm]: 'Show Assembly',
+  [PrimaryActionCore.Compile]: 'Build',
+  [PrimaryActionCore.Execute]: 'Run',
+  [PrimaryActionCore.LlvmIr]: 'Show LLVM IR',
+  [PrimaryActionCore.Mir]: 'Show MIR',
+  [PrimaryActionCore.Test]: 'Test',
+  [PrimaryActionCore.Wasm]: 'Show WASM',
+};
+
+export const getExecutionLabel = createSelector(primaryActionSelector, primaryAction => LABELS[primaryAction]);
 
 const getStable = (state: State) => state.versions && state.versions.stable;
 const getBeta = (state: State) => state.versions && state.versions.beta;

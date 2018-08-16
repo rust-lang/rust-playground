@@ -1,16 +1,15 @@
-import * as qs from 'qs';
 import React from 'react';
-import { PrismCode } from 'react-prism';
 import { connect } from 'react-redux';
 
 import { changeFocus } from './actions';
 import { State } from './reducers';
 import { State as OutputState } from './reducers/output';
-import { Channel, Edition, Focus, Mode } from './types';
+import { Focus } from './types';
 
+import Execute from './Output/Execute';
 import Gist from './Output/Gist';
-import Header from './Output/Header';
-import MyLoader from './Output/Loader';
+import Section from './Output/Section';
+import SimplePane, { SimplePaneProps } from './Output/SimplePane';
 import { getSomethingToShow, hasProperties } from './selectors';
 
 const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
@@ -35,64 +34,6 @@ interface TabProps {
   tabProps: object;
 }
 
-const Section: React.SFC<SectionProps> = ({ kind, label, children }) => {
-  if (children) {
-    return (
-      <div className={`output-${kind}`}>
-        <Header label={label} />
-        <pre><code>{children}</code></pre>
-      </div>
-    );
-  } else {
-    return null;
-  }
-};
-
-interface SectionProps {
-  kind: string;
-  label: string;
-}
-
-class HighlightErrors extends React.PureComponent<HighlightErrorsProps> {
-  public render() {
-    const { label, children } = this.props;
-
-    return (
-      <div className="output-stderr">
-        <Header label={label} />
-        <pre>
-          <PrismCode className="language-rust_errors">
-            {children}
-          </PrismCode>
-        </pre>
-      </div>
-    );
-  }
-}
-
-interface HighlightErrorsProps {
-  label: string;
-}
-
-const SimplePane: React.SFC<SimplePaneProps> = ({
-  kind, requestsInProgress, stdout, stderr, error, children,
-}) => {
-  const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
-  return (
-    <div className={`output-${kind}`}>
-      {loader}
-      <Section kind="error" label="Errors">{error}</Section>
-      <HighlightErrors label="Standard Error">{stderr}</HighlightErrors>
-      <Section kind="stdout" label="Standard Output">{stdout}</Section>
-      {children}
-    </div>
-  );
-};
-
-interface SimplePaneProps extends SimpleProps {
-  kind: string;
-}
-
 const PaneWithCode: React.SFC<PaneWithCodeProps> = ({ code, ...rest }) => (
   <SimplePane {...rest}>
     <Section kind="code" label="Result">{code}</Section>
@@ -101,20 +42,6 @@ const PaneWithCode: React.SFC<PaneWithCodeProps> = ({ code, ...rest }) => (
 
 interface PaneWithCodeProps extends SimplePaneProps {
   code?: string;
-}
-
-const Format: React.SFC<FormatProps> = ({ requestsInProgress }) => {
-  const loader = (requestsInProgress > 0) ? <MyLoader /> : null;
-
-  return (
-    <div className="output-format">
-      {loader}
-    </div>
-  );
-};
-
-interface FormatProps {
-  requestsInProgress: number;
 }
 
 const Output: React.SFC<OutputProps> = ({
@@ -136,7 +63,7 @@ const Output: React.SFC<OutputProps> = ({
 
     body = (
       <div className="output-body">
-        {focus === Focus.Execute && <SimplePane {...execute} kind="execute" />}
+        {focus === Focus.Execute && <Execute />}
         {focus === Focus.Format && <SimplePane {...format} kind="format" />}
         {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
         {focus === Focus.Miri && <SimplePane {...miri} kind="miri" />}
@@ -194,17 +121,6 @@ const Output: React.SFC<OutputProps> = ({
     </div>
   );
 };
-
-interface SimpleProps {
-  requestsInProgress: number;
-  stdout?: string;
-  stderr?: string;
-  error?: string;
-}
-
-interface WithCodeProps extends SimpleProps {
-  code: string;
-}
 
 interface OutputProps extends OutputState {
   somethingToShow: boolean;

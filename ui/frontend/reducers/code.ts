@@ -16,6 +16,9 @@ export default function code(state = DEFAULT, action: Action): State {
     case ActionType.EditCode:
       return action.code;
 
+    case ActionType.AddMainFunction:
+      return state + '\n\n' + DEFAULT;
+
     case ActionType.FormatSucceeded:
       return action.code;
 

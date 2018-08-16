@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { ClipboardIcon } from '../Icon';
 import { State } from '../reducers';
 import { issueUrlSelector, permalinkSelector, showGistLoaderSelector, urloUrlSelector } from '../selectors';
-import { Channel, Edition, Mode } from '../types';
 
 import Loader from './Loader';
 

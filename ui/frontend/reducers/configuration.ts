@@ -8,6 +8,8 @@ import {
   Editor,
   Mode,
   Orientation,
+  PrimaryAction,
+  PrimaryActionAuto,
   ProcessAssembly,
 } from '../types';
 
@@ -20,6 +22,7 @@ export interface State {
   assemblyFlavor: AssemblyFlavor;
   demangleAssembly: DemangleAssembly;
   processAssembly: ProcessAssembly;
+  primaryAction: PrimaryAction;
   channel: Channel;
   mode: Mode;
   edition: Edition;
@@ -35,6 +38,7 @@ export const DEFAULT: State = {
   assemblyFlavor: AssemblyFlavor.Att,
   demangleAssembly: DemangleAssembly.Demangle,
   processAssembly: ProcessAssembly.Filter,
+  primaryAction: PrimaryActionAuto.Auto,
   channel: Channel.Stable,
   mode: Mode.Debug,
   edition: Edition.Rust2015,
@@ -59,6 +63,8 @@ export default function configuration(state = DEFAULT, action: Action): State {
       return { ...state, demangleAssembly: action.demangleAssembly };
     case ActionType.ChangeProcessAssembly:
       return { ...state, processAssembly: action.processAssembly };
+    case ActionType.ChangePrimaryAction:
+      return { ...state, primaryAction: action.primaryAction };
     case ActionType.ChangeChannel: {
       // Extra logic can be removed when stable understands
       // `cargo-features = ["edition"]`

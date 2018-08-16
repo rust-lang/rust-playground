@@ -51,6 +51,22 @@ export enum ProcessAssembly {
   Raw = 'raw',
 }
 
+export enum PrimaryActionAuto {
+  Auto = 'auto',
+}
+
+export enum PrimaryActionCore {
+  Asm = 'asm',
+  Compile = 'compile',
+  Execute = 'execute',
+  LlvmIr = 'llvm-ir',
+  Mir = 'mir',
+  Test = 'test',
+  Wasm = 'wasm',
+}
+
+export type PrimaryAction = PrimaryActionCore | PrimaryActionAuto;
+
 export enum Channel {
   Stable = 'stable',
   Beta = 'beta',

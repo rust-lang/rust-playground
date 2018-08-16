@@ -3,7 +3,7 @@ import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { AnyAction, applyMiddleware, compose, createStore } from 'redux';
+import { applyMiddleware, compose, createStore } from 'redux';
 import persistState from 'redux-localstorage';
 import thunk, { ThunkDispatch } from 'redux-thunk';
 import * as url from 'url';
@@ -15,7 +15,6 @@ import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
 import { State } from './reducers';
 import Router from './Router';
-import { Backtrace } from './types';
 
 const baseUrl = url.resolve(window.location.href, '/');
 

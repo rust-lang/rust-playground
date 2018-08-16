@@ -15,6 +15,9 @@
     "max-classes-per-file": false,
     "member-ordering": false,
     "no-shadowed-variable": false,
+    "no-unused-variable": [true, {
+      "ignore-pattern": "^_"
+    }],
     "object-literal-sort-keys": false,
     "only-arrow-functions": false,
     "quotemark": [true, "single", "jsx-double", "avoid-template", "avoid-escape"],

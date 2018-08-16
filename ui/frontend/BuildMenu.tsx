@@ -2,12 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import {
-  changeChannel,
+  performCompile,
   performCompileToAssembly,
   performCompileToLLVM,
   performCompileToMir,
   performCompileToNightlyWasm,
   performExecute,
+  performTest,
 } from './actions';
 
 import { isWasmAvailable } from './selectors';
@@ -23,20 +24,31 @@ interface BuildMenuProps {
   compileToMir: () => any;
   compileToWasm: () => any;
   execute: () => any;
+  compile: () => any;
+  test: () => any;
   close: () => void;
 }
 
 const WasmAside: React.SFC<{}> = props => (
   <p className="build-menu__aside">
-     Note: WASM currently requires using the Nightly channel, selecting this
-     option will switch to Nightly.
+    Note: WASM currently requires using the Nightly channel, selecting this
+    option will switch to Nightly.
   </p>
 );
 
 const BuildMenu: React.SFC<BuildMenuProps> = props => (
   <MenuGroup title="What do you want to do?">
-    <ButtonMenuItem name="Build" onClick={() => { props.execute(); props.close(); }}>
-      No bells and whistles, regular build coming right&nbsp;up&nbsp;:D
+    <ButtonMenuItem name="Execute" onClick={() => { props.execute(); props.close(); }}>
+      Build and execute the code, showing the output.
+      Equivalent to <code className="build-menu__code">cargo run</code>.
+    </ButtonMenuItem>
+    <ButtonMenuItem name="Build" onClick={() => { props.compile(); props.close(); }}>
+      Build the code without executing it.
+      Equivalent to <code className="build-menu__code">cargo build</code>.
+    </ButtonMenuItem>
+    <ButtonMenuItem name="Test" onClick={() => { props.test(); props.close(); }}>
+      Build the code and run all the tests.
+      Equivalent to <code className="build-menu__code">cargo test</code>.
     </ButtonMenuItem>
     <ButtonMenuItem name="ASM" onClick={() => { props.compileToAssembly(); props.close(); }}>
       Build and show the resulting assembly code.
@@ -66,6 +78,8 @@ const mapDispatchToProps = ({
   compileToMir: performCompileToMir,
   compileToWasm: performCompileToNightlyWasm,
   execute: performExecute,
+  compile: performCompile,
+  test: performTest,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BuildMenu);

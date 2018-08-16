@@ -6,6 +6,7 @@ const DEFAULT: State = {
   stdout: null,
   stderr: null,
   error: null,
+  isAutoBuild: false,
 };
 
 interface State {
@@ -13,19 +14,22 @@ interface State {
   stdout?: string;
   stderr?: string;
   error?: string;
+  isAutoBuild: boolean;
 }
 
 export default function execute(state = DEFAULT, action: Action) {
   switch (action.type) {
-  case ActionType.ExecuteRequest:
-    return start(DEFAULT, state);
-  case ActionType.ExecuteSucceeded: {
-    const { stdout = '', stderr = '' } = action;
-    return finish(state, { stdout, stderr });
-  }
-  case ActionType.ExecuteFailed:
-    return finish(state, { error: action.error });
-  default:
-    return state;
+    case ActionType.ExecuteRequest:
+      return start(DEFAULT, state);
+    case ActionType.ExecuteSucceeded: {
+      const { stdout = '', stderr = '', isAutoBuild } = action;
+      return finish(state, { stdout, stderr, isAutoBuild });
+    }
+    case ActionType.ExecuteFailed: {
+      const { error, isAutoBuild } = action;
+      return finish(state, { error, isAutoBuild });
+    }
+    default:
+      return state;
   }
 }

@@ -2,10 +2,6 @@ import React from 'react';
 
 import { ExpandableIcon } from './Icon';
 
-interface RightIconProps {
-  icon: React.ReactNode;
-}
-
 export const RightIcon: React.SFC<HeaderButtonProps> = ({ icon, children }) => (
   <div className="header-button header-button--has-right-icon">
     {children}
