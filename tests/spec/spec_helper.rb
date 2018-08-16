@@ -51,3 +51,7 @@ RSpec.configure do |config|
     page.execute_script 'localStorage.clear();'
   end
 end
+
+Capybara.modify_selector(:link_or_button) do
+  expression_filter(:build_button) {|xpath, name| xpath[XPath.css('.button-menu-item__name').contains(name)] }
+end

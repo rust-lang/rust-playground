@@ -38,12 +38,12 @@ const WasmAside: React.SFC<{}> = props => (
 
 const BuildMenu: React.SFC<BuildMenuProps> = props => (
   <MenuGroup title="What do you want to do?">
-    <ButtonMenuItem name="Execute" onClick={() => { props.execute(); props.close(); }}>
-      Build and execute the code, showing the output.
+    <ButtonMenuItem name="Run" onClick={() => { props.execute(); props.close(); }}>
+      Build and run the code, showing the output.
       Equivalent to <code className="build-menu__code">cargo run</code>.
     </ButtonMenuItem>
     <ButtonMenuItem name="Build" onClick={() => { props.compile(); props.close(); }}>
-      Build the code without executing it.
+      Build the code without running it.
       Equivalent to <code className="build-menu__code">cargo build</code>.
     </ButtonMenuItem>
     <ButtonMenuItem name="Test" onClick={() => { props.test(); props.close(); }}>
