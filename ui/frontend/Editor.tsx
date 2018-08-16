@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { editCode, performExecute } from './actions';
+import { editCode, performPrimaryAction } from './actions';
 import AdvancedEditor from './AdvancedEditor';
 import { CommonEditorProps, Editor as EditorType } from './types';
 
@@ -19,16 +19,16 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
   public render() {
     return (
       <textarea
-         ref={this.trackEditor}
-         className="editor-simple"
-         name="editor-simple"
-         autoCapitalize="none"
-         autoComplete="off"
-         autoCorrect="off"
-         spellCheck={false}
-         value={this.props.code}
-         onChange={this.onChange}
-         onKeyDown={this.onKeyDown} />
+        ref={this.trackEditor}
+        className="editor-simple"
+        name="editor-simple"
+        autoCapitalize="none"
+        autoComplete="off"
+        autoCorrect="off"
+        spellCheck={false}
+        value={this.props.code}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown} />
     );
   }
 
@@ -67,10 +67,10 @@ class Editor extends React.PureComponent<EditorProps> {
     return (
       <div className="editor">
         <SelectedEditor code={code}
-                        position={position}
-                        crates={crates}
-                        onEditCode={onEditCode}
-                        execute={execute} />
+          position={position}
+          crates={crates}
+          onEditCode={onEditCode}
+          execute={execute} />
       </div>
     );
   }
@@ -97,7 +97,7 @@ const mapStateToProps = ({ code, configuration: { editor }, position, crates }) 
 );
 
 const mapDispatchToProps = ({
-  execute: performExecute,
+  execute: performPrimaryAction,
   onEditCode: editCode,
 });
 
