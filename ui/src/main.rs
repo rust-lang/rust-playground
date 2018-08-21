@@ -23,7 +23,7 @@ extern crate petgraph;
 extern crate regex;
 extern crate rustc_demangle;
 extern crate hubcaps;
-extern crate tokio_core;
+extern crate tokio;
 extern crate hyper;
 extern crate hyper_tls;
 extern crate openssl_probe;
