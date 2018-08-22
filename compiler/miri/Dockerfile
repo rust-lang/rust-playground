@@ -6,6 +6,7 @@ FROM sources as build
 
 RUN cargo install xargo
 RUN git clone https://github.com/solson/miri ~/miri
+RUN rm -f ~/miri/rust-toolchain # make sure we use our toolchain
 RUN ~/miri/xargo/build.sh
 RUN cargo install --all-features --path ~/miri
 
