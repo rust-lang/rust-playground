@@ -19,6 +19,13 @@ before_install:
   - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
 jobs:
+  allow_failures:
+    - env:
+        - TOOLS_TO_BUILD="rustfmt"
+    - env:
+        - TOOLS_TO_BUILD="clippy"
+    - env:
+        - TOOLS_TO_BUILD="miri"
   include:
     - stage: build compiler containers
       env:
@@ -37,10 +44,10 @@ jobs:
       script: ./.travis/build-containers.sh
     - env:
         - TOOLS_TO_BUILD="clippy"
-      script: ./.travis/build-containers.sh || true
+      script: ./.travis/build-containers.sh
     - env:
         - TOOLS_TO_BUILD="miri"
-      script: ./.travis/build-containers.sh || true
+      script: ./.travis/build-containers.sh
 
     - stage: compile code
       env:
