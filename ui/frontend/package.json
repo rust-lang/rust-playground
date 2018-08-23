@@ -31,6 +31,7 @@
     "url": "^0.11.0"
   },
   "devDependencies": {
+    "@types/jest": "^23.3.1",
     "@types/react": "^16.0.0",
     "@types/react-dom": "^16.0.0",
     "autoprefixer": "^9.0.1",
@@ -47,6 +48,7 @@
     "css-loader": "^1.0.0",
     "glob": "^7.0.5",
     "html-webpack-plugin": "^3.0.0",
+    "jest": "^23.5.0",
     "json-loader": "^0.5.4",
     "mini-css-extract-plugin": "^0.4.0",
     "node-sass": "^4.5.0",
@@ -54,6 +56,7 @@
     "postcss-loader": "^2.0.5",
     "sass-loader": "^7.0.0",
     "style-loader": "^0.21.0",
+    "ts-jest": "^23.1.4",
     "ts-loader": "^4.0.0",
     "tslint": "^5.7.0",
     "tslint-react": "^3.2.0",
@@ -65,10 +68,18 @@
     "node": "^10.7.0"
   },
   "scripts": {
+    "test": "jest",
     "test:lint": "tslint --project tsconfig.json --config tslint.json",
     "build": "webpack --progress --colors --mode development",
     "build:production": "webpack --progress --colors --mode production",
     "watch": "yarn run build --watch"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(\\.|/)(test|spec)\\.tsx?$",
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx"]
   },
   "author": "",
   "license": "MIT"
