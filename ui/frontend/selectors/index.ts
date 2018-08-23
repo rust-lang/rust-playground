@@ -227,3 +227,18 @@ export const issueUrlSelector = createSelector(
     return url.format(newIssueUrl);
   },
 );
+
+const notificationsSelector = (state: State) => state.notifications;
+
+const NOW = new Date();
+const SURVEY_END = new Date('2018-09-08T23:23:59Z');
+const SURVEY_OPEN = NOW <= SURVEY_END;
+export const showRustSurvey2018Selector = createSelector(
+  notificationsSelector,
+  notifications => SURVEY_OPEN && !notifications.seenRustSurvey2018,
+);
+
+export const anyNotificationsToShowSelector = createSelector(
+  showRustSurvey2018Selector,
+  allNotifications => allNotifications,
+);

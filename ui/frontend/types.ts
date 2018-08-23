@@ -99,3 +99,7 @@ export enum Focus {
   Format = 'format',
   Gist = 'gist',
 }
+
+export enum Notification {
+  RustSurvey2018 = 'rust-survey-2018',
+}
