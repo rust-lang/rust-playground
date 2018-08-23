@@ -12,5 +12,6 @@ docker \
     --workdir /ui \
     node:10.7 \
     bash -c 'yarn && \
+             yarn test && \
              yarn test:lint && \
              yarn run build:production'
