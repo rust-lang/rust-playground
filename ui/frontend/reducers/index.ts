@@ -4,6 +4,7 @@ import code from './code';
 import configuration from './configuration';
 import crates from './crates';
 import globalConfiguration from './globalConfiguration';
+import notifications from './notifications';
 import output from './output';
 import page from './page';
 import position from './position';
@@ -14,6 +15,7 @@ const playgroundApp = combineReducers({
   configuration,
   crates,
   globalConfiguration,
+  notifications,
   output,
   page,
   position,

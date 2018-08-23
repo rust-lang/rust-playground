@@ -13,6 +13,7 @@ import {
   Editor,
   Focus,
   Mode,
+  Notification,
   Orientation,
   Page,
   PrimaryAction,
@@ -97,6 +98,7 @@ export enum ActionType {
   CratesLoadSucceeded = 'CRATES_LOAD_SUCCEEDED',
   RequestVersionsLoad = 'REQUEST_VERSIONS_LOAD',
   VersionsLoadSucceeded = 'VERSIONS_LOAD_SUCCEEDED',
+  NotificationSeen = 'NOTIFICATION_SEEN',
 }
 
 export const toggleConfiguration = () =>
@@ -596,6 +598,11 @@ export function performVersionsLoad(): ThunkAction {
   };
 }
 
+const notificationSeen = (notification: Notification) =>
+  createAction(ActionType.NotificationSeen, { notification });
+
+export const seenRustSurvey2018 = () => notificationSeen(Notification.RustSurvey2018);
+
 function parseChannel(s: string): Channel | null {
   switch (s) {
     case 'stable':
@@ -738,4 +745,5 @@ export type Action =
   | ReturnType<typeof receiveCratesLoadSuccess>
   | ReturnType<typeof requestVersionsLoad>
   | ReturnType<typeof receiveVersionsLoadSuccess>
+  | ReturnType<typeof notificationSeen>
   ;
