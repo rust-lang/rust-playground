@@ -5,7 +5,7 @@ interface State {
   seenRustSurvey2018: boolean;
 }
 
-const DEFAULT: State = {
+export const DEFAULT: State = {
   seenRustSurvey2018: false,
 };
 

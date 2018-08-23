@@ -1,6 +1,6 @@
 import { Action, ActionType } from '../actions';
 
-const DEFAULT: State = `fn main() {
+export const DEFAULT: State = `fn main() {
     println!("Hello, world!");
 }`;
 

@@ -1,7 +1,12 @@
+import { DEFAULT as defaultCode } from './reducers/code';
 import { DEFAULT as defaultConfiguration } from './reducers/configuration';
+import { DEFAULT as defaultNotifications } from './reducers/notifications';
+
+import State from './state';
+
 const CURRENT_VERSION = 1;
 
-export function serialize(state) {
+export function serialize(state: State) {
   return JSON.stringify({
     version: CURRENT_VERSION,
     configuration: {
@@ -14,6 +19,9 @@ export function serialize(state) {
       processAssembly: state.configuration.processAssembly,
     },
     code: state.code,
+    notifications: {
+      seenRustSurvey2018: state.notifications.seenRustSurvey2018,
+    },
   });
 }
 
@@ -22,17 +30,19 @@ export function deserialize(savedState) {
   const parsedState = JSON.parse(savedState);
   if (parsedState.version !== CURRENT_VERSION) { return undefined; }
 
+  const {
+    configuration: parsedConfiguration = {},
+    code: parsedCode,
+    notifications: parsedNotifications = {},
+  } = parsedState;
+
+  // This assumes that the keys we serialize with match the keys in the
+  // live state. If that's no longer true, an additional renaming step
+  // needs to be added.
+
   return {
-    configuration: {
-      ...defaultConfiguration,
-      editor: parsedState.configuration.editor || defaultConfiguration.editor,
-      keybinding: parsedState.configuration.keybinding || defaultConfiguration.keybinding,
-      theme: parsedState.configuration.theme || defaultConfiguration.theme,
-      orientation: parsedState.configuration.orientation || defaultConfiguration.orientation,
-      assemblyFlavor: parsedState.configuration.assemblyFlavor || defaultConfiguration.assemblyFlavor,
-      demangleAssembly: parsedState.configuration.demangleAssembly || defaultConfiguration.demangleAssembly,
-      processAssembly: parsedState.configuration.processAssembly || defaultConfiguration.processAssembly,
-    },
-    code: parsedState.code,
+    configuration: { ...defaultConfiguration, ...parsedConfiguration },
+    code: parsedCode || defaultCode,
+    notifications: { ...defaultNotifications, ...parsedNotifications },
   };
 }
