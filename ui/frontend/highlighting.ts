@@ -36,8 +36,17 @@ export function configureRustErrors({ gotoPosition, reExecuteWithBacktrace, getC
       env.attributes.target = '_blank';
     }
     if (env.type === 'error-location') {
-      const errorMatch = /(\d+):(\d+)/.exec(env.content);
-      const [_, line, col] = errorMatch;
+      let line;
+      let col;
+      const errorMatchFull = /(\d+):(\d+)/.exec(env.content);
+      if (errorMatchFull) {
+        line = errorMatchFull[1];
+        col = errorMatchFull[2];
+      } else {
+        const errorMatchShort = /:(\d+)/.exec(env.content);
+        line = errorMatchShort[1];
+        col = '1';
+      }
       env.tag = 'a';
       env.attributes.href = '#';
       env.attributes['data-line'] = line;
