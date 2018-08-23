@@ -10,7 +10,7 @@ const codeSelector = (state: State) => state.code;
 const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
 const hasTestsSelector = createSelector(codeSelector, code => !!code.match(HAS_TESTS_RE));
 
-const HAS_MAIN_FUNCTION_RE = /^\s*fn\s+main\s*\(\)/m;
+const HAS_MAIN_FUNCTION_RE = /^\s*(pub\s+)?fn\s+main\s*\(\s*\)/m;
 const hasMainFunctionSelector = createSelector(codeSelector, code => !!code.match(HAS_MAIN_FUNCTION_RE));
 
 const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
