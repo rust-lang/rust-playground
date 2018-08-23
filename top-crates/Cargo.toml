@@ -4,13 +4,10 @@ name = "top-crates"
 version = "0.1.0"
 
 [dependencies]
+cargo = "0.29.0"
 lazy_static = "1.0.0"
 reqwest = "0.8.0"
 serde = "1.0.1"
 serde_derive = "1.0.1"
 serde_json = "1.0.0"
 toml = "0.4.0"
-
-[dependencies.cargo]
-git = "https://github.com/rust-lang/cargo"
-rev = "b24b455c327048df940ab8322cc6f9d361fef918"
