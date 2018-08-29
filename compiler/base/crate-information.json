@@ -6,7 +6,7 @@
   },
   {
     "name": "aho-corasick",
-    "version": "0.6.6",
+    "version": "0.6.8",
     "id": "aho_corasick"
   },
   {
@@ -61,7 +61,7 @@
   },
   {
     "name": "byteorder",
-    "version": "1.2.4",
+    "version": "1.2.6",
     "id": "byteorder"
   },
   {
@@ -71,7 +71,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.20",
+    "version": "1.0.22",
     "id": "cc"
   },
   {
@@ -81,7 +81,7 @@
   },
   {
     "name": "chrono",
-    "version": "0.4.5",
+    "version": "0.4.6",
     "id": "chrono"
   },
   {
@@ -116,7 +116,7 @@
   },
   {
     "name": "crossbeam-deque",
-    "version": "0.5.2",
+    "version": "0.6.1",
     "id": "crossbeam_deque"
   },
   {
@@ -171,7 +171,7 @@
   },
   {
     "name": "env_logger",
-    "version": "0.5.12",
+    "version": "0.5.13",
     "id": "env_logger"
   },
   {
@@ -286,7 +286,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.12.8",
+    "version": "0.12.9",
     "id": "hyper"
   },
   {
@@ -401,7 +401,7 @@
   },
   {
     "name": "memchr",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "id": "memchr"
   },
   {
@@ -433,6 +433,11 @@
     "name": "mio",
     "version": "0.6.15",
     "id": "mio"
+  },
+  {
+    "name": "mio-uds",
+    "version": "0.6.6",
+    "id": "mio_uds"
   },
   {
     "name": "miow",
@@ -516,12 +521,12 @@
   },
   {
     "name": "parking_lot",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "id": "parking_lot"
   },
   {
     "name": "parking_lot_core",
-    "version": "0.2.14",
+    "version": "0.3.0",
     "id": "parking_lot_core"
   },
   {
@@ -531,32 +536,32 @@
   },
   {
     "name": "petgraph",
-    "version": "0.4.12",
+    "version": "0.4.13",
     "id": "petgraph"
   },
   {
     "name": "phf",
-    "version": "0.7.22",
+    "version": "0.7.23",
     "id": "phf"
   },
   {
     "name": "phf_codegen",
-    "version": "0.7.22",
+    "version": "0.7.23",
     "id": "phf_codegen"
   },
   {
     "name": "phf_generator",
-    "version": "0.7.22",
+    "version": "0.7.23",
     "id": "phf_generator"
   },
   {
     "name": "phf_shared",
-    "version": "0.7.22",
+    "version": "0.7.23",
     "id": "phf_shared"
   },
   {
     "name": "pkg-config",
-    "version": "0.3.13",
+    "version": "0.3.14",
     "id": "pkg_config"
   },
   {
@@ -571,7 +576,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "0.4.13",
+    "version": "0.4.15",
     "id": "proc_macro2"
   },
   {
@@ -606,7 +611,7 @@
   },
   {
     "name": "regex",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "id": "regex"
   },
   {
@@ -651,7 +656,7 @@
   },
   {
     "name": "ryu",
-    "version": "0.2.4",
+    "version": "0.2.6",
     "id": "ryu"
   },
   {
@@ -661,7 +666,7 @@
   },
   {
     "name": "same-file",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "id": "same_file"
   },
   {
@@ -701,12 +706,12 @@
   },
   {
     "name": "serde",
-    "version": "1.0.73",
+    "version": "1.0.75",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.73",
+    "version": "1.0.75",
     "id": "serde_derive"
   },
   {
@@ -796,7 +801,7 @@
   },
   {
     "name": "syslog",
-    "version": "4.0.0",
+    "version": "4.0.1",
     "id": "syslog"
   },
   {
@@ -821,7 +826,7 @@
   },
   {
     "name": "termcolor",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "id": "termcolor"
   },
   {
@@ -856,7 +861,7 @@
   },
   {
     "name": "tokio",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "id": "tokio"
   },
   {
@@ -870,8 +875,13 @@
     "id": "tokio_core"
   },
   {
+    "name": "tokio-current-thread",
+    "version": "0.1.1",
+    "id": "tokio_current_thread"
+  },
+  {
     "name": "tokio-executor",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "id": "tokio_executor"
   },
   {
@@ -881,12 +891,12 @@
   },
   {
     "name": "tokio-io",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "id": "tokio_io"
   },
   {
     "name": "tokio-reactor",
-    "version": "0.1.3",
+    "version": "0.1.5",
     "id": "tokio_reactor"
   },
   {
@@ -901,12 +911,12 @@
   },
   {
     "name": "tokio-threadpool",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "id": "tokio_threadpool"
   },
   {
     "name": "tokio-timer",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "id": "tokio_timer"
   },
   {
@@ -916,8 +926,13 @@
   },
   {
     "name": "tokio-udp",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "id": "tokio_udp"
+  },
+  {
+    "name": "tokio-uds",
+    "version": "0.2.1",
+    "id": "tokio_uds"
   },
   {
     "name": "toml",
@@ -975,11 +990,6 @@
     "id": "unicode_xid"
   },
   {
-    "name": "unix_socket",
-    "version": "0.5.0",
-    "id": "unix_socket"
-  },
-  {
     "name": "unreachable",
     "version": "1.0.0",
     "id": "unreachable"
@@ -1001,7 +1011,7 @@
   },
   {
     "name": "utf8-ranges",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "utf8_ranges"
   },
   {
@@ -1031,7 +1041,7 @@
   },
   {
     "name": "walkdir",
-    "version": "2.2.2",
+    "version": "2.2.5",
     "id": "walkdir"
   },
   {
@@ -1055,13 +1065,18 @@
     "id": "winapi_i686_pc_windows_gnu"
   },
   {
+    "name": "winapi-util",
+    "version": "0.1.1",
+    "id": "winapi_util"
+  },
+  {
     "name": "winapi-x86_64-pc-windows-gnu",
     "version": "0.4.0",
     "id": "winapi_x86_64_pc_windows_gnu"
   },
   {
     "name": "wincolor",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "wincolor"
   },
   {
