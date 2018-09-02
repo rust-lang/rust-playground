@@ -257,6 +257,46 @@ impl Sandbox {
         Ok(Version { release, commit_hash, commit_date })
     }
 
+
+    pub fn version_rustfmt(&self) -> Result<Version> {
+        let mut command = basic_secure_docker_command();
+        command.args(&["rustfmt", "cargo", "fmt", "--version"]);
+        self.cargo_tool_version(command)
+    }
+
+    pub fn version_clippy(&self) -> Result<Version> {
+        let mut command = basic_secure_docker_command();
+        command.args(&["clippy", "cargo", "clippy", "--version"]);
+        self.cargo_tool_version(command)
+    }
+
+    pub fn version_miri(&self) -> Result<Version> {
+        let mut command = basic_secure_docker_command();
+        command.args(&["miri", "cargo", "miri", "--version"]);
+
+        let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
+        let version_output = vec_to_str(output.stdout)?;
+
+        let release = version_output.trim().into();
+        let commit_hash = String::new();
+        let commit_date = String::new();
+
+        Ok(Version { release, commit_hash, commit_date })
+    }
+
+    // Parses versions of the shape `toolname 0.0.0 (0000000 0000-00-00)`
+    fn cargo_tool_version(&self, mut command: Command) -> Result<Version> {
+        let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
+        let version_output = vec_to_str(output.stdout)?;
+        let mut parts = version_output.split_whitespace().fuse().skip(1);
+
+        let release = parts.next().unwrap_or("").into();
+        let commit_hash = parts.next().unwrap_or("").trim_left_matches('(').into();
+        let commit_date = parts.next().unwrap_or("").trim_right_matches(')').into();
+
+        Ok(Version { release, commit_hash, commit_date })
+    }
+
     fn write_source_code(&self, code: &str) -> Result<()> {
         let data = code.as_bytes();
 

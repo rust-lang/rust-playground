@@ -5,19 +5,25 @@ const DEFAULT: State = {
   stable: null,
   beta: null,
   nightly: null,
+  rustfmt: null,
+  clippy: null,
+  miri: null,
 };
 
 export interface State {
   stable?: Version;
   beta?: Version;
   nightly?: Version;
+  rustfmt?: Version;
+  clippy?: Version;
+  miri?: Version;
 }
 
 export default function crates(state = DEFAULT, action: Action) {
   switch (action.type) {
     case ActionType.VersionsLoadSucceeded: {
-    const { stable, beta, nightly } = action;
-    return { stable, beta, nightly };
+    const { stable, beta, nightly, rustfmt, clippy, miri } = action;
+    return { stable, beta, nightly, rustfmt, clippy, miri };
   }
     default:
   return state;
