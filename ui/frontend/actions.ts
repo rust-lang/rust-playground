@@ -34,6 +34,9 @@ const routes = {
       stable: '/meta/version/stable',
       beta: '/meta/version/beta',
       nightly: '/meta/version/nightly',
+      rustfmt: '/meta/version/rustfmt',
+      clippy: '/meta/version/clippy',
+      miri: '/meta/version/miri',
     },
     gist: { pathname: '/meta/gist/' },
   },
@@ -575,8 +578,8 @@ export function performCratesLoad(): ThunkAction {
 const requestVersionsLoad = () =>
   createAction(ActionType.RequestVersionsLoad);
 
-const receiveVersionsLoadSuccess = ({ stable, beta, nightly }) =>
-  createAction(ActionType.VersionsLoadSucceeded, { stable, beta, nightly });
+const receiveVersionsLoadSuccess = ({ stable, beta, nightly, rustfmt, clippy, miri }) =>
+  createAction(ActionType.VersionsLoadSucceeded, { stable, beta, nightly, rustfmt, clippy, miri });
 
 export function performVersionsLoad(): ThunkAction {
   return function(dispatch) {
@@ -585,14 +588,20 @@ export function performVersionsLoad(): ThunkAction {
     const stable = jsonGet(routes.meta.version.stable);
     const beta = jsonGet(routes.meta.version.beta);
     const nightly = jsonGet(routes.meta.version.nightly);
+    const rustfmt = jsonGet(routes.meta.version.rustfmt);
+    const clippy = jsonGet(routes.meta.version.clippy);
+    const miri = jsonGet(routes.meta.version.miri);
 
-    const all = Promise.all([stable, beta, nightly]);
+    const all = Promise.all([stable, beta, nightly, rustfmt, clippy, miri]);
 
     return all
-      .then(([stable, beta, nightly]) => dispatch(receiveVersionsLoadSuccess({
+      .then(([stable, beta, nightly, rustfmt, clippy, miri]) => dispatch(receiveVersionsLoadSuccess({
         stable,
         beta,
         nightly,
+        rustfmt,
+        clippy,
+        miri,
       })));
     // TODO: Failure case
   };

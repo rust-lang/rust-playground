@@ -104,6 +104,9 @@ fn main() {
     mount.mount("/meta/version/stable", meta_version_stable);
     mount.mount("/meta/version/beta", meta_version_beta);
     mount.mount("/meta/version/nightly", meta_version_nightly);
+    mount.mount("/meta/version/rustfmt", meta_version_rustfmt);
+    mount.mount("/meta/version/clippy", meta_version_clippy);
+    mount.mount("/meta/version/miri", meta_version_miri);
     mount.mount("/meta/gist", gist_router);
     mount.mount("/evaluate.json", evaluate);
 
@@ -232,6 +235,30 @@ fn meta_version_nightly(_req: &mut Request) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
             .version_nightly()
+            .map(MetaVersionResponse::from)
+    })
+}
+
+fn meta_version_rustfmt(_req: &mut Request) -> IronResult<Response> {
+    with_sandbox_no_request(|sandbox| {
+        cached(sandbox)
+            .version_rustfmt()
+            .map(MetaVersionResponse::from)
+    })
+}
+
+fn meta_version_clippy(_req: &mut Request) -> IronResult<Response> {
+    with_sandbox_no_request(|sandbox| {
+        cached(sandbox)
+            .version_clippy()
+            .map(MetaVersionResponse::from)
+    })
+}
+
+fn meta_version_miri(_req: &mut Request) -> IronResult<Response> {
+    with_sandbox_no_request(|sandbox| {
+        cached(sandbox)
+            .version_miri()
             .map(MetaVersionResponse::from)
     })
 }
@@ -401,6 +428,9 @@ struct SandboxCache {
     version_stable: SandboxCacheOne<sandbox::Version>,
     version_beta: SandboxCacheOne<sandbox::Version>,
     version_nightly: SandboxCacheOne<sandbox::Version>,
+    version_clippy: SandboxCacheOne<sandbox::Version>,
+    version_rustfmt: SandboxCacheOne<sandbox::Version>,
+    version_miri: SandboxCacheOne<sandbox::Version>,
 }
 
 /// Provides a similar API to the Sandbox that caches the successful results.
@@ -429,6 +459,24 @@ impl<'a> CachedSandbox<'a> {
     fn version_nightly(&self) -> Result<sandbox::Version> {
         self.cache.version_nightly.clone_or_populate(|| {
             self.sandbox.version(sandbox::Channel::Nightly)
+        })
+    }
+
+    fn version_clippy(&self) -> Result<sandbox::Version> {
+        self.cache.version_clippy.clone_or_populate(|| {
+            self.sandbox.version_clippy()
+        })
+    }
+
+    fn version_rustfmt(&self) -> Result<sandbox::Version> {
+        self.cache.version_rustfmt.clone_or_populate(|| {
+            self.sandbox.version_rustfmt()
+        })
+    }
+
+    fn version_miri(&self) -> Result<sandbox::Version> {
+        self.cache.version_miri.clone_or_populate(|| {
+            self.sandbox.version_miri()
         })
     }
 }
