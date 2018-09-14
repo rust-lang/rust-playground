@@ -39,6 +39,7 @@ RUN cd / && \
 WORKDIR /playground
 
 ADD Cargo.toml /playground/Cargo.toml
+RUN cargo fetch
 RUN cargo build
 RUN cargo build --release
 RUN rm src/*.rs
