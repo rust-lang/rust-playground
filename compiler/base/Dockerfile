@@ -28,7 +28,9 @@ ARG channel
 ADD https://static.rust-lang.org/rustup/release-stable.toml /root/rustup-manifest.toml
 ADD https://static.rust-lang.org/dist/channel-rust-${channel}-date.txt /root/rust-channel-version
 
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain "${channel}"
+# https://github.com/rust-lang-nursery/rustup.rs/issues/998
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain "${channel}" && \
+    rm -rf ~/.rustup/toolchains/*/share/doc
 
 # Prebuild the playground's dependencies
 
