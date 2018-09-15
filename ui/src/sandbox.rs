@@ -314,7 +314,7 @@ impl Sandbox {
         let mut cmd = self.docker_command(Some(crate_type));
         set_execution_environment(&mut cmd, Some(target), crate_type, edition, backtrace);
 
-        let execution_cmd = build_execution_command(Some(target), mode, crate_type, tests);
+        let execution_cmd = build_execution_command(Some(target), channel, mode, crate_type, tests);
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
@@ -327,7 +327,7 @@ impl Sandbox {
         let mut cmd = self.docker_command(Some(crate_type));
         set_execution_environment(&mut cmd, None, crate_type, edition, backtrace);
 
-        let execution_cmd = build_execution_command(None, mode, crate_type, tests);
+        let execution_cmd = build_execution_command(None, channel, mode, crate_type, tests);
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
@@ -412,7 +412,7 @@ fn basic_secure_docker_command() -> Command {
     cmd
 }
 
-fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type: CrateType, tests: bool) -> Vec<&'static str> {
+fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Vec<&'static str> {
     use self::CompileTarget::*;
     use self::CrateType::*;
     use self::Mode::*;
@@ -439,6 +439,12 @@ fn build_execution_command(target: Option<CompileTarget>, mode: Mode, crate_type
                 use self::AssemblyFlavor::*;
 
                 cmd.push("--emit=asm");
+
+                // Enable extra assembly comments for nightly builds
+                if let Channel::Nightly = channel {
+                    cmd.push("-Z");
+                    cmd.push("asm-comments");
+                }
 
                 cmd.push("-C");
                 match flavor {
