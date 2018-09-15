@@ -36,7 +36,7 @@
   },
   {
     "name": "base64",
-    "version": "0.9.2",
+    "version": "0.9.3",
     "id": "base64"
   },
   {
@@ -66,12 +66,12 @@
   },
   {
     "name": "bytes",
-    "version": "0.4.9",
+    "version": "0.4.10",
     "id": "bytes"
   },
   {
     "name": "cc",
-    "version": "1.0.22",
+    "version": "1.0.25",
     "id": "cc"
   },
   {
@@ -111,7 +111,7 @@
   },
   {
     "name": "crossbeam-channel",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "id": "crossbeam_channel"
   },
   {
@@ -121,7 +121,7 @@
   },
   {
     "name": "crossbeam-epoch",
-    "version": "0.5.2",
+    "version": "0.6.0",
     "id": "crossbeam_epoch"
   },
   {
@@ -231,7 +231,7 @@
   },
   {
     "name": "futures",
-    "version": "0.1.23",
+    "version": "0.1.24",
     "id": "futures"
   },
   {
@@ -271,7 +271,7 @@
   },
   {
     "name": "http",
-    "version": "0.1.10",
+    "version": "0.1.13",
     "id": "http"
   },
   {
@@ -286,7 +286,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.12.9",
+    "version": "0.12.10",
     "id": "hyper"
   },
   {
@@ -326,7 +326,7 @@
   },
   {
     "name": "itoa",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "id": "itoa"
   },
   {
@@ -351,7 +351,7 @@
   },
   {
     "name": "lazycell",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "id": "lazycell"
   },
   {
@@ -366,7 +366,7 @@
   },
   {
     "name": "libz-sys",
-    "version": "1.0.20",
+    "version": "1.0.22",
     "id": "libz_sys"
   },
   {
@@ -376,7 +376,7 @@
   },
   {
     "name": "log",
-    "version": "0.4.4",
+    "version": "0.4.5",
     "id": "log"
   },
   {
@@ -431,12 +431,12 @@
   },
   {
     "name": "mio",
-    "version": "0.6.15",
+    "version": "0.6.16",
     "id": "mio"
   },
   {
     "name": "mio-uds",
-    "version": "0.6.6",
+    "version": "0.6.7",
     "id": "mio_uds"
   },
   {
@@ -501,7 +501,7 @@
   },
   {
     "name": "num-traits",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "id": "num_traits"
   },
   {
@@ -526,7 +526,7 @@
   },
   {
     "name": "parking_lot_core",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "id": "parking_lot_core"
   },
   {
@@ -576,7 +576,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "0.4.15",
+    "version": "0.4.19",
     "id": "proc_macro2"
   },
   {
@@ -611,7 +611,7 @@
   },
   {
     "name": "regex",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "id": "regex"
   },
   {
@@ -661,7 +661,7 @@
   },
   {
     "name": "safemem",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "id": "safemem"
   },
   {
@@ -706,12 +706,12 @@
   },
   {
     "name": "serde",
-    "version": "1.0.75",
+    "version": "1.0.78",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.75",
+    "version": "1.0.78",
     "id": "serde_derive"
   },
   {
@@ -721,7 +721,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.26",
+    "version": "1.0.27",
     "id": "serde_json"
   },
   {
@@ -776,7 +776,7 @@
   },
   {
     "name": "syn",
-    "version": "0.14.9",
+    "version": "0.15.4",
     "id": "syn"
   },
   {
@@ -826,7 +826,7 @@
   },
   {
     "name": "termcolor",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "id": "termcolor"
   },
   {
@@ -1016,7 +1016,7 @@
   },
   {
     "name": "uuid",
-    "version": "0.6.5",
+    "version": "0.7.1",
     "id": "uuid"
   },
   {

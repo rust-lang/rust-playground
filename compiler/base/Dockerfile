@@ -1,4 +1,4 @@
-FROM ubuntu:16.04 as toolchain
+FROM ubuntu:18.04 as toolchain
 
 # `build-essential` and `file` are needed for backtrace-sys
 # `cmake`, `git`, `python` are needed for wasm tools
@@ -28,7 +28,9 @@ ARG channel
 ADD https://static.rust-lang.org/rustup/release-stable.toml /root/rustup-manifest.toml
 ADD https://static.rust-lang.org/dist/channel-rust-${channel}-date.txt /root/rust-channel-version
 
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain "${channel}"
+# https://github.com/rust-lang-nursery/rustup.rs/issues/998
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain "${channel}" && \
+    rm -rf ~/.rustup/toolchains/*/share/doc
 
 # Prebuild the playground's dependencies
 
@@ -39,6 +41,7 @@ RUN cd / && \
 WORKDIR /playground
 
 ADD Cargo.toml /playground/Cargo.toml
+RUN cargo fetch
 RUN cargo build
 RUN cargo build --release
 RUN rm src/*.rs
