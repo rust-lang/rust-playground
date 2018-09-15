@@ -66,8 +66,6 @@ fn set_edition(cargo_toml: Value, edition: &str) -> Value {
     #[derive(Debug, Serialize, Deserialize)]
     #[serde(rename_all = "kebab-case")]
     struct CargoToml {
-        #[serde(default)]
-        cargo_features: Vec<String>,
         package: Package,
         #[serde(flatten)]
         other: Other,
@@ -83,7 +81,6 @@ fn set_edition(cargo_toml: Value, edition: &str) -> Value {
     }
 
     modify(cargo_toml, |mut cargo_toml: CargoToml| {
-        ensure_string_in_vec(&mut cargo_toml.cargo_features, "edition");
         cargo_toml.package.edition = edition.into();
         cargo_toml
     })
