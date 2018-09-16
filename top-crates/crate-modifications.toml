@@ -75,4 +75,7 @@ additions = [
     "syslog",
     "tar",
     "toml",
+
+    # TariLabs additions
+    "libsecp256k1-rs",
 ]
