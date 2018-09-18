@@ -403,7 +403,7 @@ fn basic_secure_docker_command() -> Command {
         .args(&["--net", "none"])
         .args(&["--memory", "256m"])
         .args(&["--memory-swap", "320m"])
-        .args(&["--env", "PLAYGROUND_TIMEOUT=10"]);
+        .args(&["--env", "PLAYGROUND_TIMEOUT=60"]);
 
     if cfg!(feature = "fork-bomb-prevention") {
         cmd.args(&["--pids-limit", "512"]);

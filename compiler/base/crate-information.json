@@ -305,6 +305,11 @@
     "id": "h2"
   },
   {
+    "name": "hex",
+    "version": "0.3.2",
+    "id": "hex"
+  },
+  {
     "name": "hmac",
     "version": "0.4.2",
     "id": "hmac"
@@ -416,7 +421,7 @@
   },
   {
     "name": "libsecp256k1-rs",
-    "version": "0.2.2",
+    "version": "0.2.4",
     "id": "libsecp256k1_rs"
   },
   {
