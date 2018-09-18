@@ -415,6 +415,11 @@
     "id": "libflate"
   },
   {
+    "name": "libsecp256k1-rs",
+    "version": "0.2.1",
+    "id": "libsecp256k1_rs"
+  },
+  {
     "name": "libz-sys",
     "version": "1.0.22",
     "id": "libz_sys"

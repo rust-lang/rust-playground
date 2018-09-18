@@ -2,7 +2,7 @@
 
 set -euv -o pipefail
 
-repository=shepmaster
+repository=taridocker
 
 for image in rust-stable rust-beta rust-nightly rustfmt clippy miri; do
     docker pull "${repository}/${image}"

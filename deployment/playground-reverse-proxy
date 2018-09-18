@@ -5,10 +5,10 @@ server {
     listen 443 ssl default_server;
     listen [::]:443 ssl default_server;
 
-    server_name play.integer32.com;
+    server_name rustpen.tari.com;
 
-    ssl_certificate /etc/nginx/ssl/play.integer32.com/cert.pem;
-    ssl_certificate_key /etc/nginx/ssl/play.integer32.com/key.pem;
+    ssl_certificate /etc/nginx/ssl/rustpen.tari.com/cert.pem;
+    ssl_certificate_key /etc/nginx/ssl/rustpen.tari.com/key.pem;
 
     location / {
         proxy_set_header Host $host;

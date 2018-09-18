@@ -6,7 +6,7 @@ channels_to_build="${CHANNELS_TO_BUILD-stable beta nightly}"
 tools_to_build="${TOOLS_TO_BUILD-rustfmt clippy miri}"
 perform_push="${PERFORM_PUSH-false}"
 
-repository=shepmaster
+repository=taridocker
 
 for channel in $channels_to_build; do
     cd "base"
@@ -14,7 +14,7 @@ for channel in $channels_to_build; do
     image_name="rust-${channel}"
     full_name="${repository}/${image_name}"
 
-    docker pull "${full_name}"
+#    docker pull "${full_name}"
     docker build -t "${full_name}" \
            --cache-from "${full_name}" \
            --build-arg channel="${channel}" \
@@ -36,7 +36,7 @@ for tool in $tools_to_build; do
     image_name="${tool}"
     full_name="${repository}/${image_name}"
 
-    docker pull "${full_name}"
+#    docker pull "${full_name}"
     docker build -t "${full_name}" \
            --cache-from "${full_name}" \
            .
@@ -48,3 +48,5 @@ for tool in $tools_to_build; do
 
     cd ..
 done
+
+
