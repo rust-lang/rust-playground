@@ -68,6 +68,8 @@ const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
 
 fn main() {
     // Dotenv may be unable to load environment variables, but that's ok in production
+    println!("Loading environment");
+
     let _ = dotenv::dotenv();
     openssl_probe::init_ssl_cert_env_vars();
     env_logger::init();
@@ -79,6 +81,8 @@ fn main() {
     let port = env::var("PLAYGROUND_UI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(DEFAULT_PORT);
     let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or_else(|_| DEFAULT_LOG_FILE.to_string());
     let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
+
+    println!("Linking UI files");
 
     let files = Staticfile::new(&root).expect("Unable to open root directory");
     let mut files = Chain::new(files);
@@ -92,6 +96,8 @@ fn main() {
     let mut gist_router = Router::new();
     gist_router.post("/", meta_gist_create, "gist_create");
     gist_router.get("/:id", meta_gist_get, "gist_get");
+
+    println!("Mounting routes");
 
     let mut mount = Mount::new();
     mount.mount("/", files);
@@ -109,6 +115,7 @@ fn main() {
     mount.mount("/meta/version/miri", meta_version_miri);
     mount.mount("/meta/gist", gist_router);
     mount.mount("/evaluate.json", evaluate);
+
 
     let mut chain = Chain::new(mount);
     let file_logger = FileLogger::new(logfile).expect("Unable to create file logger");
@@ -135,7 +142,7 @@ fn main() {
         });
     }
 
-    info!("Starting the server on http://{}:{}", address, port);
+    println!("Starting the server on http://{}:{}", address, port);
     Iron::new(chain).http((&*address, port)).expect("Unable to start server");
 }
 

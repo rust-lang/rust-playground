@@ -6,21 +6,28 @@ automated.
 #### Dependencies (as root)
 
 ```
-apt-get update
-apt-get upgrade -y
-apt-get install git awscli nginx
+apt-get update && apt-get upgrade -y && apt-get install -y git awscli nginx
 
 # Install Docker CE
 # Configure apt-get per instructions
 # https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/
-apt-get install docker-ce
 
-# Use a production-quality storage driver that doesn't leak disk space
-cat >>/etc/docker/daemon.json <<EOF
-{
-    "storage-driver": "overlay2"
-}
-EOF
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+sudo apt-get update
+    
+sudo apt-get install -y docker-ce
+
 
 # Ensure Docker can control the PID limit
 mount | grep cgroup/pids
@@ -29,19 +36,19 @@ mount | grep cgroup/pids
 # https://docs.docker.com/engine/installation/linux/linux-postinstall/#your-kernel-does-not-support-cgroup-swap-limit-capabilities
 
 service docker restart
-usermod -a -G docker ubuntu # user needs to log out and in again
+sudo usermod -aG docker ubuntu # user needs to log out and in again
 
-fallocate -l 1G /swap.fs
-chmod 0600 /swap.fs
-mkswap /swap.fs
+sudo fallocate -l 1G /swap.fs
+sudo chmod 0600 /swap.fs
+sudo mkswap /swap.fs
 ```
 
 #### Set aside disk space (as root)
 ```
-fallocate -l 512M /playground.fs
-device=$(losetup -f --show /playground.fs)
-mkfs -t ext3 -m 1 -v $device
-mkdir /mnt/playground
+sudo fallocate -l 512M /playground.fs
+device=$(sudo losetup -f --show /playground.fs)
+sudo mkfs -t ext3 -m 1 -v $device
+sudo mkdir /mnt/playground
 ```
 
 #### Configure disk mountpoints (as root)
@@ -54,10 +61,12 @@ EOF
 
 Reboot the instance at this point.
 
-#### Get the code
+#### Get images
 ```
-git clone https://github.com/integer32llc/rust-playground.git
+git clone https://github.com/tari-labs/rust-playground.git
 cd rust-playground
+
+sudo apt install cargo libssl-dev pkg-config
 ```
 
 #### Set a crontab to update the assets, binary, and docker containers
