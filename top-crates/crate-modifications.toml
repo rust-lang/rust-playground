@@ -47,7 +47,6 @@ additions = [
     "memmap",
     "mio",
     "num",
-    "rand",
     "rayon",
     "reqwest",
     "tempdir",
