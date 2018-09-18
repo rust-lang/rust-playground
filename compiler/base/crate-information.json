@@ -15,6 +15,11 @@
     "id": "ansi_term"
   },
   {
+    "name": "arrayref",
+    "version": "0.3.5",
+    "id": "arrayref"
+  },
+  {
     "name": "arrayvec",
     "version": "0.4.7",
     "id": "arrayvec"
@@ -55,9 +60,19 @@
     "id": "bitflags"
   },
   {
+    "name": "block-buffer",
+    "version": "0.2.0",
+    "id": "block_buffer"
+  },
+  {
     "name": "build_const",
     "version": "0.2.1",
     "id": "build_const"
+  },
+  {
+    "name": "byte-tools",
+    "version": "0.2.0",
+    "id": "byte_tools"
   },
   {
     "name": "byteorder",
@@ -100,6 +115,11 @@
     "id": "color_quant"
   },
   {
+    "name": "constant_time_eq",
+    "version": "0.1.3",
+    "id": "constant_time_eq"
+  },
+  {
     "name": "crc",
     "version": "1.8.1",
     "id": "crc"
@@ -130,6 +150,11 @@
     "id": "crossbeam_utils"
   },
   {
+    "name": "crypto-mac",
+    "version": "0.4.0",
+    "id": "crypto_mac"
+  },
+  {
     "name": "csv",
     "version": "1.0.1",
     "id": "csv"
@@ -153,6 +178,11 @@
     "name": "deflate",
     "version": "0.7.18",
     "id": "deflate"
+  },
+  {
+    "name": "digest",
+    "version": "0.6.2",
+    "id": "digest"
   },
   {
     "name": "dtoa",
@@ -183,6 +213,11 @@
     "name": "extprim",
     "version": "1.6.0",
     "id": "extprim"
+  },
+  {
+    "name": "fake-simd",
+    "version": "0.1.2",
+    "id": "fake_simd"
   },
   {
     "name": "filetime",
@@ -245,6 +280,11 @@
     "id": "gcc"
   },
   {
+    "name": "generic-array",
+    "version": "0.8.3",
+    "id": "generic_array"
+  },
+  {
     "name": "getopts",
     "version": "0.2.18",
     "id": "getopts"
@@ -263,6 +303,16 @@
     "name": "h2",
     "version": "0.1.12",
     "id": "h2"
+  },
+  {
+    "name": "hmac",
+    "version": "0.4.2",
+    "id": "hmac"
+  },
+  {
+    "name": "hmac-drbg",
+    "version": "0.1.2",
+    "id": "hmac_drbg"
   },
   {
     "name": "html5ever",
@@ -363,6 +413,11 @@
     "name": "libflate",
     "version": "0.1.16",
     "id": "libflate"
+  },
+  {
+    "name": "libsecp256k1-rs",
+    "version": "0.2.1",
+    "id": "libsecp256k1_rs"
   },
   {
     "name": "libz-sys",
@@ -706,12 +761,12 @@
   },
   {
     "name": "serde",
-    "version": "1.0.78",
+    "version": "1.0.79",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.78",
+    "version": "1.0.79",
     "id": "serde_derive"
   },
   {
@@ -728,6 +783,11 @@
     "name": "serde_urlencoded",
     "version": "0.5.3",
     "id": "serde_urlencoded"
+  },
+  {
+    "name": "sha2",
+    "version": "0.6.0",
+    "id": "sha2"
   },
   {
     "name": "siphasher",
@@ -953,6 +1013,11 @@
     "name": "typeable",
     "version": "0.1.2",
     "id": "typeable"
+  },
+  {
+    "name": "typenum",
+    "version": "1.10.0",
+    "id": "typenum"
   },
   {
     "name": "ucd-util",

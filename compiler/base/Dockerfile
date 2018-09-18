@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     pkg-config \
     python \
+    musl-tools \
  && rm -rf /var/lib/apt/lists/*
 
 ENV USER=root
