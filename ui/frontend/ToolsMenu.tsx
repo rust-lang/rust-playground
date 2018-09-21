@@ -25,6 +25,7 @@ interface ToolsMenuProps {
   rustfmtVersionDetails: string;
   clippyVersion: string;
   clippyVersionDetails: string;
+  miriVersionDetails: string;
   miriVersion: string;
   clippy: () => any;
   miri: () => any;
