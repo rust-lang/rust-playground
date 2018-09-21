@@ -98,6 +98,7 @@ export const betaVersionDetailsText = createSelector([getBeta], versionDetails);
 export const nightlyVersionDetailsText = createSelector([getNightly], versionDetails);
 export const clippyVersionDetailsText = createSelector([getClippy], versionDetails);
 export const rustfmtVersionDetailsText = createSelector([getRustfmt], versionDetails);
+export const miriVersionDetailsText = createSelector([getMiri], versionDetails);
 
 export const isWasmAvailable = (state: State) => (
   state.configuration.channel === Channel.Nightly

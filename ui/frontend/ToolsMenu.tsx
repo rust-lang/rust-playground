@@ -7,6 +7,7 @@ import MenuGroup from './MenuGroup';
 import {
   clippyVersionDetailsText,
   clippyVersionText,
+  miriVersionDetailsText,
   miriVersionText,
   rustfmtVersionDetailsText,
   rustfmtVersionText,
@@ -24,6 +25,7 @@ interface ToolsMenuProps {
   rustfmtVersionDetails: string;
   clippyVersion: string;
   clippyVersionDetails: string;
+  miriVersionDetails: string;
   miriVersion: string;
   clippy: () => any;
   miri: () => any;
@@ -52,7 +54,7 @@ const ToolsMenu: React.SFC<ToolsMenuProps> = props => (
         Execute this program in the Miri interpreter to detect certain
         cases of undefined behavior (like out-of-bounds memory access).
       </div>
-      <div className="tools-menu__aside">{props.miriVersion}</div>
+      <div className="tools-menu__aside">{props.miriVersion} ({props.miriVersionDetails})</div>
     </ButtonMenuItem>
   </MenuGroup>
 );
@@ -63,6 +65,7 @@ const mapStateToProps = (state: State) => {
     rustfmtVersionDetails: rustfmtVersionDetailsText(state),
     clippyVersionDetails: clippyVersionDetailsText(state),
     clippyVersion: clippyVersionText(state),
+    miriVersionDetails: miriVersionDetailsText(state),
     miriVersion: miriVersionText(state),
   };
 };
