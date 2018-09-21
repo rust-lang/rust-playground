@@ -273,15 +273,7 @@ impl Sandbox {
     pub fn version_miri(&self) -> Result<Version> {
         let mut command = basic_secure_docker_command();
         command.args(&["miri", "cargo", "miri", "--version"]);
-
-        let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
-        let version_output = vec_to_str(output.stdout)?;
-
-        let release = version_output.trim().into();
-        let commit_hash = String::new();
-        let commit_date = String::new();
-
-        Ok(Version { release, commit_hash, commit_date })
+        self.cargo_tool_version(command)
     }
 
     // Parses versions of the shape `toolname 0.0.0 (0000000 0000-00-00)`
