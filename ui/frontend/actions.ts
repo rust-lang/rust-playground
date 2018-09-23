@@ -146,8 +146,11 @@ export const changeMode = (mode: Mode) =>
 export const changeEdition = (edition: Edition) =>
   createAction(ActionType.ChangeEdition, { edition });
 
-export const changeNightlyEdition = (edition: Edition): ThunkAction => dispatch => {
-  dispatch(changeChannel(Channel.Nightly));
+export const changeBetaEdition = (edition: Edition): ThunkAction => (dispatch, getState) => {
+  const state = getState();
+  if (!isEditionAvailable(state) && edition === Edition.Rust2018) {
+    dispatch(changeChannel(Channel.Beta));
+  }
   dispatch(changeEdition(edition));
 };
 

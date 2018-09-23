@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 
 import { changeBacktrace } from './actions';
-import { changeNightlyEdition } from './actions';
+import { changeBetaEdition } from './actions';
 import { Either as EitherConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
 import { State } from './reducers';
@@ -46,8 +46,8 @@ const AdvancedOptionsMenu: React.SFC<AdvancedOptionsMenuProps> = props => (
 
 const EditionAside: React.SFC = () => (
   <p className="advanced-options-menu__aside">
-    Note: Selecting an edition currently requires using the Nightly channel, selecting this
-    option will switch to Nightly.
+    Note: Selecting an edition currently requires using the Beta or Nightly channel; selecting this
+    option will switch to Beta.
   </p>
 );
 
@@ -60,7 +60,7 @@ const mapStateToProps = (state: State) => ({
 });
 
 const mapDispatchToProps = ({
-  changeEdition: changeNightlyEdition,
+  changeEdition: changeBetaEdition,
   changeBacktrace,
 });
 
