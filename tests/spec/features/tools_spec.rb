@@ -23,8 +23,8 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     in_tools_menu { click_on("Clippy") }
 
     within(".output-stderr") do
-      expect(page).to have_content 'deny(eq_op)'
-      expect(page).to have_content 'warn(zero_divided_by_zero)'
+      expect(page).to have_content 'deny(clippy::eq_op)'
+      expect(page).to have_content 'warn(clippy::zero_divided_by_zero)'
     end
   end
 
