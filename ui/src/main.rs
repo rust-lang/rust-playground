@@ -100,6 +100,7 @@ fn main() {
     mount.mount("/format", format);
     mount.mount("/clippy", clippy);
     mount.mount("/miri", miri);
+    mount.mount("/meta/all", meta_all);
     mount.mount("/meta/crates", meta_crates);
     mount.mount("/meta/version/stable", meta_version_stable);
     mount.mount("/meta/version/beta", meta_version_beta);
@@ -204,6 +205,21 @@ fn miri(req: &mut Request) -> IronResult<Response> {
             .miri(&req.into())
             .map(MiriResponse::from)
             .map_err(Error::Sandbox)
+    })
+}
+
+fn meta_all(_req: &mut Request) -> IronResult<Response> {
+    with_sandbox_no_request(|sandbox| {
+        let sandbox = cached(sandbox);
+        Ok(MetaAllResponse {
+            crates: sandbox.crates()?.into_iter().map(From::from).collect(),
+            stable: From::from(sandbox.version_stable()?),
+            beta: From::from(sandbox.version_beta()?),
+            nightly: From::from(sandbox.version_nightly()?),
+            rustfmt: From::from(sandbox.version_rustfmt()?),
+            clippy: From::from(sandbox.version_clippy()?),
+            miri: From::from(sandbox.version_miri()?),
+        })
     })
 }
 
@@ -662,6 +678,24 @@ struct CrateInformation {
 }
 
 #[derive(Debug, Clone, Serialize)]
+struct Version {
+    version: String,
+    hash: String,
+    date: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct MetaAllResponse {
+    crates: Vec<CrateInformation>,
+    stable: Version,
+    beta: Version,
+    nightly: Version,
+    rustfmt: Version,
+    clippy: Version,
+    miri: Version,
+}
+
+#[derive(Debug, Clone, Serialize)]
 struct MetaCratesResponse {
     crates: Vec<CrateInformation>,
 }
@@ -831,21 +865,39 @@ impl From<sandbox::MiriResponse> for MiriResponse {
     }
 }
 
+impl From<sandbox::CrateInformation> for CrateInformation {
+    fn from(me: sandbox::CrateInformation) -> Self {
+        CrateInformation {
+            name: me.name,
+            version: me.version,
+            id: me.id
+        }
+    }
+}
+
 impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
     fn from(me: Vec<sandbox::CrateInformation>) -> Self {
         let crates = me.into_iter()
-            .map(|cv| CrateInformation { name: cv.name, version: cv.version, id: cv.id })
+            .map(From::from)
             .collect();
 
-        MetaCratesResponse {
-            crates,
-        }
+        MetaCratesResponse { crates }
     }
 }
 
 impl From<sandbox::Version> for MetaVersionResponse {
     fn from(me: sandbox::Version) -> Self {
         MetaVersionResponse {
+            version: me.release,
+            hash: me.commit_hash,
+            date: me.commit_date,
+        }
+    }
+}
+
+impl From<sandbox::Version> for Version {
+    fn from(me: sandbox::Version) -> Self {
+        Version {
             version: me.release,
             hash: me.commit_hash,
             date: me.commit_date,

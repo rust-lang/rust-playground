@@ -8,7 +8,7 @@ import persistState from 'redux-localstorage';
 import thunk, { ThunkDispatch } from 'redux-thunk';
 import * as url from 'url';
 
-import { Action, gotoPosition, performCratesLoad, performVersionsLoad, reExecuteWithBacktrace } from './actions';
+import { Action, gotoPosition, performMetadataLoad, reExecuteWithBacktrace } from './actions';
 import { configureRustErrors } from './highlighting';
 import { deserialize, serialize } from './local_storage';
 import PageSwitcher from './PageSwitcher';
@@ -35,8 +35,7 @@ configureRustErrors({
   getChannel: () => store.getState().configuration.channel,
 });
 
-store.dispatch(performCratesLoad());
-store.dispatch(performVersionsLoad());
+store.dispatch(performMetadataLoad());
 
 ReactDOM.render(
   <Provider store={store}>

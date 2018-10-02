@@ -29,6 +29,7 @@ const routes = {
   clippy: { pathname: '/clippy' },
   miri: { pathname: '/miri' },
   meta: {
+    all: { pathname: '/meta/all' },
     crates: { pathname: '/meta/crates' },
     version: {
       stable: '/meta/version/stable',
@@ -97,11 +98,11 @@ export enum ActionType {
   RequestGistSave = 'REQUEST_GIST_SAVE',
   GistSaveSucceeded = 'GIST_SAVE_SUCCEEDED',
   GistSaveFailed = 'GIST_SAVE_FAILED',
-  RequestCratesLoad = 'REQUEST_CRATES_LOAD',
   CratesLoadSucceeded = 'CRATES_LOAD_SUCCEEDED',
-  RequestVersionsLoad = 'REQUEST_VERSIONS_LOAD',
   VersionsLoadSucceeded = 'VERSIONS_LOAD_SUCCEEDED',
   NotificationSeen = 'NOTIFICATION_SEEN',
+  RequestMetadataLoad = 'REQUEST_METADATA_LOAD',
+  MetadataLoadSucceeded = 'METADATA_LOAD_SUCCEEDED',
 }
 
 export const toggleConfiguration = () =>
@@ -562,50 +563,24 @@ export function performGistSave(): ThunkAction {
   };
 }
 
-const requestCratesLoad = () =>
-  createAction(ActionType.RequestCratesLoad);
-
 const receiveCratesLoadSuccess = ({ crates }) =>
   createAction(ActionType.CratesLoadSucceeded, { crates });
-
-export function performCratesLoad(): ThunkAction {
-  return function(dispatch) {
-    dispatch(requestCratesLoad());
-
-    return jsonGet(routes.meta.crates)
-      .then(json => dispatch(receiveCratesLoadSuccess(json)));
-    // TODO: Failure case
-  };
-}
-
-const requestVersionsLoad = () =>
-  createAction(ActionType.RequestVersionsLoad);
 
 const receiveVersionsLoadSuccess = ({ stable, beta, nightly, rustfmt, clippy, miri }) =>
   createAction(ActionType.VersionsLoadSucceeded, { stable, beta, nightly, rustfmt, clippy, miri });
 
-export function performVersionsLoad(): ThunkAction {
+const requestMetadataLoad = () =>
+  createAction(ActionType.RequestMetadataLoad);
+
+export function performMetadataLoad(): ThunkAction {
   return function(dispatch) {
-    dispatch(requestVersionsLoad());
+    dispatch(requestMetadataLoad());
 
-    const stable = jsonGet(routes.meta.version.stable);
-    const beta = jsonGet(routes.meta.version.beta);
-    const nightly = jsonGet(routes.meta.version.nightly);
-    const rustfmt = jsonGet(routes.meta.version.rustfmt);
-    const clippy = jsonGet(routes.meta.version.clippy);
-    const miri = jsonGet(routes.meta.version.miri);
-
-    const all = Promise.all([stable, beta, nightly, rustfmt, clippy, miri]);
-
-    return all
-      .then(([stable, beta, nightly, rustfmt, clippy, miri]) => dispatch(receiveVersionsLoadSuccess({
-        stable,
-        beta,
-        nightly,
-        rustfmt,
-        clippy,
-        miri,
-      })));
+    return jsonGet(routes.meta.all)
+      .then(json => {
+        dispatch(receiveCratesLoadSuccess(json));
+        dispatch(receiveVersionsLoadSuccess(json));
+      });
     // TODO: Failure case
   };
 }
@@ -753,9 +728,8 @@ export type Action =
   | ReturnType<typeof requestGistSave>
   | ReturnType<typeof receiveGistSaveSuccess>
   | ReturnType<typeof receiveGistSaveFailure>
-  | ReturnType<typeof requestCratesLoad>
   | ReturnType<typeof receiveCratesLoadSuccess>
-  | ReturnType<typeof requestVersionsLoad>
   | ReturnType<typeof receiveVersionsLoadSuccess>
   | ReturnType<typeof notificationSeen>
+  | ReturnType<typeof requestMetadataLoad>
   ;
