@@ -1,6 +1,11 @@
 import Prism from 'prismjs';
 
-export function configureRustErrors({ gotoPosition, reExecuteWithBacktrace, getChannel }) {
+export function configureRustErrors({
+  enableFeatureGate,
+  getChannel,
+  gotoPosition,
+  reExecuteWithBacktrace,
+}) {
   Prism.languages.rust_errors = { // eslint-disable-line camelcase
     'warning': /^warning:.*$/m,
     'error': {
@@ -11,6 +16,12 @@ export function configureRustErrors({ gotoPosition, reExecuteWithBacktrace, getC
       },
     },
     'error-location': /-->\s+(\/playground\/)?src\/.*\n/,
+    'rust-errors-help': {
+      pattern: /help:.*\n/,
+      inside: {
+        'feature-gate': /add #\!\[feature\(.+?\)\]/,
+      },
+    },
     'backtrace': {
       pattern: /at src\/.*\n/,
       inside: {
@@ -52,6 +63,12 @@ export function configureRustErrors({ gotoPosition, reExecuteWithBacktrace, getC
       env.attributes['data-line'] = line;
       env.attributes['data-col'] = col;
     }
+    if (env.type === 'feature-gate') {
+      const [_, featureGate] = /feature\((.*?)\)/.exec(env.content);
+      env.tag = 'a';
+      env.attributes.href = '#';
+      env.attributes['data-feature-gate'] = featureGate;
+    }
     if (env.type === 'backtrace-enable') {
       env.tag = 'a';
       env.attributes.href = '#';
@@ -74,6 +91,15 @@ export function configureRustErrors({ gotoPosition, reExecuteWithBacktrace, getC
       link.onclick = e => {
         e.preventDefault();
         gotoPosition(line, col);
+      };
+    });
+
+    const featureGateEnablers = env.element.querySelectorAll('.feature-gate');
+    Array.from(featureGateEnablers).forEach((link: HTMLAnchorElement) => {
+      link.onclick = e => {
+        e.preventDefault();
+        enableFeatureGate(link.dataset.featureGate);
+        gotoPosition(1, 1);
       };
     });
 

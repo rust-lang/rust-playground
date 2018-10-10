@@ -8,7 +8,14 @@ import persistState from 'redux-localstorage';
 import thunk, { ThunkDispatch } from 'redux-thunk';
 import * as url from 'url';
 
-import { Action, gotoPosition, performCratesLoad, performVersionsLoad, reExecuteWithBacktrace } from './actions';
+import {
+  Action,
+  enableFeatureGate,
+  gotoPosition,
+  performCratesLoad,
+  performVersionsLoad,
+  reExecuteWithBacktrace,
+} from './actions';
 import { configureRustErrors } from './highlighting';
 import { deserialize, serialize } from './local_storage';
 import PageSwitcher from './PageSwitcher';
@@ -30,6 +37,7 @@ const enhancers = composeEnhancers(middlewares, persistState(undefined, { serial
 const store = createStore(playgroundApp, initialState, enhancers);
 
 configureRustErrors({
+  enableFeatureGate: featureGate => store.dispatch(enableFeatureGate(featureGate)),
   gotoPosition: (line, col) => store.dispatch(gotoPosition(line, col)),
   reExecuteWithBacktrace: () => store.dispatch(reExecuteWithBacktrace()),
   getChannel: () => store.getState().configuration.channel,
