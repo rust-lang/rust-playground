@@ -4,11 +4,18 @@ import { connect } from 'react-redux';
 
 import { ClipboardIcon } from '../Icon';
 import { State } from '../reducers';
-import { issueUrlSelector, permalinkSelector, showGistLoaderSelector, urloUrlSelector } from '../selectors';
+import {
+  codeUrlSelector,
+  issueUrlSelector,
+  permalinkSelector,
+  showGistLoaderSelector,
+  urloUrlSelector,
+} from '../selectors';
 
 import Loader from './Loader';
 
 interface GistProps {
+  codeUrl?: string;
   gistUrl?: string;
   issueUrl?: string;
   permalink?: string;
@@ -26,6 +33,7 @@ const Links: React.SFC<GistProps> = props => (
   <Fragment>
     <Copied href={props.permalink}>Permalink to the playground</Copied>
     <Copied href={props.gistUrl}>Direct link to the gist</Copied>
+    <Copied href={props.codeUrl}>Embedded code in link</Copied>
     <p><a href={props.urloUrl} target="_blank">Open a new thread in the Rust user forum</a></p>
     <p><a href={props.issueUrl} target="_blank"> Open an issue on the Rust GitHub repository </a></p>
   </Fragment>
@@ -66,6 +74,7 @@ class Copied extends React.PureComponent<CopiedProps, CopiedState> {
 }
 
 const mapStateToProps = (state: State) => ({
+  codeUrl: codeUrlSelector(state),
   gistUrl: state.output.gist.url,
   issueUrl: issueUrlSelector(state),
   permalink: permalinkSelector(state),
