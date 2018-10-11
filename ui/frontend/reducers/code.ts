@@ -17,7 +17,7 @@ export default function code(state = DEFAULT, action: Action): State {
       return action.code;
 
     case ActionType.AddMainFunction:
-      return `${state}\n\n'${DEFAULT}`;
+      return `${state}\n\n${DEFAULT}`;
 
     case ActionType.EnableFeatureGate:
       return `#![feature(${action.featureGate})]\n${state}`;
