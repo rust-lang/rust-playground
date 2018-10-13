@@ -162,21 +162,26 @@ const baseUrlSelector = (state: State) =>
 const gistSelector = (state: State) =>
   state.output.gist;
 
+// Selects url.query of build configs.
+const urlQuerySelector = createSelector(
+  gistSelector,
+  gist => ({
+    version: gist.channel,
+    mode: gist.mode,
+    edition: gist.edition,
+  }),
+);
+
 export const showGistLoaderSelector = createSelector(
   gistSelector,
   gist => gist.requestsInProgress > 0,
 );
 
 export const permalinkSelector = createSelector(
-  baseUrlSelector, gistSelector,
-  (baseUrl, gist) => {
+  baseUrlSelector, urlQuerySelector, gistSelector,
+  (baseUrl, query, gist) => {
     const u = url.parse(baseUrl, true);
-    u.query = {
-      gist: gist.id,
-      version: gist.channel,
-      mode: gist.mode,
-      edition: gist.edition,
-    };
+    u.query = { ...query, gist: gist.id };
     return url.format(u);
   },
 );
@@ -238,6 +243,15 @@ export const issueUrlSelector = createSelector(
     const newIssueUrl = url.parse('https://github.com/rust-lang/rust/issues/new', true);
     newIssueUrl.query = { body: snippet };
     return url.format(newIssueUrl);
+  },
+);
+
+export const codeUrlSelector = createSelector(
+  baseUrlSelector, urlQuerySelector, gistSelector,
+  (baseUrl, query, gist) => {
+    const u = url.parse(baseUrl, true);
+    u.query = { ...query, code: gist.code };
+    return url.format(u);
   },
 );
 
