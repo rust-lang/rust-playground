@@ -608,6 +608,7 @@ struct ExecuteRequest {
     #[serde(default)]
     backtrace: bool,
     code: String,
+    stdin: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -760,6 +761,7 @@ impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
             tests: me.tests,
             backtrace: me.backtrace,
             code: me.code,
+            stdin: me.stdin,
         })
     }
 }
@@ -875,6 +877,7 @@ impl TryFrom<EvaluateRequest> for sandbox::ExecuteRequest {
             tests: false,
             backtrace: false,
             code: me.code,
+            stdin: None,
         })
     }
 }

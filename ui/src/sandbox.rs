@@ -5,7 +5,7 @@ use std::fs::{self, File};
 use std::io::prelude::*;
 use std::io::{self, BufReader, BufWriter, ErrorKind};
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::string;
 
 #[derive(Debug, Deserialize)]
@@ -59,6 +59,15 @@ quick_error! {
         UnableToReadOutput(err: io::Error) {
             description("unable to read output file")
             display("Unable to read output file: {}", err)
+            cause(err)
+        }
+        UnableToOpenStdin {
+            description("unable to open stdin")
+            display("Unable to open stdin")
+        }
+        UnableToWriteInput(err: io::Error) {
+            description("unable to write input")
+            display("Unable to read write input: {}", err)
             cause(err)
         }
         UnableToParseCrateInformation(err: ::serde_json::Error) {
@@ -167,9 +176,21 @@ impl Sandbox {
 
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
         try!(self.write_source_code(&req.code));
-        let mut command = self.execute_command(req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req.edition);
 
-        let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
+        let mut command = self.execute_command(req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req.edition);
+        let output = if let Some(ref input) = req.stdin {
+            command.stdin(Stdio::piped());
+            command.stdout(Stdio::piped());
+            command.stderr(Stdio::piped());
+            let mut child = try!(command.spawn().map_err(Error::UnableToExecuteCompiler));
+            {
+                let stdin = try!(child.stdin.as_mut().ok_or(Error::UnableToOpenStdin));
+                try!(stdin.write_all(input.as_bytes()).map_err(Error::UnableToWriteInput));
+            }
+            try!(child.wait_with_output().map_err(Error::UnableToExecuteCompiler))
+        } else {
+            try!(command.output().map_err(Error::UnableToExecuteCompiler))
+        };
 
         Ok(ExecuteResponse {
             success: output.status.success(),
@@ -388,6 +409,7 @@ fn basic_secure_docker_command() -> Command {
     cmd
         .arg("run")
         .arg("--rm")
+        .arg("--interactive")
         .arg("--cap-drop=ALL")
         .arg("--cap-add=DAC_OVERRIDE")
         .arg("--security-opt=no-new-privileges")
@@ -651,6 +673,7 @@ pub struct ExecuteRequest {
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
+    pub stdin: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -717,6 +740,7 @@ mod test {
                 code: HELLO_WORLD_CODE.to_string(),
                 edition: None,
                 backtrace: false,
+                stdin: None
             }
         }
     }
