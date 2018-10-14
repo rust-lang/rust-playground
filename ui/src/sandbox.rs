@@ -1173,4 +1173,31 @@ mod test {
 
         assert!(resp.stderr.contains("Cannot fork"));
     }
+
+    const STDIN_READER_CODE: &str = r#"
+        use std::io::{self, Read};
+        fn main() -> io::Result<()> {
+            let mut buffer = String::new();
+            let stdin = io::stdin();
+            let mut handle = stdin.lock();
+            handle.read_to_string(&mut buffer)?;
+            println!("{}", buffer);
+            Ok(())
+        }
+    "#;
+
+    #[test]
+    fn test_stdin_is_processed() {
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            code: STDIN_READER_CODE.to_string(),
+            stdin: Some("something".to_owned()),
+            ..ExecuteRequest::default()
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.execute(&req).expect("Unable to execute code");
+
+        assert!(resp.stdout == "something\n");
+    }
 }
