@@ -80,6 +80,7 @@ export enum ActionType {
   CompileWasmSucceeded = 'COMPILE_WASM_SUCCEEDED',
   CompileWasmFailed = 'COMPILE_WASM_FAILED',
   EditCode = 'EDIT_CODE',
+  EditStdin = "EDIT_STDIN",
   AddMainFunction = 'ADD_MAIN_FUNCTION',
   EnableFeatureGate = 'ENABLE_FEATURE_GATE',
   GotoPosition = 'GOTO_POSITION',
@@ -169,11 +170,11 @@ export const changeFocus = (focus: Focus) =>
 const requestExecute = () =>
   createAction(ActionType.ExecuteRequest);
 
-const receiveExecuteSuccess = ({ stdout, stderr, isAutoBuild }) =>
-  createAction(ActionType.ExecuteSucceeded, { stdout, stderr, isAutoBuild });
+const receiveExecuteSuccess = ({ stdin, stdout, stderr, isAutoBuild }) =>
+  createAction(ActionType.ExecuteSucceeded, { stdin, stdout, stderr, isAutoBuild });
 
-const receiveExecuteFailure = ({ error, isAutoBuild }) =>
-  createAction(ActionType.ExecuteFailed, { error, isAutoBuild });
+const receiveExecuteFailure = ({ stdin, error, isAutoBuild }) =>
+  createAction(ActionType.ExecuteFailed, { stdin, error, isAutoBuild });
 
 function jsonGet(urlObj) {
   const urlStr = url.format(urlObj);
@@ -224,7 +225,7 @@ async function fetchJson(url, args) {
   }
 }
 
-interface ExecuteRequestBody {
+interface RequestBody {
   channel: string;
   mode: string;
   crateType: string;
@@ -234,22 +235,26 @@ interface ExecuteRequestBody {
   backtrace: boolean;
 }
 
+interface ExecuteRequestBody extends RequestBody {
+  stdin: string;
+}
+
 const performCommonExecute = (crateType, tests): ThunkAction => (dispatch, getState) => {
   dispatch(requestExecute());
 
   const state = getState();
-  const { code, configuration: { channel, mode, edition } } = state;
+  const { code, configuration: { channel, mode, edition }, stdin } = state;
   const backtrace = state.configuration.backtrace === Backtrace.Enabled;
   const isAutoBuild = isAutoBuildSelector(state);
 
-  const body: ExecuteRequestBody = { channel, mode, crateType, tests, code, backtrace };
+  const body: ExecuteRequestBody = { channel, mode, crateType, tests, code, backtrace, stdin };
   if (isEditionAvailable(state)) {
     body.edition = edition;
   }
 
   return jsonPost(routes.execute, body)
-    .then(json => dispatch(receiveExecuteSuccess({ ...json, isAutoBuild })))
-    .catch(json => dispatch(receiveExecuteFailure({ ...json, isAutoBuild })));
+    .then(json => dispatch(receiveExecuteSuccess({ ...json, stdin, isAutoBuild })))
+    .catch(json => dispatch(receiveExecuteFailure({ ...json, stdin, isAutoBuild })));
 };
 
 function performAutoOnly(): ThunkAction {
@@ -266,7 +271,7 @@ const performExecuteOnly = (): ThunkAction => performCommonExecute('bin', false)
 const performCompileOnly = (): ThunkAction => performCommonExecute('lib', false);
 const performTestOnly = (): ThunkAction => performCommonExecute('lib', true);
 
-interface CompileRequestBody extends ExecuteRequestBody {
+interface CompileRequestBody extends RequestBody {
   target: string;
   assemblyFlavor: string;
   demangleAssembly: string;
@@ -420,6 +425,9 @@ export const performCompileToNightlyWasm =
 
 export const editCode = (code: string) =>
   createAction(ActionType.EditCode, { code });
+
+export const editStdin = (stdin: string) =>
+  createAction(ActionType.EditStdin, { stdin });
 
 export const addMainFunction = () =>
   createAction(ActionType.AddMainFunction);
@@ -740,6 +748,7 @@ export type Action =
   | ReturnType<typeof receiveCompileWasmSuccess>
   | ReturnType<typeof receiveCompileWasmFailure>
   | ReturnType<typeof editCode>
+  | ReturnType<typeof editStdin>
   | ReturnType<typeof addMainFunction>
   | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof gotoPosition>

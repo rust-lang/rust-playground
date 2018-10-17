@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 
 import code from './code';
+import stdin from './stdin';
 import configuration from './configuration';
 import crates from './crates';
 import globalConfiguration from './globalConfiguration';
@@ -20,6 +21,7 @@ const playgroundApp = combineReducers({
   page,
   position,
   versions,
+  stdin,
 });
 
 export type State = ReturnType<typeof playgroundApp>;

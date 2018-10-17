@@ -9,6 +9,7 @@ import Output from './Output';
 import { anyNotificationsToShowSelector } from './selectors';
 import State from './state';
 import { Focus, Orientation } from './types';
+import StdinEditor from './Stdin';
 
 const ConfigurationModal: React.SFC = () => (
   <div className="modal-backdrop">
@@ -34,6 +35,9 @@ const Playground: React.SFC<Props> = ({ showConfig, showNotifications, focus, sp
         <div className={`${splitClass} ${orientation}`}>
           <div className="playground-editor">
             <Editor />
+          </div>
+          <div className="playground-stdin">
+            <StdinEditor />
           </div>
           <div className={`playground-output ${outputFocused}`}>
             <Output />
