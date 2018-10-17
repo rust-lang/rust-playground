@@ -170,11 +170,11 @@ export const changeFocus = (focus: Focus) =>
 const requestExecute = () =>
   createAction(ActionType.ExecuteRequest);
 
-const receiveExecuteSuccess = ({ stdin, stdout, stderr, isAutoBuild }) =>
-  createAction(ActionType.ExecuteSucceeded, { stdin, stdout, stderr, isAutoBuild });
+const receiveExecuteSuccess = ({ stdout, stderr, isAutoBuild }) =>
+  createAction(ActionType.ExecuteSucceeded, { stdout, stderr, isAutoBuild });
 
-const receiveExecuteFailure = ({ stdin, error, isAutoBuild }) =>
-  createAction(ActionType.ExecuteFailed, { stdin, error, isAutoBuild });
+const receiveExecuteFailure = ({ error, isAutoBuild }) =>
+  createAction(ActionType.ExecuteFailed, { error, isAutoBuild });
 
 function jsonGet(urlObj) {
   const urlStr = url.format(urlObj);
@@ -253,8 +253,8 @@ const performCommonExecute = (crateType, tests): ThunkAction => (dispatch, getSt
   }
 
   return jsonPost(routes.execute, body)
-    .then(json => dispatch(receiveExecuteSuccess({ ...json, stdin, isAutoBuild })))
-    .catch(json => dispatch(receiveExecuteFailure({ ...json, stdin, isAutoBuild })));
+    .then(json => dispatch(receiveExecuteSuccess({ ...json, isAutoBuild })))
+    .catch(json => dispatch(receiveExecuteFailure({ ...json, isAutoBuild })));
 };
 
 function performAutoOnly(): ThunkAction {
