@@ -3,4 +3,4 @@
 set -eu
 
 export MIRI_SYSROOT=~/.xargo/HOST
-exec cargo miri -- -Zmiri-start-fn
+exec cargo miri
