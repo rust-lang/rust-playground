@@ -79,7 +79,12 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "testRegex": "(\\.|/)(test|spec)\\.tsx?$",
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx"]
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx"
+    ]
   },
   "author": "",
   "license": "MIT"
