@@ -2,23 +2,29 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import State from './state';
-import { CommonEditorProps, Focus } from './types';
+import { CommonEditorProps, Crate, Edition, Focus } from './types';
 
-const displayExternCrateAutocomplete = editor => {
+const displayExternCrateAutocomplete = (editor: any, autocompleteOnUse: boolean) => {
   const { session } = editor;
   const pos = editor.getCursorPosition();
   const line = session.getLine(pos.row);
   const precedingText = line.slice(0, pos.column);
 
-  return !!precedingText.match(/extern\s+crate\s*(\w+)?$/);
+  return !!precedingText.match(/extern\s+crate\s*\w*$/) ||
+    (autocompleteOnUse && !!precedingText.match(/use\s+(?!crate|self|super)\w*$/));
 };
 
-function buildCrateAutocompleter(component) {
+interface AutocompleteData {
+  crates: Crate[];
+  autocompleteOnUse: boolean;
+}
+
+function buildCrateAutocompleter(dataSource: () => AutocompleteData) {
   function getCompletions(editor, session, pos, prefix, callback) {
+    const { crates, autocompleteOnUse } = dataSource();
     let suggestions = [];
 
-    if (displayExternCrateAutocomplete(editor)) {
-      const { crates } = component.props;
+    if (displayExternCrateAutocomplete(editor, autocompleteOnUse)) {
       const len = crates.length;
 
       suggestions = crates.map(({ name, version, id }, i) => ({
@@ -94,7 +100,7 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
       enableBasicAutocompletion: true,
     });
 
-    // When the user types `extern crate` and a space, automatically
+    // When the user types either `extern crate `  or `use `, automatically
     // open the autocomplete. This should help people understand that
     // there are crates available.
     editor.commands.on('afterExec', event => {
@@ -104,12 +110,12 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
         return;
       }
 
-      if (displayExternCrateAutocomplete(editor)) {
+      if (displayExternCrateAutocomplete(editor, this.props.autocompleteOnUse)) {
         editor.execCommand('startAutocomplete');
       }
     });
 
-    editor.completers = [buildCrateAutocompleter(this)];
+    editor.completers = [buildCrateAutocompleter(() => this.props)];
   }
 
   public componentDidUpdate(prevProps, _prevState) {
@@ -146,6 +152,7 @@ class AdvancedEditor extends React.PureComponent<AdvancedEditorProps> {
 interface AdvancedEditorProps {
   ace: any;
   AceEditor: React.ReactType;
+  autocompleteOnUse: boolean;
   code: string;
   execute: () => any;
   keybinding?: string;
@@ -155,11 +162,7 @@ interface AdvancedEditorProps {
     column: number,
   };
   theme: string;
-  crates: Array<{
-    id: string,
-    name: string,
-    version: string,
-  }>;
+  crates: Crate[];
   focus?: Focus;
 }
 
@@ -319,6 +322,7 @@ interface PropsFromState {
   theme: string;
   keybinding?: string;
   focus?: Focus;
+  autocompleteOnUse: boolean;
 }
 
 const mapStateToProps = (state: State) => {
@@ -328,6 +332,7 @@ const mapStateToProps = (state: State) => {
     theme,
     keybinding: keybinding === 'ace' ? null : keybinding,
     focus: state.output.meta.focus,
+    autocompleteOnUse: state.configuration.edition === Edition.Rust2018,
   };
 };
 
