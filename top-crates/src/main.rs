@@ -251,7 +251,7 @@ fn fill_playground_metadata_features(dep: &mut DependencySpec, pkg: &Package) {
     // If `all-features` is set then we ignore `features`.
     let summary = pkg.summary();
     let mut enabled_features: BTreeSet<String> = if metadata.all_features {
-        summary.features().keys().cloned().collect()
+        summary.features().keys().map(ToString::to_string).collect()
     } else {
         metadata.features.into_iter().collect()
     };

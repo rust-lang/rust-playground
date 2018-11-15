@@ -4,7 +4,7 @@ name = "top-crates"
 version = "0.1.0"
 
 [dependencies]
-cargo = "0.29.0"
+cargo = "0.31.0"
 lazy_static = "1.0.0"
 reqwest = "0.8.0"
 serde = "1.0.1"
