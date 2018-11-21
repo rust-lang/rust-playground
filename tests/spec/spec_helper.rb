@@ -29,28 +29,25 @@ ADDRESS = ENV.fetch('PLAYGROUND_UI_ADDRESS', '127.0.0.1')
 PORT = ENV.fetch('PLAYGROUND_UI_PORT', '5000')
 
 Capybara.register_driver :firefox do |app|
+  Capybara::Selenium::Driver.load_selenium
+
   browser_options = ::Selenium::WebDriver::Firefox::Options.new
-  browser_options.args << '--headless'
+  browser_options.headless! if ENV.fetch('HEADLESS', 'true').casecmp?('true')
 
   Capybara::Selenium::Driver.new(
     app,
     browser: :firefox,
     options: browser_options,
+    clear_local_storage: true,
+    clear_session_storage: true,
   )
 end
 
-Capybara.default_driver = :firefox
+Capybara.default_driver = Capybara.javascript_driver = :firefox
 Capybara.app_host = "http://#{ADDRESS}:#{PORT}"
 Capybara.run_server = false
 Capybara.default_max_wait_time = 5
 Capybara.automatic_label_click = true
-
-RSpec.configure do |config|
-  config.before(type: :feature) do
-    visit '/'
-    page.execute_script 'localStorage.clear();'
-  end
-end
 
 Capybara.modify_selector(:link_or_button) do
   expression_filter(:build_button) {|xpath, name| xpath[XPath.css('.button-menu-item__name').contains(name)] }
