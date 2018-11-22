@@ -1,4 +1,5 @@
-import sortBy from 'lodash.sortby';
+import { sortBy } from 'lodash';
+
 import { Action, ActionType } from '../actions';
 import { Crate } from '../types';
 
