@@ -30,7 +30,7 @@ export interface State {
   backtrace: Backtrace;
 }
 
-export const DEFAULT: State = {
+const DEFAULT: State = {
   shown: false,
   editor: Editor.Advanced,
   keybinding: 'ace',
