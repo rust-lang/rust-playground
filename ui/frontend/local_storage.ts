@@ -39,7 +39,7 @@ export function deserialize(savedState) {
 }
 
 export default storage({
-  storage: localStorage,
+  storageFactory: () => localStorage,
   serialize,
   deserialize,
 });
