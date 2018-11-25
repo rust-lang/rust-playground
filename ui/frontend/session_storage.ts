@@ -30,7 +30,7 @@ export function deserialize(savedState: string): Partial<State> {
 }
 
 export default storage({
-  storage: sessionStorage,
+  storageFactory: () => sessionStorage,
   serialize,
   deserialize,
 });
