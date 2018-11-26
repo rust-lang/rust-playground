@@ -20,6 +20,7 @@ export function serialize(state: State): string {
 export function deserialize(savedState: string): Partial<State> {
   if (!savedState) { return undefined; }
   const parsedState = JSON.parse(savedState);
+  if (!parsedState) { return undefined; }
   if (parsedState.version !== CURRENT_VERSION) { return undefined; }
 
   // This assumes that the keys we serialize with match the keys in the
