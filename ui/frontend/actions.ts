@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url from 'url';
 
-import { getCrateType, isAutoBuildSelector, isEditionAvailable, runAsTest } from './selectors';
+import { getCrateType, isAutoBuildSelector, runAsTest } from './selectors';
 import State from './state';
 import {
   AssemblyFlavor,
@@ -147,14 +147,6 @@ export const changeMode = (mode: Mode) =>
 export const changeEdition = (edition: Edition) =>
   createAction(ActionType.ChangeEdition, { edition });
 
-export const changeBetaEdition = (edition: Edition): ThunkAction => (dispatch, getState) => {
-  const state = getState();
-  if (!isEditionAvailable(state) && edition === Edition.Rust2018) {
-    dispatch(changeChannel(Channel.Beta));
-  }
-  dispatch(changeEdition(edition));
-};
-
 export const changeBacktrace = (backtrace: Backtrace) =>
   createAction(ActionType.ChangeBacktrace, { backtrace });
 
@@ -242,10 +234,7 @@ const performCommonExecute = (crateType, tests): ThunkAction => (dispatch, getSt
   const backtrace = state.configuration.backtrace === Backtrace.Enabled;
   const isAutoBuild = isAutoBuildSelector(state);
 
-  const body: ExecuteRequestBody = { channel, mode, crateType, tests, code, backtrace };
-  if (isEditionAvailable(state)) {
-    body.edition = edition;
-  }
+  const body: ExecuteRequestBody = { channel, mode, edition, crateType, tests, code, backtrace };
 
   return jsonPost(routes.execute, body)
     .then(json => dispatch(receiveExecuteSuccess({ ...json, isAutoBuild })))
@@ -293,6 +282,7 @@ function performCompileShow(target, { request, success, failure }): ThunkAction 
     const body: CompileRequestBody = {
       channel,
       mode,
+      edition,
       crateType,
       tests,
       code,
@@ -302,9 +292,6 @@ function performCompileShow(target, { request, success, failure }): ThunkAction 
       processAssembly,
       backtrace,
     };
-    if (isEditionAvailable(state)) {
-      body.edition = edition;
-    }
 
     return jsonPost(routes.compile, body)
       .then(json => dispatch(success(json)))

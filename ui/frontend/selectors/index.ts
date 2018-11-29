@@ -104,14 +104,6 @@ export const isWasmAvailable = (state: State) => (
   state.configuration.channel === Channel.Nightly
 );
 
-export const channelValidForEdition = (channel: Channel) => (
-  [Channel.Beta, Channel.Nightly].includes(channel)
-);
-
-export const isEditionAvailable = (state: State) => (
-  channelValidForEdition(state.configuration.channel)
-);
-
 export const getModeLabel = (state: State) => {
   const { configuration: { mode } } = state;
   return `${mode}`;
