@@ -2,20 +2,17 @@ import { Action, ActionType } from '../actions';
 import { Notification } from '../types';
 
 interface State {
-  seenRustSurvey2018: boolean;
+  seenRustSurvey2018: boolean; // expired
 }
 
 const DEFAULT: State = {
-  seenRustSurvey2018: false,
+  seenRustSurvey2018: true,
 };
 
 export default function notifications(state = DEFAULT, action: Action): State {
   switch (action.type) {
     case ActionType.NotificationSeen: {
       switch (action.notification) {
-        case Notification.RustSurvey2018: {
-          return { ...state, seenRustSurvey2018: true };
-        }
       }
     }
     default:

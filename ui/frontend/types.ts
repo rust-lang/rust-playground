@@ -101,5 +101,4 @@ export enum Focus {
 }
 
 export enum Notification {
-  RustSurvey2018 = 'rust-survey-2018',
 }
