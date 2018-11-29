@@ -115,7 +115,7 @@ export const getChannelLabel = (state: State) => {
 };
 
 export const getEditionSet = (state: State) => (
-  state.configuration.edition !== Edition.Rust2015
+  state.configuration.edition !== Edition.Rust2018
 );
 
 export const getBacktraceSet = (state: State) => (
