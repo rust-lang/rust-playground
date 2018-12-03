@@ -210,9 +210,15 @@ async function fetchJson(url, args) {
   try {
     body = await response.json();
   } catch (convertError) {
-    throw ({
-      error: `Response was not JSON: ${convertError.toString()}`,
-    });
+    if (!response.ok) {
+      throw ({
+        error: response.statusText,
+      });
+    } else {
+      throw ({
+        error: `Response was not JSON: ${convertError.toString()}`,
+      });
+    }
   }
 
   if (response.ok) {
@@ -529,8 +535,8 @@ const requestGistLoad = () =>
 const receiveGistLoadSuccess = (props: GistSuccessProps) =>
   createAction(ActionType.GistLoadSucceeded, props);
 
-const receiveGistLoadFailure = () => // eslint-disable-line no-unused-vars
-  createAction(ActionType.GistLoadFailed);
+const receiveGistLoadFailure = (props: { id: string, error: string }) =>
+  createAction(ActionType.GistLoadFailed, props);
 
 type PerformGistLoadProps =
   Pick<GistSuccessProps, Exclude<keyof GistSuccessProps, 'url' | 'code' | 'stdout' | 'stderr'>>;
@@ -540,8 +546,9 @@ export function performGistLoad({ id, channel, mode, edition }: PerformGistLoadP
     dispatch(requestGistLoad());
     const u = url.resolve(routes.meta.gist.pathname, id);
     jsonGet(u)
-      .then(gist => dispatch(receiveGistLoadSuccess({ channel, mode, edition, ...gist })));
-    // TODO: Failure case
+      .then(
+        gist => dispatch(receiveGistLoadSuccess({ channel, mode, edition, ...gist })),
+        error => dispatch(receiveGistLoadFailure({ id, ...error })));
   };
 }
 
@@ -551,8 +558,8 @@ const requestGistSave = () =>
 const receiveGistSaveSuccess = (props: GistSuccessProps) =>
   createAction(ActionType.GistSaveSucceeded, props);
 
-const receiveGistSaveFailure = ({ error }) => // eslint-disable-line no-unused-vars
-  createAction(ActionType.GistSaveFailed, { error });
+const receiveGistSaveFailure = (props: { error: string }) =>
+  createAction(ActionType.GistSaveFailed, props);
 
 export function performGistSave(): ThunkAction {
   return function(dispatch, getState) {
@@ -561,8 +568,9 @@ export function performGistSave(): ThunkAction {
     const { code, configuration: { channel, mode, edition }, output: { execute: { stdout, stderr } } } = getState();
 
     return jsonPost(routes.meta.gist, { code })
-      .then(json => dispatch(receiveGistSaveSuccess({ ...json, code, stdout, stderr, channel, mode, edition })));
-    // TODO: Failure case
+      .then(
+        json => dispatch(receiveGistSaveSuccess({ ...json, code, stdout, stderr, channel, mode, edition })),
+        error => dispatch(receiveGistSaveFailure({ ...error })));
   };
 }
 

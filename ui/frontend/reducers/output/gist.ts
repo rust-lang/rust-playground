@@ -39,9 +39,15 @@ export default function gist(state = DEFAULT, action: Action): State {
       return finish(state, { id, url, code, stdout, stderr, channel, mode, edition });
     }
 
-    case ActionType.GistLoadFailed:
-    case ActionType.GistSaveFailed:
-      return finish(state, { error: 'Some kind of error' });
+    case ActionType.GistLoadFailed: {
+      const { id, error } = action;
+      return finish(state, { error: `Error loading gist ${id}: ${error}` });
+    }
+
+    case ActionType.GistSaveFailed: {
+      const { error } = action;
+      return finish(state, { error: `Error saving gist: ${error}` });
+    }
 
     default:
       return state;

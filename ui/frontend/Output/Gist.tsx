@@ -15,6 +15,7 @@ import {
 import Loader from './Loader';
 
 interface GistProps {
+  error?: string;
   codeUrl?: string;
   gistUrl?: string;
   issueUrl?: string;
@@ -25,7 +26,7 @@ interface GistProps {
 
 const Gist: React.SFC<GistProps> = props => (
   <div className="output-gist">
-    {props.showLoader ? <Loader /> : <Links {...props} />}
+    {props.error ? props.error : props.showLoader ? <Loader /> : <Links {...props} />}
   </div>
 );
 
@@ -74,6 +75,7 @@ class Copied extends React.PureComponent<CopiedProps, CopiedState> {
 }
 
 const mapStateToProps = (state: State) => ({
+  error: state.output.gist.error,
   codeUrl: codeUrlSelector(state),
   gistUrl: state.output.gist.url,
   issueUrl: issueUrlSelector(state),
