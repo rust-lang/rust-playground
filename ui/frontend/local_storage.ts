@@ -20,9 +20,7 @@ export function serialize(state: State) {
       processAssembly: state.configuration.processAssembly,
     },
     code: state.code,
-    notifications: {
-      seenRustSurvey2018: state.notifications.seenRustSurvey2018,
-    },
+    notifications: state.notifications,
   });
 }
 

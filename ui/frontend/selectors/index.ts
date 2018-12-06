@@ -104,14 +104,6 @@ export const isWasmAvailable = (state: State) => (
   state.configuration.channel === Channel.Nightly
 );
 
-export const channelValidForEdition = (channel: Channel) => (
-  [Channel.Beta, Channel.Nightly].includes(channel)
-);
-
-export const isEditionAvailable = (state: State) => (
-  channelValidForEdition(state.configuration.channel)
-);
-
 export const getModeLabel = (state: State) => {
   const { configuration: { mode } } = state;
   return `${mode}`;
@@ -123,7 +115,7 @@ export const getChannelLabel = (state: State) => {
 };
 
 export const getEditionSet = (state: State) => (
-  state.configuration.edition !== Edition.Rust2015
+  state.configuration.edition !== Edition.Rust2018
 );
 
 export const getBacktraceSet = (state: State) => (
@@ -258,14 +250,14 @@ export const codeUrlSelector = createSelector(
 const notificationsSelector = (state: State) => state.notifications;
 
 const NOW = new Date();
-const SURVEY_END = new Date('2018-09-08T23:23:59Z');
-const SURVEY_OPEN = NOW <= SURVEY_END;
-export const showRustSurvey2018Selector = createSelector(
+const RUST_2018_DEFAULT_END = new Date('2019-01-01T00:00:00Z');
+const RUST_2018_DEFAULT_OPEN = NOW <= RUST_2018_DEFAULT_END;
+export const showRust2018IsDefaultSelector = createSelector(
   notificationsSelector,
-  notifications => SURVEY_OPEN && !notifications.seenRustSurvey2018,
+  notifications => RUST_2018_DEFAULT_OPEN && !notifications.seenRust2018IsDefault,
 );
 
 export const anyNotificationsToShowSelector = createSelector(
-  showRustSurvey2018Selector,
+  showRust2018IsDefaultSelector,
   allNotifications => allNotifications,
 );

@@ -1,5 +1,4 @@
 import { Action, ActionType } from '../actions';
-import { channelValidForEdition } from '../selectors';
 import {
   AssemblyFlavor,
   Backtrace,
@@ -42,7 +41,7 @@ const DEFAULT: State = {
   primaryAction: PrimaryActionAuto.Auto,
   channel: Channel.Stable,
   mode: Mode.Debug,
-  edition: Edition.Rust2015,
+  edition: Edition.Rust2018,
   backtrace: Backtrace.Disabled,
 };
 
@@ -67,20 +66,11 @@ export default function configuration(state = DEFAULT, action: Action): State {
     case ActionType.ChangePrimaryAction:
       return { ...state, primaryAction: action.primaryAction };
     case ActionType.ChangeChannel: {
-      // Extra logic can be removed when stable supports edition 2018
-      let { edition } = state;
-      if (!channelValidForEdition(action.channel)) {
-        edition = Edition.Rust2015;
-      }
-      return { ...state, channel: action.channel, edition };
+      return { ...state, channel: action.channel };
     }
     case ActionType.ChangeMode:
       return { ...state, mode: action.mode };
     case ActionType.ChangeEdition: {
-      // Extra logic can be removed when stable supports edition 2018
-      if (!channelValidForEdition(state.channel)) {
-        return state;
-      }
       return { ...state, edition: action.edition };
     }
     case ActionType.ChangeBacktrace:
