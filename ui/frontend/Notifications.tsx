@@ -8,7 +8,7 @@ import { seenRust2018IsDefault } from './actions';
 import { showRust2018IsDefaultSelector } from './selectors';
 import State from './state';
 
-const EDITION_URL = 'https://rust-lang-nursery.github.io/edition-guide/rust-2018/index.html';
+const EDITION_URL = 'https://doc.rust-lang.org/edition-guide/';
 
 interface NotificationsProps {
   seenRust2018IsDefault: () => void;
