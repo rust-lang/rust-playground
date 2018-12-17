@@ -2,17 +2,17 @@ server {
     listen 80 default_server;
     listen [::]:80 default_server;
 
-    listen 443 ssl default_server;
-    listen [::]:443 ssl default_server;
+    #listen 443 ssl default_server;
+    #listen [::]:443 ssl default_server;
 
-    server_name rustpen.tari.com;
+    server_name $EC2_URL;
 
-    ssl_certificate /etc/nginx/ssl/rustpen.tari.com/cert.pem;
-    ssl_certificate_key /etc/nginx/ssl/rustpen.tari.com/key.pem;
+    #ssl_certificate /etc/nginx/ssl/rustpen.tari.com/cert.pem;
+    #ssl_certificate_key /etc/nginx/ssl/rustpen.tari.com/key.pem;
 
     location / {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:5000;
     }
 }

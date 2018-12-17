@@ -1,7 +1,12 @@
 ### Amazon EC2 (Ubuntu)
 
-Here's an example session. This could definitely be improved and
-automated.
+Here's an example session. This could definitely be improved and automated.
+
+#### Environment variables
+
+| ENVAR   | Description                                                                  |
+|:--------|:-----------------------------------------------------------------------------|
+| EC2_URL | The url to the EC2 instance, e.g. `ec2-21-21-198-01.compute-1.amazonaws.com` |
 
 #### Dependencies (as root)
 
@@ -27,7 +32,6 @@ sudo add-apt-repository \
 sudo apt-get update
     
 sudo apt-get install -y docker-ce
-
 
 # Ensure Docker can control the PID limit
 mount | grep cgroup/pids
@@ -75,6 +79,11 @@ sudo apt install cargo libssl-dev pkg-config
 crontab -e
 ```
 
+```
+0 0 * * * cd /home/ubuntu/rust-playground/compiler && ./build.sh
+0 * * * * docker images -q --filter "dangling=true" | xargs docker rmi
+```
+
 Review the [example crontab](crontab) in this repo. It calls [`update.sh`](update.sh) also in this repo.
 
 #### Install the SystemD service
@@ -95,5 +104,3 @@ systemctl enable playground.service
 cp playground-reverse-proxy /etc/nginx/sites-enabled
 service nginx reload
 ```
-
-#### Configure SSL
