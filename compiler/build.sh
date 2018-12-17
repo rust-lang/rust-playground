@@ -3,10 +3,10 @@
 set -euv -o pipefail
 
 channels_to_build="${CHANNELS_TO_BUILD-stable beta nightly}"
-tools_to_build="${TOOLS_TO_BUILD-rustfmt clippy miri}"
+tools_to_build="${TOOLS_TO_BUILD-rustfmt clippy}"
 perform_push="${PERFORM_PUSH-false}"
 
-repository=taridocker
+repository="quay.io/tarilabs"
 
 for channel in $channels_to_build; do
     cd "base"

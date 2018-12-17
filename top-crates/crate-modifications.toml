@@ -77,4 +77,8 @@ additions = [
 
     # TariLabs additions
     "libsecp256k1-rs",
+    "curve25519-dalek",
+    "ed25519-dalek",
+    "x25519-dalek",
+    "bulletproofs",
 ]
