@@ -1,6 +1,6 @@
 import { Action, ActionType } from '../actions';
 
-export const DEFAULT: State = `fn main() {
+const DEFAULT: State = `fn main() {
     println!("Hello, world!");
 }`;
 
@@ -17,7 +17,10 @@ export default function code(state = DEFAULT, action: Action): State {
       return action.code;
 
     case ActionType.AddMainFunction:
-      return state + '\n\n' + DEFAULT;
+      return `${state}\n\n${DEFAULT}`;
+
+    case ActionType.EnableFeatureGate:
+      return `#![feature(${action.featureGate})]\n${state}`;
 
     case ActionType.FormatSucceeded:
       return action.code;

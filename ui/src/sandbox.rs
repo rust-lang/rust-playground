@@ -4,9 +4,11 @@ use std::fmt;
 use std::fs::{self, File};
 use std::io::prelude::*;
 use std::io::{self, BufReader, BufWriter, ErrorKind};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::string;
+
+use tempdir::TempDir;
 
 #[derive(Debug, Deserialize)]
 struct CrateInformationInner {
@@ -35,8 +37,6 @@ pub struct Version {
     pub commit_hash: String,
     pub commit_date: String,
 }
-
-use mktemp::Temp;
 
 quick_error! {
     #[derive(Debug)]
@@ -94,8 +94,10 @@ quick_error! {
 pub type Result<T> = ::std::result::Result<T, Error>;
 
 pub struct Sandbox {
-    input_file: Temp,
-    output_dir: Temp,
+    #[allow(dead_code)]
+    scratch: TempDir,
+    input_file: PathBuf,
+    output_dir: PathBuf,
 }
 
 fn vec_to_str(v: Vec<u8>) -> Result<String> {
@@ -104,9 +106,14 @@ fn vec_to_str(v: Vec<u8>) -> Result<String> {
 
 impl Sandbox {
     pub fn new() -> Result<Self> {
+        let scratch = TempDir::new("playground").map_err(Error::UnableToCreateTempDir)?;
+        let input_file = scratch.path().join("input.rs");
+        let output_dir = scratch.path().join("output");
+
         Ok(Sandbox {
-            input_file: try!(Temp::new_file().map_err(Error::UnableToCreateTempDir)),
-            output_dir: try!(Temp::new_dir().map_err(Error::UnableToCreateTempDir)),
+            scratch,
+            input_file,
+            output_dir,
         })
     }
 
@@ -117,13 +124,11 @@ impl Sandbox {
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
-        let result_path = self.output_dir.as_ref();
-
         // The compiler writes the file to a name like
         // `compilation-3b75174cac3d47fb.ll`, so we just find the
         // first with the right extension.
         let file =
-            fs::read_dir(&result_path)
+            fs::read_dir(&self.output_dir)
             .map_err(Error::UnableToReadOutput)?
             .flat_map(|entry| entry)
             .map(|entry| entry.path())
@@ -273,15 +278,7 @@ impl Sandbox {
     pub fn version_miri(&self) -> Result<Version> {
         let mut command = basic_secure_docker_command();
         command.args(&["miri", "cargo", "miri", "--version"]);
-
-        let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
-        let version_output = vec_to_str(output.stdout)?;
-
-        let release = version_output.trim().into();
-        let commit_hash = String::new();
-        let commit_date = String::new();
-
-        Ok(Version { release, commit_hash, commit_date })
+        self.cargo_tool_version(command)
     }
 
     // Parses versions of the shape `toolname 0.0.0 (0000000 0000-00-00)`
@@ -300,13 +297,12 @@ impl Sandbox {
     fn write_source_code(&self, code: &str) -> Result<()> {
         let data = code.as_bytes();
 
-        let path = self.input_file.as_ref();
-        let file = try!(File::create(path).map_err(Error::UnableToCreateSourceFile));
+        let file = try!(File::create(&self.input_file).map_err(Error::UnableToCreateSourceFile));
         let mut file = BufWriter::new(file);
 
         try!(file.write_all(data).map_err(Error::UnableToCreateSourceFile));
 
-        debug!("Wrote {} bytes of source to {}", data.len(), path.display());
+        debug!("Wrote {} bytes of source to {}", data.len(), self.input_file.display());
         Ok(())
     }
 
@@ -371,12 +367,12 @@ impl Sandbox {
     fn docker_command(&self, crate_type: Option<CrateType>) -> Command {
         let crate_type = crate_type.unwrap_or(CrateType::Binary);
 
-        let mut mount_input_file = self.input_file.as_ref().as_os_str().to_os_string();
+        let mut mount_input_file = self.input_file.as_os_str().to_os_string();
         mount_input_file.push(":");
         mount_input_file.push("/playground/");
         mount_input_file.push(crate_type.file_name());
 
-        let mut mount_output_dir = self.output_dir.as_ref().as_os_str().to_os_string();
+        let mut mount_output_dir = self.output_dir.as_os_str().to_os_string();
         mount_output_dir.push(":");
         mount_output_dir.push("/playground-result");
 

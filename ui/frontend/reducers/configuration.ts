@@ -29,7 +29,7 @@ export interface State {
   backtrace: Backtrace;
 }
 
-export const DEFAULT: State = {
+const DEFAULT: State = {
   shown: false,
   editor: Editor.Advanced,
   keybinding: 'ace',
@@ -41,7 +41,7 @@ export const DEFAULT: State = {
   primaryAction: PrimaryActionAuto.Auto,
   channel: Channel.Stable,
   mode: Mode.Debug,
-  edition: Edition.Rust2015,
+  edition: Edition.Rust2018,
   backtrace: Backtrace.Disabled,
 };
 
@@ -66,22 +66,11 @@ export default function configuration(state = DEFAULT, action: Action): State {
     case ActionType.ChangePrimaryAction:
       return { ...state, primaryAction: action.primaryAction };
     case ActionType.ChangeChannel: {
-      // Extra logic can be removed when stable understands
-      // `cargo-features = ["edition"]`
-      let { edition } = state;
-      if (action.channel !== Channel.Nightly) {
-        edition = Edition.Rust2015;
-      }
-      return { ...state, channel: action.channel, edition };
+      return { ...state, channel: action.channel };
     }
     case ActionType.ChangeMode:
       return { ...state, mode: action.mode };
     case ActionType.ChangeEdition: {
-      // Extra logic can be removed when stable understands
-      // `cargo-features = ["edition"]`
-      if (state.channel !== Channel.Nightly) {
-        return state;
-      }
       return { ...state, edition: action.edition };
     }
     case ActionType.ChangeBacktrace:

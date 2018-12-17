@@ -34,13 +34,13 @@ pub fn filter_asm(block: &str) -> String {
     lazy_static! {
         // Example:    mov rax, rdx
         // Always inlude in results
-        static ref OPCODE_REGEX: Regex = Regex::new(r"^\s*[a-zA-Z]+.*[^:]$").unwrap();
+        static ref OPCODE_REGEX: Regex = Regex::new(r"^\s+[a-zA-Z]+.*[^:]$").unwrap();
     }
     lazy_static! {
         // Example:.Lfunc_end7:
         // Finds label declarations
         // Include in results only if it is referenced by an opcode, or is a function
-        static ref LABEL_DECL_REGEX: Regex = Regex::new(r"([a-zA-Z_.<][a-zA-Z0-9$&_.,<>\[\]{}:' ]*):$").unwrap();
+        static ref LABEL_DECL_REGEX: Regex = Regex::new(r"^([a-zA-Z_.<][a-zA-Z0-9$&_.,<>\[\]{}:' ]*):(\s+#.*)?$").unwrap();
     }
     lazy_static! {
         // Example:    mov lea rdi, [rip + str.0] // str.0 is the referenced label
@@ -51,19 +51,19 @@ pub fn filter_asm(block: &str) -> String {
         // Example:    .string "Hello, world!"
         // Note: this is a type of directive
         // Include in results if it is part of a used label, may contain label references
-        static ref DATA_REGEX: Regex = Regex::new(r"^\s*\.(string|asciz|ascii|[1248]?byte|short|word|long|quad|value|zero)").unwrap();
+        static ref DATA_REGEX: Regex = Regex::new(r"^\s+\.(string|asciz|ascii|[1248]?byte|short|word|long|quad|value|zero)").unwrap();
     }
     lazy_static! {
         // Example:    .type main,@function
         // Note: this is a type of directive
         // Never include in results, but is used to find and include functions
-        static ref FUNCTION_REGEX: Regex = Regex::new(r"^\s*\.type\s*(.*),@function$").unwrap();
+        static ref FUNCTION_REGEX: Regex = Regex::new(r"^\s+\.type\s*(.*),@function$").unwrap();
     }
     lazy_static! {
         // Example:    .p2align 4, 0x90
         // Note: this will also match entries found by DATA_REGEX and FUNCTION_REGEX
         // Never include in results
-        static ref DIRECTIVE_REGEX: Regex = Regex::new(r"^\s*\..*[^:]$").unwrap();
+        static ref DIRECTIVE_REGEX: Regex = Regex::new(r"^\s+\..*[^:]$").unwrap();
     }
     lazy_static! {
         // Never include in results
@@ -188,9 +188,8 @@ mod test {
     #[test]
     fn used_label_kept() {
         assert_eq!(
-            
-            super::filter_asm(".Lcfi0:\ncallq    .Lcfi0\n"),
-            "\n.Lcfi0:\ncallq    .Lcfi0\n");
+            super::filter_asm(".Lcfi0:\n  callq    .Lcfi0\n"),
+            "\n.Lcfi0:\n  callq    .Lcfi0\n");
     }
 
     #[test]
@@ -214,14 +213,14 @@ mod test {
 
     #[test]
     fn blank_lines_removed() {
-        assert_eq!(super::filter_asm("  mov rbp, rsp\n  main:\n  jmp core::fmt::Arguments\n  \n"),
+        assert_eq!(super::filter_asm("  mov rbp, rsp\nmain:\n  jmp core::fmt::Arguments\n  \n"),
         "  mov rbp, rsp\n  jmp core::fmt::Arguments\n")
     }
 
     #[test]
     fn functions_kept() {
-        assert_eq!(super::filter_asm("  .type main,@function\n  main:\n  pushq %rax\n"),
-        "\n  main:\n  pushq %rax\n");
+        assert_eq!(super::filter_asm("  .type main,@function\nmain:\n  pushq %rax\n"),
+        "\nmain:\n  pushq %rax\n");
     }
     #[test]
     fn used_data_ref_label_kept() {
@@ -237,5 +236,15 @@ mod test {
     fn used_data_ref_label_graph_walk() {
         assert_eq!(super::filter_asm("main:\n  .quad ref.1\n  mov main\nref.1:\n  .quad ref.2\nref.2:\n  .quad 1"),
         "\nmain:\n  .quad ref.1\n  mov main\n\nref.1:\n  .quad ref.2\n\nref.2:\n  .quad 1\n");
+    }
+    #[test]
+    fn label_with_comment_recognized() {
+        assert_eq!(super::filter_asm(".LBB6_10:  # =>Comment\n movq %r15, %rsi\n movq %rbx, %rdx\n ja .LBB6_10\n"),
+        "\n.LBB6_10:  # =>Comment\n movq %r15, %rsi\n movq %rbx, %rdx\n ja .LBB6_10\n");
+    }
+    #[test]
+    fn comment_retained() {
+        assert_eq!(super::filter_asm("# %bb.0:\n subq $24, %rsp\n"),
+        "# %bb.0:\n subq $24, %rsp\n")
     }
 }

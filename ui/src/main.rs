@@ -13,7 +13,7 @@ extern crate serde;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
-extern crate mktemp;
+extern crate tempdir;
 #[macro_use]
 extern crate quick_error;
 extern crate corsware;
@@ -23,7 +23,7 @@ extern crate petgraph;
 extern crate regex;
 extern crate rustc_demangle;
 extern crate hubcaps;
-extern crate tokio_core;
+extern crate tokio;
 extern crate hyper;
 extern crate hyper_tls;
 extern crate openssl_probe;

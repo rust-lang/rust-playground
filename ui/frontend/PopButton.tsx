@@ -124,7 +124,7 @@ class PopButton extends React.Component<PopButtonProps, PopButtonState> {
 
     const enhancedProps = { popButtonClose: this.close };
     const enhancedChildren =
-      typeof children === 'function' ?
+      children instanceof Function ?
         children(enhancedProps) :
         children;
 

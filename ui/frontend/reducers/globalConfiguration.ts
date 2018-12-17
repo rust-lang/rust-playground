@@ -4,7 +4,7 @@ export interface State {
   baseUrl: string;
 }
 
-export const DEFAULT: State = {
+const DEFAULT: State = {
   baseUrl: '',
 };
 

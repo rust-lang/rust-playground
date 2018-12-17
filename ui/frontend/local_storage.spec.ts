@@ -29,12 +29,4 @@ describe('restoring saved state', () => {
     expect(parsed.code).toEqual('not default code');
     expect(parsed.notifications.seenRustSurvey2018).toBe(true);
   });
-
-  test('partially serialized data is merged with new defaults', () => {
-    const parsed = easyDeserialize({});
-
-    expect(parsed.configuration.processAssembly).toBeDefined();
-    expect(parsed.code).toBeDefined();
-    expect(parsed.notifications.seenRustSurvey2018).toBeDefined();
-  });
 });

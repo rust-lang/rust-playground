@@ -98,12 +98,9 @@ export const betaVersionDetailsText = createSelector([getBeta], versionDetails);
 export const nightlyVersionDetailsText = createSelector([getNightly], versionDetails);
 export const clippyVersionDetailsText = createSelector([getClippy], versionDetails);
 export const rustfmtVersionDetailsText = createSelector([getRustfmt], versionDetails);
+export const miriVersionDetailsText = createSelector([getMiri], versionDetails);
 
 export const isWasmAvailable = (state: State) => (
-  state.configuration.channel === Channel.Nightly
-);
-
-export const isEditionAvailable = (state: State) => (
   state.configuration.channel === Channel.Nightly
 );
 
@@ -118,7 +115,7 @@ export const getChannelLabel = (state: State) => {
 };
 
 export const getEditionSet = (state: State) => (
-  state.configuration.edition !== Edition.Rust2015
+  state.configuration.edition !== Edition.Rust2018
 );
 
 export const getBacktraceSet = (state: State) => (
@@ -157,21 +154,26 @@ const baseUrlSelector = (state: State) =>
 const gistSelector = (state: State) =>
   state.output.gist;
 
+// Selects url.query of build configs.
+const urlQuerySelector = createSelector(
+  gistSelector,
+  gist => ({
+    version: gist.channel,
+    mode: gist.mode,
+    edition: gist.edition,
+  }),
+);
+
 export const showGistLoaderSelector = createSelector(
   gistSelector,
   gist => gist.requestsInProgress > 0,
 );
 
 export const permalinkSelector = createSelector(
-  baseUrlSelector, gistSelector,
-  (baseUrl, gist) => {
+  baseUrlSelector, urlQuerySelector, gistSelector,
+  (baseUrl, query, gist) => {
     const u = url.parse(baseUrl, true);
-    u.query = {
-      gist: gist.id,
-      version: gist.channel,
-      mode: gist.mode,
-      edition: gist.edition,
-    };
+    u.query = { ...query, gist: gist.id };
     return url.format(u);
   },
 );
@@ -236,17 +238,26 @@ export const issueUrlSelector = createSelector(
   },
 );
 
+export const codeUrlSelector = createSelector(
+  baseUrlSelector, urlQuerySelector, gistSelector,
+  (baseUrl, query, gist) => {
+    const u = url.parse(baseUrl, true);
+    u.query = { ...query, code: gist.code };
+    return url.format(u);
+  },
+);
+
 const notificationsSelector = (state: State) => state.notifications;
 
 const NOW = new Date();
-const SURVEY_END = new Date('2018-09-08T23:23:59Z');
-const SURVEY_OPEN = NOW <= SURVEY_END;
-export const showRustSurvey2018Selector = createSelector(
+const RUST_2018_DEFAULT_END = new Date('2019-01-01T00:00:00Z');
+const RUST_2018_DEFAULT_OPEN = NOW <= RUST_2018_DEFAULT_END;
+export const showRust2018IsDefaultSelector = createSelector(
   notificationsSelector,
-  notifications => SURVEY_OPEN && !notifications.seenRustSurvey2018,
+  notifications => RUST_2018_DEFAULT_OPEN && !notifications.seenRust2018IsDefault,
 );
 
 export const anyNotificationsToShowSelector = createSelector(
-  showRustSurvey2018Selector,
+  showRust2018IsDefaultSelector,
   allNotifications => allNotifications,
 );

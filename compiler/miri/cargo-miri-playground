@@ -2,5 +2,5 @@
 
 set -eu
 
-export MIRI_SYSROOT=~/.xargo/HOST
-exec cargo miri -- -Zmiri-start-fn
+export MIRI_SYSROOT=~/.cache/miri/HOST
+exec cargo miri

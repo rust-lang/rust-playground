@@ -10,7 +10,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
 
   scenario "errors are highlighted" do
     within('.output-stderr') do
-      expect(page).to have_css '.error', text: 'too many type parameters provided'
+      expect(page).to have_css '.error', text: 'wrong number of type arguments'
       expect(page).to have_css '.error', text: 'aborting due to 2 previous errors'
       expect(page).to have_css '.error', text: 'Could not compile `playground`'
     end
@@ -30,7 +30,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
 
   scenario "error codes link to the error page" do
     within('.output-stderr') do
-      expect(page).to have_link('E0087', href: /error-index.html#E0087/)
+      expect(page).to have_link('E0107', href: /error-index.html#E0107/)
     end
   end
 
