@@ -10,8 +10,8 @@ const displayExternCrateAutocomplete = (editor: any, autocompleteOnUse: boolean)
   const line = session.getLine(pos.row);
   const precedingText = line.slice(0, pos.column);
 
-  return !!precedingText.match(/extern\s+crate\s*\w*$/) ||
-    (autocompleteOnUse && !!precedingText.match(/use\s+(?!crate|self|super)\w*$/));
+  return !!precedingText.match(/^\s*extern\s+crate\s*\w*$/) ||
+    (autocompleteOnUse && !!precedingText.match(/^\s*use\s+(?!crate|self|super)\w*$/));
 };
 
 interface AutocompleteData {
