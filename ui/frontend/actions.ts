@@ -479,6 +479,11 @@ export function performClippy(): ThunkAction {
 const requestMiri = () =>
   createAction(ActionType.RequestMiri);
 
+interface MiriRequestBody {
+  code: string;
+  edition?: string;
+}
+
 const receiveMiriSuccess = ({ stdout, stderr }) =>
   createAction(ActionType.MiriSucceeded, { stdout, stderr });
 
@@ -490,8 +495,10 @@ export function performMiri(): ThunkAction {
   return function(dispatch, getState) {
     dispatch(requestMiri());
 
-    const { code } = getState();
-    const body = { code };
+    const { code, configuration: {
+      edition,
+    } } = getState();
+    const body: MiriRequestBody = { code, edition };
 
     return jsonPost(routes.miri, body)
       .then(json => dispatch(receiveMiriSuccess(json)))
