@@ -212,7 +212,7 @@ impl Sandbox {
 
     pub fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
         self.write_source_code(&req.code)?;
-        let mut command = self.miri_command();
+        let mut command = self.miri_command(req.edition);
 
         let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
 
@@ -354,8 +354,13 @@ impl Sandbox {
         cmd
     }
 
-    fn miri_command(&self) -> Command {
+    fn miri_command(&self, edition: Option<Edition>) -> Command {
         let mut cmd = self.docker_command(None);
+        if let Some(edition) = edition {
+            // set the env var that will cause modify-cargo-toml inside the docker
+            // container to set this in the `Cargo.toml`.
+            cmd.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
+        }
 
         cmd.arg("miri").args(&["cargo", "miri-playground"]);
 
@@ -692,6 +697,7 @@ pub struct ClippyResponse {
 #[derive(Debug, Clone)]
 pub struct MiriRequest {
     pub code: String,
+    pub edition: Option<Edition>,
 }
 
 #[derive(Debug, Clone)]
@@ -1055,6 +1061,7 @@ mod test {
 
         let req = MiriRequest {
             code: code.to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new()?;
