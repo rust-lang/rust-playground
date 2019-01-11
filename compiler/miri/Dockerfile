@@ -13,3 +13,5 @@ COPY --from=build /root/.cache/miri /root/.cache/miri
 COPY --from=build /root/.cargo/bin/miri /root/.cargo/bin
 COPY --from=build /root/.cargo/bin/cargo-miri /root/.cargo/bin
 ADD cargo-miri-playground /root/.cargo/bin
+
+ENTRYPOINT ["/root/entrypoint.sh"]

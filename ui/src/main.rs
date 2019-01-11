@@ -201,7 +201,7 @@ fn clippy(req: &mut Request) -> IronResult<Response> {
 fn miri(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: MiriRequest| {
         sandbox
-            .miri(&req.into())
+            .miri(&req.try_into()?)
             .map(MiriResponse::from)
             .map_err(Error::Sandbox)
     })
@@ -645,6 +645,8 @@ struct ClippyResponse {
 #[derive(Debug, Clone, Deserialize)]
 struct MiriRequest {
     code: String,
+    #[serde(default)]
+    edition: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -813,11 +815,14 @@ impl From<sandbox::ClippyResponse> for ClippyResponse {
     }
 }
 
-impl From<MiriRequest> for sandbox::MiriRequest {
-    fn from(me: MiriRequest) -> Self {
-        sandbox::MiriRequest {
+impl TryFrom<MiriRequest> for sandbox::MiriRequest {
+    type Error = Error;
+
+    fn try_from(me: MiriRequest) -> Result<Self> {
+        Ok(sandbox::MiriRequest {
             code: me.code,
-        }
+            edition: parse_edition(&me.edition)?,
+        })
     }
 }
 
