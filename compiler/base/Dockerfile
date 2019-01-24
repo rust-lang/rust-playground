@@ -32,39 +32,44 @@ ADD https://static.rust-lang.org/dist/channel-rust-${channel}-date.txt /root/rus
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain "${channel}" && \
     rm -rf ~/.rustup/toolchains/*/share/doc
 
-# Prebuild the playground's dependencies
+# Fetch all the crate source files
 
-FROM toolchain as dependencies
+FROM toolchain as bare-sources
 
 RUN cd / && \
     cargo new playground
 WORKDIR /playground
 
 ADD Cargo.toml /playground/Cargo.toml
+ADD crate-information.json /playground/crate-information.json
 RUN cargo fetch
-RUN cargo build
-RUN cargo build --release
-RUN rm src/*.rs
 
 # Build our tool for modifying Cargo.toml at runtime
 
-FROM dependencies as munge
+FROM bare-sources as munge
 
 ADD modify-cargo-toml /modify-cargo-toml
 RUN cd /modify-cargo-toml && \
     cargo build --release
 
-# Put everything together
+# Compiler and sources
 
-FROM dependencies
+FROM bare-sources as sources
 
-ENTRYPOINT ["/root/entrypoint.sh"]
+COPY --from=munge /modify-cargo-toml/target/release/modify-cargo-toml /root/.cargo/bin
+
+# Compiler and pre-compiled crates
+
+FROM sources
 
 ARG channel
 
-ADD crate-information.json /playground/crate-information.json
+RUN cargo build
+RUN cargo build --release
+RUN rm src/*.rs
 
 ADD postinstall.sh /root/
 RUN /root/postinstall.sh ${channel}
 ADD cargo-wasm /root/.cargo/bin/
-COPY --from=munge /modify-cargo-toml/target/release/modify-cargo-toml /root/.cargo/bin
+
+ENTRYPOINT ["/root/entrypoint.sh"]
