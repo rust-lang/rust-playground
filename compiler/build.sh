@@ -14,14 +14,36 @@ for channel in $channels_to_build; do
     image_name="rust-${channel}"
     full_name="${repository}/${image_name}"
 
-    docker pull "${full_name}"
-    docker build -t "${full_name}" \
+    docker pull "${full_name}" || true
+    docker pull "${full_name}:munge" || true
+
+    # Prevent building the tool multiple times
+    # https://github.com/moby/moby/issues/34715
+    docker build -t "${full_name}:munge" \
+           --target munge \
            --cache-from "${full_name}" \
+           --cache-from "${full_name}:munge" \
            --build-arg channel="${channel}" \
            .
+
+    docker build -t "${full_name}:sources" \
+           --target sources \
+           --cache-from "${full_name}" \
+           --cache-from "${full_name}:munge" \
+           --build-arg channel="${channel}" \
+           .
+
+    docker build -t "${full_name}" \
+           --cache-from "${full_name}" \
+           --cache-from "${full_name}:munge" \
+           --build-arg channel="${channel}" \
+           .
+
     docker tag "${full_name}" "${image_name}"
 
     if [[ "${perform_push}" == 'true' ]]; then
+        docker push "${full_name}:munge"
+        docker push "${full_name}:sources"
         docker push "${full_name}"
     fi
 
@@ -36,10 +58,10 @@ for tool in $tools_to_build; do
     image_name="${tool}"
     full_name="${repository}/${image_name}"
 
-    docker pull "${full_name}"
+    docker pull "${full_name}" || true
     docker build -t "${full_name}" \
-           --cache-from "${full_name}" \
            .
+
     docker tag "${full_name}" "${image_name}"
 
     if [[ "${perform_push}" == 'true' ]]; then

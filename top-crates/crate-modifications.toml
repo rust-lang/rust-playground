@@ -32,6 +32,9 @@ blacklist = [
 
     # Not supported on stable
     "pin-api",
+
+    # https://github.com/PistonDevelopers/image-tiff/issues/21
+    "image",
 ]
 
 additions = [
