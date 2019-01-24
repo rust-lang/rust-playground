@@ -58,10 +58,10 @@ for tool in $tools_to_build; do
     image_name="${tool}"
     full_name="${repository}/${image_name}"
 
-    docker pull "${full_name}"
+    docker pull "${full_name}" || true
     docker build -t "${full_name}" \
-           --cache-from "${full_name}" \
            .
+
     docker tag "${full_name}" "${image_name}"
 
     if [[ "${perform_push}" == 'true' ]]; then

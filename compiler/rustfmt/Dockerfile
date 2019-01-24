@@ -1,4 +1,4 @@
-FROM shepmaster/rust-nightly
+FROM shepmaster/rust-nightly:sources
 
 RUN rustup component add rustfmt-preview
 
