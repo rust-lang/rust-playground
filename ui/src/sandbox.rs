@@ -853,14 +853,13 @@ mod test {
         assert!(resp.stdout.contains("nightly"));
     }
 
+    // Code that will only work in Rust 2018
     const EDITION_CODE: &str = r#"
-    mod foo {
-        pub fn bar() {}
+    macro_rules! foo {
+        ($($a:ident)?) => {}
     }
 
-    fn main() {
-        crate::foo::bar();
-    }
+    fn main() {}
     "#;
 
     #[test]
@@ -874,7 +873,7 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.execute(&req)?;
 
-        assert!(resp.stderr.contains("`crate` in paths is experimental"));
+        assert!(resp.stderr.contains("`?` is not a macro repetition operator"));
         Ok(())
     }
 
@@ -890,7 +889,7 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.execute(&req)?;
 
-        assert!(resp.stderr.contains("`crate` in paths is experimental"));
+        assert!(resp.stderr.contains("`?` is not a macro repetition operator"));
         Ok(())
     }
 
@@ -996,7 +995,7 @@ mod test {
         let resp = sb.compile(&req).expect("Unable to compile code");
 
         assert!(resp.code.contains("core::fmt::Arguments::new_v1"));
-        assert!(resp.code.contains("std::io::stdio::_print@PLT"));
+        assert!(resp.code.contains("std::io::stdio::_print@GOTPCREL"));
     }
 
     #[test]
@@ -1046,8 +1045,8 @@ mod test {
         let sb = Sandbox::new().expect("Unable to create sandbox");
         let resp = sb.clippy(&req).expect("Unable to lint code");
 
-        assert!(resp.stderr.contains("deny(eq_op)"));
-        assert!(resp.stderr.contains("warn(zero_divided_by_zero)"));
+        assert!(resp.stderr.contains("deny(clippy::eq_op)"));
+        assert!(resp.stderr.contains("warn(clippy::zero_divided_by_zero)"));
     }
 
     #[test]
@@ -1067,7 +1066,7 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.miri(&req)?;
 
-        assert!(resp.stderr.contains("pointer computed at offset 1"));
+        assert!(resp.stderr.contains("Pointer must be in-bounds and live at offset 1"));
         assert!(resp.stderr.contains("outside bounds of allocation"));
         assert!(resp.stderr.contains("which has size 0"));
         Ok(())
