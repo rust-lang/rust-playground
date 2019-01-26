@@ -30,7 +30,9 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
 
   def code_with_lint_warnings
     <<~EOF
-    fn main() {
+    use itertools::Itertools;
+
+    fn example() {
         let a = 0.0 / 0.0;
         println!("NaN is {}", a);
     }
