@@ -120,7 +120,7 @@ impl Sandbox {
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
         try!(self.write_source_code(&req.code));
 
-        let mut command = self.compile_command(req.target, req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req.edition);
+        let mut command = self.compile_command(req.target, req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -172,7 +172,7 @@ impl Sandbox {
 
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
         try!(self.write_source_code(&req.code));
-        let mut command = self.execute_command(req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req.edition);
+        let mut command = self.execute_command(req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -212,7 +212,7 @@ impl Sandbox {
 
     pub fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
         self.write_source_code(&req.code)?;
-        let mut command = self.miri_command(req.edition);
+        let mut command = self.miri_command(req);
 
         let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
 
@@ -306,9 +306,9 @@ impl Sandbox {
         Ok(())
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, edition: Option<Edition>) -> Command {
+    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, req: impl EditionRequest) -> Command {
         let mut cmd = self.docker_command(Some(crate_type));
-        set_execution_environment(&mut cmd, Some(target), crate_type, edition, backtrace);
+        set_execution_environment(&mut cmd, Some(target), crate_type, req, backtrace);
 
         let execution_cmd = build_execution_command(Some(target), channel, mode, crate_type, tests);
 
@@ -319,9 +319,9 @@ impl Sandbox {
         cmd
     }
 
-    fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, edition: Option<Edition>) -> Command {
+    fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, req: impl EditionRequest) -> Command {
         let mut cmd = self.docker_command(Some(crate_type));
-        set_execution_environment(&mut cmd, None, crate_type, edition, backtrace);
+        set_execution_environment(&mut cmd, None, crate_type, req, backtrace);
 
         let execution_cmd = build_execution_command(None, channel, mode, crate_type, tests);
 
@@ -354,13 +354,9 @@ impl Sandbox {
         cmd
     }
 
-    fn miri_command(&self, edition: Option<Edition>) -> Command {
+    fn miri_command(&self, req: impl EditionRequest) -> Command {
         let mut cmd = self.docker_command(None);
-        if let Some(edition) = edition {
-            // set the env var that will cause modify-cargo-toml inside the docker
-            // container to set this in the `Cargo.toml`.
-            cmd.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
-        }
+        cmd.apply_edition(req);
 
         cmd.arg("miri").args(&["cargo", "miri-playground"]);
 
@@ -462,7 +458,7 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
     cmd
 }
 
-fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, crate_type: CrateType, edition: Option<Edition>, backtrace: bool) {
+fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, crate_type: CrateType, req: impl EditionRequest, backtrace: bool) {
     use self::CompileTarget::*;
     use self::CrateType::*;
 
@@ -475,9 +471,7 @@ fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, c
         cmd.args(&["--env", &format!("PLAYGROUND_CRATE_TYPE={}", lib.cargo_ident())]);
     }
 
-    if let Some(edition) = edition {
-        cmd.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
-    }
+    cmd.apply_edition(req);
 
     if backtrace {
         cmd.args(&["--env", "RUST_BACKTRACE=1"]);
@@ -631,6 +625,26 @@ impl LibraryType {
     }
 }
 
+trait DockerCommandExt {
+    fn apply_edition(&mut self, req: impl EditionRequest);
+}
+
+impl DockerCommandExt for Command {
+    fn apply_edition(&mut self, req: impl EditionRequest) {
+        if let Some(edition) = req.edition() {
+            self.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
+        }
+    }
+}
+
+trait EditionRequest {
+    fn edition(&self) -> Option<Edition>;
+}
+
+impl<R: EditionRequest> EditionRequest for &'_ R {
+    fn edition(&self) -> Option<Edition> { (*self).edition() }
+}
+
 #[derive(Debug, Clone)]
 pub struct CompileRequest {
     pub target: CompileTarget,
@@ -641,6 +655,10 @@ pub struct CompileRequest {
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
+}
+
+impl EditionRequest for CompileRequest {
+    fn edition(&self) -> Option<Edition> { self.edition }
 }
 
 #[derive(Debug, Clone)]
@@ -660,6 +678,10 @@ pub struct ExecuteRequest {
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
+}
+
+impl EditionRequest for ExecuteRequest {
+    fn edition(&self) -> Option<Edition> { self.edition }
 }
 
 #[derive(Debug, Clone)]
@@ -698,6 +720,10 @@ pub struct ClippyResponse {
 pub struct MiriRequest {
     pub code: String,
     pub edition: Option<Edition>,
+}
+
+impl EditionRequest for MiriRequest {
+    fn edition(&self) -> Option<Edition> { self.edition }
 }
 
 #[derive(Debug, Clone)]
