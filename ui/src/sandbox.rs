@@ -120,7 +120,7 @@ impl Sandbox {
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
         try!(self.write_source_code(&req.code));
 
-        let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests, req.backtrace, req);
+        let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests, req);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -172,7 +172,7 @@ impl Sandbox {
 
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
         try!(self.write_source_code(&req.code));
-        let mut command = self.execute_command(req.channel, req.mode, req.tests, req.backtrace, req);
+        let mut command = self.execute_command(req.channel, req.mode, req.tests, req);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -306,9 +306,9 @@ impl Sandbox {
         Ok(())
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool, backtrace: bool, req: impl CrateTypeRequest + EditionRequest) -> Command {
+    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) -> Command {
         let mut cmd = self.docker_command(Some(req.crate_type()));
-        set_execution_environment(&mut cmd, Some(target), &req, backtrace);
+        set_execution_environment(&mut cmd, Some(target), &req);
 
         let execution_cmd = build_execution_command(Some(target), channel, mode, &req, tests);
 
@@ -319,9 +319,9 @@ impl Sandbox {
         cmd
     }
 
-    fn execute_command(&self, channel: Channel, mode: Mode, tests: bool, backtrace: bool, req: impl CrateTypeRequest + EditionRequest) -> Command {
+    fn execute_command(&self, channel: Channel, mode: Mode, tests: bool, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) -> Command {
         let mut cmd = self.docker_command(Some(req.crate_type()));
-        set_execution_environment(&mut cmd, None, &req, backtrace);
+        set_execution_environment(&mut cmd, None, &req);
 
         let execution_cmd = build_execution_command(None, channel, mode, &req, tests);
 
@@ -458,7 +458,7 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
     cmd
 }
 
-fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, req: impl CrateTypeRequest + EditionRequest, backtrace: bool) {
+fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) {
     use self::CompileTarget::*;
 
     if let Some(Wasm) = target {
@@ -468,10 +468,7 @@ fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, r
 
     cmd.apply_crate_type(&req);
     cmd.apply_edition(&req);
-
-    if backtrace {
-        cmd.args(&["--env", "RUST_BACKTRACE=1"]);
-    }
+    cmd.apply_backtrace(&req);
 }
 
 fn read(path: &Path) -> Result<Option<String>> {
@@ -624,6 +621,7 @@ impl LibraryType {
 trait DockerCommandExt {
     fn apply_crate_type(&mut self, req: impl CrateTypeRequest);
     fn apply_edition(&mut self, req: impl EditionRequest);
+    fn apply_backtrace(&mut self, req: impl BacktraceRequest);
 }
 
 impl DockerCommandExt for Command {
@@ -636,6 +634,12 @@ impl DockerCommandExt for Command {
     fn apply_edition(&mut self, req: impl EditionRequest) {
         if let Some(edition) = req.edition() {
             self.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
+        }
+    }
+
+    fn apply_backtrace(&mut self, req: impl BacktraceRequest) {
+        if req.backtrace() {
+            self.args(&["--env", "RUST_BACKTRACE=1"]);
         }
     }
 }
@@ -656,6 +660,14 @@ impl<R: EditionRequest> EditionRequest for &'_ R {
     fn edition(&self) -> Option<Edition> { (*self).edition() }
 }
 
+trait BacktraceRequest {
+    fn backtrace(&self) -> bool;
+}
+
+impl<R: BacktraceRequest> BacktraceRequest for &'_ R {
+    fn backtrace(&self) -> bool { (*self).backtrace() }
+}
+
 #[derive(Debug, Clone)]
 pub struct CompileRequest {
     pub target: CompileTarget,
@@ -674,6 +686,10 @@ impl CrateTypeRequest for CompileRequest {
 
 impl EditionRequest for CompileRequest {
     fn edition(&self) -> Option<Edition> { self.edition }
+}
+
+impl BacktraceRequest for CompileRequest {
+    fn backtrace(&self) -> bool { self.backtrace }
 }
 
 #[derive(Debug, Clone)]
@@ -701,6 +717,10 @@ impl CrateTypeRequest for ExecuteRequest {
 
 impl EditionRequest for ExecuteRequest {
     fn edition(&self) -> Option<Edition> { self.edition }
+}
+
+impl BacktraceRequest for ExecuteRequest {
+    fn backtrace(&self) -> bool { self.backtrace }
 }
 
 #[derive(Debug, Clone)]
