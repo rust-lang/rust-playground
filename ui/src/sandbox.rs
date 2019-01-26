@@ -199,7 +199,7 @@ impl Sandbox {
 
     pub fn clippy(&self, req: &ClippyRequest) -> Result<ClippyResponse> {
         try!(self.write_source_code(&req.code));
-        let mut command = self.clippy_command();
+        let mut command = self.clippy_command(req);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -344,8 +344,11 @@ impl Sandbox {
         cmd
     }
 
-    fn clippy_command(&self) -> Command {
-        let mut cmd = self.docker_command(None);
+    fn clippy_command(&self, req: impl CrateTypeRequest + EditionRequest) -> Command {
+        let mut cmd = self.docker_command(Some(req.crate_type()));
+
+        cmd.apply_crate_type(&req);
+        cmd.apply_edition(&req);
 
         cmd.arg("clippy").args(&["cargo", "clippy"]);
 
@@ -746,6 +749,16 @@ pub struct FormatResponse {
 #[derive(Debug, Clone)]
 pub struct ClippyRequest {
     pub code: String,
+    pub edition: Option<Edition>,
+    pub crate_type: CrateType,
+}
+
+impl CrateTypeRequest for ClippyRequest {
+    fn crate_type(&self) -> CrateType { self.crate_type }
+}
+
+impl EditionRequest for ClippyRequest {
+    fn edition(&self) -> Option<Edition> { self.edition }
 }
 
 #[derive(Debug, Clone)]
@@ -807,6 +820,16 @@ mod test {
                 code: HELLO_WORLD_CODE.to_string(),
                 edition: None,
                 backtrace: false,
+            }
+        }
+    }
+
+    impl Default for ClippyRequest {
+        fn default() -> Self {
+            ClippyRequest {
+                code: HELLO_WORLD_CODE.to_string(),
+                crate_type: CrateType::Binary,
+                edition: None,
             }
         }
     }
@@ -1105,6 +1128,31 @@ mod test {
 
         let req = ClippyRequest {
             code: code.to_string(),
+            ..ClippyRequest::default()
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.clippy(&req).expect("Unable to lint code");
+
+        assert!(resp.stderr.contains("deny(clippy::eq_op)"));
+        assert!(resp.stderr.contains("warn(clippy::zero_divided_by_zero)"));
+    }
+
+    #[test]
+    fn linting_code_options() {
+        let code = r#"
+        use itertools::Itertools; // Edition 2018 feature
+
+        fn example() {
+            let a = 0.0 / 0.0;
+            println!("NaN is {}", a);
+        }
+        "#;
+
+        let req = ClippyRequest {
+            code: code.to_string(),
+            crate_type: CrateType::Library(LibraryType::Rlib),
+            edition: Some(Edition::Rust2018),
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
