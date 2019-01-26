@@ -100,6 +100,8 @@ export const clippyVersionDetailsText = createSelector([getClippy], versionDetai
 export const rustfmtVersionDetailsText = createSelector([getRustfmt], versionDetails);
 export const miriVersionDetailsText = createSelector([getMiri], versionDetails);
 
+const editionSelector = (state: State) => state.configuration.edition;
+
 export const isWasmAvailable = (state: State) => (
   state.configuration.channel === Channel.Nightly
 );
@@ -114,8 +116,9 @@ export const getChannelLabel = (state: State) => {
   return `${channel}`;
 };
 
-export const getEditionSet = (state: State) => (
-  state.configuration.edition !== Edition.Rust2018
+export const getEditionSet = createSelector(
+  editionSelector,
+  edition => edition !== Edition.Rust2018,
 );
 
 export const getBacktraceSet = (state: State) => (
@@ -260,4 +263,11 @@ export const showRust2018IsDefaultSelector = createSelector(
 export const anyNotificationsToShowSelector = createSelector(
   showRust2018IsDefaultSelector,
   allNotifications => allNotifications,
+);
+
+export const clippyRequestSelector = createSelector(
+  codeSelector,
+  editionSelector,
+  getCrateType,
+  (code, edition, crateType) => ({ code, edition, crateType }),
 );
