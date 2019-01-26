@@ -222,7 +222,7 @@ interface ExecuteRequestBody {
   crateType: string;
   tests: boolean;
   code: string;
-  edition?: string;
+  edition: string;
   backtrace: boolean;
 }
 
@@ -481,7 +481,7 @@ const requestMiri = () =>
 
 interface MiriRequestBody {
   code: string;
-  edition?: string;
+  edition: string;
 }
 
 const receiveMiriSuccess = ({ stdout, stderr }) =>
