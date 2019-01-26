@@ -120,7 +120,7 @@ impl Sandbox {
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
         try!(self.write_source_code(&req.code));
 
-        let mut command = self.compile_command(req.target, req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req);
+        let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests, req.backtrace, req);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -172,7 +172,7 @@ impl Sandbox {
 
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
         try!(self.write_source_code(&req.code));
-        let mut command = self.execute_command(req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req);
+        let mut command = self.execute_command(req.channel, req.mode, req.tests, req.backtrace, req);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -306,11 +306,11 @@ impl Sandbox {
         Ok(())
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, req: impl EditionRequest) -> Command {
-        let mut cmd = self.docker_command(Some(crate_type));
-        set_execution_environment(&mut cmd, Some(target), crate_type, req, backtrace);
+    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool, backtrace: bool, req: impl CrateTypeRequest + EditionRequest) -> Command {
+        let mut cmd = self.docker_command(Some(req.crate_type()));
+        set_execution_environment(&mut cmd, Some(target), &req, backtrace);
 
-        let execution_cmd = build_execution_command(Some(target), channel, mode, crate_type, tests);
+        let execution_cmd = build_execution_command(Some(target), channel, mode, &req, tests);
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
@@ -319,11 +319,11 @@ impl Sandbox {
         cmd
     }
 
-    fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, req: impl EditionRequest) -> Command {
-        let mut cmd = self.docker_command(Some(crate_type));
-        set_execution_environment(&mut cmd, None, crate_type, req, backtrace);
+    fn execute_command(&self, channel: Channel, mode: Mode, tests: bool, backtrace: bool, req: impl CrateTypeRequest + EditionRequest) -> Command {
+        let mut cmd = self.docker_command(Some(req.crate_type()));
+        set_execution_environment(&mut cmd, None, &req, backtrace);
 
-        let execution_cmd = build_execution_command(None, channel, mode, crate_type, tests);
+        let execution_cmd = build_execution_command(None, channel, mode, &req, tests);
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
@@ -409,14 +409,14 @@ fn basic_secure_docker_command() -> Command {
     cmd
 }
 
-fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Vec<&'static str> {
+fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode: Mode, req: impl CrateTypeRequest, tests: bool) -> Vec<&'static str> {
     use self::CompileTarget::*;
     use self::CrateType::*;
     use self::Mode::*;
 
     let mut cmd = vec!["cargo"];
 
-    match (target, crate_type, tests) {
+    match (target, req.crate_type(), tests) {
         (Some(Wasm), _, _) => cmd.push("wasm"),
         (Some(_), _, _)    => cmd.push("rustc"),
         (_, _, true)       => cmd.push("test"),
@@ -458,20 +458,16 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
     cmd
 }
 
-fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, crate_type: CrateType, req: impl EditionRequest, backtrace: bool) {
+fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, req: impl CrateTypeRequest + EditionRequest, backtrace: bool) {
     use self::CompileTarget::*;
-    use self::CrateType::*;
 
     if let Some(Wasm) = target {
         cmd.args(&["--env", "PLAYGROUND_NO_DEPENDENCIES=true"]);
         cmd.args(&["--env", "PLAYGROUND_RELEASE_LTO=true"]);
     }
 
-    if let Library(lib) = crate_type {
-        cmd.args(&["--env", &format!("PLAYGROUND_CRATE_TYPE={}", lib.cargo_ident())]);
-    }
-
-    cmd.apply_edition(req);
+    cmd.apply_crate_type(&req);
+    cmd.apply_edition(&req);
 
     if backtrace {
         cmd.args(&["--env", "RUST_BACKTRACE=1"]);
@@ -626,15 +622,30 @@ impl LibraryType {
 }
 
 trait DockerCommandExt {
+    fn apply_crate_type(&mut self, req: impl CrateTypeRequest);
     fn apply_edition(&mut self, req: impl EditionRequest);
 }
 
 impl DockerCommandExt for Command {
+    fn apply_crate_type(&mut self, req: impl CrateTypeRequest) {
+        if let CrateType::Library(lib) = req.crate_type() {
+            self.args(&["--env", &format!("PLAYGROUND_CRATE_TYPE={}", lib.cargo_ident())]);
+        }
+    }
+
     fn apply_edition(&mut self, req: impl EditionRequest) {
         if let Some(edition) = req.edition() {
             self.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
         }
     }
+}
+
+trait CrateTypeRequest {
+    fn crate_type(&self) -> CrateType;
+}
+
+impl<R: CrateTypeRequest> CrateTypeRequest for &'_ R {
+    fn crate_type(&self) -> CrateType { (*self).crate_type() }
 }
 
 trait EditionRequest {
@@ -655,6 +666,10 @@ pub struct CompileRequest {
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
+}
+
+impl CrateTypeRequest for CompileRequest {
+    fn crate_type(&self) -> CrateType { self.crate_type }
 }
 
 impl EditionRequest for CompileRequest {
@@ -678,6 +693,10 @@ pub struct ExecuteRequest {
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
+}
+
+impl CrateTypeRequest for ExecuteRequest {
+    fn crate_type(&self) -> CrateType { self.crate_type }
 }
 
 impl EditionRequest for ExecuteRequest {
