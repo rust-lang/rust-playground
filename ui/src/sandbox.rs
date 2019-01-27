@@ -120,7 +120,7 @@ impl Sandbox {
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
         try!(self.write_source_code(&req.code));
 
-        let mut command = self.compile_command(req.target, req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req.edition);
+        let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests, req);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -172,7 +172,7 @@ impl Sandbox {
 
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
         try!(self.write_source_code(&req.code));
-        let mut command = self.execute_command(req.channel, req.mode, req.crate_type, req.tests, req.backtrace, req.edition);
+        let mut command = self.execute_command(req.channel, req.mode, req.tests, req);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -199,7 +199,7 @@ impl Sandbox {
 
     pub fn clippy(&self, req: &ClippyRequest) -> Result<ClippyResponse> {
         try!(self.write_source_code(&req.code));
-        let mut command = self.clippy_command();
+        let mut command = self.clippy_command(req);
 
         let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
 
@@ -212,7 +212,7 @@ impl Sandbox {
 
     pub fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
         self.write_source_code(&req.code)?;
-        let mut command = self.miri_command(req.edition);
+        let mut command = self.miri_command(req);
 
         let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
 
@@ -306,11 +306,11 @@ impl Sandbox {
         Ok(())
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, edition: Option<Edition>) -> Command {
-        let mut cmd = self.docker_command(Some(crate_type));
-        set_execution_environment(&mut cmd, Some(target), crate_type, edition, backtrace);
+    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) -> Command {
+        let mut cmd = self.docker_command(Some(req.crate_type()));
+        set_execution_environment(&mut cmd, Some(target), &req);
 
-        let execution_cmd = build_execution_command(Some(target), channel, mode, crate_type, tests);
+        let execution_cmd = build_execution_command(Some(target), channel, mode, &req, tests);
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
@@ -319,11 +319,11 @@ impl Sandbox {
         cmd
     }
 
-    fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, edition: Option<Edition>) -> Command {
-        let mut cmd = self.docker_command(Some(crate_type));
-        set_execution_environment(&mut cmd, None, crate_type, edition, backtrace);
+    fn execute_command(&self, channel: Channel, mode: Mode, tests: bool, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) -> Command {
+        let mut cmd = self.docker_command(Some(req.crate_type()));
+        set_execution_environment(&mut cmd, None, &req);
 
-        let execution_cmd = build_execution_command(None, channel, mode, crate_type, tests);
+        let execution_cmd = build_execution_command(None, channel, mode, &req, tests);
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
@@ -344,8 +344,11 @@ impl Sandbox {
         cmd
     }
 
-    fn clippy_command(&self) -> Command {
-        let mut cmd = self.docker_command(None);
+    fn clippy_command(&self, req: impl CrateTypeRequest + EditionRequest) -> Command {
+        let mut cmd = self.docker_command(Some(req.crate_type()));
+
+        cmd.apply_crate_type(&req);
+        cmd.apply_edition(&req);
 
         cmd.arg("clippy").args(&["cargo", "clippy"]);
 
@@ -354,13 +357,9 @@ impl Sandbox {
         cmd
     }
 
-    fn miri_command(&self, edition: Option<Edition>) -> Command {
+    fn miri_command(&self, req: impl EditionRequest) -> Command {
         let mut cmd = self.docker_command(None);
-        if let Some(edition) = edition {
-            // set the env var that will cause modify-cargo-toml inside the docker
-            // container to set this in the `Cargo.toml`.
-            cmd.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
-        }
+        cmd.apply_edition(req);
 
         cmd.arg("miri").args(&["cargo", "miri-playground"]);
 
@@ -413,14 +412,14 @@ fn basic_secure_docker_command() -> Command {
     cmd
 }
 
-fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Vec<&'static str> {
+fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode: Mode, req: impl CrateTypeRequest, tests: bool) -> Vec<&'static str> {
     use self::CompileTarget::*;
     use self::CrateType::*;
     use self::Mode::*;
 
     let mut cmd = vec!["cargo"];
 
-    match (target, crate_type, tests) {
+    match (target, req.crate_type(), tests) {
         (Some(Wasm), _, _) => cmd.push("wasm"),
         (Some(_), _, _)    => cmd.push("rustc"),
         (_, _, true)       => cmd.push("test"),
@@ -462,26 +461,17 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
     cmd
 }
 
-fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, crate_type: CrateType, edition: Option<Edition>, backtrace: bool) {
+fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) {
     use self::CompileTarget::*;
-    use self::CrateType::*;
 
     if let Some(Wasm) = target {
         cmd.args(&["--env", "PLAYGROUND_NO_DEPENDENCIES=true"]);
         cmd.args(&["--env", "PLAYGROUND_RELEASE_LTO=true"]);
     }
 
-    if let Library(lib) = crate_type {
-        cmd.args(&["--env", &format!("PLAYGROUND_CRATE_TYPE={}", lib.cargo_ident())]);
-    }
-
-    if let Some(edition) = edition {
-        cmd.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
-    }
-
-    if backtrace {
-        cmd.args(&["--env", "RUST_BACKTRACE=1"]);
-    }
+    cmd.apply_crate_type(&req);
+    cmd.apply_edition(&req);
+    cmd.apply_backtrace(&req);
 }
 
 fn read(path: &Path) -> Result<Option<String>> {
@@ -631,6 +621,56 @@ impl LibraryType {
     }
 }
 
+trait DockerCommandExt {
+    fn apply_crate_type(&mut self, req: impl CrateTypeRequest);
+    fn apply_edition(&mut self, req: impl EditionRequest);
+    fn apply_backtrace(&mut self, req: impl BacktraceRequest);
+}
+
+impl DockerCommandExt for Command {
+    fn apply_crate_type(&mut self, req: impl CrateTypeRequest) {
+        if let CrateType::Library(lib) = req.crate_type() {
+            self.args(&["--env", &format!("PLAYGROUND_CRATE_TYPE={}", lib.cargo_ident())]);
+        }
+    }
+
+    fn apply_edition(&mut self, req: impl EditionRequest) {
+        if let Some(edition) = req.edition() {
+            self.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
+        }
+    }
+
+    fn apply_backtrace(&mut self, req: impl BacktraceRequest) {
+        if req.backtrace() {
+            self.args(&["--env", "RUST_BACKTRACE=1"]);
+        }
+    }
+}
+
+trait CrateTypeRequest {
+    fn crate_type(&self) -> CrateType;
+}
+
+impl<R: CrateTypeRequest> CrateTypeRequest for &'_ R {
+    fn crate_type(&self) -> CrateType { (*self).crate_type() }
+}
+
+trait EditionRequest {
+    fn edition(&self) -> Option<Edition>;
+}
+
+impl<R: EditionRequest> EditionRequest for &'_ R {
+    fn edition(&self) -> Option<Edition> { (*self).edition() }
+}
+
+trait BacktraceRequest {
+    fn backtrace(&self) -> bool;
+}
+
+impl<R: BacktraceRequest> BacktraceRequest for &'_ R {
+    fn backtrace(&self) -> bool { (*self).backtrace() }
+}
+
 #[derive(Debug, Clone)]
 pub struct CompileRequest {
     pub target: CompileTarget,
@@ -641,6 +681,18 @@ pub struct CompileRequest {
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
+}
+
+impl CrateTypeRequest for CompileRequest {
+    fn crate_type(&self) -> CrateType { self.crate_type }
+}
+
+impl EditionRequest for CompileRequest {
+    fn edition(&self) -> Option<Edition> { self.edition }
+}
+
+impl BacktraceRequest for CompileRequest {
+    fn backtrace(&self) -> bool { self.backtrace }
 }
 
 #[derive(Debug, Clone)]
@@ -660,6 +712,18 @@ pub struct ExecuteRequest {
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
+}
+
+impl CrateTypeRequest for ExecuteRequest {
+    fn crate_type(&self) -> CrateType { self.crate_type }
+}
+
+impl EditionRequest for ExecuteRequest {
+    fn edition(&self) -> Option<Edition> { self.edition }
+}
+
+impl BacktraceRequest for ExecuteRequest {
+    fn backtrace(&self) -> bool { self.backtrace }
 }
 
 #[derive(Debug, Clone)]
@@ -685,6 +749,16 @@ pub struct FormatResponse {
 #[derive(Debug, Clone)]
 pub struct ClippyRequest {
     pub code: String,
+    pub edition: Option<Edition>,
+    pub crate_type: CrateType,
+}
+
+impl CrateTypeRequest for ClippyRequest {
+    fn crate_type(&self) -> CrateType { self.crate_type }
+}
+
+impl EditionRequest for ClippyRequest {
+    fn edition(&self) -> Option<Edition> { self.edition }
 }
 
 #[derive(Debug, Clone)]
@@ -698,6 +772,10 @@ pub struct ClippyResponse {
 pub struct MiriRequest {
     pub code: String,
     pub edition: Option<Edition>,
+}
+
+impl EditionRequest for MiriRequest {
+    fn edition(&self) -> Option<Edition> { self.edition }
 }
 
 #[derive(Debug, Clone)]
@@ -742,6 +820,16 @@ mod test {
                 code: HELLO_WORLD_CODE.to_string(),
                 edition: None,
                 backtrace: false,
+            }
+        }
+    }
+
+    impl Default for ClippyRequest {
+        fn default() -> Self {
+            ClippyRequest {
+                code: HELLO_WORLD_CODE.to_string(),
+                crate_type: CrateType::Binary,
+                edition: None,
             }
         }
     }
@@ -853,14 +941,13 @@ mod test {
         assert!(resp.stdout.contains("nightly"));
     }
 
+    // Code that will only work in Rust 2018
     const EDITION_CODE: &str = r#"
-    mod foo {
-        pub fn bar() {}
+    macro_rules! foo {
+        ($($a:ident)?) => {}
     }
 
-    fn main() {
-        crate::foo::bar();
-    }
+    fn main() {}
     "#;
 
     #[test]
@@ -874,7 +961,7 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.execute(&req)?;
 
-        assert!(resp.stderr.contains("`crate` in paths is experimental"));
+        assert!(resp.stderr.contains("`?` is not a macro repetition operator"));
         Ok(())
     }
 
@@ -890,7 +977,7 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.execute(&req)?;
 
-        assert!(resp.stderr.contains("`crate` in paths is experimental"));
+        assert!(resp.stderr.contains("`?` is not a macro repetition operator"));
         Ok(())
     }
 
@@ -996,7 +1083,7 @@ mod test {
         let resp = sb.compile(&req).expect("Unable to compile code");
 
         assert!(resp.code.contains("core::fmt::Arguments::new_v1"));
-        assert!(resp.code.contains("std::io::stdio::_print@PLT"));
+        assert!(resp.code.contains("std::io::stdio::_print@GOTPCREL"));
     }
 
     #[test]
@@ -1041,13 +1128,38 @@ mod test {
 
         let req = ClippyRequest {
             code: code.to_string(),
+            ..ClippyRequest::default()
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
         let resp = sb.clippy(&req).expect("Unable to lint code");
 
-        assert!(resp.stderr.contains("deny(eq_op)"));
-        assert!(resp.stderr.contains("warn(zero_divided_by_zero)"));
+        assert!(resp.stderr.contains("deny(clippy::eq_op)"));
+        assert!(resp.stderr.contains("warn(clippy::zero_divided_by_zero)"));
+    }
+
+    #[test]
+    fn linting_code_options() {
+        let code = r#"
+        use itertools::Itertools; // Edition 2018 feature
+
+        fn example() {
+            let a = 0.0 / 0.0;
+            println!("NaN is {}", a);
+        }
+        "#;
+
+        let req = ClippyRequest {
+            code: code.to_string(),
+            crate_type: CrateType::Library(LibraryType::Rlib),
+            edition: Some(Edition::Rust2018),
+        };
+
+        let sb = Sandbox::new().expect("Unable to create sandbox");
+        let resp = sb.clippy(&req).expect("Unable to lint code");
+
+        assert!(resp.stderr.contains("deny(clippy::eq_op)"));
+        assert!(resp.stderr.contains("warn(clippy::zero_divided_by_zero)"));
     }
 
     #[test]
@@ -1067,7 +1179,7 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.miri(&req)?;
 
-        assert!(resp.stderr.contains("pointer computed at offset 1"));
+        assert!(resp.stderr.contains("Pointer must be in-bounds and live at offset 1"));
         assert!(resp.stderr.contains("outside bounds of allocation"));
         assert!(resp.stderr.contains("which has size 0"));
         Ok(())

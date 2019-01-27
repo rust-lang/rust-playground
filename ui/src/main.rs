@@ -192,7 +192,7 @@ fn format(req: &mut Request) -> IronResult<Response> {
 fn clippy(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: ClippyRequest| {
         sandbox
-            .clippy(&req.into())
+            .clippy(&req.try_into()?)
             .map(ClippyResponse::from)
             .map_err(Error::Sandbox)
     })
@@ -633,6 +633,10 @@ struct FormatResponse {
 #[derive(Debug, Clone, Deserialize)]
 struct ClippyRequest {
     code: String,
+    #[serde(default)]
+    edition: String,
+    #[serde(default = "default_crate_type", rename = "crateType")]
+    crate_type: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -797,11 +801,15 @@ impl From<sandbox::FormatResponse> for FormatResponse {
     }
 }
 
-impl From<ClippyRequest> for sandbox::ClippyRequest {
-    fn from(me: ClippyRequest) -> Self {
-        sandbox::ClippyRequest {
+impl TryFrom<ClippyRequest> for sandbox::ClippyRequest {
+    type Error = Error;
+
+    fn try_from(me: ClippyRequest) -> Result<Self> {
+        Ok(sandbox::ClippyRequest {
             code: me.code,
-        }
+            crate_type: parse_crate_type(&me.crate_type)?,
+            edition: parse_edition(&me.edition)?,
+        })
     }
 }
 
@@ -984,4 +992,8 @@ fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
         "proc-macro" => Library(ProcMacro),
         _ => return Err(Error::InvalidCrateType(s.into()))
     })
+}
+
+fn default_crate_type() -> String {
+    "bin".into()
 }

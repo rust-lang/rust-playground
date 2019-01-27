@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url from 'url';
 
-import { getCrateType, isAutoBuildSelector, runAsTest } from './selectors';
+import { clippyRequestSelector, getCrateType, isAutoBuildSelector, runAsTest } from './selectors';
 import State from './state';
 import {
   AssemblyFlavor,
@@ -222,7 +222,7 @@ interface ExecuteRequestBody {
   crateType: string;
   tests: boolean;
   code: string;
-  edition?: string;
+  edition: string;
   backtrace: boolean;
 }
 
@@ -456,6 +456,12 @@ export function performFormat(): ThunkAction {
 const requestClippy = () =>
   createAction(ActionType.RequestClippy);
 
+interface ClippyRequestBody {
+  code: string;
+  edition: string;
+  crateType: string;
+}
+
 const receiveClippySuccess = ({ stdout, stderr }) =>
   createAction(ActionType.ClippySucceeded, { stdout, stderr });
 
@@ -467,8 +473,7 @@ export function performClippy(): ThunkAction {
   return function(dispatch, getState) {
     dispatch(requestClippy());
 
-    const { code } = getState();
-    const body = { code };
+    const body: ClippyRequestBody = clippyRequestSelector(getState());
 
     return jsonPost(routes.clippy, body)
       .then(json => dispatch(receiveClippySuccess(json)))
@@ -481,7 +486,7 @@ const requestMiri = () =>
 
 interface MiriRequestBody {
   code: string;
-  edition?: string;
+  edition: string;
 }
 
 const receiveMiriSuccess = ({ stdout, stderr }) =>

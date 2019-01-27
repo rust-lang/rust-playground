@@ -1,9 +1,9 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.5.2)
+    addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
-    capybara (3.11.1)
+    capybara (3.13.2)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (~> 1.8)
@@ -14,11 +14,12 @@ GEM
     childprocess (0.9.0)
       ffi (~> 1.0, >= 1.0.11)
     diff-lcs (1.3)
-    ffi (1.9.25)
+    ffi (1.10.0)
     mini_mime (1.0.1)
-    mini_portile2 (2.3.0)
-    nokogiri (1.8.5)
-      mini_portile2 (~> 2.3.0)
+    mini_portile2 (2.4.0)
+    net_http_ssl_fix (0.0.10)
+    nokogiri (1.10.1)
+      mini_portile2 (~> 2.4.0)
     public_suffix (3.0.3)
     rack (2.0.6)
     rack-test (1.1.0)
@@ -41,7 +42,8 @@ GEM
     selenium-webdriver (3.141.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.2, >= 1.2.2)
-    webdrivers (3.4.3)
+    webdrivers (3.6.0)
+      net_http_ssl_fix
       nokogiri (~> 1.6)
       rubyzip (~> 1.0)
       selenium-webdriver (~> 3.0)
@@ -58,7 +60,7 @@ DEPENDENCIES
   webdrivers
 
 RUBY VERSION
-   ruby 2.5.1p57
+   ruby 2.6.0p0
 
 BUNDLED WITH
-   1.16.2
+   2.0.1
