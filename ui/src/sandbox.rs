@@ -1,3 +1,4 @@
+use snafu::{ResultExt, Snafu};
 use std::collections::BTreeMap;
 use std::ffi::OsStr;
 use std::fmt;
@@ -38,60 +39,31 @@ pub struct Version {
     pub commit_date: String,
 }
 
-quick_error! {
-    #[derive(Debug)]
-    pub enum Error {
-        UnableToCreateTempDir(err: io::Error) {
-            description("unable to create temporary directory")
-            display("Unable to create temporary directory: {}", err)
-            cause(err)
-        }
-        UnableToCreateSourceFile(err: io::Error) {
-            description("unable to create source file")
-            display("Unable to create source file: {}", err)
-            cause(err)
-        }
-        UnableToExecuteCompiler(err: io::Error) {
-            description("unable to execute the compiler")
-            display("Unable to execute the compiler: {}", err)
-            cause(err)
-        }
-        UnableToReadOutput(err: io::Error) {
-            description("unable to read output file")
-            display("Unable to read output file: {}", err)
-            cause(err)
-        }
-        UnableToParseCrateInformation(err: ::serde_json::Error) {
-            from()
-            description("unable to read crate information")
-            display("Unable to read crate information: {}", err)
-            cause(err)
-        }
-        OutputNotUtf8(err: string::FromUtf8Error) {
-            description("output was not valid UTF-8")
-            display("Output was not valid UTF-8: {}", err)
-            cause(err)
-        }
-        OutputMissing {
-            description("output was missing")
-            display("Output was missing")
-        }
-        VersionReleaseMissing {
-            description("release was missing from the version output")
-            display("Release was missing from the version output")
-        }
-        VersionHashMissing {
-            description("commit hash was missing from the version output")
-            display("Commit hash was missing from the version output")
-        }
-        VersionDateMissing {
-            description("commit date was missing from the version output")
-            display("Commit date was missing from the version output")
-        }
-    }
+#[derive(Debug, Snafu)]
+pub enum Error {
+    #[snafu::display("Unable to create temporary directory: {}", source)]
+    UnableToCreateTempDir { source: io::Error },
+    #[snafu::display("Unable to create source file: {}", source)]
+    UnableToCreateSourceFile { source: io::Error },
+    #[snafu::display("Unable to execute the compiler: {}", source)]
+    UnableToExecuteCompiler { source: io::Error },
+    #[snafu::display("Unable to read output file: {}", source)]
+    UnableToReadOutput { source: io::Error },
+    #[snafu::display("Unable to read crate information: {}", source)]
+    UnableToParseCrateInformation { source: ::serde_json::Error },
+    #[snafu::display("Output was not valid UTF-8: {}", source)]
+    OutputNotUtf8 { source: string::FromUtf8Error },
+    #[snafu::display("Output was missing")]
+    OutputMissing,
+    #[snafu::display("Release was missing from the version output")]
+    VersionReleaseMissing,
+    #[snafu::display("Commit hash was missing from the version output")]
+    VersionHashMissing,
+    #[snafu::display("Commit date was missing from the version output")]
+    VersionDateMissing,
 }
 
-pub type Result<T> = ::std::result::Result<T, Error>;
+pub type Result<T, E = Error> = ::std::result::Result<T, E>;
 
 pub struct Sandbox {
     #[allow(dead_code)]
@@ -101,12 +73,12 @@ pub struct Sandbox {
 }
 
 fn vec_to_str(v: Vec<u8>) -> Result<String> {
-    String::from_utf8(v).map_err(Error::OutputNotUtf8)
+    String::from_utf8(v).eager_context(OutputNotUtf8)
 }
 
 impl Sandbox {
     pub fn new() -> Result<Self> {
-        let scratch = TempDir::new("playground").map_err(Error::UnableToCreateTempDir)?;
+        let scratch = TempDir::new("playground").context(UnableToCreateTempDir)?;
         let input_file = scratch.path().join("input.rs");
         let output_dir = scratch.path().join("output");
 
@@ -122,14 +94,14 @@ impl Sandbox {
 
         let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests, req);
 
-        let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
+        let output = command.output().context(UnableToExecuteCompiler)?;
 
         // The compiler writes the file to a name like
         // `compilation-3b75174cac3d47fb.ll`, so we just find the
         // first with the right extension.
         let file =
             fs::read_dir(&self.output_dir)
-            .map_err(Error::UnableToReadOutput)?
+            .context(UnableToReadOutput)?
             .flat_map(|entry| entry)
             .map(|entry| entry.path())
             .find(|path| path.extension() == Some(req.target.extension()));
@@ -174,7 +146,7 @@ impl Sandbox {
         try!(self.write_source_code(&req.code));
         let mut command = self.execute_command(req.channel, req.mode, req.tests, req);
 
-        let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
+        let output = command.output().context(UnableToExecuteCompiler)?;
 
         Ok(ExecuteResponse {
             success: output.status.success(),
@@ -187,7 +159,7 @@ impl Sandbox {
         try!(self.write_source_code(&req.code));
         let mut command = self.format_command();
 
-        let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
+        let output = command.output().context(UnableToExecuteCompiler)?;
 
         Ok(FormatResponse {
             success: output.status.success(),
@@ -201,7 +173,7 @@ impl Sandbox {
         try!(self.write_source_code(&req.code));
         let mut command = self.clippy_command(req);
 
-        let output = try!(command.output().map_err(Error::UnableToExecuteCompiler));
+        let output = command.output().context(UnableToExecuteCompiler)?;
 
         Ok(ClippyResponse {
             success: output.status.success(),
@@ -214,7 +186,7 @@ impl Sandbox {
         self.write_source_code(&req.code)?;
         let mut command = self.miri_command(req);
 
-        let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
+        let output = command.output().context(UnableToExecuteCompiler)?;
 
         Ok(MiriResponse {
             success: output.status.success(),
@@ -228,9 +200,9 @@ impl Sandbox {
         command.args(&[Channel::Stable.container_name()]);
         command.args(&["cat", "crate-information.json"]);
 
-        let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
+        let output = command.output().context(UnableToExecuteCompiler)?;
 
-        let crate_info: Vec<CrateInformationInner> = ::serde_json::from_slice(&output.stdout)?;
+        let crate_info: Vec<CrateInformationInner> = ::serde_json::from_slice(&output.stdout).context(UnableToParseCrateInformation)?;
 
         let crates = crate_info.into_iter()
             .map(Into::into)
@@ -244,7 +216,7 @@ impl Sandbox {
         command.args(&[channel.container_name()]);
         command.args(&["rustc", "--version", "--verbose"]);
 
-        let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
+        let output = command.output().context(UnableToExecuteCompiler)?;
         let version_output = vec_to_str(output.stdout)?;
 
         let mut info: BTreeMap<String, String> = version_output.lines().skip(1).filter_map(|line| {
@@ -283,7 +255,7 @@ impl Sandbox {
 
     // Parses versions of the shape `toolname 0.0.0 (0000000 0000-00-00)`
     fn cargo_tool_version(&self, mut command: Command) -> Result<Version> {
-        let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
+        let output = command.output().context(UnableToExecuteCompiler)?;
         let version_output = vec_to_str(output.stdout)?;
         let mut parts = version_output.split_whitespace().fuse().skip(1);
 
@@ -297,10 +269,10 @@ impl Sandbox {
     fn write_source_code(&self, code: &str) -> Result<()> {
         let data = code.as_bytes();
 
-        let file = try!(File::create(&self.input_file).map_err(Error::UnableToCreateSourceFile));
+        let file = File::create(&self.input_file).context(UnableToCreateSourceFile)?;
         let mut file = BufWriter::new(file);
 
-        try!(file.write_all(data).map_err(Error::UnableToCreateSourceFile));
+        file.write_all(data).context(UnableToCreateSourceFile)?;
 
         debug!("Wrote {} bytes of source to {}", data.len(), self.input_file.display());
         Ok(())
@@ -478,12 +450,12 @@ fn read(path: &Path) -> Result<Option<String>> {
     let f = match File::open(path) {
         Ok(f) => f,
         Err(ref e) if e.kind() == ErrorKind::NotFound => return Ok(None),
-        Err(e) => return Err(Error::UnableToReadOutput(e)),
+        e => e.context(UnableToReadOutput)?,
     };
     let mut f = BufReader::new(f);
 
     let mut s = String::new();
-    try!(f.read_to_string(&mut s).map_err(Error::UnableToReadOutput));
+    f.read_to_string(&mut s).context(UnableToReadOutput)?;
     Ok(Some(s))
 }
 

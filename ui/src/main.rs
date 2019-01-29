@@ -14,8 +14,6 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 extern crate tempdir;
-#[macro_use]
-extern crate quick_error;
 extern crate corsware;
 #[macro_use]
 extern crate lazy_static;
@@ -27,6 +25,7 @@ extern crate tokio;
 extern crate hyper;
 extern crate hyper_tls;
 extern crate openssl_probe;
+extern crate snafu;
 
 use std::any::Any;
 use std::convert::{TryFrom, TryInto};
@@ -46,9 +45,9 @@ use playground_middleware::{
     Staticfile, Cache, Prefix, ModifyWith, GuessContentType, FileLogger, StatisticLogger, Rewrite
 };
 use router::Router;
-
 use serde::Serialize;
 use serde::de::DeserializeOwned;
+use snafu::{ResultExt, Snafu};
 
 use sandbox::Sandbox;
 
@@ -165,7 +164,7 @@ fn compile(req: &mut Request) -> IronResult<Response> {
         sandbox
             .compile(&req)
             .map(CompileResponse::from)
-            .map_err(Error::Sandbox)
+            .eager_context(Compilation)
     })
 }
 
@@ -175,7 +174,7 @@ fn execute(req: &mut Request) -> IronResult<Response> {
         sandbox
             .execute(&req)
             .map(ExecuteResponse::from)
-            .map_err(Error::Sandbox)
+            .eager_context(Execution)
     })
 }
 
@@ -185,7 +184,7 @@ fn format(req: &mut Request) -> IronResult<Response> {
         sandbox
             .format(&req)
             .map(FormatResponse::from)
-            .map_err(Error::Sandbox)
+            .eager_context(Formatting)
     })
 }
 
@@ -194,7 +193,7 @@ fn clippy(req: &mut Request) -> IronResult<Response> {
         sandbox
             .clippy(&req.try_into()?)
             .map(ClippyResponse::from)
-            .map_err(Error::Sandbox)
+            .eager_context(Linting)
     })
 }
 
@@ -203,7 +202,7 @@ fn miri(req: &mut Request) -> IronResult<Response> {
         sandbox
             .miri(&req.try_into()?)
             .map(MiriResponse::from)
-            .map_err(Error::Sandbox)
+            .eager_context(Interpreting)
     })
 }
 
@@ -292,7 +291,7 @@ fn evaluate(req: &mut Request) -> IronResult<Response> {
         sandbox
             .execute(&req)
             .map(EvaluateResponse::from)
-            .map_err(Error::Sandbox)
+            .eager_context(Evaluation)
     })
 }
 
@@ -319,7 +318,7 @@ where
     Req: DeserializeOwned + Clone + Any + 'static,
 {
     deserialize_from_request(req, |req| {
-        let sandbox = Sandbox::new()?;
+        let sandbox = Sandbox::new().context(SandboxCreation)?;
         f(sandbox, req)
     })
 }
@@ -330,7 +329,7 @@ where
     Req: DeserializeOwned + Clone + Any + 'static,
 {
     let body = req.get::<bodyparser::Struct<Req>>()
-        .map_err(Error::Deserialization)?;
+        .context(Deserialization)?;
 
     let req = body.ok_or(Error::RequestMissing)?;
 
@@ -343,7 +342,7 @@ fn run_handler_no_request<Resp, F>(f: F) -> Result<Resp>
 where
     F: FnOnce(Sandbox) -> Result<Resp>,
 {
-    let sandbox = Sandbox::new()?;
+    let sandbox = Sandbox::new().context(SandboxCreation)?;
     let resp = f(sandbox)?;
     Ok(resp)
 }
@@ -353,7 +352,7 @@ where
     Resp: Serialize,
 {
     let response = response.and_then(|resp| {
-        let resp = serde_json::ser::to_string(&resp)?;
+        let resp = serde_json::ser::to_string(&resp).context(Serialization)?;
         Ok(resp)
     });
 
@@ -411,7 +410,7 @@ where
     where
         F: FnOnce() -> sandbox::Result<T>
     {
-        let value = populator().map_err(Error::Sandbox)?;
+        let value = populator().context(Caching)?;
         *cache = Some(SandboxCacheInfo {
             value: value.clone(),
             time: Instant::now(),
@@ -493,71 +492,51 @@ fn cached(sandbox: Sandbox) -> CachedSandbox<'static> {
     }
 }
 
-quick_error! {
-    #[derive(Debug)]
-    pub enum Error {
-        Sandbox(err: sandbox::Error) {
-            description("sandbox operation failed")
-            display("Sandbox operation failed: {}", err)
-            cause(err)
-            from()
-        }
-        Serialization(err: serde_json::Error) {
-            description("unable to serialize response")
-            display("Unable to serialize response: {}", err)
-            cause(err)
-            from()
-        }
-        Deserialization(err: bodyparser::BodyError) {
-            description("unable to deserialize request")
-            display("Unable to deserialize request: {}", err)
-            cause(err)
-            from()
-        }
-        InvalidTarget(value: String) {
-            description("an invalid target was passed")
-            display("The value {:?} is not a valid target", value)
-        }
-        InvalidAssemblyFlavor(value: String) {
-            description("an invalid assembly flavor was passed")
-            display("The value {:?} is not a valid assembly flavor", value)
-        }
-        InvalidDemangleAssembly(value: String) {
-            description("an invalid demangling option was passed")
-            display("The value {:?} is not a valid demangle option", value)
-        }
-        InvalidProcessAssembly(value: String) {
-            description("an invalid assembly processing option was passed")
-            display("The value {:?} is not a valid assembly processing option", value)
-        }
-        InvalidChannel(value: String) {
-            description("an invalid channel was passed")
-            display("The value {:?} is not a valid channel", value,)
-        }
-        InvalidMode(value: String) {
-            description("an invalid mode was passed")
-            display("The value {:?} is not a valid mode", value)
-        }
-        InvalidEdition(value: String) {
-            description("an invalid edition was passed")
-            display("The value {:?} is not a valid edition", value)
-        }
-        InvalidCrateType(value: String) {
-            description("an invalid crate type was passed")
-            display("The value {:?} is not a valid crate type", value)
-        }
-        RequestMissing {
-            description("no request was provided")
-            display("No request was provided")
-        }
-        CachePoisoned {
-            description("the cache has been poisoned")
-            display("The cache has been poisoned")
-        }
-    }
+#[derive(Debug, Snafu)]
+pub enum Error {
+    #[snafu::display("Sandbox creation failed: {}", source)]
+    SandboxCreation { source: sandbox::Error },
+    #[snafu::display("Compilation operation failed: {}", source)]
+    Compilation { source: sandbox::Error },
+    #[snafu::display("Execution operation failed: {}", source)]
+    Execution { source: sandbox::Error },
+    #[snafu::display("Evaluation operation failed: {}", source)]
+    Evaluation { source: sandbox::Error },
+    #[snafu::display("Linting operation failed: {}", source)]
+    Linting { source: sandbox::Error },
+    #[snafu::display("Formatting operation failed: {}", source)]
+    Formatting { source: sandbox::Error },
+    #[snafu::display("Interpreting operation failed: {}", source)]
+    Interpreting { source: sandbox::Error },
+    #[snafu::display("Caching operation failed: {}", source)]
+    Caching { source: sandbox::Error },
+    #[snafu::display("Unable to serialize response: {}", source)]
+    Serialization { source: serde_json::Error },
+    #[snafu::display("Unable to deserialize request: {}", source)]
+    Deserialization { source: bodyparser::BodyError },
+    #[snafu::display("The value {:?} is not a valid target", value)]
+    InvalidTarget { value: String },
+    #[snafu::display("The value {:?} is not a valid assembly flavor", value)]
+    InvalidAssemblyFlavor { value: String },
+    #[snafu::display("The value {:?} is not a valid demangle option", value)]
+    InvalidDemangleAssembly { value: String },
+    #[snafu::display("The value {:?} is not a valid assembly processing option", value)]
+    InvalidProcessAssembly { value: String },
+    #[snafu::display("The value {:?} is not a valid channel", value,)]
+    InvalidChannel { value: String },
+    #[snafu::display("The value {:?} is not a valid mode", value)]
+    InvalidMode { value: String },
+    #[snafu::display("The value {:?} is not a valid edition", value)]
+    InvalidEdition { value: String },
+    #[snafu::display("The value {:?} is not a valid crate type", value)]
+    InvalidCrateType { value: String },
+    #[snafu::display("No request was provided")]
+    RequestMissing,
+    #[snafu::display("The cache has been poisoned")]
+    CachePoisoned,
 }
 
-type Result<T> = ::std::result::Result<T, Error>;
+type Result<T, E = Error> = ::std::result::Result<T, E>;
 
 const FATAL_ERROR_JSON: &str =
     r#"{"error": "Multiple cascading errors occurred, abandon all hope"}"#;
@@ -926,7 +905,7 @@ fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
         "llvm-ir" => sandbox::CompileTarget::LlvmIr,
         "mir" => sandbox::CompileTarget::Mir,
         "wasm" => sandbox::CompileTarget::Wasm,
-        _ => return Err(Error::InvalidTarget(s.into()))
+        value => InvalidTarget { value }.fail()?,
     })
 }
 
@@ -934,7 +913,7 @@ fn parse_assembly_flavor(s: &str) -> Result<sandbox::AssemblyFlavor> {
     Ok(match s {
         "att" => sandbox::AssemblyFlavor::Att,
         "intel" => sandbox::AssemblyFlavor::Intel,
-        _ => return Err(Error::InvalidAssemblyFlavor(s.into()))
+        value => InvalidAssemblyFlavor { value }.fail()?
     })
 }
 
@@ -942,7 +921,7 @@ fn parse_demangle_assembly(s: &str) -> Result<sandbox::DemangleAssembly> {
     Ok(match s {
         "demangle" => sandbox::DemangleAssembly::Demangle,
         "mangle" => sandbox::DemangleAssembly::Mangle,
-        _ => return Err(Error::InvalidDemangleAssembly(s.into()))
+        value => InvalidDemangleAssembly { value }.fail()?,
     })
 }
 
@@ -950,7 +929,7 @@ fn parse_process_assembly(s: &str) -> Result<sandbox::ProcessAssembly> {
     Ok(match s {
         "filter" => sandbox::ProcessAssembly::Filter,
         "raw" => sandbox::ProcessAssembly::Raw,
-        _ => return Err(Error::InvalidProcessAssembly(s.into()))
+        value => InvalidProcessAssembly { value }.fail()?
     })
 }
 
@@ -959,7 +938,7 @@ fn parse_channel(s: &str) -> Result<sandbox::Channel> {
         "stable" => sandbox::Channel::Stable,
         "beta" => sandbox::Channel::Beta,
         "nightly" => sandbox::Channel::Nightly,
-        _ => return Err(Error::InvalidChannel(s.into()))
+        value => InvalidChannel { value }.fail()?,
     })
 }
 
@@ -967,7 +946,7 @@ fn parse_mode(s: &str) -> Result<sandbox::Mode> {
     Ok(match s {
         "debug" => sandbox::Mode::Debug,
         "release" => sandbox::Mode::Release,
-        _ => return Err(Error::InvalidMode(s.into()))
+        value => InvalidMode { value }.fail()?,
     })
 }
 
@@ -976,7 +955,7 @@ fn parse_edition(s: &str) -> Result<Option<sandbox::Edition>> {
         "" => None,
         "2015" => Some(sandbox::Edition::Rust2015),
         "2018" => Some(sandbox::Edition::Rust2018),
-        _ => return Err(Error::InvalidEdition(s.into()))
+        value => InvalidEdition { value }.fail()?,
     })
 }
 
@@ -990,7 +969,7 @@ fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
         "staticlib" => Library(Staticlib),
         "cdylib" => Library(Cdylib),
         "proc-macro" => Library(ProcMacro),
-        _ => return Err(Error::InvalidCrateType(s.into()))
+        value => InvalidCrateType { value }.fail()?,
     })
 }
 
