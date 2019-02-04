@@ -49,7 +49,7 @@ use serde::Serialize;
 use serde::de::DeserializeOwned;
 use snafu::{ResultExt, Snafu};
 
-use sandbox::Sandbox;
+use crate::sandbox::Sandbox;
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
@@ -960,7 +960,7 @@ fn parse_edition(s: &str) -> Result<Option<sandbox::Edition>> {
 }
 
 fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
-    use sandbox::{CrateType::*, LibraryType::*};
+    use crate::sandbox::{CrateType::*, LibraryType::*};
     Ok(match s {
         "bin" => Binary,
         "lib" => Library(Lib),
