@@ -160,7 +160,7 @@ impl iron::typemap::Key for GhToken {
 
 fn compile(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: CompileRequest| {
-        let req = try!(req.try_into());
+        let req = req.try_into()?;
         sandbox
             .compile(&req)
             .map(CompileResponse::from)
@@ -170,7 +170,7 @@ fn compile(req: &mut Request) -> IronResult<Response> {
 
 fn execute(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: ExecuteRequest| {
-        let req = try!(req.try_into());
+        let req = req.try_into()?;
         sandbox
             .execute(&req)
             .map(ExecuteResponse::from)
@@ -180,7 +180,7 @@ fn execute(req: &mut Request) -> IronResult<Response> {
 
 fn format(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: FormatRequest| {
-        let req = try!(req.try_into());
+        let req = req.try_into()?;
         sandbox
             .format(&req)
             .map(FormatResponse::from)
@@ -738,10 +738,10 @@ impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
 
     fn try_from(me: ExecuteRequest) -> Result<Self> {
         Ok(sandbox::ExecuteRequest {
-            channel: try!(parse_channel(&me.channel)),
-            mode: try!(parse_mode(&me.mode)),
+            channel: parse_channel(&me.channel)?,
+            mode: parse_mode(&me.mode)?,
             edition: parse_edition(&me.edition)?,
-            crate_type: try!(parse_crate_type(&me.crate_type)),
+            crate_type: parse_crate_type(&me.crate_type)?,
             tests: me.tests,
             backtrace: me.backtrace,
             code: me.code,

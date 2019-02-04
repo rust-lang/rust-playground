@@ -90,7 +90,7 @@ impl Sandbox {
     }
 
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
-        try!(self.write_source_code(&req.code));
+        self.write_source_code(&req.code)?;
 
         let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests, req);
 
@@ -143,42 +143,42 @@ impl Sandbox {
     }
 
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
-        try!(self.write_source_code(&req.code));
+        self.write_source_code(&req.code)?;
         let mut command = self.execute_command(req.channel, req.mode, req.tests, req);
 
         let output = command.output().context(UnableToExecuteCompiler)?;
 
         Ok(ExecuteResponse {
             success: output.status.success(),
-            stdout: try!(vec_to_str(output.stdout)),
-            stderr: try!(vec_to_str(output.stderr)),
+            stdout: vec_to_str(output.stdout)?,
+            stderr: vec_to_str(output.stderr)?,
         })
     }
 
     pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
-        try!(self.write_source_code(&req.code));
+        self.write_source_code(&req.code)?;
         let mut command = self.format_command();
 
         let output = command.output().context(UnableToExecuteCompiler)?;
 
         Ok(FormatResponse {
             success: output.status.success(),
-            code: try!(try!(read(self.input_file.as_ref())).ok_or(Error::OutputMissing)),
-            stdout: try!(vec_to_str(output.stdout)),
-            stderr: try!(vec_to_str(output.stderr)),
+            code: read(self.input_file.as_ref())?.ok_or(Error::OutputMissing)?,
+            stdout: vec_to_str(output.stdout)?,
+            stderr: vec_to_str(output.stderr)?,
         })
     }
 
     pub fn clippy(&self, req: &ClippyRequest) -> Result<ClippyResponse> {
-        try!(self.write_source_code(&req.code));
+        self.write_source_code(&req.code)?;
         let mut command = self.clippy_command(req);
 
         let output = command.output().context(UnableToExecuteCompiler)?;
 
         Ok(ClippyResponse {
             success: output.status.success(),
-            stdout: try!(vec_to_str(output.stdout)),
-            stderr: try!(vec_to_str(output.stderr)),
+            stdout: vec_to_str(output.stdout)?,
+            stderr: vec_to_str(output.stderr)?,
         })
     }
 
