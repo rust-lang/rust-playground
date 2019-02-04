@@ -24,7 +24,7 @@ impl From<gists::Gist> for Gist {
             .map(|(name, file)| (name, file.content.unwrap_or_default()))
             .collect();
 
-        files.sort_by(|&(ref name1, _), &(ref name2, _)| name1.cmp(name2));
+        files.sort_by(|(name1, _), (name2, _)| name1.cmp(name2));
 
         let code = match files.len() {
             0 | 1 => files.into_iter().map(|(_, content)| content).collect(),
