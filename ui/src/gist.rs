@@ -1,8 +1,12 @@
-use hubcaps::{self, Credentials, Github, gists::{self, Content, GistOptions}};
+use hubcaps::{
+    self,
+    gists::{self, Content, GistOptions},
+    Credentials, Github,
+};
 use hyper;
 use hyper_tls;
 use std::collections::HashMap;
-use tokio::{runtime::current_thread::Runtime, prelude::Future};
+use tokio::{prelude::Future, runtime::current_thread::Runtime};
 
 const FILENAME: &str = "playground.rs";
 const DESCRIPTION: &str = "Code shared from the Rust Playground";

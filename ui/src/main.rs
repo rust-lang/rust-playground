@@ -1,29 +1,31 @@
 #![feature(try_from)]
 #![deny(rust_2018_idioms)]
 
-use std::any::Any;
-use std::convert::{TryFrom, TryInto};
-use std::env;
-use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
-use std::time::{Duration, Instant};
-
-use corsware::{CorsMiddleware, AllowedOrigins, UniCase};
-use iron::headers::ContentType;
-use iron::method::Method::{Get, Post};
-use iron::modifiers::Header;
-use iron::prelude::*;
-use iron::status;
+use corsware::{AllowedOrigins, CorsMiddleware, UniCase};
+use iron::{
+    headers::ContentType,
+    method::Method::{Get, Post},
+    modifiers::Header,
+    prelude::*,
+    status,
+};
 use lazy_static::lazy_static;
 use mount::Mount;
 use playground_middleware::{
-    Staticfile, Cache, Prefix, ModifyWith, GuessContentType, FileLogger, StatisticLogger, Rewrite
+    Cache, FileLogger, GuessContentType, ModifyWith, Prefix, Rewrite, Staticfile, StatisticLogger,
 };
 use router::Router;
-use serde_derive::{Serialize, Deserialize};
-use serde::Serialize;
-use serde::de::DeserializeOwned;
+use serde::{de::DeserializeOwned, Serialize};
+use serde_derive::{Deserialize, Serialize};
 use snafu::{ResultExt, Snafu};
+use std::{
+    any::Any,
+    convert::{TryFrom, TryInto},
+    env,
+    path::PathBuf,
+    sync::{Arc, Mutex},
+    time::{Duration, Instant},
+};
 
 use crate::sandbox::Sandbox;
 
@@ -31,9 +33,9 @@ const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
 const DEFAULT_LOG_FILE: &str = "access-log.csv";
 
-mod sandbox;
 mod asm_cleanup;
 mod gist;
+mod sandbox;
 
 const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
 const ONE_DAY_IN_SECONDS: u64 = 60 * 60 * 24;

@@ -1,11 +1,11 @@
 // Thanks to Matt Godbolt for creating the amazing Compiler Explorer https://www.godbolt.org
 // This aims to provide similar assembly cleanup to what Godbolt does
 
+use lazy_static::lazy_static;
+use petgraph::prelude::*;
 use regex::{Captures, Regex};
 use rustc_demangle::demangle;
 use std::collections::HashSet;
-use petgraph::prelude::*;
-use lazy_static::lazy_static;
 
 pub fn demangle_asm(block: &str) -> String {
     lazy_static! {
@@ -88,8 +88,8 @@ pub fn filter_asm(block: &str) -> String {
         } else if let Some(label_decl_cap) = LABEL_DECL_REGEX.captures(line).and_then(|cap| cap.get(1)) {
             line_info.push(LabelDecl(label_decl_cap.as_str()));
             labels.insert(label_decl_cap.as_str());
-            current_label = label_decl_cap.as_str(); 
-        } else if DATA_REGEX.is_match(line) && current_label != "" { 
+            current_label = label_decl_cap.as_str();
+        } else if DATA_REGEX.is_match(line) && current_label != "" {
             line_info.push(Data(current_label));
             // These will be checked for references to other labels later on
             // Skip the data type, just capture its reference
@@ -97,17 +97,17 @@ pub fn filter_asm(block: &str) -> String {
                 // Create a graph of how data labels reference each other
                 label_graph.add_edge(current_label, label_ref_cap.as_str(), 1);
             }
-        } else if let Some(function_cap) = FUNCTION_REGEX.captures(line).and_then(|cap| cap.get(1)) { 
-            line_info.push(FunctionDecl); 
+        } else if let Some(function_cap) = FUNCTION_REGEX.captures(line).and_then(|cap| cap.get(1)) {
+            line_info.push(FunctionDecl);
             opcode_operands.insert(function_cap.as_str());
         // DIRECTIVE_REGEX must be checked after FUNCTION_REGEX and DATA_REGEX, matches them too
-        } else if DIRECTIVE_REGEX.is_match(line) { 
+        } else if DIRECTIVE_REGEX.is_match(line) {
             line_info.push(Directive);
         } else if BLANK_REGEX.is_match(line) {
             line_info.push(Blank);
         // If no matches are found then include line in output
         } else {
-            line_info.push(Misc); 
+            line_info.push(Misc);
         }
     }
 
@@ -129,11 +129,11 @@ pub fn filter_asm(block: &str) -> String {
     let mut filtered_asm = String::new();
     for (line, line_type) in block.lines().zip(&line_info) {
         match *line_type {
-            Opcode | Misc => { 
+            Opcode | Misc => {
                 filtered_asm.push_str(line);
                 filtered_asm.push('\n');
             },
-            Data(data) if used_labels.contains(&data) => { 
+            Data(data) if used_labels.contains(&data) => {
                 filtered_asm.push_str(line);
                 filtered_asm.push('\n');
             },

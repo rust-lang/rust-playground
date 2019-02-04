@@ -1,14 +1,15 @@
+use serde_derive::Deserialize;
 use snafu::{ResultExt, Snafu};
-use std::collections::BTreeMap;
-use std::ffi::OsStr;
-use std::fmt;
-use std::fs::{self, File};
-use std::io::prelude::*;
-use std::io::{self, BufReader, BufWriter, ErrorKind};
-use std::path::{Path, PathBuf};
-use std::process::Command;
-use std::string;
-use serde_derive::{Serialize, Deserialize};
+use std::{
+    collections::BTreeMap,
+    ffi::OsStr,
+    fmt,
+    fs::{self, File},
+    io::{self, prelude::*, BufReader, BufWriter, ErrorKind},
+    path::{Path, PathBuf},
+    process::Command,
+    string,
+};
 use tempdir::TempDir;
 
 #[derive(Debug, Deserialize)]
