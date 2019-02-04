@@ -8,7 +8,7 @@ use std::io::{self, BufReader, BufWriter, ErrorKind};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::string;
-
+use serde_derive::{Serialize, Deserialize};
 use tempdir::TempDir;
 
 #[derive(Debug, Deserialize)]
@@ -274,7 +274,7 @@ impl Sandbox {
 
         file.write_all(data).context(UnableToCreateSourceFile)?;
 
-        debug!("Wrote {} bytes of source to {}", data.len(), self.input_file.display());
+        log::debug!("Wrote {} bytes of source to {}", data.len(), self.input_file.display());
         Ok(())
     }
 
@@ -286,7 +286,7 @@ impl Sandbox {
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
-        debug!("Compilation command is {:?}", cmd);
+        log::debug!("Compilation command is {:?}", cmd);
 
         cmd
     }
@@ -299,7 +299,7 @@ impl Sandbox {
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
-        debug!("Execution command is {:?}", cmd);
+        log::debug!("Execution command is {:?}", cmd);
 
         cmd
     }
@@ -311,7 +311,7 @@ impl Sandbox {
 
         cmd.arg("rustfmt").args(&["cargo", "fmt"]);
 
-        debug!("Formatting command is {:?}", cmd);
+        log::debug!("Formatting command is {:?}", cmd);
 
         cmd
     }
@@ -324,7 +324,7 @@ impl Sandbox {
 
         cmd.arg("clippy").args(&["cargo", "clippy"]);
 
-        debug!("Clippy command is {:?}", cmd);
+        log::debug!("Clippy command is {:?}", cmd);
 
         cmd
     }
@@ -335,7 +335,7 @@ impl Sandbox {
 
         cmd.arg("miri").args(&["cargo", "miri-playground"]);
 
-        debug!("Miri command is {:?}", cmd);
+        log::debug!("Miri command is {:?}", cmd);
 
         cmd
     }
@@ -497,7 +497,7 @@ impl CompileTarget {
 }
 
 impl fmt::Display for CompileTarget {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         use self::CompileTarget::*;
 
         match *self {

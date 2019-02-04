@@ -5,13 +5,14 @@ use regex::{Captures, Regex};
 use rustc_demangle::demangle;
 use std::collections::HashSet;
 use petgraph::prelude::*;
+use lazy_static::lazy_static;
 
 pub fn demangle_asm(block: &str) -> String {
     lazy_static! {
         static ref DEMANGLE_REGEX: Regex = Regex::new(r"_[a-zA-Z0-9._$]*").unwrap();
     }
 
-    DEMANGLE_REGEX.replace_all(block, |caps: &Captures| {
+    DEMANGLE_REGEX.replace_all(block, |caps: &Captures<'_>| {
         format!("{:#}", demangle(caps.get(0).map_or("", |m| m.as_str())))
     }).to_string()
 }

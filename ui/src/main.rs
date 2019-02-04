@@ -1,31 +1,5 @@
 #![feature(try_from)]
-
-#[macro_use]
-extern crate log;
-extern crate env_logger;
-extern crate dotenv;
-extern crate iron;
-extern crate mount;
-extern crate router;
-extern crate playground_middleware;
-extern crate bodyparser;
-extern crate serde;
-extern crate serde_json;
-#[macro_use]
-extern crate serde_derive;
-extern crate tempdir;
-extern crate corsware;
-#[macro_use]
-extern crate lazy_static;
-extern crate petgraph;
-extern crate regex;
-extern crate rustc_demangle;
-extern crate hubcaps;
-extern crate tokio;
-extern crate hyper;
-extern crate hyper_tls;
-extern crate openssl_probe;
-extern crate snafu;
+#![deny(rust_2018_idioms)]
 
 use std::any::Any;
 use std::convert::{TryFrom, TryInto};
@@ -40,11 +14,13 @@ use iron::method::Method::{Get, Post};
 use iron::modifiers::Header;
 use iron::prelude::*;
 use iron::status;
+use lazy_static::lazy_static;
 use mount::Mount;
 use playground_middleware::{
     Staticfile, Cache, Prefix, ModifyWith, GuessContentType, FileLogger, StatisticLogger, Rewrite
 };
 use router::Router;
+use serde_derive::{Serialize, Deserialize};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use snafu::{ResultExt, Snafu};
@@ -134,7 +110,7 @@ fn main() {
         });
     }
 
-    info!("Starting the server on http://{}:{}", address, port);
+    log::info!("Starting the server on http://{}:{}", address, port);
     Iron::new(chain).http((&*address, port)).expect("Unable to start server");
 }
 
@@ -148,7 +124,7 @@ impl GhToken {
 }
 
 impl iron::BeforeMiddleware for GhToken {
-    fn before(&self, req: &mut Request) -> IronResult<()> {
+    fn before(&self, req: &mut Request<'_, '_>) -> IronResult<()> {
         req.extensions.insert::<Self>(self.clone());
         Ok(())
     }
@@ -158,7 +134,7 @@ impl iron::typemap::Key for GhToken {
     type Value = Self;
 }
 
-fn compile(req: &mut Request) -> IronResult<Response> {
+fn compile(req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: CompileRequest| {
         let req = req.try_into()?;
         sandbox
@@ -168,7 +144,7 @@ fn compile(req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn execute(req: &mut Request) -> IronResult<Response> {
+fn execute(req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: ExecuteRequest| {
         let req = req.try_into()?;
         sandbox
@@ -178,7 +154,7 @@ fn execute(req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn format(req: &mut Request) -> IronResult<Response> {
+fn format(req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: FormatRequest| {
         let req = req.try_into()?;
         sandbox
@@ -188,7 +164,7 @@ fn format(req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn clippy(req: &mut Request) -> IronResult<Response> {
+fn clippy(req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: ClippyRequest| {
         sandbox
             .clippy(&req.try_into()?)
@@ -197,7 +173,7 @@ fn clippy(req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn miri(req: &mut Request) -> IronResult<Response> {
+fn miri(req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: MiriRequest| {
         sandbox
             .miri(&req.try_into()?)
@@ -206,7 +182,7 @@ fn miri(req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn meta_crates(_req: &mut Request) -> IronResult<Response> {
+fn meta_crates(_req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
             .crates()
@@ -214,7 +190,7 @@ fn meta_crates(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn meta_version_stable(_req: &mut Request) -> IronResult<Response> {
+fn meta_version_stable(_req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
             .version_stable()
@@ -222,7 +198,7 @@ fn meta_version_stable(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn meta_version_beta(_req: &mut Request) -> IronResult<Response> {
+fn meta_version_beta(_req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
             .version_beta()
@@ -230,7 +206,7 @@ fn meta_version_beta(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn meta_version_nightly(_req: &mut Request) -> IronResult<Response> {
+fn meta_version_nightly(_req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
             .version_nightly()
@@ -238,7 +214,7 @@ fn meta_version_nightly(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn meta_version_rustfmt(_req: &mut Request) -> IronResult<Response> {
+fn meta_version_rustfmt(_req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
             .version_rustfmt()
@@ -246,7 +222,7 @@ fn meta_version_rustfmt(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn meta_version_clippy(_req: &mut Request) -> IronResult<Response> {
+fn meta_version_clippy(_req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
             .version_clippy()
@@ -254,7 +230,7 @@ fn meta_version_clippy(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn meta_version_miri(_req: &mut Request) -> IronResult<Response> {
+fn meta_version_miri(_req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
             .version_miri()
@@ -262,7 +238,7 @@ fn meta_version_miri(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn meta_gist_create(req: &mut Request) -> IronResult<Response> {
+fn meta_gist_create(req: &mut Request<'_, '_>) -> IronResult<Response> {
     let token = req.extensions.get::<GhToken>().unwrap().0.as_ref().clone();
     serialize_to_response(deserialize_from_request(req, |r: MetaGistCreateRequest| {
         let gist = gist::create(token, r.code);
@@ -270,7 +246,7 @@ fn meta_gist_create(req: &mut Request) -> IronResult<Response> {
     }))
 }
 
-fn meta_gist_get(req: &mut Request) -> IronResult<Response> {
+fn meta_gist_get(req: &mut Request<'_, '_>) -> IronResult<Response> {
     match req.extensions.get::<Router>().unwrap().find("id") {
         Some(id) => {
             let token = req.extensions.get::<GhToken>().unwrap().0.as_ref().clone();
@@ -285,7 +261,7 @@ fn meta_gist_get(req: &mut Request) -> IronResult<Response> {
 
 // This is a backwards compatibilty shim. The Rust homepage and the
 // documentation use this to run code in place.
-fn evaluate(req: &mut Request) -> IronResult<Response> {
+fn evaluate(req: &mut Request<'_, '_>) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: EvaluateRequest| {
         let req = req.try_into()?;
         sandbox
@@ -295,7 +271,7 @@ fn evaluate(req: &mut Request) -> IronResult<Response> {
     })
 }
 
-fn with_sandbox<Req, Resp, F>(req: &mut Request, f: F) -> IronResult<Response>
+fn with_sandbox<Req, Resp, F>(req: &mut Request<'_, '_>, f: F) -> IronResult<Response>
 where
     F: FnOnce(Sandbox, Req) -> Result<Resp>,
     Req: DeserializeOwned + Clone + Any + 'static,
@@ -312,7 +288,7 @@ where
     serialize_to_response(run_handler_no_request(f))
 }
 
-fn run_handler<Req, Resp, F>(req: &mut Request, f: F) -> Result<Resp>
+fn run_handler<Req, Resp, F>(req: &mut Request<'_, '_>, f: F) -> Result<Resp>
 where
     F: FnOnce(Sandbox, Req) -> Result<Resp>,
     Req: DeserializeOwned + Clone + Any + 'static,
@@ -323,7 +299,7 @@ where
     })
 }
 
-fn deserialize_from_request<Req, Resp, F>(req: &mut Request, f: F) -> Result<Resp>
+fn deserialize_from_request<Req, Resp, F>(req: &mut Request<'_, '_>, f: F) -> Result<Resp>
 where
     F: FnOnce(Req) -> Result<Resp>,
     Req: DeserializeOwned + Clone + Any + 'static,
