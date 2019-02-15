@@ -41,6 +41,7 @@ RUN cd / && \
 WORKDIR /playground
 
 ADD Cargo.toml /playground/Cargo.toml
+ADD cargo.sh /playground/cargo.sh
 ADD crate-information.json /playground/crate-information.json
 RUN cargo fetch
 

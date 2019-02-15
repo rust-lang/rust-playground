@@ -1,14 +1,18 @@
 use serde_derive::Deserialize;
 use snafu::{ResultExt, Snafu};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, HashMap},
     ffi::OsStr,
     fmt,
     fs::{self, File},
     io::{self, prelude::*, BufReader, BufWriter, ErrorKind},
     path::{Path, PathBuf},
-    process::Command,
+    process::{Command, ChildStdout, Stdio},
     string,
+    sync::{Mutex, Arc},
+    sync::mpsc::{self, Receiver, RecvError},
+    time::Duration,
+    thread
 };
 use tempdir::TempDir;
 
@@ -90,10 +94,10 @@ impl Sandbox {
         })
     }
 
-    pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
-        self.write_source_code(&req.code)?;
+    pub fn compile(&self, req: &CompileRequest, container: &DockerContainer) -> Result<CompileResponse> {
+        self.write_source_code_to_path(&container.src_dir, &req.crate_type, &req.code)?;
 
-        let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests, req);
+        let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests, req, container);
 
         let output = command.output().context(UnableToExecuteCompiler)?;
 
@@ -101,7 +105,7 @@ impl Sandbox {
         // `compilation-3b75174cac3d47fb.ll`, so we just find the
         // first with the right extension.
         let file =
-            fs::read_dir(&self.output_dir)
+            fs::read_dir(&container.output_dir)
             .context(UnableToReadOutput)?
             .flat_map(|entry| entry)
             .map(|entry| entry.path())
@@ -143,9 +147,9 @@ impl Sandbox {
         })
     }
 
-    pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
-        self.write_source_code(&req.code)?;
-        let mut command = self.execute_command(req.channel, req.mode, req.tests, req);
+    pub fn execute(&self, req: &ExecuteRequest, container: &DockerContainer) -> Result<ExecuteResponse> {
+        self.write_source_code_to_path(&container.src_dir, &req.crate_type, &req.code)?;
+        let mut command = self.execute_command(req.channel, req.mode, req.tests, req, &container);
 
         let output = command.output().context(UnableToExecuteCompiler)?;
 
@@ -279,26 +283,39 @@ impl Sandbox {
         Ok(())
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) -> Command {
-        let mut cmd = self.docker_command(Some(req.crate_type()));
-        set_execution_environment(&mut cmd, Some(target), &req);
+    fn write_source_code_to_path(&self, src_dir: &PathBuf, crate_type: &CrateType, code: &str) -> Result<()> {
+        let data = code.as_bytes();
+
+        let input_file = src_dir.clone().join(crate_type.file_name());
+        let file = File::create(&input_file).context(UnableToCreateSourceFile)?;
+        let mut file = BufWriter::new(file);
+
+        file.write_all(data).context(UnableToCreateSourceFile)?;
+
+        log::debug!("Wrote {} bytes of source to {:?}", data.len(), input_file.display());
+        Ok(())
+    }
+
+    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest, container: &DockerContainer) -> Command {
+        let mut cmd = self.docker_exec_command(&container.id);
 
         let execution_cmd = build_execution_command(Some(target), channel, mode, &req, tests);
+        cmd.args(&execution_cmd);
 
-        cmd.arg(&channel.container_name()).args(&execution_cmd);
+        set_execution_environment(&mut cmd, Some(target), &req);
 
         log::debug!("Compilation command is {:?}", cmd);
 
         cmd
     }
 
-    fn execute_command(&self, channel: Channel, mode: Mode, tests: bool, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) -> Command {
-        let mut cmd = self.docker_command(Some(req.crate_type()));
-        set_execution_environment(&mut cmd, None, &req);
+    fn execute_command(&self, channel: Channel, mode: Mode, tests: bool, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest, container: &DockerContainer) -> Command {
+        let mut cmd = self.docker_exec_command(&container.id);
 
         let execution_cmd = build_execution_command(None, channel, mode, &req, tests);
+        cmd.args(&execution_cmd);
 
-        cmd.arg(&channel.container_name()).args(&execution_cmd);
+        set_execution_environment(&mut cmd, None, &req);
 
         log::debug!("Execution command is {:?}", cmd);
 
@@ -346,7 +363,7 @@ impl Sandbox {
 
         let mut mount_input_file = self.input_file.as_os_str().to_os_string();
         mount_input_file.push(":");
-        mount_input_file.push("/playground/");
+        mount_input_file.push("/playground/src/");
         mount_input_file.push(crate_type.file_name());
 
         let mut mount_output_dir = self.output_dir.as_os_str().to_os_string();
@@ -361,6 +378,126 @@ impl Sandbox {
 
         cmd
     }
+
+    fn docker_exec_command(&self, container_id: &str) -> Command {
+        let mut cmd = Command::new("docker");
+
+        cmd
+            .arg("exec")
+            .arg(container_id);
+
+        cmd
+    }
+
+}
+
+pub struct DockerContainer {
+    pub id: String,
+    _temp_dir: TempDir, //we need to keep this, or it's dropped (= deleted)
+    pub src_dir: PathBuf,
+    pub output_dir: PathBuf,
+}
+
+impl DockerContainer {
+
+    pub fn terminate(&self) {
+        let mut cmd = Command::new("docker");
+        cmd
+            .arg("exec")
+            .arg(&self.id)
+            .args(&["pkill", "sleep"])
+            .status();
+    }
+
+}
+
+pub struct DockerContainers {
+    receivers: HashMap<Channel, Arc<Mutex<Receiver<DockerContainer>>>>,
+    active: Arc<Mutex<bool>>
+}
+
+impl DockerContainers {
+    pub fn new(pool_size: usize) -> DockerContainers {
+        let mut receivers = HashMap::new();
+
+        let active = Arc::new(Mutex::new(true));
+
+        for channel in [Channel::Stable, Channel::Beta, Channel::Nightly].iter() {
+            let (sender, receiver) = mpsc::sync_channel(pool_size);
+
+            receivers.insert(channel.to_owned(), Arc::new(Mutex::new(receiver)));
+
+            let active_mutex = active.clone();
+            thread::spawn(move || {
+                let mut active = true;
+                while active {
+                    sender.send(DockerContainers::start_container(channel)).unwrap_or(());
+                    active = *active_mutex.lock().unwrap();
+                }
+            });
+        }
+
+        DockerContainers { receivers, active }
+    }
+
+    fn container_id_from_stdout(stdout: ChildStdout) -> String {
+        let mut stdout = BufReader::new(stdout);
+        let mut container_id = String::new();
+        stdout.read_line(&mut container_id).unwrap();
+
+        container_id.trim().to_string()
+    }
+
+    fn start_container(channel: &Channel) -> DockerContainer {
+        let temp_dir = TempDir::new("playground_container").unwrap();
+        let src_dir = temp_dir.path().to_owned();
+        let output_dir = temp_dir.path().join("output");
+
+        let mut mount_src_dir = src_dir.as_os_str().to_os_string();
+        mount_src_dir.push(":");
+        mount_src_dir.push("/playground/src");
+
+        let mut mount_output_dir = output_dir.as_os_str().to_os_string();
+        mount_output_dir.push(":");
+        mount_output_dir.push("/playground-result");
+
+        let mut cmd = basic_secure_docker_command();
+        cmd
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null())
+            .arg("--volume").arg(&mount_src_dir)
+            .arg("--volume").arg(&mount_output_dir)
+            .arg("-d")
+            .arg(channel.container_name());
+
+        match cmd.spawn() {
+            Ok(child) => {
+                let id = Self::container_id_from_stdout(child.stdout.unwrap());
+
+                DockerContainer { id, _temp_dir: temp_dir, src_dir, output_dir }
+            }
+            Err(err) => panic!("Error starting container {}: {}", channel.container_name(), err)
+        }
+    }
+
+    pub fn pop(&self, channel: Channel) -> Result<DockerContainer, RecvError> {
+        self.receivers.get(&channel).unwrap().lock().unwrap().recv()
+    }
+}
+
+impl Drop for DockerContainers {
+
+    fn drop(&mut self) {
+        let mut active = self.active.lock().unwrap();
+        *active = false;
+
+        for (_, receiver) in self.receivers.iter() {
+            while let Ok(container) = receiver.lock().unwrap().recv_timeout(Duration::new(1, 0)) {
+                container.terminate();
+            }
+        }
+    }
+
 }
 
 fn basic_secure_docker_command() -> Command {
@@ -390,7 +527,7 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
     use self::CrateType::*;
     use self::Mode::*;
 
-    let mut cmd = vec!["cargo"];
+    let mut cmd = vec!["bash", "cargo.sh"];
 
     match (target, req.crate_type(), tests) {
         (Some(Wasm), _, _) => cmd.push("wasm"),
@@ -510,7 +647,7 @@ impl fmt::Display for CompileTarget {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Channel {
     Stable,
     Beta,
@@ -563,8 +700,8 @@ impl CrateType {
         use self::CrateType::*;
 
         match *self {
-            Binary => "src/main.rs",
-            Library(_) => "src/lib.rs",
+            Binary => "main.rs",
+            Library(_) => "lib.rs",
         }
     }
 }
@@ -760,6 +897,8 @@ pub struct MiriResponse {
 
 #[cfg(test)]
 mod test {
+    use std::time::Duration;
+
     use super::*;
 
     const HELLO_WORLD_CODE: &'static str = r#"
@@ -812,7 +951,10 @@ mod test {
         let req = ExecuteRequest::default();
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.execute(&req).expect("Unable to execute code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container).expect("Unable to execute code");
 
         assert!(resp.stdout.contains("Hello, world!"));
     }
@@ -837,7 +979,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.execute(&req).expect("Unable to execute code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container).expect("Unable to execute code");
 
         assert!(resp.stdout.contains("debug mode"));
     }
@@ -851,7 +996,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.execute(&req).expect("Unable to execute code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container).expect("Unable to execute code");
 
         assert!(resp.stdout.contains("release mode"));
     }
@@ -875,7 +1023,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.execute(&req).expect("Unable to execute code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container).expect("Unable to execute code");
 
         assert!(resp.stdout.contains("rustc"));
         assert!(!resp.stdout.contains("beta"));
@@ -891,7 +1042,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.execute(&req).expect("Unable to execute code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container).expect("Unable to execute code");
 
         assert!(resp.stdout.contains("rustc"));
         assert!(resp.stdout.contains("beta"));
@@ -907,7 +1061,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.execute(&req).expect("Unable to execute code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container).expect("Unable to execute code");
 
         assert!(resp.stdout.contains("rustc"));
         assert!(!resp.stdout.contains("beta"));
@@ -932,7 +1089,10 @@ mod test {
         };
 
         let sb = Sandbox::new()?;
-        let resp = sb.execute(&req)?;
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container)?;
 
         assert!(resp.stderr.contains("`?` is not a macro repetition operator"));
         Ok(())
@@ -948,7 +1108,10 @@ mod test {
         };
 
         let sb = Sandbox::new()?;
-        let resp = sb.execute(&req)?;
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container)?;
 
         assert!(resp.stderr.contains("`?` is not a macro repetition operator"));
         Ok(())
@@ -964,7 +1127,10 @@ mod test {
         };
 
         let sb = Sandbox::new()?;
-        let resp = sb.execute(&req)?;
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container)?;
 
         assert!(!resp.stderr.contains("`crate` in paths is experimental"));
         Ok(())
@@ -989,7 +1155,10 @@ mod test {
         };
 
         let sb = Sandbox::new()?;
-        let resp = sb.execute(&req)?;
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container)?;
 
         assert!(resp.stderr.contains("Run with `RUST_BACKTRACE=1` for a backtrace"));
         assert!(!resp.stderr.contains("stack backtrace:"));
@@ -1006,7 +1175,10 @@ mod test {
         };
 
         let sb = Sandbox::new()?;
-        let resp = sb.execute(&req)?;
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container)?;
 
         assert!(!resp.stderr.contains("Run with `RUST_BACKTRACE=1` for a backtrace"));
         assert!(resp.stderr.contains("stack backtrace:"));
@@ -1022,7 +1194,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.compile(&req).expect("Unable to compile code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.compile(&req, &container).expect("Unable to compile code");
 
         assert!(resp.code.contains("ModuleID"));
         assert!(resp.code.contains("target datalayout"));
@@ -1037,7 +1212,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.compile(&req).expect("Unable to compile code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.compile(&req, &container).expect("Unable to compile code");
 
         assert!(resp.code.contains(".text"));
         assert!(resp.code.contains(".file"));
@@ -1053,7 +1231,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.compile(&req).expect("Unable to compile code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.compile(&req, &container).expect("Unable to compile code");
 
         assert!(resp.code.contains("core::fmt::Arguments::new_v1"));
         assert!(resp.code.contains("std::io::stdio::_print@GOTPCREL"));
@@ -1068,7 +1249,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.compile(&req).expect("Unable to compile code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.compile(&req, &container).expect("Unable to compile code");
 
         assert!(resp.code.contains(".text"));
         assert!(resp.code.contains(".file"));
@@ -1175,7 +1359,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.execute(&req).expect("Unable to execute code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container).expect("Unable to execute code");
 
         assert!(resp.stdout.contains("Failed to connect"));
     }
@@ -1196,7 +1383,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.execute(&req).expect("Unable to execute code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container).expect("Unable to execute code");
 
         assert!(resp.stderr.contains("Killed"));
     }
@@ -1216,7 +1406,10 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.execute(&req).expect("Unable to execute code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container).expect("Unable to execute code");
 
         assert!(resp.stderr.contains("Killed"));
     }
@@ -1241,8 +1434,21 @@ mod test {
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
-        let resp = sb.execute(&req).expect("Unable to execute code");
+        let containers = DockerContainers::new(0);
+        let container = containers.pop(req.channel).unwrap();
+
+        let resp = sb.execute(&req, &container).expect("Unable to execute code");
 
         assert!(resp.stderr.contains("Cannot fork"));
+    }
+
+    #[test]
+    fn docker_containers() {
+        let containers = DockerContainers::new(0);
+        thread::sleep(Duration::new(2, 0));
+
+        let container = containers.pop(Channel::Stable).unwrap();
+        assert_eq!(false, container.id.is_empty());
+        container.terminate();
     }
 }

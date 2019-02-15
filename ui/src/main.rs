@@ -26,11 +26,12 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::sandbox::Sandbox;
+use crate::sandbox::{Channel, DockerContainers, Sandbox};
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
 const DEFAULT_LOG_FILE: &str = "access-log.csv";
+const DEFAULT_DOCKER_CONTAINER_POOL_SIZE: usize = 10;
 
 mod asm_cleanup;
 mod gist;
@@ -55,6 +56,9 @@ fn main() {
     let port = env::var("PLAYGROUND_UI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(DEFAULT_PORT);
     let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or_else(|_| DEFAULT_LOG_FILE.to_string());
     let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
+    let docker_containers_pool_size = env::var("DOCKER_CONTAINER_POOL_SIZE").ok().and_then(|v| v.parse().ok()).unwrap_or(DEFAULT_DOCKER_CONTAINER_POOL_SIZE);
+
+    let containers = Arc::new(DockerContainers::new(docker_containers_pool_size));
 
     let files = Staticfile::new(&root).expect("Unable to open root directory");
     let mut files = Chain::new(files);
@@ -71,8 +75,10 @@ fn main() {
 
     let mut mount = Mount::new();
     mount.mount("/", files);
-    mount.mount("/compile", compile);
-    mount.mount("/execute", execute);
+    let containers_clone = containers.clone();
+    mount.mount("/compile", move |req: &mut Request<'_, '_>| compile(req, &containers_clone));
+    let containers_clone = containers.clone();
+    mount.mount("/execute", move |req: &mut Request<'_, '_>| handle(req, &containers_clone));
     mount.mount("/format", format);
     mount.mount("/clippy", clippy);
     mount.mount("/miri", miri);
@@ -84,7 +90,8 @@ fn main() {
     mount.mount("/meta/version/clippy", meta_version_clippy);
     mount.mount("/meta/version/miri", meta_version_miri);
     mount.mount("/meta/gist", gist_router);
-    mount.mount("/evaluate.json", evaluate);
+    let containers_clone = containers.clone();
+    mount.mount("/evaluate.json", move |req: &mut Request<'_, '_>| evaluate(req, &containers_clone));
 
     let mut chain = Chain::new(mount);
     let file_logger = FileLogger::new(logfile).expect("Unable to create file logger");
@@ -135,21 +142,23 @@ impl iron::typemap::Key for GhToken {
     type Value = Self;
 }
 
-fn compile(req: &mut Request<'_, '_>) -> IronResult<Response> {
+fn compile(req: &mut Request<'_, '_>, containers: &DockerContainers) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: CompileRequest| {
-        let req = req.try_into()?;
+        let req: sandbox::CompileRequest = req.try_into()?;
+        let container = containers.pop(req.channel).unwrap();
         sandbox
-            .compile(&req)
+            .compile(&req, &container)
             .map(CompileResponse::from)
             .eager_context(Compilation)
     })
 }
 
-fn execute(req: &mut Request<'_, '_>) -> IronResult<Response> {
+fn handle(req: &mut Request<'_, '_>, containers: &DockerContainers) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: ExecuteRequest| {
-        let req = req.try_into()?;
+        let req: sandbox::ExecuteRequest = req.try_into()?;
+        let container = containers.pop(req.channel).unwrap();
         sandbox
-            .execute(&req)
+            .execute(&req, &container)
             .map(ExecuteResponse::from)
             .eager_context(Execution)
     })
@@ -262,11 +271,12 @@ fn meta_gist_get(req: &mut Request<'_, '_>) -> IronResult<Response> {
 
 // This is a backwards compatibilty shim. The Rust homepage and the
 // documentation use this to run code in place.
-fn evaluate(req: &mut Request<'_, '_>) -> IronResult<Response> {
+fn evaluate(req: &mut Request<'_, '_>, containers: &DockerContainers) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: EvaluateRequest| {
         let req = req.try_into()?;
+        let container = containers.pop(Channel::Stable).unwrap();
         sandbox
-            .execute(&req)
+            .execute(&req, &container)
             .map(EvaluateResponse::from)
             .eager_context(Evaluation)
     })
