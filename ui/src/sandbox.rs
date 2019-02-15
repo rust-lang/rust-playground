@@ -12,7 +12,7 @@ use std::{
     sync::{Mutex, Arc},
     sync::mpsc::{self, Receiver, RecvError},
     time::Duration,
-    thread
+    thread::{self, JoinHandle}
 };
 use tempdir::TempDir;
 
@@ -396,17 +396,33 @@ pub struct DockerContainer {
     _temp_dir: TempDir, //we need to keep this, or it's dropped (= deleted)
     pub src_dir: PathBuf,
     pub output_dir: PathBuf,
+    terminated: Arc<Mutex<bool>>
 }
 
 impl DockerContainer {
 
-    pub fn terminate(&self) {
-        let mut cmd = Command::new("docker");
-        cmd
-            .arg("exec")
-            .arg(&self.id)
-            .args(&["pkill", "sleep"])
-            .status();
+    pub fn terminate(&mut self) -> JoinHandle<()> {
+        let mut terminated = self.terminated.lock().unwrap();
+        *terminated = true;
+
+        let container_id = self.id.clone();
+        thread::spawn(move || {
+            let mut cmd = Command::new("docker");
+            cmd
+                .arg("exec")
+                .arg(&container_id)
+                .args(&["pkill", "sleep"])
+                .status()
+                .expect(&format!("Unable to kill container with id {}", container_id));
+        })
+    }
+
+    // this was initially used to implement the Drop trait, keeping it for future reference 
+    #[allow(dead_code)]
+    fn is_terminated(&self) -> bool {
+        let terminated = &self.terminated.clone();
+        let terminated = terminated.lock().unwrap();
+        *terminated
     }
 
 }
@@ -431,7 +447,7 @@ impl DockerContainers {
             thread::spawn(move || {
                 let mut active = true;
                 while active {
-                    sender.send(DockerContainers::start_container(channel)).unwrap_or(());
+                    sender.send(Self::start_container(channel)).unwrap_or(());
                     active = *active_mutex.lock().unwrap();
                 }
             });
@@ -474,7 +490,7 @@ impl DockerContainers {
             Ok(child) => {
                 let id = Self::container_id_from_stdout(child.stdout.unwrap());
 
-                DockerContainer { id, _temp_dir: temp_dir, src_dir, output_dir }
+                DockerContainer { id, _temp_dir: temp_dir, src_dir, output_dir, terminated: Arc::new(Mutex::new(false)) }
             }
             Err(err) => panic!("Error starting container {}: {}", channel.container_name(), err)
         }
@@ -483,19 +499,28 @@ impl DockerContainers {
     pub fn pop(&self, channel: Channel) -> Result<DockerContainer, RecvError> {
         self.receivers.get(&channel).unwrap().lock().unwrap().recv()
     }
+
+    pub fn terminate(&self) {
+        log::info!("Shutting down docker containers pool...");
+        let mut active = self.active.lock().unwrap();
+        *active = false;
+
+        let mut terminate_handles = Vec::new();
+        for (_, receiver) in self.receivers.iter() {
+            while let Ok(mut container) = receiver.lock().unwrap().recv_timeout(Duration::new(1, 0)) {
+                terminate_handles.push(container.terminate());
+            }
+        }
+        for handle in terminate_handles.into_iter() {
+            handle.join().expect("error when joining");
+        }
+    }
 }
 
 impl Drop for DockerContainers {
 
     fn drop(&mut self) {
-        let mut active = self.active.lock().unwrap();
-        *active = false;
-
-        for (_, receiver) in self.receivers.iter() {
-            while let Ok(container) = receiver.lock().unwrap().recv_timeout(Duration::new(1, 0)) {
-                container.terminate();
-            }
-        }
+        self.terminate();
     }
 
 }
@@ -1447,8 +1472,8 @@ mod test {
         let containers = DockerContainers::new(0);
         thread::sleep(Duration::new(2, 0));
 
-        let container = containers.pop(Channel::Stable).unwrap();
+        let mut container = containers.pop(Channel::Stable).unwrap();
         assert_eq!(false, container.id.is_empty());
-        container.terminate();
+        container.terminate().join().expect("error when joining");
     }
 }

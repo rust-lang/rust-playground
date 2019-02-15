@@ -22,6 +22,7 @@ use std::{
     convert::{TryFrom, TryInto},
     env,
     path::PathBuf,
+    process,
     sync::{Arc, Mutex},
     time::{Duration, Instant},
 };
@@ -43,6 +44,13 @@ const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
 
 const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
 
+fn set_graceful_shutdown_hook(containers: Arc<Mutex<DockerContainers>>) {
+    ctrlc::set_handler(move || {
+        containers.lock().unwrap().terminate();
+        process::exit(0);
+    }).expect("Error setting Ctrl-C handler");
+}
+
 fn main() {
     // Dotenv may be unable to load environment variables, but that's ok in production
     let _ = dotenv::dotenv();
@@ -58,7 +66,9 @@ fn main() {
     let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
     let docker_containers_pool_size = env::var("DOCKER_CONTAINER_POOL_SIZE").ok().and_then(|v| v.parse().ok()).unwrap_or(DEFAULT_DOCKER_CONTAINER_POOL_SIZE);
 
-    let containers = Arc::new(DockerContainers::new(docker_containers_pool_size));
+    let containers = Arc::new(Mutex::new(DockerContainers::new(docker_containers_pool_size)));
+
+    set_graceful_shutdown_hook(containers.clone());
 
     let files = Staticfile::new(&root).expect("Unable to open root directory");
     let mut files = Chain::new(files);
@@ -142,10 +152,10 @@ impl iron::typemap::Key for GhToken {
     type Value = Self;
 }
 
-fn compile(req: &mut Request<'_, '_>, containers: &DockerContainers) -> IronResult<Response> {
+fn compile(req: &mut Request<'_, '_>, containers: &Mutex<DockerContainers>) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: CompileRequest| {
         let req: sandbox::CompileRequest = req.try_into()?;
-        let container = containers.pop(req.channel).unwrap();
+        let container = containers.lock().unwrap().pop(req.channel).unwrap();
         sandbox
             .compile(&req, &container)
             .map(CompileResponse::from)
@@ -153,10 +163,10 @@ fn compile(req: &mut Request<'_, '_>, containers: &DockerContainers) -> IronResu
     })
 }
 
-fn handle(req: &mut Request<'_, '_>, containers: &DockerContainers) -> IronResult<Response> {
+fn handle(req: &mut Request<'_, '_>, containers: &Mutex<DockerContainers>) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: ExecuteRequest| {
         let req: sandbox::ExecuteRequest = req.try_into()?;
-        let container = containers.pop(req.channel).unwrap();
+        let container = containers.lock().unwrap().pop(req.channel).unwrap();
         sandbox
             .execute(&req, &container)
             .map(ExecuteResponse::from)
@@ -271,10 +281,10 @@ fn meta_gist_get(req: &mut Request<'_, '_>) -> IronResult<Response> {
 
 // This is a backwards compatibilty shim. The Rust homepage and the
 // documentation use this to run code in place.
-fn evaluate(req: &mut Request<'_, '_>, containers: &DockerContainers) -> IronResult<Response> {
+fn evaluate(req: &mut Request<'_, '_>, containers: &Mutex<DockerContainers>) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: EvaluateRequest| {
         let req = req.try_into()?;
-        let container = containers.pop(Channel::Stable).unwrap();
+        let container = containers.lock().unwrap().pop(Channel::Stable).unwrap();
         sandbox
             .execute(&req, &container)
             .map(EvaluateResponse::from)
