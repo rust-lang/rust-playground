@@ -9,7 +9,7 @@ import integer32Logo from './assets/integer32-logo.svg';
 
 const ACE_URL = 'https://github.com/ajaxorg/ace';
 const CLIPPY_URL = 'https://github.com/Manishearth/rust-clippy';
-const MIRI_URL = 'https://github.com/solson/miri';
+const MIRI_URL = 'https://github.com/rust-lang/miri';
 const CRATES_IO_URL = 'https://crates.io/';
 const RUST_COOKBOOK_URL = 'https://rust-lang-nursery.github.io/rust-cookbook/';
 const CRATES_URL = 'https://github.com/integer32llc/rust-playground/blob/master/compiler/base/Cargo.toml';
