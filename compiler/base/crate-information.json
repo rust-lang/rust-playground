@@ -11,7 +11,7 @@
   },
   {
     "name": "aho-corasick",
-    "version": "0.6.9",
+    "version": "0.6.10",
     "id": "aho_corasick"
   },
   {
@@ -36,7 +36,7 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.13",
+    "version": "0.3.14",
     "id": "backtrace"
   },
   {
@@ -46,7 +46,7 @@
   },
   {
     "name": "base64",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "id": "base64"
   },
   {
@@ -81,7 +81,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.28",
+    "version": "1.0.29",
     "id": "cc"
   },
   {
@@ -105,6 +105,11 @@
     "id": "cloudabi"
   },
   {
+    "name": "color_quant",
+    "version": "1.0.1",
+    "id": "color_quant"
+  },
+  {
     "name": "crc",
     "version": "1.8.1",
     "id": "crc"
@@ -116,27 +121,32 @@
   },
   {
     "name": "crossbeam",
-    "version": "0.6.0",
+    "version": "0.7.1",
     "id": "crossbeam"
   },
   {
     "name": "crossbeam-channel",
-    "version": "0.3.6",
+    "version": "0.3.8",
     "id": "crossbeam_channel"
   },
   {
     "name": "crossbeam-deque",
-    "version": "0.6.3",
+    "version": "0.7.1",
     "id": "crossbeam_deque"
   },
   {
     "name": "crossbeam-epoch",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "id": "crossbeam_epoch"
   },
   {
+    "name": "crossbeam-queue",
+    "version": "0.1.2",
+    "id": "crossbeam_queue"
+  },
+  {
     "name": "crossbeam-utils",
-    "version": "0.6.3",
+    "version": "0.6.5",
     "id": "crossbeam_utils"
   },
   {
@@ -160,18 +170,23 @@
     "id": "debug_unreachable"
   },
   {
+    "name": "deflate",
+    "version": "0.7.19",
+    "id": "deflate"
+  },
+  {
     "name": "dtoa",
     "version": "0.4.3",
     "id": "dtoa"
   },
   {
     "name": "either",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "id": "either"
   },
   {
     "name": "encoding_rs",
-    "version": "0.8.14",
+    "version": "0.8.16",
     "id": "encoding_rs"
   },
   {
@@ -215,6 +230,11 @@
     "id": "foreign_types_shared"
   },
   {
+    "name": "fuchsia-cprng",
+    "version": "0.1.1",
+    "id": "fuchsia_cprng"
+  },
+  {
     "name": "fuchsia-zircon",
     "version": "0.3.3",
     "id": "fuchsia_zircon"
@@ -245,9 +265,9 @@
     "id": "gcc"
   },
   {
-    "name": "getopts",
-    "version": "0.2.18",
-    "id": "getopts"
+    "name": "gif",
+    "version": "0.10.1",
+    "id": "gif"
   },
   {
     "name": "glob",
@@ -256,7 +276,7 @@
   },
   {
     "name": "h2",
-    "version": "0.1.15",
+    "version": "0.1.16",
     "id": "h2"
   },
   {
@@ -266,7 +286,7 @@
   },
   {
     "name": "http",
-    "version": "0.1.15",
+    "version": "0.1.16",
     "id": "http"
   },
   {
@@ -281,7 +301,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.12.22",
+    "version": "0.12.24",
     "id": "hyper"
   },
   {
@@ -295,9 +315,19 @@
     "id": "idna"
   },
   {
+    "name": "image",
+    "version": "0.21.0",
+    "id": "image"
+  },
+  {
     "name": "indexmap",
     "version": "1.0.2",
     "id": "indexmap"
+  },
+  {
+    "name": "inflate",
+    "version": "0.4.5",
+    "id": "inflate"
   },
   {
     "name": "iovec",
@@ -313,6 +343,11 @@
     "name": "itoa",
     "version": "0.4.3",
     "id": "itoa"
+  },
+  {
+    "name": "jpeg-decoder",
+    "version": "0.1.15",
+    "id": "jpeg_decoder"
   },
   {
     "name": "kernel32-sys",
@@ -336,12 +371,12 @@
   },
   {
     "name": "libc",
-    "version": "0.2.48",
+    "version": "0.2.49",
     "id": "libc"
   },
   {
     "name": "libflate",
-    "version": "0.1.19",
+    "version": "0.1.20",
     "id": "libflate"
   },
   {
@@ -353,6 +388,11 @@
     "name": "log",
     "version": "0.4.6",
     "id": "log"
+  },
+  {
+    "name": "lzw",
+    "version": "0.10.0",
+    "id": "lzw"
   },
   {
     "name": "mac",
@@ -371,7 +411,7 @@
   },
   {
     "name": "memchr",
-    "version": "2.1.3",
+    "version": "2.2.0",
     "id": "memchr"
   },
   {
@@ -431,7 +471,7 @@
   },
   {
     "name": "new_debug_unreachable",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "id": "debug_unreachable"
   },
   {
@@ -455,6 +495,11 @@
     "id": "num_complex"
   },
   {
+    "name": "num-derive",
+    "version": "0.2.4",
+    "id": "num_derive"
+  },
+  {
     "name": "num-integer",
     "version": "0.1.39",
     "id": "num_integer"
@@ -476,7 +521,7 @@
   },
   {
     "name": "num_cpus",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "id": "num_cpus"
   },
   {
@@ -540,13 +585,18 @@
     "id": "pkg_config"
   },
   {
+    "name": "png",
+    "version": "0.14.0",
+    "id": "png"
+  },
+  {
     "name": "precomputed-hash",
     "version": "0.1.1",
     "id": "precomputed_hash"
   },
   {
     "name": "proc-macro2",
-    "version": "0.4.26",
+    "version": "0.4.27",
     "id": "proc_macro2"
   },
   {
@@ -561,7 +611,7 @@
   },
   {
     "name": "rand",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "id": "rand"
   },
   {
@@ -571,7 +621,7 @@
   },
   {
     "name": "rand_core",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "id": "rand_core"
   },
   {
@@ -585,13 +635,18 @@
     "id": "rand_isaac"
   },
   {
+    "name": "rand_jitter",
+    "version": "0.1.3",
+    "id": "rand_jitter"
+  },
+  {
     "name": "rand_os",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "id": "rand_os"
   },
   {
     "name": "rand_pcg",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "id": "rand_pcg"
   },
   {
@@ -621,7 +676,7 @@
   },
   {
     "name": "regex-syntax",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "id": "regex_syntax"
   },
   {
@@ -631,12 +686,12 @@
   },
   {
     "name": "reqwest",
-    "version": "0.9.9",
+    "version": "0.9.10",
     "id": "reqwest"
   },
   {
     "name": "ring",
-    "version": "0.14.3",
+    "version": "0.14.6",
     "id": "ring"
   },
   {
@@ -660,14 +715,24 @@
     "id": "ryu"
   },
   {
+    "name": "safe-transmute",
+    "version": "0.10.1",
+    "id": "safe_transmute"
+  },
+  {
     "name": "same-file",
     "version": "1.0.4",
     "id": "same_file"
   },
   {
     "name": "schannel",
-    "version": "0.1.14",
+    "version": "0.1.15",
     "id": "schannel"
+  },
+  {
+    "name": "scoped_threadpool",
+    "version": "0.1.9",
+    "id": "scoped_threadpool"
   },
   {
     "name": "scopeguard",
@@ -691,17 +756,17 @@
   },
   {
     "name": "serde",
-    "version": "1.0.85",
+    "version": "1.0.88",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.85",
+    "version": "1.0.88",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.37",
+    "version": "1.0.38",
     "id": "serde_json"
   },
   {
@@ -721,8 +786,13 @@
   },
   {
     "name": "smallvec",
-    "version": "0.6.8",
+    "version": "0.6.9",
     "id": "smallvec"
+  },
+  {
+    "name": "spin",
+    "version": "0.5.0",
+    "id": "spin"
   },
   {
     "name": "stable_deref_trait",
@@ -781,7 +851,7 @@
   },
   {
     "name": "tempfile",
-    "version": "3.0.5",
+    "version": "3.0.7",
     "id": "tempfile"
   },
   {
@@ -825,13 +895,18 @@
     "id": "threadpool"
   },
   {
+    "name": "tiff",
+    "version": "0.2.2",
+    "id": "tiff"
+  },
+  {
     "name": "time",
     "version": "0.1.42",
     "id": "time"
   },
   {
     "name": "tokio",
-    "version": "0.1.14",
+    "version": "0.1.15",
     "id": "tokio"
   },
   {
@@ -861,12 +936,12 @@
   },
   {
     "name": "tokio-threadpool",
-    "version": "0.1.10",
+    "version": "0.1.11",
     "id": "tokio_threadpool"
   },
   {
     "name": "tokio-timer",
-    "version": "0.2.8",
+    "version": "0.2.10",
     "id": "tokio_timer"
   },
   {
@@ -941,7 +1016,7 @@
   },
   {
     "name": "uuid",
-    "version": "0.7.1",
+    "version": "0.7.2",
     "id": "uuid"
   },
   {
@@ -991,7 +1066,7 @@
   },
   {
     "name": "winapi-util",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "id": "winapi_util"
   },
   {
