@@ -1,8 +1,12 @@
-use hubcaps::{self, Credentials, Github, gists::{self, Content, GistOptions}};
+use hubcaps::{
+    self,
+    gists::{self, Content, GistOptions},
+    Credentials, Github,
+};
 use hyper;
 use hyper_tls;
 use std::collections::HashMap;
-use tokio::{runtime::current_thread::Runtime, prelude::Future};
+use tokio::{prelude::Future, runtime::current_thread::Runtime};
 
 const FILENAME: &str = "playground.rs";
 const DESCRIPTION: &str = "Code shared from the Rust Playground";
@@ -20,7 +24,7 @@ impl From<gists::Gist> for Gist {
             .map(|(name, file)| (name, file.content.unwrap_or_default()))
             .collect();
 
-        files.sort_by(|&(ref name1, _), &(ref name2, _)| name1.cmp(name2));
+        files.sort_by(|(name1, _), (name2, _)| name1.cmp(name2));
 
         let code = match files.len() {
             0 | 1 => files.into_iter().map(|(_, content)| content).collect(),

@@ -1,14 +1,15 @@
+use serde_derive::Deserialize;
 use snafu::{ResultExt, Snafu};
-use std::collections::BTreeMap;
-use std::ffi::OsStr;
-use std::fmt;
-use std::fs::{self, File};
-use std::io::prelude::*;
-use std::io::{self, BufReader, BufWriter, ErrorKind};
-use std::path::{Path, PathBuf};
-use std::process::Command;
-use std::string;
-
+use std::{
+    collections::BTreeMap,
+    ffi::OsStr,
+    fmt,
+    fs::{self, File},
+    io::{self, prelude::*, BufReader, BufWriter, ErrorKind},
+    path::{Path, PathBuf},
+    process::Command,
+    string,
+};
 use tempdir::TempDir;
 
 #[derive(Debug, Deserialize)]
@@ -90,7 +91,7 @@ impl Sandbox {
     }
 
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
-        try!(self.write_source_code(&req.code));
+        self.write_source_code(&req.code)?;
 
         let mut command = self.compile_command(req.target, req.channel, req.mode, req.tests, req);
 
@@ -143,42 +144,42 @@ impl Sandbox {
     }
 
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
-        try!(self.write_source_code(&req.code));
+        self.write_source_code(&req.code)?;
         let mut command = self.execute_command(req.channel, req.mode, req.tests, req);
 
         let output = command.output().context(UnableToExecuteCompiler)?;
 
         Ok(ExecuteResponse {
             success: output.status.success(),
-            stdout: try!(vec_to_str(output.stdout)),
-            stderr: try!(vec_to_str(output.stderr)),
+            stdout: vec_to_str(output.stdout)?,
+            stderr: vec_to_str(output.stderr)?,
         })
     }
 
     pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
-        try!(self.write_source_code(&req.code));
+        self.write_source_code(&req.code)?;
         let mut command = self.format_command();
 
         let output = command.output().context(UnableToExecuteCompiler)?;
 
         Ok(FormatResponse {
             success: output.status.success(),
-            code: try!(try!(read(self.input_file.as_ref())).ok_or(Error::OutputMissing)),
-            stdout: try!(vec_to_str(output.stdout)),
-            stderr: try!(vec_to_str(output.stderr)),
+            code: read(self.input_file.as_ref())?.ok_or(Error::OutputMissing)?,
+            stdout: vec_to_str(output.stdout)?,
+            stderr: vec_to_str(output.stderr)?,
         })
     }
 
     pub fn clippy(&self, req: &ClippyRequest) -> Result<ClippyResponse> {
-        try!(self.write_source_code(&req.code));
+        self.write_source_code(&req.code)?;
         let mut command = self.clippy_command(req);
 
         let output = command.output().context(UnableToExecuteCompiler)?;
 
         Ok(ClippyResponse {
             success: output.status.success(),
-            stdout: try!(vec_to_str(output.stdout)),
-            stderr: try!(vec_to_str(output.stderr)),
+            stdout: vec_to_str(output.stdout)?,
+            stderr: vec_to_str(output.stderr)?,
         })
     }
 
@@ -260,8 +261,8 @@ impl Sandbox {
         let mut parts = version_output.split_whitespace().fuse().skip(1);
 
         let release = parts.next().unwrap_or("").into();
-        let commit_hash = parts.next().unwrap_or("").trim_left_matches('(').into();
-        let commit_date = parts.next().unwrap_or("").trim_right_matches(')').into();
+        let commit_hash = parts.next().unwrap_or("").trim_start_matches('(').into();
+        let commit_date = parts.next().unwrap_or("").trim_end_matches(')').into();
 
         Ok(Version { release, commit_hash, commit_date })
     }
@@ -274,7 +275,7 @@ impl Sandbox {
 
         file.write_all(data).context(UnableToCreateSourceFile)?;
 
-        debug!("Wrote {} bytes of source to {}", data.len(), self.input_file.display());
+        log::debug!("Wrote {} bytes of source to {}", data.len(), self.input_file.display());
         Ok(())
     }
 
@@ -286,7 +287,7 @@ impl Sandbox {
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
-        debug!("Compilation command is {:?}", cmd);
+        log::debug!("Compilation command is {:?}", cmd);
 
         cmd
     }
@@ -299,7 +300,7 @@ impl Sandbox {
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
-        debug!("Execution command is {:?}", cmd);
+        log::debug!("Execution command is {:?}", cmd);
 
         cmd
     }
@@ -311,7 +312,7 @@ impl Sandbox {
 
         cmd.arg("rustfmt").args(&["cargo", "fmt"]);
 
-        debug!("Formatting command is {:?}", cmd);
+        log::debug!("Formatting command is {:?}", cmd);
 
         cmd
     }
@@ -324,7 +325,7 @@ impl Sandbox {
 
         cmd.arg("clippy").args(&["cargo", "clippy"]);
 
-        debug!("Clippy command is {:?}", cmd);
+        log::debug!("Clippy command is {:?}", cmd);
 
         cmd
     }
@@ -335,7 +336,7 @@ impl Sandbox {
 
         cmd.arg("miri").args(&["cargo", "miri-playground"]);
 
-        debug!("Miri command is {:?}", cmd);
+        log::debug!("Miri command is {:?}", cmd);
 
         cmd
     }
@@ -497,7 +498,7 @@ impl CompileTarget {
 }
 
 impl fmt::Display for CompileTarget {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         use self::CompileTarget::*;
 
         match *self {
