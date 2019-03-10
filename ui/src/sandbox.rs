@@ -261,8 +261,8 @@ impl Sandbox {
         let mut parts = version_output.split_whitespace().fuse().skip(1);
 
         let release = parts.next().unwrap_or("").into();
-        let commit_hash = parts.next().unwrap_or("").trim_left_matches('(').into();
-        let commit_date = parts.next().unwrap_or("").trim_right_matches(')').into();
+        let commit_hash = parts.next().unwrap_or("").trim_start_matches('(').into();
+        let commit_date = parts.next().unwrap_or("").trim_end_matches(')').into();
 
         Ok(Version { release, commit_hash, commit_date })
     }
