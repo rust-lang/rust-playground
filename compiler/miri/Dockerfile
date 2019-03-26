@@ -1,8 +1,7 @@
 FROM shepmaster/rust-nightly:sources
 
-RUN rustup component add rust-src
+RUN rustup component add rust-src miri
 
-RUN cargo install --git https://github.com/rust-lang/miri/ miri
 RUN cargo miri setup
 RUN cargo miri run
 RUN rm src/*.rs
