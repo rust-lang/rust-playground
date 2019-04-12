@@ -730,11 +730,6 @@
     "id": "rdrand"
   },
   {
-    "name": "redox_users",
-    "version": "0.3.0",
-    "id": "redox_users"
-  },
-  {
     "name": "regex",
     "version": "1.1.5",
     "id": "regex"

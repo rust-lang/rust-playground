@@ -23,6 +23,7 @@ blacklist = [
     # Not supported on stable
     "redox_syscall",
     "redox_termios",
+    "redox_users",
 
     # Not available on Linux
     "security-framework",
