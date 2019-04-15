@@ -13,9 +13,10 @@ use std::collections::btree_map::Entry;
 use std::fs::File;
 use std::io::{Read, Write};
 
-use cargo::core::{Dependency, Package, Source, SourceId};
 use cargo::core::registry::PackageRegistry;
 use cargo::core::resolver::{self, Method, Resolve};
+use cargo::core::source::MaybePackage;
+use cargo::core::{Dependency, Package, Source, SourceId};
 use cargo::sources::RegistrySource;
 use cargo::util::Config;
 
@@ -287,7 +288,7 @@ fn main() {
     // Setup to interact with cargo.
     let config = Config::default().expect("Unable to create default Cargo config");
     let crates_io = SourceId::crates_io(&config).expect("Unable to create crates.io source ID");
-    let mut source = RegistrySource::remote(&crates_io, &config);
+    let mut source = RegistrySource::remote(crates_io, &HashSet::new(), &config);
     source.update().expect("Unable to update registry");
 
     let mut top = TopCrates::download();
@@ -303,7 +304,7 @@ fn main() {
 
         // Query the registry for a summary of this crate.
         // Usefully, this doesn't seem to include yanked versions
-        let dep = Dependency::parse_no_deprecated(name, None, &crates_io)
+        let dep = Dependency::parse_no_deprecated(name, None, crates_io)
             .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
         let matches = source.query_vec(&dep).unwrap_or_else(|e| {
@@ -341,11 +342,16 @@ fn main() {
     for (name, spec) in &mut unique_latest_crates {
         let version = spec.version();
 
-        let pkgid = cargo::core::PackageId::new(&name, &version, &crates_io)
+        let pkgid = cargo::core::PackageId::new(&name, &version, crates_io)
             .unwrap_or_else(|e| panic!("Unable to build PackageId for {} {}: {}", name, version, e));
 
-        let pkg = source.download(&pkgid)
+        let pkg = source.download(pkgid)
             .unwrap_or_else(|e| panic!("Unable to download {} {}: {}", name, version, e));
+
+        let pkg = match pkg {
+            MaybePackage::Ready(pkg) => pkg,
+            _ => panic!("Package {} {} was not downloaded", name, version),
+        };
 
         for target in pkg.targets() {
             if let cargo::core::TargetKind::Lib(_) = *target.kind() {
