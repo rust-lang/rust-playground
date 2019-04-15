@@ -1,4 +1,3 @@
-#![feature(try_from)]
 #![deny(rust_2018_idioms)]
 
 use corsware::{AllowedOrigins, CorsMiddleware, UniCase};
@@ -472,45 +471,45 @@ fn cached(sandbox: Sandbox) -> CachedSandbox<'static> {
 
 #[derive(Debug, Snafu)]
 pub enum Error {
-    #[snafu::display("Sandbox creation failed: {}", source)]
+    #[snafu(display("Sandbox creation failed: {}", source))]
     SandboxCreation { source: sandbox::Error },
-    #[snafu::display("Compilation operation failed: {}", source)]
+    #[snafu(display("Compilation operation failed: {}", source))]
     Compilation { source: sandbox::Error },
-    #[snafu::display("Execution operation failed: {}", source)]
+    #[snafu(display("Execution operation failed: {}", source))]
     Execution { source: sandbox::Error },
-    #[snafu::display("Evaluation operation failed: {}", source)]
+    #[snafu(display("Evaluation operation failed: {}", source))]
     Evaluation { source: sandbox::Error },
-    #[snafu::display("Linting operation failed: {}", source)]
+    #[snafu(display("Linting operation failed: {}", source))]
     Linting { source: sandbox::Error },
-    #[snafu::display("Formatting operation failed: {}", source)]
+    #[snafu(display("Formatting operation failed: {}", source))]
     Formatting { source: sandbox::Error },
-    #[snafu::display("Interpreting operation failed: {}", source)]
+    #[snafu(display("Interpreting operation failed: {}", source))]
     Interpreting { source: sandbox::Error },
-    #[snafu::display("Caching operation failed: {}", source)]
+    #[snafu(display("Caching operation failed: {}", source))]
     Caching { source: sandbox::Error },
-    #[snafu::display("Unable to serialize response: {}", source)]
+    #[snafu(display("Unable to serialize response: {}", source))]
     Serialization { source: serde_json::Error },
-    #[snafu::display("Unable to deserialize request: {}", source)]
+    #[snafu(display("Unable to deserialize request: {}", source))]
     Deserialization { source: bodyparser::BodyError },
-    #[snafu::display("The value {:?} is not a valid target", value)]
+    #[snafu(display("The value {:?} is not a valid target", value))]
     InvalidTarget { value: String },
-    #[snafu::display("The value {:?} is not a valid assembly flavor", value)]
+    #[snafu(display("The value {:?} is not a valid assembly flavor", value))]
     InvalidAssemblyFlavor { value: String },
-    #[snafu::display("The value {:?} is not a valid demangle option", value)]
+    #[snafu(display("The value {:?} is not a valid demangle option", value))]
     InvalidDemangleAssembly { value: String },
-    #[snafu::display("The value {:?} is not a valid assembly processing option", value)]
+    #[snafu(display("The value {:?} is not a valid assembly processing option", value))]
     InvalidProcessAssembly { value: String },
-    #[snafu::display("The value {:?} is not a valid channel", value,)]
+    #[snafu(display("The value {:?} is not a valid channel", value,))]
     InvalidChannel { value: String },
-    #[snafu::display("The value {:?} is not a valid mode", value)]
+    #[snafu(display("The value {:?} is not a valid mode", value))]
     InvalidMode { value: String },
-    #[snafu::display("The value {:?} is not a valid edition", value)]
+    #[snafu(display("The value {:?} is not a valid edition", value))]
     InvalidEdition { value: String },
-    #[snafu::display("The value {:?} is not a valid crate type", value)]
+    #[snafu(display("The value {:?} is not a valid crate type", value))]
     InvalidCrateType { value: String },
-    #[snafu::display("No request was provided")]
+    #[snafu(display("No request was provided"))]
     RequestMissing,
-    #[snafu::display("The cache has been poisoned")]
+    #[snafu(display("The cache has been poisoned"))]
     CachePoisoned,
 }
 

@@ -31,7 +31,7 @@ hyper-tls = "0.3.0"
 router = "0.6.0"
 openssl-probe = "0.1.2"
 dotenv = "0.13.0"
-snafu = { version = "0.1.2", features = ["unstable_display_attribute"] }
+snafu = "0.2.0"
 
 [dependencies.playground-middleware]
 git = "https://github.com/integer32llc/playground-middleware"

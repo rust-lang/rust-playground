@@ -176,7 +176,7 @@
   },
   {
     "name": "csv",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "id": "csv"
   },
   {
@@ -361,7 +361,7 @@
   },
   {
     "name": "image",
-    "version": "0.21.0",
+    "version": "0.21.1",
     "id": "image"
   },
   {
@@ -756,7 +756,7 @@
   },
   {
     "name": "rustc-demangle",
-    "version": "0.1.13",
+    "version": "0.1.14",
     "id": "rustc_demangle"
   },
   {
@@ -773,11 +773,6 @@
     "name": "ryu",
     "version": "0.2.7",
     "id": "ryu"
-  },
-  {
-    "name": "safe-transmute",
-    "version": "0.10.1",
-    "id": "safe_transmute"
   },
   {
     "name": "same-file",
@@ -886,7 +881,7 @@
   },
   {
     "name": "syn",
-    "version": "0.15.30",
+    "version": "0.15.31",
     "id": "syn"
   },
   {

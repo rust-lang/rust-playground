@@ -42,25 +42,25 @@ pub struct Version {
 
 #[derive(Debug, Snafu)]
 pub enum Error {
-    #[snafu::display("Unable to create temporary directory: {}", source)]
+    #[snafu(display("Unable to create temporary directory: {}", source))]
     UnableToCreateTempDir { source: io::Error },
-    #[snafu::display("Unable to create source file: {}", source)]
+    #[snafu(display("Unable to create source file: {}", source))]
     UnableToCreateSourceFile { source: io::Error },
-    #[snafu::display("Unable to execute the compiler: {}", source)]
+    #[snafu(display("Unable to execute the compiler: {}", source))]
     UnableToExecuteCompiler { source: io::Error },
-    #[snafu::display("Unable to read output file: {}", source)]
+    #[snafu(display("Unable to read output file: {}", source))]
     UnableToReadOutput { source: io::Error },
-    #[snafu::display("Unable to read crate information: {}", source)]
+    #[snafu(display("Unable to read crate information: {}", source))]
     UnableToParseCrateInformation { source: ::serde_json::Error },
-    #[snafu::display("Output was not valid UTF-8: {}", source)]
+    #[snafu(display("Output was not valid UTF-8: {}", source))]
     OutputNotUtf8 { source: string::FromUtf8Error },
-    #[snafu::display("Output was missing")]
+    #[snafu(display("Output was missing"))]
     OutputMissing,
-    #[snafu::display("Release was missing from the version output")]
+    #[snafu(display("Release was missing from the version output"))]
     VersionReleaseMissing,
-    #[snafu::display("Commit hash was missing from the version output")]
+    #[snafu(display("Commit hash was missing from the version output"))]
     VersionHashMissing,
-    #[snafu::display("Commit date was missing from the version output")]
+    #[snafu(display("Commit date was missing from the version output"))]
     VersionDateMissing,
 }
 
