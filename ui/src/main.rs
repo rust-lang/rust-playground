@@ -1,4 +1,3 @@
-#![feature(try_from)]
 #![deny(rust_2018_idioms)]
 
 use corsware::{AllowedOrigins, CorsMiddleware, UniCase};
