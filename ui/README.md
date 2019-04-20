@@ -17,3 +17,28 @@ of choice.
 
 [dotenv]: https://crates.io/crates/dotenv
 [gist]: https://developer.github.com/v3/gists/#authentication
+
+### Troubleshooting
+
+#### macOS
+
+After launching `ui`, when you try to do any action (ex. `build`, `rustfmt`, `run` and so on), you get errors from Docker about "Mounts denied":
+
+```
+docker: Error response from daemon: Mounts denied:
+The paths /var/folders/dx/l5pn75zx5v9_cwstvgwc5qyc0000gn/T/playground.6gEHdGUM6XPU/output and /var/folders/dx/l5pn75zx5v9_cwstvgwc5qyc0000gn/T/playground.6gEHdGUM6XPU/input.rs
+are not shared from OS X and are not known to Docker.
+You can configure shared paths from Docker -> Preferences... -> File Sharing.
+See https://docs.docker.com/docker-for-mac/osxfs/#namespaces for more info.
+.
+time="2099-12-31T00:00:00+00:00" level=error msg="error waiting for container: context canceled"
+```
+
+To fix this issue, set the `TMPDIR` environment variable to a path that Docker can mount:
+
+```
+mkdir tmp
+TMPDIR=$PWD/tmp cargo run
+```
+
+(Note: This was reported at [#480](https://github.com/integer32llc/rust-playground/issues/480))
