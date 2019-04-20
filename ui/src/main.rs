@@ -576,6 +576,8 @@ struct ExecuteResponse {
 #[derive(Debug, Clone, Deserialize)]
 struct FormatRequest {
     code: String,
+    #[serde(default)]
+    edition: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -742,6 +744,7 @@ impl TryFrom<FormatRequest> for sandbox::FormatRequest {
     fn try_from(me: FormatRequest) -> Result<Self> {
         Ok(sandbox::FormatRequest {
             code: me.code,
+            edition: parse_edition(&me.edition)?,
         })
     }
 }

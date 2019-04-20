@@ -271,3 +271,9 @@ export const clippyRequestSelector = createSelector(
   getCrateType,
   (code, edition, crateType) => ({ code, edition, crateType }),
 );
+
+export const formatRequestSelector = createSelector(
+  codeSelector,
+  editionSelector,
+  (code, edition) => ({ code, edition }),
+);

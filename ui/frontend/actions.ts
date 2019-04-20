@@ -2,7 +2,13 @@ import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url from 'url';
 
-import { clippyRequestSelector, getCrateType, isAutoBuildSelector, runAsTest } from './selectors';
+import {
+  clippyRequestSelector,
+  formatRequestSelector,
+  getCrateType,
+  isAutoBuildSelector,
+  runAsTest,
+} from './selectors';
 import State from './state';
 import {
   AssemblyFlavor,
@@ -420,6 +426,11 @@ export const gotoPosition = (line, column) =>
 const requestFormat = () =>
   createAction(ActionType.RequestFormat);
 
+interface FormatRequestBody {
+  code: string;
+  edition: string;
+}
+
 interface FormatResponseBody {
   code: string;
   stdout: string;
@@ -438,8 +449,7 @@ export function performFormat(): ThunkAction {
   return function(dispatch, getState) {
     dispatch(requestFormat());
 
-    const { code } = getState();
-    const body = { code };
+    const body: FormatRequestBody = formatRequestSelector(getState());
 
     return jsonPost(routes.format, body)
       .then(json => {
