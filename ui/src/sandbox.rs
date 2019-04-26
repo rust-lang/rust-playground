@@ -158,7 +158,7 @@ impl Sandbox {
 
     pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
         self.write_source_code(&req.code)?;
-        let mut command = self.format_command();
+        let mut command = self.format_command(req);
 
         let output = command.output().context(UnableToExecuteCompiler)?;
 
@@ -305,10 +305,12 @@ impl Sandbox {
         cmd
     }
 
-    fn format_command(&self) -> Command {
+    fn format_command(&self, req: impl EditionRequest) -> Command {
         let crate_type = CrateType::Binary;
 
         let mut cmd = self.docker_command(Some(crate_type));
+
+        cmd.apply_edition(req);
 
         cmd.arg("rustfmt").args(&["cargo", "fmt"]);
 
@@ -709,6 +711,11 @@ pub struct ExecuteResponse {
 #[derive(Debug, Clone)]
 pub struct FormatRequest {
     pub code: String,
+    pub edition: Option<Edition>,
+}
+
+impl EditionRequest for FormatRequest {
+    fn edition(&self) -> Option<Edition> { self.edition }
 }
 
 #[derive(Debug, Clone)]
@@ -914,14 +921,14 @@ mod test {
         assert!(resp.stdout.contains("nightly"));
     }
 
-    // Code that will only work in Rust 2018
+    // Code that will only work in Rust 2015
     const EDITION_CODE: &str = r#"
-    macro_rules! foo {
-        ($($a:ident)?) => {}
+    fn main() {
+        let async = true;
     }
-
-    fn main() {}
     "#;
+
+    const EDITION_ERROR: &str = "found reserved keyword `async`";
 
     #[test]
     fn rust_edition_default() -> Result<()> {
@@ -931,10 +938,9 @@ mod test {
             ..ExecuteRequest::default()
         };
 
-        let sb = Sandbox::new()?;
-        let resp = sb.execute(&req)?;
+        let resp = Sandbox::new()?.execute(&req)?;
 
-        assert!(resp.stderr.contains("`?` is not a macro repetition operator"));
+        assert!(!resp.stderr.contains(EDITION_ERROR));
         Ok(())
     }
 
@@ -947,10 +953,9 @@ mod test {
             ..ExecuteRequest::default()
         };
 
-        let sb = Sandbox::new()?;
-        let resp = sb.execute(&req)?;
+        let resp = Sandbox::new()?.execute(&req)?;
 
-        assert!(resp.stderr.contains("`?` is not a macro repetition operator"));
+        assert!(!resp.stderr.contains(EDITION_ERROR));
         Ok(())
     }
 
@@ -963,10 +968,9 @@ mod test {
             ..ExecuteRequest::default()
         };
 
-        let sb = Sandbox::new()?;
-        let resp = sb.execute(&req)?;
+        let resp = Sandbox::new()?.execute(&req)?;
 
-        assert!(!resp.stderr.contains("`crate` in paths is experimental"));
+        assert!(resp.stderr.contains(EDITION_ERROR));
         Ok(())
     }
 
@@ -980,6 +984,8 @@ mod test {
     }
     "#;
 
+    const BACKTRACE_NOTE: &str = "Run with `RUST_BACKTRACE=1` environment variable to display a backtrace";
+
     #[test]
     fn backtrace_disabled() -> Result<()> {
         let req = ExecuteRequest {
@@ -991,7 +997,7 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.execute(&req)?;
 
-        assert!(resp.stderr.contains("Run with `RUST_BACKTRACE=1` for a backtrace"));
+        assert!(resp.stderr.contains(BACKTRACE_NOTE));
         assert!(!resp.stderr.contains("stack backtrace:"));
 
         Ok(())
@@ -1008,7 +1014,7 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.execute(&req)?;
 
-        assert!(!resp.stderr.contains("Run with `RUST_BACKTRACE=1` for a backtrace"));
+        assert!(!resp.stderr.contains(BACKTRACE_NOTE));
         assert!(resp.stderr.contains("stack backtrace:"));
 
         Ok(())
@@ -1078,6 +1084,7 @@ mod test {
     fn formatting_code() {
         let req = FormatRequest {
             code: "fn foo () { method_call(); }".to_string(),
+            edition: None,
         };
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -1088,6 +1095,44 @@ mod test {
         assert_eq!(lines[0], "fn foo() {");
         assert_eq!(lines[1], "    method_call();");
         assert_eq!(lines[2], "}");
+    }
+
+    // Code that is only syntactically valid in Rust 2018
+    const FORMAT_IN_EDITION_2018: &str = r#"fn main() { use std::num::ParseIntError; let result: Result<i32, ParseIntError> = try { "1".parse::<i32>()? + "2".parse::<i32>()? + "3".parse::<i32>()? }; assert_eq!(result, Ok(6)); }"#;
+
+    const FORMAT_ERROR: &str = r#"error: expected identifier, found `"1"`"#;
+
+    #[test]
+    fn formatting_code_edition_2015() -> Result<()> {
+        let req = FormatRequest {
+            code: FORMAT_IN_EDITION_2018.to_string(),
+            edition: Some(Edition::Rust2015),
+        };
+
+        let resp = Sandbox::new()?.format(&req)?;
+
+        assert!(resp.stderr.contains(FORMAT_ERROR));
+        Ok(())
+    }
+
+    #[test]
+    fn formatting_code_edition_2018() -> Result<()> {
+        let req = FormatRequest {
+            code: FORMAT_IN_EDITION_2018.to_string(),
+            edition: Some(Edition::Rust2018),
+        };
+
+        let resp = Sandbox::new()?.format(&req)?;
+        assert!(!resp.stderr.contains(FORMAT_ERROR));
+
+        let lines: Vec<_> = resp.code.lines().collect();
+        assert_eq!(lines[0], r#"fn main() {"#);
+        assert_eq!(lines[1], r#"    use std::num::ParseIntError;"#);
+        assert_eq!(lines[2], r#"    let result: Result<i32, ParseIntError> ="#);
+        assert_eq!(lines[3], r#"        try { "1".parse::<i32>()? + "2".parse::<i32>()? + "3".parse::<i32>()? };"#);
+        assert_eq!(lines[4], r#"    assert_eq!(result, Ok(6));"#);
+        assert_eq!(lines[5], r#"}"#);
+        Ok(())
     }
 
     #[test]
