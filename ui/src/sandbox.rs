@@ -914,14 +914,14 @@ mod test {
         assert!(resp.stdout.contains("nightly"));
     }
 
-    // Code that will only work in Rust 2018
+    // Code that will only work in Rust 2015
     const EDITION_CODE: &str = r#"
-    macro_rules! foo {
-        ($($a:ident)?) => {}
+    fn main() {
+        let async = true;
     }
-
-    fn main() {}
     "#;
+
+    const EDITION_ERROR: &str = "found reserved keyword `async`";
 
     #[test]
     fn rust_edition_default() -> Result<()> {
@@ -931,10 +931,9 @@ mod test {
             ..ExecuteRequest::default()
         };
 
-        let sb = Sandbox::new()?;
-        let resp = sb.execute(&req)?;
+        let resp = Sandbox::new()?.execute(&req)?;
 
-        assert!(resp.stderr.contains("`?` is not a macro repetition operator"));
+        assert!(!resp.stderr.contains(EDITION_ERROR));
         Ok(())
     }
 
@@ -947,10 +946,9 @@ mod test {
             ..ExecuteRequest::default()
         };
 
-        let sb = Sandbox::new()?;
-        let resp = sb.execute(&req)?;
+        let resp = Sandbox::new()?.execute(&req)?;
 
-        assert!(resp.stderr.contains("`?` is not a macro repetition operator"));
+        assert!(!resp.stderr.contains(EDITION_ERROR));
         Ok(())
     }
 
@@ -963,10 +961,9 @@ mod test {
             ..ExecuteRequest::default()
         };
 
-        let sb = Sandbox::new()?;
-        let resp = sb.execute(&req)?;
+        let resp = Sandbox::new()?.execute(&req)?;
 
-        assert!(!resp.stderr.contains("`crate` in paths is experimental"));
+        assert!(resp.stderr.contains(EDITION_ERROR));
         Ok(())
     }
 
