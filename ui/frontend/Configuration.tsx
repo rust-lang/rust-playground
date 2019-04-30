@@ -81,24 +81,6 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
 
     const advancedEditor = editor === Editor.Advanced;
 
-    const keybindingSelect = advancedEditor ? (
-      <ConfigurationSelect what="keybinding"
-                           label="Editor Keybinding"
-                           defaultValue={keybinding}
-                           onChange={this.onChangeKeybinding}>
-        {keybindingOptions}
-      </ConfigurationSelect>
-    ) : null;
-
-    const themeSelect = advancedEditor ? (
-      <ConfigurationSelect what="theme"
-                           label="Editor Theme"
-                           defaultValue={theme}
-                           onChange={this.onChangeTheme}>
-        {themeOptions}
-      </ConfigurationSelect>
-    ) : null;
-
     return (
       <div className="configuration">
         <ConfigurationSelect what="editor"
@@ -109,9 +91,23 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
           <option value={Editor.Advanced}>Advanced</option>
         </ConfigurationSelect>
 
-        {keybindingSelect}
+        {advancedEditor &&
+          <ConfigurationSelect what="keybinding"
+                               label="Editor Keybinding"
+                               defaultValue={keybinding}
+                               onChange={this.onChangeKeybinding}>
+            {keybindingOptions}
+          </ConfigurationSelect>
+        }
 
-        {themeSelect}
+        {advancedEditor &&
+          <ConfigurationSelect what="theme"
+                               label="Editor Theme"
+                               defaultValue={theme}
+                               onChange={this.onChangeTheme}>
+            {themeOptions}
+          </ConfigurationSelect>
+        }
 
         <ConfigurationSelect what="orientation"
                              label="Split Orientation"
