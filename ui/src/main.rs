@@ -654,6 +654,10 @@ struct EvaluateRequest {
     version: String,
     optimize: String,
     code: String,
+    #[serde(default)]
+    edition: String,
+    #[serde(default)]
+    tests: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -842,9 +846,9 @@ impl TryFrom<EvaluateRequest> for sandbox::ExecuteRequest {
         Ok(sandbox::ExecuteRequest {
             channel: parse_channel(&me.version)?,
             mode: if me.optimize != "0" { sandbox::Mode::Release } else { sandbox::Mode::Debug },
-            edition: None, // FIXME: What should this be?
+            edition: parse_edition(&me.edition)?,
             crate_type: sandbox::CrateType::Binary,
-            tests: false,
+            tests: me.tests,
             backtrace: false,
             code: me.code,
         })
