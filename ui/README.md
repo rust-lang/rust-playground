@@ -13,6 +13,7 @@ of choice.
 | `PLAYGROUND_UI_ADDRESS`   | No       |       127.0.0.1 | The address to listen on                                                |
 | `PLAYGROUND_UI_PORT`      | No       |            5000 | The port to listen on                                                   |
 | `PLAYGROUND_LOG_FILE`     | No       |  access-log.csv | The file to record accesses                                             |
+| `PLAYGROUND_CORS_ENABLED` | No       |                 | If set, will enable CORS support                                        |
 | `TMPDIR`                  | No       | system-provided | Where compilation artifacts will be saved. Must be accessible to Docker |
 
 [dotenv]: https://crates.io/crates/dotenv
