@@ -2,10 +2,11 @@
 
 use cargo::{
     core::{
+        package::PackageSet,
         registry::PackageRegistry,
         resolver::{self, Method, Resolve},
-        source::MaybePackage,
-        Dependency, Package, Source, SourceId,
+        source::SourceMap,
+        Dependency, Package, PackageId, Source, SourceId, TargetKind,
     },
     sources::RegistrySource,
     util::Config,
@@ -335,32 +336,48 @@ fn main() {
 
     let mut infos = Vec::new();
 
-    for (name, spec) in &mut unique_latest_crates {
-        let version = spec.version();
+    let package_ids: Vec<_> = unique_latest_crates
+        .iter()
+        .map(|(name, spec)| {
+            let version = spec.version();
+            PackageId::new(name, &version, crates_io).unwrap_or_else(|e| {
+                panic!("Unable to build PackageId for {} {}: {}", name, version, e)
+            })
+        })
+        .collect();
 
-        let pkgid = cargo::core::PackageId::new(&name, &version, crates_io)
-            .unwrap_or_else(|e| panic!("Unable to build PackageId for {} {}: {}", name, version, e));
+    let mut sources = SourceMap::new();
+    sources.insert(Box::new(source));
 
-        let pkg = source.download(pkgid)
-            .unwrap_or_else(|e| panic!("Unable to download {} {}: {}", name, version, e));
+    let package_set =
+        PackageSet::new(&package_ids, sources, &config).expect("Unable to create a PackageSet");
 
-        let pkg = match pkg {
-            MaybePackage::Ready(pkg) => pkg,
-            _ => panic!("Package {} {} was not downloaded", name, version),
-        };
+    let packages = package_set
+        .get_many(package_set.package_ids())
+        .expect("Unable to download packages");
+
+    for pkg in packages {
+        let name = pkg.name().to_string();
+        let version = pkg.version().to_string();
+
+        let spec = unique_latest_crates
+            .get_mut(&name)
+            .expect("Crate went missing");
 
         for target in pkg.targets() {
-            if let cargo::core::TargetKind::Lib(_) = *target.kind() {
+            if let TargetKind::Lib(_) = *target.kind() {
                 infos.push(CrateInformation {
                     name: name.clone(),
                     version: version.clone(),
-                    id: target.crate_name()
+                    id: target.crate_name(),
                 })
             }
         }
 
         fill_playground_metadata_features(spec, &pkg);
     }
+
+    infos.sort_by(|a, b| a.name.cmp(&b.name));
 
     let manifest = TomlManifest {
         package: TomlPackage {
