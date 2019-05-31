@@ -1,26 +1,22 @@
-extern crate cargo;
-extern crate reqwest;
-#[macro_use]
-extern crate lazy_static;
-extern crate serde;
-extern crate serde_json;
-#[macro_use]
-extern crate serde_derive;
-extern crate toml;
+#![deny(rust_2018_idioms)]
 
-use std::collections::{BTreeMap, BTreeSet, HashSet};
-use std::collections::btree_map::Entry;
-use std::fs::File;
-use std::io::{Read, Write};
-
-use cargo::core::registry::PackageRegistry;
-use cargo::core::resolver::{self, Method, Resolve};
-use cargo::core::source::MaybePackage;
-use cargo::core::{Dependency, Package, Source, SourceId};
-use cargo::sources::RegistrySource;
-use cargo::util::Config;
-
-use serde::Serialize;
+use cargo::{
+    core::{
+        registry::PackageRegistry,
+        resolver::{self, Method, Resolve},
+        source::MaybePackage,
+        Dependency, Package, Source, SourceId,
+    },
+    sources::RegistrySource,
+    util::Config,
+};
+use lazy_static::lazy_static;
+use serde::{Deserialize, Serialize};
+use std::{
+    collections::{btree_map::Entry, BTreeMap, BTreeSet, HashSet},
+    fs::File,
+    io::{Read, Write},
+};
 
 /// The list of crates from crates.io
 #[derive(Debug, Deserialize)]
