@@ -273,7 +273,8 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedE
     await this.requireLibraries();
     await import(
       /* webpackChunkName: "brace-keybinding-[request]" */
-      `brace/keybinding/${keybinding}`,
+      /* tslint:disable-next-line: trailing-comma */
+      `brace/keybinding/${keybinding}`
     );
 
     this.setState({ keybinding, keybindingState: LoadState.Loaded });
@@ -294,7 +295,8 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedE
     await this.requireLibraries();
     await import(
       /* webpackChunkName: "brace-theme-[request]" */
-      `brace/theme/${theme}`,
+      /* tslint:disable-next-line: trailing-comma */
+      `brace/theme/${theme}`
     );
 
     this.setState({ theme, themeState: LoadState.Loaded });
@@ -303,7 +305,8 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedE
   private async requireLibraries() {
     return import(
       /* webpackChunkName: "advanced-editor" */
-      './advanced-editor',
+      /* tslint:disable-next-line: trailing-comma */
+      './advanced-editor'
     );
   }
 }
