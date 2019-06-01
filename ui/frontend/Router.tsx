@@ -1,6 +1,6 @@
 import React from 'react';
 
-import createHistory from 'history/createBrowserHistory';
+import { createBrowserHistory as createHistory } from 'history';
 import { createRouter } from './uss-router';
 import UssRouter from './uss-router/Router';
 
