@@ -11,8 +11,14 @@ const basename = require('basename');
 const thisPackage = require('./package.json');
 const devDependencies = Object.keys(thisPackage.devDependencies);
 
-const allKeybindingNames = glob.sync('./node_modules/brace/keybinding/*.js').map(basename);
-const allThemeNames = glob.sync('./node_modules/brace/theme/*.js').map(basename);
+const allKeybindingNames =
+      glob.sync('./node_modules/ace-builds/src-noconflict/keybinding-*.js')
+      .map(basename)
+      .map(n => n.replace(/^keybinding-/, ''));
+const allThemeNames =
+      glob.sync('./node_modules/ace-builds/src-noconflict/theme-*.js')
+      .map(basename)
+      .map(n => n.replace(/^theme-/, ''));
 
 // There's a builtin/default keybinding that we call `ace`.
 const allKeybindings = allKeybindingNames.concat(['ace']).sort();
