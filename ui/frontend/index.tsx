@@ -1,4 +1,5 @@
-import '@babel/polyfill';
+import 'core-js';
+import 'regenerator-runtime/runtime';
 
 import { merge } from 'lodash';
 import React from 'react';

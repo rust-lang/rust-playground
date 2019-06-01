@@ -30,8 +30,8 @@ hyper = "0.12.0"
 hyper-tls = "0.3.0"
 router = "0.6.0"
 openssl-probe = "0.1.2"
-dotenv = "0.13.0"
-snafu = "0.2.0"
+dotenv = "0.14.1"
+snafu = "0.4.1"
 
 [dependencies.playground-middleware]
 git = "https://github.com/integer32llc/playground-middleware"

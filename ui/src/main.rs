@@ -141,7 +141,7 @@ fn compile(req: &mut Request<'_, '_>) -> IronResult<Response> {
         sandbox
             .compile(&req)
             .map(CompileResponse::from)
-            .eager_context(Compilation)
+            .context(Compilation)
     })
 }
 
@@ -151,7 +151,7 @@ fn execute(req: &mut Request<'_, '_>) -> IronResult<Response> {
         sandbox
             .execute(&req)
             .map(ExecuteResponse::from)
-            .eager_context(Execution)
+            .context(Execution)
     })
 }
 
@@ -161,7 +161,7 @@ fn format(req: &mut Request<'_, '_>) -> IronResult<Response> {
         sandbox
             .format(&req)
             .map(FormatResponse::from)
-            .eager_context(Formatting)
+            .context(Formatting)
     })
 }
 
@@ -170,7 +170,7 @@ fn clippy(req: &mut Request<'_, '_>) -> IronResult<Response> {
         sandbox
             .clippy(&req.try_into()?)
             .map(ClippyResponse::from)
-            .eager_context(Linting)
+            .context(Linting)
     })
 }
 
@@ -179,7 +179,7 @@ fn miri(req: &mut Request<'_, '_>) -> IronResult<Response> {
         sandbox
             .miri(&req.try_into()?)
             .map(MiriResponse::from)
-            .eager_context(Interpreting)
+            .context(Interpreting)
     })
 }
 
@@ -268,7 +268,7 @@ fn evaluate(req: &mut Request<'_, '_>) -> IronResult<Response> {
         sandbox
             .execute(&req)
             .map(EvaluateResponse::from)
-            .eager_context(Evaluation)
+            .context(Evaluation)
     })
 }
 

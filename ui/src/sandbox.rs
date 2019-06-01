@@ -74,7 +74,7 @@ pub struct Sandbox {
 }
 
 fn vec_to_str(v: Vec<u8>) -> Result<String> {
-    String::from_utf8(v).eager_context(OutputNotUtf8)
+    String::from_utf8(v).context(OutputNotUtf8)
 }
 
 impl Sandbox {
