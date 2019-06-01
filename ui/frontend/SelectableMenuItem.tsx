@@ -3,7 +3,9 @@ import React from 'react';
 import { CheckmarkIcon } from './Icon';
 import MenuItem from './MenuItem';
 
-interface SelectableMenuItemProps extends React.HTMLProps<HTMLButtonElement> {
+type Button = JSX.IntrinsicElements['button'];
+
+interface SelectableMenuItemProps extends Button {
   name: string;
   selected: boolean;
 }
