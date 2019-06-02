@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 
 import State from './state';
@@ -36,6 +36,20 @@ const buildCrateAutocompleter = (autocompleteOnUse: boolean, crates: Crate[]): A
     callback(null, suggestions);
   },
 });
+
+function useRafDebouncedFunction<A extends any[]>(fn: (...args: A) => void) {
+  const timeout = useRef<number>();
+
+  return useCallback((...args: A): void => {
+    if (timeout.current) {
+      window.cancelAnimationFrame(timeout.current);
+    }
+
+    timeout.current = window.requestAnimationFrame(() => {
+      fn(...args);
+    });
+  }, [fn, timeout]);
+}
 
 interface AdvancedEditorProps {
   ace: Ace;
@@ -131,7 +145,8 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
     editor.completers = [buildCrateAutocompleter(autocompleteOnUse, crates)];
   });
 
-  useEditorProp(props.onEditCode, (editor, onEditCode) => {
+  const onEditCodeDebounced = useRafDebouncedFunction(props.onEditCode);
+  useEditorProp(onEditCodeDebounced, (editor, onEditCode) => {
     const listener = editor.on<true>('change', _delta => {
       if (!silenceOnChange.current) {
         onEditCode(editor.getValue());
