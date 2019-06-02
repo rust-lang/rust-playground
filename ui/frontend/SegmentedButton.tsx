@@ -19,7 +19,9 @@ const SegmentedButtonInner: React.SFC<SegmentedButtonInnerProps> = ({ innerRef, 
   </button>
 );
 
-interface SegmentedButtonProps extends React.HTMLProps<HTMLButtonElement> {
+type Button = JSX.IntrinsicElements['button'];
+
+interface SegmentedButtonProps extends Button {
   isBuild?: boolean;
 }
 

@@ -2,7 +2,9 @@ import React from 'react';
 
 import MenuItem from './MenuItem';
 
-interface ButtonMenuItemProps extends React.HTMLProps<HTMLButtonElement> {
+type Button = JSX.IntrinsicElements['button'];
+
+interface ButtonMenuItemProps extends Button {
   name: string;
 }
 
