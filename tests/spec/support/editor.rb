@@ -5,7 +5,11 @@ class Editor
   end
 
   def set(text)
-    page.execute_script "ace.edit('editor').setValue(#{text.to_json})"
+    page.within('.editor .ace_text-input', visible: :any) do
+      page.execute_script <<~JS
+        window.rustPlayground.setCode(#{text.to_json});
+      JS
+    end
   end
 
   def has_line?(text)
