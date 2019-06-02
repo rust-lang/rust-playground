@@ -146,8 +146,9 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
   useEditorProp(props.code, (editor, code) => {
     if (editor.getValue() !== code) {
       silenceOnChange.current = true;
+      const currentSelection = editor.selection.toJSON();
       editor.setValue(code);
-      editor.selection.clearSelection();
+      editor.selection.fromJSON(currentSelection);
       silenceOnChange.current = false;
     }
   });

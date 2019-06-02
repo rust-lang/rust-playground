@@ -66,5 +66,21 @@ declare module 'ace-builds' {
     export interface Editor {
       execCommand(name: string | string[], args?: any): any;
     }
+
+    // Allows preserving and restoring the selection across an external update
+    //
+    // const currentSelection = editor.selection.toJSON();
+    // editor.setValue(code, 1);
+    // editor.selection.fromJSON(currentSelection);
+    interface SavedSelection {
+      start: Point;
+      end: Point;
+      isBackwards: boolean;
+    }
+
+    export interface Selection {
+      toJSON(): SavedSelection;
+      fromJSON(selection: SavedSelection): void;
+    }
   }
 }
