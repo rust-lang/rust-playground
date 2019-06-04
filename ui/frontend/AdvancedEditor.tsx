@@ -37,7 +37,7 @@ const buildCrateAutocompleter = (autocompleteOnUse: boolean, crates: Crate[]): A
   },
 });
 
-function useRafDebouncedFunction<A extends any[]>(fn: (...args: A) => void) {
+function useRafDebouncedFunction<A extends any[]>(fn: (...args: A) => void, onCall?: (...args: A) => void) {
   const timeout = useRef<number>();
 
   return useCallback((...args: A): void => {
@@ -47,8 +47,9 @@ function useRafDebouncedFunction<A extends any[]>(fn: (...args: A) => void) {
 
     timeout.current = window.requestAnimationFrame(() => {
       fn(...args);
+      if (onCall) { onCall(...args); }
     });
-  }, [fn, timeout]);
+  }, [fn, onCall, timeout]);
 }
 
 interface AdvancedEditorProps {
@@ -70,7 +71,6 @@ interface AdvancedEditorProps {
 const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
   const [editor, setEditor] = useState<AceEditor>(null);
   const child = useRef<HTMLDivElement>(null);
-  const silenceOnChange = useRef(false);
 
   useEffect(() => {
     if (!child.current) { return; }
@@ -145,10 +145,45 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
     editor.completers = [buildCrateAutocompleter(autocompleteOnUse, crates)];
   });
 
-  const onEditCodeDebounced = useRafDebouncedFunction(props.onEditCode);
+  // Both Ace and the playground want to be the One True Owner of
+  // the textual content. This can cause issues because the Redux
+  // store will attempt to change Ace in response to changes
+  // *originating* from Ace. In addition, Ace can generate multiple
+  // `change` events in response to what looks like a single user
+  // action. This includes:
+  //
+  // - Auto-indenting after pressing return
+  // - Invoking undo
+  // - Multi-cursor editing
+  //
+  // To avoid issues...
+  //
+  // 1. When we are setting the Ace value based on the prop, we
+  //    prevent generating outgoing events. This requires that the
+  //    events are synchronously generated during the call to
+  //    `setValue`
+  //
+  // 2. We throttle outgoing events to once per animation frame,
+  //    only sending the most recent update. This reduces the updates
+  //    to Redux and thus the number of updates to our props. While
+  //    this covers a lot of the problems, it does not handle rapid
+  //    typing (a.k.a. banging on the keyboard).
+  //
+  // 3. When we do generate an outgoing event, we log it. If we see
+  //    that same event come back next via the property, we ignore it.
+  //
+  // 4. When all else fails, we ignore the prop if the value to set is
+  //    what Ace already has.
+  const doingSetProp = useRef(false);
+  const previouslyNotified = useRef([]);
+  const onEditCodeDebounced = useRafDebouncedFunction(
+    props.onEditCode,
+    useCallback(code => previouslyNotified.current.push(code), [previouslyNotified]),
+  );
+
   useEditorProp(onEditCodeDebounced, (editor, onEditCode) => {
     const listener = editor.on<true>('change', _delta => {
-      if (!silenceOnChange.current) {
+      if (!doingSetProp.current) {
         onEditCode(editor.getValue());
       }
     });
@@ -159,13 +194,25 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
   });
 
   useEditorProp(props.code, (editor, code) => {
-    if (editor.getValue() !== code) {
-      silenceOnChange.current = true;
-      const currentSelection = editor.selection.toJSON();
-      editor.setValue(code);
-      editor.selection.fromJSON(currentSelection);
-      silenceOnChange.current = false;
+    // Is this prop update the result of our own `change` event?
+    const last = previouslyNotified.current.shift();
+    if (code === last) {
+      return;
     }
+
+    // It wasn't; discard any remaining self-generated events and resync
+    previouslyNotified.current = [];
+
+    // Avoid spuriously resetting the text
+    if (editor.getValue() === code) {
+      return;
+    }
+
+    doingSetProp.current = true;
+    const currentSelection = editor.selection.toJSON();
+    editor.setValue(code);
+    editor.selection.fromJSON(currentSelection);
+    doingSetProp.current = false;
   });
 
   useEditorProp(props.theme, (editor, theme) => {
