@@ -36,8 +36,10 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain "${channel}
 
 FROM toolchain as bare-sources
 
+# https://github.com/rust-lang/cargo/issues/7049
 RUN cd / && \
-    cargo new playground
+    mkdir -p playground && \
+    cargo init playground
 WORKDIR /playground
 
 ADD Cargo.toml /playground/Cargo.toml
