@@ -6,7 +6,7 @@
   },
   {
     "name": "aho-corasick",
-    "version": "0.7.3",
+    "version": "0.7.4",
     "id": "aho_corasick"
   },
   {
@@ -36,12 +36,12 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.26",
+    "version": "0.3.32",
     "id": "backtrace"
   },
   {
     "name": "backtrace-sys",
-    "version": "0.1.28",
+    "version": "0.1.30",
     "id": "backtrace_sys"
   },
   {
@@ -61,7 +61,7 @@
   },
   {
     "name": "bitflags",
-    "version": "1.0.4",
+    "version": "1.1.0",
     "id": "bitflags"
   },
   {
@@ -70,19 +70,24 @@
     "id": "blake2_rfc"
   },
   {
-    "name": "build_const",
+    "name": "bstr",
     "version": "0.2.1",
-    "id": "build_const"
+    "id": "bstr"
   },
   {
     "name": "byteorder",
-    "version": "1.3.1",
+    "version": "1.3.2",
     "id": "byteorder"
   },
   {
     "name": "bytes",
     "version": "0.4.12",
     "id": "bytes"
+  },
+  {
+    "name": "c2-chacha",
+    "version": "0.2.2",
+    "id": "c2_chacha"
   },
   {
     "name": "cc",
@@ -96,7 +101,7 @@
   },
   {
     "name": "chrono",
-    "version": "0.4.6",
+    "version": "0.4.7",
     "id": "chrono"
   },
   {
@@ -128,11 +133,6 @@
     "name": "cookie_store",
     "version": "0.7.0",
     "id": "cookie_store"
-  },
-  {
-    "name": "crc",
-    "version": "1.8.1",
-    "id": "crc"
   },
   {
     "name": "crc32fast",
@@ -171,12 +171,12 @@
   },
   {
     "name": "csv",
-    "version": "1.0.7",
+    "version": "1.1.1",
     "id": "csv"
   },
   {
     "name": "csv-core",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "id": "csv_core"
   },
   {
@@ -191,7 +191,7 @@
   },
   {
     "name": "deflate",
-    "version": "0.7.19",
+    "version": "0.7.20",
     "id": "deflate"
   },
   {
@@ -216,7 +216,7 @@
   },
   {
     "name": "env_logger",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "id": "env_logger"
   },
   {
@@ -246,7 +246,7 @@
   },
   {
     "name": "flate2",
-    "version": "1.0.7",
+    "version": "1.0.9",
     "id": "flate2"
   },
   {
@@ -286,7 +286,7 @@
   },
   {
     "name": "futures",
-    "version": "0.1.27",
+    "version": "0.1.28",
     "id": "futures"
   },
   {
@@ -300,8 +300,13 @@
     "id": "gcc"
   },
   {
+    "name": "getrandom",
+    "version": "0.1.6",
+    "id": "getrandom"
+  },
+  {
     "name": "gif",
-    "version": "0.10.1",
+    "version": "0.10.2",
     "id": "gif"
   },
   {
@@ -311,7 +316,7 @@
   },
   {
     "name": "h2",
-    "version": "0.1.21",
+    "version": "0.1.25",
     "id": "h2"
   },
   {
@@ -331,7 +336,7 @@
   },
   {
     "name": "httparse",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "id": "httparse"
   },
   {
@@ -341,7 +346,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.12.29",
+    "version": "0.12.31",
     "id": "hyper"
   },
   {
@@ -356,7 +361,7 @@
   },
   {
     "name": "image",
-    "version": "0.21.1",
+    "version": "0.21.2",
     "id": "image"
   },
   {
@@ -406,7 +411,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.56",
+    "version": "0.2.58",
     "id": "libc"
   },
   {
@@ -451,7 +456,7 @@
   },
   {
     "name": "memoffset",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "id": "memoffset"
   },
   {
@@ -471,12 +476,12 @@
   },
   {
     "name": "miniz_oxide",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "id": "miniz_oxide"
   },
   {
     "name": "miniz_oxide_c_api",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "id": "miniz_oxide_c_api"
   },
   {
@@ -521,7 +526,7 @@
   },
   {
     "name": "num-complex",
-    "version": "0.2.1",
+    "version": "0.2.3",
     "id": "num_complex"
   },
   {
@@ -541,7 +546,7 @@
   },
   {
     "name": "num-rational",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "id": "num_rational"
   },
   {
@@ -551,7 +556,7 @@
   },
   {
     "name": "num_cpus",
-    "version": "1.10.0",
+    "version": "1.10.1",
     "id": "num_cpus"
   },
   {
@@ -625,6 +630,11 @@
     "id": "png"
   },
   {
+    "name": "ppv-lite86",
+    "version": "0.2.5",
+    "id": "ppv_lite86"
+  },
+  {
     "name": "precomputed-hash",
     "version": "0.1.1",
     "id": "precomputed_hash"
@@ -651,22 +661,22 @@
   },
   {
     "name": "rand",
-    "version": "0.6.5",
+    "version": "0.7.0",
     "id": "rand"
   },
   {
     "name": "rand_chacha",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "id": "rand_chacha"
   },
   {
     "name": "rand_core",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "id": "rand_core"
   },
   {
     "name": "rand_hc",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "id": "rand_hc"
   },
   {
@@ -696,12 +706,12 @@
   },
   {
     "name": "rayon",
-    "version": "1.0.3",
+    "version": "1.1.0",
     "id": "rayon"
   },
   {
     "name": "rayon-core",
-    "version": "1.4.1",
+    "version": "1.5.0",
     "id": "rayon_core"
   },
   {
@@ -711,22 +721,27 @@
   },
   {
     "name": "regex",
-    "version": "1.1.6",
+    "version": "1.1.8",
     "id": "regex"
   },
   {
+    "name": "regex-automata",
+    "version": "0.1.7",
+    "id": "regex_automata"
+  },
+  {
     "name": "regex-syntax",
-    "version": "0.6.6",
+    "version": "0.6.7",
     "id": "regex_syntax"
   },
   {
     "name": "remove_dir_all",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "id": "remove_dir_all"
   },
   {
     "name": "reqwest",
-    "version": "0.9.17",
+    "version": "0.9.18",
     "id": "reqwest"
   },
   {
@@ -751,7 +766,7 @@
   },
   {
     "name": "ryu",
-    "version": "0.2.8",
+    "version": "1.0.0",
     "id": "ryu"
   },
   {
@@ -791,17 +806,17 @@
   },
   {
     "name": "serde",
-    "version": "1.0.91",
+    "version": "1.0.94",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.91",
+    "version": "1.0.94",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.39",
+    "version": "1.0.40",
     "id": "serde_json"
   },
   {
@@ -821,7 +836,7 @@
   },
   {
     "name": "smallvec",
-    "version": "0.6.9",
+    "version": "0.6.10",
     "id": "smallvec"
   },
   {
@@ -836,7 +851,7 @@
   },
   {
     "name": "string",
-    "version": "0.1.3",
+    "version": "0.2.1",
     "id": "string"
   },
   {
@@ -861,7 +876,7 @@
   },
   {
     "name": "syn",
-    "version": "0.15.34",
+    "version": "0.15.39",
     "id": "syn"
   },
   {
@@ -891,7 +906,7 @@
   },
   {
     "name": "tempfile",
-    "version": "3.0.8",
+    "version": "3.1.0",
     "id": "tempfile"
   },
   {
@@ -906,23 +921,18 @@
   },
   {
     "name": "termcolor",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "id": "termcolor"
   },
   {
     "name": "termion",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "id": "termion"
   },
   {
     "name": "textwrap",
     "version": "0.11.0",
     "id": "textwrap"
-  },
-  {
-    "name": "thread-id",
-    "version": "3.3.0",
-    "id": "thread_id"
   },
   {
     "name": "thread_local",
@@ -946,7 +956,7 @@
   },
   {
     "name": "tokio",
-    "version": "0.1.21",
+    "version": "0.1.22",
     "id": "tokio"
   },
   {
@@ -961,7 +971,7 @@
   },
   {
     "name": "tokio-executor",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "id": "tokio_executor"
   },
   {
@@ -976,7 +986,7 @@
   },
   {
     "name": "tokio-sync",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "id": "tokio_sync"
   },
   {
@@ -986,18 +996,13 @@
   },
   {
     "name": "tokio-threadpool",
-    "version": "0.1.14",
+    "version": "0.1.15",
     "id": "tokio_threadpool"
   },
   {
     "name": "tokio-timer",
     "version": "0.2.11",
     "id": "tokio_timer"
-  },
-  {
-    "name": "tokio-trace-core",
-    "version": "0.2.0",
-    "id": "tokio_trace_core"
   },
   {
     "name": "toml",
@@ -1066,7 +1071,7 @@
   },
   {
     "name": "utf8-ranges",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "id": "utf8_ranges"
   },
   {
@@ -1076,7 +1081,7 @@
   },
   {
     "name": "vcpkg",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "id": "vcpkg"
   },
   {
@@ -1096,12 +1101,12 @@
   },
   {
     "name": "walkdir",
-    "version": "2.2.7",
+    "version": "2.2.8",
     "id": "walkdir"
   },
   {
     "name": "want",
-    "version": "0.0.6",
+    "version": "0.2.0",
     "id": "want"
   },
   {
