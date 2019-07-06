@@ -284,6 +284,7 @@ fn write_manifest(manifest: TomlManifest, path: &str) {
 fn main() {
     // Setup to interact with cargo.
     let config = Config::default().expect("Unable to create default Cargo config");
+    let _lock = config.acquire_package_cache_lock();
     let crates_io = SourceId::crates_io(&config).expect("Unable to create crates.io source ID");
     let mut source = RegistrySource::remote(crates_io, &HashSet::new(), &config);
     source.update().expect("Unable to update registry");
@@ -317,7 +318,7 @@ fn main() {
         // Add a dependency on this crate.
         summaries.push((summary, Method::Required {
             dev_deps: false,
-            features: &[],
+            features: Default::default(),
             uses_default_features: true,
             all_features: false,
         }));
