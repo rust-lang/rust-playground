@@ -3,4 +3,4 @@
 set -eu
 
 export MIRI_SYSROOT=~/.cache/miri/HOST
-exec cargo miri -- -Zmiri-seed=cafedead
+exec cargo miri
