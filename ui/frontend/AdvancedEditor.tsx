@@ -182,7 +182,7 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
   );
 
   useEditorProp(onEditCodeDebounced, (editor, onEditCode) => {
-    const listener = editor.on<true>('change', _delta => {
+    const listener = editor.on('change', _delta => {
       if (!doingSetProp.current) {
         onEditCode(editor.getValue());
       }
