@@ -1,38 +1,14 @@
 blacklist = [
-    # Requires native dependencies
-    "libressl-pnacl-sys",
-    "pnacl-build-helper",
-
-    # Not supported on stable
-    "aster",
-    "quasi",
-    "quasi_codegen",
-    "quasi_macros",
-
-    # Apparently deleted
-    "serde_macros",
-    # Deprecated, causes old versions
-    "serde_codegen",
-
-    # Ecosystem is fragmented, only pull in via dependencies
-    "openssl",
-    "openssl-sys",
-    "openssl-sys-extras",
-    "openssl-verify",
-
     # Not supported on stable
     "redox_syscall",
-    "redox_termios",
     "redox_users",
 
-    # Not available on Linux
-    "security-framework",
-    "security-framework-sys",
+    # # Not available on Linux
     "core-foundation",
     "core-foundation-sys",
-
-    # Not supported on stable
-    "pin-api",
+    "security-framework",
+    "security-framework-sys",
+    "winreg",
 ]
 
 additions = [
