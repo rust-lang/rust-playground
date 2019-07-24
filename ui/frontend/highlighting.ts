@@ -7,7 +7,13 @@ export function configureRustErrors({
   reExecuteWithBacktrace,
 }) {
   Prism.languages.rust_errors = { // eslint-disable-line camelcase
-    'warning': /^warning:.*$/m,
+    'warning': {
+      pattern: /^warning(\[E\d+\])?:.*$/m,
+      inside: {
+        'error-explanation': /\[E\d+\]/,
+        'see-issue': /see issue #\d+/,
+      },
+    },
     'error': {
       pattern: /^error(\[E\d+\])?:.*$/m,
       inside: {
