@@ -1,79 +1,59 @@
 blacklist = [
-    # Requires native dependencies
-    "libressl-pnacl-sys",
-    "pnacl-build-helper",
-
-    # Not supported on stable
-    "aster",
-    "quasi",
-    "quasi_codegen",
-    "quasi_macros",
-
-    # Apparently deleted
-    "serde_macros",
-    # Deprecated, causes old versions
-    "serde_codegen",
-
-    # Ecosystem is fragmented, only pull in via dependencies
-    "openssl",
-    "openssl-sys",
-    "openssl-sys-extras",
-    "openssl-verify",
-
     # Not supported on stable
     "redox_syscall",
-    "redox_termios",
     "redox_users",
 
-    # Not available on Linux
-    "security-framework",
-    "security-framework-sys",
+    # # Not available on Linux
     "core-foundation",
     "core-foundation-sys",
-
-    # Not supported on stable
-    "pin-api",
+    "security-framework",
+    "security-framework-sys",
+    "winreg",
 ]
 
 additions = [
-    # Libz Blitz alumni and in progress crates
+    # From the Rust Cookbook
+    "ansi_term",
+    "base64",
     "bitflags",
     "byteorder",
-    "env_logger",
-    "error-chain",
-    "flate2",
-    "gcc",
-    "lazy_static",
-    "log",
-    "memmap",
-    "mio",
-    "num",
-    "rand",
-    "rayon",
-    "reqwest",
-    "tempdir",
-    "threadpool",
-    "url",
-    "walkdir",
-
-    # Libz Blitz todo list already available in rust-cookbook
-    "base64",
+    "cc",
     "chrono",
     "clap",
     "crossbeam",
     "csv",
     "data-encoding",
+    "env_logger",
+    "flate2",
     "glob",
     "image",
+    "lazy_static",
+    "log",
+    "log4rs",
+    "memmap",
+    "mime",
+    "nalgebra",
+    "ndarray",
+    "num",
     "num_cpus",
-    "petgraph",
+    "postgres",
+    "rand",
+    "rayon",
     "regex",
+    "reqwest",
     "ring",
+    "rusqlite",
+    "same-file",
     "select",
+    "semver",
     "serde",
-    "serde_derive",
     "serde_json",
     "syslog",
     "tar",
+    "tempdir",
+    "threadpool",
     "toml",
+    "unicode-segmentation",
+    "url",
+    "walkdir",
 ]
