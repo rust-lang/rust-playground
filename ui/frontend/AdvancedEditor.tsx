@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { connect } from 'react-redux';
 
 import State from './state';
-import { CommonEditorProps, Crate, Edition, Focus } from './types';
+import { CommonEditorProps, Crate, Edition, Focus, PairCharacters } from './types';
 
 type Ace = typeof import('ace-builds');
 type AceEditor = import('ace-builds').Ace.Editor;
@@ -66,6 +66,7 @@ interface AdvancedEditorProps {
   theme: string;
   crates: Crate[];
   focus?: Focus;
+  pairCharacters: PairCharacters;
 }
 
 const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
@@ -229,6 +230,10 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
         cm.ace.execCommand('executeCode');
       });
     }
+  });
+
+  useEditorProp(props.pairCharacters, (editor, pairCharacters) => {
+    editor.setBehavioursEnabled(pairCharacters !== PairCharacters.Disabled);
   });
 
   useEditorProp(props.position, (editor, { line, column }) => {
@@ -408,6 +413,7 @@ interface AdvancedEditorAsyncState {
   keybindingState: LoadState;
   modeState: LoadState;
   ace?: Ace;
+  pairCharacters?: PairCharacters;
 }
 
 interface PropsFromState {
@@ -415,13 +421,15 @@ interface PropsFromState {
   keybinding?: string;
   focus?: Focus;
   autocompleteOnUse: boolean;
+  pairCharacters: PairCharacters;
 }
 
 const mapStateToProps = (state: State) => {
-  const { configuration: { theme, keybinding } } = state;
+  const { configuration: { theme, keybinding, pairCharacters } } = state;
 
   return {
     theme,
+    pairCharacters,
     keybinding: keybinding === 'ace' ? null : keybinding,
     focus: state.output.meta.focus,
     autocompleteOnUse: state.configuration.edition === Edition.Rust2018,

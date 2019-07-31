@@ -30,6 +30,11 @@ export enum Editor {
   Advanced = 'advanced',
 }
 
+export enum PairCharacters {
+  Enabled = 'enabled',
+  Disabled = 'disabled',
+}
+
 export enum Orientation {
   Automatic = 'automatic',
   Horizontal = 'horizontal',

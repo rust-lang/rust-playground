@@ -14,6 +14,7 @@ export function serialize(state: State) {
       editor: state.configuration.editor,
       keybinding: state.configuration.keybinding,
       theme: state.configuration.theme,
+      pairCharacters: state.configuration.pairCharacters,
       orientation: state.configuration.orientation,
       assemblyFlavor: state.configuration.assemblyFlavor,
       demangleAssembly: state.configuration.demangleAssembly,

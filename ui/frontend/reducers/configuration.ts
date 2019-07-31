@@ -8,6 +8,7 @@ import {
   Editor,
   Mode,
   Orientation,
+  PairCharacters,
   PrimaryAction,
   PrimaryActionAuto,
   ProcessAssembly,
@@ -18,6 +19,7 @@ export interface State {
   editor: Editor;
   keybinding: string;
   theme: string;
+  pairCharacters: PairCharacters;
   orientation: Orientation;
   assemblyFlavor: AssemblyFlavor;
   demangleAssembly: DemangleAssembly;
@@ -34,6 +36,7 @@ const DEFAULT: State = {
   editor: Editor.Advanced,
   keybinding: 'ace',
   theme: 'github',
+  pairCharacters: PairCharacters.Enabled,
   orientation: Orientation.Automatic,
   assemblyFlavor: AssemblyFlavor.Att,
   demangleAssembly: DemangleAssembly.Demangle,
@@ -55,6 +58,8 @@ export default function configuration(state = DEFAULT, action: Action): State {
       return { ...state, keybinding: action.keybinding };
     case ActionType.ChangeTheme:
       return { ...state, theme: action.theme };
+    case ActionType.ChangePairCharacters:
+      return { ...state, pairCharacters: action.pairCharacters };
     case ActionType.ChangeOrientation:
       return { ...state, orientation: action.orientation };
     case ActionType.ChangeAssemblyFlavor:
