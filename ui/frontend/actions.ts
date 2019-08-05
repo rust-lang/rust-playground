@@ -56,7 +56,6 @@ const createAction = <T extends string, P extends {}>(type: T, props?: P) => (
 );
 
 export enum ActionType {
-  ToggleConfiguration = 'TOGGLE_CONFIGURATION',
   SetPage = 'SET_PAGE',
   ChangeEditor = 'CHANGE_EDITOR',
   ChangeKeybinding = 'CHANGE_KEYBINDING',
@@ -112,9 +111,6 @@ export enum ActionType {
   VersionsLoadSucceeded = 'VERSIONS_LOAD_SUCCEEDED',
   NotificationSeen = 'NOTIFICATION_SEEN',
 }
-
-export const toggleConfiguration = () =>
-  createAction(ActionType.ToggleConfiguration);
 
 const setPage = (page: Page) =>
   createAction(ActionType.SetPage, { page });
@@ -723,7 +719,6 @@ export function showExample(code): ThunkAction {
 }
 
 export type Action =
-  | ReturnType<typeof toggleConfiguration>
   | ReturnType<typeof setPage>
   | ReturnType<typeof changePairCharacters>
   | ReturnType<typeof changeAssemblyFlavor>
