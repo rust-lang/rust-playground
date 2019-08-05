@@ -5,9 +5,9 @@ import { addMainFunction } from '../actions';
 import { State } from '../reducers';
 
 import Section from './Section';
-import SimplePane, { SimplePaneProps } from './SimplePane';
+import SimplePane, { ReallySimplePaneProps } from './SimplePane';
 
-interface ExecuteProps extends SimplePaneProps {
+interface ExecuteProps extends ReallySimplePaneProps {
   isAutoBuild: boolean;
   addMainFunction: () => any;
 }

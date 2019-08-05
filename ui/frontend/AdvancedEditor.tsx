@@ -52,6 +52,10 @@ function useRafDebouncedFunction<A extends any[]>(fn: (...args: A) => void, onCa
   }, [fn, onCall, timeout]);
 }
 
+interface AdvancedEditorProps extends AdvancedEditorAsyncProps {
+  ace: Ace;
+}
+
 interface AdvancedEditorProps {
   ace: Ace;
   autocompleteOnUse: boolean;
@@ -279,7 +283,24 @@ enum LoadState {
 // as ACE should never be loaded.
 //
 // Themes and keybindings can be changed at runtime.
-class AdvancedEditorAsync extends React.Component<AdvancedEditorProps, AdvancedEditorAsyncState> {
+
+interface AdvancedEditorAsyncProps {
+  autocompleteOnUse: boolean;
+  code: string;
+  execute: () => any;
+  keybinding?: string;
+  onEditCode: (_: string) => any;
+  position: {
+    line: number,
+    column: number,
+  };
+  theme: string;
+  crates: Crate[];
+  focus?: Focus;
+  pairCharacters: PairCharacters;
+}
+
+class AdvancedEditorAsync extends React.Component<AdvancedEditorAsyncProps, AdvancedEditorAsyncState> {
   constructor(props) {
     super(props);
     this.state = {

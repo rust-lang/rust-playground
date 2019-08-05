@@ -124,7 +124,6 @@ const Output: React.SFC<OutputProps> = ({
 
 interface OutputProps extends OutputState {
   somethingToShow: boolean;
-  changeFocus: (_?: Focus) => any;
   focusClose: () => void;
   focusExecute: () => void;
   focusFormat: () => void;
