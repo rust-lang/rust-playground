@@ -15,7 +15,6 @@ import {
 } from '../types';
 
 export interface State {
-  shown: boolean;
   editor: Editor;
   keybinding: string;
   theme: string;
@@ -32,7 +31,6 @@ export interface State {
 }
 
 const DEFAULT: State = {
-  shown: false,
   editor: Editor.Advanced,
   keybinding: 'ace',
   theme: 'github',
@@ -50,8 +48,6 @@ const DEFAULT: State = {
 
 export default function configuration(state = DEFAULT, action: Action): State {
   switch (action.type) {
-    case ActionType.ToggleConfiguration:
-      return { ...state, shown: !state.shown };
     case ActionType.ChangeEditor:
       return { ...state, editor: action.editor };
     case ActionType.ChangeKeybinding:

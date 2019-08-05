@@ -353,31 +353,6 @@ body {
     }
 }
 
-$PHI: 2.61803398875;
-
-.modal {
-    &-backdrop {
-        position: fixed;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 10;
-    }
-
-    &-content {
-        margin: 0 auto;
-        background-color: #FFF;
-        border: 1px solid black;
-        padding: 1em;
-        margin-top: 10em;
-
-        width: 600px;
-        height: 950px / $PHI;
-    }
-}
-
 @keyframes loader-fade {
     0% {
         opacity: 0;
