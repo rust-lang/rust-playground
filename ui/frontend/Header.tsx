@@ -5,7 +5,7 @@ import AdvancedOptionsMenu from './AdvancedOptionsMenu';
 import BuildMenu from './BuildMenu';
 import ChannelMenu from './ChannelMenu';
 import ConfigMenu from './ConfigMenu';
-import HeaderButton, { RightIcon as RightIconButton } from './HeaderButton';
+import HeaderButton from './HeaderButton';
 import { BuildIcon, ConfigIcon, HelpIcon, MoreOptionsActiveIcon, MoreOptionsIcon } from './Icon';
 import ModeMenu from './ModeMenu';
 import PopButton, { PopButtonEnhancements } from './PopButton';
@@ -40,9 +40,9 @@ const Header: React.SFC<HeaderProps> = props => (
     <HeaderSet id="build">
       <SegmentedButtonSet>
         <SegmentedButton isBuild onClick={props.execute}>
-          <RightIconButton icon={<BuildIcon />}>
+          <HeaderButton rightIcon={<BuildIcon />}>
             {props.executionLabel}
-          </RightIconButton>
+          </HeaderButton>
         </SegmentedButton>
         <PopButton button={BuildMenuButton}>{({ popButtonClose }) => (
           <BuildMenu close={popButtonClose} />
