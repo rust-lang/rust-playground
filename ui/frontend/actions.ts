@@ -22,6 +22,7 @@ import {
   Notification,
   Orientation,
   Page,
+  PairCharacters,
   PrimaryAction,
   PrimaryActionAuto,
   PrimaryActionCore,
@@ -60,6 +61,7 @@ export enum ActionType {
   ChangeEditor = 'CHANGE_EDITOR',
   ChangeKeybinding = 'CHANGE_KEYBINDING',
   ChangeTheme = 'CHANGE_THEME',
+  ChangePairCharacters = 'CHANGE_PAIR_CHARACTERS',
   ChangeOrientation = 'CHANGE_ORIENTATION',
   ChangeAssemblyFlavor = 'CHANGE_ASSEMBLY_FLAVOR',
   ChangePrimaryAction = 'CHANGE_PRIMARY_ACTION',
@@ -128,6 +130,9 @@ export const changeKeybinding = (keybinding: string) =>
 
 export const changeTheme = (theme: string) =>
   createAction(ActionType.ChangeTheme, { theme });
+
+export const changePairCharacters = (pairCharacters: PairCharacters) =>
+  createAction(ActionType.ChangePairCharacters, { pairCharacters });
 
 export const changeOrientation = (orientation: Orientation) =>
   createAction(ActionType.ChangeOrientation, { orientation });
@@ -720,6 +725,7 @@ export function showExample(code): ThunkAction {
 export type Action =
   | ReturnType<typeof toggleConfiguration>
   | ReturnType<typeof setPage>
+  | ReturnType<typeof changePairCharacters>
   | ReturnType<typeof changeAssemblyFlavor>
   | ReturnType<typeof changeBacktrace>
   | ReturnType<typeof changeChannel>

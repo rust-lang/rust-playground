@@ -9,12 +9,20 @@ import {
   changeEditor,
   changeKeybinding,
   changeOrientation,
+  changePairCharacters,
   changeProcessAssembly,
   changeTheme,
   toggleConfiguration,
 } from './actions';
 import State from './state';
-import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, ProcessAssembly} from './types';
+import {
+  AssemblyFlavor,
+  DemangleAssembly,
+  Editor,
+  Orientation,
+  PairCharacters,
+  ProcessAssembly,
+} from './types';
 
 const keybindingOptions = ACE_KEYBINDINGS.map(t => <option value={t} key={t}>{t}</option>);
 const themeOptions = ACE_THEMES.map(t => <option value={t} key={t}>{t}</option>);
@@ -49,6 +57,7 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
   private onChangeEditor = e => this.props.changeEditor(e.target.value);
   private onChangeKeybinding = e => this.props.changeKeybinding(e.target.value);
   private onChangeTheme = e => this.props.changeTheme(e.target.value);
+  private onChangePairCharacters = e => this.props.changePairCharacters(e.target.value);
   private onChangeOrientation = e => this.props.changeOrientation(e.target.value);
   private onChangeAssemblyFlavor = e => this.props.changeAssemblyFlavor(e.target.value);
   private onChangeDemangleAssembly = e => this.props.changeDemangleAssembly(e.target.value);
@@ -72,6 +81,7 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
     const { editor,
       keybinding,
       theme,
+      pairCharacters,
       orientation,
       assemblyFlavor,
       demangleAssembly,
@@ -106,6 +116,16 @@ class Configuration extends React.PureComponent<ConfigurationProps> {
                                defaultValue={theme}
                                onChange={this.onChangeTheme}>
             {themeOptions}
+          </ConfigurationSelect>
+        }
+
+        {advancedEditor &&
+          <ConfigurationSelect what="editor"
+                               label="Editor Automatically Pair Characters"
+                               defaultValue={pairCharacters}
+                               onChange={this.onChangePairCharacters}>
+            <option value={PairCharacters.Enabled}>Enabled</option>
+            <option value={PairCharacters.Disabled}>Disabled</option>
           </ConfigurationSelect>
         }
 
@@ -154,6 +174,7 @@ interface ConfigurationProps {
   changeEditor: (Editor) => any;
   changeKeybinding: (_: string) => any;
   changeTheme: (_: string) => any;
+  changePairCharacters: (PairCharacters) => any;
   changeOrientation: (Orientation) => any;
   changeAssemblyFlavor: (AssemblyFlavor) => any;
   changeDemangleAssembly: (DemangleAssembly) => any;
@@ -161,6 +182,7 @@ interface ConfigurationProps {
   editor: Editor;
   keybinding: string;
   theme: string;
+  pairCharacters: PairCharacters;
   orientation: Orientation;
   assemblyFlavor: AssemblyFlavor;
   demangleAssembly: DemangleAssembly;
@@ -172,6 +194,7 @@ const mapStateToProps = ({ configuration: {
   editor,
   keybinding,
   theme,
+  pairCharacters,
   orientation,
   assemblyFlavor,
   demangleAssembly,
@@ -181,6 +204,7 @@ const mapStateToProps = ({ configuration: {
     editor,
     keybinding,
     theme,
+    pairCharacters,
     orientation,
     assemblyFlavor,
     demangleAssembly,
@@ -192,6 +216,7 @@ const mapDispatchToProps = ({
   changeEditor,
   changeKeybinding,
   changeTheme,
+  changePairCharacters,
   changeOrientation,
   changeAssemblyFlavor,
   changeDemangleAssembly,

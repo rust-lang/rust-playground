@@ -12,11 +12,19 @@ import {
   changeEditor,
   changeKeybinding,
   changeOrientation,
+  changePairCharacters,
   changeProcessAssembly,
   changeTheme,
 } from './actions';
 import State from './state';
-import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, ProcessAssembly } from './types';
+import {
+  AssemblyFlavor,
+  DemangleAssembly,
+  Editor,
+  Orientation,
+  PairCharacters,
+  ProcessAssembly,
+} from './types';
 
 interface ConfigMenuProps {
   assemblyFlavor: AssemblyFlavor;
@@ -27,12 +35,14 @@ interface ConfigMenuProps {
   changeOrientation: (_: Orientation) => any;
   changeProcessAssembly: (_: ProcessAssembly) => any;
   changeTheme: (_: string) => any;
+  changePairCharacters: (_: PairCharacters) => any;
   demangleAssembly: DemangleAssembly;
   editorStyle: Editor;
   keybinding: string;
   orientation: Orientation;
   processAssembly: ProcessAssembly;
   theme: string;
+  pairCharacters: PairCharacters;
   close: () => void;
 }
 
@@ -64,6 +74,14 @@ const ConfigMenu: React.SFC<ConfigMenuProps> = props => (
           >
             {ACE_THEMES.map(t => <option key={t} value={t}>{t}</option>)}
           </SelectConfig>
+
+          <EitherConfig
+            id="editor-pair-characters"
+            name="Pair Characters"
+            a={PairCharacters.Enabled}
+            b={PairCharacters.Disabled}
+            value={props.pairCharacters}
+            onChange={props.changePairCharacters} />
         </Fragment>
       )}
     </MenuGroup>
@@ -121,6 +139,7 @@ const mapStateToProps = (state: State) => ({
   theme: state.configuration.theme,
   orientation: state.configuration.orientation,
   editorStyle: state.configuration.editor,
+  pairCharacters: state.configuration.pairCharacters,
   assemblyFlavor: state.configuration.assemblyFlavor,
   demangleAssembly: state.configuration.demangleAssembly,
   processAssembly: state.configuration.processAssembly,
@@ -132,6 +151,7 @@ const mapDispatchToProps = ({
   changeOrientation,
   changeEditorStyle: changeEditor,
   changeAssemblyFlavor,
+  changePairCharacters,
   changeProcessAssembly,
   changeDemangleAssembly,
 });
