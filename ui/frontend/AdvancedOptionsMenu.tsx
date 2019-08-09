@@ -1,56 +1,45 @@
-import React, { Fragment } from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { changeBacktrace, changeEdition } from './actions';
+import * as actions from './actions';
 import { Either as EitherConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
 import { State } from './reducers';
-import { getBacktraceSet, getEditionSet } from './selectors';
+import * as selectors from './selectors';
 import { Backtrace, Edition } from './types';
 
-interface AdvancedOptionsMenuProps {
-  edition: Edition;
-  isEditionSet: boolean;
-  changeEdition: (_: Edition) => any;
-  backtrace: Backtrace;
-  isBacktraceSet: boolean;
-  changeBacktrace: (_: Backtrace) => any;
-}
+const AdvancedOptionsMenu: React.SFC = () => {
+  const isEditionSet = useSelector(selectors.getEditionSet);
+  const edition = useSelector((state: State) => state.configuration.edition);
+  const isBacktraceSet = useSelector(selectors.getBacktraceSet);
+  const backtrace = useSelector((state: State) => state.configuration.backtrace);
 
-const AdvancedOptionsMenu: React.SFC<AdvancedOptionsMenuProps> = props => (
-  <Fragment>
+  const dispatch = useDispatch();
+
+  const changeEdition = useCallback((e) => dispatch(actions.changeEdition(e)), [dispatch]);
+  const changeBacktrace = useCallback((b) => dispatch(actions.changeBacktrace(b)), [dispatch]);
+
+  return (
     <MenuGroup title="Advanced options">
       <EitherConfig
         id="edition"
         name="Edition"
         a={Edition.Rust2015}
         b={Edition.Rust2018}
-        value={props.edition}
-        isNotDefault={props.isEditionSet}
-        onChange={props.changeEdition} />
+        value={edition}
+        isNotDefault={isEditionSet}
+        onChange={changeEdition} />
 
       <EitherConfig
         id="backtrace"
         name="Backtrace"
         a={Backtrace.Disabled}
         b={Backtrace.Enabled}
-        value={props.backtrace}
-        isNotDefault={props.isBacktraceSet}
-        onChange={props.changeBacktrace} />
+        value={backtrace}
+        isNotDefault={isBacktraceSet}
+        onChange={changeBacktrace} />
     </MenuGroup>
-  </Fragment>
-);
+  );
+};
 
-const mapStateToProps = (state: State) => ({
-  isEditionSet: getEditionSet(state),
-  edition: state.configuration.edition,
-  isBacktraceSet: getBacktraceSet(state),
-  backtrace: state.configuration.backtrace,
-});
-
-const mapDispatchToProps = ({
-  changeEdition,
-  changeBacktrace,
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdvancedOptionsMenu);
+export default AdvancedOptionsMenu;
