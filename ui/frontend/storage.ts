@@ -36,7 +36,6 @@ const storage = <St>(config: Config<St>): StoreEnhancer =>
         const current = storage.getItem(key);
         storage.setItem(key, current);
       } catch (e) {
-        // tslint:disable-next-line:no-console
         console.warn('Unable to store configuration, falling back to non-persistent in-memory storage');
         storage = new InMemoryStorage();
       }

@@ -45,8 +45,6 @@ interface PaneWithCodeProps extends SimplePaneProps {
 }
 
 const Output: React.SFC<OutputProps> = ({
-  // https://github.com/palantir/tslint/issues/3960
-  // tslint:disable-next-line:trailing-comma
   somethingToShow, meta: { focus }, execute, format, clippy, miri, assembly, llvmIr, mir, wasm, gist, ...props
 }) => {
   if (!somethingToShow) {

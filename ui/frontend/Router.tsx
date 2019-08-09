@@ -61,7 +61,7 @@ const locationToAction = location => {
 export default class Router extends React.Component<RouterProps> {
   private router: any;
 
-  constructor(props) {
+  public constructor(props) {
     super(props);
 
     const history = createHistory();

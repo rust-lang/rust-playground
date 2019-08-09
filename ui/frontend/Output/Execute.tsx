@@ -26,7 +26,7 @@ const Warning: React.SFC<WarningProps> = props => (
   <Section kind="warning" label="Warnings">
     No main function was detected, so your code was compiled
     {'\n'}
-    but not run. If you'd like to execute your code, please
+    but not run. If you’d like to execute your code, please
     {'\n'}
     <button className="output-add-main" onClick={props.addMainFunction}>
       add a main function

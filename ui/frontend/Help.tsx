@@ -120,7 +120,7 @@ const Help = ({ navigateToIndex }: HelpProps) => (
 
         <p>
           See the <a href={CRATES_URL}>complete list of crates</a> to know
-          what's available.
+          what’s available.
         </p>
       </LinkableSection>
 
@@ -149,7 +149,7 @@ const Help = ({ navigateToIndex }: HelpProps) => (
 
       <LinkableSection id="features-miri" header="Checking code for undefined behavior" level={H3}>
         <p>
-          <a href={MIRI_URL}>Miri</a> is an interpreter for Rust's mid-level intermediate
+          <a href={MIRI_URL}>Miri</a> is an interpreter for Rust’s mid-level intermediate
           representation (MIR) and can be used to detect certain kinds of undefined behavior
           in your unsafe Rust code. Click on the <strong>Miri</strong> button in
           the <strong>Tools</strong> menu to check.
@@ -171,7 +171,7 @@ const Help = ({ navigateToIndex }: HelpProps) => (
 
       <LinkableSection id="features-linking" header="Linking to the playground with initial code" level={H3}>
         <p>
-          If you have a web page with Rust code that you'd like to
+          If you have a web page with Rust code that you’d like to
           show in action, you can link to the playground with the
           Rust code in the query parameter <Code>code</Code>. Make sure to
           escape any special characters. Keep the code short, as URLs have
@@ -193,7 +193,7 @@ const Help = ({ navigateToIndex }: HelpProps) => (
 
       <LinkableSection id="features-library" header="Compiling as a library" level={H3}>
         <p>
-          If your code contains the <Code>#![crate_type="lib"]</Code> attribute,
+          If your code contains the <Code>#![crate_type=&quot;lib&quot;]</Code> attribute,
           {' '}
           <Code>cargo build</Code> will be executed instead of <Code>cargo
           run</Code>.
@@ -208,7 +208,7 @@ const Help = ({ navigateToIndex }: HelpProps) => (
           output of the compiler as x86_64 assembly, LLVM IR, Rust MIR, or
           WebAssembly. This is often used in conjunction with the
           {' '}
-          <a href="#features-modes">mode</a> set to "Release" to see how the
+          <a href="#features-modes">mode</a> set to “Release” to see how the
           compiler has chosen to optimize some specific piece of code.
         </p>
 
@@ -265,7 +265,7 @@ const Help = ({ navigateToIndex }: HelpProps) => (
 
       <LinkableSection id="features-persistence" header="Persistence" level={H3}>
         <p>
-          The most recently entered code will be automatically saved in your browser's
+          The most recently entered code will be automatically saved in your browser’s
           {' '}
           <a href={LOCALSTORAGE_URL}>local storage</a>. This allows you to recover
           your last work even if you close the browser.
@@ -274,7 +274,7 @@ const Help = ({ navigateToIndex }: HelpProps) => (
         <p>
           Local storage is a singleton resource, so if you use multiple windows,
           only the most recently saved code will be persisted.
-         </p>
+        </p>
       </LinkableSection>
     </LinkableSection>
 
@@ -323,15 +323,15 @@ const H3: React.SFC = ({ children }) => <h3>{children}</h3>;
 const LinkableSection: React.SFC<LinkableSectionProps> = ({
   id, header, level: Level, children,
 }) => (
-    <div id={id}>
-      <Level>
-        <span className="help__header">
-          <a className="help__header-link" href={`#${id}`}>{header}</a>
-        </span>
-      </Level>
-      {children}
-    </div>
-  );
+  <div id={id}>
+    <Level>
+      <span className="help__header">
+        <a className="help__header-link" href={`#${id}`}>{header}</a>
+      </span>
+    </Level>
+    {children}
+  </div>
+);
 
 interface LinkableSectionProps {
   id: string;

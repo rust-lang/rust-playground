@@ -64,8 +64,8 @@ interface AdvancedEditorProps {
   keybinding?: string;
   onEditCode: (_: string) => any;
   position: {
-    line: number,
-    column: number,
+    line: number;
+    column: number;
   };
   theme: string;
   crates: Crate[];
@@ -99,10 +99,12 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
       enableBasicAutocompletion: true,
     });
 
+    const danglingElement = child.current;
+
     return () => {
       editor.destroy();
       setEditor(null);
-      child.current.textContent = '';
+      danglingElement.textContent = '';
     };
   }, [props.ace, child]);
 
@@ -112,7 +114,7 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
       if (editor) {
         return whenPresent(editor, prop);
       }
-    }, [editor, prop]);
+    }, [prop, whenPresent]);
   }
 
   useEditorProp(props.execute, (editor, execute) => {
@@ -291,8 +293,8 @@ interface AdvancedEditorAsyncProps {
   keybinding?: string;
   onEditCode: (_: string) => any;
   position: {
-    line: number,
-    column: number,
+    line: number;
+    column: number;
   };
   theme: string;
   crates: Crate[];
@@ -301,7 +303,7 @@ interface AdvancedEditorAsyncProps {
 }
 
 class AdvancedEditorAsync extends React.Component<AdvancedEditorAsyncProps, AdvancedEditorAsyncState> {
-  constructor(props) {
+  public constructor(props) {
     super(props);
     this.state = {
       modeState: LoadState.Unloaded,
@@ -323,7 +325,7 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorAsyncProps, Adva
     this.load();
   }
 
-  public componentDidUpdate(prevProps, prevState) {
+  public componentDidUpdate(_prevProps, _prevState) {
     if (this.isLoadNeeded()) {
       this.load();
     }
@@ -389,7 +391,6 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorAsyncProps, Adva
     await this.requireLibraries();
     await import(
       /* webpackChunkName: "ace-[request]" */
-      /* tslint:disable-next-line: trailing-comma */
       `ace-builds/src-noconflict/keybinding-${keybinding}`
     );
 
@@ -411,7 +412,6 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorAsyncProps, Adva
     await this.requireLibraries();
     await import(
       /* webpackChunkName: "ace-[request]" */
-      /* tslint:disable-next-line: trailing-comma */
       `ace-builds/src-noconflict/theme-${theme}`
     );
 
@@ -421,7 +421,6 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorAsyncProps, Adva
   private async requireLibraries() {
     return import(
       /* webpackChunkName: "advanced-editor" */
-      /* tslint:disable-next-line: trailing-comma */
       './advanced-editor'
     );
   }

@@ -69,7 +69,7 @@ const Header: React.SFC<HeaderProps> = props => (
     <HeaderSet id="share">
       <SegmentedButtonSet>
         <SegmentedButton title="Create shareable links to this code" onClick={props.gistSave}>
-          <HeaderButton >Share</HeaderButton>
+          <HeaderButton>Share</HeaderButton>
         </SegmentedButton>
       </SegmentedButtonSet>
     </HeaderSet>
@@ -94,7 +94,7 @@ const Header: React.SFC<HeaderProps> = props => (
         </SegmentedLink>
       </SegmentedButtonSet>
     </HeaderSet>
-  </div >
+  </div>
 );
 
 interface HeaderSetProps {

@@ -34,8 +34,8 @@ const Links: React.SFC<GistProps> = props => (
     <Copied href={props.permalink}>Permalink to the playground</Copied>
     <Copied href={props.gistUrl}>Direct link to the gist</Copied>
     <Copied href={props.codeUrl}>Embedded code in link</Copied>
-    <p><a href={props.urloUrl} target="_blank">Open a new thread in the Rust user forum</a></p>
-    <p><a href={props.issueUrl} target="_blank"> Open an issue on the Rust GitHub repository </a></p>
+    <NewWindow href={props.urloUrl}>Open a new thread in the Rust user forum</NewWindow>
+    <NewWindow href={props.issueUrl}> Open an issue on the Rust GitHub repository</NewWindow>
   </Fragment>
 );
 
@@ -48,7 +48,7 @@ interface CopiedState {
 }
 
 class Copied extends React.PureComponent<CopiedProps, CopiedState> {
-  constructor(props) {
+  public constructor(props) {
     super(props);
     this.state = { copied: false };
   }
@@ -72,6 +72,16 @@ class Copied extends React.PureComponent<CopiedProps, CopiedState> {
     setTimeout(() => { this.setState({ copied: false }); }, 1000);
   }
 }
+
+interface NewWindowProps {
+  href: string;
+}
+
+const NewWindow: React.SFC<NewWindowProps> = props => (
+  <p>
+    <a href={props.href} target="_blank" rel="noopener noreferrer">{props.children}</a>
+  </p>
+);
 
 const mapStateToProps = (state: State) => ({
   codeUrl: codeUrlSelector(state),

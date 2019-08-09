@@ -82,14 +82,14 @@ interface EditorProps {
   execute: () => any;
   onEditCode: (_: string) => any;
   position: {
-    line: number,
-    column: number,
+    line: number;
+    column: number;
   };
-  crates: Array<{
-    id: string,
-    name: string,
-    version: string,
-  }>;
+  crates: {
+    id: string;
+    name: string;
+    version: string;
+  }[];
 }
 
 const mapStateToProps = ({ code, configuration: { editor }, position, crates }) => (

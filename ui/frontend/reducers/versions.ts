@@ -22,10 +22,10 @@ export interface State {
 export default function crates(state = DEFAULT, action: Action) {
   switch (action.type) {
     case ActionType.VersionsLoadSucceeded: {
-    const { stable, beta, nightly, rustfmt, clippy, miri } = action;
-    return { stable, beta, nightly, rustfmt, clippy, miri };
-  }
+      const { stable, beta, nightly, rustfmt, clippy, miri } = action;
+      return { stable, beta, nightly, rustfmt, clippy, miri };
+    }
     default:
-  return state;
-}
+      return state;
+  }
 }
