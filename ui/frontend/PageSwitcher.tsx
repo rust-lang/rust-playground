@@ -1,17 +1,19 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import Help from './Help';
 import Playground from './Playground';
+import { State } from './reducers';
 
-const PageSwitcher: React.SFC<Props> = ({ page }) => (
-  page === 'index' ? <Playground /> : <Help />
-);
+const PageSwitcher: React.SFC = () => {
+  const page = useSelector((state: State) => state.page);
 
-interface Props {
-  page: string;
+  switch (page) {
+    case 'index':
+      return <Playground />;
+    case 'help':
+      return <Help />;
+  }
 }
 
-const mapStateToProps = ({ page }) => ({ page });
-
-export default connect(mapStateToProps)(PageSwitcher);
+export default PageSwitcher;
