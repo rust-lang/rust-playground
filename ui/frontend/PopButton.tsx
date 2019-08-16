@@ -1,144 +1,66 @@
-import React from 'react';
-import { Arrow, Manager, Popper, Target } from 'react-popper';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
+import { Manager, Popper, Reference } from 'react-popper';
 import { Portal } from 'react-portal';
 
-export type SetRefFunc = (ref: HTMLElement) => void;
-export type ButtonFactory = (_: PopButtonEnhancements) => React.ReactNode;
-export type ContentFactory = (_: PopButtonContentEnhancements) => React.ReactNode;
-
-export interface PopButtonEnhancements {
-  popButtonProps: {
-    ref: SetRefFunc;
-    onClick: () => void;
-  };
+interface NewPopProps {
+  Button: React.ComponentType<{
+    toggle: () => void;
+  } & React.RefAttributes<HTMLElement>>;
+  Menu: React.ComponentType<{ close: () => void }>;
 }
 
-interface PopButtonStatelessProps {
-  button: ButtonFactory;
-  isOpen: boolean;
-  onClick: () => void;
-  setButtonRef: SetRefFunc;
-  setPopperRef: SetRefFunc;
-}
+const PopButton: React.SFC<NewPopProps> = ({ Button, Menu }) => {
+  const [isOpen, setOpen] = useState(false);
+  const toggle = useCallback(() => setOpen(v => !v), []);
+  const close = useCallback(() => setOpen(false), []);
 
-const PopButtonStateless: React.SFC<PopButtonStatelessProps> =
-  ({ button, children, isOpen, onClick, setButtonRef, setPopperRef }) => {
+  const buttonRef = useRef<HTMLElement>();
+  const menuRef = useRef<HTMLElement>();
 
-    const targetTrampoline = ({ targetProps: { ref: setTargetRef, ..._targetProps } }) => (
-      button({
-        popButtonProps: {
-          onClick,
-          ref: r => {
-            setButtonRef(r);
-            setTargetRef(r);
-          },
-        },
-      })
-    );
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (buttonRef.current && buttonRef.current.contains(event.target)) {
+        // They are clicking on the button, so let that go ahead and close us.
+        return;
+      }
 
-    return (
-      <Manager tag={false}>
-        <Target>{targetTrampoline}</Target>
-        {isOpen && <PopButtonPopper setPopperRef={setPopperRef}>{children}</PopButtonPopper>}
-      </Manager>
-    );
-  };
-
-interface PopButtonPopperProps {
-  setPopperRef: SetRefFunc;
-}
-
-const PopButtonPopper: React.SFC<PopButtonPopperProps> = ({ setPopperRef, children }) => (
-  <Portal>
-    <div ref={setPopperRef}>
-      <Popper className="popper" placement="bottom" modifiers={{ computeStyle: { gpuAcceleration: false } }}>
-        <Arrow className="popper__arrow" />
-        <div className="popper__content">{children}</div>
-      </Popper>
-    </div>
-  </Portal>
-);
-
-interface PopButtonProps {
-  button: ButtonFactory;
-  children: React.ReactNode | ContentFactory;
-}
-
-interface PopButtonState {
-  isOpen: boolean;
-}
-
-export interface PopButtonContentEnhancements {
-  popButtonClose: () => void;
-}
-
-class PopButton extends React.Component<PopButtonProps, PopButtonState> {
-  private buttonRef;
-  private popperRef;
-
-  public constructor(props) {
-    super(props);
-    this.state = {
-      isOpen: false,
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        close();
+      }
     };
-  }
 
-  private handleToggleVisibility = () => {
-    this.setState({ isOpen: !this.state.isOpen });
-  }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [close]);
 
-  private close = () => {
-    this.setState({ isOpen: false });
-  }
-
-  private setButtonRef = r => {
-    this.buttonRef = r;
-  }
-
-  private setPopperRef = r => {
-    this.popperRef = r;
-  }
-
-  private handleClickOutside = event => {
-    if (this.buttonRef && this.buttonRef.contains(event.target)) {
-      // They are clicking on the button, so let that go ahead and close us.
-      return;
-    }
-
-    if (this.popperRef && !this.popperRef.contains(event.target)) {
-      this.close();
-    }
-  }
-
-  public componentDidMount() {
-    document.addEventListener('mousedown', this.handleClickOutside);
-  }
-
-  public componentWillUnmount() {
-    document.removeEventListener('mousedown', this.handleClickOutside);
-  }
-
-  public render() {
-    const { isOpen } = this.state;
-    const { button, children } = this.props;
-
-    const enhancedProps = { popButtonClose: this.close };
-    const enhancedChildren =
-      children instanceof Function ?
-        children(enhancedProps) :
-        children;
-
-    return (
-      <PopButtonStateless
-        button={button}
-        isOpen={isOpen}
-        onClick={this.handleToggleVisibility}
-        setButtonRef={this.setButtonRef}
-        setPopperRef={this.setPopperRef}>
-        {enhancedChildren}
-      </PopButtonStateless>
-    );
-  }
-}
+  return (
+    <Manager>
+      <Reference>
+        {({ ref }) => <Button ref={(r) => { ref(r); buttonRef.current = r; }} toggle={toggle} />}
+      </Reference>
+      {isOpen && <Portal>
+        <Popper placement="bottom" modifiers={{ computeStyle: { gpuAcceleration: false } }}>
+          {({ ref, style, arrowProps, placement }) => (
+            <div
+              className="popper"
+              ref={(r) => { ref(r); menuRef.current = r; }}
+              style={style}
+              data-placement={placement}
+            >
+              <div
+                className="popper__arrow"
+                ref={arrowProps.ref}
+                style={arrowProps.style}
+              />
+              <div className="popper__content">
+                <Menu close={close} />
+              </div>
+            </div>
+          )}
+        </Popper>
+      </Portal>}
+    </Manager>
+  );
+};
 
 export default PopButton;
