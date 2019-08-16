@@ -73,6 +73,15 @@ interface AdvancedEditorProps {
   pairCharacters: PairCharacters;
 }
 
+// Run an effect when the editor or prop changes
+function useEditorProp<T>(editor: AceEditor, prop: T, whenPresent: (editor: AceEditor, prop: T) => void) {
+  useEffect(() => {
+    if (editor) {
+      return whenPresent(editor, prop);
+    }
+  }, [editor, prop, whenPresent]);
+}
+
 const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
   const [editor, setEditor] = useState<AceEditor>(null);
   const child = useRef<HTMLDivElement>(null);
@@ -108,16 +117,7 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
     };
   }, [props.ace, child]);
 
-  // Run an effect when the editor or prop changes
-  function useEditorProp<T>(prop: T, whenPresent: (editor: AceEditor, prop: T) => void) {
-    useEffect(() => {
-      if (editor) {
-        return whenPresent(editor, prop);
-      }
-    }, [prop, whenPresent]);
-  }
-
-  useEditorProp(props.execute, (editor, execute) => {
+  useEditorProp(editor, props.execute, useCallback((editor, execute) => {
     // TODO: Remove command?
     editor.commands.addCommand({
       name: 'executeCode',
@@ -128,7 +128,7 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
       exec: execute,
       readOnly: true,
     });
-  });
+  }, []));
 
   const autocompleteProps = useMemo(() => ({
     autocompleteOnUse: props.autocompleteOnUse,
@@ -138,7 +138,7 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
   // When the user types either `extern crate ` or `use `, automatically
   // open the autocomplete. This should help people understand that
   // there are crates available.
-  useEditorProp(autocompleteProps, (editor, { autocompleteOnUse, crates }) => {
+  useEditorProp(editor, autocompleteProps, useCallback((editor, { autocompleteOnUse, crates }) => {
     editor.commands.on('afterExec', ({ editor, command }) => {
       if (!(command.name === 'backspace' || command.name === 'insertstring')) {
         return;
@@ -150,7 +150,7 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
     });
 
     editor.completers = [buildCrateAutocompleter(autocompleteOnUse, crates)];
-  });
+  }, []));
 
   // Both Ace and the playground want to be the One True Owner of
   // the textual content. This can cause issues because the Redux
@@ -188,7 +188,7 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
     useCallback(code => previouslyNotified.current.push(code), [previouslyNotified]),
   );
 
-  useEditorProp(onEditCodeDebounced, (editor, onEditCode) => {
+  useEditorProp(editor, onEditCodeDebounced, useCallback((editor, onEditCode) => {
     const listener = editor.on('change', _delta => {
       if (!doingSetProp.current) {
         onEditCode(editor.getValue());
@@ -198,9 +198,9 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
     return () => {
       editor.off('change', listener);
     };
-  });
+  }, []));
 
-  useEditorProp(props.code, (editor, code) => {
+  useEditorProp(editor, props.code, useCallback((editor, code) => {
     // Is this prop update the result of our own `change` event?
     const last = previouslyNotified.current.shift();
     if (code === last) {
@@ -220,33 +220,38 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
     editor.setValue(code);
     editor.selection.fromJSON(currentSelection);
     doingSetProp.current = false;
-  });
+  }, []));
 
-  useEditorProp(props.theme, (editor, theme) => {
+  useEditorProp(editor, props.theme, useCallback((editor, theme) => {
     editor.setTheme(`ace/theme/${theme}`);
-  });
+  }, []));
 
-  useEditorProp(props.keybinding, (editor, keybinding) => {
+  const keybindingProps = useMemo(() => ({
+    keybinding: props.keybinding,
+    ace: props.ace,
+  }), [props.keybinding, props.ace]);
+
+  useEditorProp(editor, keybindingProps, useCallback((editor, { keybinding, ace }) => {
     const handler = keybinding ? `ace/keyboard/${keybinding}` : null;
     editor.setKeyboardHandler(handler);
 
     if (keybinding === 'vim') {
-      const { CodeMirror: { Vim } } = props.ace.require('ace/keyboard/vim');
+      const { CodeMirror: { Vim } } = ace.require('ace/keyboard/vim');
       Vim.defineEx('write', 'w', (cm, _input) => {
         cm.ace.execCommand('executeCode');
       });
     }
-  });
+  }, []));
 
-  useEditorProp(props.pairCharacters, (editor, pairCharacters) => {
+  useEditorProp(editor, props.pairCharacters, useCallback((editor, pairCharacters) => {
     editor.setBehavioursEnabled(pairCharacters !== PairCharacters.Disabled);
-  });
+  }, []));
 
-  useEditorProp(props.position, (editor, { line, column }) => {
+  useEditorProp(editor, props.position, useCallback((editor, { line, column }) => {
     // Columns are zero-indexed in ACE
     editor.gotoLine(line, column - 1, false);
     editor.focus();
-  });
+  }, []));
 
   // There's a tricky bug with Ace:
   //
@@ -258,9 +263,9 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
   // Ace doesn't know that we changed the visible area and so
   // doesn't recalculate. Knowing if the focus changed is enough
   // to force such a recalculation.
-  useEditorProp(props.focus, (editor, _focus) => {
+  useEditorProp(editor, props.focus, useCallback((editor, _focus) => {
     editor.resize();
-  });
+  }, []));
 
   return (
     <div className="editor-advanced" ref={child} />
