@@ -1,5 +1,5 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import AdvancedOptionsMenu from './AdvancedOptionsMenu';
 import BuildMenu from './BuildMenu';
@@ -12,90 +12,81 @@ import PopButton, { PopButtonEnhancements } from './PopButton';
 import { SegmentedButton, SegmentedButtonSet, SegmentedLink } from './SegmentedButton';
 import ToolsMenu from './ToolsMenu';
 
-import {
-  navigateToHelp,
-  performGistSave,
-  performPrimaryAction,
-} from './actions';
-import {
-  getAdvancedOptionsSet,
-  getChannelLabel,
-  getExecutionLabel,
-  getModeLabel,
-} from './selectors';
-import State from './state';
+import * as actions from './actions';
+import * as selectors from './selectors';
 
-interface HeaderProps {
-  executionLabel: string;
-  modeLabel: string;
-  channelLabel: string;
-  navigateToHelp: () => any;
-  execute: () => any;
-  gistSave: () => any;
-  advancedOptionsSet: boolean;
-}
+const Header: React.SFC = () => {
+  const advancedOptionsSet = useSelector(selectors.getAdvancedOptionsSet);
+  const channelLabel = useSelector(selectors.getChannelLabel);
+  const executionLabel = useSelector(selectors.getExecutionLabel);
+  const modeLabel = useSelector(selectors.getModeLabel);
 
-const Header: React.SFC<HeaderProps> = props => (
-  <div className="header">
-    <HeaderSet id="build">
-      <SegmentedButtonSet>
-        <SegmentedButton isBuild onClick={props.execute}>
-          <HeaderButton rightIcon={<BuildIcon />}>
-            {props.executionLabel}
-          </HeaderButton>
-        </SegmentedButton>
-        <PopButton button={BuildMenuButton}>{({ popButtonClose }) => (
-          <BuildMenu close={popButtonClose} />
-        )}</PopButton>
-      </SegmentedButtonSet>
-    </HeaderSet>
-    <HeaderSet id="channel-mode">
-      <SegmentedButtonSet>
-        <PopButton
-          button={p => <ModeMenuButton label={props.modeLabel} {...p} />}>{({ popButtonClose }) => (
-            <ModeMenu close={popButtonClose} />
+  const dispatch = useDispatch();
+  const execute = useCallback(() => dispatch(actions.performPrimaryAction()), [dispatch]);
+  const gistSave = useCallback(() => dispatch(actions.performGistSave()), [dispatch]);
+
+  return (
+    <div className="header">
+      <HeaderSet id="build">
+        <SegmentedButtonSet>
+          <SegmentedButton isBuild onClick={execute}>
+            <HeaderButton rightIcon={<BuildIcon />}>
+              {executionLabel}
+            </HeaderButton>
+          </SegmentedButton>
+          <PopButton button={BuildMenuButton}>{({ popButtonClose }) => (
+            <BuildMenu close={popButtonClose} />
           )}</PopButton>
-        <PopButton
-          button={p => <ChannelMenuButton label={props.channelLabel}{...p} />}>{({ popButtonClose }) => (
-            <ChannelMenu close={popButtonClose} />
+        </SegmentedButtonSet>
+      </HeaderSet>
+      <HeaderSet id="channel-mode">
+        <SegmentedButtonSet>
+          <PopButton
+            button={p => <ModeMenuButton label={modeLabel} {...p} />}>{({ popButtonClose }) => (
+              <ModeMenu close={popButtonClose} />
+            )}</PopButton>
+          <PopButton
+            button={p => <ChannelMenuButton label={channelLabel}{...p} />}>{({ popButtonClose }) => (
+              <ChannelMenu close={popButtonClose} />
+            )}</PopButton>
+          <PopButton
+            button={({ ...p }) => <AdvancedOptionsMenuButton advancedOptionsSet={advancedOptionsSet} {...p} />}
+          >
+            <AdvancedOptionsMenu />
+          </PopButton>
+        </SegmentedButtonSet>
+      </HeaderSet>
+      <HeaderSet id="share">
+        <SegmentedButtonSet>
+          <SegmentedButton title="Create shareable links to this code" onClick={gistSave}>
+            <HeaderButton>Share</HeaderButton>
+          </SegmentedButton>
+        </SegmentedButtonSet>
+      </HeaderSet>
+      <HeaderSet id="tools">
+        <SegmentedButtonSet>
+          <PopButton button={ToolsMenuButton}>{({ popButtonClose }) => (
+            <ToolsMenu close={popButtonClose} />
           )}</PopButton>
-        <PopButton
-          button={({ ...p }) => <AdvancedOptionsMenuButton advancedOptionsSet={props.advancedOptionsSet} {...p} />}
-        >
-          <AdvancedOptionsMenu />
-        </PopButton>
-      </SegmentedButtonSet>
-    </HeaderSet>
-    <HeaderSet id="share">
-      <SegmentedButtonSet>
-        <SegmentedButton title="Create shareable links to this code" onClick={props.gistSave}>
-          <HeaderButton >Share</HeaderButton>
-        </SegmentedButton>
-      </SegmentedButtonSet>
-    </HeaderSet>
-    <HeaderSet id="tools">
-      <SegmentedButtonSet>
-        <PopButton button={ToolsMenuButton}>{({ popButtonClose }) => (
-          <ToolsMenu close={popButtonClose} />
-        )}</PopButton>
-      </SegmentedButtonSet>
-    </HeaderSet>
-    <HeaderSet id="config">
-      <SegmentedButtonSet>
-        <PopButton button={ConfigMenuButton}>{({ popButtonClose }) => (
-          <ConfigMenu close={popButtonClose} />
-        )}</PopButton>
-      </SegmentedButtonSet>
-    </HeaderSet>
-    <HeaderSet id="help">
-      <SegmentedButtonSet>
-        <SegmentedLink title="View help" action={props.navigateToHelp}>
-          <HeaderButton icon={<HelpIcon />} />
-        </SegmentedLink>
-      </SegmentedButtonSet>
-    </HeaderSet>
-  </div >
-);
+        </SegmentedButtonSet>
+      </HeaderSet>
+      <HeaderSet id="config">
+        <SegmentedButtonSet>
+          <PopButton button={ConfigMenuButton}>{({ popButtonClose }) => (
+            <ConfigMenu close={popButtonClose} />
+          )}</PopButton>
+        </SegmentedButtonSet>
+      </HeaderSet>
+      <HeaderSet id="help">
+        <SegmentedButtonSet>
+          <SegmentedLink title="View help" action={actions.navigateToHelp}>
+            <HeaderButton icon={<HelpIcon />} />
+          </SegmentedLink>
+        </SegmentedButtonSet>
+      </HeaderSet>
+    </div>
+  );
+};
 
 interface HeaderSetProps {
   id: string;
@@ -155,17 +146,4 @@ const ConfigMenuButton: React.SFC<PopButtonEnhancements> = ({ popButtonProps }) 
   </SegmentedButton>
 );
 
-const mapStateToProps = (state: State) => ({
-  executionLabel: getExecutionLabel(state),
-  modeLabel: getModeLabel(state),
-  channelLabel: getChannelLabel(state),
-  navigateToHelp,
-  advancedOptionsSet: getAdvancedOptionsSet(state),
-});
-
-const mapDispatchToProps = ({
-  execute: performPrimaryAction,
-  gistSave: performGistSave,
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Header);
+export default Header;

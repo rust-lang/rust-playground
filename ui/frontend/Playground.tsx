@@ -1,15 +1,18 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import Editor from './Editor';
 import Header from './Header';
 import Notifications from './Notifications';
 import Output from './Output';
-import { anyNotificationsToShowSelector } from './selectors';
+import * as selectors from './selectors';
 import State from './state';
-import { Focus, Orientation } from './types';
 
-const Playground: React.SFC<Props> = ({ showNotifications, focus, splitOrientation }) => {
+const Playground: React.SFC = () => {
+  const showNotifications = useSelector(selectors.anyNotificationsToShowSelector);
+  const focus = useSelector((state: State) => state.output.meta.focus);
+  const splitOrientation = useSelector((state: State) => state.configuration.orientation);
+
   const outputFocused = focus ? 'playground-output-focused' : '';
   const splitClass = 'playground-split';
   const orientation = splitClass + '-' + splitOrientation;
@@ -34,16 +37,4 @@ const Playground: React.SFC<Props> = ({ showNotifications, focus, splitOrientati
   );
 };
 
-interface Props {
-  focus?: Focus;
-  showNotifications: boolean;
-  splitOrientation: Orientation;
-}
-
-const mapStateToProps = (state: State) => ({
-  focus: state.output.meta.focus,
-  splitOrientation: state.configuration.orientation,
-  showNotifications: anyNotificationsToShowSelector(state),
-});
-
-export default connect(mapStateToProps)(Playground);
+export default Playground;

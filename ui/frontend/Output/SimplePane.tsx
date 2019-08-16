@@ -20,12 +20,15 @@ const HighlightErrors: React.SFC<HighlightErrorsProps> = ({ label, children }) =
   </div>
 );
 
-export interface SimplePaneProps {
+export interface SimplePaneProps extends ReallySimplePaneProps {
+  kind: string;
+}
+
+export interface ReallySimplePaneProps {
   requestsInProgress: number;
   stdout?: string;
   stderr?: string;
   error?: string;
-  kind: string;
 }
 
 const SimplePane: React.SFC<SimplePaneProps> = props => (

@@ -1,29 +1,32 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 
 import 'prismjs/components/prism-rust.min';
 import { PrismCode } from 'react-prism';
 
-import { showExample } from './actions';
+import * as actions from './actions';
 
-const Example: React.SFC<Props> = ({ code, showExample }) => (
-  <pre className="help__example">
-    <button className="help__load_example" onClick={() => showExample(code)}>
-      Load in playground
-    </button>
-    <PrismCode className="language-rust">
-      {code}
-    </PrismCode>
-  </pre>
-);
-
-export interface Props {
+export interface HelpExampleProps {
   code: string;
-  showExample: (code: string) => any;
 }
 
-const mapDispatchToProps = ({
-  showExample,
-});
+const HelpExample: React.SFC<HelpExampleProps> = ({ code }) => {
+  const dispatch = useDispatch();
+  const showExample = useCallback(
+    () => dispatch(actions.showExample(code)),
+    [dispatch, code]
+  );
 
-export default connect(null, mapDispatchToProps)(Example);
+  return (
+    <pre className="help__example">
+      <button className="help__load_example" onClick={showExample}>
+        Load in playground
+      </button>
+      <PrismCode className="language-rust">
+        {code}
+      </PrismCode>
+    </pre>
+  );
+};
+
+export default HelpExample;

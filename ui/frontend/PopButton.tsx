@@ -24,7 +24,7 @@ interface PopButtonStatelessProps {
 const PopButtonStateless: React.SFC<PopButtonStatelessProps> =
   ({ button, children, isOpen, onClick, setButtonRef, setPopperRef }) => {
 
-    const targetTrampoline = ({ targetProps: { ref: setTargetRef, ...targetProps } }) => (
+    const targetTrampoline = ({ targetProps: { ref: setTargetRef, ..._targetProps } }) => (
       button({
         popButtonProps: {
           onClick,
@@ -76,7 +76,7 @@ class PopButton extends React.Component<PopButtonProps, PopButtonState> {
   private buttonRef;
   private popperRef;
 
-  constructor(props) {
+  public constructor(props) {
     super(props);
     this.state = {
       isOpen: false,

@@ -1,21 +1,12 @@
 /* global ACE_KEYBINDINGS:false, ACE_THEMES:false */
 
-import React, { Fragment } from 'react';
-import { connect } from 'react-redux';
+import React, { Fragment, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Either as EitherConfig, Select as SelectConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
 
-import {
-  changeAssemblyFlavor,
-  changeDemangleAssembly,
-  changeEditor,
-  changeKeybinding,
-  changeOrientation,
-  changePairCharacters,
-  changeProcessAssembly,
-  changeTheme,
-} from './actions';
+import * as actions from './actions';
 import State from './state';
 import {
   AssemblyFlavor,
@@ -27,133 +18,116 @@ import {
 } from './types';
 
 interface ConfigMenuProps {
-  assemblyFlavor: AssemblyFlavor;
-  changeAssemblyFlavor: (_: AssemblyFlavor) => any;
-  changeDemangleAssembly: (_: DemangleAssembly) => any;
-  changeEditorStyle: (_: Editor) => any;
-  changeKeybinding: (_: string) => any;
-  changeOrientation: (_: Orientation) => any;
-  changeProcessAssembly: (_: ProcessAssembly) => any;
-  changeTheme: (_: string) => any;
-  changePairCharacters: (_: PairCharacters) => any;
-  demangleAssembly: DemangleAssembly;
-  editorStyle: Editor;
-  keybinding: string;
-  orientation: Orientation;
-  processAssembly: ProcessAssembly;
-  theme: string;
-  pairCharacters: PairCharacters;
   close: () => void;
 }
 
-const ConfigMenu: React.SFC<ConfigMenuProps> = props => (
-  <Fragment>
-    <MenuGroup title="Editor">
-      <EitherConfig
-        id="editor-style"
-        name="Style"
-        a={Editor.Simple}
-        b={Editor.Advanced}
-        value={props.editorStyle}
-        onChange={props.changeEditorStyle} />
+const ConfigMenu: React.SFC<ConfigMenuProps> = () => {
+  const keybinding = useSelector((state: State) => state.configuration.keybinding);
+  const theme = useSelector((state: State) => state.configuration.theme);
+  const orientation = useSelector((state: State) => state.configuration.orientation);
+  const editorStyle = useSelector((state: State) => state.configuration.editor);
+  const pairCharacters = useSelector((state: State) => state.configuration.pairCharacters);
+  const assemblyFlavor = useSelector((state: State) => state.configuration.assemblyFlavor);
+  const demangleAssembly = useSelector((state: State) => state.configuration.demangleAssembly);
+  const processAssembly = useSelector((state: State) => state.configuration.processAssembly);
 
-      {props.editorStyle === Editor.Advanced && (
-        <Fragment>
-          <SelectConfig
-            name="Keybinding"
-            value={props.keybinding}
-            onChange={props.changeKeybinding}
-          >
-            {ACE_KEYBINDINGS.map(k => <option key={k} value={k}>{k}</option>)}
-          </SelectConfig>
+  const dispatch = useDispatch();
+  const changeTheme = useCallback((t) => dispatch(actions.changeTheme(t)), [dispatch]);
+  const changeKeybinding = useCallback((k) => dispatch(actions.changeKeybinding(k)), [dispatch]);
+  const changeOrientation = useCallback((o) => dispatch(actions.changeOrientation(o)), [dispatch]);
+  const changeEditorStyle = useCallback((e) => dispatch(actions.changeEditor(e)), [dispatch]);
+  const changeAssemblyFlavor = useCallback((a) => dispatch(actions.changeAssemblyFlavor(a)), [dispatch]);
+  const changePairCharacters = useCallback((p) => dispatch(actions.changePairCharacters(p)), [dispatch]);
+  const changeProcessAssembly = useCallback((p) => dispatch(actions.changeProcessAssembly(p)), [dispatch]);
+  const changeDemangleAssembly = useCallback((d) => dispatch(actions.changeDemangleAssembly(d)), [dispatch]);
 
-          <SelectConfig
-            name="Theme"
-            value={props.theme}
-            onChange={props.changeTheme}
-          >
-            {ACE_THEMES.map(t => <option key={t} value={t}>{t}</option>)}
-          </SelectConfig>
+  return (
+    <Fragment>
+      <MenuGroup title="Editor">
+        <EitherConfig
+          id="editor-style"
+          name="Style"
+          a={Editor.Simple}
+          b={Editor.Advanced}
+          value={editorStyle}
+          onChange={changeEditorStyle} />
 
-          <EitherConfig
-            id="editor-pair-characters"
-            name="Pair Characters"
-            a={PairCharacters.Enabled}
-            b={PairCharacters.Disabled}
-            value={props.pairCharacters}
-            onChange={props.changePairCharacters} />
-        </Fragment>
-      )}
-    </MenuGroup>
+        {editorStyle === Editor.Advanced && (
+          <Fragment>
+            <SelectConfig
+              name="Keybinding"
+              value={keybinding}
+              onChange={changeKeybinding}
+            >
+              {ACE_KEYBINDINGS.map(k => <option key={k} value={k}>{k}</option>)}
+            </SelectConfig>
 
-    <MenuGroup title="UI">
-      <SelectConfig
-        name="Orientation"
-        value={props.orientation}
-        onChange={props.changeOrientation}
-      >
-        <option value={Orientation.Automatic}>Automatic</option>
-        <option value={Orientation.Horizontal}>Horizontal</option>
-        <option value={Orientation.Vertical}>Vertical</option>
-      </SelectConfig>
-    </MenuGroup>
+            <SelectConfig
+              name="Theme"
+              value={theme}
+              onChange={changeTheme}
+            >
+              {ACE_THEMES.map(t => <option key={t} value={t}>{t}</option>)}
+            </SelectConfig>
 
-    <MenuGroup title="Assembly">
-      <EitherConfig
-        id="assembly-flavor"
-        name="Flavor"
-        a={AssemblyFlavor.Att}
-        b={AssemblyFlavor.Intel}
-        aLabel="AT&T"
-        bLabel="Intel"
-        value={props.assemblyFlavor}
-        onChange={props.changeAssemblyFlavor} />
+            <EitherConfig
+              id="editor-pair-characters"
+              name="Pair Characters"
+              a={PairCharacters.Enabled}
+              b={PairCharacters.Disabled}
+              value={pairCharacters}
+              onChange={changePairCharacters} />
+          </Fragment>
+        )}
+      </MenuGroup>
 
-      <EitherConfig
-        id="assembly-symbols"
-        name="Symbol Demangling"
-        a={DemangleAssembly.Demangle}
-        b={DemangleAssembly.Mangle}
-        aLabel="On"
-        bLabel="Off"
-        value={props.demangleAssembly}
-        onChange={props.changeDemangleAssembly}
-      />
+      <MenuGroup title="UI">
+        <SelectConfig
+          name="Orientation"
+          value={orientation}
+          onChange={changeOrientation}
+        >
+          <option value={Orientation.Automatic}>Automatic</option>
+          <option value={Orientation.Horizontal}>Horizontal</option>
+          <option value={Orientation.Vertical}>Vertical</option>
+        </SelectConfig>
+      </MenuGroup>
 
-      <EitherConfig
-        id="assembly-view"
-        name="Name Filtering"
-        a={ProcessAssembly.Filter}
-        b={ProcessAssembly.Raw}
-        aLabel="On"
-        bLabel="Off"
-        value={props.processAssembly}
-        onChange={props.changeProcessAssembly}
-      />
-    </MenuGroup>
-  </Fragment>
-);
+      <MenuGroup title="Assembly">
+        <EitherConfig
+          id="assembly-flavor"
+          name="Flavor"
+          a={AssemblyFlavor.Att}
+          b={AssemblyFlavor.Intel}
+          aLabel="AT&T"
+          bLabel="Intel"
+          value={assemblyFlavor}
+          onChange={changeAssemblyFlavor} />
 
-const mapStateToProps = (state: State) => ({
-  keybinding: state.configuration.keybinding,
-  theme: state.configuration.theme,
-  orientation: state.configuration.orientation,
-  editorStyle: state.configuration.editor,
-  pairCharacters: state.configuration.pairCharacters,
-  assemblyFlavor: state.configuration.assemblyFlavor,
-  demangleAssembly: state.configuration.demangleAssembly,
-  processAssembly: state.configuration.processAssembly,
-});
+        <EitherConfig
+          id="assembly-symbols"
+          name="Symbol Demangling"
+          a={DemangleAssembly.Demangle}
+          b={DemangleAssembly.Mangle}
+          aLabel="On"
+          bLabel="Off"
+          value={demangleAssembly}
+          onChange={changeDemangleAssembly}
+        />
 
-const mapDispatchToProps = ({
-  changeTheme,
-  changeKeybinding,
-  changeOrientation,
-  changeEditorStyle: changeEditor,
-  changeAssemblyFlavor,
-  changePairCharacters,
-  changeProcessAssembly,
-  changeDemangleAssembly,
-});
+        <EitherConfig
+          id="assembly-view"
+          name="Name Filtering"
+          a={ProcessAssembly.Filter}
+          b={ProcessAssembly.Raw}
+          aLabel="On"
+          bLabel="Off"
+          value={processAssembly}
+          onChange={changeProcessAssembly}
+        />
+      </MenuGroup>
+    </Fragment>
+  );
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(ConfigMenu);
+export default ConfigMenu;

@@ -6,7 +6,7 @@ export function configureRustErrors({
   gotoPosition,
   reExecuteWithBacktrace,
 }) {
-  Prism.languages.rust_errors = { // eslint-disable-line camelcase
+  Prism.languages.rust_errors = { // eslint-disable-line @typescript-eslint/camelcase
     'warning': {
       pattern: /^warning(\[E\d+\])?:.*$/m,
       inside: {

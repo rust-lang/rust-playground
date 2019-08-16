@@ -28,6 +28,7 @@ interface SegmentedButtonProps extends Button {
 export const SegmentedButton = React.forwardRef<HTMLButtonElement, SegmentedButtonProps>((props, ref) => (
   <SegmentedButtonInner innerRef={ref} {...props} />
 ));
+SegmentedButton.displayName = 'SegmentedButton';
 
 interface SegmentedLinkInnerProps extends LinkProps {
   // I can't figure out how to make these types line up
@@ -46,3 +47,4 @@ const SegmentedLinkInner: React.SFC<SegmentedLinkInnerProps> = ({ innerRef, chil
 export const SegmentedLink = React.forwardRef<typeof Link, LinkProps>((props, ref) => (
   <SegmentedLinkInner innerRef={ref} {...props} />
 ));
+SegmentedLink.displayName = 'SegmentedLink';

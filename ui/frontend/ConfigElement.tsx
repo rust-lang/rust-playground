@@ -60,5 +60,5 @@ const ConfigElement: React.SFC<ConfigElementProps> = ({ name, isNotDefault, chil
         {children}
       </div>
     </div>
-  </MenuItem >
+  </MenuItem>
 );

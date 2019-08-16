@@ -1,43 +1,40 @@
 import React, { Fragment } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { ClipboardIcon } from '../Icon';
 import { State } from '../reducers';
-import {
-  codeUrlSelector,
-  issueUrlSelector,
-  permalinkSelector,
-  showGistLoaderSelector,
-  urloUrlSelector,
-} from '../selectors';
+import * as selectors from '../selectors';
 
 import Loader from './Loader';
 
-interface GistProps {
-  codeUrl?: string;
-  gistUrl?: string;
-  issueUrl?: string;
-  permalink?: string;
-  showLoader: boolean;
-  urloUrl?: string;
-}
+const Gist: React.SFC = () => {
+  const showLoader = useSelector(selectors.showGistLoaderSelector);
 
-const Gist: React.SFC<GistProps> = props => (
-  <div className="output-gist">
-    {props.showLoader ? <Loader /> : <Links {...props} />}
-  </div>
-);
+  return (
+    <div className="output-gist">
+      {showLoader ? <Loader /> : <Links />}
+    </div>
+  );
+};
 
-const Links: React.SFC<GistProps> = props => (
-  <Fragment>
-    <Copied href={props.permalink}>Permalink to the playground</Copied>
-    <Copied href={props.gistUrl}>Direct link to the gist</Copied>
-    <Copied href={props.codeUrl}>Embedded code in link</Copied>
-    <p><a href={props.urloUrl} target="_blank">Open a new thread in the Rust user forum</a></p>
-    <p><a href={props.issueUrl} target="_blank"> Open an issue on the Rust GitHub repository </a></p>
-  </Fragment>
-);
+const Links: React.SFC = () => {
+  const codeUrl = useSelector(selectors.codeUrlSelector);
+  const gistUrl = useSelector((state: State) => state.output.gist.url);
+  const issueUrl = useSelector(selectors.issueUrlSelector);
+  const permalink = useSelector(selectors.permalinkSelector);
+  const urloUrl = useSelector(selectors.urloUrlSelector);
+
+  return (
+    <Fragment>
+      <Copied href={permalink}>Permalink to the playground</Copied>
+      <Copied href={gistUrl}>Direct link to the gist</Copied>
+      <Copied href={codeUrl}>Embedded code in link</Copied>
+      <NewWindow href={urloUrl}>Open a new thread in the Rust user forum</NewWindow>
+      <NewWindow href={issueUrl}> Open an issue on the Rust GitHub repository</NewWindow>
+    </Fragment>
+  );
+};
 
 interface CopiedProps {
   href: string;
@@ -48,7 +45,7 @@ interface CopiedState {
 }
 
 class Copied extends React.PureComponent<CopiedProps, CopiedState> {
-  constructor(props) {
+  public constructor(props) {
     super(props);
     this.state = { copied: false };
   }
@@ -73,13 +70,14 @@ class Copied extends React.PureComponent<CopiedProps, CopiedState> {
   }
 }
 
-const mapStateToProps = (state: State) => ({
-  codeUrl: codeUrlSelector(state),
-  gistUrl: state.output.gist.url,
-  issueUrl: issueUrlSelector(state),
-  permalink: permalinkSelector(state),
-  showLoader: showGistLoaderSelector(state),
-  urloUrl: urloUrlSelector(state),
-});
+interface NewWindowProps {
+  href: string;
+}
 
-export default connect(mapStateToProps)(Gist);
+const NewWindow: React.SFC<NewWindowProps> = props => (
+  <p>
+    <a href={props.href} target="_blank" rel="noopener noreferrer">{props.children}</a>
+  </p>
+);
+
+export default Gist;

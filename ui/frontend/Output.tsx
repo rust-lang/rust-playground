@@ -1,19 +1,18 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { changeFocus } from './actions';
+import * as actions from './actions';
 import { State } from './reducers';
-import { State as OutputState } from './reducers/output';
 import { Focus } from './types';
 
 import Execute from './Output/Execute';
 import Gist from './Output/Gist';
 import Section from './Output/Section';
 import SimplePane, { SimplePaneProps } from './Output/SimplePane';
-import { getSomethingToShow, hasProperties } from './selectors';
+import * as selectors from './selectors';
 
 const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
-  if (hasProperties(tabProps)) {
+  if (selectors.hasProperties(tabProps)) {
     const selected = focus === kind ? 'output-tab-selected' : '';
     return (
       <button className={`output-tab ${selected}`}
@@ -44,11 +43,23 @@ interface PaneWithCodeProps extends SimplePaneProps {
   code?: string;
 }
 
-const Output: React.SFC<OutputProps> = ({
-  // https://github.com/palantir/tslint/issues/3960
-  // tslint:disable-next-line:trailing-comma
-  somethingToShow, meta: { focus }, execute, format, clippy, miri, assembly, llvmIr, mir, wasm, gist, ...props
-}) => {
+const Output: React.SFC = () => {
+  const somethingToShow = useSelector(selectors.getSomethingToShow);
+  const { meta: { focus }, execute, format, clippy, miri, assembly, llvmIr, mir, wasm, gist } =
+    useSelector((state: State) => state.output);
+
+  const dispatch = useDispatch();
+  const focusClose = useCallback(() => dispatch(actions.changeFocus(null)), [dispatch]);
+  const focusExecute = useCallback(() => dispatch(actions.changeFocus(Focus.Execute)), [dispatch]);
+  const focusFormat = useCallback(() => dispatch(actions.changeFocus(Focus.Format)), [dispatch]);
+  const focusClippy = useCallback(() => dispatch(actions.changeFocus(Focus.Clippy)), [dispatch]);
+  const focusMiri = useCallback(() => dispatch(actions.changeFocus(Focus.Miri)), [dispatch]);
+  const focusAssembly = useCallback(() => dispatch(actions.changeFocus(Focus.Asm)), [dispatch]);
+  const focusLlvmIr = useCallback(() => dispatch(actions.changeFocus(Focus.LlvmIr)), [dispatch]);
+  const focusMir = useCallback(() => dispatch(actions.changeFocus(Focus.Mir)), [dispatch]);
+  const focusWasm = useCallback(() => dispatch(actions.changeFocus(Focus.Wasm)), [dispatch]);
+  const focusGist = useCallback(() => dispatch(actions.changeFocus(Focus.Gist)), [dispatch]);
+
   if (!somethingToShow) {
     return null;
   }
@@ -58,7 +69,7 @@ const Output: React.SFC<OutputProps> = ({
   if (focus) {
     close = (
       <button className="output-tab output-tab-close"
-        onClick={props.focusClose}>Close</button>
+        onClick={focusClose}>Close</button>
     );
 
     body = (
@@ -81,39 +92,39 @@ const Output: React.SFC<OutputProps> = ({
       <div className="output-tabs">
         <Tab kind={Focus.Execute} focus={focus}
           label="Execution"
-          onClick={props.focusExecute}
+          onClick={focusExecute}
           tabProps={execute} />
         <Tab kind={Focus.Format} focus={focus}
           label="Format"
-          onClick={props.focusFormat}
+          onClick={focusFormat}
           tabProps={format} />
         <Tab kind={Focus.Clippy} focus={focus}
           label="Clippy"
-          onClick={props.focusClippy}
+          onClick={focusClippy}
           tabProps={clippy} />
         <Tab kind={Focus.Miri} focus={focus}
           label="Miri"
-          onClick={props.focusMiri}
+          onClick={focusMiri}
           tabProps={miri} />
         <Tab kind={Focus.Asm} focus={focus}
           label="ASM"
-          onClick={props.focusAssembly}
+          onClick={focusAssembly}
           tabProps={assembly} />
         <Tab kind={Focus.LlvmIr} focus={focus}
           label="LLVM IR"
-          onClick={props.focusLlvmIr}
+          onClick={focusLlvmIr}
           tabProps={llvmIr} />
         <Tab kind={Focus.Mir} focus={focus}
           label="MIR"
-          onClick={props.focusMir}
+          onClick={focusMir}
           tabProps={mir} />
         <Tab kind={Focus.Wasm} focus={focus}
           label="WASM"
-          onClick={props.focusWasm}
+          onClick={focusWasm}
           tabProps={wasm} />
         <Tab kind={Focus.Gist} focus={focus}
           label="Share"
-          onClick={props.focusGist}
+          onClick={focusGist}
           tabProps={gist} />
         {close}
       </div>
@@ -122,42 +133,4 @@ const Output: React.SFC<OutputProps> = ({
   );
 };
 
-interface OutputProps extends OutputState {
-  somethingToShow: boolean;
-  changeFocus: (_?: Focus) => any;
-  focusClose: () => void;
-  focusExecute: () => void;
-  focusFormat: () => void;
-  focusClippy: () => void;
-  focusMiri: () => void;
-  focusAssembly: () => void;
-  focusLlvmIr: () => void;
-  focusMir: () => void;
-  focusWasm: () => void;
-  focusGist: () => void;
-}
-
-const mapStateToProps = (state: State) => ({
-  somethingToShow: getSomethingToShow(state),
-  ...state.output,
-});
-
-const mapDispatchToProps = ({
-  focusClose: () => changeFocus(null),
-  focusExecute: () => changeFocus(Focus.Execute),
-  focusFormat: () => changeFocus(Focus.Format),
-  focusClippy: () => changeFocus(Focus.Clippy),
-  focusMiri: () => changeFocus(Focus.Miri),
-  focusAssembly: () => changeFocus(Focus.Asm),
-  focusLlvmIr: () => changeFocus(Focus.LlvmIr),
-  focusMir: () => changeFocus(Focus.Mir),
-  focusWasm: () => changeFocus(Focus.Wasm),
-  focusGist: () => changeFocus(Focus.Gist),
-});
-
-const ConnectedOutput = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Output);
-
-export default ConnectedOutput;
+export default Output;

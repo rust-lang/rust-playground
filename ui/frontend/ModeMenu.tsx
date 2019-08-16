@@ -1,52 +1,48 @@
-import React, { Fragment } from 'react';
-import { connect } from 'react-redux';
+import React, { Fragment, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import MenuGroup from './MenuGroup';
 import SelectOne from './SelectOne';
 
-import { changeMode } from './actions';
+import * as actions from './actions';
 import State from './state';
 import { Mode } from './types';
 
 interface ModeMenuProps {
-  mode: Mode;
-  changeMode: (_: Mode) => any;
   close: () => void;
 }
 
-const ModeMenu: React.SFC<ModeMenuProps> = props => (
-  <Fragment>
-    <MenuGroup title="Mode &mdash; Choose optimization level">
-      <SelectOne
-        name="Debug"
-        currentValue={props.mode}
-        thisValue={Mode.Debug}
-        changeValue={mode => { props.changeMode(mode); props.close(); }}
-      >
-        Build with debug information, without optimizations.
-      </SelectOne>
-      <SelectOne
-        name="Release"
-        currentValue={props.mode}
-        thisValue={Mode.Release}
-        changeValue={mode => { props.changeMode(mode); props.close(); }}
-      >
-        Build with optimizations turned on.
-      </SelectOne>
-    </MenuGroup>
-  </Fragment>
-);
+const ModeMenu: React.SFC<ModeMenuProps> = props => {
+  const mode = useSelector((state: State) => state.configuration.mode);
+  const dispatch = useDispatch();
+  const changeMode = useCallback((mode) => {
+    dispatch(actions.changeMode(mode));
+    props.close();
+  }, [dispatch, props]
+  );
 
-const mapStateToProps = (state: State) => {
-  const { configuration: { mode } } = state;
-
-  return {
-    mode,
-  };
+  return (
+    <Fragment>
+      <MenuGroup title="Mode &mdash; Choose optimization level">
+        <SelectOne
+          name="Debug"
+          currentValue={mode}
+          thisValue={Mode.Debug}
+          changeValue={changeMode}
+        >
+          Build with debug information, without optimizations.
+        </SelectOne>
+        <SelectOne
+          name="Release"
+          currentValue={mode}
+          thisValue={Mode.Release}
+          changeValue={changeMode}
+        >
+          Build with optimizations turned on.
+        </SelectOne>
+      </MenuGroup>
+    </Fragment>
+  );
 };
 
-const mapDispatchToProps = {
-  changeMode,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ModeMenu);
+export default ModeMenu;

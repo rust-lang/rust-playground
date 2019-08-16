@@ -1,22 +1,26 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { addMainFunction } from '../actions';
+import * as actions from '../actions';
+import * as selectors from '../selectors';
 import { State } from '../reducers';
 
 import Section from './Section';
-import SimplePane, { SimplePaneProps } from './SimplePane';
+import SimplePane from './SimplePane';
 
-interface ExecuteProps extends SimplePaneProps {
-  isAutoBuild: boolean;
-  addMainFunction: () => any;
-}
+const Execute: React.SFC = () => {
+  const details = useSelector((state: State) => state.output.execute);
+  const isAutoBuild = useSelector(selectors.isAutoBuildSelector);
 
-const Execute: React.SFC<ExecuteProps> = props => (
-  <SimplePane {...props} kind="execute">
-    {props.isAutoBuild && <Warning addMainFunction={props.addMainFunction} />}
-  </SimplePane>
-);
+  const dispatch = useDispatch();
+  const addMainFunction = useCallback(() => dispatch(actions.addMainFunction()), [dispatch]);
+
+  return (
+    <SimplePane {...details} kind="execute">
+      {isAutoBuild && <Warning addMainFunction={addMainFunction} />}
+    </SimplePane>
+  );
+};
 
 interface WarningProps {
   addMainFunction: () => any;
@@ -26,7 +30,7 @@ const Warning: React.SFC<WarningProps> = props => (
   <Section kind="warning" label="Warnings">
     No main function was detected, so your code was compiled
     {'\n'}
-    but not run. If you'd like to execute your code, please
+    but not run. If you’d like to execute your code, please
     {'\n'}
     <button className="output-add-main" onClick={props.addMainFunction}>
       add a main function
@@ -35,13 +39,4 @@ const Warning: React.SFC<WarningProps> = props => (
   </Section>
 );
 
-const mapStateToProps = (state: State) => state.output.execute;
-
-const mapDispatchToProps = ({
-  addMainFunction,
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Execute);
+export default Execute;

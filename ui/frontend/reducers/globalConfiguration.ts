@@ -8,6 +8,6 @@ const DEFAULT: State = {
   baseUrl: '',
 };
 
-export default function globalConfiguration(state = DEFAULT, action: Action): State {
+export default function globalConfiguration(state = DEFAULT, _action: Action): State {
   return state;
 }

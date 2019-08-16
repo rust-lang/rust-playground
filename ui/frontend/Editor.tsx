@@ -1,9 +1,10 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { editCode, performPrimaryAction } from './actions';
+import * as actions from './actions';
 import AdvancedEditor from './AdvancedEditor';
 import { CommonEditorProps, Editor as EditorType } from './types';
+import { State } from './reducers';
 
 class SimpleEditor extends React.PureComponent<CommonEditorProps> {
   private _editor: HTMLTextAreaElement;
@@ -59,51 +60,27 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
   }
 }
 
-class Editor extends React.PureComponent<EditorProps> {
-  public render() {
-    const { editor, execute, code, crates, position, onEditCode } = this.props;
-    const SelectedEditor = editor === EditorType.Simple ? SimpleEditor : AdvancedEditor;
+const Editor: React.SFC = () => {
+  const code = useSelector((state: State) => state.code);
+  const editor = useSelector((state: State) => state.configuration.editor);
+  const position = useSelector((state: State) => state.position);
+  const crates = useSelector((state: State) => state.crates);
 
-    return (
-      <div className="editor">
-        <SelectedEditor code={code}
-          position={position}
-          crates={crates}
-          onEditCode={onEditCode}
-          execute={execute} />
-      </div>
-    );
-  }
-}
+  const dispatch = useDispatch();
+  const execute = useCallback(() => dispatch(actions.performPrimaryAction()), [dispatch]);
+  const onEditCode = useCallback((c) => dispatch(actions.editCode(c)), [dispatch]);
 
-interface EditorProps {
-  code: string;
-  editor: EditorType;
-  execute: () => any;
-  onEditCode: (_: string) => any;
-  position: {
-    line: number,
-    column: number,
-  };
-  crates: Array<{
-    id: string,
-    name: string,
-    version: string,
-  }>;
-}
+  const SelectedEditor = editor === EditorType.Simple ? SimpleEditor : AdvancedEditor;
 
-const mapStateToProps = ({ code, configuration: { editor }, position, crates }) => (
-  { code, editor, position, crates }
-);
+  return (
+    <div className="editor">
+      <SelectedEditor code={code}
+        position={position}
+        crates={crates}
+        onEditCode={onEditCode}
+        execute={execute} />
+    </div>
+  );
+};
 
-const mapDispatchToProps = ({
-  execute: performPrimaryAction,
-  onEditCode: editCode,
-});
-
-const ConnectedEditor = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Editor);
-
-export default ConnectedEditor;
+export default Editor;
