@@ -1,48 +1,38 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useContext, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 
-type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
+import { Context } from './Router';
 
-interface LinkInnerProps extends LinkProps {
-  dispatch: (_: any) => any;
-}
+type Anchor = JSX.IntrinsicElements['a'];
+type SlimAnchor = Omit<Anchor, 'action' | 'onClick'>;
 
-// We are passed `dispatch` anyway, so we can make use of it
-class LinkInner extends React.Component<LinkInnerProps> {
-  public render() {
-    const { dispatch, action, onClick, children, ...rest } = this.props;
-    const { router } = this.context;
-
-    const location = router.provisionalLocation(action);
-    const href = location.pathname;
-
-    const realOnClick = e => {
-      if (onClick) {
-        onClick();
-      } else {
-        dispatch(action());
-      }
-      e.preventDefault();
-    };
-
-    return (
-      <a {...rest} href={href} onClick={realOnClick}>
-        {children}
-      </a>
-    );
-  }
-
-  public static contextTypes = {
-    router: PropTypes.any,
-  };
-}
-
-export interface LinkProps extends Omit<React.HTMLProps<HTMLAnchorElement>, 'action' | 'onClick'> {
+export interface LinkProps extends SlimAnchor {
   action?: () => any;
-  onClick?: () => any;
+  onClick?: () => void;
 }
 
-const LinkContainer = connect()(LinkInner);
+const Link: React.SFC<LinkProps> = (props) => {
+  const dispatch = useDispatch();
+  const router = useContext(Context);
+  const { action, onClick, children, ...anchorProps } = props;
 
-export default LinkContainer;
+  const realOnClick = useCallback(e => {
+    if (onClick) {
+      onClick();
+    } else {
+      dispatch(action());
+    }
+    e.preventDefault();
+  }, [action, dispatch, onClick]);
+
+  const location = router.provisionalLocation(action);
+  const href = location.pathname;
+
+  return (
+    <a {...anchorProps} href={href} onClick={realOnClick}>
+      {children}
+    </a>
+  );
+};
+
+export default Link;

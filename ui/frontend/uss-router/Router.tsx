@@ -1,24 +1,18 @@
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { createContext } from 'react';
 
-class Router extends React.Component<RouterProps> {
-  public getChildContext() {
-    return {
-      router: this.props.router,
-    };
-  }
-
-  public render() {
-    return React.Children.only(this.props.children);
-  }
-
-  public static childContextTypes = {
-    router: PropTypes.any,
-  };
-}
+export const Context = createContext(undefined);
 
 interface RouterProps {
-  router: any;
+  router: boolean;
 }
+
+const Router: React.SFC<RouterProps> = (props) => {
+
+  return (
+    <Context.Provider value={props.router}>
+      {props.children}
+    </Context.Provider>
+  );
+};
 
 export default Router;
