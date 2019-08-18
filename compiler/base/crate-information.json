@@ -361,7 +361,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "id": "getrandom"
   },
   {
@@ -786,7 +786,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "proc_macro2"
   },
   {
@@ -801,7 +801,7 @@
   },
   {
     "name": "quote",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "id": "quote"
   },
   {
@@ -971,7 +971,7 @@
   },
   {
     "name": "serde",
-    "version": "1.0.98",
+    "version": "1.0.99",
     "id": "serde"
   },
   {
@@ -981,7 +981,7 @@
   },
   {
     "name": "serde_derive",
-    "version": "1.0.98",
+    "version": "1.0.99",
     "id": "serde_derive"
   },
   {
@@ -1071,12 +1071,12 @@
   },
   {
     "name": "syn",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "id": "syn"
   },
   {
     "name": "synstructure",
-    "version": "0.11.0",
+    "version": "0.12.0",
     "id": "synstructure"
   },
   {
