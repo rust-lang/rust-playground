@@ -1,7 +1,7 @@
 [
   {
     "name": "adler32",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "id": "adler32"
   },
   {
@@ -366,7 +366,7 @@
   },
   {
     "name": "gif",
-    "version": "0.10.2",
+    "version": "0.10.3",
     "id": "gif"
   },
   {
@@ -806,7 +806,7 @@
   },
   {
     "name": "rand",
-    "version": "0.7.1",
+    "version": "0.7.2",
     "id": "rand"
   },
   {
