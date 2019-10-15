@@ -41,7 +41,7 @@
   },
   {
     "name": "arrayvec",
-    "version": "0.4.11",
+    "version": "0.5.1",
     "id": "arrayvec"
   },
   {
@@ -56,7 +56,7 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.37",
+    "version": "0.3.38",
     "id": "backtrace"
   },
   {
@@ -81,7 +81,7 @@
   },
   {
     "name": "bitflags",
-    "version": "1.1.0",
+    "version": "1.2.1",
     "id": "bitflags"
   },
   {
@@ -131,7 +131,7 @@
   },
   {
     "name": "cfg-if",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "id": "cfg_if"
   },
   {
@@ -261,7 +261,7 @@
   },
   {
     "name": "env_logger",
-    "version": "0.6.2",
+    "version": "0.7.0",
     "id": "env_logger"
   },
   {
@@ -271,12 +271,12 @@
   },
   {
     "name": "failure",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "id": "failure"
   },
   {
     "name": "failure_derive",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "id": "failure_derive"
   },
   {
@@ -301,7 +301,7 @@
   },
   {
     "name": "flate2",
-    "version": "1.0.11",
+    "version": "1.0.12",
     "id": "flate2"
   },
   {
@@ -436,7 +436,7 @@
   },
   {
     "name": "image",
-    "version": "0.22.2",
+    "version": "0.22.3",
     "id": "image"
   },
   {
@@ -451,7 +451,7 @@
   },
   {
     "name": "iovec",
-    "version": "0.1.2",
+    "version": "0.1.4",
     "id": "iovec"
   },
   {
@@ -471,7 +471,7 @@
   },
   {
     "name": "js-sys",
-    "version": "0.3.27",
+    "version": "0.3.28",
     "id": "js_sys"
   },
   {
@@ -491,7 +491,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.62",
+    "version": "0.2.64",
     "id": "libc"
   },
   {
@@ -556,7 +556,7 @@
   },
   {
     "name": "matrixmultiply",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "id": "matrixmultiply"
   },
   {
@@ -590,13 +590,8 @@
     "id": "mime_guess"
   },
   {
-    "name": "miniz-sys",
-    "version": "0.1.12",
-    "id": "miniz_sys"
-  },
-  {
     "name": "miniz_oxide",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "id": "miniz_oxide"
   },
   {
@@ -621,7 +616,7 @@
   },
   {
     "name": "ndarray",
-    "version": "0.12.1",
+    "version": "0.13.0",
     "id": "ndarray"
   },
   {
@@ -636,7 +631,7 @@
   },
   {
     "name": "nodrop",
-    "version": "0.1.13",
+    "version": "0.1.14",
     "id": "nodrop"
   },
   {
@@ -691,7 +686,7 @@
   },
   {
     "name": "openssl",
-    "version": "0.10.24",
+    "version": "0.10.25",
     "id": "openssl"
   },
   {
@@ -701,18 +696,13 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.49",
+    "version": "0.9.51",
     "id": "openssl_sys"
   },
   {
     "name": "ordered-float",
     "version": "1.0.2",
     "id": "ordered_float"
-  },
-  {
-    "name": "owning_ref",
-    "version": "0.4.0",
-    "id": "owning_ref"
   },
   {
     "name": "parking_lot",
@@ -786,7 +776,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "id": "proc_macro2"
   },
   {
@@ -851,7 +841,7 @@
   },
   {
     "name": "rawpointer",
-    "version": "0.1.0",
+    "version": "0.2.1",
     "id": "rawpointer"
   },
   {
@@ -891,7 +881,7 @@
   },
   {
     "name": "reqwest",
-    "version": "0.9.20",
+    "version": "0.9.22",
     "id": "reqwest"
   },
   {
@@ -926,7 +916,7 @@
   },
   {
     "name": "ryu",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "id": "ryu"
   },
   {
@@ -986,7 +976,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.40",
+    "version": "1.0.41",
     "id": "serde_json"
   },
   {
@@ -996,7 +986,7 @@
   },
   {
     "name": "serde_yaml",
-    "version": "0.8.9",
+    "version": "0.8.11",
     "id": "serde_yaml"
   },
   {
@@ -1035,18 +1025,13 @@
     "id": "spin"
   },
   {
-    "name": "stable_deref_trait",
-    "version": "1.1.1",
-    "id": "stable_deref_trait"
-  },
-  {
     "name": "string",
     "version": "0.2.1",
     "id": "string"
   },
   {
     "name": "string_cache",
-    "version": "0.7.3",
+    "version": "0.7.4",
     "id": "string_cache"
   },
   {
@@ -1076,7 +1061,7 @@
   },
   {
     "name": "synstructure",
-    "version": "0.12.0",
+    "version": "0.12.1",
     "id": "synstructure"
   },
   {
@@ -1171,12 +1156,12 @@
   },
   {
     "name": "tokio-reactor",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "id": "tokio_reactor"
   },
   {
     "name": "tokio-sync",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "id": "tokio_sync"
   },
   {
@@ -1186,7 +1171,7 @@
   },
   {
     "name": "tokio-threadpool",
-    "version": "0.1.15",
+    "version": "0.1.16",
     "id": "tokio_threadpool"
   },
   {
@@ -1331,37 +1316,37 @@
   },
   {
     "name": "wasm-bindgen",
-    "version": "0.2.50",
+    "version": "0.2.51",
     "id": "wasm_bindgen"
   },
   {
     "name": "wasm-bindgen-backend",
-    "version": "0.2.50",
+    "version": "0.2.51",
     "id": "wasm_bindgen_backend"
   },
   {
     "name": "wasm-bindgen-macro",
-    "version": "0.2.50",
+    "version": "0.2.51",
     "id": "wasm_bindgen_macro"
   },
   {
     "name": "wasm-bindgen-macro-support",
-    "version": "0.2.50",
+    "version": "0.2.51",
     "id": "wasm_bindgen_macro_support"
   },
   {
     "name": "wasm-bindgen-shared",
-    "version": "0.2.50",
+    "version": "0.2.51",
     "id": "wasm_bindgen_shared"
   },
   {
     "name": "wasm-bindgen-webidl",
-    "version": "0.2.50",
+    "version": "0.2.51",
     "id": "wasm_bindgen_webidl"
   },
   {
     "name": "web-sys",
-    "version": "0.3.27",
+    "version": "0.3.28",
     "id": "web_sys"
   },
   {
