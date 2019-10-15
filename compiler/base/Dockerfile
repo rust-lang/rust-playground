@@ -27,10 +27,7 @@ ARG channel
 # installation of Rust.
 ADD https://static.rust-lang.org/rustup/release-stable.toml /root/rustup-manifest.toml
 ADD https://static.rust-lang.org/dist/channel-rust-${channel}-date.txt /root/rust-channel-version
-
-# https://github.com/rust-lang-nursery/rustup.rs/issues/998
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain "${channel}" && \
-    rm -rf ~/.rustup/toolchains/*/share/doc
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain "${channel}"
 
 # Fetch all the crate source files
 
