@@ -4,17 +4,18 @@ use cargo::{
     core::{
         package::PackageSet,
         registry::PackageRegistry,
-        resolver::{self, Method, Resolve},
+        resolver::{self, Method},
         source::SourceMap,
         Dependency, Package, PackageId, Source, SourceId, TargetKind,
     },
     sources::RegistrySource,
     util::Config,
 };
+use itertools::Itertools;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::{btree_map::Entry, BTreeMap, BTreeSet, HashSet},
+    collections::{BTreeMap, BTreeSet, HashSet},
     fs::File,
     io::{Read, Write},
 };
@@ -88,30 +89,17 @@ struct Profiles {
     release: Profile,
 }
 
-/// `"1.0.0"` or `{ version = "1.0.0", features = ["..."] }`
-#[derive(Serialize, Clone)]
-#[serde(untagged)]
-enum DependencySpec {
+#[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+struct DependencySpec {
+    #[serde(skip_serializing_if = "String::is_empty")]
+    package: String,
     #[serde(serialize_with = "exact_version")]
-    String(String),
-    #[serde(rename_all = "kebab-case")]
-    Explicit {
-        #[serde(serialize_with = "exact_version")]
-        version: String,
-        #[serde(skip_serializing_if = "Vec::is_empty")]
-        features: Vec<String>,
-        #[serde(skip_serializing_if = "is_true")]
-        default_features: bool,
-    }
-}
-
-impl DependencySpec {
-    fn version(&self) -> String {
-        match *self {
-            DependencySpec::String(ref version) |
-            DependencySpec::Explicit { ref version, .. } => version.clone(),
-        }
-    }
+    version: String,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    features: Vec<String>,
+    #[serde(skip_serializing_if = "is_true")]
+    default_features: bool,
 }
 
 fn exact_version<S>(version: &String, serializer: S) -> Result<S::Ok, S::Error>
@@ -168,36 +156,7 @@ impl TopCrates {
     }
 }
 
-fn unique_latest_crates(resolve: Resolve) -> BTreeMap<String, DependencySpec> {
-    let mut uniqs = BTreeMap::new();
-    for pkg in resolve.iter() {
-        if MODIFICATIONS.blacklisted(pkg.name().as_str()) {
-            continue;
-        }
-
-        match uniqs.entry(pkg.name()) {
-            Entry::Vacant(entry) => {
-                // First time seeing this package.
-                entry.insert(pkg.version());
-            }
-            Entry::Occupied(mut entry) => {
-                // Seen before, keep the newest version.
-                if &pkg.version() > entry.get() {
-                    entry.insert(pkg.version());
-                }
-            }
-        }
-    }
-
-    uniqs.into_iter()
-         .map(|(name, version)| (
-             name.to_string(),
-             DependencySpec::String(version.to_string()),
-         ))
-         .collect()
-}
-
-/// Updates `dep` to include features specified by the custom metadata of `pkg`.
+/// Finds the features specified by the custom metadata of `pkg`.
 ///
 /// Our custom metadata format looks like:
 ///
@@ -207,16 +166,9 @@ fn unique_latest_crates(resolve: Resolve) -> BTreeMap<String, DependencySpec> {
 ///     all-features = false
 ///
 /// All fields are optional.
-fn fill_playground_metadata_features(dep: &mut DependencySpec, pkg: &Package) {
-    let custom_metadata = match pkg.manifest().custom_metadata() {
-        Some(custom_metadata) => custom_metadata,
-        None => return,
-    };
-
-    let playground_metadata = match custom_metadata.get("playground") {
-        Some(playground_metadata) => playground_metadata,
-        None => return,
-    };
+fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
+    let custom_metadata = pkg.manifest().custom_metadata()?;
+    let playground_metadata = custom_metadata.get("playground")?;
 
     #[derive(Deserialize)]
     #[serde(default, rename_all = "kebab-case")]
@@ -242,7 +194,7 @@ fn fill_playground_metadata_features(dep: &mut DependencySpec, pkg: &Package) {
             eprintln!(
                 "Failed to parse custom metadata for {} {}: {}",
                 pkg.name(), pkg.version(), err);
-            return;
+            return None;
         }
     };
 
@@ -267,11 +219,12 @@ fn fill_playground_metadata_features(dep: &mut DependencySpec, pkg: &Package) {
     }
 
     if !enabled_features.is_empty() || !metadata.default_features {
-        *dep = DependencySpec::Explicit {
-            version: dep.version(),
-            features: enabled_features.into_iter().collect(),
-            default_features: metadata.default_features,
-        };
+        Some((
+            enabled_features.into_iter().collect(),
+            metadata.default_features,
+        ))
+    } else {
+        None
     }
 }
 
@@ -329,20 +282,21 @@ fn main() {
         .expect("Unable to create package registry");
     registry.lock_patches();
     let try_to_use = HashSet::new();
-    let res = resolver::resolve(&summaries, &[], &mut registry, &try_to_use, None, true)
+    let resolve = resolver::resolve(&summaries, &[], &mut registry, &try_to_use, None, true)
         .expect("Unable to resolve dependencies");
 
-    // Construct playground's Cargo.toml.
-    let mut unique_latest_crates = unique_latest_crates(res);
-
-    let mut infos = Vec::new();
-
-    let package_ids: Vec<_> = unique_latest_crates
+    // Get the package information for all dependencies.
+    let package_ids: Vec<_> = resolve
         .iter()
-        .map(|(name, spec)| {
-            let version = spec.version();
-            PackageId::new(name, &version, crates_io).unwrap_or_else(|e| {
-                panic!("Unable to build PackageId for {} {}: {}", name, version, e)
+        .filter(|pkg| !MODIFICATIONS.blacklisted(pkg.name().as_str()))
+        .map(|pkg| {
+            PackageId::new(&pkg.name(), pkg.version(), crates_io).unwrap_or_else(|e| {
+                panic!(
+                    "Unable to build PackageId for {} {}: {}",
+                    pkg.name(),
+                    pkg.version(),
+                    e
+                )
             })
         })
         .collect();
@@ -353,33 +307,63 @@ fn main() {
     let package_set =
         PackageSet::new(&package_ids, sources, &config).expect("Unable to create a PackageSet");
 
-    let packages = package_set
+    let mut packages = package_set
         .get_many(package_set.package_ids())
         .expect("Unable to download packages");
 
-    for pkg in packages {
-        let name = pkg.name().to_string();
-        let version = pkg.version().to_string();
+    // Sort all packages by name then version (descending), so that
+    // when we group them we know we get all the same crates together
+    // and the newest version first.
+    packages.sort_by(|a, b| {
+        a.name()
+            .cmp(&b.name())
+            .then(a.version().cmp(&b.version()).reverse())
+    });
 
-        let spec = unique_latest_crates
-            .get_mut(&name)
-            .expect("Crate went missing");
+    let mut dependencies = BTreeMap::new();
+    let mut infos = Vec::new();
 
-        for target in pkg.targets() {
-            if let TargetKind::Lib(_) = *target.kind() {
-                infos.push(CrateInformation {
-                    name: name.clone(),
-                    version: version.clone(),
-                    id: target.crate_name(),
+    for (name, pkgs) in &packages.into_iter().group_by(|pkg| pkg.name()) {
+        for pkg in pkgs {
+            let version = pkg.version();
+
+            let crate_name = pkg
+                .targets()
+                .iter()
+                .flat_map(|target| match target.kind() {
+                    TargetKind::Lib(_) => Some(target.crate_name()),
+                    _ => None,
                 })
-            }
-        }
+                .next()
+                .unwrap_or_else(|| panic!("{} did not have a library", name));
 
-        fill_playground_metadata_features(spec, &pkg);
+            // We see the newest version first.
+            let exposed_name = crate_name.clone();
+
+            let (features, default_features) =
+                playground_metadata_features(&pkg).unwrap_or_else(|| (Vec::new(), true));
+
+            dependencies.insert(
+                exposed_name.clone(),
+                DependencySpec {
+                    package: name.to_string(),
+                    version: version.to_string(),
+                    features,
+                    default_features,
+                },
+            );
+
+            infos.push(CrateInformation {
+                name: name.to_string(),
+                version: version.to_string(),
+                id: exposed_name,
+            });
+
+            break; // Don't include additional versions of this crate
+        }
     }
 
-    infos.sort_by(|a, b| a.name.cmp(&b.name));
-
+    // Construct playground's Cargo.toml.
     let manifest = TomlManifest {
         package: TomlPackage {
             name: "playground".to_owned(),
@@ -390,7 +374,7 @@ fn main() {
             dev: Profile { codegen_units: 1, incremental: false },
             release: Profile { codegen_units: 1, incremental: false },
         },
-        dependencies: unique_latest_crates,
+        dependencies,
     };
 
     // Write manifest file.
