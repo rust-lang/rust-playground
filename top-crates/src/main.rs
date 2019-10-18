@@ -324,6 +324,8 @@ fn main() {
     let mut infos = Vec::new();
 
     for (name, pkgs) in &packages.into_iter().group_by(|pkg| pkg.name()) {
+        let mut first = true;
+
         for pkg in pkgs {
             let version = pkg.version();
 
@@ -337,8 +339,17 @@ fn main() {
                 .next()
                 .unwrap_or_else(|| panic!("{} did not have a library", name));
 
-            // We see the newest version first.
-            let exposed_name = crate_name.clone();
+            // We see the newest version first. Any subsequent
+            // versions will have their version appended so that they
+            // are uniquely named
+            let exposed_name = if first {
+                crate_name.clone()
+            } else {
+                format!(
+                    "{}_{}_{}_{}",
+                    crate_name, version.major, version.minor, version.patch
+                )
+            };
 
             let (features, default_features) =
                 playground_metadata_features(&pkg).unwrap_or_else(|| (Vec::new(), true));
@@ -359,7 +370,7 @@ fn main() {
                 id: exposed_name,
             });
 
-            break; // Don't include additional versions of this crate
+            first = false;
         }
     }
 
