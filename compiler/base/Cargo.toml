@@ -9,300 +9,1237 @@ incremental = false
 [profile.release]
 codegen-units = 1
 incremental = false
+[dependencies.adler32]
+package = "adler32"
+version = "=1.0.4"
 
-[dependencies]
-adler32 = "=1.0.4"
-aho-corasick = "=0.7.6"
-alga = "=0.9.1"
-ansi_term = "=0.12.1"
-antidote = "=1.0.0"
-approx = "=0.3.2"
-arc-swap = "=0.3.11"
-arrayref = "=0.3.5"
-arrayvec = "=0.5.1"
-atty = "=0.2.13"
-autocfg = "=0.1.6"
-backtrace = "=0.3.38"
-backtrace-sys = "=0.1.31"
-base64 = "=0.10.1"
-bit-set = "=0.5.1"
-bit-vec = "=0.5.1"
-bitflags = "=1.2.1"
-blake2b_simd = "=0.5.8"
-block-buffer = "=0.3.3"
-bstr = "=0.2.8"
-bumpalo = "=2.6.0"
-byte-tools = "=0.2.0"
-byteorder = "=1.3.2"
-bytes = "=0.4.12"
-c2-chacha = "=0.2.2"
-cc = "=1.0.45"
-cfg-if = "=0.1.10"
-clap = "=2.33.0"
-cloudabi = "=0.0.3"
-color_quant = "=1.0.1"
-constant_time_eq = "=0.1.4"
-cookie = "=0.12.0"
-cookie_store = "=0.7.0"
-crc32fast = "=1.2.0"
-crossbeam = "=0.7.2"
-crossbeam-channel = "=0.3.9"
-crossbeam-deque = "=0.7.1"
-crossbeam-epoch = "=0.7.2"
-crossbeam-queue = "=0.1.2"
-crossbeam-utils = "=0.6.6"
-crypto-mac = "=0.5.2"
-csv = "=1.1.1"
-csv-core = "=0.1.6"
-data-encoding = "=2.1.2"
-deflate = "=0.7.20"
-digest = "=0.7.6"
-dirs = "=2.0.2"
-dirs-sys = "=0.3.4"
-dtoa = "=0.4.4"
-either = "=1.5.3"
-encoding_rs = "=0.8.20"
-env_logger = "=0.7.0"
-error-chain = "=0.12.1"
-failure = "=0.1.6"
-failure_derive = "=0.1.6"
-fake-simd = "=0.1.2"
-fallible-iterator = "=0.2.0"
-fallible-streaming-iterator = "=0.1.9"
-filetime = "=0.2.7"
-flate2 = "=1.0.12"
-fnv = "=1.0.6"
-foreign-types = "=0.3.2"
-foreign-types-shared = "=0.1.1"
-fuchsia-cprng = "=0.1.1"
-fuchsia-zircon = "=0.3.3"
-fuchsia-zircon-sys = "=0.3.3"
-futf = "=0.1.4"
-futures = "=0.1.29"
-futures-cpupool = "=0.1.8"
-gcc = "=0.3.55"
-generic-array = "=0.12.3"
-getrandom = "=0.1.12"
-gif = "=0.10.3"
-glob = "=0.3.0"
-h2 = "=0.1.26"
-heck = "=0.3.1"
-hex = "=0.2.0"
-hmac = "=0.5.0"
-html5ever = "=0.23.0"
-http = "=0.1.18"
-http-body = "=0.1.0"
-httparse = "=1.3.4"
-humantime = "=1.3.0"
-hyper = "=0.12.35"
-hyper-tls = "=0.3.2"
-idna = "=0.2.0"
-image = "=0.22.3"
-indexmap = "=1.2.0"
-inflate = "=0.4.5"
-iovec = "=0.1.4"
-itertools = "=0.8.0"
-itoa = "=0.4.4"
-jpeg-decoder = "=0.1.16"
-js-sys = "=0.3.28"
-kernel32-sys = "=0.2.2"
-lazy_static = "=1.4.0"
-lazycell = "=1.2.1"
-libc = "=0.2.64"
-libm = "=0.1.4"
-libsqlite3-sys = "=0.16.0"
-linked-hash-map = "=0.5.2"
-lock_api = "=0.3.1"
-log = "=0.4.8"
-log-mdc = "=0.1.0"
-log4rs = "=0.8.3"
-lru-cache = "=0.1.2"
-lzw = "=0.10.0"
-mac = "=0.1.1"
-markup5ever = "=0.8.1"
-matches = "=0.1.8"
-matrixmultiply = "=0.2.3"
-md5 = "=0.3.8"
-memchr = "=2.2.1"
-memmap = "=0.7.0"
-memoffset = "=0.5.1"
-mime = "=0.3.14"
-mime_guess = "=2.0.1"
-miniz_oxide = "=0.3.3"
-mio = "=0.6.19"
-miow = "=0.2.1"
-nalgebra = "=0.18.1"
-native-tls = "=0.2.3"
-ndarray = "=0.13.0"
-net2 = "=0.2.33"
-new_debug_unreachable = "=1.0.3"
-nodrop = "=0.1.14"
-nom = "=4.2.3"
-num = "=0.2.0"
-num-bigint = "=0.2.3"
-num-complex = "=0.2.3"
-num-derive = "=0.2.5"
-num-integer = "=0.1.41"
-num-iter = "=0.1.39"
-num-rational = "=0.2.2"
-num-traits = "=0.2.8"
-num_cpus = "=1.10.1"
-openssl = "=0.10.25"
-openssl-probe = "=0.1.2"
-openssl-sys = "=0.9.51"
-ordered-float = "=1.0.2"
-parking_lot = "=0.9.0"
-parking_lot_core = "=0.6.2"
-percent-encoding = "=2.1.0"
-phf = "=0.7.24"
-phf_codegen = "=0.7.24"
-phf_generator = "=0.7.24"
-phf_shared = "=0.7.24"
-pkg-config = "=0.3.16"
-png = "=0.15.0"
-postgres = "=0.15.2"
-postgres-protocol = "=0.3.2"
-postgres-shared = "=0.4.2"
-ppv-lite86 = "=0.2.5"
-precomputed-hash = "=0.1.1"
-proc-macro2 = "=1.0.5"
-publicsuffix = "=1.5.3"
-quick-error = "=1.2.2"
-quote = "=1.0.2"
-rand = "=0.7.2"
-rand_chacha = "=0.2.1"
-rand_core = "=0.5.1"
-rand_hc = "=0.2.0"
-rand_isaac = "=0.1.1"
-rand_jitter = "=0.1.4"
-rand_os = "=0.1.3"
-rand_pcg = "=0.1.2"
-rand_xorshift = "=0.1.1"
-rawpointer = "=0.2.1"
-rayon = "=1.2.0"
-rayon-core = "=1.6.0"
-rdrand = "=0.4.0"
-regex = "=1.3.1"
-regex-automata = "=0.1.8"
-regex-syntax = "=0.6.12"
-remove_dir_all = "=0.5.2"
-reqwest = "=0.9.22"
-ring = "=0.16.9"
-rusqlite = "=0.20.0"
-rust-argon2 = "=0.5.1"
-rustc-demangle = "=0.1.16"
-rustc-serialize = "=0.3.24"
-rustc_version = "=0.2.3"
-ryu = "=1.0.2"
-safemem = "=0.2.0"
-same-file = "=1.0.5"
-schannel = "=0.1.16"
-scoped_threadpool = "=0.1.9"
-scopeguard = "=1.0.0"
-select = "=0.4.3"
-semver = "=0.9.0"
-semver-parser = "=0.9.0"
-serde-value = "=0.5.3"
-serde_derive = "=1.0.101"
-serde_urlencoded = "=0.5.5"
-serde_yaml = "=0.8.11"
-sha2 = "=0.7.1"
-siphasher = "=0.2.3"
-slab = "=0.4.2"
-smallvec = "=0.6.10"
-socket2 = "=0.3.11"
-sourcefile = "=0.1.4"
-spin = "=0.5.2"
-string = "=0.2.1"
-string_cache = "=0.7.4"
-string_cache_codegen = "=0.4.4"
-string_cache_shared = "=0.3.0"
-stringprep = "=0.1.2"
-strsim = "=0.9.2"
-synstructure = "=0.12.1"
-syslog = "=4.0.1"
-tar = "=0.4.26"
-tempdir = "=0.3.7"
-tempfile = "=3.1.0"
-tendril = "=0.4.1"
-term = "=0.6.1"
-termcolor = "=1.0.5"
-textwrap = "=0.11.0"
-thread-id = "=3.3.0"
-thread_local = "=1.0.0"
-threadpool = "=1.7.1"
-tiff = "=0.3.1"
-time = "=0.1.42"
-tokio = "=0.1.22"
-tokio-buf = "=0.1.1"
-tokio-current-thread = "=0.1.6"
-tokio-executor = "=0.1.8"
-tokio-io = "=0.1.12"
-tokio-reactor = "=0.1.10"
-tokio-sync = "=0.1.7"
-tokio-tcp = "=0.1.3"
-tokio-threadpool = "=0.1.16"
-tokio-timer = "=0.2.11"
-toml = "=0.5.3"
-traitobject = "=0.1.0"
-try-lock = "=0.2.2"
-try_from = "=0.3.2"
-typemap = "=0.3.3"
-typenum = "=1.11.2"
-ucd-util = "=0.1.5"
-unicase = "=2.5.1"
-unicode-bidi = "=0.3.4"
-unicode-normalization = "=0.1.8"
-unicode-segmentation = "=1.3.0"
-unicode-width = "=0.1.6"
-unicode-xid = "=0.2.0"
-unreachable = "=1.0.0"
-unsafe-any = "=0.4.2"
-untrusted = "=0.7.0"
-url = "=2.1.0"
-utf-8 = "=0.7.5"
-utf8-ranges = "=1.0.4"
-vcpkg = "=0.2.7"
-vec_map = "=0.8.1"
-version_check = "=0.9.1"
-void = "=1.0.2"
-walkdir = "=2.2.9"
-want = "=0.2.0"
-wasi = "=0.7.0"
-wasm-bindgen = "=0.2.51"
-wasm-bindgen-backend = "=0.2.51"
-wasm-bindgen-macro = "=0.2.51"
-wasm-bindgen-macro-support = "=0.2.51"
-wasm-bindgen-shared = "=0.2.51"
-wasm-bindgen-webidl = "=0.2.51"
-web-sys = "=0.3.28"
-weedle = "=0.10.0"
-winapi = "=0.3.8"
-winapi-build = "=0.1.1"
-winapi-i686-pc-windows-gnu = "=0.4.0"
-winapi-util = "=0.1.2"
-winapi-x86_64-pc-windows-gnu = "=0.4.0"
-wincolor = "=1.0.2"
-ws2_32-sys = "=0.2.1"
-xattr = "=0.2.2"
-yaml-rust = "=0.4.3"
+[dependencies.aho_corasick]
+package = "aho-corasick"
+version = "=0.7.6"
+
+[dependencies.alga]
+package = "alga"
+version = "=0.9.1"
+
+[dependencies.ansi_term]
+package = "ansi_term"
+version = "=0.12.1"
+
+[dependencies.ansi_term_0_11_0]
+package = "ansi_term"
+version = "=0.11.0"
+
+[dependencies.antidote]
+package = "antidote"
+version = "=1.0.0"
+
+[dependencies.approx]
+package = "approx"
+version = "=0.3.2"
+
+[dependencies.arc_swap]
+package = "arc-swap"
+version = "=0.3.11"
+
+[dependencies.argon2]
+package = "rust-argon2"
+version = "=0.5.1"
+
+[dependencies.arrayref]
+package = "arrayref"
+version = "=0.3.5"
+
+[dependencies.arrayvec]
+package = "arrayvec"
+version = "=0.5.1"
+
+[dependencies.arrayvec_0_4_12]
+package = "arrayvec"
+version = "=0.4.12"
+
+[dependencies.atty]
+package = "atty"
+version = "=0.2.13"
+
+[dependencies.autocfg]
+package = "autocfg"
+version = "=0.1.6"
+
+[dependencies.backtrace]
+package = "backtrace"
+version = "=0.3.40"
+
+[dependencies.backtrace_sys]
+package = "backtrace-sys"
+version = "=0.1.32"
+
+[dependencies.base64]
+package = "base64"
+version = "=0.10.1"
+
+[dependencies.base64_0_6_0]
+package = "base64"
+version = "=0.6.0"
+
+[dependencies.bit_set]
+package = "bit-set"
+version = "=0.5.1"
+
+[dependencies.bit_vec]
+package = "bit-vec"
+version = "=0.5.1"
+
+[dependencies.bitflags]
+package = "bitflags"
+version = "=1.2.1"
+
+[dependencies.blake2b_simd]
+package = "blake2b_simd"
+version = "=0.5.8"
+
+[dependencies.block_buffer]
+package = "block-buffer"
+version = "=0.3.3"
+
+[dependencies.bstr]
+package = "bstr"
+version = "=0.2.8"
+
+[dependencies.build]
+package = "winapi-build"
+version = "=0.1.1"
+
+[dependencies.bumpalo]
+package = "bumpalo"
+version = "=2.6.0"
+
+[dependencies.byte_tools]
+package = "byte-tools"
+version = "=0.2.0"
+
+[dependencies.byteorder]
+package = "byteorder"
+version = "=1.3.2"
+
+[dependencies.bytes]
+package = "bytes"
+version = "=0.4.12"
+
+[dependencies.c2_chacha]
+package = "c2-chacha"
+version = "=0.2.2"
+
+[dependencies.cc]
+package = "cc"
+version = "=1.0.46"
+
+[dependencies.cfg_if]
+package = "cfg-if"
+version = "=0.1.10"
 
 [dependencies.chrono]
+package = "chrono"
 version = "=0.4.9"
 features = ["wasmbind"]
 
+[dependencies.clap]
+package = "clap"
+version = "=2.33.0"
+
+[dependencies.cloudabi]
+package = "cloudabi"
+version = "=0.0.3"
+
+[dependencies.color_quant]
+package = "color_quant"
+version = "=1.0.1"
+
+[dependencies.constant_time_eq]
+package = "constant_time_eq"
+version = "=0.1.4"
+
+[dependencies.cookie]
+package = "cookie"
+version = "=0.12.0"
+
+[dependencies.cookie_store]
+package = "cookie_store"
+version = "=0.7.0"
+
+[dependencies.crc32fast]
+package = "crc32fast"
+version = "=1.2.0"
+
+[dependencies.crossbeam]
+package = "crossbeam"
+version = "=0.7.2"
+
+[dependencies.crossbeam_channel]
+package = "crossbeam-channel"
+version = "=0.3.9"
+
+[dependencies.crossbeam_deque]
+package = "crossbeam-deque"
+version = "=0.7.1"
+
+[dependencies.crossbeam_epoch]
+package = "crossbeam-epoch"
+version = "=0.7.2"
+
+[dependencies.crossbeam_queue]
+package = "crossbeam-queue"
+version = "=0.1.2"
+
+[dependencies.crossbeam_utils]
+package = "crossbeam-utils"
+version = "=0.6.6"
+
+[dependencies.crypto_mac]
+package = "crypto-mac"
+version = "=0.5.2"
+
+[dependencies.csv]
+package = "csv"
+version = "=1.1.1"
+
+[dependencies.csv_core]
+package = "csv-core"
+version = "=0.1.6"
+
+[dependencies.data_encoding]
+package = "data-encoding"
+version = "=2.1.2"
+
+[dependencies.debug_unreachable]
+package = "new_debug_unreachable"
+version = "=1.0.3"
+
+[dependencies.deflate]
+package = "deflate"
+version = "=0.7.20"
+
+[dependencies.digest]
+package = "digest"
+version = "=0.7.6"
+
+[dependencies.dirs]
+package = "dirs"
+version = "=2.0.2"
+
+[dependencies.dirs_sys]
+package = "dirs-sys"
+version = "=0.3.4"
+
+[dependencies.dtoa]
+package = "dtoa"
+version = "=0.4.4"
+
+[dependencies.either]
+package = "either"
+version = "=1.5.3"
+
+[dependencies.encoding_rs]
+package = "encoding_rs"
+version = "=0.8.20"
+
+[dependencies.env_logger]
+package = "env_logger"
+version = "=0.7.1"
+
+[dependencies.error_chain]
+package = "error-chain"
+version = "=0.12.1"
+
+[dependencies.error_chain_0_11_0]
+package = "error-chain"
+version = "=0.11.0"
+
+[dependencies.failure]
+package = "failure"
+version = "=0.1.6"
+
+[dependencies.failure_derive]
+package = "failure_derive"
+version = "=0.1.6"
+
+[dependencies.fake_simd]
+package = "fake-simd"
+version = "=0.1.2"
+
+[dependencies.fallible_iterator]
+package = "fallible-iterator"
+version = "=0.2.0"
+
+[dependencies.fallible_iterator_0_1_6]
+package = "fallible-iterator"
+version = "=0.1.6"
+
+[dependencies.fallible_streaming_iterator]
+package = "fallible-streaming-iterator"
+version = "=0.1.9"
+
+[dependencies.filetime]
+package = "filetime"
+version = "=0.2.7"
+
+[dependencies.flate2]
+package = "flate2"
+version = "=1.0.12"
+
+[dependencies.fnv]
+package = "fnv"
+version = "=1.0.6"
+
+[dependencies.foreign_types]
+package = "foreign-types"
+version = "=0.3.2"
+
+[dependencies.foreign_types_shared]
+package = "foreign-types-shared"
+version = "=0.1.1"
+
+[dependencies.fuchsia_cprng]
+package = "fuchsia-cprng"
+version = "=0.1.1"
+
+[dependencies.fuchsia_zircon]
+package = "fuchsia-zircon"
+version = "=0.3.3"
+
+[dependencies.fuchsia_zircon_sys]
+package = "fuchsia-zircon-sys"
+version = "=0.3.3"
+
+[dependencies.futf]
+package = "futf"
+version = "=0.1.4"
+
+[dependencies.futures]
+package = "futures"
+version = "=0.1.29"
+
+[dependencies.futures_cpupool]
+package = "futures-cpupool"
+version = "=0.1.8"
+
+[dependencies.gcc]
+package = "gcc"
+version = "=0.3.55"
+
+[dependencies.generic_array]
+package = "generic-array"
+version = "=0.12.3"
+
+[dependencies.generic_array_0_9_0]
+package = "generic-array"
+version = "=0.9.0"
+
+[dependencies.getrandom]
+package = "getrandom"
+version = "=0.1.12"
+
+[dependencies.gif]
+package = "gif"
+version = "=0.10.3"
+
+[dependencies.glob]
+package = "glob"
+version = "=0.3.0"
+
+[dependencies.h2]
+package = "h2"
+version = "=0.1.26"
+
+[dependencies.heck]
+package = "heck"
+version = "=0.3.1"
+
+[dependencies.hex]
+package = "hex"
+version = "=0.2.0"
+
+[dependencies.hmac]
+package = "hmac"
+version = "=0.5.0"
+
+[dependencies.html5ever]
+package = "html5ever"
+version = "=0.23.0"
+
+[dependencies.http]
+package = "http"
+version = "=0.1.19"
+
+[dependencies.http_body]
+package = "http-body"
+version = "=0.1.0"
+
+[dependencies.httparse]
+package = "httparse"
+version = "=1.3.4"
+
+[dependencies.humantime]
+package = "humantime"
+version = "=1.3.0"
+
+[dependencies.hyper]
+package = "hyper"
+version = "=0.12.35"
+
+[dependencies.hyper_tls]
+package = "hyper-tls"
+version = "=0.3.2"
+
+[dependencies.idna]
+package = "idna"
+version = "=0.2.0"
+
+[dependencies.idna_0_1_5]
+package = "idna"
+version = "=0.1.5"
+
+[dependencies.image]
+package = "image"
+version = "=0.22.3"
+
+[dependencies.indexmap]
+package = "indexmap"
+version = "=1.2.0"
+
+[dependencies.inflate]
+package = "inflate"
+version = "=0.4.5"
+
+[dependencies.iovec]
+package = "iovec"
+version = "=0.1.4"
+
+[dependencies.itertools]
+package = "itertools"
+version = "=0.8.0"
+
+[dependencies.itoa]
+package = "itoa"
+version = "=0.4.4"
+
+[dependencies.jpeg_decoder]
+package = "jpeg-decoder"
+version = "=0.1.16"
+
+[dependencies.js_sys]
+package = "js-sys"
+version = "=0.3.28"
+
+[dependencies.kernel32]
+package = "kernel32-sys"
+version = "=0.2.2"
+
+[dependencies.lazy_static]
+package = "lazy_static"
+version = "=1.4.0"
+
+[dependencies.lazycell]
+package = "lazycell"
+version = "=1.2.1"
+
+[dependencies.libc]
+package = "libc"
+version = "=0.2.65"
+
+[dependencies.libm]
+package = "libm"
+version = "=0.1.4"
+
+[dependencies.libsqlite3_sys]
+package = "libsqlite3-sys"
+version = "=0.16.0"
+
+[dependencies.linked_hash_map]
+package = "linked-hash-map"
+version = "=0.5.2"
+
+[dependencies.lock_api]
+package = "lock_api"
+version = "=0.3.1"
+
+[dependencies.log]
+package = "log"
+version = "=0.4.8"
+
+[dependencies.log4rs]
+package = "log4rs"
+version = "=0.8.3"
+
+[dependencies.log_mdc]
+package = "log-mdc"
+version = "=0.1.0"
+
+[dependencies.lru_cache]
+package = "lru-cache"
+version = "=0.1.2"
+
+[dependencies.lzw]
+package = "lzw"
+version = "=0.10.0"
+
+[dependencies.mac]
+package = "mac"
+version = "=0.1.1"
+
+[dependencies.markup5ever]
+package = "markup5ever"
+version = "=0.8.1"
+
+[dependencies.matches]
+package = "matches"
+version = "=0.1.8"
+
+[dependencies.matrixmultiply]
+package = "matrixmultiply"
+version = "=0.2.3"
+
+[dependencies.md5]
+package = "md5"
+version = "=0.3.8"
+
+[dependencies.memchr]
+package = "memchr"
+version = "=2.2.1"
+
+[dependencies.memchr_1_0_2]
+package = "memchr"
+version = "=1.0.2"
+
+[dependencies.memmap]
+package = "memmap"
+version = "=0.7.0"
+
+[dependencies.memoffset]
+package = "memoffset"
+version = "=0.5.1"
+
+[dependencies.mime]
+package = "mime"
+version = "=0.3.14"
+
+[dependencies.mime_guess]
+package = "mime_guess"
+version = "=2.0.1"
+
+[dependencies.miniz_oxide]
+package = "miniz_oxide"
+version = "=0.3.3"
+
+[dependencies.mio]
+package = "mio"
+version = "=0.6.19"
+
+[dependencies.miow]
+package = "miow"
+version = "=0.2.1"
+
+[dependencies.nalgebra]
+package = "nalgebra"
+version = "=0.18.1"
+
+[dependencies.native_tls]
+package = "native-tls"
+version = "=0.2.3"
+
+[dependencies.ndarray]
+package = "ndarray"
+version = "=0.13.0"
+
+[dependencies.net2]
+package = "net2"
+version = "=0.2.33"
+
+[dependencies.nodrop]
+package = "nodrop"
+version = "=0.1.14"
+
+[dependencies.nom]
+package = "nom"
+version = "=4.2.3"
+
+[dependencies.num]
+package = "num"
+version = "=0.2.0"
+
+[dependencies.num_bigint]
+package = "num-bigint"
+version = "=0.2.3"
+
+[dependencies.num_complex]
+package = "num-complex"
+version = "=0.2.3"
+
+[dependencies.num_cpus]
+package = "num_cpus"
+version = "=1.10.1"
+
+[dependencies.num_derive]
+package = "num-derive"
+version = "=0.2.5"
+
+[dependencies.num_integer]
+package = "num-integer"
+version = "=0.1.41"
+
+[dependencies.num_iter]
+package = "num-iter"
+version = "=0.1.39"
+
+[dependencies.num_rational]
+package = "num-rational"
+version = "=0.2.2"
+
+[dependencies.num_traits]
+package = "num-traits"
+version = "=0.2.8"
+
+[dependencies.openssl]
+package = "openssl"
+version = "=0.10.25"
+
+[dependencies.openssl_probe]
+package = "openssl-probe"
+version = "=0.1.2"
+
+[dependencies.openssl_sys]
+package = "openssl-sys"
+version = "=0.9.51"
+
+[dependencies.ordered_float]
+package = "ordered-float"
+version = "=1.0.2"
+
+[dependencies.parking_lot]
+package = "parking_lot"
+version = "=0.9.0"
+
+[dependencies.parking_lot_core]
+package = "parking_lot_core"
+version = "=0.6.2"
+
+[dependencies.percent_encoding]
+package = "percent-encoding"
+version = "=2.1.0"
+
+[dependencies.percent_encoding_1_0_1]
+package = "percent-encoding"
+version = "=1.0.1"
+
+[dependencies.phf]
+package = "phf"
+version = "=0.7.24"
+
+[dependencies.phf_codegen]
+package = "phf_codegen"
+version = "=0.7.24"
+
+[dependencies.phf_generator]
+package = "phf_generator"
+version = "=0.7.24"
+
+[dependencies.phf_shared]
+package = "phf_shared"
+version = "=0.7.24"
+
+[dependencies.pkg_config]
+package = "pkg-config"
+version = "=0.3.16"
+
+[dependencies.png]
+package = "png"
+version = "=0.15.0"
+
+[dependencies.postgres]
+package = "postgres"
+version = "=0.15.2"
+
+[dependencies.postgres_protocol]
+package = "postgres-protocol"
+version = "=0.3.2"
+
+[dependencies.postgres_shared]
+package = "postgres-shared"
+version = "=0.4.2"
+
+[dependencies.ppv_lite86]
+package = "ppv-lite86"
+version = "=0.2.5"
+
+[dependencies.precomputed_hash]
+package = "precomputed-hash"
+version = "=0.1.1"
+
+[dependencies.proc_macro2]
+package = "proc-macro2"
+version = "=1.0.5"
+
+[dependencies.proc_macro2_0_4_30]
+package = "proc-macro2"
+version = "=0.4.30"
+
+[dependencies.publicsuffix]
+package = "publicsuffix"
+version = "=1.5.3"
+
+[dependencies.quick_error]
+package = "quick-error"
+version = "=1.2.2"
+
+[dependencies.quote]
+package = "quote"
+version = "=1.0.2"
+
+[dependencies.quote_0_6_13]
+package = "quote"
+version = "=0.6.13"
+
+[dependencies.rand]
+package = "rand"
+version = "=0.7.2"
+
+[dependencies.rand_0_3_23]
+package = "rand"
+version = "=0.3.23"
+
+[dependencies.rand_0_4_6]
+package = "rand"
+version = "=0.4.6"
+
+[dependencies.rand_0_6_5]
+package = "rand"
+version = "=0.6.5"
+
+[dependencies.rand_chacha]
+package = "rand_chacha"
+version = "=0.2.1"
+
+[dependencies.rand_chacha_0_1_1]
+package = "rand_chacha"
+version = "=0.1.1"
+
+[dependencies.rand_core]
+package = "rand_core"
+version = "=0.5.1"
+
+[dependencies.rand_core_0_3_1]
+package = "rand_core"
+version = "=0.3.1"
+
+[dependencies.rand_core_0_4_2]
+package = "rand_core"
+version = "=0.4.2"
+
+[dependencies.rand_hc]
+package = "rand_hc"
+version = "=0.2.0"
+
+[dependencies.rand_hc_0_1_0]
+package = "rand_hc"
+version = "=0.1.0"
+
+[dependencies.rand_isaac]
+package = "rand_isaac"
+version = "=0.1.1"
+
+[dependencies.rand_jitter]
+package = "rand_jitter"
+version = "=0.1.4"
+
+[dependencies.rand_os]
+package = "rand_os"
+version = "=0.1.3"
+
+[dependencies.rand_pcg]
+package = "rand_pcg"
+version = "=0.1.2"
+
+[dependencies.rand_xorshift]
+package = "rand_xorshift"
+version = "=0.1.1"
+
+[dependencies.rawpointer]
+package = "rawpointer"
+version = "=0.2.1"
+
+[dependencies.rayon]
+package = "rayon"
+version = "=1.2.0"
+
+[dependencies.rayon_core]
+package = "rayon-core"
+version = "=1.6.0"
+
+[dependencies.rdrand]
+package = "rdrand"
+version = "=0.4.0"
+
+[dependencies.regex]
+package = "regex"
+version = "=1.3.1"
+
+[dependencies.regex_automata]
+package = "regex-automata"
+version = "=0.1.8"
+
+[dependencies.regex_syntax]
+package = "regex-syntax"
+version = "=0.6.12"
+
+[dependencies.remove_dir_all]
+package = "remove_dir_all"
+version = "=0.5.2"
+
+[dependencies.reqwest]
+package = "reqwest"
+version = "=0.9.22"
+
+[dependencies.ring]
+package = "ring"
+version = "=0.16.9"
+
+[dependencies.rusqlite]
+package = "rusqlite"
+version = "=0.20.0"
+
+[dependencies.rustc_demangle]
+package = "rustc-demangle"
+version = "=0.1.16"
+
+[dependencies.rustc_serialize]
+package = "rustc-serialize"
+version = "=0.3.24"
+
+[dependencies.rustc_version]
+package = "rustc_version"
+version = "=0.2.3"
+
+[dependencies.ryu]
+package = "ryu"
+version = "=1.0.2"
+
+[dependencies.safemem]
+package = "safemem"
+version = "=0.2.0"
+
+[dependencies.same_file]
+package = "same-file"
+version = "=1.0.5"
+
+[dependencies.schannel]
+package = "schannel"
+version = "=0.1.16"
+
+[dependencies.scoped_threadpool]
+package = "scoped_threadpool"
+version = "=0.1.9"
+
+[dependencies.scopeguard]
+package = "scopeguard"
+version = "=1.0.0"
+
+[dependencies.select]
+package = "select"
+version = "=0.4.3"
+
+[dependencies.semver]
+package = "semver"
+version = "=0.9.0"
+
+[dependencies.semver_parser]
+package = "semver-parser"
+version = "=0.9.0"
+
+[dependencies.semver_parser_0_7_0]
+package = "semver-parser"
+version = "=0.7.0"
+
 [dependencies.serde]
+package = "serde"
 version = "=1.0.101"
 features = ["derive", "rc"]
 
+[dependencies.serde_derive]
+package = "serde_derive"
+version = "=1.0.101"
+
 [dependencies.serde_json]
+package = "serde_json"
 version = "=1.0.41"
 features = ["raw_value"]
 
+[dependencies.serde_urlencoded]
+package = "serde_urlencoded"
+version = "=0.5.5"
+
+[dependencies.serde_value]
+package = "serde-value"
+version = "=0.5.3"
+
+[dependencies.serde_yaml]
+package = "serde_yaml"
+version = "=0.8.11"
+
+[dependencies.sha2]
+package = "sha2"
+version = "=0.7.1"
+
+[dependencies.siphasher]
+package = "siphasher"
+version = "=0.2.3"
+
+[dependencies.slab]
+package = "slab"
+version = "=0.4.2"
+
+[dependencies.smallvec]
+package = "smallvec"
+version = "=0.6.10"
+
+[dependencies.socket2]
+package = "socket2"
+version = "=0.3.11"
+
+[dependencies.sourcefile]
+package = "sourcefile"
+version = "=0.1.4"
+
+[dependencies.spin]
+package = "spin"
+version = "=0.5.2"
+
+[dependencies.string]
+package = "string"
+version = "=0.2.1"
+
+[dependencies.string_cache]
+package = "string_cache"
+version = "=0.7.4"
+
+[dependencies.string_cache_codegen]
+package = "string_cache_codegen"
+version = "=0.4.4"
+
+[dependencies.string_cache_shared]
+package = "string_cache_shared"
+version = "=0.3.0"
+
+[dependencies.stringprep]
+package = "stringprep"
+version = "=0.1.2"
+
+[dependencies.strsim]
+package = "strsim"
+version = "=0.9.2"
+
+[dependencies.strsim_0_8_0]
+package = "strsim"
+version = "=0.8.0"
+
 [dependencies.syn]
+package = "syn"
 version = "=1.0.5"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
+[dependencies.syn_0_15_44]
+package = "syn"
+version = "=0.15.44"
+features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
+
+[dependencies.synstructure]
+package = "synstructure"
+version = "=0.12.1"
+
+[dependencies.syslog]
+package = "syslog"
+version = "=4.0.1"
+
+[dependencies.tar]
+package = "tar"
+version = "=0.4.26"
+
+[dependencies.tempdir]
+package = "tempdir"
+version = "=0.3.7"
+
+[dependencies.tempfile]
+package = "tempfile"
+version = "=3.1.0"
+
+[dependencies.tendril]
+package = "tendril"
+version = "=0.4.1"
+
+[dependencies.term]
+package = "term"
+version = "=0.6.1"
+
+[dependencies.termcolor]
+package = "termcolor"
+version = "=1.0.5"
+
+[dependencies.textwrap]
+package = "textwrap"
+version = "=0.11.0"
+
+[dependencies.thread_id]
+package = "thread-id"
+version = "=3.3.0"
+
+[dependencies.thread_local]
+package = "thread_local"
+version = "=1.0.0"
+
+[dependencies.thread_local_0_3_6]
+package = "thread_local"
+version = "=0.3.6"
+
+[dependencies.threadpool]
+package = "threadpool"
+version = "=1.7.1"
+
+[dependencies.tiff]
+package = "tiff"
+version = "=0.3.1"
+
+[dependencies.time]
+package = "time"
+version = "=0.1.42"
+
+[dependencies.tokio]
+package = "tokio"
+version = "=0.1.22"
+
+[dependencies.tokio_buf]
+package = "tokio-buf"
+version = "=0.1.1"
+
+[dependencies.tokio_current_thread]
+package = "tokio-current-thread"
+version = "=0.1.6"
+
+[dependencies.tokio_executor]
+package = "tokio-executor"
+version = "=0.1.8"
+
+[dependencies.tokio_io]
+package = "tokio-io"
+version = "=0.1.12"
+
+[dependencies.tokio_reactor]
+package = "tokio-reactor"
+version = "=0.1.10"
+
+[dependencies.tokio_sync]
+package = "tokio-sync"
+version = "=0.1.7"
+
+[dependencies.tokio_tcp]
+package = "tokio-tcp"
+version = "=0.1.3"
+
+[dependencies.tokio_threadpool]
+package = "tokio-threadpool"
+version = "=0.1.16"
+
+[dependencies.tokio_timer]
+package = "tokio-timer"
+version = "=0.2.11"
+
+[dependencies.toml]
+package = "toml"
+version = "=0.5.3"
+
+[dependencies.traitobject]
+package = "traitobject"
+version = "=0.1.0"
+
+[dependencies.try_from]
+package = "try_from"
+version = "=0.3.2"
+
+[dependencies.try_lock]
+package = "try-lock"
+version = "=0.2.2"
+
+[dependencies.typemap]
+package = "typemap"
+version = "=0.3.3"
+
+[dependencies.typenum]
+package = "typenum"
+version = "=1.11.2"
+
+[dependencies.ucd_util]
+package = "ucd-util"
+version = "=0.1.5"
+
+[dependencies.unicase]
+package = "unicase"
+version = "=2.5.1"
+
+[dependencies.unicode_bidi]
+package = "unicode-bidi"
+version = "=0.3.4"
+
+[dependencies.unicode_normalization]
+package = "unicode-normalization"
+version = "=0.1.8"
+
+[dependencies.unicode_segmentation]
+package = "unicode-segmentation"
+version = "=1.3.0"
+
+[dependencies.unicode_width]
+package = "unicode-width"
+version = "=0.1.6"
+
+[dependencies.unicode_xid]
+package = "unicode-xid"
+version = "=0.2.0"
+
+[dependencies.unicode_xid_0_1_0]
+package = "unicode-xid"
+version = "=0.1.0"
+
+[dependencies.unreachable]
+package = "unreachable"
+version = "=1.0.0"
+
+[dependencies.unsafe_any]
+package = "unsafe-any"
+version = "=0.4.2"
+
+[dependencies.untrusted]
+package = "untrusted"
+version = "=0.7.0"
+
+[dependencies.url]
+package = "url"
+version = "=2.1.0"
+
+[dependencies.url_1_7_2]
+package = "url"
+version = "=1.7.2"
+
+[dependencies.utf8]
+package = "utf-8"
+version = "=0.7.5"
+
+[dependencies.utf8_ranges]
+package = "utf8-ranges"
+version = "=1.0.4"
+
 [dependencies.uuid]
+package = "uuid"
+version = "=0.8.0"
+features = ["serde", "v1", "v3", "v4", "v5"]
+
+[dependencies.uuid_0_7_4]
+package = "uuid"
 version = "=0.7.4"
 features = ["serde", "u128", "v1", "v3", "v4", "v5"]
+
+[dependencies.vcpkg]
+package = "vcpkg"
+version = "=0.2.7"
+
+[dependencies.vec_map]
+package = "vec_map"
+version = "=0.8.1"
+
+[dependencies.version_check]
+package = "version_check"
+version = "=0.9.1"
+
+[dependencies.version_check_0_1_5]
+package = "version_check"
+version = "=0.1.5"
+
+[dependencies.void]
+package = "void"
+version = "=1.0.2"
+
+[dependencies.walkdir]
+package = "walkdir"
+version = "=2.2.9"
+
+[dependencies.want]
+package = "want"
+version = "=0.2.0"
+
+[dependencies.wasi]
+package = "wasi"
+version = "=0.7.0"
+
+[dependencies.wasm_bindgen]
+package = "wasm-bindgen"
+version = "=0.2.51"
+
+[dependencies.wasm_bindgen_backend]
+package = "wasm-bindgen-backend"
+version = "=0.2.51"
+
+[dependencies.wasm_bindgen_macro]
+package = "wasm-bindgen-macro"
+version = "=0.2.51"
+
+[dependencies.wasm_bindgen_macro_support]
+package = "wasm-bindgen-macro-support"
+version = "=0.2.51"
+
+[dependencies.wasm_bindgen_shared]
+package = "wasm-bindgen-shared"
+version = "=0.2.51"
+
+[dependencies.wasm_bindgen_webidl]
+package = "wasm-bindgen-webidl"
+version = "=0.2.51"
+
+[dependencies.web_sys]
+package = "web-sys"
+version = "=0.3.28"
+
+[dependencies.weedle]
+package = "weedle"
+version = "=0.10.0"
+
+[dependencies.winapi]
+package = "winapi"
+version = "=0.3.8"
+
+[dependencies.winapi_0_2_8]
+package = "winapi"
+version = "=0.2.8"
+
+[dependencies.winapi_i686_pc_windows_gnu]
+package = "winapi-i686-pc-windows-gnu"
+version = "=0.4.0"
+
+[dependencies.winapi_util]
+package = "winapi-util"
+version = "=0.1.2"
+
+[dependencies.winapi_x86_64_pc_windows_gnu]
+package = "winapi-x86_64-pc-windows-gnu"
+version = "=0.4.0"
+
+[dependencies.wincolor]
+package = "wincolor"
+version = "=1.0.2"
+
+[dependencies.ws2_32]
+package = "ws2_32-sys"
+version = "=0.2.1"
+
+[dependencies.xattr]
+package = "xattr"
+version = "=0.2.2"
+
+[dependencies.yaml_rust]
+package = "yaml-rust"
+version = "=0.4.3"

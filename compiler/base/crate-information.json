@@ -20,6 +20,11 @@
     "id": "ansi_term"
   },
   {
+    "name": "ansi_term",
+    "version": "0.11.0",
+    "id": "ansi_term_0_11_0"
+  },
+  {
     "name": "antidote",
     "version": "1.0.0",
     "id": "antidote"
@@ -45,6 +50,11 @@
     "id": "arrayvec"
   },
   {
+    "name": "arrayvec",
+    "version": "0.4.12",
+    "id": "arrayvec_0_4_12"
+  },
+  {
     "name": "atty",
     "version": "0.2.13",
     "id": "atty"
@@ -56,18 +66,23 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.38",
+    "version": "0.3.40",
     "id": "backtrace"
   },
   {
     "name": "backtrace-sys",
-    "version": "0.1.31",
+    "version": "0.1.32",
     "id": "backtrace_sys"
   },
   {
     "name": "base64",
     "version": "0.10.1",
     "id": "base64"
+  },
+  {
+    "name": "base64",
+    "version": "0.6.0",
+    "id": "base64_0_6_0"
   },
   {
     "name": "bit-set",
@@ -126,7 +141,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.45",
+    "version": "1.0.46",
     "id": "cc"
   },
   {
@@ -261,13 +276,18 @@
   },
   {
     "name": "env_logger",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "id": "env_logger"
   },
   {
     "name": "error-chain",
     "version": "0.12.1",
     "id": "error_chain"
+  },
+  {
+    "name": "error-chain",
+    "version": "0.11.0",
+    "id": "error_chain_0_11_0"
   },
   {
     "name": "failure",
@@ -288,6 +308,11 @@
     "name": "fallible-iterator",
     "version": "0.2.0",
     "id": "fallible_iterator"
+  },
+  {
+    "name": "fallible-iterator",
+    "version": "0.1.6",
+    "id": "fallible_iterator_0_1_6"
   },
   {
     "name": "fallible-streaming-iterator",
@@ -360,6 +385,11 @@
     "id": "generic_array"
   },
   {
+    "name": "generic-array",
+    "version": "0.9.0",
+    "id": "generic_array_0_9_0"
+  },
+  {
     "name": "getrandom",
     "version": "0.1.12",
     "id": "getrandom"
@@ -401,7 +431,7 @@
   },
   {
     "name": "http",
-    "version": "0.1.18",
+    "version": "0.1.19",
     "id": "http"
   },
   {
@@ -433,6 +463,11 @@
     "name": "idna",
     "version": "0.2.0",
     "id": "idna"
+  },
+  {
+    "name": "idna",
+    "version": "0.1.5",
+    "id": "idna_0_1_5"
   },
   {
     "name": "image",
@@ -491,7 +526,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.64",
+    "version": "0.2.65",
     "id": "libc"
   },
   {
@@ -568,6 +603,11 @@
     "name": "memchr",
     "version": "2.2.1",
     "id": "memchr"
+  },
+  {
+    "name": "memchr",
+    "version": "1.0.2",
+    "id": "memchr_1_0_2"
   },
   {
     "name": "memmap",
@@ -720,6 +760,11 @@
     "id": "percent_encoding"
   },
   {
+    "name": "percent-encoding",
+    "version": "1.0.1",
+    "id": "percent_encoding_1_0_1"
+  },
+  {
     "name": "phf",
     "version": "0.7.24",
     "id": "phf"
@@ -780,6 +825,11 @@
     "id": "proc_macro2"
   },
   {
+    "name": "proc-macro2",
+    "version": "0.4.30",
+    "id": "proc_macro2_0_4_30"
+  },
+  {
     "name": "publicsuffix",
     "version": "1.5.3",
     "id": "publicsuffix"
@@ -795,9 +845,29 @@
     "id": "quote"
   },
   {
+    "name": "quote",
+    "version": "0.6.13",
+    "id": "quote_0_6_13"
+  },
+  {
     "name": "rand",
     "version": "0.7.2",
     "id": "rand"
+  },
+  {
+    "name": "rand",
+    "version": "0.6.5",
+    "id": "rand_0_6_5"
+  },
+  {
+    "name": "rand",
+    "version": "0.4.6",
+    "id": "rand_0_4_6"
+  },
+  {
+    "name": "rand",
+    "version": "0.3.23",
+    "id": "rand_0_3_23"
   },
   {
     "name": "rand_chacha",
@@ -805,14 +875,34 @@
     "id": "rand_chacha"
   },
   {
+    "name": "rand_chacha",
+    "version": "0.1.1",
+    "id": "rand_chacha_0_1_1"
+  },
+  {
     "name": "rand_core",
     "version": "0.5.1",
     "id": "rand_core"
   },
   {
+    "name": "rand_core",
+    "version": "0.4.2",
+    "id": "rand_core_0_4_2"
+  },
+  {
+    "name": "rand_core",
+    "version": "0.3.1",
+    "id": "rand_core_0_3_1"
+  },
+  {
     "name": "rand_hc",
     "version": "0.2.0",
     "id": "rand_hc"
+  },
+  {
+    "name": "rand_hc",
+    "version": "0.1.0",
+    "id": "rand_hc_0_1_0"
   },
   {
     "name": "rand_isaac",
@@ -960,6 +1050,11 @@
     "id": "semver_parser"
   },
   {
+    "name": "semver-parser",
+    "version": "0.7.0",
+    "id": "semver_parser_0_7_0"
+  },
+  {
     "name": "serde",
     "version": "1.0.101",
     "id": "serde"
@@ -1055,9 +1150,19 @@
     "id": "strsim"
   },
   {
+    "name": "strsim",
+    "version": "0.8.0",
+    "id": "strsim_0_8_0"
+  },
+  {
     "name": "syn",
     "version": "1.0.5",
     "id": "syn"
+  },
+  {
+    "name": "syn",
+    "version": "0.15.44",
+    "id": "syn_0_15_44"
   },
   {
     "name": "synstructure",
@@ -1113,6 +1218,11 @@
     "name": "thread_local",
     "version": "1.0.0",
     "id": "thread_local"
+  },
+  {
+    "name": "thread_local",
+    "version": "0.3.6",
+    "id": "thread_local_0_3_6"
   },
   {
     "name": "threadpool",
@@ -1245,6 +1355,11 @@
     "id": "unicode_xid"
   },
   {
+    "name": "unicode-xid",
+    "version": "0.1.0",
+    "id": "unicode_xid_0_1_0"
+  },
+  {
     "name": "unreachable",
     "version": "1.0.0",
     "id": "unreachable"
@@ -1265,6 +1380,11 @@
     "id": "url"
   },
   {
+    "name": "url",
+    "version": "1.7.2",
+    "id": "url_1_7_2"
+  },
+  {
     "name": "utf-8",
     "version": "0.7.5",
     "id": "utf8"
@@ -1276,8 +1396,13 @@
   },
   {
     "name": "uuid",
-    "version": "0.7.4",
+    "version": "0.8.0",
     "id": "uuid"
+  },
+  {
+    "name": "uuid",
+    "version": "0.7.4",
+    "id": "uuid_0_7_4"
   },
   {
     "name": "vcpkg",
@@ -1293,6 +1418,11 @@
     "name": "version_check",
     "version": "0.9.1",
     "id": "version_check"
+  },
+  {
+    "name": "version_check",
+    "version": "0.1.5",
+    "id": "version_check_0_1_5"
   },
   {
     "name": "void",
@@ -1358,6 +1488,11 @@
     "name": "winapi",
     "version": "0.3.8",
     "id": "winapi"
+  },
+  {
+    "name": "winapi",
+    "version": "0.2.8",
+    "id": "winapi_0_2_8"
   },
   {
     "name": "winapi-build",
