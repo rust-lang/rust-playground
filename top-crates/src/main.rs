@@ -29,14 +29,14 @@ struct TopCrates {
 /// A single crate from crates.io
 #[derive(Debug, Deserialize)]
 struct OneCrate {
-    #[serde(rename="crate")]
+    #[serde(rename = "crate")]
     krate: Crate,
 }
 
 /// The shared description of a crate
 #[derive(Debug, Deserialize)]
 struct Crate {
-    #[serde(rename="id")]
+    #[serde(rename = "id")]
     name: String,
 }
 
@@ -76,7 +76,7 @@ struct Modifications {
 
 /// A profile section in a Cargo.toml file
 #[derive(Serialize)]
-#[serde(rename_all="kebab-case")]
+#[serde(rename_all = "kebab-case")]
 struct Profile {
     codegen_units: u32,
     incremental: bool,
@@ -128,8 +128,7 @@ lazy_static! {
         f.read_to_end(&mut d)
             .expect("unable to read crate modifications file");
 
-        toml::from_slice(&d)
-            .expect("unable to parse crate modifications file")
+        toml::from_slice(&d).expect("unable to parse crate modifications file")
     };
 }
 
@@ -138,7 +137,7 @@ impl TopCrates {
     fn download() -> TopCrates {
         let resp =
             reqwest::get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
-            .expect("Could not fetch top crates");
+                .expect("Could not fetch top crates");
         assert!(resp.status().is_success());
 
         serde_json::from_reader(resp).expect("Invalid JSON")
@@ -193,7 +192,10 @@ fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
         Err(err) => {
             eprintln!(
                 "Failed to parse custom metadata for {} {}: {}",
-                pkg.name(), pkg.version(), err);
+                pkg.name(),
+                pkg.version(),
+                err
+            );
             return None;
         }
     };
@@ -263,23 +265,26 @@ fn main() {
         });
 
         // Find the newest non-prelease version
-        let summary = matches.into_iter()
+        let summary = matches
+            .into_iter()
             .filter(|summary| !summary.version().is_prerelease())
             .max_by_key(|summary| summary.version().clone())
             .unwrap_or_else(|| panic!("Registry has no viable versions of {}", name));
 
         // Add a dependency on this crate.
-        summaries.push((summary, Method::Required {
-            dev_deps: false,
-            features: Default::default(),
-            uses_default_features: true,
-            all_features: false,
-        }));
+        summaries.push((
+            summary,
+            Method::Required {
+                dev_deps: false,
+                features: Default::default(),
+                uses_default_features: true,
+                all_features: false,
+            },
+        ));
     }
 
     // Resolve transitive dependencies.
-    let mut registry = PackageRegistry::new(&config)
-        .expect("Unable to create package registry");
+    let mut registry = PackageRegistry::new(&config).expect("Unable to create package registry");
     registry.lock_patches();
     let try_to_use = HashSet::new();
     let resolve = resolver::resolve(&summaries, &[], &mut registry, &try_to_use, None, true)
@@ -382,8 +387,14 @@ fn main() {
             authors: vec!["The Rust Playground".to_owned()],
         },
         profile: Profiles {
-            dev: Profile { codegen_units: 1, incremental: false },
-            release: Profile { codegen_units: 1, incremental: false },
+            dev: Profile {
+                codegen_units: 1,
+                incremental: false,
+            },
+            release: Profile {
+                codegen_units: 1,
+                incremental: false,
+            },
         },
         dependencies,
     };
@@ -394,8 +405,7 @@ fn main() {
     println!("wrote {}", cargo_toml);
 
     let path = "../compiler/base/crate-information.json";
-    let mut f = File::create(path)
-        .unwrap_or_else(|e| panic!("Unable to create {}: {}", path, e));
+    let mut f = File::create(path).unwrap_or_else(|e| panic!("Unable to create {}: {}", path, e));
     serde_json::to_writer_pretty(&mut f, &infos)
         .unwrap_or_else(|e| panic!("Unable to write {}: {}", path, e));
     println!("Wrote {}", path);
