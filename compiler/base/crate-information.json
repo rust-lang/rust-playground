@@ -56,12 +56,12 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.38",
+    "version": "0.3.40",
     "id": "backtrace"
   },
   {
     "name": "backtrace-sys",
-    "version": "0.1.31",
+    "version": "0.1.32",
     "id": "backtrace_sys"
   },
   {
@@ -126,7 +126,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.45",
+    "version": "1.0.46",
     "id": "cc"
   },
   {
@@ -261,7 +261,7 @@
   },
   {
     "name": "env_logger",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "id": "env_logger"
   },
   {
@@ -401,7 +401,7 @@
   },
   {
     "name": "http",
-    "version": "0.1.18",
+    "version": "0.1.19",
     "id": "http"
   },
   {
@@ -491,7 +491,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.64",
+    "version": "0.2.65",
     "id": "libc"
   },
   {
@@ -1276,7 +1276,7 @@
   },
   {
     "name": "uuid",
-    "version": "0.7.4",
+    "version": "0.8.0",
     "id": "uuid"
   },
   {
