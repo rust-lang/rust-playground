@@ -143,6 +143,31 @@ impl TopCrates {
         serde_json::from_reader(resp).expect("Invalid JSON")
     }
 
+    fn add_rust_cookbook_crates(&mut self) {
+        let mut resp = reqwest::get(
+            "https://raw.githubusercontent.com/rust-lang-nursery/rust-cookbook/master/Cargo.toml",
+        )
+        .expect("Could not fetch cookbook manifest");
+        assert!(resp.status().is_success());
+
+        let mut content = String::new();
+        resp.read_to_string(&mut content)
+            .expect("could not read cookbook manifest");
+
+        let manifest = content
+            .parse::<toml::Value>()
+            .expect("could not parse cookbook manifest");
+
+        let dependencies = manifest["dependencies"]
+            .as_table()
+            .expect("no dependencies found for cookbook manifest");
+        self.crates.extend({
+            dependencies.iter().map(|(name, _)| Crate {
+                name: name.to_string(),
+            })
+        })
+    }
+
     /// Add crates that have been hand-picked
     fn add_curated_crates(&mut self) {
         self.crates.extend({
@@ -245,6 +270,7 @@ fn main() {
     source.update().expect("Unable to update registry");
 
     let mut top = TopCrates::download();
+    top.add_rust_cookbook_crates();
     top.add_curated_crates();
 
     // Find the newest (non-prerelease, non-yanked) versions of all
