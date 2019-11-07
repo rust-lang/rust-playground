@@ -286,6 +286,10 @@ version = "=0.1.9"
 package = "filetime"
 version = "=0.2.7"
 
+[dependencies.fixedbitset]
+package = "fixedbitset"
+version = "=0.1.9"
+
 [dependencies.flate2]
 package = "flate2"
 version = "=1.0.12"
@@ -662,6 +666,10 @@ version = "=0.9.52"
 package = "ordered-float"
 version = "=1.0.2"
 
+[dependencies.ordermap]
+package = "ordermap"
+version = "=0.3.5"
+
 [dependencies.parking_lot]
 package = "parking_lot"
 version = "=0.9.0"
@@ -677,6 +685,10 @@ version = "=2.1.0"
 [dependencies.percent_encoding_1_0_1]
 package = "percent-encoding"
 version = "=1.0.1"
+
+[dependencies.petgraph]
+package = "petgraph"
+version = "=0.4.13"
 
 [dependencies.phf]
 package = "phf"
@@ -1022,17 +1034,9 @@ features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 package = "synstructure"
 version = "=0.12.2"
 
-[dependencies.syslog]
-package = "syslog"
-version = "=5.0.0"
-
 [dependencies.tar]
 package = "tar"
 version = "=0.4.26"
-
-[dependencies.tempdir]
-package = "tempdir"
-version = "=0.3.7"
 
 [dependencies.tempfile]
 package = "tempfile"

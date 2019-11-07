@@ -330,6 +330,11 @@
     "id": "filetime"
   },
   {
+    "name": "fixedbitset",
+    "version": "0.1.9",
+    "id": "fixedbitset"
+  },
+  {
     "name": "flate2",
     "version": "1.0.12",
     "id": "flate2"
@@ -805,6 +810,11 @@
     "id": "ordered_float"
   },
   {
+    "name": "ordermap",
+    "version": "0.3.5",
+    "id": "ordermap"
+  },
+  {
     "name": "parking_lot",
     "version": "0.9.0",
     "id": "parking_lot"
@@ -823,6 +833,11 @@
     "name": "percent-encoding",
     "version": "1.0.1",
     "id": "percent_encoding_1_0_1"
+  },
+  {
+    "name": "petgraph",
+    "version": "0.4.13",
+    "id": "petgraph"
   },
   {
     "name": "phf",
@@ -1255,19 +1270,9 @@
     "id": "synstructure"
   },
   {
-    "name": "syslog",
-    "version": "5.0.0",
-    "id": "syslog"
-  },
-  {
     "name": "tar",
     "version": "0.4.26",
     "id": "tar"
-  },
-  {
-    "name": "tempdir",
-    "version": "0.3.7",
-    "id": "tempdir"
   },
   {
     "name": "tempfile",
