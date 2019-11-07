@@ -4,7 +4,7 @@ use cargo::{
     core::{
         package::PackageSet,
         registry::PackageRegistry,
-        resolver::{self, Method},
+        resolver::{self, ResolveOpts},
         source::SourceMap,
         Dependency, Package, PackageId, Source, SourceId, TargetKind,
     },
@@ -300,7 +300,7 @@ fn main() {
         // Add a dependency on this crate.
         summaries.push((
             summary,
-            Method::Required {
+            ResolveOpts {
                 dev_deps: false,
                 features: Default::default(),
                 uses_default_features: true,
@@ -321,7 +321,7 @@ fn main() {
         .iter()
         .filter(|pkg| !MODIFICATIONS.blacklisted(pkg.name().as_str()))
         .map(|pkg| {
-            PackageId::new(&pkg.name(), pkg.version(), crates_io).unwrap_or_else(|e| {
+            PackageId::new(pkg.name(), pkg.version(), crates_io).unwrap_or_else(|e| {
                 panic!(
                     "Unable to build PackageId for {} {}: {}",
                     pkg.name(),
