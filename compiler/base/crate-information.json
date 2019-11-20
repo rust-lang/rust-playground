@@ -1255,6 +1255,11 @@
     "id": "strsim_0_8_0"
   },
   {
+    "name": "structure",
+    "version": "0.1.2",
+    "id": "structure"
+  },
+  {
     "name": "syn",
     "version": "1.0.7",
     "id": "syn"
