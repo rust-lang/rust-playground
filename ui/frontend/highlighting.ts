@@ -34,7 +34,7 @@ export function configureRustErrors({
         'backtrace-location': /src\/main.rs:(\d+)/,
       },
     },
-    'backtrace-enable': /Run with `RUST_BACKTRACE=1` environment variable to display a backtrace/,
+    'backtrace-enable': /Run with `RUST_BACKTRACE=1` environment variable to display a backtrace/i,
   };
 
   Prism.hooks.add('wrap', env => {
