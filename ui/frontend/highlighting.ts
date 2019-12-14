@@ -11,14 +11,18 @@ export function configureRustErrors({
       pattern: /^warning(\[E\d+\])?:.*$/m,
       inside: {
         'error-explanation': /\[E\d+\]/,
-        'see-issue': /see issue #\d+/,
       },
     },
     'error': {
       pattern: /^error(\[E\d+\])?:.*$/m,
       inside: {
         'error-explanation': /\[E\d+\]/,
-        'see-issue': /see issue #\d+/,
+      },
+    },
+    'note': {
+      pattern: /^\s*=\s*note:.*$/m,
+      inside: {
+        'see-issue': /see .*rust-lang\/rust\/issues\/\d+/,
       },
     },
     'error-location': /-->\s+(\/playground\/)?src\/.*\n/,
@@ -34,7 +38,7 @@ export function configureRustErrors({
         'backtrace-location': /src\/main.rs:(\d+)/,
       },
     },
-    'backtrace-enable': /Run with `RUST_BACKTRACE=1` environment variable to display a backtrace/,
+    'backtrace-enable': /Run with `RUST_BACKTRACE=1` environment variable to display a backtrace/i,
   };
 
   Prism.hooks.add('wrap', env => {

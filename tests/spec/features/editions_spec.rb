@@ -16,7 +16,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
 
     within('.output-stderr') do
       expect(page).to have_content 'unused variable: `async`'
-      expect(page).to_not have_content 'expected pattern, found reserved keyword `async`'
+      expect(page).to_not have_content 'expected identifier, found keyword `async`'
     end
   end
 
@@ -25,7 +25,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
     click_on("Run")
 
     within('.output-stderr') do
-      expect(page).to have_content 'expected pattern, found reserved keyword `async`'
+      expect(page).to have_content 'expected identifier, found keyword `async`'
       expect(page).to_not have_content 'unused variable: `async`'
     end
   end

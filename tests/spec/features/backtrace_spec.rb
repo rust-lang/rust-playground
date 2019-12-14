@@ -38,7 +38,7 @@ RSpec.feature "A backtrace is shown for certain errors", type: :feature, js: tru
 
     scenario "the backtrace suggestion is a link" do
       within('.output-stderr') do
-        expect(page).to have_link(text: /Run with .* a backtrace/)
+        expect(page).to have_link(text: /Run with .* a backtrace/i)
       end
     end
   end
