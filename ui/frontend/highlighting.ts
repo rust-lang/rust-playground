@@ -11,14 +11,18 @@ export function configureRustErrors({
       pattern: /^warning(\[E\d+\])?:.*$/m,
       inside: {
         'error-explanation': /\[E\d+\]/,
-        'see-issue': /see issue #\d+/,
       },
     },
     'error': {
       pattern: /^error(\[E\d+\])?:.*$/m,
       inside: {
         'error-explanation': /\[E\d+\]/,
-        'see-issue': /see issue #\d+/,
+      },
+    },
+    'note': {
+      pattern: /^\s*=\s*note:.*$/m,
+      inside: {
+        'see-issue': /see .*rust-lang\/rust\/issues\/\d+/,
       },
     },
     'error-location': /-->\s+(\/playground\/)?src\/.*\n/,
