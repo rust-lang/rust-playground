@@ -12,7 +12,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
     within('.output-stderr') do
       expect(page).to have_css '.error', text: 'wrong number of type arguments'
       expect(page).to have_css '.error', text: 'aborting due to 2 previous errors'
-      expect(page).to have_css '.error', text: 'Could not compile `playground`'
+      expect(page).to have_css '.error', text: /Could not compile `playground`/i
     end
   end
 
