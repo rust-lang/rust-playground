@@ -35,15 +35,15 @@ const PopButton: React.SFC<NewPopProps> = ({ Button, Menu }) => {
 
   return (
     <Manager>
-      <Reference>
-        {({ ref }) => <Button ref={(r) => { ref(r); buttonRef.current = r; }} toggle={toggle} />}
+      <Reference innerRef={buttonRef}>
+        {({ ref }) => <Button ref={ref} toggle={toggle} />}
       </Reference>
       {isOpen && <Portal>
-        <Popper placement="bottom" modifiers={{ computeStyle: { gpuAcceleration: false } }}>
+        <Popper placement="bottom" innerRef={menuRef} modifiers={{ computeStyle: { gpuAcceleration: false } }}>
           {({ ref, style, arrowProps, placement }) => (
             <div
               className="popper"
-              ref={(r) => { ref(r); menuRef.current = r; }}
+              ref={ref}
               style={style}
               data-placement={placement}
             >
