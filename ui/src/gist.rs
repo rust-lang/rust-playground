@@ -6,7 +6,7 @@ use hubcaps::{
 use hyper;
 use hyper_tls;
 use std::collections::HashMap;
-use tokio::{prelude::Future, runtime::current_thread::Runtime};
+use tokio1::{prelude::Future, runtime::current_thread::Runtime};
 
 const FILENAME: &str = "playground.rs";
 const DESCRIPTION: &str = "Code shared from the Rust Playground";
