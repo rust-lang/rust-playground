@@ -1216,9 +1216,9 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.miri(&req)?;
 
-        assert!(resp.stderr.contains("Pointer must be in-bounds and live at offset 1"));
-        assert!(resp.stderr.contains("outside bounds of allocation"));
-        assert!(resp.stderr.contains("which has size 0"));
+        assert!(resp.stderr.contains("pointer must be in-bounds at offset 1"), "was: {}", resp.stderr);
+        assert!(resp.stderr.contains("outside bounds of allocation"), "was: {}", resp.stderr);
+        assert!(resp.stderr.contains("which has size 0"), "was: {}", resp.stderr);
         Ok(())
     }
 
