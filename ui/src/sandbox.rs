@@ -1003,7 +1003,7 @@ mod test {
     }
     "#;
 
-    const BACKTRACE_NOTE: &str = "Run with `RUST_BACKTRACE=1` environment variable to display a backtrace";
+    const BACKTRACE_NOTE: &str = "run with `RUST_BACKTRACE=1` environment variable to display a backtrace";
 
     #[test]
     fn backtrace_disabled() -> Result<()> {
@@ -1016,8 +1016,8 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.execute(&req)?;
 
-        assert!(resp.stderr.contains(BACKTRACE_NOTE));
-        assert!(!resp.stderr.contains("stack backtrace:"));
+        assert!(resp.stderr.contains(BACKTRACE_NOTE), "Was: {}", resp.stderr);
+        assert!(!resp.stderr.contains("stack backtrace:"), "Was: {}", resp.stderr);
 
         Ok(())
     }
@@ -1033,8 +1033,8 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.execute(&req)?;
 
-        assert!(!resp.stderr.contains(BACKTRACE_NOTE));
-        assert!(resp.stderr.contains("stack backtrace:"));
+        assert!(!resp.stderr.contains(BACKTRACE_NOTE), "Was: {}", resp.stderr);
+        assert!(resp.stderr.contains("stack backtrace:"), "Was: {}", resp.stderr);
 
         Ok(())
     }
