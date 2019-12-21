@@ -947,7 +947,7 @@ mod test {
     }
     "#;
 
-    const EDITION_ERROR: &str = "found reserved keyword `async`";
+    const EDITION_ERROR: &str = "found keyword `async`";
 
     #[test]
     fn rust_edition_default() -> Result<()> {
@@ -959,7 +959,7 @@ mod test {
 
         let resp = Sandbox::new()?.execute(&req)?;
 
-        assert!(!resp.stderr.contains(EDITION_ERROR));
+        assert!(!resp.stderr.contains(EDITION_ERROR), "was: {}", resp.stderr);
         Ok(())
     }
 
@@ -974,7 +974,7 @@ mod test {
 
         let resp = Sandbox::new()?.execute(&req)?;
 
-        assert!(!resp.stderr.contains(EDITION_ERROR));
+        assert!(!resp.stderr.contains(EDITION_ERROR), "was: {}", resp.stderr);
         Ok(())
     }
 
@@ -989,7 +989,7 @@ mod test {
 
         let resp = Sandbox::new()?.execute(&req)?;
 
-        assert!(resp.stderr.contains(EDITION_ERROR));
+        assert!(resp.stderr.contains(EDITION_ERROR), "was: {}", resp.stderr);
         Ok(())
     }
 
