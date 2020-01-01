@@ -346,10 +346,6 @@ version = "=0.2.1"
 package = "heck"
 version = "=0.3.1"
 
-[dependencies.hermit_abi]
-package = "hermit-abi"
-version = "=0.1.5"
-
 [dependencies.hmac]
 package = "hmac"
 version = "=0.7.1"
@@ -692,7 +688,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.6"
+version = "=1.0.7"
 
 [dependencies.proc_macro2_0_4_30]
 package = "proc-macro2"

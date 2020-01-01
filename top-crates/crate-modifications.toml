@@ -9,6 +9,7 @@ blacklist = [
     "security-framework",
     "security-framework-sys",
     "winreg",
+    "hermit-abi",
 ]
 
 additions = []
