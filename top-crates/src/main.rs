@@ -132,23 +132,31 @@ lazy_static! {
     };
 }
 
+fn simple_get(url: &str) -> reqwest::Result<reqwest::blocking::Response> {
+    reqwest::blocking::ClientBuilder::new()
+        .user_agent("Rust Playground - Top Crates Utility")
+        .build()?
+        .get(url)
+        .send()
+}
+
 impl TopCrates {
     /// List top 100 crates by number of downloads on crates.io.
     fn download() -> TopCrates {
         let resp =
-            reqwest::get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
+            simple_get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
                 .expect("Could not fetch top crates");
-        assert!(resp.status().is_success());
+        assert!(resp.status().is_success(), "Could not download top crates; HTTP status was {}", resp.status());
 
         serde_json::from_reader(resp).expect("Invalid JSON")
     }
 
     fn add_rust_cookbook_crates(&mut self) {
-        let mut resp = reqwest::get(
+        let mut resp = simple_get(
             "https://raw.githubusercontent.com/rust-lang-nursery/rust-cookbook/master/Cargo.toml",
         )
         .expect("Could not fetch cookbook manifest");
-        assert!(resp.status().is_success());
+        assert!(resp.status().is_success(), "Could not download cookbook; HTTP status was {}", resp.status());
 
         let mut content = String::new();
         resp.read_to_string(&mut content)
