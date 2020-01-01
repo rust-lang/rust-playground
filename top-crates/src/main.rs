@@ -6,7 +6,7 @@ use cargo::{
         registry::PackageRegistry,
         resolver::{self, ResolveOpts},
         source::SourceMap,
-        Dependency, Package, PackageId, Source, SourceId, TargetKind,
+        Dependency, Package, Source, SourceId, TargetKind,
     },
     sources::RegistrySource,
     util::Config,
@@ -324,20 +324,10 @@ fn main() {
     let resolve = resolver::resolve(&summaries, &[], &mut registry, &try_to_use, None, true)
         .expect("Unable to resolve dependencies");
 
-    // Get the package information for all dependencies.
+    // Remove blacklisted packages that have been added due to resolution
     let package_ids: Vec<_> = resolve
         .iter()
         .filter(|pkg| !MODIFICATIONS.blacklisted(pkg.name().as_str()))
-        .map(|pkg| {
-            PackageId::new(pkg.name(), pkg.version(), crates_io).unwrap_or_else(|e| {
-                panic!(
-                    "Unable to build PackageId for {} {}: {}",
-                    pkg.name(),
-                    pkg.version(),
-                    e
-                )
-            })
-        })
         .collect();
 
     let mut sources = SourceMap::new();
