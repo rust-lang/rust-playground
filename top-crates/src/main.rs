@@ -2,6 +2,7 @@
 
 use cargo::{
     core::{
+        compiler::{CompileKind, CompileTarget, TargetInfo},
         package::PackageSet,
         registry::PackageRegistry,
         resolver::{self, ResolveOpts},
@@ -19,6 +20,8 @@ use std::{
     fs::File,
     io::{Read, Write},
 };
+
+const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
 
 /// The list of crates from crates.io
 #[derive(Debug, Deserialize)]
@@ -284,7 +287,7 @@ fn main() {
     // Find the newest (non-prerelease, non-yanked) versions of all
     // the interesting crates.
     let mut summaries = Vec::new();
-    for Crate { ref name } in top.crates {
+    for Crate { name } in &top.crates {
         if MODIFICATIONS.blacklisted(name) {
             continue;
         }
@@ -324,9 +327,42 @@ fn main() {
     let resolve = resolver::resolve(&summaries, &[], &mut registry, &try_to_use, None, true)
         .expect("Unable to resolve dependencies");
 
-    // Remove blacklisted packages that have been added due to resolution
+    // Find crates incompatible with the playground's platform
+    let mut valid_for_our_platform: BTreeSet<_> = summaries.iter().map(|(s, _)| s.package_id()).collect();
+
+    let ct = CompileTarget::new(PLAYGROUND_TARGET_PLATFORM).expect("Unable to create a CompileTarget");
+    let ck = CompileKind::Target(ct);
+    let rustc = config.load_global_rustc(None).expect("Unable to load the global rustc");
+
+    let ti = TargetInfo::new(&config, ck, &rustc, ck).expect("Unable to create a TargetInfo");
+    let cc = ti.cfg();
+
+    let mut to_visit = valid_for_our_platform.clone();
+
+    while !to_visit.is_empty() {
+        let mut visit_next = BTreeSet::new();
+
+        for package_id in to_visit {
+            for (dep_pkg, deps) in resolve.deps(package_id) {
+
+                let for_this_platform = deps.iter().any(|dep| {
+                    dep.platform().map_or(true, |platform| platform.matches(PLAYGROUND_TARGET_PLATFORM, cc))
+                });
+
+                if for_this_platform {
+                    valid_for_our_platform.insert(dep_pkg);
+                    visit_next.insert(dep_pkg);
+                }
+            }
+        }
+
+        to_visit = visit_next;
+    }
+
+    // Remove invalid and blacklisted packages that have been added due to resolution
     let package_ids: Vec<_> = resolve
         .iter()
+        .filter(|pkg| valid_for_our_platform.contains(pkg))
         .filter(|pkg| !MODIFICATIONS.blacklisted(pkg.name().as_str()))
         .collect();
 
