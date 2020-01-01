@@ -410,11 +410,6 @@
     "id": "heck"
   },
   {
-    "name": "hermit-abi",
-    "version": "0.1.5",
-    "id": "hermit_abi"
-  },
-  {
     "name": "hmac",
     "version": "0.7.1",
     "id": "hmac"
@@ -856,7 +851,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "id": "proc_macro2"
   },
   {
