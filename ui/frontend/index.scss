@@ -644,6 +644,7 @@ $header-transition: 0.2s ease-in-out;
 
   width: 100%;
   transition: color $header-transition;
+  user-select: text;
 }
 
 .button-menu-item {
