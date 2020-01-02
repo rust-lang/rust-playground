@@ -1,15 +1,3 @@
-blacklist = [
-    # Not supported on stable
-    "redox_syscall",
-    "redox_users",
-
-    # # Not available on Linux
-    "core-foundation",
-    "core-foundation-sys",
-    "security-framework",
-    "security-framework-sys",
-    "winreg",
-    "hermit-abi",
-]
+blacklist = []
 
 additions = []

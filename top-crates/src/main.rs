@@ -2,11 +2,12 @@
 
 use cargo::{
     core::{
+        compiler::{CompileKind, CompileTarget, TargetInfo},
         package::PackageSet,
         registry::PackageRegistry,
         resolver::{self, ResolveOpts},
         source::SourceMap,
-        Dependency, Package, PackageId, Source, SourceId, TargetKind,
+        Dependency, Package, Source, SourceId, TargetKind,
     },
     sources::RegistrySource,
     util::Config,
@@ -19,6 +20,8 @@ use std::{
     fs::File,
     io::{Read, Write},
 };
+
+const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
 
 /// The list of crates from crates.io
 #[derive(Debug, Deserialize)]
@@ -132,23 +135,31 @@ lazy_static! {
     };
 }
 
+fn simple_get(url: &str) -> reqwest::Result<reqwest::blocking::Response> {
+    reqwest::blocking::ClientBuilder::new()
+        .user_agent("Rust Playground - Top Crates Utility")
+        .build()?
+        .get(url)
+        .send()
+}
+
 impl TopCrates {
     /// List top 100 crates by number of downloads on crates.io.
     fn download() -> TopCrates {
         let resp =
-            reqwest::get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
+            simple_get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
                 .expect("Could not fetch top crates");
-        assert!(resp.status().is_success());
+        assert!(resp.status().is_success(), "Could not download top crates; HTTP status was {}", resp.status());
 
         serde_json::from_reader(resp).expect("Invalid JSON")
     }
 
     fn add_rust_cookbook_crates(&mut self) {
-        let mut resp = reqwest::get(
+        let mut resp = simple_get(
             "https://raw.githubusercontent.com/rust-lang-nursery/rust-cookbook/master/Cargo.toml",
         )
         .expect("Could not fetch cookbook manifest");
-        assert!(resp.status().is_success());
+        assert!(resp.status().is_success(), "Could not download cookbook; HTTP status was {}", resp.status());
 
         let mut content = String::new();
         resp.read_to_string(&mut content)
@@ -276,7 +287,7 @@ fn main() {
     // Find the newest (non-prerelease, non-yanked) versions of all
     // the interesting crates.
     let mut summaries = Vec::new();
-    for Crate { ref name } in top.crates {
+    for Crate { name } in &top.crates {
         if MODIFICATIONS.blacklisted(name) {
             continue;
         }
@@ -316,20 +327,43 @@ fn main() {
     let resolve = resolver::resolve(&summaries, &[], &mut registry, &try_to_use, None, true)
         .expect("Unable to resolve dependencies");
 
-    // Get the package information for all dependencies.
+    // Find crates incompatible with the playground's platform
+    let mut valid_for_our_platform: BTreeSet<_> = summaries.iter().map(|(s, _)| s.package_id()).collect();
+
+    let ct = CompileTarget::new(PLAYGROUND_TARGET_PLATFORM).expect("Unable to create a CompileTarget");
+    let ck = CompileKind::Target(ct);
+    let rustc = config.load_global_rustc(None).expect("Unable to load the global rustc");
+
+    let ti = TargetInfo::new(&config, ck, &rustc, ck).expect("Unable to create a TargetInfo");
+    let cc = ti.cfg();
+
+    let mut to_visit = valid_for_our_platform.clone();
+
+    while !to_visit.is_empty() {
+        let mut visit_next = BTreeSet::new();
+
+        for package_id in to_visit {
+            for (dep_pkg, deps) in resolve.deps(package_id) {
+
+                let for_this_platform = deps.iter().any(|dep| {
+                    dep.platform().map_or(true, |platform| platform.matches(PLAYGROUND_TARGET_PLATFORM, cc))
+                });
+
+                if for_this_platform {
+                    valid_for_our_platform.insert(dep_pkg);
+                    visit_next.insert(dep_pkg);
+                }
+            }
+        }
+
+        to_visit = visit_next;
+    }
+
+    // Remove invalid and blacklisted packages that have been added due to resolution
     let package_ids: Vec<_> = resolve
         .iter()
+        .filter(|pkg| valid_for_our_platform.contains(pkg))
         .filter(|pkg| !MODIFICATIONS.blacklisted(pkg.name().as_str()))
-        .map(|pkg| {
-            PackageId::new(pkg.name(), pkg.version(), crates_io).unwrap_or_else(|e| {
-                panic!(
-                    "Unable to build PackageId for {} {}: {}",
-                    pkg.name(),
-                    pkg.version(),
-                    e
-                )
-            })
-        })
         .collect();
 
     let mut sources = SourceMap::new();

@@ -30,11 +30,6 @@
     "id": "antidote"
   },
   {
-    "name": "anyhow",
-    "version": "1.0.26",
-    "id": "anyhow"
-  },
-  {
     "name": "approx",
     "version": "0.3.2",
     "id": "approx"
@@ -105,11 +100,6 @@
     "id": "bstr"
   },
   {
-    "name": "bumpalo",
-    "version": "2.6.0",
-    "id": "bumpalo"
-  },
-  {
     "name": "byte-tools",
     "version": "0.3.1",
     "id": "byte_tools"
@@ -148,11 +138,6 @@
     "name": "clap",
     "version": "2.33.0",
     "id": "clap"
-  },
-  {
-    "name": "cloudabi",
-    "version": "0.0.3",
-    "id": "cloudabi"
   },
   {
     "name": "color_quant",
@@ -305,21 +290,6 @@
     "id": "foreign_types_shared"
   },
   {
-    "name": "fuchsia-cprng",
-    "version": "0.1.1",
-    "id": "fuchsia_cprng"
-  },
-  {
-    "name": "fuchsia-zircon",
-    "version": "0.3.3",
-    "id": "fuchsia_zircon"
-  },
-  {
-    "name": "fuchsia-zircon-sys",
-    "version": "0.3.3",
-    "id": "fuchsia_zircon_sys"
-  },
-  {
     "name": "futf",
     "version": "0.1.4",
     "id": "futf"
@@ -405,11 +375,6 @@
     "id": "h2"
   },
   {
-    "name": "heck",
-    "version": "0.3.1",
-    "id": "heck"
-  },
-  {
     "name": "hmac",
     "version": "0.7.1",
     "id": "hmac"
@@ -488,11 +453,6 @@
     "name": "jpeg-decoder",
     "version": "0.1.18",
     "id": "jpeg_decoder"
-  },
-  {
-    "name": "js-sys",
-    "version": "0.3.33",
-    "id": "js_sys"
   },
   {
     "name": "kernel32-sys",
@@ -625,11 +585,6 @@
     "id": "mio_uds"
   },
   {
-    "name": "miow",
-    "version": "0.2.1",
-    "id": "miow"
-  },
-  {
     "name": "nalgebra",
     "version": "0.19.0",
     "id": "nalgebra"
@@ -658,11 +613,6 @@
     "name": "nodrop",
     "version": "0.1.14",
     "id": "nodrop"
-  },
-  {
-    "name": "nom",
-    "version": "4.2.3",
-    "id": "nom"
   },
   {
     "name": "num",
@@ -965,11 +915,6 @@
     "id": "rayon_core"
   },
   {
-    "name": "rdrand",
-    "version": "0.4.0",
-    "id": "rdrand"
-  },
-  {
     "name": "regex",
     "version": "1.3.1",
     "id": "regex"
@@ -1028,11 +973,6 @@
     "name": "same-file",
     "version": "1.0.5",
     "id": "same_file"
-  },
-  {
-    "name": "schannel",
-    "version": "0.1.16",
-    "id": "schannel"
   },
   {
     "name": "scoped_threadpool",
@@ -1120,11 +1060,6 @@
     "id": "smallvec"
   },
   {
-    "name": "sourcefile",
-    "version": "0.1.4",
-    "id": "sourcefile"
-  },
-  {
     "name": "spin",
     "version": "0.5.2",
     "id": "spin"
@@ -1166,7 +1101,7 @@
   },
   {
     "name": "syn",
-    "version": "1.0.11",
+    "version": "1.0.12",
     "id": "syn"
   },
   {
@@ -1365,11 +1300,6 @@
     "id": "uuid"
   },
   {
-    "name": "vcpkg",
-    "version": "0.2.8",
-    "id": "vcpkg"
-  },
-  {
     "name": "vec_map",
     "version": "0.8.1",
     "id": "vec_map"
@@ -1400,56 +1330,6 @@
     "id": "want"
   },
   {
-    "name": "wasi",
-    "version": "0.7.0",
-    "id": "wasi"
-  },
-  {
-    "name": "wasm-bindgen",
-    "version": "0.2.56",
-    "id": "wasm_bindgen"
-  },
-  {
-    "name": "wasm-bindgen-backend",
-    "version": "0.2.56",
-    "id": "wasm_bindgen_backend"
-  },
-  {
-    "name": "wasm-bindgen-futures",
-    "version": "0.4.6",
-    "id": "wasm_bindgen_futures"
-  },
-  {
-    "name": "wasm-bindgen-macro",
-    "version": "0.2.56",
-    "id": "wasm_bindgen_macro"
-  },
-  {
-    "name": "wasm-bindgen-macro-support",
-    "version": "0.2.56",
-    "id": "wasm_bindgen_macro_support"
-  },
-  {
-    "name": "wasm-bindgen-shared",
-    "version": "0.2.56",
-    "id": "wasm_bindgen_shared"
-  },
-  {
-    "name": "wasm-bindgen-webidl",
-    "version": "0.2.56",
-    "id": "wasm_bindgen_webidl"
-  },
-  {
-    "name": "web-sys",
-    "version": "0.3.33",
-    "id": "web_sys"
-  },
-  {
-    "name": "weedle",
-    "version": "0.10.0",
-    "id": "weedle"
-  },
-  {
     "name": "winapi",
     "version": "0.3.8",
     "id": "winapi"
@@ -1463,31 +1343,6 @@
     "name": "winapi-build",
     "version": "0.1.1",
     "id": "build"
-  },
-  {
-    "name": "winapi-i686-pc-windows-gnu",
-    "version": "0.4.0",
-    "id": "winapi_i686_pc_windows_gnu"
-  },
-  {
-    "name": "winapi-util",
-    "version": "0.1.2",
-    "id": "winapi_util"
-  },
-  {
-    "name": "winapi-x86_64-pc-windows-gnu",
-    "version": "0.4.0",
-    "id": "winapi_x86_64_pc_windows_gnu"
-  },
-  {
-    "name": "wincolor",
-    "version": "1.0.2",
-    "id": "wincolor"
-  },
-  {
-    "name": "ws2_32-sys",
-    "version": "0.2.1",
-    "id": "ws2_32"
   },
   {
     "name": "xattr",
