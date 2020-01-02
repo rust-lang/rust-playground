@@ -950,7 +950,7 @@ version = "=1.0.0"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.11"
+version = "=1.0.12"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.syn_0_15_44]
