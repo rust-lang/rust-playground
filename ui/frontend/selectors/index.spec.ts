@@ -21,12 +21,20 @@ describe('checking for a main function', () => {
     expect(hasMainFunctionSelector(buildState('pub fn main()'))).toBe(true);
   });
 
+  test('an async main counts', () => {
+    expect(hasMainFunctionSelector(buildState('async fn main()'))).toBe(true);
+  });
+
+  test('a public async main counts', () => {
+    expect(hasMainFunctionSelector(buildState('pub async fn main()'))).toBe(true);
+  });
+
   test('leading indentation is ignored', () => {
     expect(hasMainFunctionSelector(buildState('\t fn main()'))).toBe(true);
   });
 
   test('extra space everywhere is ignored', () => {
-    expect(hasMainFunctionSelector(buildState('  pub  fn  main  (  )'))).toBe(true);
+    expect(hasMainFunctionSelector(buildState('  pub async   fn  main  (  )'))).toBe(true);
   });
 
   test('a commented-out main does not count', () => {
