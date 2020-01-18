@@ -5,4 +5,4 @@ RUN rustup component add clippy-preview
 RUN cargo clippy
 RUN rm src/*.rs
 
-ENTRYPOINT ["/root/entrypoint.sh"]
+ENTRYPOINT ["/playground/tools/entrypoint.sh"]

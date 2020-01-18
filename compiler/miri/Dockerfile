@@ -6,6 +6,6 @@ RUN cargo miri setup
 RUN cargo miri run
 RUN rm src/*.rs
 
-ADD cargo-miri-playground /root/.cargo/bin
+ADD --chown=playground cargo-miri-playground /playground/.cargo/bin
 
-ENTRYPOINT ["/root/entrypoint.sh"]
+ENTRYPOINT ["/playground/tools/entrypoint.sh"]

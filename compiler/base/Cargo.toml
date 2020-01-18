@@ -47,15 +47,19 @@ version = "=0.5.1"
 
 [dependencies.atty]
 package = "atty"
-version = "=0.2.13"
+version = "=0.2.14"
 
 [dependencies.autocfg]
+package = "autocfg"
+version = "=1.0.0"
+
+[dependencies.autocfg_0_1_7]
 package = "autocfg"
 version = "=0.1.7"
 
 [dependencies.backtrace]
 package = "backtrace"
-version = "=0.3.40"
+version = "=0.3.42"
 
 [dependencies.backtrace_sys]
 package = "backtrace-sys"
@@ -87,7 +91,7 @@ version = "=0.1.5"
 
 [dependencies.bstr]
 package = "bstr"
-version = "=0.2.8"
+version = "=0.2.9"
 
 [dependencies.build]
 package = "winapi-build"
@@ -111,7 +115,7 @@ version = "=0.2.3"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.0.48"
+version = "=1.0.50"
 
 [dependencies.cfg_if]
 package = "cfg-if"
@@ -164,7 +168,7 @@ version = "=0.7.0"
 
 [dependencies.csv]
 package = "csv"
-version = "=1.1.1"
+version = "=1.1.2"
 
 [dependencies.csv_core]
 package = "csv-core"
@@ -304,7 +308,7 @@ version = "=0.12.3"
 
 [dependencies.getrandom]
 package = "getrandom"
-version = "=0.1.13"
+version = "=0.1.14"
 
 [dependencies.gif]
 package = "gif"
@@ -348,7 +352,7 @@ version = "=0.13.1"
 
 [dependencies.hyper_tls]
 package = "hyper-tls"
-version = "=0.4.0"
+version = "=0.4.1"
 
 [dependencies.idna]
 package = "idna"
@@ -356,11 +360,11 @@ version = "=0.2.0"
 
 [dependencies.image]
 package = "image"
-version = "=0.22.3"
+version = "=0.22.4"
 
 [dependencies.indexmap]
 package = "indexmap"
-version = "=1.3.0"
+version = "=1.3.1"
 
 [dependencies.inflate]
 package = "inflate"
@@ -390,10 +394,6 @@ version = "=0.2.2"
 package = "lazy_static"
 version = "=1.4.0"
 
-[dependencies.lazycell]
-package = "lazycell"
-version = "=1.2.1"
-
 [dependencies.libc]
 package = "libc"
 version = "=0.2.66"
@@ -404,7 +404,7 @@ version = "=0.1.4"
 
 [dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.17.0"
+version = "=0.17.1"
 
 [dependencies.linked_hash_map]
 package = "linked-hash-map"
@@ -412,7 +412,7 @@ version = "=0.5.2"
 
 [dependencies.lock_api]
 package = "lock_api"
-version = "=0.3.2"
+version = "=0.3.3"
 
 [dependencies.log]
 package = "log"
@@ -456,7 +456,7 @@ version = "=0.7.0"
 
 [dependencies.memchr]
 package = "memchr"
-version = "=2.2.1"
+version = "=2.3.0"
 
 [dependencies.memmap]
 package = "memmap"
@@ -468,7 +468,7 @@ version = "=0.5.3"
 
 [dependencies.mime]
 package = "mime"
-version = "=0.3.14"
+version = "=0.3.16"
 
 [dependencies.mime_guess]
 package = "mime_guess"
@@ -508,19 +508,19 @@ version = "=0.1.14"
 
 [dependencies.num]
 package = "num"
-version = "=0.2.0"
+version = "=0.2.1"
 
 [dependencies.num_bigint]
 package = "num-bigint"
-version = "=0.2.4"
+version = "=0.2.5"
 
 [dependencies.num_complex]
 package = "num-complex"
-version = "=0.2.3"
+version = "=0.2.4"
 
 [dependencies.num_cpus]
 package = "num_cpus"
-version = "=1.11.1"
+version = "=1.12.0"
 
 [dependencies.num_derive]
 package = "num-derive"
@@ -528,19 +528,19 @@ version = "=0.2.5"
 
 [dependencies.num_integer]
 package = "num-integer"
-version = "=0.1.41"
+version = "=0.1.42"
 
 [dependencies.num_iter]
 package = "num-iter"
-version = "=0.1.39"
+version = "=0.1.40"
 
 [dependencies.num_rational]
 package = "num-rational"
-version = "=0.2.2"
+version = "=0.2.3"
 
 [dependencies.num_traits]
 package = "num-traits"
-version = "=0.2.10"
+version = "=0.2.11"
 
 [dependencies.opaque_debug]
 package = "opaque-debug"
@@ -612,7 +612,7 @@ version = "=0.4.6"
 
 [dependencies.pin_project_lite]
 package = "pin-project-lite"
-version = "=0.1.1"
+version = "=0.1.2"
 
 [dependencies.pin_utils]
 package = "pin-utils"
@@ -624,7 +624,7 @@ version = "=0.3.17"
 
 [dependencies.png]
 package = "png"
-version = "=0.15.2"
+version = "=0.15.3"
 
 [dependencies.postgres]
 package = "postgres"
@@ -648,7 +648,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.7"
+version = "=1.0.8"
 
 [dependencies.proc_macro2_0_4_30]
 package = "proc-macro2"
@@ -664,7 +664,7 @@ version = "=0.1.3"
 
 [dependencies.quick_error]
 package = "quick-error"
-version = "=1.2.2"
+version = "=1.2.3"
 
 [dependencies.quote]
 package = "quote"
@@ -676,7 +676,7 @@ version = "=0.6.13"
 
 [dependencies.rand]
 package = "rand"
-version = "=0.7.2"
+version = "=0.7.3"
 
 [dependencies.rand_0_6_5]
 package = "rand"
@@ -748,7 +748,7 @@ version = "=1.7.0"
 
 [dependencies.regex]
 package = "regex"
-version = "=1.3.1"
+version = "=1.3.3"
 
 [dependencies.regex_automata]
 package = "regex-automata"
@@ -756,7 +756,7 @@ version = "=0.1.8"
 
 [dependencies.regex_syntax]
 package = "regex-syntax"
-version = "=0.6.12"
+version = "=0.6.13"
 
 [dependencies.remove_dir_all]
 package = "remove_dir_all"
@@ -764,7 +764,8 @@ version = "=0.5.2"
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.10.0"
+version = "=0.10.1"
+features = ["blocking", "cookies", "json"]
 
 [dependencies.ring]
 package = "ring"
@@ -786,13 +787,17 @@ version = "=0.3.24"
 package = "rustc_version"
 version = "=0.2.3"
 
+[dependencies.rustversion]
+package = "rustversion"
+version = "=1.0.1"
+
 [dependencies.ryu]
 package = "ryu"
 version = "=1.0.2"
 
 [dependencies.same_file]
 package = "same-file"
-version = "=1.0.5"
+version = "=1.0.6"
 
 [dependencies.scoped_threadpool]
 package = "scoped_threadpool"
@@ -846,7 +851,7 @@ version = "=0.8.11"
 
 [dependencies.sha2]
 package = "sha2"
-version = "=0.8.0"
+version = "=0.8.1"
 
 [dependencies.siphasher]
 package = "siphasher"
@@ -898,7 +903,7 @@ version = "=1.0.0"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.12"
+version = "=1.0.13"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.syn_0_15_44]
@@ -924,7 +929,7 @@ version = "=0.4.1"
 
 [dependencies.termcolor]
 package = "termcolor"
-version = "=1.0.5"
+version = "=1.1.0"
 
 [dependencies.textwrap]
 package = "textwrap"
@@ -936,11 +941,7 @@ version = "=3.3.0"
 
 [dependencies.thread_local]
 package = "thread_local"
-version = "=1.0.0"
-
-[dependencies.thread_local_0_3_6]
-package = "thread_local"
-version = "=0.3.6"
+version = "=1.0.1"
 
 [dependencies.threadpool]
 package = "threadpool"
@@ -952,15 +953,23 @@ version = "=0.3.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.2.1"
+version = "=0.2.3"
 
 [dependencies.time_0_1_42]
 package = "time"
 version = "=0.1.42"
 
+[dependencies.time_macros]
+package = "time-macros"
+version = "=0.1.0"
+
+[dependencies.time_macros_impl]
+package = "time-macros-impl"
+version = "=0.1.0"
+
 [dependencies.tokio]
 package = "tokio"
-version = "=0.2.6"
+version = "=0.2.9"
 features = ["full"]
 
 [dependencies.tokio_postgres]
@@ -977,7 +986,7 @@ version = "=0.2.0"
 
 [dependencies.toml]
 package = "toml"
-version = "=0.5.5"
+version = "=0.5.6"
 
 [dependencies.tower_service]
 package = "tower-service"
@@ -1001,7 +1010,7 @@ version = "=1.11.2"
 
 [dependencies.ucd_util]
 package = "ucd-util"
-version = "=0.1.5"
+version = "=0.1.7"
 
 [dependencies.unicase]
 package = "unicase"
@@ -1045,7 +1054,7 @@ version = "=0.7.0"
 
 [dependencies.url]
 package = "url"
-version = "=2.1.0"
+version = "=2.1.1"
 
 [dependencies.utf8]
 package = "utf-8"
@@ -1078,7 +1087,7 @@ version = "=1.0.2"
 
 [dependencies.walkdir]
 package = "walkdir"
-version = "=2.2.9"
+version = "=2.3.1"
 
 [dependencies.want]
 package = "want"
