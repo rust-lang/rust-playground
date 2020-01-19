@@ -6,6 +6,7 @@ use std::{
     fmt,
     fs::{self, File},
     io::{self, prelude::*, BufReader, BufWriter, ErrorKind},
+    os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
     string,
     time::Duration,
@@ -48,6 +49,10 @@ pub struct Version {
 pub enum Error {
     #[snafu(display("Unable to create temporary directory: {}", source))]
     UnableToCreateTempDir { source: io::Error },
+    #[snafu(display("Unable to create output directory: {}", source))]
+    UnableToCreateOutputDir { source: io::Error },
+    #[snafu(display("Unable to set permissions for output directory: {}", source))]
+    UnableToSetOutputPermissions { source: io::Error },
     #[snafu(display("Unable to create source file: {}", source))]
     UnableToCreateSourceFile { source: io::Error },
     #[snafu(display("Unable to execute the compiler: {}", source))]
@@ -88,6 +93,15 @@ impl Sandbox {
         let scratch = TempDir::new("playground").context(UnableToCreateTempDir)?;
         let input_file = scratch.path().join("input.rs");
         let output_dir = scratch.path().join("output");
+
+        // We must create a world-writable directory so that the
+        // process inside the Docker container can write into it.
+        //
+        // This problem does *not* occur when using the indirection of
+        // docker-machine.
+        fs::create_dir(&output_dir).context(UnableToCreateOutputDir)?;
+        let perms = PermissionsExt::from_mode(0o777);
+        fs::set_permissions(&output_dir, perms).context(UnableToSetOutputPermissions)?;
 
         Ok(Sandbox {
             scratch,
