@@ -5,7 +5,7 @@ use std::{
     ffi::OsStr,
     fmt,
     fs::{self, File},
-    io::{self, prelude::*, BufReader, BufWriter, ErrorKind},
+    io::{self, prelude::*, BufReader, ErrorKind},
     os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
     string,
@@ -55,6 +55,8 @@ pub enum Error {
     UnableToSetOutputPermissions { source: io::Error },
     #[snafu(display("Unable to create source file: {}", source))]
     UnableToCreateSourceFile { source: io::Error },
+    #[snafu(display("Unable to set permissions for source file: {}", source))]
+    UnableToSetSourcePermissions { source: io::Error },
     #[snafu(display("Unable to execute the compiler: {}", source))]
     UnableToExecuteCompiler { source: io::Error },
     #[snafu(display("Compiler execution took longer than {} ms", timeout.as_millis()))]
@@ -88,20 +90,24 @@ fn vec_to_str(v: Vec<u8>) -> Result<String> {
     String::from_utf8(v).context(OutputNotUtf8)
 }
 
+// We must create a world-writable files (rustfmt) and directories
+// (LLVM IR) so that the process inside the Docker container can write
+// into it.
+//
+// This problem does *not* occur when using the indirection of
+// docker-machine.
+fn wide_open_permissions() -> std::fs::Permissions {
+    PermissionsExt::from_mode(0o777)
+}
+
 impl Sandbox {
     pub fn new() -> Result<Self> {
         let scratch = TempDir::new("playground").context(UnableToCreateTempDir)?;
         let input_file = scratch.path().join("input.rs");
         let output_dir = scratch.path().join("output");
 
-        // We must create a world-writable directory so that the
-        // process inside the Docker container can write into it.
-        //
-        // This problem does *not* occur when using the indirection of
-        // docker-machine.
         fs::create_dir(&output_dir).context(UnableToCreateOutputDir)?;
-        let perms = PermissionsExt::from_mode(0o777);
-        fs::set_permissions(&output_dir, perms).context(UnableToSetOutputPermissions)?;
+        fs::set_permissions(&output_dir, wide_open_permissions()).context(UnableToSetOutputPermissions)?;
 
         Ok(Sandbox {
             scratch,
@@ -288,14 +294,10 @@ impl Sandbox {
     }
 
     fn write_source_code(&self, code: &str) -> Result<()> {
-        let data = code.as_bytes();
+        fs::write(&self.input_file, code).context(UnableToCreateSourceFile)?;
+        fs::set_permissions(&self.input_file, wide_open_permissions()).context(UnableToSetSourcePermissions)?;
 
-        let file = File::create(&self.input_file).context(UnableToCreateSourceFile)?;
-        let mut file = BufWriter::new(file);
-
-        file.write_all(data).context(UnableToCreateSourceFile)?;
-
-        log::debug!("Wrote {} bytes of source to {}", data.len(), self.input_file.display());
+        log::debug!("Wrote {} bytes of source to {}", code.len(), self.input_file.display());
         Ok(())
     }
 
