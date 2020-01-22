@@ -65,7 +65,7 @@ pub fn create_future(token: String, code: String) -> impl Future<Item = Gist, Er
 
     let options = GistOptions {
         description: Some(DESCRIPTION.into()),
-        public: Some(true),
+        public: Some(false),
         files,
     };
 
