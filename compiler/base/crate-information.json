@@ -101,7 +101,7 @@
   },
   {
     "name": "bstr",
-    "version": "0.2.9",
+    "version": "0.2.10",
     "id": "bstr"
   },
   {
@@ -116,7 +116,7 @@
   },
   {
     "name": "bytes",
-    "version": "0.5.3",
+    "version": "0.5.4",
     "id": "bytes"
   },
   {
@@ -191,7 +191,7 @@
   },
   {
     "name": "csv",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "id": "csv"
   },
   {
@@ -736,17 +736,17 @@
   },
   {
     "name": "pin-project",
-    "version": "0.4.6",
+    "version": "0.4.7",
     "id": "pin_project"
   },
   {
     "name": "pin-project-internal",
-    "version": "0.4.6",
+    "version": "0.4.7",
     "id": "pin_project_internal"
   },
   {
     "name": "pin-project-lite",
-    "version": "0.1.2",
+    "version": "0.1.4",
     "id": "pin_project_lite"
   },
   {
@@ -891,8 +891,13 @@
   },
   {
     "name": "rand_pcg",
-    "version": "0.1.2",
+    "version": "0.2.1",
     "id": "rand_pcg"
+  },
+  {
+    "name": "rand_pcg",
+    "version": "0.1.2",
+    "id": "rand_pcg_0_1_2"
   },
   {
     "name": "rand_xorshift",
@@ -966,7 +971,7 @@
   },
   {
     "name": "rustversion",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "id": "rustversion"
   },
   {
@@ -1026,7 +1031,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.44",
+    "version": "1.0.45",
     "id": "serde_json"
   },
   {
@@ -1106,7 +1111,7 @@
   },
   {
     "name": "syn",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "id": "syn"
   },
   {
@@ -1166,7 +1171,7 @@
   },
   {
     "name": "time",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "id": "time"
   },
   {
@@ -1186,7 +1191,7 @@
   },
   {
     "name": "tokio",
-    "version": "0.2.9",
+    "version": "0.2.10",
     "id": "tokio"
   },
   {
@@ -1251,7 +1256,7 @@
   },
   {
     "name": "unicode-normalization",
-    "version": "0.1.11",
+    "version": "0.1.12",
     "id": "unicode_normalization"
   },
   {
