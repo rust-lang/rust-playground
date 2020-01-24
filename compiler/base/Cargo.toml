@@ -91,7 +91,7 @@ version = "=0.1.5"
 
 [dependencies.bstr]
 package = "bstr"
-version = "=0.2.9"
+version = "=0.2.10"
 
 [dependencies.build]
 package = "winapi-build"
@@ -107,7 +107,7 @@ version = "=1.3.2"
 
 [dependencies.bytes]
 package = "bytes"
-version = "=0.5.3"
+version = "=0.5.4"
 
 [dependencies.c2_chacha]
 package = "c2-chacha"
@@ -168,7 +168,7 @@ version = "=0.7.0"
 
 [dependencies.csv]
 package = "csv"
-version = "=1.1.2"
+version = "=1.1.3"
 
 [dependencies.csv_core]
 package = "csv-core"
@@ -604,15 +604,15 @@ version = "=0.7.24"
 
 [dependencies.pin_project]
 package = "pin-project"
-version = "=0.4.6"
+version = "=0.4.7"
 
 [dependencies.pin_project_internal]
 package = "pin-project-internal"
-version = "=0.4.6"
+version = "=0.4.7"
 
 [dependencies.pin_project_lite]
 package = "pin-project-lite"
-version = "=0.1.2"
+version = "=0.1.4"
 
 [dependencies.pin_utils]
 package = "pin-utils"
@@ -728,6 +728,10 @@ version = "=0.1.3"
 
 [dependencies.rand_pcg]
 package = "rand_pcg"
+version = "=0.2.1"
+
+[dependencies.rand_pcg_0_1_2]
+package = "rand_pcg"
 version = "=0.1.2"
 
 [dependencies.rand_xorshift]
@@ -789,7 +793,7 @@ version = "=0.2.3"
 
 [dependencies.rustversion]
 package = "rustversion"
-version = "=1.0.1"
+version = "=1.0.2"
 
 [dependencies.ryu]
 package = "ryu"
@@ -834,7 +838,7 @@ version = "=1.0.104"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.44"
+version = "=1.0.45"
 features = ["raw_value"]
 
 [dependencies.serde_urlencoded]
@@ -903,7 +907,7 @@ version = "=1.0.0"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.13"
+version = "=1.0.14"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.syn_0_15_44]
@@ -953,7 +957,7 @@ version = "=0.3.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.2.3"
+version = "=0.2.4"
 
 [dependencies.time_0_1_42]
 package = "time"
@@ -969,7 +973,7 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=0.2.9"
+version = "=0.2.10"
 features = ["full"]
 
 [dependencies.tokio_postgres]
@@ -1022,7 +1026,7 @@ version = "=0.3.4"
 
 [dependencies.unicode_normalization]
 package = "unicode-normalization"
-version = "=0.1.11"
+version = "=0.1.12"
 
 [dependencies.unicode_segmentation]
 package = "unicode-segmentation"
