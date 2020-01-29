@@ -914,3 +914,35 @@ $header-transition: 0.2s ease-in-out;
       cursor: pointer;
     }
 }
+
+.rustfmt-modal {
+  border: 4px solid $border-color;
+  z-index: 10;
+
+  .backbone {
+    height: 100%;
+  }
+
+  .toml-header {
+    display: flex;
+    justify-content: space-between;
+    line-height: 30px;
+    background-color: $background;
+
+    .toml-header-label {
+      margin-left: 4px;
+    }
+
+    .icon-areas {
+      display: flex;
+      padding: 4px;
+    }
+  }
+
+  .toml-input-area {
+    width: 100%;
+    height: calc(100% - 30px);
+    resize: none;
+    border: none;
+  }
+}
