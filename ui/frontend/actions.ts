@@ -87,6 +87,8 @@ export enum ActionType {
   CompileWasmSucceeded = 'COMPILE_WASM_SUCCEEDED',
   CompileWasmFailed = 'COMPILE_WASM_FAILED',
   EditCode = 'EDIT_CODE',
+  EditRustfmtToml = 'EDIT_RUSTFMT_TOML',
+  ToggleRustfmtTomlModalShow = 'TOGGLE_RUSTFMT_TOML_MODAL_SHOW',
   AddMainFunction = 'ADD_MAIN_FUNCTION',
   EnableFeatureGate = 'ENABLE_FEATURE_GATE',
   GotoPosition = 'GOTO_POSITION',
@@ -415,6 +417,12 @@ export const performCompileToNightlyWasm =
 export const editCode = (code: string) =>
   createAction(ActionType.EditCode, { code });
 
+export const editRustfmtToml = (code: string) =>
+  createAction(ActionType.EditRustfmtToml, { code });
+
+export const toggleRustfmtTomlModalShow = () =>
+  createAction(ActionType.ToggleRustfmtTomlModalShow);
+
 export const addMainFunction = () =>
   createAction(ActionType.AddMainFunction);
 
@@ -429,6 +437,7 @@ const requestFormat = () =>
 
 interface FormatRequestBody {
   code: string;
+  rustfmtToml: string;
   edition: string;
 }
 
@@ -750,6 +759,8 @@ export type Action =
   | ReturnType<typeof receiveCompileWasmSuccess>
   | ReturnType<typeof receiveCompileWasmFailure>
   | ReturnType<typeof editCode>
+  | ReturnType<typeof editRustfmtToml>
+  | ReturnType<typeof toggleRustfmtTomlModalShow>
   | ReturnType<typeof addMainFunction>
   | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof gotoPosition>
