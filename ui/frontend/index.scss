@@ -627,10 +627,30 @@ $header-transition: 0.2s ease-in-out;
 }
 
 .menu-item {
+  width: 100%;
   margin-bottom: 1em;
 
   &:last-child {
     margin-bottom: 0;
+  }
+}
+
+.menu-item-wrapper {
+  display: flex;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+.menu-right {
+  display: flex;
+  align-items: center;
+  border-left: solid $header-main-border 2px;
+
+  svg {
+    cursor: pointer;
+    &:hover {
+      color: $header-tint;
+    }
   }
 }
 
