@@ -576,6 +576,8 @@ struct ExecuteResponse {
 #[derive(Debug, Clone, Deserialize)]
 struct FormatRequest {
     code: String,
+    #[serde(rename = "rustfmtToml")]
+    rustfmt_toml: String,
     #[serde(default)]
     edition: String,
 }
@@ -748,6 +750,7 @@ impl TryFrom<FormatRequest> for sandbox::FormatRequest {
     fn try_from(me: FormatRequest) -> Result<Self> {
         Ok(sandbox::FormatRequest {
             code: me.code,
+            rustfmt_toml: me.rustfmt_toml,
             edition: parse_edition(&me.edition)?,
         })
     }

@@ -83,6 +83,7 @@ pub struct Sandbox {
     #[allow(dead_code)]
     scratch: TempDir,
     input_file: PathBuf,
+    rustfmt_toml: PathBuf,
     output_dir: PathBuf,
 }
 
@@ -104,6 +105,7 @@ impl Sandbox {
     pub fn new() -> Result<Self> {
         let scratch = TempDir::new("playground").context(UnableToCreateTempDir)?;
         let input_file = scratch.path().join("input.rs");
+        let rustfmt_toml = scratch.path().join("rustfmt.toml");
         let output_dir = scratch.path().join("output");
 
         fs::create_dir(&output_dir).context(UnableToCreateOutputDir)?;
@@ -112,6 +114,7 @@ impl Sandbox {
         Ok(Sandbox {
             scratch,
             input_file,
+            rustfmt_toml,
             output_dir,
         })
     }
@@ -184,6 +187,7 @@ impl Sandbox {
 
     pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
         self.write_source_code(&req.code)?;
+        self.write_rustfmt_toml(&req.rustfmt_toml)?;
         let command = self.format_command(req);
 
         let output = run_command_with_timeout(command)?;
@@ -301,6 +305,14 @@ impl Sandbox {
         Ok(())
     }
 
+    fn write_rustfmt_toml(&self, code: &str) -> Result<()> {
+      fs::write(&self.rustfmt_toml, code).context(UnableToCreateSourceFile)?;
+      fs::set_permissions(&self.rustfmt_toml, wide_open_permissions()).context(UnableToSetSourcePermissions)?;
+
+      log::debug!("Wrote {} bytes of source to rustfmt.toml", code.len());
+      Ok(())
+  }
+
     fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) -> Command {
         let mut cmd = self.docker_command(Some(req.crate_type()));
         set_execution_environment(&mut cmd, Some(target), &req);
@@ -373,6 +385,10 @@ impl Sandbox {
         mount_input_file.push("/playground/");
         mount_input_file.push(crate_type.file_name());
 
+        let mut mount_rustfmt = self.rustfmt_toml.as_os_str().to_os_string();
+        mount_rustfmt.push(":");
+        mount_rustfmt.push("/playground/rustfmt.toml");
+
         let mut mount_output_dir = self.output_dir.as_os_str().to_os_string();
         mount_output_dir.push(":");
         mount_output_dir.push("/playground-result");
@@ -381,6 +397,7 @@ impl Sandbox {
 
         cmd
             .arg("--volume").arg(&mount_input_file)
+            .arg("--volume").arg(&mount_rustfmt)
             .arg("--volume").arg(&mount_output_dir);
 
         cmd
@@ -746,6 +763,7 @@ pub struct ExecuteResponse {
 #[derive(Debug, Clone)]
 pub struct FormatRequest {
     pub code: String,
+    pub rustfmt_toml: String,
     pub edition: Option<Edition>,
 }
 
@@ -1119,6 +1137,7 @@ mod test {
     fn formatting_code() {
         let req = FormatRequest {
             code: "fn foo () { method_call(); }".to_string(),
+            rustfmt_toml: "".to_string(),
             edition: None,
         };
 
@@ -1134,13 +1153,25 @@ mod test {
 
     // Code that is only syntactically valid in Rust 2018
     const FORMAT_IN_EDITION_2018: &str = r#"fn main() { use std::num::ParseIntError; let result: Result<i32, ParseIntError> = try { "1".parse::<i32>()? + "2".parse::<i32>()? + "3".parse::<i32>()? }; assert_eq!(result, Ok(6)); }"#;
-
+    const FORMAT_USING_RUSTFMT_TOML: &str = r#"fn main() {
+    let lorem = vec![
+        "ipsum",
+        "dolor",
+        "sit",
+        "amet",
+        "consectetur",
+        "adipiscing",
+        "elit",
+    ];
+}
+  "#;
     const FORMAT_ERROR: &str = r#"error: expected identifier, found `"1"`"#;
 
     #[test]
     fn formatting_code_edition_2015() -> Result<()> {
         let req = FormatRequest {
             code: FORMAT_IN_EDITION_2018.to_string(),
+            rustfmt_toml: "".to_string(),
             edition: Some(Edition::Rust2015),
         };
 
@@ -1154,6 +1185,7 @@ mod test {
     fn formatting_code_edition_2018() -> Result<()> {
         let req = FormatRequest {
             code: FORMAT_IN_EDITION_2018.to_string(),
+            rustfmt_toml: "".to_string(),
             edition: Some(Edition::Rust2018),
         };
 
@@ -1167,6 +1199,30 @@ mod test {
         assert_eq!(lines[3], r#"        try { "1".parse::<i32>()? + "2".parse::<i32>()? + "3".parse::<i32>()? };"#);
         assert_eq!(lines[4], r#"    assert_eq!(result, Ok(6));"#);
         assert_eq!(lines[5], r#"}"#);
+        Ok(())
+    }
+
+    #[test]
+    fn formatting_code_using_rustfmt_toml() -> Result<()> {
+        let req = FormatRequest {
+            code: FORMAT_USING_RUSTFMT_TOML.to_string(),
+            rustfmt_toml: r#"indent_style = "Visual""#.to_string(),
+            edition: Some(Edition::Rust2018),
+        };
+
+        let resp = Sandbox::new()?.format(&req)?;
+        assert!(!resp.stderr.contains(FORMAT_ERROR));
+
+        let lines: Vec<_> = resp.code.lines().collect();
+        assert_eq!(lines[0], r#"fn main() {"#);
+        assert_eq!(lines[1], r#"    let lorem = vec!["ipsum","#);
+        assert_eq!(lines[2], r#"                     "dolor","#);
+        assert_eq!(lines[3], r#"                     "sit","#);
+        assert_eq!(lines[4], r#"                     "amet","#);
+        assert_eq!(lines[5], r#"                     "consectetur","#);
+        assert_eq!(lines[6], r#"                     "adipiscing","#);
+        assert_eq!(lines[7], r#"                     "elit",];"#);
+        assert_eq!(lines[8], r#"}"#);
         Ok(())
     }
 
