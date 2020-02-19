@@ -605,6 +605,11 @@
     "id": "ndarray"
   },
   {
+    "name": "ndarray-rand",
+    "version": "0.11.0",
+    "id": "ndarray_rand"
+  },
+  {
     "name": "net2",
     "version": "0.2.33",
     "id": "net2"

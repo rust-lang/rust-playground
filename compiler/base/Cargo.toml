@@ -503,6 +503,10 @@ version = "=0.2.3"
 package = "ndarray"
 version = "=0.13.0"
 
+[dependencies.ndarray_rand]
+package = "ndarray-rand"
+version = "=0.11.0"
+
 [dependencies.net2]
 package = "net2"
 version = "=0.2.33"
