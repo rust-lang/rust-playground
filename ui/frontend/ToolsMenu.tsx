@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { RustfmtTomlIcon } from './Icon';
 import ButtonMenuItem from './ButtonMenuItem';
 import MenuGroup from './MenuGroup';
 
@@ -32,15 +33,25 @@ const ToolsMenu: React.SFC<ToolsMenuProps> = props => {
     dispatch(actions.performFormat());
     props.close();
   }, [dispatch, props]);
+  const formatDialog = useCallback(() => {
+    dispatch(actions.toggleRustfmtTomlModalShow());
+  }, [dispatch]);
 
   return (
     <MenuGroup title="Tools">
-      <ButtonMenuItem
-        name="Rustfmt"
-        onClick={format}>
-        <div>Format this code with Rustfmt.</div>
-        <div className="tools-menu__aside">{rustfmtVersion} ({rustfmtVersionDetails})</div>
-      </ButtonMenuItem>
+      <div className="menu-item-wrapper">
+        <ButtonMenuItem
+          name="Rustfmt"
+          onClick={format}>
+          <div>Format this code with Rustfmt.</div>
+          <div className="tools-menu__aside">{rustfmtVersion} ({rustfmtVersionDetails})</div>
+        </ButtonMenuItem>
+
+        <div className="menu-right" onClick={formatDialog}>
+          <RustfmtTomlIcon />
+        </div>
+      </div>
+
       <ButtonMenuItem
         name="Clippy"
         onClick={clippy}>

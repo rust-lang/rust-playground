@@ -6,6 +6,7 @@ import { State } from '../reducers';
 import { Backtrace, Channel, Edition, PrimaryActionAuto, PrimaryActionCore } from '../types';
 
 const codeSelector = (state: State) => state.code;
+const rustfmtSelector = (state: State) => state.rustfmt.toml;
 
 const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
 export const hasTestsSelector = createSelector(codeSelector, code => !!code.match(HAS_TESTS_RE));
@@ -274,6 +275,7 @@ export const clippyRequestSelector = createSelector(
 
 export const formatRequestSelector = createSelector(
   codeSelector,
+  rustfmtSelector,
   editionSelector,
-  (code, edition) => ({ code, edition }),
+  (code, rustfmtToml, edition) => ({ code, edition, rustfmtToml }),
 );

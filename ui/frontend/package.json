@@ -20,6 +20,7 @@
     "react-portal": "^4.1.4",
     "react-prism": "^4.0.0",
     "react-redux": "^7.0.0",
+    "react-rnd": "^10.1.4",
     "redux": "^4.0.0",
     "redux-thunk": "^2.1.0",
     "regenerator-runtime": "^0.13.2",
