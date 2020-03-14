@@ -111,7 +111,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
       in_build_menu { click_on("MIR") }
 
       within('.output-stderr') do
-        expect(page).to have_content 'an un-closed delimiter'
+        expect(page).to have_content 'an unclosed delimiter'
       end
     end
   end
