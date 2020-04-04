@@ -4,6 +4,7 @@ export function configureRustErrors({
   enableFeatureGate,
   getChannel,
   gotoPosition,
+  addImport,
   reExecuteWithBacktrace,
 }) {
   Prism.languages.rust_errors = { // eslint-disable-line @typescript-eslint/camelcase
@@ -26,6 +27,12 @@ export function configureRustErrors({
       },
     },
     'error-location': /-->\s+(\/playground\/)?src\/.*\n/,
+    'import-suggestion-outer': {
+      pattern: /\|\s+use\s+([^;]+);/,
+      inside: {
+        'import-suggestion': /use\s+.*/,
+      },
+    },
     'rust-errors-help': {
       pattern: /help:.*\n/,
       inside: {
@@ -73,6 +80,11 @@ export function configureRustErrors({
       env.attributes['data-line'] = line;
       env.attributes['data-col'] = col;
     }
+    if (env.type === 'import-suggestion') {
+      env.tag = 'a';
+      env.attributes.href = '#';
+      env.attributes['data-suggestion'] = env.content;
+    }
     if (env.type === 'feature-gate') {
       const [_, featureGate] = /feature\((.*?)\)/.exec(env.content);
       env.tag = 'a';
@@ -101,6 +113,15 @@ export function configureRustErrors({
       link.onclick = e => {
         e.preventDefault();
         gotoPosition(line, col);
+      };
+    });
+
+    const importSuggestions = env.element.querySelectorAll('.import-suggestion');
+    Array.from(importSuggestions).forEach((link: HTMLAnchorElement) => {
+      const { suggestion } = link.dataset;
+      link.onclick = (e) => {
+        e.preventDefault();
+        addImport(suggestion + '\n');
       };
     });
 
