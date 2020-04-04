@@ -29,7 +29,7 @@ export function configureRustErrors({
     'rust-errors-help': {
       pattern: /help:.*\n/,
       inside: {
-        'feature-gate': /add #\!\[feature\(.+?\)\]/,
+        'feature-gate': /add `#\!\[feature\(.+?\)\]`/,
       },
     },
     'backtrace': {
