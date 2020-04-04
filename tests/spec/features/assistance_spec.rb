@@ -38,6 +38,21 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
     end
   end
 
+  scenario "using a type that hasn't been imported offers importing it" do
+    editor.set <<~EOF
+      fn example(_: HashMap) {}
+    EOF
+    click_on("Build")
+
+    within('.output-stderr') do
+      click_on("use std::collections::HashMap;")
+    end
+
+    within('.editor') do
+      expect(editor).to have_line 'use std::collections::HashMap;'
+    end
+  end
+
   private
 
   def editor
