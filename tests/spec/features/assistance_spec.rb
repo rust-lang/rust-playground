@@ -53,6 +53,23 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
     end
   end
 
+  scenario "triggering a panic offers enabling backtraces" do
+    editor.set <<~EOF
+      fn main() {
+          panic!("Oops");
+      }
+    EOF
+    click_on("Run")
+
+    within('.output-stderr') do
+      click_on("run with `RUST_BACKTRACE=1` environment variable to display a backtrace")
+    end
+
+    within('.output-stderr') do
+      expect(page).to have_content("stack backtrace:")
+    end
+  end
+
   private
 
   def editor
