@@ -50,7 +50,7 @@
     "css-loader": "^3.0.0",
     "eslint": "^6.1.0",
     "eslint-plugin-react": "^7.14.3",
-    "eslint-plugin-react-hooks": "^2.3.0",
+    "eslint-plugin-react-hooks": "^4.0.0",
     "glob": "^7.0.5",
     "html-webpack-plugin": "^3.0.0",
     "jest": "^25.1.0",
