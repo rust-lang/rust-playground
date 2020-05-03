@@ -72,7 +72,7 @@ struct CrateInformation {
 #[derive(Debug, Deserialize)]
 struct Modifications {
     #[serde(default)]
-    blacklist: Vec<String>,
+    exclusions: Vec<String>,
     #[serde(default)]
     additions: BTreeSet<String>,
 }
@@ -117,8 +117,8 @@ fn is_true(b: &bool) -> bool {
 }
 
 impl Modifications {
-    fn blacklisted(&self, name: &str) -> bool {
-        self.blacklist.iter().any(|n| n == name)
+    fn excluded(&self, name: &str) -> bool {
+        self.exclusions.iter().any(|n| n == name)
     }
 }
 
@@ -288,7 +288,7 @@ fn main() {
     // the interesting crates.
     let mut summaries = Vec::new();
     for Crate { name } in &top.crates {
-        if MODIFICATIONS.blacklisted(name) {
+        if MODIFICATIONS.excluded(name) {
             continue;
         }
 
@@ -361,11 +361,11 @@ fn main() {
         to_visit = visit_next;
     }
 
-    // Remove invalid and blacklisted packages that have been added due to resolution
+    // Remove invalid and excluded packages that have been added due to resolution
     let package_ids: Vec<_> = resolve
         .iter()
         .filter(|pkg| valid_for_our_platform.contains(pkg))
-        .filter(|pkg| !MODIFICATIONS.blacklisted(pkg.name().as_str()))
+        .filter(|pkg| !MODIFICATIONS.excluded(pkg.name().as_str()))
         .collect();
 
     let mut sources = SourceMap::new();
