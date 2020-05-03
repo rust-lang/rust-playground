@@ -100,7 +100,6 @@ module.exports = function(_, argv) {
         title: "Rust Playground",
         template: 'index.ejs',
         filename: '../index.html',
-        chunksSortMode: 'dependency',
       }),
       new CopyPlugin([
         { from: 'robots.txt', to: '..' },

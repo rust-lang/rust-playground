@@ -23,7 +23,7 @@ export function configureRustErrors({
     'note': {
       pattern: /^\s*=\s*note:.*$/m,
       inside: {
-        'see-issue': /see .*rust-lang\/rust\/issues\/\d+/,
+        'see-issue': /see .*rust-lang\/rust\/issues\/\d+>/,
       },
     },
     'error-location': /-->\s+(\/playground\/)?src\/.*\n/,
