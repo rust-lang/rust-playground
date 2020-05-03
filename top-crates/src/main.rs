@@ -5,7 +5,7 @@ use cargo::{
         compiler::{CompileKind, CompileTarget, TargetInfo},
         package::PackageSet,
         registry::PackageRegistry,
-        resolver::{self, ResolveOpts},
+        resolver::{self, features::RequestedFeatures, ResolveOpts},
         source::SourceMap,
         Dependency, Package, Source, SourceId, TargetKind,
     },
@@ -313,9 +313,11 @@ fn main() {
             summary,
             ResolveOpts {
                 dev_deps: false,
-                features: Default::default(),
-                uses_default_features: true,
-                all_features: false,
+                features: RequestedFeatures {
+                    features: Default::default(),
+                    uses_default_features: true,
+                    all_features: false,
+                },
             },
         ));
     }
