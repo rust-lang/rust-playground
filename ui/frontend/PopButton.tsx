@@ -2,6 +2,11 @@ import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { Manager, Popper, Reference } from 'react-popper';
 import { Portal } from 'react-portal';
 
+const POPPER_MODIFIERS = [
+  // Issue #303
+  { name: 'computeStyles', options: { gpuAcceleration: false } },
+];
+
 interface NewPopProps {
   Button: React.ComponentType<{
     toggle: () => void;
@@ -39,7 +44,7 @@ const PopButton: React.SFC<NewPopProps> = ({ Button, Menu }) => {
         {({ ref }) => <Button ref={ref} toggle={toggle} />}
       </Reference>
       {isOpen && <Portal>
-        <Popper placement="bottom" innerRef={menuRef} modifiers={{ computeStyle: { gpuAcceleration: false } }}>
+        <Popper placement="bottom" innerRef={menuRef} modifiers={POPPER_MODIFIERS}>
           {({ ref, style, arrowProps, placement }) => (
             <div
               className="popper"
