@@ -20,6 +20,9 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.RequestMiri:
       return { ...state, focus: Focus.Miri };
 
+    case ActionType.RequestMacroExpansion:
+      return { ...state, focus: Focus.MacroExpansion };
+
     case ActionType.CompileLlvmIrRequest:
       return { ...state, focus: Focus.LlvmIr };
 

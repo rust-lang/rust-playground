@@ -76,6 +76,7 @@ fn main() {
     mount.mount("/format", format);
     mount.mount("/clippy", clippy);
     mount.mount("/miri", miri);
+    mount.mount("/macro-expansion", macro_expansion);
     mount.mount("/meta/crates", meta_crates);
     mount.mount("/meta/version/stable", meta_version_stable);
     mount.mount("/meta/version/beta", meta_version_beta);
@@ -180,6 +181,15 @@ fn miri(req: &mut Request<'_, '_>) -> IronResult<Response> {
             .miri(&req.try_into()?)
             .map(MiriResponse::from)
             .context(Interpreting)
+    })
+}
+
+fn macro_expansion(req: &mut Request<'_, '_>) -> IronResult<Response> {
+    with_sandbox(req, |sandbox, req: MacroExpansionRequest| {
+        sandbox
+            .macro_expansion(&req.try_into()?)
+            .map(MacroExpansionResponse::from)
+            .context(Expansion)
     })
 }
 
@@ -481,6 +491,8 @@ pub enum Error {
     Evaluation { source: sandbox::Error },
     #[snafu(display("Linting operation failed: {}", source))]
     Linting { source: sandbox::Error },
+    #[snafu(display("Expansion operation failed: {}", source))]
+    Expansion { source: sandbox::Error },
     #[snafu(display("Formatting operation failed: {}", source))]
     Formatting { source: sandbox::Error },
     #[snafu(display("Interpreting operation failed: {}", source))]
@@ -613,6 +625,20 @@ struct MiriRequest {
 
 #[derive(Debug, Clone, Serialize)]
 struct MiriResponse {
+    success: bool,
+    stdout: String,
+    stderr: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct MacroExpansionRequest {
+    code: String,
+    #[serde(default)]
+    edition: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct MacroExpansionResponse {
     success: bool,
     stdout: String,
     stderr: String,
@@ -800,6 +826,27 @@ impl TryFrom<MiriRequest> for sandbox::MiriRequest {
 impl From<sandbox::MiriResponse> for MiriResponse {
     fn from(me: sandbox::MiriResponse) -> Self {
         MiriResponse {
+            success: me.success,
+            stdout: me.stdout,
+            stderr: me.stderr,
+        }
+    }
+}
+
+impl TryFrom<MacroExpansionRequest> for sandbox::MacroExpansionRequest {
+    type Error = Error;
+
+    fn try_from(me: MacroExpansionRequest) -> Result<Self> {
+        Ok(sandbox::MacroExpansionRequest {
+            code: me.code,
+            edition: parse_edition(&me.edition)?,
+        })
+    }
+}
+
+impl From<sandbox::MacroExpansionResponse> for MacroExpansionResponse {
+    fn from(me: sandbox::MacroExpansionResponse) -> Self {
+        MacroExpansionResponse {
             success: me.success,
             stdout: me.stdout,
             stderr: me.stderr,

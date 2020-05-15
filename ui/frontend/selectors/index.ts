@@ -143,6 +143,7 @@ const getOutputs = (state: State) => [
   state.output.llvmIr,
   state.output.mir,
   state.output.miri,
+  state.output.macroExpansion,
   state.output.wasm,
 ];
 
