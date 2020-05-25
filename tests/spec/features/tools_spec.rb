@@ -57,6 +57,39 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     EOF
   end
 
+  scenario "expand macros with the nightly compiler" do
+    editor.set code_that_uses_macros
+    in_tools_menu { click_on("Expand macros") }
+
+    within(".output-stdout") do
+      # First-party
+      expect(page).to have_content('core::fmt::Arguments::new_v1')
+
+      # Third-party procedural macro
+      expect(page).to have_content('block_on(async')
+
+      # User-specified declarative macro
+      expect(page).to have_content('fn created_by_macro() -> i32 { 42 }')
+    end
+  end
+
+  def code_that_uses_macros
+    <<~EOF
+    macro_rules! demo {
+        ($name:ident) => {
+            fn $name() -> i32 { 42 }
+        }
+    }
+
+    demo!(created_by_macro);
+
+    #[tokio::main]
+    async fn example() {
+        println!("a value: {}", created_by_macro());
+    }
+    EOF
+  end
+
   def editor
     Editor.new(page)
   end
