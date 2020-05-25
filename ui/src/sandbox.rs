@@ -222,6 +222,19 @@ impl Sandbox {
         })
     }
 
+    pub fn macro_expansion(&self, req: &MacroExpansionRequest) -> Result<MacroExpansionResponse> {
+        self.write_source_code(&req.code)?;
+        let command = self.macro_expansion_command(req);
+
+        let output = run_command_with_timeout(command)?;
+
+        Ok(MacroExpansionResponse {
+            success: output.status.success(),
+            stdout: vec_to_str(output.stdout)?,
+            stderr: vec_to_str(output.stderr)?,
+        })
+    }
+
     pub fn crates(&self) -> Result<Vec<CrateInformation>> {
         let mut command = basic_secure_docker_command();
         command.args(&[Channel::Stable.container_name()]);
@@ -361,6 +374,23 @@ impl Sandbox {
         cmd.arg("miri").args(&["cargo", "miri-playground"]);
 
         log::debug!("Miri command is {:?}", cmd);
+
+        cmd
+    }
+
+    fn macro_expansion_command(&self, req: impl EditionRequest) -> Command {
+        let mut cmd = self.docker_command(None);
+        cmd.apply_edition(req);
+
+        cmd.arg(&Channel::Nightly.container_name()).args(&[
+            "cargo",
+            "rustc",
+            "--",
+            "-Zunstable-options",
+            "--pretty=expanded",
+        ]);
+
+        log::debug!("Macro expansion command is {:?}", cmd);
 
         cmd
     }
@@ -795,6 +825,25 @@ impl EditionRequest for MiriRequest {
 
 #[derive(Debug, Clone)]
 pub struct MiriResponse {
+    pub success: bool,
+    pub stdout: String,
+    pub stderr: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct MacroExpansionRequest {
+    pub code: String,
+    pub edition: Option<Edition>,
+}
+
+impl EditionRequest for MacroExpansionRequest {
+    fn edition(&self) -> Option<Edition> {
+        self.edition
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MacroExpansionResponse {
     pub success: bool,
     pub stdout: String,
     pub stderr: String,

@@ -96,6 +96,7 @@ export enum Backtrace {
 export enum Focus {
   Clippy = 'clippy',
   Miri = 'miri',
+  MacroExpansion = 'macro-expansion',
   LlvmIr = 'llvm-ir',
   Mir = 'mir',
   Wasm = 'wasm',

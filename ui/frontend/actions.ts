@@ -35,6 +35,7 @@ const routes = {
   format: { pathname: '/format' },
   clippy: { pathname: '/clippy' },
   miri: { pathname: '/miri' },
+  macroExpansion: { pathname: '/macro-expansion' },
   meta: {
     crates: { pathname: '/meta/crates' },
     version: {
@@ -100,6 +101,9 @@ export enum ActionType {
   RequestMiri = 'REQUEST_MIRI',
   MiriSucceeded = 'MIRI_SUCCEEDED',
   MiriFailed = 'MIRI_FAILED',
+  RequestMacroExpansion = 'REQUEST_MACRO_EXPANSION',
+  MacroExpansionSucceeded = 'MACRO_EXPANSION_SUCCEEDED',
+  MacroExpansionFailed = 'MACRO_EXPANSION_FAILED',
   RequestGistLoad = 'REQUEST_GIST_LOAD',
   GistLoadSucceeded = 'GIST_LOAD_SUCCEEDED',
   GistLoadFailed = 'GIST_LOAD_FAILED',
@@ -526,6 +530,36 @@ export function performMiri(): ThunkAction {
   };
 }
 
+const requestMacroExpansion = () =>
+  createAction(ActionType.RequestMacroExpansion);
+
+interface MacroExpansionRequestBody {
+  code: string;
+  edition: string;
+}
+
+const receiveMacroExpansionSuccess = ({ stdout, stderr }) =>
+  createAction(ActionType.MacroExpansionSucceeded, { stdout, stderr });
+
+const receiveMacroExpansionFailure = ({ error }) =>
+  createAction(ActionType.MacroExpansionFailed, { error });
+
+export function performMacroExpansion(): ThunkAction {
+  // TODO: Check a cache
+  return function(dispatch, getState) {
+    dispatch(requestMacroExpansion());
+
+    const { code, configuration: {
+      edition,
+    } } = getState();
+    const body: MacroExpansionRequestBody = { code, edition };
+
+    return jsonPost(routes.macroExpansion, body)
+      .then(json => dispatch(receiveMacroExpansionSuccess(json)))
+      .catch(json => dispatch(receiveMacroExpansionFailure(json)));
+  };
+}
+
 interface GistSuccessProps {
   id: string;
   url: string;
@@ -767,6 +801,9 @@ export type Action =
   | ReturnType<typeof requestMiri>
   | ReturnType<typeof receiveMiriSuccess>
   | ReturnType<typeof receiveMiriFailure>
+  | ReturnType<typeof requestMacroExpansion>
+  | ReturnType<typeof receiveMacroExpansionSuccess>
+  | ReturnType<typeof receiveMacroExpansionFailure>
   | ReturnType<typeof requestGistLoad>
   | ReturnType<typeof receiveGistLoadSuccess>
   | ReturnType<typeof receiveGistLoadFailure>

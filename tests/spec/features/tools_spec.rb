@@ -44,7 +44,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     in_tools_menu { click_on("Miri") }
 
     within(".output-stderr") do
-      expect(page).to have_content %r{pointer must be in-bounds at offset 1, but is outside bounds of allocation \d+ which has size 0}
+      expect(page).to have_content %r{pointer must be in-bounds at offset 1, but is outside bounds of alloc\d+ which has size 0}
     end
   end
 
@@ -53,6 +53,39 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     fn main() {
         let mut a: [u8; 0] = [];
         unsafe { *a.get_unchecked_mut(1) = 1; }
+    }
+    EOF
+  end
+
+  scenario "expand macros with the nightly compiler" do
+    editor.set code_that_uses_macros
+    in_tools_menu { click_on("Expand macros") }
+
+    within(".output-stdout") do
+      # First-party
+      expect(page).to have_content('core::fmt::Arguments::new_v1')
+
+      # Third-party procedural macro
+      expect(page).to have_content('block_on(async')
+
+      # User-specified declarative macro
+      expect(page).to have_content('fn created_by_macro() -> i32 { 42 }')
+    end
+  end
+
+  def code_that_uses_macros
+    <<~EOF
+    macro_rules! demo {
+        ($name:ident) => {
+            fn $name() -> i32 { 42 }
+        }
+    }
+
+    demo!(created_by_macro);
+
+    #[tokio::main]
+    async fn example() {
+        println!("a value: {}", created_by_macro());
     }
     EOF
   end

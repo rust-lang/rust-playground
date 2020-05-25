@@ -24,7 +24,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
 
   scenario "github see-issues are links" do
     within('.output-stderr') do
-      expect(page).to have_link('see issue #44580 <https://github.com/rust-lang/rust/issues/44580>', href: 'https://github.com/rust-lang/rust/issues/23416')
+      expect(page).to have_link('see issue #23416 <https://github.com/rust-lang/rust/issues/23416>', href: 'https://github.com/rust-lang/rust/issues/23416')
     end
   end
 
