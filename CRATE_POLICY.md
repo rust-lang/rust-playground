@@ -4,9 +4,7 @@ The playground selects a number of root crates to include:
 
 - The top 100 crates based on [all time downloads][]
 - Crates from the [Rust cookbook][]
-
-The latest stable version of these crates are available, as well as
-whatever dependencies these crates require.
+- Transitive dependencies of the above crates
 
 ## Why is there a policy?
 
