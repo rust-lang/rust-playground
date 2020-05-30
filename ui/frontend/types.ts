@@ -5,6 +5,9 @@ export interface Position {
   column: number;
 }
 
+export const makePosition = (line: string | number, column: string | number): Position =>
+  ({ line: +line, column: +column });
+
 export interface Crate {
   id: string;
   name: string;

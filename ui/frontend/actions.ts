@@ -27,6 +27,7 @@ import {
   PrimaryActionAuto,
   PrimaryActionCore,
   ProcessAssembly,
+  makePosition,
 } from './types';
 
 const routes = {
@@ -430,7 +431,7 @@ export const enableFeatureGate = (featureGate: string) =>
   createAction(ActionType.EnableFeatureGate, { featureGate });
 
 export const gotoPosition = (line: string | number, column: string | number) =>
-  createAction(ActionType.GotoPosition, { line: +line, column: +column });
+  createAction(ActionType.GotoPosition, makePosition(line, column));
 
 const requestFormat = () =>
   createAction(ActionType.RequestFormat);
