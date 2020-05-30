@@ -8,6 +8,7 @@ import notifications from './notifications';
 import output from './output';
 import page from './page';
 import position from './position';
+import selection from './selection';
 import versions from './versions';
 
 const playgroundApp = combineReducers({
@@ -19,6 +20,7 @@ const playgroundApp = combineReducers({
   output,
   page,
   position,
+  selection,
   versions,
 });
 

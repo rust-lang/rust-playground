@@ -1,9 +1,11 @@
 import Prism from 'prismjs';
+import { makePosition } from './types';
 
 export function configureRustErrors({
   enableFeatureGate,
   getChannel,
   gotoPosition,
+  selectText,
   addImport,
   reExecuteWithBacktrace,
 }) {
@@ -158,10 +160,13 @@ export function configureRustErrors({
 
     const mirSourceLinks = env.element.querySelectorAll('.mir-source');
     Array.from(mirSourceLinks).forEach((link: HTMLAnchorElement) => {
-      const { startLine, startCol } = link.dataset;
+      const { startLine, startCol, endLine, endCol } = link.dataset;
+      const start = makePosition(startLine, startCol);
+      const end = makePosition(endLine, endCol);
+
       link.onclick = e => {
         e.preventDefault();
-        gotoPosition(startLine, startCol);
+        selectText(start, end);
       };
     });
   });

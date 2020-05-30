@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import * as actions from './actions';
 import AdvancedEditor from './AdvancedEditor';
-import { CommonEditorProps, Editor as EditorType, Position } from './types';
+import { CommonEditorProps, Editor as EditorType, Position, Selection } from './types';
 import { State } from './reducers';
 
 class CodeByteOffsets {
@@ -22,6 +22,17 @@ class CodeByteOffsets {
     const highlightedBytes = highlightedLine.length;
 
     return [precedingBytes, precedingBytes + highlightedBytes];
+  }
+
+  public rangeToOffsets(start: Position, end: Position) {
+    const startBytes = this.positionToBytes(start);
+    const endBytes = this.positionToBytes(end);
+    return [startBytes, endBytes];
+  }
+
+  private positionToBytes(position: Position) {
+    // Subtract one as this logic is zero-based and the columns are one-based
+    return this.bytesBeforeLine(position.line) + position.column - 1;
   }
 
   private bytesBeforeLine(line: number) {
@@ -64,6 +75,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
 
   public componentDidUpdate(prevProps, _prevState) {
     this.gotoPosition(prevProps.position, this.props.position);
+    this.setSelection(prevProps.selection, this.props.selection);
   }
 
   private gotoPosition(oldPosition: Position, newPosition: Position) {
@@ -78,12 +90,26 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
     editor.focus();
     editor.setSelectionRange(startBytes, endBytes);
   }
+
+  private setSelection(oldSelection: Selection, newSelection: Selection) {
+    const editor = this._editor;
+
+    if (!newSelection || !editor) { return; }
+    if (newSelection === oldSelection) { return; }
+
+    const offsets = new CodeByteOffsets(this.props.code);
+    const [startBytes, endBytes] = offsets.rangeToOffsets(newSelection.start, newSelection.end);
+
+    editor.focus();
+    editor.setSelectionRange(startBytes, endBytes);
+  }
 }
 
 const Editor: React.SFC = () => {
   const code = useSelector((state: State) => state.code);
   const editor = useSelector((state: State) => state.configuration.editor);
   const position = useSelector((state: State) => state.position);
+  const selection = useSelector((state: State) => state.selection);
   const crates = useSelector((state: State) => state.crates);
 
   const dispatch = useDispatch();
@@ -96,6 +122,7 @@ const Editor: React.SFC = () => {
     <div className="editor">
       <SelectedEditor code={code}
         position={position}
+        selection={selection}
         crates={crates}
         onEditCode={onEditCode}
         execute={execute} />

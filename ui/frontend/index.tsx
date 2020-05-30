@@ -14,6 +14,7 @@ import {
   editCode,
   enableFeatureGate,
   gotoPosition,
+  selectText,
   addImport,
   performCratesLoad,
   performVersionsLoad,
@@ -49,6 +50,7 @@ const store = createStore(playgroundApp, initialState, enhancers);
 configureRustErrors({
   enableFeatureGate: featureGate => store.dispatch(enableFeatureGate(featureGate)),
   gotoPosition: (line, col) => store.dispatch(gotoPosition(line, col)),
+  selectText: (start, end) => store.dispatch(selectText(start, end)),
   addImport: (code) => store.dispatch(addImport(code)),
   reExecuteWithBacktrace: () => store.dispatch(reExecuteWithBacktrace()),
   getChannel: () => store.getState().configuration.channel,
