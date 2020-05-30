@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { connect } from 'react-redux';
 
 import State from './state';
-import { CommonEditorProps, Crate, Edition, Focus, PairCharacters } from './types';
+import { CommonEditorProps, Crate, Edition, Focus, PairCharacters, Position } from './types';
 
 type Ace = typeof import('ace-builds');
 type AceEditor = import('ace-builds').Ace.Editor;
@@ -63,10 +63,7 @@ interface AdvancedEditorProps {
   execute: () => any;
   keybinding?: string;
   onEditCode: (_: string) => any;
-  position: {
-    line: number;
-    column: number;
-  };
+  position: Position;
   theme: string;
   crates: Crate[];
   focus?: Focus;
@@ -297,10 +294,7 @@ interface AdvancedEditorAsyncProps {
   execute: () => any;
   keybinding?: string;
   onEditCode: (_: string) => any;
-  position: {
-    line: number;
-    column: number;
-  };
+  position: Position;
   theme: string;
   crates: Crate[];
   focus?: Focus;

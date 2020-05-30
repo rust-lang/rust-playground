@@ -429,7 +429,7 @@ export const addImport = (code: string) =>
 export const enableFeatureGate = (featureGate: string) =>
   createAction(ActionType.EnableFeatureGate, { featureGate });
 
-export const gotoPosition = (line, column) =>
+export const gotoPosition = (line: string | number, column: string | number) =>
   createAction(ActionType.GotoPosition, { line: +line, column: +column });
 
 const requestFormat = () =>

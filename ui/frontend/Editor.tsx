@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import * as actions from './actions';
 import AdvancedEditor from './AdvancedEditor';
-import { CommonEditorProps, Editor as EditorType } from './types';
+import { CommonEditorProps, Editor as EditorType, Position } from './types';
 import { State } from './reducers';
 
 class SimpleEditor extends React.PureComponent<CommonEditorProps> {
@@ -37,7 +37,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
     this.gotoPosition(prevProps.position, this.props.position);
   }
 
-  private gotoPosition(oldPosition, newPosition) {
+  private gotoPosition(oldPosition: Position, newPosition: Position) {
     const editor = this._editor;
 
     if (!newPosition || !editor) { return; }
