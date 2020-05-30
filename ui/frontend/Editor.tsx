@@ -6,6 +6,35 @@ import AdvancedEditor from './AdvancedEditor';
 import { CommonEditorProps, Editor as EditorType, Position } from './types';
 import { State } from './reducers';
 
+class CodeByteOffsets {
+  readonly code: string;
+  readonly lines: string[];
+
+  constructor(code: string) {
+    this.code = code;
+    this.lines = code.split('\n');
+  }
+
+  public lineToOffsets(line: number) {
+    const precedingBytes = this.bytesBeforeLine(line);
+
+    const highlightedLine = this.lines[line];
+    const highlightedBytes = highlightedLine.length;
+
+    return [precedingBytes, precedingBytes + highlightedBytes];
+  }
+
+  private bytesBeforeLine(line: number) {
+    // Subtract one as this logic is zero-based and the lines are one-based
+    line -= 1;
+
+    const precedingLines = this.lines.slice(0, line);
+
+    // Add one to account for the newline we split on and removed
+    return precedingLines.map(l => l.length + 1).reduce((a, b) => a + b);
+  }
+}
+
 class SimpleEditor extends React.PureComponent<CommonEditorProps> {
   private _editor: HTMLTextAreaElement;
 
@@ -43,20 +72,10 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
     if (!newPosition || !editor) { return; }
     if (newPosition === oldPosition) { return; }
 
-    // Subtract one as this logix is zero-based and the lines are one-based
-    const line = newPosition.line - 1;
-    const { code } = this.props;
+    const offsets = new CodeByteOffsets(this.props.code);
+    const [startBytes, endBytes] = offsets.lineToOffsets(newPosition.line);
 
-    const lines = code.split('\n');
-
-    const precedingLines = lines.slice(0, line);
-    const highlightedLine = lines[line];
-
-    // Add one to account for the newline we split on and removed
-    const precedingBytes = precedingLines.map(l => l.length + 1).reduce((a, b) => a + b);
-    const highlightedBytes = highlightedLine.length;
-
-    editor.setSelectionRange(precedingBytes, precedingBytes + highlightedBytes);
+    editor.setSelectionRange(startBytes, endBytes);
   }
 }
 
