@@ -75,6 +75,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
     const offsets = new CodeByteOffsets(this.props.code);
     const [startBytes, endBytes] = offsets.lineToOffsets(newPosition.line);
 
+    editor.focus();
     editor.setSelectionRange(startBytes, endBytes);
   }
 }
