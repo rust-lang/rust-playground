@@ -1,9 +1,11 @@
 import Prism from 'prismjs';
+import { makePosition } from './types';
 
 export function configureRustErrors({
   enableFeatureGate,
   getChannel,
   gotoPosition,
+  selectText,
   addImport,
   reExecuteWithBacktrace,
 }) {
@@ -47,6 +49,10 @@ export function configureRustErrors({
     },
     'backtrace-enable': /Run with `RUST_BACKTRACE=1` environment variable to display a backtrace/i,
   };
+
+  Prism.languages.rust_mir = { // eslint-disable-line @typescript-eslint/camelcase
+    'mir-source': /src\/.*.rs:\d+:\d+: \d+:\d+/,
+  }
 
   Prism.hooks.add('wrap', env => {
     if (env.type === 'error-explanation') {
@@ -104,6 +110,16 @@ export function configureRustErrors({
       env.attributes['data-line'] = line;
       env.attributes['data-col'] = '1';
     }
+    if (env.type === 'mir-source') {
+      const lineMatch = /(\d+):(\d+): (\d+):(\d+)/.exec(env.content);
+      const [_, startLine, startCol, endLine, endCol] = lineMatch;
+      env.tag = 'a';
+      env.attributes.href = '#';
+      env.attributes['data-start-line'] = startLine;
+      env.attributes['data-start-col'] = startCol;
+      env.attributes['data-end-line'] = endLine;
+      env.attributes['data-end-col'] = endCol;
+    }
   });
 
   Prism.hooks.add('after-highlight', env => {
@@ -139,6 +155,18 @@ export function configureRustErrors({
       link.onclick = e => {
         e.preventDefault();
         reExecuteWithBacktrace();
+      };
+    });
+
+    const mirSourceLinks = env.element.querySelectorAll('.mir-source');
+    Array.from(mirSourceLinks).forEach((link: HTMLAnchorElement) => {
+      const { startLine, startCol, endLine, endCol } = link.dataset;
+      const start = makePosition(startLine, startCol);
+      const end = makePosition(endLine, endCol);
+
+      link.onclick = e => {
+        e.preventDefault();
+        selectText(start, end);
       };
     });
   });

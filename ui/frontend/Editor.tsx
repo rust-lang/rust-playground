@@ -3,8 +3,48 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import * as actions from './actions';
 import AdvancedEditor from './AdvancedEditor';
-import { CommonEditorProps, Editor as EditorType } from './types';
+import { CommonEditorProps, Editor as EditorType, Position, Selection } from './types';
 import { State } from './reducers';
+
+class CodeByteOffsets {
+  readonly code: string;
+  readonly lines: string[];
+
+  constructor(code: string) {
+    this.code = code;
+    this.lines = code.split('\n');
+  }
+
+  public lineToOffsets(line: number) {
+    const precedingBytes = this.bytesBeforeLine(line);
+
+    const highlightedLine = this.lines[line];
+    const highlightedBytes = highlightedLine.length;
+
+    return [precedingBytes, precedingBytes + highlightedBytes];
+  }
+
+  public rangeToOffsets(start: Position, end: Position) {
+    const startBytes = this.positionToBytes(start);
+    const endBytes = this.positionToBytes(end);
+    return [startBytes, endBytes];
+  }
+
+  private positionToBytes(position: Position) {
+    // Subtract one as this logic is zero-based and the columns are one-based
+    return this.bytesBeforeLine(position.line) + position.column - 1;
+  }
+
+  private bytesBeforeLine(line: number) {
+    // Subtract one as this logic is zero-based and the lines are one-based
+    line -= 1;
+
+    const precedingLines = this.lines.slice(0, line);
+
+    // Add one to account for the newline we split on and removed
+    return precedingLines.map(l => l.length + 1).reduce((a, b) => a + b);
+  }
+}
 
 class SimpleEditor extends React.PureComponent<CommonEditorProps> {
   private _editor: HTMLTextAreaElement;
@@ -35,28 +75,33 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
 
   public componentDidUpdate(prevProps, _prevState) {
     this.gotoPosition(prevProps.position, this.props.position);
+    this.setSelection(prevProps.selection, this.props.selection);
   }
 
-  private gotoPosition(oldPosition, newPosition) {
+  private gotoPosition(oldPosition: Position, newPosition: Position) {
     const editor = this._editor;
 
     if (!newPosition || !editor) { return; }
     if (newPosition === oldPosition) { return; }
 
-    // Subtract one as this logix is zero-based and the lines are one-based
-    const line = newPosition.line - 1;
-    const { code } = this.props;
+    const offsets = new CodeByteOffsets(this.props.code);
+    const [startBytes, endBytes] = offsets.lineToOffsets(newPosition.line);
 
-    const lines = code.split('\n');
+    editor.focus();
+    editor.setSelectionRange(startBytes, endBytes);
+  }
 
-    const precedingLines = lines.slice(0, line);
-    const highlightedLine = lines[line];
+  private setSelection(oldSelection: Selection, newSelection: Selection) {
+    const editor = this._editor;
 
-    // Add one to account for the newline we split on and removed
-    const precedingBytes = precedingLines.map(l => l.length + 1).reduce((a, b) => a + b);
-    const highlightedBytes = highlightedLine.length;
+    if (!newSelection || !editor) { return; }
+    if (newSelection === oldSelection) { return; }
 
-    editor.setSelectionRange(precedingBytes, precedingBytes + highlightedBytes);
+    const offsets = new CodeByteOffsets(this.props.code);
+    const [startBytes, endBytes] = offsets.rangeToOffsets(newSelection.start, newSelection.end);
+
+    editor.focus();
+    editor.setSelectionRange(startBytes, endBytes);
   }
 }
 
@@ -64,6 +109,7 @@ const Editor: React.SFC = () => {
   const code = useSelector((state: State) => state.code);
   const editor = useSelector((state: State) => state.configuration.editor);
   const position = useSelector((state: State) => state.position);
+  const selection = useSelector((state: State) => state.selection);
   const crates = useSelector((state: State) => state.crates);
 
   const dispatch = useDispatch();
@@ -76,6 +122,7 @@ const Editor: React.SFC = () => {
     <div className="editor">
       <SelectedEditor code={code}
         position={position}
+        selection={selection}
         crates={crates}
         onEditCode={onEditCode}
         execute={execute} />

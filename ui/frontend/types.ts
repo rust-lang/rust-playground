@@ -5,6 +5,14 @@ export interface Position {
   column: number;
 }
 
+export const makePosition = (line: string | number, column: string | number): Position =>
+  ({ line: +line, column: +column });
+
+export interface Selection {
+  start?: Position;
+  end?: Position;
+}
+
 export interface Crate {
   id: string;
   name: string;
@@ -22,6 +30,7 @@ export interface CommonEditorProps {
   execute: () => any;
   onEditCode: (_: string) => any;
   position: Position;
+  selection: Selection;
   crates: Crate[];
 }
 

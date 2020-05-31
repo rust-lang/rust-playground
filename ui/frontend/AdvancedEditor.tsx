@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { connect } from 'react-redux';
 
 import State from './state';
-import { CommonEditorProps, Crate, Edition, Focus, PairCharacters } from './types';
+import { CommonEditorProps, Crate, Edition, Focus, PairCharacters, Position, Selection } from './types';
 
 type Ace = typeof import('ace-builds');
 type AceEditor = import('ace-builds').Ace.Editor;
@@ -63,10 +63,8 @@ interface AdvancedEditorProps {
   execute: () => any;
   keybinding?: string;
   onEditCode: (_: string) => any;
-  position: {
-    line: number;
-    column: number;
-  };
+  position: Position;
+  selection: Selection;
   theme: string;
   crates: Crate[];
   focus?: Focus;
@@ -253,6 +251,28 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
     editor.focus();
   }, []));
 
+  const selectionProps = useMemo(() => ({
+    selection: props.selection,
+    ace: props.ace,
+  }), [props.selection, props.ace]);
+
+  useEditorProp(editor, selectionProps, useCallback((editor, { ace, selection }) => {
+    if (selection.start && selection.end) {
+      // Columns are zero-indexed in ACE, but why does the selection
+      // API and `gotoLine` treat the row/line differently?
+      const toPoint = ({ line, column }: Position) => ({ row: line - 1, column: column - 1 });
+
+      const start = toPoint(selection.start);
+      const end = toPoint(selection.end);
+
+      const range = new ace.Range(start.row, start.column, end.row, end.column);
+
+      editor.selection.setRange(range);
+      editor.renderer.scrollCursorIntoView(start);
+      editor.focus();
+    }
+  }, []));
+
   // There's a tricky bug with Ace:
   //
   // 1. Open the page
@@ -297,10 +317,8 @@ interface AdvancedEditorAsyncProps {
   execute: () => any;
   keybinding?: string;
   onEditCode: (_: string) => any;
-  position: {
-    line: number;
-    column: number;
-  };
+  position: Position;
+  selection: Selection;
   theme: string;
   crates: Crate[];
   focus?: Focus;

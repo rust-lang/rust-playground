@@ -27,6 +27,8 @@ import {
   PrimaryActionAuto,
   PrimaryActionCore,
   ProcessAssembly,
+  Position,
+  makePosition,
 } from './types';
 
 const routes = {
@@ -92,6 +94,7 @@ export enum ActionType {
   AddImport = 'ADD_IMPORT',
   EnableFeatureGate = 'ENABLE_FEATURE_GATE',
   GotoPosition = 'GOTO_POSITION',
+  SelectText = 'SELECT_TEXT',
   RequestFormat = 'REQUEST_FORMAT',
   FormatSucceeded = 'FORMAT_SUCCEEDED',
   FormatFailed = 'FORMAT_FAILED',
@@ -429,8 +432,11 @@ export const addImport = (code: string) =>
 export const enableFeatureGate = (featureGate: string) =>
   createAction(ActionType.EnableFeatureGate, { featureGate });
 
-export const gotoPosition = (line, column) =>
-  createAction(ActionType.GotoPosition, { line: +line, column: +column });
+export const gotoPosition = (line: string | number, column: string | number) =>
+  createAction(ActionType.GotoPosition, makePosition(line, column));
+
+export const selectText = (start: Position, end: Position) =>
+  createAction(ActionType.SelectText, { start, end });
 
 const requestFormat = () =>
   createAction(ActionType.RequestFormat);
@@ -792,6 +798,7 @@ export type Action =
   | ReturnType<typeof addImport>
   | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof gotoPosition>
+  | ReturnType<typeof selectText>
   | ReturnType<typeof requestFormat>
   | ReturnType<typeof receiveFormatSuccess>
   | ReturnType<typeof receiveFormatFailure>

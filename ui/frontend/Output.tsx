@@ -9,6 +9,7 @@ import Execute from './Output/Execute';
 import Gist from './Output/Gist';
 import Section from './Output/Section';
 import SimplePane, { SimplePaneProps } from './Output/SimplePane';
+import PaneWithMir from './Output/PaneWithMir';
 import * as selectors from './selectors';
 
 const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
@@ -82,7 +83,7 @@ const Output: React.SFC = () => {
         {focus === Focus.MacroExpansion && <SimplePane {...macroExpansion} kind="macro-expansion" />}
         {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
         {focus === Focus.LlvmIr && <PaneWithCode {...llvmIr} kind="llvm-ir" />}
-        {focus === Focus.Mir && <PaneWithCode {...mir} kind="mir" />}
+        {focus === Focus.Mir && <PaneWithMir {...mir} kind="mir" />}
         {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
         {focus === Focus.Gist && <Gist />}
       </div>
