@@ -1,6 +1,8 @@
-FROM ubuntu:18.04 as toolchain
+FROM ubuntu:20.04 as toolchain
 
 ARG channel
+
+ENV DEBIAN_FRONTEND="noninteractive"
 
 # `build-essential` and `file` are needed for backtrace-sys
 # `cmake`, `git`, `python` are needed for wasm tools
