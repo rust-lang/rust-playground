@@ -102,6 +102,7 @@ module.exports = function(_, argv) {
         filename: '../index.html',
       }),
       new CopyPlugin([
+        { from: 'favicon.ico', to: '..' },
         { from: 'robots.txt', to: '..' },
       ]),
       new MiniCssExtractPlugin({
