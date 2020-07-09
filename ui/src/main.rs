@@ -14,8 +14,7 @@ use playground_middleware::{
     Cache, FileLogger, GuessContentType, ModifyWith, Prefix, Rewrite, Staticfile, StatisticLogger,
 };
 use router::Router;
-use serde::{de::DeserializeOwned, Serialize};
-use serde_derive::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Serialize, Deserialize};
 use snafu::{ResultExt, Snafu};
 use std::{
     any::Any,
