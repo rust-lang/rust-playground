@@ -101,9 +101,11 @@ module.exports = function(_, argv) {
         template: 'index.ejs',
         filename: '../index.html',
       }),
-      new CopyPlugin([
-        { from: 'robots.txt', to: '..' },
-      ]),
+      new CopyPlugin({
+        patterns: [
+          { from: 'robots.txt', to: '..' },
+        ],
+      }),
       new MiniCssExtractPlugin({
         filename: `${filenameTemplate}.css`,
         chunkFilename: `${filenameTemplate}.css`,

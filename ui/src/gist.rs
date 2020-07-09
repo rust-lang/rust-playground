@@ -3,10 +3,7 @@ use hubcaps::{
     gists::{self, Content, GistOptions},
     Credentials, Github,
 };
-use hyper;
-use hyper_tls;
 use std::collections::HashMap;
-use tokio1::{prelude::Future, runtime::current_thread::Runtime};
 
 const FILENAME: &str = "playground.rs";
 const DESCRIPTION: &str = "Code shared from the Rust Playground";
@@ -44,16 +41,16 @@ impl From<gists::Gist> for Gist {
     }
 }
 
-pub fn create(token: String, code: String) -> Gist {
-    Runtime::new()
-        .expect("unable to create runtime")
-        .block_on(create_future(token, code))
+#[tokio::main]
+pub async fn create(token: String, code: String) -> Gist {
+    create_future(token, code)
+        .await
         .expect("Unable to create gist")
     // TODO: Better reporting of failures
 }
 
-pub fn create_future(token: String, code: String) -> impl Future<Item = Gist, Error = hubcaps::Error> {
-    let github = github(token);
+pub async fn create_future(token: String, code: String) -> hubcaps::Result<Gist> {
+    let github = github(token)?;
 
     let file = Content {
         filename: None,
@@ -72,31 +69,27 @@ pub fn create_future(token: String, code: String) -> impl Future<Item = Gist, Er
     github
         .gists()
         .create(&options)
+        .await
         .map(Into::into)
 }
 
-pub fn load(token: String, id: &str) -> Gist {
-    Runtime::new()
-        .expect("unable to create runtime")
-        .block_on(load_future(token, id))
+#[tokio::main]
+pub async fn load(token: String, id: &str) -> Gist {
+    load_future(token, id).await
         .expect("Unable to load gist")
     // TODO: Better reporting of a 404
 }
 
-pub fn load_future(token: String, id: &str) -> impl Future<Item = Gist, Error = ::hubcaps::Error> {
-    let github = github(token);
+pub async fn load_future(token: String, id: &str) -> hubcaps::Result<Gist> {
+    let github = github(token)?;
 
     github
         .gists()
         .get(id)
+        .await
         .map(Into::into)
 }
 
-type HubcapConnector = hyper_tls::HttpsConnector<hyper::client::HttpConnector>;
-
-fn github(token: String) -> Github<HubcapConnector> {
-    Github::new(
-        String::from("The Rust Playground"),
-        Some(Credentials::Token(token)),
-    )
+fn github(token: String) -> hubcaps::Result<Github> {
+    Github::new("The Rust Playground", Credentials::Token(token))
 }

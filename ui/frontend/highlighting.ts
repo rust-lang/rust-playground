@@ -9,7 +9,7 @@ export function configureRustErrors({
   addImport,
   reExecuteWithBacktrace,
 }) {
-  Prism.languages.rust_errors = { // eslint-disable-line @typescript-eslint/camelcase
+  Prism.languages.rust_errors = {
     'warning': {
       pattern: /^warning(\[E\d+\])?:.*$/m,
       inside: {
@@ -50,7 +50,7 @@ export function configureRustErrors({
     'backtrace-enable': /Run with `RUST_BACKTRACE=1` environment variable to display a backtrace/i,
   };
 
-  Prism.languages.rust_mir = { // eslint-disable-line @typescript-eslint/camelcase
+  Prism.languages.rust_mir = {
     'mir-source': /src\/.*.rs:\d+:\d+: \d+:\d+/,
   }
 
