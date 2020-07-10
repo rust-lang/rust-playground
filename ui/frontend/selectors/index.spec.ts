@@ -29,6 +29,18 @@ describe('checking for a main function', () => {
     expect(hasMainFunctionSelector(buildState('pub async fn main()'))).toBe(true);
   });
 
+  test('a const main counts', () => {
+    expect(hasMainFunctionSelector(buildState('const fn main()'))).toBe(true);
+  });
+
+  test('a public const main counts', () => {
+    expect(hasMainFunctionSelector(buildState('pub const fn main()'))).toBe(true);
+  });
+
+  test('a public const async main counts', () => {
+    expect(hasMainFunctionSelector(buildState('pub const async fn main()'))).toBe(true);
+  });
+
   test('leading indentation is ignored', () => {
     expect(hasMainFunctionSelector(buildState('\t fn main()'))).toBe(true);
   });
