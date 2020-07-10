@@ -78,7 +78,7 @@ body {
 
     &-split {
         display: flex;
-        height: 100vh;
+        height: 100%;
 
         &-automatic {
             @media screen and (max-width: 1600px) {
