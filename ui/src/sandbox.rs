@@ -383,11 +383,9 @@ impl Sandbox {
         cmd.apply_edition(req);
 
         cmd.arg(&Channel::Nightly.container_name()).args(&[
-            "cargo",
-            "rustc",
-            "--",
-            "-Zunstable-options",
-            "--pretty=expanded",
+            "/bin/sh",
+            "-c",
+            "cargo rustc -- -Zunstable-options --pretty=expanded | rustfmt",
         ]);
 
         log::debug!("Macro expansion command is {:?}", cmd);
