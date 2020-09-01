@@ -11,6 +11,7 @@ import ModeMenu from './ModeMenu';
 import PopButton from './PopButton';
 import { SegmentedButton, SegmentedButtonSet, SegmentedLink } from './SegmentedButton';
 import ToolsMenu from './ToolsMenu';
+import AdvancedResetMenu from './AdvancedResetMenu';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
@@ -28,6 +29,12 @@ const Header: React.SFC = () => (
         <ModeMenuButton />
         <ChannelMenuButton />
         <AdvancedOptionsMenuButton />
+      </SegmentedButtonSet>
+    </HeaderSet>
+    <HeaderSet id="reset">
+      <SegmentedButtonSet>
+        <ResetButton />
+        <AdvancedResetMenuButton />
       </SegmentedButtonSet>
     </HeaderSet>
     <HeaderSet id="share">
@@ -124,6 +131,28 @@ const AdvancedOptionsMenuButton: React.SFC = () => {
   Button.displayName = 'AdvancedOptionsMenuButton.Button';
 
   return <PopButton Button={Button} Menu={AdvancedOptionsMenu} />;
+}
+
+const ResetButton: React.SFC = () => {
+  const dispatch = useDispatch();
+  const resetAction = useCallback(() => dispatch(actions.resetEditorToEmpty()), [dispatch]);
+
+  return (
+    <SegmentedButton title="Reset the editor" onClick={resetAction}>
+      <HeaderButton>Reset</HeaderButton>
+    </SegmentedButton>
+  );
+};
+
+const AdvancedResetMenuButton: React.SFC = () => {
+  const Button = React.forwardRef<HTMLButtonElement, { toggle: () => void }>(({ toggle }, ref) => (
+    <SegmentedButton title="Reset the editor with some default content" ref={ref} onClick={toggle}>
+      <HeaderButton icon={<MoreOptionsIcon />} />
+    </SegmentedButton>
+  ));
+  Button.displayName = 'AdvancedResetMenuButton.Button';
+
+  return <PopButton Button={Button} Menu={AdvancedResetMenu} />;
 }
 
 const ShareButton: React.SFC = () => {

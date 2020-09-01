@@ -118,6 +118,9 @@ export enum ActionType {
   RequestVersionsLoad = 'REQUEST_VERSIONS_LOAD',
   VersionsLoadSucceeded = 'VERSIONS_LOAD_SUCCEEDED',
   NotificationSeen = 'NOTIFICATION_SEEN',
+  ResetEditorToEmpty = 'RESET_EDITOR_TO_EMPTY',
+  ResetEditorToMinimal = 'RESET_EDITOR_TO_MINIMAL',
+  ResetEditorToHelloWorld = 'RESET_EDITOR_TO_HELLOWORLD',
 }
 
 const setPage = (page: Page) =>
@@ -419,6 +422,15 @@ export const performCompileToMir =
   performAndSwitchPrimaryAction(performCompileToMirOnly, PrimaryActionCore.Mir);
 export const performCompileToNightlyWasm =
   performAndSwitchPrimaryAction(performCompileToNightlyWasmOnly, PrimaryActionCore.Wasm);
+
+export const resetEditorToEmpty = () =>
+  createAction(ActionType.ResetEditorToEmpty);
+
+export const resetEditorToMinimal = () =>
+  createAction(ActionType.ResetEditorToMinimal);
+
+export const resetEditorToHello = () =>
+  createAction(ActionType.ResetEditorToHelloWorld);
 
 export const editCode = (code: string) =>
   createAction(ActionType.EditCode, { code });
@@ -822,4 +834,7 @@ export type Action =
   | ReturnType<typeof requestVersionsLoad>
   | ReturnType<typeof receiveVersionsLoadSuccess>
   | ReturnType<typeof notificationSeen>
+  | ReturnType<typeof resetEditorToEmpty>
+  | ReturnType<typeof resetEditorToMinimal>
+  | ReturnType<typeof resetEditorToHello>
   ;

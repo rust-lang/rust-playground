@@ -4,6 +4,9 @@ const DEFAULT: State = `fn main() {
     println!("Hello, world!");
 }`;
 
+const EMPTY_MAIN: State = `fn main() {
+}`;
+
 export type State = string;
 
 export default function code(state = DEFAULT, action: Action): State {
@@ -27,6 +30,15 @@ export default function code(state = DEFAULT, action: Action): State {
 
     case ActionType.FormatSucceeded:
       return action.code;
+
+    case ActionType.ResetEditorToEmpty:
+      return '';
+
+    case ActionType.ResetEditorToMinimal:
+      return EMPTY_MAIN;
+
+    case ActionType.ResetEditorToHelloWorld:
+      return DEFAULT;
 
     default:
       return state;
