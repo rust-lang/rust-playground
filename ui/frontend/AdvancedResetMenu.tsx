@@ -27,7 +27,7 @@ const AdvancedResetMenu: React.SFC<AdvancedResetMenuProps> = props => {
         <div>Reset the editor content with just an empty main function.</div>
       </ButtonMenuItem>
       <ButtonMenuItem name='Reset to an "Hello World"' onClick={resetToHello}>
-        <div>Reset the editor content with an &quot;Hello World" executable.</div>
+        <div>Reset the editor content with an &quot;Hello World&quot; executable.</div>
       </ButtonMenuItem>
     </MenuGroup>
   );
