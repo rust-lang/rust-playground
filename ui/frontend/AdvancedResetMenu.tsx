@@ -1,10 +1,9 @@
 import React, { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import ButtonMenuItem from './ButtonMenuItem';
 import MenuGroup from './MenuGroup';
 
-import * as selectors from './selectors';
 import * as actions from './actions';
 
 interface AdvancedResetMenuProps {
@@ -28,7 +27,7 @@ const AdvancedResetMenu: React.SFC<AdvancedResetMenuProps> = props => {
         <div>Reset the editor content with just an empty main function.</div>
       </ButtonMenuItem>
       <ButtonMenuItem name='Reset to an "Hello World"' onClick={resetToHello}>
-        <div>Reset the editor content with an "Hello World" executable.</div>
+        <div>Reset the editor content with an &quot;Hello World" executable.</div>
       </ButtonMenuItem>
     </MenuGroup>
   );
