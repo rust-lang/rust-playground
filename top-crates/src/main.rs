@@ -336,7 +336,7 @@ fn main() {
     let ck = CompileKind::Target(ct);
     let rustc = config.load_global_rustc(None).expect("Unable to load the global rustc");
 
-    let ti = TargetInfo::new(&config, ck, &rustc, ck).expect("Unable to create a TargetInfo");
+    let ti = TargetInfo::new(&config, &[ck], &rustc, ck).expect("Unable to create a TargetInfo");
     let cc = ti.cfg();
 
     let mut to_visit = valid_for_our_platform.clone();
