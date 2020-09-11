@@ -5,7 +5,7 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
-cargo = "0.45.0"
+cargo = "0.47.0"
 itertools = "0.9.0"
 lazy_static = "1.0.0"
 reqwest = { version = "0.10.0", features = ["blocking"] }

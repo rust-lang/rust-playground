@@ -6,12 +6,12 @@
   },
   {
     "name": "adler",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "id": "adler"
   },
   {
     "name": "adler32",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "id": "adler32"
   },
   {
@@ -46,7 +46,7 @@
   },
   {
     "name": "async-trait",
-    "version": "0.1.36",
+    "version": "0.1.40",
     "id": "async_trait"
   },
   {
@@ -56,7 +56,7 @@
   },
   {
     "name": "autocfg",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "autocfg"
   },
   {
@@ -101,7 +101,7 @@
   },
   {
     "name": "bytemuck",
-    "version": "1.2.0",
+    "version": "1.4.1",
     "id": "bytemuck"
   },
   {
@@ -111,12 +111,12 @@
   },
   {
     "name": "bytes",
-    "version": "0.5.5",
+    "version": "0.5.6",
     "id": "bytes"
   },
   {
     "name": "cc",
-    "version": "1.0.58",
+    "version": "1.0.59",
     "id": "cc"
   },
   {
@@ -126,12 +126,12 @@
   },
   {
     "name": "chrono",
-    "version": "0.4.13",
+    "version": "0.4.15",
     "id": "chrono"
   },
   {
     "name": "clap",
-    "version": "2.33.1",
+    "version": "2.33.3",
     "id": "clap"
   },
   {
@@ -140,8 +140,13 @@
     "id": "color_quant"
   },
   {
+    "name": "const_fn",
+    "version": "0.4.2",
+    "id": "const_fn"
+  },
+  {
     "name": "cpuid-bool",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "id": "cpuid_bool"
   },
   {
@@ -156,7 +161,7 @@
   },
   {
     "name": "crossbeam-channel",
-    "version": "0.4.2",
+    "version": "0.4.4",
     "id": "crossbeam_channel"
   },
   {
@@ -196,7 +201,7 @@
   },
   {
     "name": "data-encoding",
-    "version": "2.2.1",
+    "version": "2.3.0",
     "id": "data_encoding"
   },
   {
@@ -216,12 +221,12 @@
   },
   {
     "name": "either",
-    "version": "1.5.3",
+    "version": "1.6.0",
     "id": "either"
   },
   {
     "name": "encoding_rs",
-    "version": "0.8.23",
+    "version": "0.8.24",
     "id": "encoding_rs"
   },
   {
@@ -231,7 +236,7 @@
   },
   {
     "name": "error-chain",
-    "version": "0.12.2",
+    "version": "0.12.4",
     "id": "error_chain"
   },
   {
@@ -256,7 +261,7 @@
   },
   {
     "name": "filetime",
-    "version": "0.2.10",
+    "version": "0.2.12",
     "id": "filetime"
   },
   {
@@ -266,7 +271,7 @@
   },
   {
     "name": "flate2",
-    "version": "1.0.16",
+    "version": "1.0.17",
     "id": "flate2"
   },
   {
@@ -336,7 +341,7 @@
   },
   {
     "name": "generic-array",
-    "version": "0.14.2",
+    "version": "0.14.4",
     "id": "generic_array"
   },
   {
@@ -346,7 +351,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.1.14",
+    "version": "0.1.15",
     "id": "getrandom"
   },
   {
@@ -366,8 +371,13 @@
   },
   {
     "name": "h2",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "id": "h2"
+  },
+  {
+    "name": "hashbrown",
+    "version": "0.9.0",
+    "id": "hashbrown"
   },
   {
     "name": "hmac",
@@ -401,7 +411,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.13.6",
+    "version": "0.13.7",
     "id": "hyper"
   },
   {
@@ -416,12 +426,12 @@
   },
   {
     "name": "image",
-    "version": "0.23.6",
+    "version": "0.23.9",
     "id": "image"
   },
   {
     "name": "indexmap",
-    "version": "1.4.0",
+    "version": "1.6.0",
     "id": "indexmap"
   },
   {
@@ -433,6 +443,11 @@
     "name": "iovec",
     "version": "0.1.4",
     "id": "iovec"
+  },
+  {
+    "name": "ipnet",
+    "version": "2.3.0",
+    "id": "ipnet"
   },
   {
     "name": "itertools",
@@ -450,18 +465,13 @@
     "id": "jpeg_decoder"
   },
   {
-    "name": "kernel32-sys",
-    "version": "0.2.2",
-    "id": "kernel32"
-  },
-  {
     "name": "lazy_static",
     "version": "1.4.0",
     "id": "lazy_static"
   },
   {
     "name": "libc",
-    "version": "0.2.72",
+    "version": "0.2.77",
     "id": "libc"
   },
   {
@@ -471,7 +481,7 @@
   },
   {
     "name": "libsqlite3-sys",
-    "version": "0.18.0",
+    "version": "0.20.0",
     "id": "libsqlite3_sys"
   },
   {
@@ -485,13 +495,8 @@
     "id": "lock_api"
   },
   {
-    "name": "lock_api",
-    "version": "0.3.4",
-    "id": "lock_api_0_3_4"
-  },
-  {
     "name": "log",
-    "version": "0.4.8",
+    "version": "0.4.11",
     "id": "log"
   },
   {
@@ -501,7 +506,7 @@
   },
   {
     "name": "log4rs",
-    "version": "0.12.0",
+    "version": "0.13.0",
     "id": "log4rs"
   },
   {
@@ -576,7 +581,7 @@
   },
   {
     "name": "miniz_oxide",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "id": "miniz_oxide"
   },
   {
@@ -601,7 +606,7 @@
   },
   {
     "name": "nalgebra",
-    "version": "0.21.1",
+    "version": "0.22.0",
     "id": "nalgebra"
   },
   {
@@ -616,7 +621,7 @@
   },
   {
     "name": "net2",
-    "version": "0.2.34",
+    "version": "0.2.35",
     "id": "net2"
   },
   {
@@ -686,7 +691,7 @@
   },
   {
     "name": "once_cell",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "id": "once_cell"
   },
   {
@@ -720,19 +725,9 @@
     "id": "parking_lot"
   },
   {
-    "name": "parking_lot",
-    "version": "0.10.2",
-    "id": "parking_lot_0_10_2"
-  },
-  {
     "name": "parking_lot_core",
     "version": "0.8.0",
     "id": "parking_lot_core"
-  },
-  {
-    "name": "parking_lot_core",
-    "version": "0.7.2",
-    "id": "parking_lot_core_0_7_2"
   },
   {
     "name": "paste",
@@ -776,12 +771,12 @@
   },
   {
     "name": "pin-project",
-    "version": "0.4.22",
+    "version": "0.4.23",
     "id": "pin_project"
   },
   {
     "name": "pin-project-internal",
-    "version": "0.4.22",
+    "version": "0.4.23",
     "id": "pin_project_internal"
   },
   {
@@ -796,17 +791,17 @@
   },
   {
     "name": "pkg-config",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "id": "pkg_config"
   },
   {
     "name": "png",
-    "version": "0.16.6",
+    "version": "0.16.7",
     "id": "png"
   },
   {
     "name": "postgres",
-    "version": "0.17.4",
+    "version": "0.17.5",
     "id": "postgres"
   },
   {
@@ -821,7 +816,7 @@
   },
   {
     "name": "ppv-lite86",
-    "version": "0.2.8",
+    "version": "0.2.9",
     "id": "ppv_lite86"
   },
   {
@@ -831,7 +826,7 @@
   },
   {
     "name": "proc-macro-hack",
-    "version": "0.5.16",
+    "version": "0.5.18",
     "id": "proc_macro_hack"
   },
   {
@@ -841,13 +836,18 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.18",
+    "version": "1.0.21",
     "id": "proc_macro2"
   },
   {
     "name": "quick-error",
-    "version": "1.2.3",
+    "version": "2.0.0",
     "id": "quick_error"
+  },
+  {
+    "name": "quick-error",
+    "version": "1.2.3",
+    "id": "quick_error_1_2_3"
   },
   {
     "name": "quote",
@@ -871,8 +871,13 @@
   },
   {
     "name": "rand_distr",
-    "version": "0.2.2",
+    "version": "0.3.0",
     "id": "rand_distr"
+  },
+  {
+    "name": "rand_distr",
+    "version": "0.2.2",
+    "id": "rand_distr_0_2_2"
   },
   {
     "name": "rand_hc",
@@ -896,12 +901,12 @@
   },
   {
     "name": "rayon",
-    "version": "1.3.1",
+    "version": "1.4.0",
     "id": "rayon"
   },
   {
     "name": "rayon-core",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "id": "rayon_core"
   },
   {
@@ -926,7 +931,7 @@
   },
   {
     "name": "reqwest",
-    "version": "0.10.6",
+    "version": "0.10.8",
     "id": "reqwest"
   },
   {
@@ -936,18 +941,13 @@
   },
   {
     "name": "rusqlite",
-    "version": "0.23.1",
+    "version": "0.24.0",
     "id": "rusqlite"
   },
   {
     "name": "rustc-demangle",
     "version": "0.1.16",
     "id": "rustc_demangle"
-  },
-  {
-    "name": "rustc-serialize",
-    "version": "0.3.24",
-    "id": "rustc_serialize"
   },
   {
     "name": "rustc_version",
@@ -1001,7 +1001,7 @@
   },
   {
     "name": "serde",
-    "version": "1.0.114",
+    "version": "1.0.115",
     "id": "serde"
   },
   {
@@ -1011,12 +1011,12 @@
   },
   {
     "name": "serde_derive",
-    "version": "1.0.114",
+    "version": "1.0.115",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.56",
+    "version": "1.0.57",
     "id": "serde_json"
   },
   {
@@ -1036,7 +1036,7 @@
   },
   {
     "name": "simba",
-    "version": "0.1.5",
+    "version": "0.2.0",
     "id": "simba"
   },
   {
@@ -1051,12 +1051,12 @@
   },
   {
     "name": "smallvec",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "id": "smallvec"
   },
   {
     "name": "socket2",
-    "version": "0.3.12",
+    "version": "0.3.15",
     "id": "socket2"
   },
   {
@@ -1066,7 +1066,7 @@
   },
   {
     "name": "standback",
-    "version": "0.2.9",
+    "version": "0.2.10",
     "id": "standback"
   },
   {
@@ -1096,12 +1096,12 @@
   },
   {
     "name": "subtle",
-    "version": "2.2.3",
+    "version": "2.3.0",
     "id": "subtle"
   },
   {
     "name": "syn",
-    "version": "1.0.33",
+    "version": "1.0.40",
     "id": "syn"
   },
   {
@@ -1111,7 +1111,7 @@
   },
   {
     "name": "tar",
-    "version": "0.4.29",
+    "version": "0.4.30",
     "id": "tar"
   },
   {
@@ -1161,13 +1161,13 @@
   },
   {
     "name": "time",
-    "version": "0.2.16",
+    "version": "0.2.18",
     "id": "time"
   },
   {
     "name": "time",
-    "version": "0.1.43",
-    "id": "time_0_1_43"
+    "version": "0.1.44",
+    "id": "time_0_1_44"
   },
   {
     "name": "time-macros",
@@ -1181,12 +1181,12 @@
   },
   {
     "name": "tinyvec",
-    "version": "0.3.3",
+    "version": "0.3.4",
     "id": "tinyvec"
   },
   {
     "name": "tokio",
-    "version": "0.2.21",
+    "version": "0.2.22",
     "id": "tokio"
   },
   {
@@ -1215,13 +1215,23 @@
     "id": "tower_service"
   },
   {
+    "name": "tracing",
+    "version": "0.1.19",
+    "id": "tracing"
+  },
+  {
+    "name": "tracing-core",
+    "version": "0.1.16",
+    "id": "tracing_core"
+  },
+  {
     "name": "traitobject",
     "version": "0.1.0",
     "id": "traitobject"
   },
   {
     "name": "try-lock",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "id": "try_lock"
   },
   {
@@ -1323,16 +1333,6 @@
     "name": "winapi",
     "version": "0.3.9",
     "id": "winapi"
-  },
-  {
-    "name": "winapi",
-    "version": "0.2.8",
-    "id": "winapi_0_2_8"
-  },
-  {
-    "name": "winapi-build",
-    "version": "0.1.1",
-    "id": "build"
   },
   {
     "name": "xattr",
