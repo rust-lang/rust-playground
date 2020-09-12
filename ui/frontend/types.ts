@@ -116,5 +116,5 @@ export enum Focus {
 }
 
 export enum Notification {
-  Rust2018IsDefault = 'rust-2018-is-default',
+  RustSurvey2020 = 'rust-survey-2020',
 }
