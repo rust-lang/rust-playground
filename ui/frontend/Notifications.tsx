@@ -7,7 +7,7 @@ import { Close } from './Icon';
 import * as actions from './actions';
 import * as selectors from './selectors';
 
-const SURVEY_URL = "https://blog.rust-lang.org/2020/09/10/survey-launch.html";
+const SURVEY_URL = 'https://blog.rust-lang.org/2020/09/10/survey-launch.html';
 
 const Notifications: React.SFC = () => {
   return (
