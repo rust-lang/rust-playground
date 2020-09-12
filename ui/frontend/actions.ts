@@ -671,7 +671,7 @@ export function performVersionsLoad(): ThunkAction {
 const notificationSeen = (notification: Notification) =>
   createAction(ActionType.NotificationSeen, { notification });
 
-export const seenRust2018IsDefault = () => notificationSeen(Notification.Rust2018IsDefault);
+export const seenRustSurvey2020 = () => notificationSeen(Notification.RustSurvey2020);
 
 function parseChannel(s: string): Channel | null {
   switch (s) {
