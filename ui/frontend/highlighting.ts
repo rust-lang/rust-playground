@@ -42,7 +42,7 @@ export function configureRustErrors({
       },
     },
     'backtrace': {
-      pattern: /at src\/.*\n/,
+      pattern: /at \.\/src\/.*\n/,
       inside: {
         'backtrace-location': /src\/main.rs:(\d+)/,
       },
