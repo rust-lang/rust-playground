@@ -30,11 +30,11 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
     click_on("Build")
 
     within('.output-stderr') do
-      click_on("add `#![feature(const_generics)]`")
+      click_on("add `#![feature(min_const_generics)]`")
     end
 
     within('.editor') do
-      expect(editor).to have_line '#![feature(const_generics)]'
+      expect(editor).to have_line '#![feature(min_const_generics)]'
     end
   end
 
