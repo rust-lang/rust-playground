@@ -1282,7 +1282,7 @@ mod test {
         let resp = sb.miri(&req)?;
 
         assert!(resp.stderr.contains("pointer must be in-bounds at offset 1"), "was: {}", resp.stderr);
-        assert!(resp.stderr.contains("outside bounds of allocation"), "was: {}", resp.stderr);
+        assert!(resp.stderr.contains("outside bounds of alloc"), "was: {}", resp.stderr);
         assert!(resp.stderr.contains("which has size 0"), "was: {}", resp.stderr);
         Ok(())
     }
