@@ -1,5 +1,5 @@
 use serde_derive::Deserialize;
-use snafu::{ResultExt, Snafu};
+use snafu::{OptionExt, ResultExt, Snafu};
 use std::{
     collections::BTreeMap,
     ffi::OsStr,
@@ -57,10 +57,20 @@ pub enum Error {
     UnableToCreateSourceFile { source: io::Error },
     #[snafu(display("Unable to set permissions for source file: {}", source))]
     UnableToSetSourcePermissions { source: io::Error },
-    #[snafu(display("Unable to execute the compiler: {}", source))]
-    UnableToExecuteCompiler { source: io::Error },
+
+    #[snafu(display("Unable to start the compiler: {}", source))]
+    UnableToStartCompiler { source: io::Error },
+    #[snafu(display("Unable to find the compiler ID"))]
+    MissingCompilerId,
+    #[snafu(display("Unable to wait for the compiler: {}", source))]
+    UnableToWaitForCompiler { source: io::Error },
+    #[snafu(display("Unable to get output from the compiler: {}", source))]
+    UnableToGetOutputFromCompiler { source: io::Error },
+    #[snafu(display("Unable to remove the compiler: {}", source))]
+    UnableToRemoveCompiler { source: io::Error },
     #[snafu(display("Compiler execution took longer than {} ms", timeout.as_millis()))]
     CompilerExecutionTimedOut { source: tokio::time::Elapsed, timeout: Duration },
+
     #[snafu(display("Unable to read output file: {}", source))]
     UnableToReadOutput { source: io::Error },
     #[snafu(display("Unable to read crate information: {}", source))]
@@ -428,7 +438,7 @@ macro_rules! docker_command {
 fn basic_secure_docker_command() -> Command {
     let mut cmd = docker_command!(
         "run",
-        "--rm",
+        "--detach",
         "--cap-drop=ALL",
         // Needed to allow overwriting the file
         "--cap-add=DAC_OVERRIDE",
@@ -526,12 +536,58 @@ fn read(path: &Path) -> Result<Option<String>> {
 
 #[tokio::main]
 async fn run_command_with_timeout(mut command: Command) -> Result<std::process::Output> {
+    use std::os::unix::process::ExitStatusExt;
+
     let timeout = DOCKER_PROCESS_TIMEOUT_HARD;
 
-    tokio::time::timeout(timeout, command.output())
+    let output = command.output()
         .await
-        .context(CompilerExecutionTimedOut { timeout })?
-        .context(UnableToExecuteCompiler)
+        .context(UnableToStartCompiler)?;
+
+    // Exit early, in case we don't have the container
+    if !output.status.success() {
+        return Ok(output);
+    }
+
+    let output = String::from_utf8_lossy(&output.stdout);
+    let id = output.lines().next().context(MissingCompilerId)?.trim();
+
+    // ----------
+
+    let mut command = docker_command!("wait", id);
+
+    let timed_out = match tokio::time::timeout(timeout, command.output()).await {
+        Ok(Ok(o)) => {
+            // Didn't time out, didn't fail to run
+            let o = String::from_utf8_lossy(&o.stdout);
+            let code = o.lines().next().unwrap_or("").trim().parse().unwrap_or(i32::MAX);
+            Ok(ExitStatusExt::from_raw(code))
+        }
+        Ok(e) => return e.context(UnableToWaitForCompiler), // Failed to run
+        Err(e) => Err(e), // Timed out
+    };
+
+    // ----------
+
+    let mut command = docker_command!("logs", id);
+    let mut output = command.output().await.context(UnableToGetOutputFromCompiler)?;
+
+    // ----------
+
+    let mut command = docker_command!(
+        "rm",
+        // Kills container if still running
+        "--force",
+        id
+    );
+    command.stdout(std::process::Stdio::null());
+    command.status().await.context(UnableToRemoveCompiler)?;
+
+    let code = timed_out.context(CompilerExecutionTimedOut { timeout })?;
+
+    output.status = code;
+
+    Ok(output)
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -1422,6 +1478,17 @@ mod test {
             }
         "##;
 
+        #[tokio::main]
+        async fn docker_process_count() -> usize {
+            let mut cmd = docker_command!("ps", "-a");
+            let output = cmd.output().await.expect("Unable to get process count");
+            let output = String::from_utf8_lossy(&output.stdout);
+            // Skip one line of header
+            output.lines().skip(1).count()
+        }
+
+        assert_eq!(0, docker_process_count(), "There must be no running docker processes");
+
         let req = ExecuteRequest {
             code: code.to_string(),
             ..ExecuteRequest::default()
@@ -1433,6 +1500,8 @@ mod test {
             Err(Error::CompilerExecutionTimedOut{..}) => {/* Ok */}
             Err(e) => panic!("Got the wrong error: {}", e),
         }
+
+        assert_eq!(0, docker_process_count(), "A docker process continues to run");
     }
 
     #[test]
