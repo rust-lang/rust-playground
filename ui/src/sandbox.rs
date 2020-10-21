@@ -417,21 +417,28 @@ impl Sandbox {
     }
 }
 
-fn basic_secure_docker_command() -> Command {
-    let mut cmd = Command::new("docker");
+macro_rules! docker_command {
+    ($($arg:expr),* $(,)?) => ({
+        let mut cmd = Command::new("docker");
+        $( cmd.arg($arg); )*
+        cmd
+    });
+}
 
-    cmd
-        .arg("run")
-        .arg("--rm")
-        .arg("--cap-drop=ALL")
+fn basic_secure_docker_command() -> Command {
+    let mut cmd = docker_command!(
+        "run",
+        "--rm",
+        "--cap-drop=ALL",
         // Needed to allow overwriting the file
-        .arg("--cap-add=DAC_OVERRIDE")
-        .arg("--security-opt=no-new-privileges")
-        .args(&["--workdir", "/playground"])
-        .args(&["--net", "none"])
-        .args(&["--memory", "256m"])
-        .args(&["--memory-swap", "320m"])
-        .args(&["--env", &format!("PLAYGROUND_TIMEOUT={}", DOCKER_PROCESS_TIMEOUT_SOFT.as_secs())]);
+        "--cap-add=DAC_OVERRIDE",
+        "--security-opt=no-new-privileges",
+        "--workdir", "/playground",
+        "--net", "none",
+        "--memory", "256m",
+        "--memory-swap", "320m",
+        "--env", format!("PLAYGROUND_TIMEOUT={}", DOCKER_PROCESS_TIMEOUT_SOFT.as_secs()),
+    );
 
     if cfg!(feature = "fork-bomb-prevention") {
         cmd.args(&["--pids-limit", "512"]);
