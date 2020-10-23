@@ -93,21 +93,9 @@ version = "=1.2.1"
 package = "block-buffer"
 version = "=0.9.0"
 
-[dependencies.block_buffer_0_7_3]
-package = "block-buffer"
-version = "=0.7.3"
-
-[dependencies.block_padding]
-package = "block-padding"
-version = "=0.1.5"
-
 [dependencies.bstr]
 package = "bstr"
-version = "=0.2.13"
-
-[dependencies.byte_tools]
-package = "byte-tools"
-version = "=0.3.1"
+version = "=0.2.14"
 
 [dependencies.bytemuck]
 package = "bytemuck"
@@ -119,6 +107,10 @@ package = "byteorder"
 version = "=1.3.4"
 
 [dependencies.bytes]
+package = "bytes"
+version = "=0.6.0"
+
+[dependencies.bytes_0_5_6]
 package = "bytes"
 version = "=0.5.6"
 
@@ -157,7 +149,7 @@ version = "=0.1.2"
 
 [dependencies.crc32fast]
 package = "crc32fast"
-version = "=1.2.0"
+version = "=1.2.1"
 
 [dependencies.crossbeam]
 package = "crossbeam"
@@ -167,25 +159,13 @@ version = "=0.8.0"
 package = "crossbeam-channel"
 version = "=0.5.0"
 
-[dependencies.crossbeam_channel_0_4_4]
-package = "crossbeam-channel"
-version = "=0.4.4"
-
 [dependencies.crossbeam_deque]
 package = "crossbeam-deque"
 version = "=0.8.0"
 
-[dependencies.crossbeam_deque_0_7_3]
-package = "crossbeam-deque"
-version = "=0.7.3"
-
 [dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
 version = "=0.9.0"
-
-[dependencies.crossbeam_epoch_0_8_2]
-package = "crossbeam-epoch"
-version = "=0.8.2"
 
 [dependencies.crossbeam_queue]
 package = "crossbeam-queue"
@@ -195,13 +175,9 @@ version = "=0.3.0"
 package = "crossbeam-utils"
 version = "=0.8.0"
 
-[dependencies.crossbeam_utils_0_7_2]
-package = "crossbeam-utils"
-version = "=0.7.2"
-
 [dependencies.crypto_mac]
 package = "crypto-mac"
-version = "=0.8.0"
+version = "=0.9.1"
 
 [dependencies.csv]
 package = "csv"
@@ -226,10 +202,6 @@ version = "=0.8.6"
 [dependencies.digest]
 package = "digest"
 version = "=0.9.0"
-
-[dependencies.digest_0_8_1]
-package = "digest"
-version = "=0.8.1"
 
 [dependencies.dtoa]
 package = "dtoa"
@@ -258,10 +230,6 @@ version = "=0.1.8"
 [dependencies.failure_derive]
 package = "failure_derive"
 version = "=0.1.8"
-
-[dependencies.fake_simd]
-package = "fake-simd"
-version = "=0.1.2"
 
 [dependencies.fallible_iterator]
 package = "fallible-iterator"
@@ -340,10 +308,6 @@ version = "=0.3.6"
 package = "generic-array"
 version = "=0.14.4"
 
-[dependencies.generic_array_0_12_3]
-package = "generic-array"
-version = "=0.12.3"
-
 [dependencies.generic_array_0_13_2]
 package = "generic-array"
 version = "=0.13.2"
@@ -378,7 +342,7 @@ version = "=0.6.0"
 
 [dependencies.hmac]
 package = "hmac"
-version = "=0.8.1"
+version = "=0.9.0"
 
 [dependencies.html5ever]
 package = "html5ever"
@@ -496,10 +460,6 @@ version = "=0.10.0"
 package = "mac"
 version = "=0.1.1"
 
-[dependencies.maplit]
-package = "maplit"
-version = "=1.0.2"
-
 [dependencies.markup5ever]
 package = "markup5ever"
 version = "=0.10.0"
@@ -516,10 +476,6 @@ version = "=0.1.8"
 package = "matrixmultiply"
 version = "=0.2.3"
 
-[dependencies.maybe_uninit]
-package = "maybe-uninit"
-version = "=2.0.0"
-
 [dependencies.md5]
 package = "md5"
 version = "=0.7.0"
@@ -533,6 +489,10 @@ package = "memmap"
 version = "=0.7.0"
 
 [dependencies.memoffset]
+package = "memoffset"
+version = "=0.6.1"
+
+[dependencies.memoffset_0_5_6]
 package = "memoffset"
 version = "=0.5.6"
 
@@ -554,16 +514,12 @@ version = "=0.3.7"
 
 [dependencies.mio]
 package = "mio"
-version = "=0.7.3"
+version = "=0.7.4"
 features = ["os-poll", "os-util", "tcp", "udp", "uds"]
 
 [dependencies.mio_0_6_22]
 package = "mio"
 version = "=0.6.22"
-
-[dependencies.mio_uds]
-package = "mio-uds"
-version = "=0.6.8"
 
 [dependencies.nalgebra]
 package = "nalgebra"
@@ -633,10 +589,6 @@ version = "=1.4.1"
 package = "opaque-debug"
 version = "=0.3.0"
 
-[dependencies.opaque_debug_0_2_3]
-package = "opaque-debug"
-version = "=0.2.3"
-
 [dependencies.openssl]
 package = "openssl"
 version = "=0.10.30"
@@ -677,18 +629,6 @@ version = "=2.1.0"
 package = "pest"
 version = "=2.1.3"
 
-[dependencies.pest_derive]
-package = "pest_derive"
-version = "=2.1.0"
-
-[dependencies.pest_generator]
-package = "pest_generator"
-version = "=2.1.3"
-
-[dependencies.pest_meta]
-package = "pest_meta"
-version = "=2.1.3"
-
 [dependencies.petgraph]
 package = "petgraph"
 version = "=0.5.1"
@@ -719,7 +659,7 @@ version = "=0.4.27"
 
 [dependencies.pin_project_lite]
 package = "pin-project-lite"
-version = "=0.1.10"
+version = "=0.1.11"
 
 [dependencies.pin_utils]
 package = "pin-utils"
@@ -735,15 +675,15 @@ version = "=0.16.7"
 
 [dependencies.postgres]
 package = "postgres"
-version = "=0.17.5"
+version = "=0.18.1"
 
 [dependencies.postgres_protocol]
 package = "postgres-protocol"
-version = "=0.5.2"
+version = "=0.5.3"
 
 [dependencies.postgres_types]
 package = "postgres-types"
-version = "=0.1.2"
+version = "=0.1.3"
 
 [dependencies.ppv_lite86]
 package = "ppv-lite86"
@@ -812,11 +752,11 @@ version = "=0.2.1"
 
 [dependencies.rayon]
 package = "rayon"
-version = "=1.4.1"
+version = "=1.5.0"
 
 [dependencies.rayon_core]
 package = "rayon-core"
-version = "=1.8.1"
+version = "=1.9.0"
 
 [dependencies.regex]
 package = "regex"
@@ -850,7 +790,7 @@ features = ["bundled-full"]
 
 [dependencies.rustc_demangle]
 package = "rustc-demangle"
-version = "=0.1.17"
+version = "=0.1.18"
 
 [dependencies.rustc_version]
 package = "rustc_version"
@@ -886,7 +826,7 @@ version = "=0.9.0"
 
 [dependencies.semver_parser]
 package = "semver-parser"
-version = "=0.10.0"
+version = "=0.10.1"
 
 [dependencies.semver_parser_0_7_0]
 package = "semver-parser"
@@ -918,17 +858,13 @@ version = "=0.6.0"
 package = "serde_yaml"
 version = "=0.8.13"
 
-[dependencies.sha1]
-package = "sha-1"
-version = "=0.8.2"
-
 [dependencies.sha2]
 package = "sha2"
 version = "=0.9.1"
 
 [dependencies.simba]
 package = "simba"
-version = "=0.2.1"
+version = "=0.2.4"
 
 [dependencies.siphasher]
 package = "siphasher"
@@ -980,7 +916,7 @@ version = "=2.3.0"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.44"
+version = "=1.0.46"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.synstructure]
@@ -1049,7 +985,7 @@ version = "=0.3.4"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=0.3.0"
+version = "=0.3.1"
 features = ["full"]
 
 [dependencies.tokio_0_2_22]
@@ -1059,13 +995,17 @@ features = ["full"]
 
 [dependencies.tokio_postgres]
 package = "tokio-postgres"
-version = "=0.5.5"
+version = "=0.6.0"
 
 [dependencies.tokio_tls]
 package = "tokio-tls"
 version = "=0.3.1"
 
 [dependencies.tokio_util]
+package = "tokio-util"
+version = "=0.4.0"
+
+[dependencies.tokio_util_0_3_1]
 package = "tokio-util"
 version = "=0.3.1"
 
