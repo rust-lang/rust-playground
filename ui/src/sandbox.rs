@@ -860,6 +860,22 @@ pub struct MacroExpansionResponse {
 mod test {
     use super::*;
 
+    // Running the tests completely in parallel causes spurious
+    // failures due to my resource-limited Docker
+    // environment. Additionally, we have some tests that *require*
+    // that no other Docker processes are running.
+    fn one_test_at_a_time() -> impl Drop {
+        use lazy_static::lazy_static;
+        use std::sync::Mutex;
+
+        lazy_static! {
+            static ref DOCKER_SINGLETON: Mutex<()> = Default::default();
+        }
+
+        // We can't poison the empty tuple
+        DOCKER_SINGLETON.lock().unwrap_or_else(|e| e.into_inner())
+    }
+
     const HELLO_WORLD_CODE: &'static str = r#"
     fn main() {
         println!("Hello, world!");
@@ -907,6 +923,7 @@ mod test {
 
     #[test]
     fn basic_functionality() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest::default();
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -929,6 +946,7 @@ mod test {
 
     #[test]
     fn debug_mode() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             code: COMPILATION_MODE_CODE.to_string(),
             ..ExecuteRequest::default()
@@ -942,6 +960,7 @@ mod test {
 
     #[test]
     fn release_mode() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             mode: Mode::Release,
             code: COMPILATION_MODE_CODE.to_string(),
@@ -966,6 +985,7 @@ mod test {
 
     #[test]
     fn stable_channel() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Stable,
             code: VERSION_CODE.to_string(),
@@ -982,6 +1002,7 @@ mod test {
 
     #[test]
     fn beta_channel() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Beta,
             code: VERSION_CODE.to_string(),
@@ -998,6 +1019,7 @@ mod test {
 
     #[test]
     fn nightly_channel() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Nightly,
             code: VERSION_CODE.to_string(),
@@ -1023,6 +1045,7 @@ mod test {
 
     #[test]
     fn rust_edition_default() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Nightly,
             code: EDITION_CODE.to_string(),
@@ -1037,6 +1060,7 @@ mod test {
 
     #[test]
     fn rust_edition_2015() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Nightly,
             code: EDITION_CODE.to_string(),
@@ -1052,6 +1076,7 @@ mod test {
 
     #[test]
     fn rust_edition_2018() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Nightly,
             code: EDITION_CODE.to_string(),
@@ -1079,6 +1104,7 @@ mod test {
 
     #[test]
     fn backtrace_disabled() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             code: BACKTRACE_CODE.to_string(),
             backtrace: false,
@@ -1096,6 +1122,7 @@ mod test {
 
     #[test]
     fn backtrace_enabled() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             code: BACKTRACE_CODE.to_string(),
             backtrace: true,
@@ -1113,6 +1140,7 @@ mod test {
 
     #[test]
     fn output_llvm_ir() {
+        let _singleton = one_test_at_a_time();
         let req = CompileRequest {
             target: CompileTarget::LlvmIr,
             ..CompileRequest::default()
@@ -1128,6 +1156,7 @@ mod test {
 
     #[test]
     fn output_assembly() {
+        let _singleton = one_test_at_a_time();
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Raw),
             ..CompileRequest::default()
@@ -1144,6 +1173,7 @@ mod test {
 
     #[test]
     fn output_demangled_assembly() {
+        let _singleton = one_test_at_a_time();
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Demangle, ProcessAssembly::Raw),
             ..CompileRequest::default()
@@ -1159,6 +1189,7 @@ mod test {
     #[test]
     #[should_panic]
     fn output_filtered_assembly() {
+        let _singleton = one_test_at_a_time();
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Filter),
             ..CompileRequest::default()
@@ -1173,6 +1204,7 @@ mod test {
 
     #[test]
     fn formatting_code() {
+        let _singleton = one_test_at_a_time();
         let req = FormatRequest {
             code: "fn foo () { method_call(); }".to_string(),
             edition: None,
@@ -1195,6 +1227,7 @@ mod test {
 
     #[test]
     fn formatting_code_edition_2015() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = FormatRequest {
             code: FORMAT_IN_EDITION_2018.to_string(),
             edition: Some(Edition::Rust2015),
@@ -1208,6 +1241,7 @@ mod test {
 
     #[test]
     fn formatting_code_edition_2018() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = FormatRequest {
             code: FORMAT_IN_EDITION_2018.to_string(),
             edition: Some(Edition::Rust2018),
@@ -1228,6 +1262,7 @@ mod test {
 
     #[test]
     fn linting_code() {
+        let _singleton = one_test_at_a_time();
         let code = r#"
         fn main() {
             let a = 0.0 / 0.0;
@@ -1249,6 +1284,7 @@ mod test {
 
     #[test]
     fn linting_code_options() {
+        let _singleton = one_test_at_a_time();
         let code = r#"
         use itertools::Itertools; // Edition 2018 feature
 
@@ -1273,6 +1309,7 @@ mod test {
 
     #[test]
     fn interpreting_code() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let code = r#"
         fn main() {
             let mut a: [u8; 0] = [];
@@ -1296,6 +1333,7 @@ mod test {
 
     #[test]
     fn network_connections_are_disabled() {
+        let _singleton = one_test_at_a_time();
         let code = r#"
             fn main() {
                 match ::std::net::TcpStream::connect("google.com:80") {
@@ -1318,6 +1356,7 @@ mod test {
 
     #[test]
     fn memory_usage_is_limited() {
+        let _singleton = one_test_at_a_time();
         let code = r#"
             fn main() {
                 let megabyte = 1024 * 1024;
@@ -1339,6 +1378,7 @@ mod test {
 
     #[test]
     fn wallclock_time_is_limited() {
+        let _singleton = one_test_at_a_time();
         let code = r#"
             fn main() {
                 let a_long_time = std::time::Duration::from_secs(20);
@@ -1359,6 +1399,7 @@ mod test {
 
     #[test]
     fn wallclock_time_is_limited_from_outside() {
+        let _singleton = one_test_at_a_time();
         let code = r##"
             use std::{process::Command, thread, time::Duration};
 
@@ -1396,6 +1437,7 @@ mod test {
 
     #[test]
     fn number_of_pids_is_limited() {
+        let _singleton = one_test_at_a_time();
         let forkbomb = r##"
             fn main() {
                 ::std::process::Command::new("sh").arg("-c").arg(r#"
