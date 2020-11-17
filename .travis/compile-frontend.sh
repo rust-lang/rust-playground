@@ -10,7 +10,7 @@ docker \
     -v $HOME/cache/node/node_modules:/ui/node_modules \
     -v $HOME/cache/node/yarn-cache:/root/.yarn-cache \
     --workdir /ui \
-    node:12.13 \
+    node:14.15 \
     bash -c 'yarn && \
              yarn test && \
              yarn test:lint && \
