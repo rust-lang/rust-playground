@@ -51,7 +51,7 @@
   },
   {
     "name": "async-trait",
-    "version": "0.1.41",
+    "version": "0.1.42",
     "id": "async_trait"
   },
   {
@@ -66,7 +66,7 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.54",
+    "version": "0.3.55",
     "id": "backtrace"
   },
   {
@@ -78,11 +78,6 @@
     "name": "base64",
     "version": "0.13.0",
     "id": "base64"
-  },
-  {
-    "name": "base64",
-    "version": "0.12.3",
-    "id": "base64_0_12_3"
   },
   {
     "name": "bit-set",
@@ -131,7 +126,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.63",
+    "version": "1.0.65",
     "id": "cc"
   },
   {
@@ -191,17 +186,17 @@
   },
   {
     "name": "crossbeam-epoch",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "id": "crossbeam_epoch"
   },
   {
     "name": "crossbeam-queue",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "id": "crossbeam_queue"
   },
   {
     "name": "crossbeam-utils",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "id": "crossbeam_utils"
   },
   {
@@ -211,7 +206,7 @@
   },
   {
     "name": "csv",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "id": "csv"
   },
   {
@@ -595,11 +590,6 @@
     "id": "memoffset"
   },
   {
-    "name": "memoffset",
-    "version": "0.5.6",
-    "id": "memoffset_0_5_6"
-  },
-  {
     "name": "mime",
     "version": "0.3.16",
     "id": "mime"
@@ -626,8 +616,8 @@
   },
   {
     "name": "mio",
-    "version": "0.6.22",
-    "id": "mio_0_6_22"
+    "version": "0.6.23",
+    "id": "mio_0_6_23"
   },
   {
     "name": "nalgebra",
@@ -641,12 +631,12 @@
   },
   {
     "name": "ndarray",
-    "version": "0.13.1",
+    "version": "0.14.0",
     "id": "ndarray"
   },
   {
     "name": "net2",
-    "version": "0.2.35",
+    "version": "0.2.36",
     "id": "net2"
   },
   {
@@ -668,11 +658,6 @@
     "name": "num-complex",
     "version": "0.3.1",
     "id": "num_complex"
-  },
-  {
-    "name": "num-complex",
-    "version": "0.2.4",
-    "id": "num_complex_0_2_4"
   },
   {
     "name": "num-integer",
@@ -951,12 +936,12 @@
   },
   {
     "name": "reqwest",
-    "version": "0.10.8",
+    "version": "0.10.9",
     "id": "reqwest"
   },
   {
     "name": "ring",
-    "version": "0.16.16",
+    "version": "0.16.19",
     "id": "ring"
   },
   {
@@ -1026,12 +1011,12 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.59",
+    "version": "1.0.60",
     "id": "serde_json"
   },
   {
     "name": "serde_urlencoded",
-    "version": "0.6.1",
+    "version": "0.7.0",
     "id": "serde_urlencoded"
   },
   {
@@ -1066,7 +1051,7 @@
   },
   {
     "name": "socket2",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "id": "socket2"
   },
   {
@@ -1111,7 +1096,7 @@
   },
   {
     "name": "syn",
-    "version": "1.0.48",
+    "version": "1.0.53",
     "id": "syn"
   },
   {
@@ -1191,7 +1176,7 @@
   },
   {
     "name": "tinyvec",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "id": "tinyvec"
   },
   {
@@ -1201,7 +1186,7 @@
   },
   {
     "name": "tokio",
-    "version": "0.3.4",
+    "version": "0.3.5",
     "id": "tokio"
   },
   {
@@ -1241,7 +1226,7 @@
   },
   {
     "name": "tracing",
-    "version": "0.1.21",
+    "version": "0.1.22",
     "id": "tracing"
   },
   {
@@ -1296,7 +1281,7 @@
   },
   {
     "name": "unicode-segmentation",
-    "version": "1.7.0",
+    "version": "1.7.1",
     "id": "unicode_segmentation"
   },
   {
@@ -1348,11 +1333,6 @@
     "name": "version_check",
     "version": "0.9.2",
     "id": "version_check"
-  },
-  {
-    "name": "void",
-    "version": "1.0.2",
-    "id": "void"
   },
   {
     "name": "walkdir",

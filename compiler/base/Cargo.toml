@@ -51,7 +51,7 @@ version = "=0.5.2"
 
 [dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.41"
+version = "=0.1.42"
 
 [dependencies.atty]
 package = "atty"
@@ -63,7 +63,7 @@ version = "=1.0.1"
 
 [dependencies.backtrace]
 package = "backtrace"
-version = "=0.3.54"
+version = "=0.3.55"
 
 [dependencies.backtrace_sys]
 package = "backtrace-sys"
@@ -72,10 +72,6 @@ version = "=0.1.37"
 [dependencies.base64]
 package = "base64"
 version = "=0.13.0"
-
-[dependencies.base64_0_12_3]
-package = "base64"
-version = "=0.12.3"
 
 [dependencies.bit_set]
 package = "bit-set"
@@ -116,7 +112,7 @@ version = "=0.5.6"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.0.63"
+version = "=1.0.65"
 
 [dependencies.cfg_if]
 package = "cfg-if"
@@ -165,15 +161,15 @@ version = "=0.8.0"
 
 [dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.0"
+version = "=0.9.1"
 
 [dependencies.crossbeam_queue]
 package = "crossbeam-queue"
-version = "=0.3.0"
+version = "=0.3.1"
 
 [dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.0"
+version = "=0.8.1"
 
 [dependencies.crypto_mac]
 package = "crypto-mac"
@@ -181,7 +177,7 @@ version = "=0.9.1"
 
 [dependencies.csv]
 package = "csv"
-version = "=1.1.4"
+version = "=1.1.5"
 
 [dependencies.csv_core]
 package = "csv-core"
@@ -492,10 +488,6 @@ version = "=0.7.0"
 package = "memoffset"
 version = "=0.6.1"
 
-[dependencies.memoffset_0_5_6]
-package = "memoffset"
-version = "=0.5.6"
-
 [dependencies.mime]
 package = "mime"
 version = "=0.3.16"
@@ -517,9 +509,9 @@ package = "mio"
 version = "=0.7.6"
 features = ["net", "os-ext", "os-poll"]
 
-[dependencies.mio_0_6_22]
+[dependencies.mio_0_6_23]
 package = "mio"
-version = "=0.6.22"
+version = "=0.6.23"
 
 [dependencies.nalgebra]
 package = "nalgebra"
@@ -531,11 +523,11 @@ version = "=0.2.6"
 
 [dependencies.ndarray]
 package = "ndarray"
-version = "=0.13.1"
+version = "=0.14.0"
 
 [dependencies.net2]
 package = "net2"
-version = "=0.2.35"
+version = "=0.2.36"
 
 [dependencies.num]
 package = "num"
@@ -548,10 +540,6 @@ version = "=0.3.1"
 [dependencies.num_complex]
 package = "num-complex"
 version = "=0.3.1"
-
-[dependencies.num_complex_0_2_4]
-package = "num-complex"
-version = "=0.2.4"
 
 [dependencies.num_cpus]
 package = "num_cpus"
@@ -776,12 +764,12 @@ version = "=0.5.3"
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.10.8"
+version = "=0.10.9"
 features = ["blocking", "cookies", "json"]
 
 [dependencies.ring]
 package = "ring"
-version = "=0.16.16"
+version = "=0.16.19"
 
 [dependencies.rusqlite]
 package = "rusqlite"
@@ -835,12 +823,12 @@ version = "=1.0.117"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.59"
+version = "=1.0.60"
 features = ["raw_value"]
 
 [dependencies.serde_urlencoded]
 package = "serde_urlencoded"
-version = "=0.6.1"
+version = "=0.7.0"
 
 [dependencies.serde_value]
 package = "serde-value"
@@ -872,7 +860,7 @@ version = "=1.5.0"
 
 [dependencies.socket2]
 package = "socket2"
-version = "=0.3.16"
+version = "=0.3.17"
 
 [dependencies.spin]
 package = "spin"
@@ -908,7 +896,7 @@ version = "=2.3.0"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.48"
+version = "=1.0.53"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.synstructure]
@@ -973,7 +961,7 @@ version = "=0.1.1"
 
 [dependencies.tinyvec]
 package = "tinyvec"
-version = "=1.0.1"
+version = "=1.1.0"
 features = ["alloc", "grab_spare_slice", "rustc_1_40", "serde"]
 
 [dependencies.tinyvec_macros]
@@ -982,7 +970,7 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=0.3.4"
+version = "=0.3.5"
 features = ["full"]
 
 [dependencies.tokio_0_2_23]
@@ -1016,7 +1004,7 @@ version = "=0.3.0"
 
 [dependencies.tracing]
 package = "tracing"
-version = "=0.1.21"
+version = "=0.1.22"
 
 [dependencies.tracing_core]
 package = "tracing-core"
@@ -1060,7 +1048,7 @@ version = "=0.1.16"
 
 [dependencies.unicode_segmentation]
 package = "unicode-segmentation"
-version = "=1.7.0"
+version = "=1.7.1"
 
 [dependencies.unicode_width]
 package = "unicode-width"
@@ -1102,10 +1090,6 @@ version = "=0.8.2"
 [dependencies.version_check]
 package = "version_check"
 version = "=0.9.2"
-
-[dependencies.void]
-package = "void"
-version = "=1.0.2"
 
 [dependencies.walkdir]
 package = "walkdir"
