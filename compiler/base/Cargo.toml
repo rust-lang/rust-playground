@@ -23,7 +23,7 @@ version = "=1.2.0"
 
 [dependencies.ahash]
 package = "ahash"
-version = "=0.4.6"
+version = "=0.4.7"
 
 [dependencies.aho_corasick]
 package = "aho-corasick"
@@ -37,13 +37,17 @@ version = "=0.12.1"
 package = "ansi_term"
 version = "=0.11.0"
 
+[dependencies.anyhow]
+package = "anyhow"
+version = "=1.0.36"
+
 [dependencies.approx]
 package = "approx"
 version = "=0.4.0"
 
 [dependencies.arc_swap]
 package = "arc-swap"
-version = "=0.4.7"
+version = "=0.4.8"
 
 [dependencies.arrayvec]
 package = "arrayvec"
@@ -79,7 +83,7 @@ version = "=0.5.2"
 
 [dependencies.bit_vec]
 package = "bit-vec"
-version = "=0.6.2"
+version = "=0.6.3"
 
 [dependencies.bitflags]
 package = "bitflags"
@@ -112,7 +116,7 @@ version = "=0.5.6"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.0.65"
+version = "=1.0.66"
 
 [dependencies.cfg_if]
 package = "cfg-if"
@@ -137,7 +141,7 @@ version = "=1.1.0"
 
 [dependencies.const_fn]
 package = "const_fn"
-version = "=0.4.3"
+version = "=0.4.4"
 
 [dependencies.cpuid_bool]
 package = "cpuid-bool"
@@ -194,6 +198,10 @@ version = "=1.0.4"
 [dependencies.deflate]
 package = "deflate"
 version = "=0.8.6"
+
+[dependencies.derivative]
+package = "derivative"
+version = "=2.1.1"
 
 [dependencies.digest]
 package = "digest"
@@ -350,7 +358,7 @@ version = "=0.25.1"
 
 [dependencies.http]
 package = "http"
-version = "=0.2.1"
+version = "=0.2.2"
 
 [dependencies.http_body]
 package = "http-body"
@@ -367,10 +375,6 @@ version = "=0.3.2"
 [dependencies.humantime]
 package = "humantime"
 version = "=2.0.1"
-
-[dependencies.humantime_1_3_0]
-package = "humantime"
-version = "=1.3.0"
 
 [dependencies.hyper]
 package = "hyper"
@@ -390,7 +394,7 @@ version = "=0.23.12"
 
 [dependencies.indexmap]
 package = "indexmap"
-version = "=1.6.0"
+version = "=1.6.1"
 
 [dependencies.instant]
 package = "instant"
@@ -422,7 +426,7 @@ version = "=1.4.0"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.80"
+version = "=0.2.81"
 
 [dependencies.libm]
 package = "libm"
@@ -446,7 +450,7 @@ version = "=0.4.11"
 
 [dependencies.log4rs]
 package = "log4rs"
-version = "=0.13.0"
+version = "=1.0.0"
 
 [dependencies.log_mdc]
 package = "log-mdc"
@@ -470,7 +474,7 @@ version = "=0.1.8"
 
 [dependencies.matrixmultiply]
 package = "matrixmultiply"
-version = "=0.2.3"
+version = "=0.2.4"
 
 [dependencies.md5]
 package = "md5"
@@ -515,7 +519,7 @@ version = "=0.6.23"
 
 [dependencies.nalgebra]
 package = "nalgebra"
-version = "=0.23.1"
+version = "=0.23.2"
 
 [dependencies.native_tls]
 package = "native-tls"
@@ -527,7 +531,7 @@ version = "=0.14.0"
 
 [dependencies.net2]
 package = "net2"
-version = "=0.2.36"
+version = "=0.2.37"
 
 [dependencies.num]
 package = "num"
@@ -575,7 +579,7 @@ version = "=0.3.0"
 
 [dependencies.openssl]
 package = "openssl"
-version = "=0.10.30"
+version = "=0.10.31"
 
 [dependencies.openssl_probe]
 package = "openssl-probe"
@@ -583,11 +587,11 @@ version = "=0.1.2"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.58"
+version = "=0.9.59"
 
 [dependencies.ordered_float]
 package = "ordered-float"
-version = "=1.1.0"
+version = "=2.0.1"
 
 [dependencies.parking_lot]
 package = "parking_lot"
@@ -595,11 +599,11 @@ version = "=0.11.1"
 
 [dependencies.parking_lot_core]
 package = "parking_lot_core"
-version = "=0.8.0"
+version = "=0.8.2"
 
 [dependencies.paste]
 package = "paste"
-version = "=1.0.3"
+version = "=1.0.4"
 
 [dependencies.percent_encoding]
 package = "percent-encoding"
@@ -663,7 +667,7 @@ version = "=0.3.19"
 
 [dependencies.png]
 package = "png"
-version = "=0.16.7"
+version = "=0.16.8"
 
 [dependencies.postgres]
 package = "postgres"
@@ -702,35 +706,51 @@ version = "=0.1.6"
 package = "quick-error"
 version = "=2.0.0"
 
-[dependencies.quick_error_1_2_3]
-package = "quick-error"
-version = "=1.2.3"
-
 [dependencies.quote]
 package = "quote"
-version = "=1.0.7"
+version = "=1.0.8"
 
 [dependencies.rand]
+package = "rand"
+version = "=0.8.0"
+
+[dependencies.rand_0_7_3]
 package = "rand"
 version = "=0.7.3"
 
 [dependencies.rand_chacha]
 package = "rand_chacha"
+version = "=0.3.0"
+
+[dependencies.rand_chacha_0_2_2]
+package = "rand_chacha"
 version = "=0.2.2"
 
 [dependencies.rand_core]
+package = "rand_core"
+version = "=0.6.0"
+
+[dependencies.rand_core_0_5_1]
 package = "rand_core"
 version = "=0.5.1"
 
 [dependencies.rand_distr]
 package = "rand_distr"
+version = "=0.4.0"
+
+[dependencies.rand_distr_0_3_0]
+package = "rand_distr"
 version = "=0.3.0"
 
 [dependencies.rand_hc]
 package = "rand_hc"
-version = "=0.2.0"
+version = "=0.3.0"
 
 [dependencies.rand_pcg]
+package = "rand_pcg"
+version = "=0.3.0"
+
+[dependencies.rand_pcg_0_2_1]
 package = "rand_pcg"
 version = "=0.2.1"
 
@@ -764,7 +784,7 @@ version = "=0.5.3"
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.10.9"
+version = "=0.10.10"
 features = ["blocking", "cookies", "json"]
 
 [dependencies.ring]
@@ -773,7 +793,7 @@ version = "=0.16.19"
 
 [dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.24.1"
+version = "=0.24.2"
 features = ["bundled-full"]
 
 [dependencies.rustc_demangle]
@@ -814,12 +834,12 @@ version = "=0.10.1"
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.117"
+version = "=1.0.118"
 features = ["derive", "rc"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.117"
+version = "=1.0.118"
 
 [dependencies.serde_json]
 package = "serde_json"
@@ -832,7 +852,7 @@ version = "=0.7.0"
 
 [dependencies.serde_value]
 package = "serde-value"
-version = "=0.6.0"
+version = "=0.7.0"
 
 [dependencies.serde_yaml]
 package = "serde_yaml"
@@ -856,11 +876,15 @@ version = "=0.4.2"
 
 [dependencies.smallvec]
 package = "smallvec"
-version = "=1.5.0"
+version = "=1.5.1"
+
+[dependencies.smawk]
+package = "smawk"
+version = "=0.3.0"
 
 [dependencies.socket2]
 package = "socket2"
-version = "=0.3.17"
+version = "=0.3.19"
 
 [dependencies.spin]
 package = "spin"
@@ -892,11 +916,11 @@ version = "=0.8.0"
 
 [dependencies.subtle]
 package = "subtle"
-version = "=2.3.0"
+version = "=2.4.0"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.53"
+version = "=1.0.55"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.synstructure]
@@ -921,11 +945,19 @@ version = "=1.1.2"
 
 [dependencies.textwrap]
 package = "textwrap"
-version = "=0.12.1"
+version = "=0.13.1"
 
 [dependencies.textwrap_0_11_0]
 package = "textwrap"
 version = "=0.11.0"
+
+[dependencies.thiserror]
+package = "thiserror"
+version = "=1.0.22"
+
+[dependencies.thiserror_impl]
+package = "thiserror-impl"
+version = "=1.0.22"
 
 [dependencies.thread_id]
 package = "thread-id"
@@ -941,7 +973,7 @@ version = "=1.8.1"
 
 [dependencies.tiff]
 package = "tiff"
-version = "=0.6.0"
+version = "=0.6.1"
 
 [dependencies.time]
 package = "time"
@@ -970,12 +1002,12 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=0.3.5"
+version = "=0.3.6"
 features = ["full"]
 
-[dependencies.tokio_0_2_23]
+[dependencies.tokio_0_2_24]
 package = "tokio"
-version = "=0.2.23"
+version = "=0.2.24"
 features = ["full"]
 
 [dependencies.tokio_postgres]
@@ -996,7 +1028,7 @@ version = "=0.3.1"
 
 [dependencies.toml]
 package = "toml"
-version = "=0.5.7"
+version = "=0.5.8"
 
 [dependencies.tower_service]
 package = "tower-service"
@@ -1073,10 +1105,6 @@ version = "=2.2.0"
 [dependencies.utf8]
 package = "utf-8"
 version = "=0.7.5"
-
-[dependencies.utf8_ranges]
-package = "utf8-ranges"
-version = "=1.0.4"
 
 [dependencies.uuid]
 package = "uuid"
