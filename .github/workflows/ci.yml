@@ -56,7 +56,6 @@ jobs:
           push: true
           tags: |
             ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-            ${{ env.TAG_PREFIX }}--latest
           cache-from: |
             ${{ env.TAG_PREFIX }}--${{ github.run_id }}
             ${{ env.TAG_PREFIX }}--latest
@@ -76,7 +75,6 @@ jobs:
           push: true
           tags: |
             ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-            ${{ env.TAG_PREFIX }}--latest
           cache-from: |
             ${{ env.TAG_PREFIX }}--${{ github.run_id }}
             ${{ env.TAG_PREFIX }}--latest
@@ -96,7 +94,6 @@ jobs:
           push: true
           tags: |
             ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-            ${{ env.TAG_PREFIX }}--latest
           cache-from: |
             ${{ env.TAG_PREFIX }}--${{ github.run_id }}
             ${{ env.TAG_PREFIX }}--latest
@@ -116,7 +113,6 @@ jobs:
           push: true
           tags: |
             ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-            ${{ env.TAG_PREFIX }}--latest
           cache-from: |
             ${{ env.TAG_PREFIX }}--${{ github.run_id }}
             ${{ env.TAG_PREFIX }}--latest
@@ -133,7 +129,6 @@ jobs:
           push: true
           tags: |
             ${{ env.IMAGE_NAME }}:${{ github.run_id }}
-            ${{ env.IMAGE_NAME }}:latest
           cache-from: |
             ${{ env.IMAGE_NAME }}:${{ github.run_id }}
             ${{ env.IMAGE_NAME }}:latest
@@ -170,12 +165,11 @@ jobs:
           context: compiler/${{ matrix.tool }}/
           file: compiler/${{ matrix.tool }}/Dockerfile
           build-args: |
-            base_image=ghcr.io/integer32llc/rust-playground-ci-rust-nightly:sources--latest
+            base_image=ghcr.io/integer32llc/rust-playground-ci-rust-nightly:sources--${{ github.run_id }}
           pull: true
           push: true
           tags: |
             ${{ env.IMAGE_NAME }}:${{ github.run_id }}
-            ${{ env.IMAGE_NAME }}:latest
           cache-from: |
             ${{ env.IMAGE_NAME }}:${{ github.run_id }}
             ${{ env.IMAGE_NAME }}:latest
@@ -309,15 +303,15 @@ jobs:
 
       - name: "Pull containers"
         run: |
-          echo ghcr.io/integer32llc/rust-playground-ci-{rust-{stable,beta,nightly},tool-{clippy,rustfmt,miri}} | xargs -n1 docker pull
+          echo ghcr.io/integer32llc/rust-playground-ci-{rust-{stable,beta,nightly},tool-{clippy,rustfmt,miri}}:${{ github.run_id }} | xargs -n1 docker pull
 
       - name: "Rename containers"
         run: |
           for c in stable beta nightly; do
-            docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c rust-$c
+            docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} rust-$c
           done
           for t in clippy miri rustfmt; do
-            docker tag ghcr.io/integer32llc/rust-playground-ci-tool-$t $t
+            docker tag ghcr.io/integer32llc/rust-playground-ci-tool-$t:${{ github.run_id }} $t
           done
 
       - name: "Download backend"
@@ -353,7 +347,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - run_integration_tests
-    if: github.event.push.ref == 'refs/heads/master'
+    if: github.event.name == 'push' && github.event.ref == 'refs/heads/master'
 
     steps:
       - name: "Login to Docker Hub"
@@ -371,15 +365,15 @@ jobs:
 
       - name: "Pull containers"
         run: |
-          echo ghcr.io/integer32llc/rust-playground-ci-{rust-{stable,beta,nightly},tool-{clippy,rustfmt,miri}} | xargs -n1 docker pull
+          echo ghcr.io/integer32llc/rust-playground-ci-{rust-{stable,beta,nightly},tool-{clippy,rustfmt,miri}}:${{ github.run_id }} | xargs -n1 docker pull
 
       - name: "Rename containers"
         run: |
           for c in stable beta nightly; do
-            docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c shepmaster/rust-$c
+            docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} shepmaster/rust-$c
           done
           for t in clippy miri rustfmt; do
-            docker tag ghcr.io/integer32llc/rust-playground-ci-tool-$t shepmaster/$t
+            docker tag ghcr.io/integer32llc/rust-playground-ci-tool-$t:${{ github.run_id }} shepmaster/$t
           done
 
       - name: "Push containers"
