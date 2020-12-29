@@ -11,8 +11,13 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (~> 1.5)
       xpath (~> 3.2)
+    capybara-screenshot (1.0.25)
+      capybara (>= 1.0, < 4)
+      launchy
     childprocess (3.0.0)
     diff-lcs (1.4.4)
+    launchy (2.5.0)
+      addressable (~> 2.7)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     nokogiri (1.10.10)
@@ -51,6 +56,7 @@ PLATFORMS
 
 DEPENDENCIES
   capybara
+  capybara-screenshot
   rspec
   selenium-webdriver
   webdrivers

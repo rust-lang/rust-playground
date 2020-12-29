@@ -4,5 +4,6 @@ ruby "2.7.2"
 
 gem "capybara"
 gem "rspec"
+gem 'capybara-screenshot'
 gem 'selenium-webdriver'
 gem 'webdrivers'

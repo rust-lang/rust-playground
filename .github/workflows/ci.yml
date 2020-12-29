@@ -341,6 +341,13 @@ jobs:
           chmod +x ./server/ui && ./server/ui &
           bundle exec rspec
 
+      - name: "Preserve screenshots"
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-failures
+          path: tests/test-failures
+
   release_artifacts:
     name: "Release artifacts"
     runs-on: ubuntu-latest
