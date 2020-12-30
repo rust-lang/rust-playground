@@ -132,7 +132,6 @@ components:
           channel=${{ matrix.channel }}
         pull: true
         push: true
-        load: true
         tags: |-
           ${{ env.IMAGE_NAME }}:${{ github.run_id }}
         cache-from: |-
@@ -162,7 +161,6 @@ components:
           base_image=ghcr.io/integer32llc/rust-playground-ci-rust-nightly:sources--${{ github.run_id }}
         pull: true
         push: true
-        load: true
         tags: |-
           ${{ env.IMAGE_NAME }}:${{ github.run_id }}
         cache-from: |-
@@ -188,6 +186,11 @@ components:
           docker tag ghcr.io/integer32llc/rust-playground-ci-tool-$t:${{ github.run_id }} shepmaster/$t
           docker tag ghcr.io/integer32llc/rust-playground-ci-tool-$t:${{ github.run_id }} $t
         done
+
+  - pull_current_container: &pull_current_container
+      name: "Pull container"
+      run: |-
+        docker pull ${{ env.IMAGE_NAME }}:${{ github.run_id }}
 
   - rename_current_container: &rename_current_container
       name: "Rename container"
@@ -483,6 +486,7 @@ workflows:
           - *build_compiler_containers_sources
           - *build_compiler_containers_final
 
+          - *pull_current_container
           - *rename_current_container
           - *push_current_container
 
@@ -500,5 +504,6 @@ workflows:
           - *login_docker_hub
           - *build_tool_containers_final
 
+          - *pull_current_container
           - *rename_current_container
           - *push_current_container
