@@ -22,7 +22,7 @@ jobs:
     env:
       IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
       DOCKER_HUB_IMAGE_NAME: shepmaster/rust-${{ matrix.channel }}
-    continue-on-failure: true
+    continue-on-error: true
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -139,7 +139,7 @@ jobs:
     env:
       IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
       DOCKER_HUB_IMAGE_NAME: shepmaster/${{ matrix.tool }}
-    continue-on-failure: true
+    continue-on-error: true
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
