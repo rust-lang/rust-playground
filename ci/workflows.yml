@@ -132,6 +132,7 @@ components:
           channel=${{ matrix.channel }}
         pull: true
         push: true
+        load: true
         tags: |-
           ${{ env.IMAGE_NAME }}:${{ github.run_id }}
         cache-from: |-
@@ -161,6 +162,7 @@ components:
           base_image=ghcr.io/integer32llc/rust-playground-ci-rust-nightly:sources--${{ github.run_id }}
         pull: true
         push: true
+        load: true
         tags: |-
           ${{ env.IMAGE_NAME }}:${{ github.run_id }}
         cache-from: |-
