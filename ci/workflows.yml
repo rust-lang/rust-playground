@@ -493,7 +493,7 @@ workflows:
       build_tool_containers:
         <<: *build_tool_containers_job
         env:
-          <<: *build_compiler_containers_job_env
+          <<: *build_tool_containers_job_env
           DOCKER_HUB_IMAGE_NAME: shepmaster/${{ matrix.tool }}
         continue-on-error: true
 

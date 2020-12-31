@@ -139,7 +139,7 @@ jobs:
         - miri
         - rustfmt
     env:
-      IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
+      IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-tool-${{ matrix.tool }}
       DOCKER_HUB_IMAGE_NAME: shepmaster/${{ matrix.tool }}
     continue-on-error: true
     steps:
