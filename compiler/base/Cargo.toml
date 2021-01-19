@@ -11,7 +11,7 @@ codegen-units = 1
 incremental = false
 [dependencies.addr2line]
 package = "addr2line"
-version = "=0.14.0"
+version = "=0.14.1"
 
 [dependencies.adler]
 package = "adler"
@@ -39,7 +39,7 @@ version = "=0.11.0"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.37"
+version = "=1.0.38"
 
 [dependencies.approx]
 package = "approx"
@@ -52,14 +52,6 @@ version = "=0.4.8"
 [dependencies.arrayvec]
 package = "arrayvec"
 version = "=0.5.2"
-
-[dependencies.async_stream]
-package = "async-stream"
-version = "=0.3.0"
-
-[dependencies.async_stream_impl]
-package = "async-stream-impl"
-version = "=0.3.0"
 
 [dependencies.async_trait]
 package = "async-trait"
@@ -76,10 +68,6 @@ version = "=1.0.1"
 [dependencies.backtrace]
 package = "backtrace"
 version = "=0.3.55"
-
-[dependencies.backtrace_sys]
-package = "backtrace-sys"
-version = "=0.1.37"
 
 [dependencies.base64]
 package = "base64"
@@ -107,20 +95,16 @@ version = "=0.2.14"
 
 [dependencies.bytemuck]
 package = "bytemuck"
-version = "=1.4.1"
-features = ["derive", "extern_crate_alloc", "extern_crate_std", "zeroable_maybe_uninit"]
+version = "=1.5.0"
+features = ["bytemuck_derive", "derive", "extern_crate_alloc", "extern_crate_std", "zeroable_maybe_uninit"]
 
 [dependencies.byteorder]
 package = "byteorder"
-version = "=1.3.4"
+version = "=1.4.2"
 
 [dependencies.bytes]
 package = "bytes"
-version = "=1.0.0"
-
-[dependencies.bytes_0_5_6]
-package = "bytes"
-version = "=0.5.6"
+version = "=1.0.1"
 
 [dependencies.cc]
 package = "cc"
@@ -149,7 +133,7 @@ version = "=1.1.0"
 
 [dependencies.const_fn]
 package = "const_fn"
-version = "=0.4.4"
+version = "=0.4.5"
 
 [dependencies.cpuid_bool]
 package = "cpuid-bool"
@@ -209,7 +193,7 @@ version = "=0.8.6"
 
 [dependencies.derivative]
 package = "derivative"
-version = "=2.1.1"
+version = "=2.1.3"
 
 [dependencies.digest]
 package = "digest"
@@ -285,40 +269,40 @@ version = "=0.1.4"
 
 [dependencies.futures]
 package = "futures"
-version = "=0.3.8"
+version = "=0.3.12"
 features = ["compat", "io-compat", "thread-pool"]
 
 [dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.8"
+version = "=0.3.12"
 
 [dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.8"
+version = "=0.3.12"
 
 [dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.8"
+version = "=0.3.12"
 
 [dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.8"
+version = "=0.3.12"
 
 [dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.8"
+version = "=0.3.12"
 
 [dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.8"
+version = "=0.3.12"
 
 [dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.8"
+version = "=0.3.12"
 
 [dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.8"
+version = "=0.3.12"
 
 [dependencies.generic_array]
 package = "generic-array"
@@ -326,11 +310,11 @@ version = "=0.14.4"
 
 [dependencies.getrandom]
 package = "getrandom"
-version = "=0.2.0"
+version = "=0.2.2"
 
-[dependencies.getrandom_0_1_15]
+[dependencies.getrandom_0_1_16]
 package = "getrandom"
-version = "=0.1.15"
+version = "=0.1.16"
 
 [dependencies.gif]
 package = "gif"
@@ -346,7 +330,7 @@ version = "=0.3.0"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.2.7"
+version = "=0.3.0"
 
 [dependencies.hashbrown]
 package = "hashbrown"
@@ -366,15 +350,11 @@ version = "=0.25.1"
 
 [dependencies.http]
 package = "http"
-version = "=0.2.2"
+version = "=0.2.3"
 
 [dependencies.http_body]
 package = "http-body"
 version = "=0.4.0"
-
-[dependencies.http_body_0_3_1]
-package = "http-body"
-version = "=0.3.1"
 
 [dependencies.httparse]
 package = "httparse"
@@ -386,20 +366,16 @@ version = "=0.3.2"
 
 [dependencies.humantime]
 package = "humantime"
-version = "=2.0.1"
+version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=0.14.1"
+version = "=0.14.2"
 features = ["full"]
-
-[dependencies.hyper_0_13_9]
-package = "hyper"
-version = "=0.13.9"
 
 [dependencies.hyper_tls]
 package = "hyper-tls"
-version = "=0.4.3"
+version = "=0.5.0"
 
 [dependencies.idna]
 package = "idna"
@@ -443,7 +419,7 @@ version = "=1.4.0"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.81"
+version = "=0.2.82"
 
 [dependencies.libm]
 package = "libm"
@@ -455,7 +431,7 @@ version = "=0.20.1"
 
 [dependencies.linked_hash_map]
 package = "linked-hash-map"
-version = "=0.5.3"
+version = "=0.5.4"
 
 [dependencies.lock_api]
 package = "lock_api"
@@ -463,7 +439,7 @@ version = "=0.4.2"
 
 [dependencies.log]
 package = "log"
-version = "=0.4.11"
+version = "=0.4.13"
 
 [dependencies.log4rs]
 package = "log4rs"
@@ -513,10 +489,6 @@ version = "=0.6.1"
 package = "mime"
 version = "=0.3.16"
 
-[dependencies.mime_guess]
-package = "mime_guess"
-version = "=2.0.3"
-
 [dependencies.miniz_oxide]
 package = "miniz_oxide"
 version = "=0.4.3"
@@ -527,20 +499,16 @@ version = "=0.3.7"
 
 [dependencies.mio]
 package = "mio"
-version = "=0.7.6"
+version = "=0.7.7"
 features = ["net", "os-ext", "os-poll"]
-
-[dependencies.mio_0_6_23]
-package = "mio"
-version = "=0.6.23"
 
 [dependencies.nalgebra]
 package = "nalgebra"
-version = "=0.23.2"
+version = "=0.24.0"
 
 [dependencies.native_tls]
 package = "native-tls"
-version = "=0.2.6"
+version = "=0.2.7"
 
 [dependencies.ndarray]
 package = "ndarray"
@@ -652,7 +620,7 @@ version = "=0.8.0"
 
 [dependencies.pin_project]
 package = "pin-project"
-version = "=1.0.2"
+version = "=1.0.4"
 
 [dependencies.pin_project_0_4_27]
 package = "pin-project"
@@ -660,7 +628,7 @@ version = "=0.4.27"
 
 [dependencies.pin_project_internal]
 package = "pin-project-internal"
-version = "=1.0.2"
+version = "=1.0.4"
 
 [dependencies.pin_project_internal_0_4_27]
 package = "pin-project-internal"
@@ -668,11 +636,7 @@ version = "=0.4.27"
 
 [dependencies.pin_project_lite]
 package = "pin-project-lite"
-version = "=0.2.0"
-
-[dependencies.pin_project_lite_0_1_11]
-package = "pin-project-lite"
-version = "=0.1.11"
+version = "=0.2.4"
 
 [dependencies.pin_utils]
 package = "pin-utils"
@@ -717,7 +681,7 @@ version = "=0.5.19"
 
 [dependencies.proc_macro_nested]
 package = "proc-macro-nested"
-version = "=0.1.6"
+version = "=0.1.7"
 
 [dependencies.quick_error]
 package = "quick-error"
@@ -729,7 +693,8 @@ version = "=1.0.8"
 
 [dependencies.rand]
 package = "rand"
-version = "=0.8.0"
+version = "=0.8.2"
+features = ["serde1", "small_rng"]
 
 [dependencies.rand_0_7_3]
 package = "rand"
@@ -745,7 +710,8 @@ version = "=0.2.2"
 
 [dependencies.rand_core]
 package = "rand_core"
-version = "=0.6.0"
+version = "=0.6.1"
+features = ["alloc", "getrandom", "serde", "serde1", "std"]
 
 [dependencies.rand_core_0_5_1]
 package = "rand_core"
@@ -785,7 +751,7 @@ version = "=1.9.0"
 
 [dependencies.regex]
 package = "regex"
-version = "=1.4.2"
+version = "=1.4.3"
 
 [dependencies.regex_automata]
 package = "regex-automata"
@@ -793,7 +759,7 @@ version = "=0.1.9"
 
 [dependencies.regex_syntax]
 package = "regex-syntax"
-version = "=0.6.21"
+version = "=0.6.22"
 
 [dependencies.remove_dir_all]
 package = "remove_dir_all"
@@ -801,8 +767,8 @@ version = "=0.5.3"
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.10.10"
-features = ["blocking", "cookies", "json"]
+version = "=0.11.0"
+features = ["blocking", "cookies", "json", "multipart"]
 
 [dependencies.ring]
 package = "ring"
@@ -819,7 +785,7 @@ version = "=0.1.18"
 
 [dependencies.rustc_version]
 package = "rustc_version"
-version = "=0.3.0"
+version = "=0.3.3"
 
 [dependencies.ryu]
 package = "ryu"
@@ -847,16 +813,16 @@ version = "=0.11.0"
 
 [dependencies.semver_parser]
 package = "semver-parser"
-version = "=0.10.1"
+version = "=0.10.2"
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.118"
+version = "=1.0.120"
 features = ["derive", "rc"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.118"
+version = "=1.0.120"
 
 [dependencies.serde_json]
 package = "serde_json"
@@ -873,7 +839,7 @@ version = "=0.7.0"
 
 [dependencies.serde_yaml]
 package = "serde_yaml"
-version = "=0.8.14"
+version = "=0.8.15"
 
 [dependencies.sha2]
 package = "sha2"
@@ -893,7 +859,7 @@ version = "=0.4.2"
 
 [dependencies.smallvec]
 package = "smallvec"
-version = "=1.5.1"
+version = "=1.6.1"
 
 [dependencies.smawk]
 package = "smawk"
@@ -909,7 +875,7 @@ version = "=0.5.2"
 
 [dependencies.standback]
 package = "standback"
-version = "=0.2.13"
+version = "=0.2.14"
 
 [dependencies.string_cache]
 package = "string_cache"
@@ -937,7 +903,7 @@ version = "=2.4.0"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.56"
+version = "=1.0.58"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.synstructure]
@@ -950,11 +916,11 @@ version = "=0.4.30"
 
 [dependencies.tempfile]
 package = "tempfile"
-version = "=3.1.0"
+version = "=3.2.0"
 
 [dependencies.tendril]
 package = "tendril"
-version = "=0.4.1"
+version = "=0.4.2"
 
 [dependencies.termcolor]
 package = "termcolor"
@@ -962,7 +928,7 @@ version = "=1.1.2"
 
 [dependencies.textwrap]
 package = "textwrap"
-version = "=0.13.1"
+version = "=0.13.2"
 
 [dependencies.textwrap_0_11_0]
 package = "textwrap"
@@ -982,7 +948,7 @@ version = "=3.3.0"
 
 [dependencies.thread_local]
 package = "thread_local"
-version = "=1.0.1"
+version = "=1.1.0"
 
 [dependencies.threadpool]
 package = "threadpool"
@@ -994,7 +960,7 @@ version = "=0.6.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.2.23"
+version = "=0.2.24"
 
 [dependencies.time_0_1_44]
 package = "time"
@@ -1019,13 +985,12 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.0.1"
+version = "=1.0.2"
 features = ["full", "test-util"]
 
-[dependencies.tokio_0_2_24]
-package = "tokio"
-version = "=0.2.24"
-features = ["full"]
+[dependencies.tokio_native_tls]
+package = "tokio-native-tls"
+version = "=0.3.0"
 
 [dependencies.tokio_postgres]
 package = "tokio-postgres"
@@ -1033,19 +998,11 @@ version = "=0.7.0"
 
 [dependencies.tokio_stream]
 package = "tokio-stream"
-version = "=0.1.0"
-
-[dependencies.tokio_tls]
-package = "tokio-tls"
-version = "=0.3.1"
+version = "=0.1.2"
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.6.0"
-
-[dependencies.tokio_util_0_3_1]
-package = "tokio-util"
-version = "=0.3.1"
+version = "=0.6.1"
 
 [dependencies.toml]
 package = "toml"
@@ -1129,7 +1086,7 @@ version = "=0.7.5"
 
 [dependencies.uuid]
 package = "uuid"
-version = "=0.8.1"
+version = "=0.8.2"
 features = ["serde", "v1", "v3", "v4", "v5"]
 
 [dependencies.vec_map]
@@ -1166,4 +1123,4 @@ version = "=0.16.1"
 
 [dependencies.yaml_rust]
 package = "yaml-rust"
-version = "=0.4.4"
+version = "=0.4.5"
