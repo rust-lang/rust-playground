@@ -251,7 +251,7 @@ fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
         if let Some(default_feature_names) = summary.features().get("default") {
             enabled_features.remove("default");
             for feature in default_feature_names {
-                enabled_features.remove(&feature.to_string(summary));
+                enabled_features.remove(&feature.to_string());
             }
         }
     }
