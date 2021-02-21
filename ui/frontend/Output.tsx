@@ -46,7 +46,7 @@ interface PaneWithCodeProps extends SimplePaneProps {
 
 const Output: React.SFC = () => {
   const somethingToShow = useSelector(selectors.getSomethingToShow);
-  const { meta: { focus }, execute, format, clippy, miri, macroExpansion, assembly, llvmIr, mir, wasm, gist } =
+  const { meta: { focus }, execute, format, clippy, miri, macroExpansion, assembly, llvmIr, mir, hir, wasm, gist } =
     useSelector((state: State) => state.output);
 
   const dispatch = useDispatch();
@@ -59,6 +59,7 @@ const Output: React.SFC = () => {
   const focusAssembly = useCallback(() => dispatch(actions.changeFocus(Focus.Asm)), [dispatch]);
   const focusLlvmIr = useCallback(() => dispatch(actions.changeFocus(Focus.LlvmIr)), [dispatch]);
   const focusMir = useCallback(() => dispatch(actions.changeFocus(Focus.Mir)), [dispatch]);
+  const focusHir = useCallback(() => dispatch(actions.changeFocus(Focus.Hir)), [dispatch]);
   const focusWasm = useCallback(() => dispatch(actions.changeFocus(Focus.Wasm)), [dispatch]);
   const focusGist = useCallback(() => dispatch(actions.changeFocus(Focus.Gist)), [dispatch]);
 
@@ -84,6 +85,7 @@ const Output: React.SFC = () => {
         {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
         {focus === Focus.LlvmIr && <PaneWithCode {...llvmIr} kind="llvm-ir" />}
         {focus === Focus.Mir && <PaneWithMir {...mir} kind="mir" />}
+        {focus === Focus.Hir && <PaneWithMir {...hir} kind="hir" />}
         {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
         {focus === Focus.Gist && <Gist />}
       </div>
@@ -125,6 +127,10 @@ const Output: React.SFC = () => {
           label="MIR"
           onClick={focusMir}
           tabProps={mir} />
+        <Tab kind={Focus.Hir} focus={focus}
+          label="HIR"
+          onClick={focusHir}
+          tabProps={hir} />
         <Tab kind={Focus.Wasm} focus={focus}
           label="WASM"
           onClick={focusWasm}
