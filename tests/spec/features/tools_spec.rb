@@ -44,7 +44,8 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     in_tools_menu { click_on("Miri") }
 
     within(".output-stderr") do
-      expect(page).to have_content %r{pointer must be in-bounds at offset 1, but is outside bounds of alloc\d+ which has size 0}
+      expect(page).to have_content %r{pointer must be in-bounds at offset 1, but is outside bounds of alloc\d+ which has size 0}, wait: 10
+
     end
   end
 
