@@ -6,7 +6,7 @@
   },
   {
     "name": "adler",
-    "version": "0.2.3",
+    "version": "1.0.2",
     "id": "adler"
   },
   {
@@ -106,7 +106,7 @@
   },
   {
     "name": "bytemuck",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "id": "bytemuck"
   },
   {
@@ -121,7 +121,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.66",
+    "version": "1.0.67",
     "id": "cc"
   },
   {
@@ -181,7 +181,7 @@
   },
   {
     "name": "crossbeam-epoch",
-    "version": "0.9.1",
+    "version": "0.9.3",
     "id": "crossbeam_epoch"
   },
   {
@@ -191,7 +191,7 @@
   },
   {
     "name": "crossbeam-utils",
-    "version": "0.8.1",
+    "version": "0.8.3",
     "id": "crossbeam_utils"
   },
   {
@@ -296,7 +296,7 @@
   },
   {
     "name": "form_urlencoded",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "form_urlencoded"
   },
   {
@@ -306,47 +306,47 @@
   },
   {
     "name": "futures",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "id": "futures"
   },
   {
     "name": "futures-channel",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "id": "futures_core"
   },
   {
     "name": "futures-executor",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "id": "futures_io"
   },
   {
     "name": "futures-macro",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "id": "futures_macro"
   },
   {
     "name": "futures-sink",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "id": "futures_sink"
   },
   {
     "name": "futures-task",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "id": "futures_task"
   },
   {
     "name": "futures-util",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "id": "futures_util"
   },
   {
@@ -381,7 +381,7 @@
   },
   {
     "name": "h2",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "id": "h2"
   },
   {
@@ -441,12 +441,12 @@
   },
   {
     "name": "idna",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "id": "idna"
   },
   {
     "name": "image",
-    "version": "0.23.13",
+    "version": "0.23.14",
     "id": "image"
   },
   {
@@ -491,7 +491,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.86",
+    "version": "0.2.87",
     "id": "libc"
   },
   {
@@ -551,8 +551,13 @@
   },
   {
     "name": "matrixmultiply",
-    "version": "0.2.4",
+    "version": "0.3.0",
     "id": "matrixmultiply"
+  },
+  {
+    "name": "matrixmultiply",
+    "version": "0.2.4",
+    "id": "matrixmultiply_0_2_4"
   },
   {
     "name": "md5",
@@ -581,7 +586,7 @@
   },
   {
     "name": "miniz_oxide",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "id": "miniz_oxide"
   },
   {
@@ -591,12 +596,12 @@
   },
   {
     "name": "mio",
-    "version": "0.7.7",
+    "version": "0.7.9",
     "id": "mio"
   },
   {
     "name": "nalgebra",
-    "version": "0.24.1",
+    "version": "0.25.1",
     "id": "nalgebra"
   },
   {
@@ -666,7 +671,7 @@
   },
   {
     "name": "once_cell",
-    "version": "1.5.2",
+    "version": "1.7.2",
     "id": "once_cell"
   },
   {
@@ -756,7 +761,7 @@
   },
   {
     "name": "pin-project-lite",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "id": "pin_project_lite"
   },
   {
@@ -860,11 +865,6 @@
     "id": "rand_distr"
   },
   {
-    "name": "rand_distr",
-    "version": "0.3.0",
-    "id": "rand_distr_0_3_0"
-  },
-  {
     "name": "rand_hc",
     "version": "0.3.0",
     "id": "rand_hc"
@@ -916,7 +916,7 @@
   },
   {
     "name": "reqwest",
-    "version": "0.11.0",
+    "version": "0.11.1",
     "id": "reqwest"
   },
   {
@@ -991,7 +991,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.62",
+    "version": "1.0.64",
     "id": "serde_json"
   },
   {
@@ -1011,7 +1011,7 @@
   },
   {
     "name": "simba",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "id": "simba"
   },
   {
@@ -1091,7 +1091,7 @@
   },
   {
     "name": "tar",
-    "version": "0.4.32",
+    "version": "0.4.33",
     "id": "tar"
   },
   {
@@ -1111,7 +1111,7 @@
   },
   {
     "name": "textwrap",
-    "version": "0.13.2",
+    "version": "0.13.4",
     "id": "textwrap"
   },
   {
@@ -1121,12 +1121,12 @@
   },
   {
     "name": "thiserror",
-    "version": "1.0.23",
+    "version": "1.0.24",
     "id": "thiserror"
   },
   {
     "name": "thiserror-impl",
-    "version": "1.0.23",
+    "version": "1.0.24",
     "id": "thiserror_impl"
   },
   {
@@ -1211,18 +1211,13 @@
   },
   {
     "name": "tracing",
-    "version": "0.1.23",
+    "version": "0.1.25",
     "id": "tracing"
   },
   {
     "name": "tracing-core",
     "version": "0.1.17",
     "id": "tracing_core"
-  },
-  {
-    "name": "tracing-futures",
-    "version": "0.2.5",
-    "id": "tracing_futures"
   },
   {
     "name": "traitobject",
@@ -1291,7 +1286,7 @@
   },
   {
     "name": "url",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "id": "url"
   },
   {
