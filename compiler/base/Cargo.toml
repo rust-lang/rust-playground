@@ -15,7 +15,7 @@ version = "=0.14.1"
 
 [dependencies.adler]
 package = "adler"
-version = "=0.2.3"
+version = "=1.0.2"
 
 [dependencies.adler32]
 package = "adler32"
@@ -95,7 +95,7 @@ version = "=0.2.15"
 
 [dependencies.bytemuck]
 package = "bytemuck"
-version = "=1.5.0"
+version = "=1.5.1"
 features = ["bytemuck_derive", "derive", "extern_crate_alloc", "extern_crate_std", "zeroable_maybe_uninit"]
 
 [dependencies.byteorder]
@@ -108,7 +108,7 @@ version = "=1.0.1"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.0.66"
+version = "=1.0.67"
 
 [dependencies.cfg_if]
 package = "cfg-if"
@@ -157,7 +157,7 @@ version = "=0.8.0"
 
 [dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.1"
+version = "=0.9.3"
 
 [dependencies.crossbeam_queue]
 package = "crossbeam-queue"
@@ -165,7 +165,7 @@ version = "=0.3.1"
 
 [dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.1"
+version = "=0.8.3"
 
 [dependencies.crypto_mac]
 package = "crypto-mac"
@@ -253,7 +253,7 @@ version = "=0.1.1"
 
 [dependencies.form_urlencoded]
 package = "form_urlencoded"
-version = "=1.0.0"
+version = "=1.0.1"
 
 [dependencies.futf]
 package = "futf"
@@ -261,40 +261,40 @@ version = "=0.1.4"
 
 [dependencies.futures]
 package = "futures"
-version = "=0.3.12"
+version = "=0.3.13"
 features = ["compat", "io-compat", "thread-pool"]
 
 [dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.12"
+version = "=0.3.13"
 
 [dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.12"
+version = "=0.3.13"
 
 [dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.12"
+version = "=0.3.13"
 
 [dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.12"
+version = "=0.3.13"
 
 [dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.12"
+version = "=0.3.13"
 
 [dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.12"
+version = "=0.3.13"
 
 [dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.12"
+version = "=0.3.13"
 
 [dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.12"
+version = "=0.3.13"
 
 [dependencies.generic_array]
 package = "generic-array"
@@ -322,7 +322,7 @@ version = "=0.3.0"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.3.0"
+version = "=0.3.1"
 
 [dependencies.hashbrown]
 package = "hashbrown"
@@ -371,11 +371,11 @@ version = "=0.5.0"
 
 [dependencies.idna]
 package = "idna"
-version = "=0.2.1"
+version = "=0.2.2"
 
 [dependencies.image]
 package = "image"
-version = "=0.23.13"
+version = "=0.23.14"
 
 [dependencies.indexmap]
 package = "indexmap"
@@ -411,7 +411,7 @@ version = "=1.4.0"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.86"
+version = "=0.2.87"
 
 [dependencies.libm]
 package = "libm"
@@ -459,6 +459,10 @@ version = "=0.1.8"
 
 [dependencies.matrixmultiply]
 package = "matrixmultiply"
+version = "=0.3.0"
+
+[dependencies.matrixmultiply_0_2_4]
+package = "matrixmultiply"
 version = "=0.2.4"
 
 [dependencies.md5]
@@ -483,7 +487,7 @@ version = "=0.3.16"
 
 [dependencies.miniz_oxide]
 package = "miniz_oxide"
-version = "=0.4.3"
+version = "=0.4.4"
 
 [dependencies.miniz_oxide_0_3_7]
 package = "miniz_oxide"
@@ -491,12 +495,12 @@ version = "=0.3.7"
 
 [dependencies.mio]
 package = "mio"
-version = "=0.7.7"
+version = "=0.7.9"
 features = ["net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
 package = "nalgebra"
-version = "=0.24.1"
+version = "=0.25.1"
 
 [dependencies.native_tls]
 package = "native-tls"
@@ -548,7 +552,7 @@ version = "=0.23.0"
 
 [dependencies.once_cell]
 package = "once_cell"
-version = "=1.5.2"
+version = "=1.7.2"
 
 [dependencies.opaque_debug]
 package = "opaque-debug"
@@ -620,7 +624,7 @@ version = "=1.0.5"
 
 [dependencies.pin_project_lite]
 package = "pin-project-lite"
-version = "=0.2.4"
+version = "=0.2.5"
 
 [dependencies.pin_utils]
 package = "pin-utils"
@@ -705,10 +709,6 @@ version = "=0.5.1"
 package = "rand_distr"
 version = "=0.4.0"
 
-[dependencies.rand_distr_0_3_0]
-package = "rand_distr"
-version = "=0.3.0"
-
 [dependencies.rand_hc]
 package = "rand_hc"
 version = "=0.3.0"
@@ -751,7 +751,7 @@ version = "=0.5.3"
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.11.0"
+version = "=0.11.1"
 features = ["blocking", "cookies", "json", "multipart"]
 
 [dependencies.ring]
@@ -810,7 +810,7 @@ version = "=1.0.123"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.62"
+version = "=1.0.64"
 features = ["raw_value"]
 
 [dependencies.serde_urlencoded]
@@ -831,7 +831,7 @@ version = "=0.9.3"
 
 [dependencies.simba]
 package = "simba"
-version = "=0.3.1"
+version = "=0.4.0"
 
 [dependencies.siphasher]
 package = "siphasher"
@@ -896,7 +896,7 @@ version = "=0.12.4"
 
 [dependencies.tar]
 package = "tar"
-version = "=0.4.32"
+version = "=0.4.33"
 
 [dependencies.tempfile]
 package = "tempfile"
@@ -912,7 +912,7 @@ version = "=1.1.2"
 
 [dependencies.textwrap]
 package = "textwrap"
-version = "=0.13.2"
+version = "=0.13.4"
 
 [dependencies.textwrap_0_11_0]
 package = "textwrap"
@@ -920,11 +920,11 @@ version = "=0.11.0"
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.23"
+version = "=1.0.24"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.23"
+version = "=1.0.24"
 
 [dependencies.thread_id]
 package = "thread-id"
@@ -994,15 +994,11 @@ version = "=0.3.1"
 
 [dependencies.tracing]
 package = "tracing"
-version = "=0.1.23"
+version = "=0.1.25"
 
 [dependencies.tracing_core]
 package = "tracing-core"
 version = "=0.1.17"
-
-[dependencies.tracing_futures]
-package = "tracing-futures"
-version = "=0.2.5"
 
 [dependencies.traitobject]
 package = "traitobject"
@@ -1058,7 +1054,7 @@ version = "=0.7.1"
 
 [dependencies.url]
 package = "url"
-version = "=2.2.0"
+version = "=2.2.1"
 
 [dependencies.utf8]
 package = "utf-8"
