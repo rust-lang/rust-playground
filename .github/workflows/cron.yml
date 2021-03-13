@@ -2,13 +2,13 @@
 ---
 name: Scheduled rebuild
 'on':
-  workflow_dispatch: 
+  workflow_dispatch:
   schedule:
   - cron: 7 2 * * *
 env:
   DOCKER_HUB_USERNAME: shepmaster
   GH_CONTAINER_REGISTRY_USERNAME: shepmaster
-  AWS_ACCESS_KEY_ID: AKIAWESVHZ3J6US4DSXP
+  AWS_ACCESS_KEY_ID: AKIAWESVHZ3JQAY5NM5K
 jobs:
   build_compiler_containers:
     name: Build ${{ matrix.channel }} compiler container
