@@ -56,7 +56,7 @@
   },
   {
     "name": "async-trait",
-    "version": "0.1.42",
+    "version": "0.1.48",
     "id": "async_trait"
   },
   {
@@ -111,7 +111,7 @@
   },
   {
     "name": "byteorder",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "id": "byteorder"
   },
   {
@@ -201,7 +201,7 @@
   },
   {
     "name": "csv",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "id": "csv"
   },
   {
@@ -451,7 +451,7 @@
   },
   {
     "name": "indexmap",
-    "version": "1.6.1",
+    "version": "1.6.2",
     "id": "indexmap"
   },
   {
@@ -491,7 +491,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.87",
+    "version": "0.2.88",
     "id": "libc"
   },
   {
@@ -601,7 +601,7 @@
   },
   {
     "name": "nalgebra",
-    "version": "0.25.1",
+    "version": "0.25.3",
     "id": "nalgebra"
   },
   {
@@ -626,18 +626,23 @@
   },
   {
     "name": "num",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "id": "num"
   },
   {
     "name": "num-bigint",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "id": "num_bigint"
   },
   {
     "name": "num-complex",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "id": "num_complex"
+  },
+  {
+    "name": "num-complex",
+    "version": "0.3.1",
+    "id": "num_complex_0_3_1"
   },
   {
     "name": "num-integer",
@@ -651,8 +656,13 @@
   },
   {
     "name": "num-rational",
-    "version": "0.3.2",
+    "version": "0.4.0",
     "id": "num_rational"
+  },
+  {
+    "name": "num-rational",
+    "version": "0.3.2",
+    "id": "num_rational_0_3_2"
   },
   {
     "name": "num-traits",
@@ -681,7 +691,7 @@
   },
   {
     "name": "openssl",
-    "version": "0.10.32",
+    "version": "0.10.33",
     "id": "openssl"
   },
   {
@@ -691,7 +701,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.60",
+    "version": "0.9.61",
     "id": "openssl_sys"
   },
   {
@@ -711,7 +721,7 @@
   },
   {
     "name": "paste",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "id": "paste"
   },
   {
@@ -761,7 +771,7 @@
   },
   {
     "name": "pin-project-lite",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "id": "pin_project_lite"
   },
   {
@@ -896,7 +906,7 @@
   },
   {
     "name": "regex",
-    "version": "1.4.3",
+    "version": "1.4.5",
     "id": "regex"
   },
   {
@@ -906,7 +916,7 @@
   },
   {
     "name": "regex-syntax",
-    "version": "0.6.22",
+    "version": "0.6.23",
     "id": "regex_syntax"
   },
   {
@@ -916,7 +926,7 @@
   },
   {
     "name": "reqwest",
-    "version": "0.11.1",
+    "version": "0.11.2",
     "id": "reqwest"
   },
   {
@@ -976,7 +986,7 @@
   },
   {
     "name": "serde",
-    "version": "1.0.123",
+    "version": "1.0.124",
     "id": "serde"
   },
   {
@@ -986,7 +996,7 @@
   },
   {
     "name": "serde_derive",
-    "version": "1.0.123",
+    "version": "1.0.124",
     "id": "serde_derive"
   },
   {
@@ -1081,7 +1091,7 @@
   },
   {
     "name": "syn",
-    "version": "1.0.60",
+    "version": "1.0.64",
     "id": "syn"
   },
   {
@@ -1181,7 +1191,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "id": "tokio"
   },
   {
@@ -1196,7 +1206,7 @@
   },
   {
     "name": "tokio-util",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "id": "tokio_util"
   },
   {
@@ -1236,7 +1246,7 @@
   },
   {
     "name": "typenum",
-    "version": "1.12.0",
+    "version": "1.13.0",
     "id": "typenum"
   },
   {
