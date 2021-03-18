@@ -230,7 +230,7 @@ workflows:
     jobs:
       build_compiler_containers:
         <<: *build_compiler_containers_job
-        if: "contains(github.event.pull_request.labels.*.name, 'CI: approved')"
+        if: "github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'CI: approved')"
         env:
           <<: *build_compiler_containers_job_env
 
@@ -246,7 +246,7 @@ workflows:
 
       build_tool_containers:
         <<: *build_tool_containers_job
-        if: "contains(github.event.pull_request.labels.*.name, 'CI: approved')"
+        if: "github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'CI: approved')"
         env:
           <<: *build_tool_containers_job_env
 
@@ -259,7 +259,7 @@ workflows:
       build_backend:
         name: "Build backend"
         runs-on: ubuntu-latest
-        if: "contains(github.event.pull_request.labels.*.name, 'CI: approved')"
+        if: "github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'CI: approved')"
 
         steps:
           - *checkout_pr
@@ -302,7 +302,7 @@ workflows:
       build_frontend:
         name: "Build frontend"
         runs-on: ubuntu-latest
-        if: "contains(github.event.pull_request.labels.*.name, 'CI: approved')"
+        if: "github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'CI: approved')"
 
         steps:
           - *checkout_pr
@@ -349,7 +349,7 @@ workflows:
       run_integration_tests:
         name: "Running integration tests"
         runs-on: ubuntu-latest
-        if: "contains(github.event.pull_request.labels.*.name, 'CI: approved')"
+        if: "github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'CI: approved')"
         needs:
           - build_compiler_containers
           - build_tool_containers
