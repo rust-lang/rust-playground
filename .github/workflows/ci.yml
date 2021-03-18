@@ -5,13 +5,15 @@ name: Validate everything
   push:
     branches:
     - master
-  pull_request:
+  pull_request_target:
+    types:
+    - labeled
     branches:
     - master
 env:
   DOCKER_HUB_USERNAME: shepmaster
   GH_CONTAINER_REGISTRY_USERNAME: shepmaster
-  AWS_ACCESS_KEY_ID: AKIAWESVHZ3J6US4DSXP
+  AWS_ACCESS_KEY_ID: AKIAWESVHZ3JQAY5NM5K
 jobs:
   build_compiler_containers:
     name: Build ${{ matrix.channel }} compiler container
@@ -22,11 +24,14 @@ jobs:
         - stable
         - beta
         - nightly
+    if: 'contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     env:
       IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        ref: "${{ github.event.pull_request.head.sha }}"
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
       with:
@@ -124,11 +129,14 @@ jobs:
         - clippy
         - miri
         - rustfmt
+    if: 'contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     env:
       IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-tool-${{ matrix.tool }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        ref: "${{ github.event.pull_request.head.sha }}"
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
       with:
@@ -155,9 +163,12 @@ jobs:
   build_backend:
     name: Build backend
     runs-on: ubuntu-latest
+    if: 'contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        ref: "${{ github.event.pull_request.head.sha }}"
     - name: Cache Cargo intermediate products
       uses: actions/cache@v2
       with:
@@ -182,9 +193,12 @@ jobs:
   build_frontend:
     name: Build frontend
     runs-on: ubuntu-latest
+    if: 'contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        ref: "${{ github.event.pull_request.head.sha }}"
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -214,6 +228,7 @@ jobs:
   run_integration_tests:
     name: Running integration tests
     runs-on: ubuntu-latest
+    if: 'contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     needs:
     - build_compiler_containers
     - build_tool_containers
@@ -225,6 +240,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        ref: "${{ github.event.pull_request.head.sha }}"
     - name: Configure Ruby
       uses: actions/setup-ruby@v1
       with:
