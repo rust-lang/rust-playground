@@ -24,7 +24,7 @@ jobs:
         - stable
         - beta
         - nightly
-    if: 'contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
+    if: 'github.event_name == ''push'' || contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     env:
       IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
     steps:
@@ -129,7 +129,7 @@ jobs:
         - clippy
         - miri
         - rustfmt
-    if: 'contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
+    if: 'github.event_name == ''push'' || contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     env:
       IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-tool-${{ matrix.tool }}
     steps:
@@ -163,7 +163,7 @@ jobs:
   build_backend:
     name: Build backend
     runs-on: ubuntu-latest
-    if: 'contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
+    if: 'github.event_name == ''push'' || contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -193,7 +193,7 @@ jobs:
   build_frontend:
     name: Build frontend
     runs-on: ubuntu-latest
-    if: 'contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
+    if: 'github.event_name == ''push'' || contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -228,7 +228,7 @@ jobs:
   run_integration_tests:
     name: Running integration tests
     runs-on: ubuntu-latest
-    if: 'contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
+    if: 'github.event_name == ''push'' || contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     needs:
     - build_compiler_containers
     - build_tool_containers
