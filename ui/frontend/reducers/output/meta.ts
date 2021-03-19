@@ -29,6 +29,9 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.CompileMirRequest:
       return { ...state, focus: Focus.Mir };
 
+    case ActionType.CompileHirRequest:
+      return { ...state, focus: Focus.Hir };
+
     case ActionType.CompileWasmRequest:
       return { ...state, focus: Focus.Wasm };
 

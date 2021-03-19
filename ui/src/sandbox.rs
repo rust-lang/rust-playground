@@ -169,6 +169,8 @@ impl Sandbox {
             if process == ProcessAssembly::Filter {
                 code = super::asm_cleanup::filter_asm(&code);
             }
+        } else if CompileTarget::Hir == req.target {
+            // TODO: Run rustfmt on the generated HIR.
         }
 
         Ok(CompileResponse {
@@ -479,7 +481,13 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
     }
 
     if let Some(target) = target {
-        cmd.extend(&["--", "-o", "/playground-result/compilation"]);
+        cmd.extend(&["--", "-o"]);
+        if target == Hir {
+            // -Zunpretty=hir only emits the HIR, not the binary itself
+            cmd.push("/playground-result/compilation.hir");
+        } else {
+            cmd.push("/playground-result/compilation");
+        }
 
         match target {
             Assembly(flavor, _, _) => {
@@ -501,6 +509,7 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
             },
             LlvmIr => cmd.push("--emit=llvm-ir"),
             Mir => cmd.push("--emit=mir"),
+            Hir => cmd.push("-Zunpretty=hir"),
             Wasm => { /* handled by cargo-wasm wrapper */ },
          }
     }
@@ -612,6 +621,7 @@ pub enum CompileTarget {
     Assembly(AssemblyFlavor, DemangleAssembly, ProcessAssembly),
     LlvmIr,
     Mir,
+    Hir,
     Wasm,
 }
 
@@ -621,6 +631,7 @@ impl CompileTarget {
             CompileTarget::Assembly(_, _, _) => "s",
             CompileTarget::LlvmIr            => "ll",
             CompileTarget::Mir               => "mir",
+            CompileTarget::Hir               => "hir",
             CompileTarget::Wasm              => "wat",
         };
         OsStr::new(ext)
@@ -635,6 +646,7 @@ impl fmt::Display for CompileTarget {
             Assembly(_, _, _) => "assembly".fmt(f),
             LlvmIr            => "LLVM IR".fmt(f),
             Mir               => "Rust MIR".fmt(f),
+            Hir               => "Rust HIR".fmt(f),
             Wasm              => "WebAssembly".fmt(f),
         }
     }

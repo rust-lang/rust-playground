@@ -934,6 +934,7 @@ fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
                                                   sandbox::ProcessAssembly::Filter),
         "llvm-ir" => sandbox::CompileTarget::LlvmIr,
         "mir" => sandbox::CompileTarget::Mir,
+        "hir" => sandbox::CompileTarget::Hir,
         "wasm" => sandbox::CompileTarget::Wasm,
         value => InvalidTarget { value }.fail()?,
     })
