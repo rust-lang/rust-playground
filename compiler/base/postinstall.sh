@@ -20,8 +20,13 @@ function install_wasm_gc() {
     cargo install wasm-gc
 }
 
+function install_wasm_pack() {
+    curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+}
+
 if [[ $1 == "nightly" ]]; then
     (install_wasm_target)
     (install_wasm2wat)
     (install_wasm_gc)
+    (install_wasm_pack)
 fi
