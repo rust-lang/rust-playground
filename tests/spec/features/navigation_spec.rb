@@ -41,7 +41,6 @@ RSpec.feature "Navigating between pages", type: :feature, js: true do
     expect(page).to be_at_url('/', version: 'beta', mode: 'release')
 
     go_back
-    go_back
     expect(page).to be_at_url('/')
   end
 

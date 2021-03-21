@@ -71,6 +71,7 @@ const LABELS: { [index in PrimaryActionCore]: string } = {
   [PrimaryActionCore.Compile]: 'Build',
   [PrimaryActionCore.Execute]: 'Run',
   [PrimaryActionCore.LlvmIr]: 'Show LLVM IR',
+  [PrimaryActionCore.Hir]: 'Show HIR',
   [PrimaryActionCore.Mir]: 'Show MIR',
   [PrimaryActionCore.Test]: 'Test',
   [PrimaryActionCore.Wasm]: 'Show WASM',
@@ -102,9 +103,11 @@ export const miriVersionDetailsText = createSelector([getMiri], versionDetails);
 
 const editionSelector = (state: State) => state.configuration.edition;
 
-export const isWasmAvailable = (state: State) => (
+export const isNightlyChannel = (state: State) => (
   state.configuration.channel === Channel.Nightly
 );
+export const isWasmAvailable = isNightlyChannel;
+export const isHirAvailable = isNightlyChannel;
 
 export const getModeLabel = (state: State) => {
   const { configuration: { mode } } = state;
@@ -142,6 +145,7 @@ const getOutputs = (state: State) => [
   state.output.gist,
   state.output.llvmIr,
   state.output.mir,
+  state.output.hir,
   state.output.miri,
   state.output.macroExpansion,
   state.output.wasm,

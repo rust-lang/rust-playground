@@ -39,11 +39,7 @@ version = "=0.11.0"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.39"
-
-[dependencies.anymap]
-package = "anymap"
-version = "=0.12.1"
+version = "=1.0.38"
 
 [dependencies.approx]
 package = "approx"
@@ -105,14 +101,10 @@ version = "=2.4.0"
 package = "bstr"
 version = "=0.2.15"
 
-[dependencies.bumpalo]
-package = "bumpalo"
-version = "=3.6.1"
-
 [dependencies.bytemuck]
 package = "bytemuck"
 version = "=1.5.1"
-features = ["derive", "extern_crate_alloc", "extern_crate_std", "zeroable_maybe_uninit"]
+features = ["bytemuck_derive", "derive", "extern_crate_alloc", "extern_crate_std", "zeroable_maybe_uninit"]
 
 [dependencies.byteorder]
 package = "byteorder"
@@ -390,7 +382,7 @@ version = "=0.2.3"
 
 [dependencies.http_body]
 package = "http-body"
-version = "=0.4.1"
+version = "=0.4.0"
 
 [dependencies.httparse]
 package = "httparse"
@@ -449,17 +441,13 @@ version = "=0.4.7"
 package = "jpeg-decoder"
 version = "=0.1.22"
 
-[dependencies.js_sys]
-package = "js-sys"
-version = "=0.3.49"
-
 [dependencies.lazy_static]
 package = "lazy_static"
 version = "=1.4.0"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.90"
+version = "=0.2.88"
 
 [dependencies.libm]
 package = "libm"
@@ -543,7 +531,7 @@ version = "=0.3.7"
 
 [dependencies.mio]
 package = "mio"
-version = "=0.7.10"
+version = "=0.7.9"
 features = ["net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
@@ -755,7 +743,7 @@ version = "=0.2.2"
 [dependencies.rand_core]
 package = "rand_core"
 version = "=0.6.2"
-features = ["alloc", "serde1", "std"]
+features = ["alloc", "getrandom", "serde", "serde1", "std"]
 
 [dependencies.rand_core_0_5_1]
 package = "rand_core"
@@ -915,7 +903,7 @@ version = "=0.5.2"
 
 [dependencies.standback]
 package = "standback"
-version = "=0.2.16"
+version = "=0.2.15"
 
 [dependencies.string_cache]
 package = "string_cache"
@@ -1000,7 +988,7 @@ version = "=0.6.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.2.26"
+version = "=0.2.25"
 
 [dependencies.time_0_1_44]
 package = "time"
@@ -1025,7 +1013,7 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.4.0"
+version = "=1.3.0"
 features = ["full", "test-util"]
 
 [dependencies.tokio_native_tls]
@@ -1038,7 +1026,7 @@ version = "=0.7.0"
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.6.5"
+version = "=0.6.4"
 
 [dependencies.toml]
 package = "toml"
@@ -1184,11 +1172,3 @@ version = "=0.16.1"
 [dependencies.yaml_rust]
 package = "yaml-rust"
 version = "=0.4.5"
-
-[dependencies.yew]
-package = "yew"
-version = "=0.17.4"
-
-[dependencies.yew_macro]
-package = "yew-macro"
-version = "=0.17.0"

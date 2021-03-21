@@ -24,12 +24,14 @@ const useDispatchAndClose = (action: () => void, close: () => void) => {
 }
 
 const BuildMenu: React.SFC<BuildMenuProps> = props => {
+  const isHirAvailable = useSelector(selectors.isHirAvailable);
   const isWasmAvailable = useSelector(selectors.isWasmAvailable);
 
   const compile = useDispatchAndClose(actions.performCompile, props.close);
   const compileToAssembly = useDispatchAndClose(actions.performCompileToAssembly, props.close);
   const compileToLLVM = useDispatchAndClose(actions.performCompileToLLVM, props.close);
   const compileToMir = useDispatchAndClose(actions.performCompileToMir, props.close);
+  const compileToHir = useDispatchAndClose(actions.performCompileToNightlyHir, props.close);
   const compileToWasm = useDispatchAndClose(actions.performCompileToNightlyWasm, props.close);
   const execute = useDispatchAndClose(actions.performExecute, props.close);
   const test = useDispatchAndClose(actions.performTest, props.close);
@@ -55,7 +57,11 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => {
         Build and show the resulting LLVM IR, LLVM’s intermediate representation.
       </ButtonMenuItem>
       <ButtonMenuItem name="MIR" onClick={compileToMir}>
-        Build and show the resulting MIR, Rust’s intermediate representation.
+        Build and show the resulting MIR, Rust’s control-flow-based intermediate representation.
+      </ButtonMenuItem>
+      <ButtonMenuItem name="HIR" onClick={compileToHir}>
+        Build and show the resulting HIR, Rust’s syntax-based intermediate representation.
+        {!isHirAvailable && <HirAside />}
       </ButtonMenuItem>
       <ButtonMenuItem name="WASM" onClick={compileToWasm}>
         Build a WebAssembly module for web browsers, in the .WAT textual representation.
@@ -64,6 +70,13 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => {
     </MenuGroup>
   );
 };
+
+const HirAside: React.SFC = () => (
+  <p className="build-menu__aside">
+    Note: HIR currently requires using the Nightly channel, selecting this
+    option will switch to Nightly.
+  </p>
+);
 
 const WasmAside: React.SFC = () => (
   <p className="build-menu__aside">

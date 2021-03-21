@@ -83,6 +83,9 @@ export enum ActionType {
   CompileLlvmIrRequest = 'COMPILE_LLVM_IR_REQUEST',
   CompileLlvmIrSucceeded = 'COMPILE_LLVM_IR_SUCCEEDED',
   CompileLlvmIrFailed = 'COMPILE_LLVM_IR_FAILED',
+  CompileHirRequest = 'COMPILE_HIR_REQUEST',
+  CompileHirSucceeded = 'COMPILE_HIR_SUCCEEDED',
+  CompileHirFailed = 'COMPILE_HIR_FAILED',
   CompileMirRequest = 'COMPILE_MIR_REQUEST',
   CompileMirSucceeded = 'COMPILE_MIR_SUCCEEDED',
   CompileMirFailed = 'COMPILE_MIR_FAILED',
@@ -346,6 +349,27 @@ const performCompileToLLVMOnly = () =>
     failure: receiveCompileLlvmIrFailure,
   });
 
+const requestCompileHir = () =>
+  createAction(ActionType.CompileHirRequest);
+
+const receiveCompileHirSuccess = ({ code, stdout, stderr }) =>
+  createAction(ActionType.CompileHirSucceeded, { code, stdout, stderr });
+
+const receiveCompileHirFailure = ({ error }) =>
+  createAction(ActionType.CompileHirFailed, { error });
+
+const performCompileToHirOnly = () =>
+  performCompileShow('hir', {
+    request: requestCompileHir,
+    success: receiveCompileHirSuccess,
+    failure: receiveCompileHirFailure,
+  });
+
+const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
+  dispatch(changeChannel(Channel.Nightly));
+  dispatch(performCompileToHirOnly());
+};
+
 const requestCompileMir = () =>
   createAction(ActionType.CompileMirRequest);
 
@@ -390,6 +414,7 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Test]: performTestOnly,
   [PrimaryActionAuto.Auto]: performAutoOnly,
   [PrimaryActionCore.LlvmIr]: performCompileToLLVMOnly,
+  [PrimaryActionCore.Hir]: performCompileToHirOnly,
   [PrimaryActionCore.Mir]: performCompileToMirOnly,
   [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
 };
@@ -417,6 +442,8 @@ export const performCompileToLLVM =
   performAndSwitchPrimaryAction(performCompileToLLVMOnly, PrimaryActionCore.LlvmIr);
 export const performCompileToMir =
   performAndSwitchPrimaryAction(performCompileToMirOnly, PrimaryActionCore.Mir);
+export const performCompileToNightlyHir =
+  performAndSwitchPrimaryAction(performCompileToNightlyHirOnly, PrimaryActionCore.Hir);
 export const performCompileToNightlyWasm =
   performAndSwitchPrimaryAction(performCompileToNightlyWasmOnly, PrimaryActionCore.Wasm);
 
@@ -790,6 +817,9 @@ export type Action =
   | ReturnType<typeof requestCompileMir>
   | ReturnType<typeof receiveCompileMirSuccess>
   | ReturnType<typeof receiveCompileMirFailure>
+  | ReturnType<typeof requestCompileHir>
+  | ReturnType<typeof receiveCompileHirSuccess>
+  | ReturnType<typeof receiveCompileHirFailure>
   | ReturnType<typeof requestCompileWasm>
   | ReturnType<typeof receiveCompileWasmSuccess>
   | ReturnType<typeof receiveCompileWasmFailure>

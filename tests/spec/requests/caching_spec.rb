@@ -21,7 +21,7 @@ RSpec.feature "Caching headers are provided for assets ", type: :request do
   describe "an asset" do
     let(:index_body) { Net::HTTP.get(index_uri) }
     let(:index_page) { Capybara.string(index_body) }
-    let(:asset_path) { index_page.first('body script', visible: false)[:src] }
+    let(:asset_path) { index_page.first('head script', visible: false)[:src] }
     let(:asset_uri) { URI.join(index_uri, asset_path) }
     let(:one_year_s) { 365 * 24 * 60 * 60 }
 

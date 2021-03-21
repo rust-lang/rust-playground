@@ -25,16 +25,16 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
   scenario "using an unstable feature offers adding the feature flag" do
     in_channel_menu { click_on("Nightly") }
     editor.set <<~EOF
-      fn foo<const T: usize>() {}
+      extern "avr-interrupt" fn dummy() {}
     EOF
     click_on("Build")
 
     within('.output-stderr') do
-      click_on("add `#![feature(min_const_generics)]`")
+      click_on("add `#![feature(abi_avr_interrupt)]`")
     end
 
     within('.editor') do
-      expect(editor).to have_line '#![feature(min_const_generics)]'
+      expect(editor).to have_line '#![feature(abi_avr_interrupt)]'
     end
   end
 

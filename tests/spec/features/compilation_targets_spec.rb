@@ -95,6 +95,18 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     end
   end
 
+  scenario "compiling to HIR" do
+    editor.set <<~EOF
+      fn demo() -> impl std::fmt::Display { 42 }
+    EOF
+
+    in_build_menu { click_on("HIR") }
+
+    within('.output-result') do
+      expect(page).to have_content 'fn demo() -> /*impl Trait*/ { 42 }'
+    end
+  end
+
   scenario "compiling to WebAssembly" do
     in_build_menu { click_on("WASM") }
 
