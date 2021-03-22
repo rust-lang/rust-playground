@@ -85,6 +85,7 @@ fn main() {
     mount.mount("/meta/version/miri", meta_version_miri);
     mount.mount("/meta/gist", gist_router);
     mount.mount("/evaluate.json", evaluate);
+    mount.mount("/wasm-pack", wasm_pack);
 
     let mut chain = Chain::new(mount);
     let file_logger = FileLogger::new(logfile).expect("Unable to create file logger");
@@ -278,6 +279,16 @@ fn evaluate(req: &mut Request<'_, '_>) -> IronResult<Response> {
             .execute(&req)
             .map(EvaluateResponse::from)
             .context(Evaluation)
+    })
+}
+
+fn wasm_pack(req: &mut Request<'_, '_>) -> IronResult<Response>{
+    with_sandbox(req, |sandbox, req: WasmPackRequest| {
+        let req = req.try_into()?;
+        sandbox
+            .wasm_pack(&req)
+            .map(WasmPackResponse::from)
+            .context(WasmPack)
     })
 }
 
@@ -488,6 +499,8 @@ pub enum Error {
     Execution { source: sandbox::Error },
     #[snafu(display("Evaluation operation failed: {}", source))]
     Evaluation { source: sandbox::Error },
+    #[snafu(display("wasm-pack operation failed: {}", source))]
+    WasmPack { source: sandbox::Error },
     #[snafu(display("Linting operation failed: {}", source))]
     Linting { source: sandbox::Error },
     #[snafu(display("Expansion operation failed: {}", source))]
@@ -689,6 +702,18 @@ struct EvaluateRequest {
 struct EvaluateResponse {
     result: String,
     error: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct WasmPackRequest {
+    code: String
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct WasmPackResponse {
+    wasm_js: Option<String>,
+    wasm_bg: Option<String>,
+    error: Option<String>
 }
 
 impl TryFrom<CompileRequest> for sandbox::CompileRequest {
@@ -921,6 +946,36 @@ impl From<sandbox::ExecuteResponse> for EvaluateResponse {
             let result = me.stderr + &me.stdout;
             EvaluateResponse {
                 result: result.clone(),
+                error: Some(result),
+            }
+        }
+    }
+}
+
+impl TryFrom<WasmPackRequest> for sandbox::WasmPackRequest {
+    type Error = Error;
+
+    fn try_from(me: WasmPackRequest) -> Result<Self> {
+        Ok(sandbox::WasmPackRequest {
+            code: me.code,
+            ..sandbox::WasmPackRequest::default()
+        })
+    }
+}
+
+impl From<sandbox::WasmPackResponse> for WasmPackResponse {
+    fn from(me: sandbox::WasmPackResponse) -> Self {
+        if me.success {
+            WasmPackResponse {
+                wasm_bg: me.wasm_bg,
+                wasm_js: me.wasm_js,
+                error: None,
+            }
+        } else {
+            let result = me.stderr + &me.stdout;
+            WasmPackResponse {
+                wasm_bg: None,
+                wasm_js: None,
                 error: Some(result),
             }
         }

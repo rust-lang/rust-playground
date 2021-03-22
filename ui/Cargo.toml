@@ -29,6 +29,7 @@ router = "0.6.0"
 openssl-probe = "0.1.2"
 dotenv = "0.15.0"
 snafu = "0.6.0"
+base64 = "0.13.0"
 
 [dependencies.playground-middleware]
 git = "https://github.com/integer32llc/playground-middleware"

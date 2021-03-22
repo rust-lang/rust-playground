@@ -194,6 +194,40 @@ impl Sandbox {
         })
     }
 
+
+    pub fn wasm_pack(&self, req: &WasmPackRequest) -> Result<WasmPackResponse> {
+        self.write_source_code(&req.code)?;
+        let command = self.wasm_pack_command(req)?;
+
+        let output = run_command_with_timeout(command)?;
+
+        let (wasm_bg, wasm_js) = if output.status.success() {
+            let wasm_base64 = self.get_built_code_base64(format!("{}_bg.wasm", req.output_name.as_str()).as_str())?;
+            let js_base64 = self.get_built_code_base64(format!("{}.js", req.output_name.as_str()).as_str())?;
+            (Some(wasm_base64), Some(js_base64))
+        } else {
+            (None, None)
+        };
+
+        Ok(WasmPackResponse {
+            success: output.status.success(),
+            stdout: vec_to_str(output.stdout)?,
+            stderr: vec_to_str(output.stderr)?,
+            wasm_bg: wasm_bg,
+            wasm_js: wasm_js
+        })
+    }
+
+    fn get_built_code_base64(&self, file: &str) -> Result<String> {
+        // pkg is default output directory of wasm-pack build
+        // https://rustwasm.github.io/wasm-pack/book/commands/build.html#output-directory
+        let file =  self.scratch.path().join("yew-wasm-pack-minimal").join("pkg").join(file);
+        let mut wasm_file = fs::File::open(file).context(UnableToCreateSourceFile)?;
+        let mut buf = Vec::new();
+        wasm_file.read_to_end(&mut buf).context(UnableToReadOutput)?;
+        Ok(base64::encode(buf))
+    }
+
     pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
         self.write_source_code(&req.code)?;
         let command = self.format_command(req);
@@ -350,6 +384,28 @@ impl Sandbox {
         log::debug!("Execution command is {:?}", cmd);
 
         cmd
+    }
+
+    fn wasm_pack_command(&self, req: &WasmPackRequest) -> Result<Command> {
+        let source_dir = Path::new("/playground").join("yew-wasm-pack-minimal");
+        let source_dir = source_dir.as_os_str().to_str().unwrap();
+        let target_dir = self.scratch.path().join("yew-wasm-pack-minimal");
+        let target_dir = target_dir.as_os_str().to_str().unwrap();
+        
+        let mut cmd = self.docker_command(Some(req.crate_type()));
+        let prepare_wasm_pack_cmd = build_prepare_wasm_pack_command(source_dir, target_dir);
+        let wasm_pack_cmd = build_wasm_pack_command(target_dir, req.output_name.as_str());
+        let combine_cmd = [vec!["pwd"], prepare_wasm_pack_cmd, wasm_pack_cmd];
+        let combine_cmd = combine_cmd.iter().map(|cmd| {
+            cmd.join(" ")
+        }).collect::<Vec<_>>().join(" && ");
+        let bash_cmd = ["bash", "-c", &format!("\"{}\"", combine_cmd)];
+
+        cmd.arg(&Channel::Nightly.container_name()).args(&bash_cmd);
+
+        log::debug!("wasm-pack command is {:?}", cmd);
+
+        Ok(cmd)
     }
 
     fn format_command(&self, req: impl EditionRequest) -> Command {
@@ -512,9 +568,24 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
             Hir => cmd.push("-Zunpretty=hir"),
             Wasm => { /* handled by cargo-wasm wrapper */ },
          }
-    }
+    }   
 
     cmd
+}
+
+fn build_wasm_pack_command<'a>(path: &'a str, out_name: &'a str) -> Vec<&'a str> {
+    vec![
+        "wasm-pack", "build",
+        "--target", "web",
+        "--out-name", out_name,
+        path
+    ]
+}
+
+fn build_prepare_wasm_pack_command<'a>(source_dir: &'a str, target_dir: &'a str) -> Vec<&'a str> {
+    vec!["cp", "-r",
+        source_dir,
+        target_dir]
 }
 
 fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) {
@@ -924,6 +995,35 @@ pub struct MacroExpansionResponse {
     pub stderr: String,
 }
 
+#[derive(Debug, Clone)]
+pub struct WasmPackRequest {
+    pub code: String,
+    pub crate_type: CrateType,
+    pub output_name: String,
+}
+
+impl Default for WasmPackRequest {
+    fn default() -> Self {
+        WasmPackRequest {
+            code: String::from(""),
+            crate_type: CrateType::Library(LibraryType::Rlib),
+            output_name: "wasm".to_string(),
+        }
+    }
+}
+
+impl CrateTypeRequest for WasmPackRequest {
+    fn crate_type(&self) -> CrateType { self.crate_type }
+}
+
+#[derive(Debug, Clone)]
+pub struct WasmPackResponse {
+    pub wasm_js: Option<String>,
+    pub wasm_bg: Option<String>,
+    pub success: bool,
+    pub stdout: String,
+    pub stderr: String,
+}
 #[cfg(test)]
 mod test {
     use super::*;
