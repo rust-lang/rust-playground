@@ -6,6 +6,7 @@ import * as selectors from './selectors';
 
 import ButtonMenuItem from './ButtonMenuItem';
 import MenuGroup from './MenuGroup';
+import MenuAside from './MenuAside';
 
 import styles from './BuildMenu.module.css';
 
@@ -74,17 +75,17 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => {
 };
 
 const HirAside: React.SFC = () => (
-  <p className={styles.aside}>
+  <MenuAside>
     Note: HIR currently requires using the Nightly channel, selecting this
     option will switch to Nightly.
-  </p>
+  </MenuAside>
 );
 
 const WasmAside: React.SFC = () => (
-  <p className={styles.aside}>
+  <MenuAside>
     Note: WASM currently requires using the Nightly channel, selecting this
     option will switch to Nightly.
-  </p>
+  </MenuAside>
 );
 
 export default BuildMenu;
