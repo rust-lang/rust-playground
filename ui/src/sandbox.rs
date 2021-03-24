@@ -201,6 +201,10 @@ impl Sandbox {
 
         let output = run_command_with_timeout(command)?;
 
+        // log::info!("{:?}", std::fs::read_dir(&self.scratch.path().join("pkg")).context(UnableToStartCompiler)?.map(|res| res.map(|e| e.path())).collect::<Result<Vec<_>, std::io::Error>>());
+        log::debug!("{:?}", &output.status);
+
+        // let (wasm_bg, wasm_js) = (None, None);
         let (wasm_bg, wasm_js) = if output.status.success() {
             let wasm_base64 = self.get_built_code_base64(format!("{}_bg.wasm", req.output_name.as_str()).as_str())?;
             let js_base64 = self.get_built_code_base64(format!("{}.js", req.output_name.as_str()).as_str())?;
@@ -221,7 +225,7 @@ impl Sandbox {
     fn get_built_code_base64(&self, file: &str) -> Result<String> {
         // pkg is default output directory of wasm-pack build
         // https://rustwasm.github.io/wasm-pack/book/commands/build.html#output-directory
-        let file =  self.scratch.path().join("yew-wasm-pack-minimal").join("pkg").join(file);
+        let file = self.output_dir.join("pkg").join(file);
         let mut wasm_file = fs::File::open(file).context(UnableToCreateSourceFile)?;
         let mut buf = Vec::new();
         wasm_file.read_to_end(&mut buf).context(UnableToReadOutput)?;
@@ -387,21 +391,26 @@ impl Sandbox {
     }
 
     fn wasm_pack_command(&self, req: &WasmPackRequest) -> Result<Command> {
-        let source_dir = Path::new("/playground").join("yew-wasm-pack-minimal");
-        let source_dir = source_dir.as_os_str().to_str().unwrap();
-        let target_dir = self.scratch.path().join("yew-wasm-pack-minimal");
-        let target_dir = target_dir.as_os_str().to_str().unwrap();
+        // let source_dir = Path::new("/playground").join("yew-wasm-pack-minimal");
+        // let source_dir = source_dir.as_os_str().to_str().unwrap();
+        // let target_dir = self.scratch.as_path().join("yew-wasm-pack-minimal");
+        // let target_dir = target_dir.as_os_str().to_str().unwrap();
         
         let mut cmd = self.docker_command(Some(req.crate_type()));
-        let prepare_wasm_pack_cmd = build_prepare_wasm_pack_command(source_dir, target_dir);
-        let wasm_pack_cmd = build_wasm_pack_command(target_dir, req.output_name.as_str());
-        let combine_cmd = [vec!["pwd"], prepare_wasm_pack_cmd, wasm_pack_cmd];
-        let combine_cmd = combine_cmd.iter().map(|cmd| {
-            cmd.join(" ")
-        }).collect::<Vec<_>>().join(" && ");
-        let bash_cmd = ["bash", "-c", &format!("\"{}\"", combine_cmd)];
+        // let prepare_wasm_pack_cmd = build_prepare_wasm_pack_command(source_dir, target_dir);
+        // let wasm_pack_cmd = build_wasm_pack_command(target_dir, req.output_name.as_str());
+        // let dummy_cmd = vec!["find", "/", "-regex", ".*/.*.wasm"];//, self.output_dir.as_os_str().to_str().unwrap()];
+        // let dummy_cmd = vec!["ls", "pkg"];//, self.output_dir.as_os_str().to_str().unwrap()];
+        let dummy_cmd = vec!["mv", "pkg", "/playground-result"];//, self.output_dir.as_os_str().to_str().unwrap()];
+        
+        // let combine_cmd = [];//, prepare_wasm_pack_cmd, wasm_pack_cmd];
+        // // let combine_cmd = [wasm_pack_cmd];
+        // let combine_cmd = combine_cmd.iter().map(|cmd| {
+        //     cmd.join(" ")
+        // }).collect::<Vec<_>>().join(" && ");
+        // let bash_cmd = ["bash", "-c", &format!("\"{}\"", combine_cmd)];
 
-        cmd.arg(&Channel::Nightly.container_name()).args(&bash_cmd);
+        cmd.arg(&Channel::Nightly.container_name()).args(&dummy_cmd);
 
         log::debug!("wasm-pack command is {:?}", cmd);
 
@@ -475,10 +484,14 @@ impl Sandbox {
         mount_output_dir.push(":");
         mount_output_dir.push("/playground-result");
 
+        // let mut mount_output_wasm = self.scratch.as_path().join("pkg").as_os_str().to_os_string();
+        // mount_output_wasm.push(":");
+        // mount_output_wasm.push("/playground/pkg");
         let mut cmd = basic_secure_docker_command();
 
         cmd
             .arg("--volume").arg(&mount_input_file)
+            // .arg("--volume").arg(&mount_output_wasm)
             .arg("--volume").arg(&mount_output_dir);
 
         cmd
@@ -575,10 +588,11 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
 
 fn build_wasm_pack_command<'a>(path: &'a str, out_name: &'a str) -> Vec<&'a str> {
     vec![
-        "wasm-pack", "build",
+        "wasm-pack",
+        "build",
         "--target", "web",
         "--out-name", out_name,
-        path
+        // // path
     ]
 }
 
@@ -737,7 +751,7 @@ impl Channel {
         match *self {
             Stable => "rust-stable",
             Beta => "rust-beta",
-            Nightly => "rust-nightly",
+            Nightly => "unique-nightly",
         }
     }
 }
