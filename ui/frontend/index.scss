@@ -2,8 +2,6 @@
 
 $background: #E1E1DB;
 $rust: #AA4422;
-$selected-radio: desaturate(lighten($rust, 30%), 20%);
-$unselected-radio: lighten($selected-radio, 20%);
 $border-color: #BBBBBB;
 $border: 1px solid $border-color;
 
@@ -134,31 +132,6 @@ body {
             flex: 1 1 auto;
             position: relative;
         }
-    }
-}
-
-.configuration {
-    position: relative;
-    width: 100%;
-    height: 100%;
-
-    &-item {
-        display: flex;
-        margin-bottom: 0.5em;
-    }
-
-    &-label {
-        flex: 1 1 100%;
-    }
-
-    &-value {
-        flex: 1 1 100%;
-    }
-
-    &-actions {
-        right: 0;
-        bottom: 0;
-        position: absolute;
     }
 }
 
@@ -304,52 +277,6 @@ body {
 
     &-add-main {
       @include button-as-link;
-    }
-}
-
-.drop {
-    &__toggle {
-        font-size: 50%;
-        height: 100%;
-    }
-
-    &__menu {
-        display: none;
-
-        position: absolute;
-        top: 90%;
-        left: 0;
-        z-index: 10;
-
-        margin: 0;
-        padding: 0;
-
-        border: $border;
-        box-shadow: 0.5px 0.5px 10px 1px rgba(0, 0, 0, 0.2);
-
-        &--open {
-            display: inherit;
-        }
-    }
-
-    &__menu-item {
-        list-style: none;
-        white-space: nowrap;
-        border-bottom: $border;
-        &:last-child {
-            border-bottom: none;
-        }
-    }
-
-    &__button {
-        width: 100%;
-        background: white;
-        border: none;
-        cursor: pointer;
-        text-align: left;
-        &:hover {
-            background-color: darken(white, 10%);
-        }
     }
 }
 
@@ -722,13 +649,6 @@ $header-transition: 0.2s ease-in-out;
 .channel-menu {
   &__description {
     margin: 0;
-  }
-}
-
-.advanced-options-menu {
-  &__aside {
-    margin: 0.25em 0 1em 0;
-    color: #888;
   }
 }
 
