@@ -89,12 +89,7 @@ module.exports = function(_, argv) {
         },
         {
           test: /\.svg$/,
-          use: {
-            loader: 'svg-url-loader',
-            options: {
-              noquotes: true,
-            },
-          },
+          type: 'asset/inline',
         },
       ],
     },
