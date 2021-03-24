@@ -344,28 +344,6 @@ body {
            text-decoration: underline;
        }
     }
-
-    &__example {
-        position: relative;
-    }
-
-    &__load_example {
-        position: absolute;
-        right: 0;
-        top: 0;
-        border: none;
-        background: rgba(255, 255, 255, 0.8);
-        border-bottom-left-radius: 0.5em;
-        visibility: hidden;
-        opacity: 0;
-        transition: all 0.5s;
-        cursor: pointer;
-    }
-
-    &__example:hover &__load_example {
-        visibility: visible;
-        opacity: 1;
-    }
 }
 
 $header-tint: #428bca;
