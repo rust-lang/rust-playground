@@ -4,6 +4,8 @@ import * as actions from './actions';
 import Example from './HelpExample';
 import Link from './uss-router/Link';
 
+import styles from './Help.module.css';
+
 import integer32Logo from './assets/integer32-logo.svg';
 
 const ACE_URL = 'https://github.com/ajaxorg/ace';
@@ -75,7 +77,7 @@ fn main() {
 
 const Help: React.SFC = () => {
   return (
-    <section className="help">
+    <section className={`help ${styles.container}`}>
       <h1>The Rust Playground</h1>
       <Link action={actions.navigateToIndex}>Return to the playground</Link>
 
@@ -98,7 +100,7 @@ const Help: React.SFC = () => {
         part of <a href={I32_URL}>Integer 32</a>.
         </p>
 
-        <p className="help__logo">
+        <p className={styles.logo}>
           <a href={I32_URL}>
             <img src={integer32Logo} alt="Integer 32 Logo" />
           </a>
@@ -178,7 +180,7 @@ const Help: React.SFC = () => {
                                         limitations on the maximum length.
           </p>
 
-          <pre className="help__code"><code>{LINK_EXAMPLE}</code></pre>
+          <pre className={styles.code}><code>{LINK_EXAMPLE}</code></pre>
         </LinkableSection>
 
         <LinkableSection id="features-tests" header="Executing tests" level={H3}>
@@ -322,8 +324,8 @@ const LinkableSection: React.SFC<LinkableSectionProps> = ({
 }) => (
   <div id={id}>
     <Level>
-      <span className="help__header">
-        <a className="help__header-link" href={`#${id}`}>{header}</a>
+      <span className={styles.header}>
+        <a className={styles.headerLink} href={`#${id}`}>{header}</a>
       </span>
     </Level>
     {children}
@@ -337,7 +339,7 @@ interface LinkableSectionProps {
 }
 
 const Code: React.SFC = ({ children }) => (
-  <code className="help__code">{children}</code>
+  <code className={styles.code}>{children}</code>
 );
 
 export default Help;
