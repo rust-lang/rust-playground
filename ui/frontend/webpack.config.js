@@ -40,6 +40,10 @@ module.exports = function(_, argv) {
         false :
         'inline-source-map';
 
+  const localIdentName = isProduction ?
+         "[hash:base64]" :
+         "[path][name]__[local]--[hash:base64]";
+
   return {
     entry: {
       app: ['./index.tsx', './index.scss'],
@@ -85,6 +89,21 @@ module.exports = function(_, argv) {
             "css-loader",
             "postcss-loader",
             "sass-loader",
+          ],
+        },
+        {
+          test: /\.module.css$/,
+          use: [
+            MiniCssExtractPlugin.loader,
+            {
+              loader: "css-loader",
+              options: {
+                modules: {
+                  localIdentName,
+                },
+              },
+            },
+            "postcss-loader",
           ],
         },
         {
