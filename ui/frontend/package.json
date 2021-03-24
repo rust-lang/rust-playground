@@ -21,6 +21,7 @@
     "react-portal": "^4.1.4",
     "react-prism": "^4.0.0",
     "react-redux": "^7.0.0",
+    "react-shadow": "^19.0.2",
     "redux": "^4.0.0",
     "redux-thunk": "^2.1.0",
     "regenerator-runtime": "^0.13.2",

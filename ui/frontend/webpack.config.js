@@ -92,6 +92,10 @@ module.exports = function(_, argv) {
           ],
         },
         {
+          test: /prismjs\/themes\/.*css$/,
+          type: 'asset/resource',
+        },
+        {
           test: /\.module.css$/,
           use: [
             MiniCssExtractPlugin.loader,
