@@ -47,6 +47,14 @@ module.exports = function(_, argv) {
 
     devtool,
 
+    cache: {
+      type: 'filesystem',
+
+      buildDependencies: {
+        config: [__filename],
+      },
+    },
+
     output: {
       publicPath: 'assets/',
       path: `${__dirname}/build/assets`,
