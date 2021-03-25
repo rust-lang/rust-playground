@@ -29,26 +29,6 @@ body {
     font-family: $primary-font;
 }
 
-@mixin split-first-child() {
-    // the first child, i.e. the editor has the border already
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 0;
-}
-
-@mixin split-all-children() {
-    // space between the split
-    margin-left: 0.5em;
-
-    // FIXME: remove this, when the output-rules are 'aware' of the orientation
-    //        (this disables the extra margin-top for the spacing between editor
-    //        and output in the horizontal split mode)
-    margin-top: -0.2em;
-
-    // for the border of the editor
-    margin-bottom: 4px;
-}
-
 @mixin button-reset {
   border: none;
   padding: 0;
@@ -65,74 +45,6 @@ body {
   cursor: pointer;
   text-decoration: underline;
   color: #0000EE;
-}
-
-.playground {
-    display: flex;
-    height: 100vh;
-    flex-direction: column;
-
-    padding-bottom: 1em;
-
-    &-split {
-        display: flex;
-        height: 100%;
-
-        &-automatic {
-            @media screen and (max-width: 1600px) {
-                flex-direction: column;
-            }
-
-            @media screen and (min-width: 1600px) {
-                flex-direction: row;
-            }
-        }
-
-        &-horizontal {
-            flex-direction: column;
-        }
-
-        &-vertical {
-            flex-direction: row;
-        }
-
-        &-vertical > *:first-child {
-            @include split-first-child();
-        }
-
-        // automatic vertical
-        &-automatic > *:first-child {
-            @media screen and (min-width: 1600px) {
-                @include split-first-child();
-            }
-        }
-
-        &-vertical > * {
-            @include split-all-children();
-        }
-
-        // automatic vertical
-        &-automatic > * {
-            @media screen and (min-width: 1600px) {
-                @include split-all-children();
-            }
-        }
-    }
-
-    &-editor {
-        flex: 1 1 auto;
-        position: relative;
-
-        border: 4px solid $border-color;
-        border-radius: 4px;
-    }
-
-    &-output {
-        &-focused {
-            flex: 1 1 auto;
-            position: relative;
-        }
-    }
 }
 
 @mixin body-monospace {
@@ -173,7 +85,7 @@ body {
 
     margin-top: 0.2em;
 
-    .playground-output-focused & {
+    &--focused {
         position: absolute;
         width: 100%;
         height: 100%;
@@ -646,4 +558,8 @@ $header-transition: 0.2s ease-in-out;
       }
     }
   }
+}
+
+:root {
+  --border-color: #{$border-color};
 }

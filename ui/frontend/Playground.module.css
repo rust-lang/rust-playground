@@ -1,0 +1,97 @@
+.container {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  padding-bottom: 1em;
+}
+
+.split {
+  display: flex;
+  height: 100%;
+}
+
+.splitAutomatic {
+  composes: split;
+}
+
+@media screen and (max-width: 1600px) {
+  .splitAutomatic {
+    flex-direction: column;
+  }
+}
+
+@media screen and (min-width: 1600px) {
+  .splitAutomatic {
+    flex-direction: row;
+  }
+}
+
+.splitHorizontal {
+  composes: split;
+  flex-direction: column;
+}
+
+.splitVertical {
+  composes: split;
+  flex-direction: row;
+}
+
+.splitVertical > * {
+  /* FIXME: remove this, when the output-rules are 'aware' of the
+   * orientation (this disables the extra margin-top for the spacing
+   * between editor and output in the horizontal split mode)
+   */
+  margin-top: -0.2em;
+
+  /* for the border of the editor */
+  margin-bottom: 4px;
+
+  /* space between the split */
+  margin-left: 0.5em;
+}
+
+.splitVertical > *:first-child {
+  /* the first child, i.e. the editor has the border already */
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+}
+
+@media screen and (min-width: 1600px) {
+  /* automatic vertical */
+  .splitAutomatic > *:first-child {
+    /* the first child, i.e. the editor has the border already */
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+  }
+}
+
+/* automatic vertical */
+@media screen and (min-width: 1600px) {
+  .splitAutomatic > * {
+    /* FIXME: remove this, when the output-rules are 'aware' of the
+   * orientation (this disables the extra margin-top for the spacing
+   * between editor and output in the horizontal split mode)
+   */
+    margin-top: -0.2em;
+
+    /* for the border of the editor */
+    margin-bottom: 4px;
+
+    /* space between the split */
+    margin-left: 0.5em;
+  }
+}
+
+.editor {
+  position: relative;
+  flex: 1 1 auto;
+  border: 4px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.outputFocused {
+  position: relative;
+  flex: 1 1 auto;
+}
