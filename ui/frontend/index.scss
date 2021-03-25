@@ -647,38 +647,3 @@ $header-transition: 0.2s ease-in-out;
     }
   }
 }
-
-.notifications {
-    position: absolute;
-    z-index: 10;
-
-    $buffer: 0.5em;
-
-    bottom: $buffer;
-    left: $buffer;
-    right: $buffer;
-
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 50em;
-
-    background: white;
-    border: 2px solid #428bca;
-
-    &__notification {
-      display: flex;
-    }
-
-    $space: 0.25em;
-
-    &__notification-content {
-      padding: $space 0 $space $space;
-    }
-
-    &__close {
-      @include button-reset;
-      padding: $space;
-      background: #e1e1db;
-      cursor: pointer;
-    }
-}

@@ -1,0 +1,9 @@
+.-buttonReset {
+  padding: 0;
+  border: none;
+  background: inherit;
+  background-color: transparent; /* IE 11 */
+  font: inherit;
+  line-height: inherit;
+  text-align: inherit;
+}
