@@ -69,7 +69,7 @@ const ExecuteButton: React.SFC = () => {
 
   return (
     <SegmentedButton isBuild onClick={execute}>
-      <HeaderButton rightIcon={<BuildIcon />}>
+      <HeaderButton bold rightIcon={<BuildIcon />}>
         {executionLabel}
       </HeaderButton>
     </SegmentedButton>

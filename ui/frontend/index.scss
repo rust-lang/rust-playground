@@ -411,10 +411,6 @@ $header-transition: 0.2s ease-in-out;
         border-right-width: 0;
       }
 
-      .header-button {
-        font-weight: 700;
-      }
-
       &:hover {
         background: $rust-dark;
         color: white;
@@ -649,51 +645,6 @@ $header-transition: 0.2s ease-in-out;
         border-left-width: 0;
       }
     }
-  }
-}
-
-.header-button {
-  height: 3em;
-  padding: 0 1.25em;
-  display: flex;
-  align-items: center;
-
-  text-transform: uppercase;
-  text-decoration: none;
-  font-weight: 600;
-
-  white-space: nowrap;
-
-  &--expandable {
-    padding-right: 1em;
-  }
-
-  &--has-left-icon {
-    padding-left: 1em;
-  }
-
-  &--has-right-icon {
-    padding-right: 1em;
-  }
-
-  &--icon-only {
-    padding: 0 0.75em;
-  }
-
-  &__left-icon {
-    margin-right: 0.5em;
-  }
-
-  &--icon-only &__left-icon {
-    margin-right: 0;
-  }
-
-  &__drop {
-    margin-left: 0.75em;
-  }
-
-  &__right-icon {
-    margin-left: 0.75em;
   }
 }
 
