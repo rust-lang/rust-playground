@@ -447,8 +447,8 @@ fn basic_secure_docker_command() -> Command {
         "--security-opt=no-new-privileges",
         "--workdir", "/playground",
         "--net", "none",
-        "--memory", "256m",
-        "--memory-swap", "320m",
+        "--memory", "512m",
+        "--memory-swap", "640m",
         "--env", format!("PLAYGROUND_TIMEOUT={}", DOCKER_PROCESS_TIMEOUT_SOFT.as_secs()),
     );
 
