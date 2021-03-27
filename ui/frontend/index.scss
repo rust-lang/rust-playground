@@ -356,31 +356,6 @@ $header-transition: 0.2s ease-in-out;
   }
 }
 
-.menu-group {
-  width: 27em;
-  padding: 0.75em 1em 0 1em;
-
-  &:last-child {
-    padding-bottom: 0.75em;
-  }
-
-  line-height: normal;
-
-  &__title {
-    margin: 0;
-
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 11px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid $header-main-border;
-  }
-
-  &__content {
-    padding: 1em 0.25em;
-  }
-}
-
 @mixin menu-item-title {
   font-size: 13px;
   font-weight: 600;
@@ -527,4 +502,5 @@ $header-transition: 0.2s ease-in-out;
 
 :root {
   --border-color: #{$border-color};
+  --header-main-border: #{$header-main-border};
 }
