@@ -381,14 +381,6 @@ $header-transition: 0.2s ease-in-out;
   }
 }
 
-.menu-item {
-  margin-bottom: 1em;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
 @mixin menu-item-title {
   font-size: 13px;
   font-weight: 600;
