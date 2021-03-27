@@ -19,6 +19,7 @@ import {
   performCratesLoad,
   performVersionsLoad,
   reExecuteWithBacktrace,
+  browserWidthChanged,
 } from './actions';
 import { configureRustErrors } from './highlighting';
 import localStorage from './local_storage';
@@ -46,6 +47,12 @@ const enhancers = composeEnhancers(
   sessionStorage,
 );
 const store = createStore(playgroundApp, initialState, enhancers);
+
+const z = (evt: MediaQueryList | MediaQueryListEvent) => { store.dispatch(browserWidthChanged(evt.matches)); };
+
+const maxWidthMediaQuery = window.matchMedia('(max-width: 1600px)');
+z(maxWidthMediaQuery);
+maxWidthMediaQuery.addListener(z);
 
 configureRustErrors({
   enableFeatureGate: featureGate => store.dispatch(enableFeatureGate(featureGate)),

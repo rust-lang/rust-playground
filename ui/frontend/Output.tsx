@@ -44,11 +44,7 @@ interface PaneWithCodeProps extends SimplePaneProps {
   code?: string;
 }
 
-interface OutputProps {
-  isFocused?: boolean;
-}
-
-const Output: React.SFC<OutputProps> = ({ isFocused }) => {
+const Output: React.SFC = () => {
   const somethingToShow = useSelector(selectors.getSomethingToShow);
   const { meta: { focus }, execute, format, clippy, miri, macroExpansion, assembly, llvmIr, mir, hir, wasm, gist } =
     useSelector((state: State) => state.output);
@@ -97,7 +93,7 @@ const Output: React.SFC<OutputProps> = ({ isFocused }) => {
   }
 
   return (
-    <div className={`output ${isFocused ? 'output--focused' : ''}`}>
+    <div className="output">
       <div className="output-tabs">
         <Tab kind={Focus.Execute} focus={focus}
           label="Execution"

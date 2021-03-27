@@ -6408,7 +6408,7 @@ prompts@^2.0.1:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.5.8, prop-types@^15.7.2:
+prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -6547,6 +6547,14 @@ react-shadow@^19.0.2:
   dependencies:
     humps "^2.0.1"
     react-use "^15.3.3"
+
+react-split-grid@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/react-split-grid/-/react-split-grid-1.0.3.tgz#f3b7e8a7aee6085870521c7b697b4b9147c46edf"
+  integrity sha512-iE7R7Ne6KOIstKH4hROG3pwPod3LGJ4TB1P2jmPY2/oYI9+Jw8K7Rj0z7C2ZkfDLgMK2vTc+vpYOkFzr/+eaIg==
+  dependencies:
+    prop-types "^15.5.7"
+    split-grid "^1.0.9"
 
 react-universal-interface@^0.6.2:
   version "0.6.2"
@@ -7327,6 +7335,11 @@ specificity@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/specificity/-/specificity-0.4.1.tgz#aab5e645012db08ba182e151165738d00887b019"
   integrity sha512-1klA3Gi5PD1Wv9Q0wUoOQN1IWAuPu0D1U03ThXTr0cJ20+/iq2tHSDnK7Kk/0LXJ1ztUB2/1Os0wKmfyNgUQfg==
+
+split-grid@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/split-grid/-/split-grid-1.0.9.tgz#d946e4d6d1767a98d6b1a97b338fc60e1f1bc930"
+  integrity sha512-D7Tgibf7ksIEZKxmAKbXb7kKFANcXRj9j2VgM097KIr146zMXErt9MIHQeEiRxL+HM7WwkJdDyPTxDDsSVUSBA==
 
 split-string@^3.0.1, split-string@^3.0.2:
   version "3.1.0"

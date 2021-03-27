@@ -5,93 +5,68 @@
   padding-bottom: 1em;
 }
 
-.split {
-  display: flex;
+.-autoSize {
+  width: 100%;
+  min-width: 0;
   height: 100%;
+  min-height: 0;
 }
 
-.splitAutomatic {
-  composes: split;
+.-parent {
+  composes: -autoSize;
+  display: grid;
 }
 
-@media screen and (max-width: 1600px) {
-  .splitAutomatic {
-    flex-direction: column;
-  }
+$plainPrimaryDimension: 1fr auto;
+
+.plainRows {
+  composes: -parent;
+  grid-template-rows: $plainPrimaryDimension;
 }
 
-@media screen and (min-width: 1600px) {
-  .splitAutomatic {
-    flex-direction: row;
-  }
+.plainColumns {
+  composes: -parent;
+  grid-template-columns: $plainPrimaryDimension;
 }
 
-.splitHorizontal {
-  composes: split;
-  flex-direction: column;
+.-gutter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.splitVertical {
-  composes: split;
-  flex-direction: row;
+$splitPrimaryDimension: 1fr 12px 1fr;
+$splitSecondaryDimension: 1fr;
+
+.splitRows {
+  composes: -parent;
+  grid-template-columns: $splitSecondaryDimension;
+  grid-template-rows: $splitPrimaryDimension;
 }
 
-.splitVertical > * {
-  /* FIXME: remove this, when the output-rules are 'aware' of the
-   * orientation (this disables the extra margin-top for the spacing
-   * between editor and output in the horizontal split mode)
-   */
-  margin-top: -0.2em;
-
-  /* for the border of the editor */
-  margin-bottom: 4px;
-
-  /* space between the split */
-  margin-left: 0.5em;
+.splitRowsGutter {
+  composes: -gutter;
+  cursor: row-resize;
+  transform: rotate(90deg);
 }
 
-.splitVertical > *:first-child {
-  /* the first child, i.e. the editor has the border already */
-  margin-top: 0;
-  margin-bottom: 0;
-  margin-left: 0;
+.splitColumns {
+  composes: -parent;
+  grid-template-columns: $splitPrimaryDimension;
+  grid-template-rows: $splitSecondaryDimension;
 }
 
-@media screen and (min-width: 1600px) {
-  /* automatic vertical */
-  .splitAutomatic > *:first-child {
-    /* the first child, i.e. the editor has the border already */
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 0;
-  }
-}
-
-/* automatic vertical */
-@media screen and (min-width: 1600px) {
-  .splitAutomatic > * {
-    /* FIXME: remove this, when the output-rules are 'aware' of the
-   * orientation (this disables the extra margin-top for the spacing
-   * between editor and output in the horizontal split mode)
-   */
-    margin-top: -0.2em;
-
-    /* for the border of the editor */
-    margin-bottom: 4px;
-
-    /* space between the split */
-    margin-left: 0.5em;
-  }
+.splitColumnsGutter {
+  composes: -gutter;
+  cursor: col-resize;
 }
 
 .editor {
-  position: relative;
-  flex: 1 1 auto;
+  composes: -autoSize;
   border: 4px solid var(--border-color);
   border-radius: 4px;
 }
 
-.outputFocused {
-  position: relative;
-  flex: 1 1 auto;
+.output {
+  composes: -autoSize;
 }
