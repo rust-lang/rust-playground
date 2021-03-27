@@ -5,7 +5,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
   before do
     visit '/'
     editor.set(code)
-    within('.header') { click_on("Run") }
+    within(:header) { click_on("Run") }
   end
 
   scenario "errors are highlighted" do

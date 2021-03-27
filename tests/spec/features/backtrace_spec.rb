@@ -13,7 +13,7 @@ RSpec.feature "A backtrace is shown for certain errors", type: :feature, js: tru
   context "backtraces are enabled" do
     before do
       in_advanced_options_menu { choose 'enabled' }
-      within('.header') { click_on("Run") }
+      within(:header) { click_on("Run") }
     end
 
     scenario "a backtrace is shown" do
@@ -33,7 +33,7 @@ RSpec.feature "A backtrace is shown for certain errors", type: :feature, js: tru
 
   context "backtraces are disabled" do
     before do
-      within('.header') { click_on("Run") }
+      within(:header) { click_on("Run") }
     end
 
     scenario "the backtrace suggestion is a link" do
