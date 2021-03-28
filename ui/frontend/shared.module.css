@@ -7,3 +7,15 @@
   line-height: inherit;
   text-align: inherit;
 }
+
+.-menuItemTitle {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.-menuItemFullButton {
+  composes: -buttonReset;
+  width: 100%;
+  transition: color var(--header-transition);
+  user-select: text;
+}

@@ -369,23 +369,6 @@ $header-transition: 0.2s ease-in-out;
   user-select: text;
 }
 
-.button-menu-item {
-  @include full-menu-button;
-
-  &:hover {
-    color: $header-tint;
-  }
-
-  &__name {
-    @include menu-item-title;
-    margin: 0;
-  }
-
-  &__description {
-    margin: 0;
-  }
-}
-
 .selectable-item {
   @include full-menu-button;
 
@@ -503,4 +486,6 @@ $header-transition: 0.2s ease-in-out;
 :root {
   --border-color: #{$border-color};
   --header-main-border: #{$header-main-border};
+  --header-transition: #{$header-transition};
+  --header-tint: #{$header-tint};
 }
