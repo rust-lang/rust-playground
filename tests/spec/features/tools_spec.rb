@@ -13,9 +13,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     editor.set 'fn main() { [1,2,3,4]; }'
     in_tools_menu { click_on("Rustfmt") }
 
-    within('.editor') do
-      expect(editor).to have_line '[1, 2, 3, 4];'
-    end
+    expect(editor).to have_line '[1, 2, 3, 4];'
   end
 
   scenario "linting code with Clippy" do

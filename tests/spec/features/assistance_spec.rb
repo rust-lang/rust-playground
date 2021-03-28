@@ -17,9 +17,7 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
       click_on("add a main function")
     end
 
-    within('.editor') do
-      expect(editor).to have_line 'println!("Hello, world!")'
-    end
+    expect(editor).to have_line 'println!("Hello, world!")'
   end
 
   scenario "using an unstable feature offers adding the feature flag" do
@@ -33,9 +31,7 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
       click_on("add `#![feature(abi_avr_interrupt)]`")
     end
 
-    within('.editor') do
-      expect(editor).to have_line '#![feature(abi_avr_interrupt)]'
-    end
+    expect(editor).to have_line '#![feature(abi_avr_interrupt)]'
   end
 
   scenario "using a type that hasn't been imported offers importing it" do
@@ -48,9 +44,7 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
       click_on("use std::collections::HashMap;")
     end
 
-    within('.editor') do
-      expect(editor).to have_line 'use std::collections::HashMap;'
-    end
+    expect(editor).to have_line 'use std::collections::HashMap;'
   end
 
   scenario "triggering a panic offers enabling backtraces" do
