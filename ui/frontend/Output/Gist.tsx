@@ -55,7 +55,6 @@ class Copied extends React.PureComponent<CopiedProps, CopiedState> {
 const Links: React.SFC = () => {
   const codeUrl = useSelector(selectors.codeUrlSelector);
   const gistUrl = useSelector((state: State) => state.output.gist.url);
-  const issueUrl = useSelector(selectors.issueUrlSelector);
   const permalink = useSelector(selectors.permalinkSelector);
   const urloUrl = useSelector(selectors.urloUrlSelector);
 
@@ -65,7 +64,6 @@ const Links: React.SFC = () => {
       <Copied href={gistUrl}>Direct link to the gist</Copied>
       <Copied href={codeUrl}>Embedded code in link</Copied>
       <NewWindow href={urloUrl}>Open a new thread in the Rust user forum</NewWindow>
-      <NewWindow href={issueUrl}> Open an issue on the Rust GitHub repository</NewWindow>
     </Fragment>
   );
 };
