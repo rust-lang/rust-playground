@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  color: var(--border-color);
+  white-space: nowrap;
+
+  &::before,
+  &::after {
+    flex: 1 1 auto;
+    border-top: var(--border);
+    margin: auto;
+    content: '';
+  }
+
+  &::before {
+    margin-right: 2%;
+  }
+
+  &::after {
+    margin-left: 2%;
+  }
+}

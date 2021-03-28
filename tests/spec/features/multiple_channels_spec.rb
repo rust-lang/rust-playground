@@ -14,7 +14,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
     in_channel_menu { click_on("Stable") }
     click_on("Run")
 
-    within('.output-stdout') do
+    within(:output, :stdout) do
       expect(page).to have_content 'rustc'
       expect(page).to_not have_content 'beta'
       expect(page).to_not have_content 'nightly'
@@ -25,7 +25,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
     in_channel_menu { click_on("Beta") }
     click_on("Run")
 
-    within('.output-stdout') do
+    within(:output, :stdout) do
       expect(page).to have_content 'rustc'
       expect(page).to have_content 'beta'
       expect(page).to_not have_content 'nightly'
@@ -36,7 +36,7 @@ RSpec.feature "Multiple Rust versions", type: :feature, js: true do
     in_channel_menu { click_on("Nightly") }
     click_on("Run")
 
-    within('.output-stdout') do
+    within(:output, :stdout) do
       expect(page).to have_content 'rustc'
       expect(page).to_not have_content 'beta'
       expect(page).to have_content 'nightly'

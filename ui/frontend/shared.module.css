@@ -23,6 +23,14 @@
   text-align: inherit;
 }
 
+.-buttonAsLink {
+  composes: -buttonReset;
+  color: #00e;
+  cursor: pointer;
+  text-decoration: underline;
+  user-select: text;
+}
+
 .-menuItemTitle {
   font-size: 13px;
   font-weight: 600;

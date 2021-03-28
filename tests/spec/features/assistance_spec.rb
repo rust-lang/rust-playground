@@ -13,7 +13,7 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
     EOF
     click_on("Build")
 
-    within('.output-warning') do
+    within(:output, :warning) do
       click_on("add a main function")
     end
 
@@ -27,7 +27,7 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
     EOF
     click_on("Build")
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       click_on("add `#![feature(abi_avr_interrupt)]`")
     end
 
@@ -40,7 +40,7 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
     EOF
     click_on("Build")
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       click_on("use std::collections::HashMap;")
     end
 
@@ -55,11 +55,11 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
     EOF
     click_on("Run")
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       click_on("run with `RUST_BACKTRACE=1` environment variable to display a backtrace")
     end
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       expect(page).to have_content("stack backtrace:")
     end
   end

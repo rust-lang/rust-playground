@@ -69,3 +69,11 @@ end
 Capybara.add_selector(:header) do
   css { |_id| "[data-test-id = 'header']" }
 end
+
+Capybara.add_selector(:output) do
+  css do |id|
+    id_s = 'output'
+    id_s += "-#{id}" if id
+    "[data-test-id = '#{id_s}']"
+  end
+end

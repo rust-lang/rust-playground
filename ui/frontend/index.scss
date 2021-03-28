@@ -29,142 +29,6 @@ body {
     font-family: $primary-font;
 }
 
-@mixin button-reset {
-  border: none;
-  padding: 0;
-  text-align: inherit;
-  font: inherit;
-  line-height: inherit;
-  background: inherit;
-  background-color: transparent; // IE 11
-}
-
-@mixin button-as-link {
-  @include button-reset;
-  user-select: text;
-  cursor: pointer;
-  text-decoration: underline;
-  color: #0000EE;
-}
-
-@mixin body-monospace {
-    font-size: 0.9em;
-    // http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/
-    // ACE uses Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
-    font-family: 'Source Code Pro', monospace;
-}
-
-.output {
-    $current-tab: #f9ffff;
-    $background-tab: desaturate($current-tab, 100%);
-
-    display: flex;
-    flex-direction: column;
-
-    width: 100%;
-    height: 100%;
-
-    &-tabs {
-        display: flex;
-    }
-
-    &-tab {
-        flex: 1 1 auto;
-
-        line-height: 1.5em;
-        background-color: $background-tab;
-        border: $border;
-        border-right: none;
-
-        cursor: pointer;
-
-        &:last-of-type {
-            border-right: $border;
-        }
-
-        &-selected {
-            background-color: $current-tab;
-            border-bottom: none;
-
-            cursor: default;
-
-            &:focus {
-                outline: none;
-            }
-        }
-
-        &-close {
-            flex: 0 0 auto;
-        }
-    }
-
-    &-body {
-        height: 100%;
-        overflow: scroll;
-
-        background-color: $current-tab;
-        border: $border;
-        border-top: none;
-
-        padding: 0.5em;
-    }
-
-    &-header {
-        display: flex;
-        white-space: nowrap;
-        color: $border-color;
-
-        &:before, &:after {
-            border-top: $border;
-            content: '';
-            flex: 1 1 auto;
-            margin: auto;
-        }
-        &:before { margin-right: 2%; }
-        &:after { margin-left: 2% }
-    }
-
-    code {
-        @include body-monospace;
-    }
-
-    &-gist-copy {
-        display: flex;
-
-        $copied-duration: 1s ease-in-out;
-
-        &-button {
-            @include button-reset;
-            cursor: pointer;
-            margin: 0 0.25em 0 0.5em;
-            transition: color $copied-duration;
-        }
-
-        &-text {
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility $copied-duration, opacity $copied-duration, color $copied-duration;
-        }
-
-        &--active &-button {
-            color: green;
-            transition: color 0s;
-        }
-
-        &--active &-text {
-            color: green;
-
-            visibility: visible;
-            opacity: 1;
-            transition: visibility 0s, opacity 0s, color 0s;
-        }
-    }
-
-    &-add-main {
-      @include button-as-link;
-    }
-}
-
 .language-rust_errors {
     .warning {
         color: #f79a06;
@@ -173,7 +37,6 @@ body {
         color: #bf1b1b;
     }
 }
-
 
 $header-tint: #428bca;
 $header-main-border: #dedede;
@@ -185,6 +48,7 @@ $header-transition: 0.2s ease-in-out;
   --rust: #{$rust};
   --rust-dark: #80331a;
   --border-color: #{$border-color};
+  --border: #{$border};
   --header-main-border: #{$header-main-border};
   --header-transition: #{$header-transition};
   --header-tint: #{$header-tint};

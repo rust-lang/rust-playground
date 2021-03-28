@@ -14,7 +14,7 @@ RSpec.feature "Compiling in different modes", type: :feature, js: true do
     in_mode_menu { click_on("Debug") }
     click_on("Run")
 
-    within('.output-stdout') do
+    within(:output, :stdout) do
       expect(page).to have_content 'Compiling in debug mode'
       expect(page).to_not have_content 'Compiling in release mode'
     end
@@ -24,7 +24,7 @@ RSpec.feature "Compiling in different modes", type: :feature, js: true do
     in_mode_menu { click_on("Release") }
     click_on("Run")
 
-    within('.output-stdout') do
+    within(:output, :stdout) do
       expect(page).to_not have_content 'Compiling in debug mode'
       expect(page).to have_content 'Compiling in release mode'
     end

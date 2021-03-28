@@ -14,7 +14,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
     in_advanced_options_menu { choose '2015' }
     click_on("Run")
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       expect(page).to have_content 'unused variable: `async`'
       expect(page).to_not have_content 'expected identifier, found keyword `async`'
     end
@@ -24,7 +24,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
     in_advanced_options_menu { choose '2018' }
     click_on("Run")
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       expect(page).to have_content 'expected identifier, found keyword `async`'
       expect(page).to_not have_content 'unused variable: `async`'
     end

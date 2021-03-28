@@ -40,7 +40,7 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
   scenario "loading from a Gist preserves the links" do
     visit '/?gist=20fb1e0475f890d0fdb7864e3ad0820c'
 
-    within('.output') { click_on 'Share' }
+    within(:output) { click_on 'Share' }
     expect(page).to have_link("Permalink to the playground", href: /gist=20fb1e0475f890d0fdb7864e3ad0820c/)
   end
 

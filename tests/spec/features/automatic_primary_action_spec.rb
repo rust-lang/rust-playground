@@ -13,7 +13,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     EOF
     click_on("Run")
 
-    within('.output-stdout') do
+    within(:output, :stdout) do
       expect(page).to have_content 'Hello, world'
     end
   end
@@ -27,7 +27,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     EOF
     click_on("Build")
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       expect(page).to have_content 'function is never used: `main`'
     end
   end
@@ -47,7 +47,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     EOF
     click_on("Build")
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       expect(page).to have_content 'function is never used: `main`'
     end
   end
@@ -59,7 +59,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     EOF
     click_on("Test")
 
-    within('.output-stdout') do
+    within(:output, :stdout) do
       expect(page).to have_content 'running 1 test'
       expect(page).to have_content 'test awesome ... ok'
       expect(page).to have_content 'test result: ok'
@@ -79,7 +79,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     EOF
     click_on("Test")
 
-    within('.output-stdout') do
+    within(:output, :stdout) do
       expect(page).to have_content 'running 1 test'
       expect(page).to_not have_content 'Running in main'
     end
@@ -93,7 +93,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     EOF
     click_on("Run")
 
-    within('.output-stdout') do
+    within(:output, :stdout) do
       expect(page).to have_content 'Running in main'
     end
   end
@@ -106,7 +106,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     EOF
     click_on("Build")
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       expect(page).to have_content 'function is never used: `arbitrary_code`'
     end
   end

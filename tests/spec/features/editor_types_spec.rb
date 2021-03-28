@@ -13,7 +13,7 @@ RSpec.feature "Editing in different editors", type: :feature, js: true do
 
     click_on("Run")
 
-    within('.output-stdout') do
+    within(:output, :stdout) do
       expect(page).to have_content 'simple editor'
     end
   end

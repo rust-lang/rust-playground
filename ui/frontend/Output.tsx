@@ -12,11 +12,12 @@ import SimplePane, { SimplePaneProps } from './Output/SimplePane';
 import PaneWithMir from './Output/PaneWithMir';
 import * as selectors from './selectors';
 
+import styles from './Output.module.css';
+
 const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
   if (selectors.hasProperties(tabProps)) {
-    const selected = focus === kind ? 'output-tab-selected' : '';
     return (
-      <button className={`output-tab ${selected}`}
+      <button className={focus === kind ? styles.tabSelected : styles.tab}
         onClick={onClick}>
         {label}
       </button>
@@ -70,13 +71,10 @@ const Output: React.SFC = () => {
   let close = null;
   let body = null;
   if (focus) {
-    close = (
-      <button className="output-tab output-tab-close"
-        onClick={focusClose}>Close</button>
-    );
+    close = <button className={styles.tabClose} onClick={focusClose}>Close</button>;
 
     body = (
-      <div className="output-body">
+      <div className={styles.body}>
         {focus === Focus.Execute && <Execute />}
         {focus === Focus.Format && <SimplePane {...format} kind="format" />}
         {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
@@ -93,8 +91,8 @@ const Output: React.SFC = () => {
   }
 
   return (
-    <div className="output">
-      <div className="output-tabs">
+    <div className={styles.container} data-test-id="output">
+      <div className={styles.tabs}>
         <Tab kind={Focus.Execute} focus={focus}
           label="Execution"
           onClick={focusExecute}
@@ -141,7 +139,7 @@ const Output: React.SFC = () => {
           tabProps={gist} />
         {close}
       </div>
-      {body}
+      { body}
     </div>
   );
 };
