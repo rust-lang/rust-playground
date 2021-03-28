@@ -3,6 +3,8 @@ import React from 'react';
 import { CheckmarkIcon } from './Icon';
 import MenuItem from './MenuItem';
 
+import styles from './SelectableMenuItem.module.css';
+
 type Button = JSX.IntrinsicElements['button'];
 
 interface SelectableMenuItemProps extends Button {
@@ -12,14 +14,14 @@ interface SelectableMenuItemProps extends Button {
 
 const SelectableMenuItem: React.SFC<SelectableMenuItemProps> = ({ name, selected, children, ...props }) => (
   <MenuItem>
-    <button className={`selectable-item ${selected ? 'selectable-item--selected' : ''}`} {...props}>
-      <div className="selectable-item__header">
-        <span className="selectable-item__checkmark">
+    <button className={selected ? styles.selected : styles.container} {...props}>
+      <div className={styles.header}>
+        <span className={styles.checkmark}>
           <CheckmarkIcon />
         </span>
-        <span className="selectable-item__name">{name}</span>
+        <span className={styles.name}>{name}</span>
       </div>
-      <div className="selectable-item__description">{children}</div>
+      <div className={styles.description}>{children}</div>
     </button>
   </MenuItem>
 );

@@ -356,62 +356,6 @@ $header-transition: 0.2s ease-in-out;
   }
 }
 
-@mixin menu-item-title {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-@mixin full-menu-button {
-  @include button-reset;
-
-  width: 100%;
-  transition: color $header-transition;
-  user-select: text;
-}
-
-.selectable-item {
-  @include full-menu-button;
-
-  &__header {
-    display: flex;
-    align-items: center;
-  }
-
-  &__name {
-    @include menu-item-title;
-  }
-
-  &__description {
-    padding-left: 2em;
-  }
-
-  &:hover {
-    color: $header-tint;
-  }
-
-  &--selected {
-    font-weight: 600;
-    color: $header-tint;
-  }
-
-  &__checkmark {
-    margin-right: 0.5em;
-
-    opacity: 0;
-    transition: opacity 0.15s ease-in-out;
-  }
-
-  &:hover &__checkmark {
-    opacity: 0.5;
-    color: $header-tint;
-  }
-
-  &--selected &__checkmark,
-  &--selected:hover &__checkmark {
-    opacity: 1;
-  }
-}
-
 .config-element {
   display: flex;
   align-items: center;
