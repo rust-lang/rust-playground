@@ -285,52 +285,6 @@ $header-transition: 0.2s ease-in-out;
   }
 }
 
-.popper {
-  z-index: 10;
-  font-size: 12px;
-
-  // Prevents the popper from shifting when adding it to the DOM
-  // triggers showing the scrollbars.
-  // https://github.com/FezVrasta/popper.js/issues/457#issuecomment-367692177
-  top: 0;
-
-  $fg-color: #222;
-  $bg-color: white;
-  $arrow-size: 10px;
-  $vertical-border-color: #cacaca;
-
-  &__arrow {
-    position: absolute;
-    margin: $arrow-size;
-    border: $arrow-size solid transparent;
-  }
-
-  &[data-placement^="bottom"] &__arrow {
-    margin-top: 0;
-    border-top-width: 0;
-    border-bottom-color: $bg-color;
-  }
-
-  &__content {
-    background: $bg-color;
-    color: $fg-color;
-
-    margin: $arrow-size;
-
-    border-radius: $header-border-radius;
-
-    box-shadow: 0 1px 4px -2px rgba(0, 0, 0, 0.6), inset 0 1px 0px white;
-
-    border-left: 1px solid $vertical-border-color;
-    border-right: 1px solid $vertical-border-color;
-    border-bottom: 1px solid $header-accent-border;
-  }
-
-  button:enabled {
-    cursor: pointer;
-  }
-}
-
 .config-element {
   display: flex;
   align-items: center;
@@ -407,4 +361,6 @@ $header-transition: 0.2s ease-in-out;
   --header-main-border: #{$header-main-border};
   --header-transition: #{$header-transition};
   --header-tint: #{$header-tint};
+  --header-border-radius: #{$header-border-radius};
+  --header-accent-border: #{$header-accent-border};
 }
