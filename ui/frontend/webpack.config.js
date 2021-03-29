@@ -45,9 +45,7 @@ module.exports = function(_, argv) {
          "[path][name]__[local]--[hash:base64]";
 
   return {
-    entry: {
-      app: ['./index.tsx', './index.scss'],
-    },
+    entry: './index.tsx',
 
     devtool,
 
@@ -83,20 +81,21 @@ module.exports = function(_, argv) {
           use: ['babel-loader', 'ts-loader'],
         },
         {
-          test: /\.scss$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            "css-loader",
-            "postcss-loader",
-            "sass-loader",
-          ],
-        },
-        {
           test: /prismjs\/themes\/.*css$/,
           type: 'asset/resource',
         },
         {
+          test: /\.css$/,
+          include: /node_modules/,
+          use: [
+            MiniCssExtractPlugin.loader,
+            "css-loader",
+            "postcss-loader",
+          ],
+        },
+        {
           test: /\.module.css$/,
+          exclude: /node_modules/,
           use: [
             MiniCssExtractPlugin.loader,
             {

@@ -1,0 +1,47 @@
+:root {
+  --primary-font: 'Open Sans', sans-serif;
+  --rust: #a42;
+  --rust-dark: #80331a;
+  --border-color: #bbb;
+  --border: 1px solid var(--border-color);
+  --header-main-border: #dedede;
+  --header-transition: 0.2s ease-in-out;
+  --header-tint: #428bca;
+  --header-border-radius: 4px;
+  --header-accent-border: #bdbdbd;
+}
+
+/* Modify normalized styles */
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: var(--primary-font);
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  padding: 0 1em;
+  background-color: #e1e1db;
+  font-family: var(--primary-font);
+}
+
+:global(.language-rust_errors) {
+  & :global(.warning) {
+    color: #f79a06;
+  }
+
+  & :global(.error) {
+    color: #bf1b1b;
+  }
+}

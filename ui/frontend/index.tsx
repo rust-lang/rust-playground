@@ -1,6 +1,9 @@
 import 'core-js';
 import 'regenerator-runtime/runtime';
 
+import 'normalize.css/normalize.css';
+import './index.module.css';
+
 import { merge } from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
