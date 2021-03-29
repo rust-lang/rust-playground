@@ -48,7 +48,7 @@
     "babel-plugin-lodash": "^3.3.4",
     "basename": "^0.1.2",
     "compression-webpack-plugin": "^7.1.2",
-    "copy-webpack-plugin": "^7.0.0",
+    "copy-webpack-plugin": "^8.0.0",
     "css-loader": "^5.1.1",
     "eslint": "^7.4.0",
     "eslint-plugin-react": "^7.14.3",
