@@ -37,6 +37,14 @@ describe('checking for a main function', () => {
     expect(hasMainFunctionSelector(buildState('pub const fn main()'))).toBe(true);
   });
 
+  test('an unsafe main counts', () => {
+    expect(hasMainFunctionSelector(buildState('unsafe fn main()'))).toBe(true);
+  });
+
+  test('a public unsafe main counts', () => {
+    expect(hasMainFunctionSelector(buildState('pub unsafe fn main()'))).toBe(true);
+  });
+  
   test('a public const async main counts', () => {
     expect(hasMainFunctionSelector(buildState('pub const async fn main()'))).toBe(true);
   });
