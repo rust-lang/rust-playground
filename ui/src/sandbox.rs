@@ -196,40 +196,45 @@ impl Sandbox {
 
 
     pub fn wasm_pack(&self, req: &WasmPackRequest) -> Result<WasmPackResponse> {
-        self.write_source_code(&req.code)?;
-        let command = self.wasm_pack_command(req)?;
+        use CompileTarget::*;
+        use CrateType::*;
 
-        let output = run_command_with_timeout(command)?;
+        let compile_req = CompileRequest{
+            backtrace: false, 
+            channel: Channel::Nightly,
+            code: req.code.clone(),
+            crate_type: Library(LibraryType::Cdylib),
+            edition: Some(Edition::Rust2018),
+            mode: Mode::Debug,
+            target: WasmPack,
+            tests: false,
+        };
+        let res = self.compile(&compile_req)?;
+        let js_file =
+            fs::read_dir(&self.output_dir)
+            .context(UnableToReadOutput)?
+            .flat_map(|entry| entry)
+            .map(|entry| entry.path())
+            .find(|path| path.extension() == Some(OsStr::new("js")));
 
-        // log::info!("{:?}", std::fs::read_dir(&self.scratch.path().join("pkg")).context(UnableToStartCompiler)?.map(|res| res.map(|e| e.path())).collect::<Result<Vec<_>, std::io::Error>>());
-        log::debug!("{:?}", &output.status);
+        let js_code = match js_file {
+            Some(file) => read(&file)?.unwrap_or_else(String::new),
+            None => String::new() // TODO: return proper error?
+        };
 
-        // let (wasm_bg, wasm_js) = (None, None);
-        let (wasm_bg, wasm_js) = if output.status.success() {
-            let wasm_base64 = self.get_built_code_base64(format!("{}_bg.wasm", req.output_name.as_str()).as_str())?;
-            let js_base64 = self.get_built_code_base64(format!("{}.js", req.output_name.as_str()).as_str())?;
-            (Some(wasm_base64), Some(js_base64))
+        let (wasm_bg, wasm_js) = if res.success {
+            (Some(res.code), Some(js_code))
         } else {
             (None, None)
         };
 
         Ok(WasmPackResponse {
-            success: output.status.success(),
-            stdout: vec_to_str(output.stdout)?,
-            stderr: vec_to_str(output.stderr)?,
+            success: res.success,
+            stdout: res.stdout,
+            stderr: res.stderr,
             wasm_bg: wasm_bg,
             wasm_js: wasm_js
         })
-    }
-
-    fn get_built_code_base64(&self, file: &str) -> Result<String> {
-        // pkg is default output directory of wasm-pack build
-        // https://rustwasm.github.io/wasm-pack/book/commands/build.html#output-directory
-        let file = self.output_dir.join("pkg").join(file);
-        let mut wasm_file = fs::File::open(file).context(UnableToCreateSourceFile)?;
-        let mut buf = Vec::new();
-        wasm_file.read_to_end(&mut buf).context(UnableToReadOutput)?;
-        Ok(base64::encode(buf))
     }
 
     pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
@@ -390,33 +395,6 @@ impl Sandbox {
         cmd
     }
 
-    fn wasm_pack_command(&self, req: &WasmPackRequest) -> Result<Command> {
-        // let source_dir = Path::new("/playground").join("yew-wasm-pack-minimal");
-        // let source_dir = source_dir.as_os_str().to_str().unwrap();
-        // let target_dir = self.scratch.as_path().join("yew-wasm-pack-minimal");
-        // let target_dir = target_dir.as_os_str().to_str().unwrap();
-        
-        let mut cmd = self.docker_command(Some(req.crate_type()));
-        // let prepare_wasm_pack_cmd = build_prepare_wasm_pack_command(source_dir, target_dir);
-        // let wasm_pack_cmd = build_wasm_pack_command(target_dir, req.output_name.as_str());
-        // let dummy_cmd = vec!["find", "/", "-regex", ".*/.*.wasm"];//, self.output_dir.as_os_str().to_str().unwrap()];
-        // let dummy_cmd = vec!["ls", "pkg"];//, self.output_dir.as_os_str().to_str().unwrap()];
-        let dummy_cmd = vec!["mv", "pkg", "/playground-result"];//, self.output_dir.as_os_str().to_str().unwrap()];
-        
-        // let combine_cmd = [];//, prepare_wasm_pack_cmd, wasm_pack_cmd];
-        // // let combine_cmd = [wasm_pack_cmd];
-        // let combine_cmd = combine_cmd.iter().map(|cmd| {
-        //     cmd.join(" ")
-        // }).collect::<Vec<_>>().join(" && ");
-        // let bash_cmd = ["bash", "-c", &format!("\"{}\"", combine_cmd)];
-
-        cmd.arg(&Channel::Nightly.container_name()).args(&dummy_cmd);
-
-        log::debug!("wasm-pack command is {:?}", cmd);
-
-        Ok(cmd)
-    }
-
     fn format_command(&self, req: impl EditionRequest) -> Command {
         let crate_type = CrateType::Binary;
 
@@ -538,6 +516,7 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
     let mut cmd = vec!["cargo"];
 
     match (target, req.crate_type(), tests) {
+        (Some(WasmPack), _, _) => cmd.push("pack"),
         (Some(Wasm), _, _) => cmd.push("wasm"),
         (Some(_), _, _)    => cmd.push("rustc"),
         (_, _, true)       => cmd.push("test"),
@@ -580,27 +559,13 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
             Mir => cmd.push("--emit=mir"),
             Hir => cmd.push("-Zunpretty=hir"),
             Wasm => { /* handled by cargo-wasm wrapper */ },
+            WasmPack => { /* handled by cargo-wasmpack wrapper */ },
          }
     }   
-
+    log::debug!("{:?}", &cmd);
     cmd
 }
 
-fn build_wasm_pack_command<'a>(path: &'a str, out_name: &'a str) -> Vec<&'a str> {
-    vec![
-        "wasm-pack",
-        "build",
-        "--target", "web",
-        "--out-name", out_name,
-        // // path
-    ]
-}
-
-fn build_prepare_wasm_pack_command<'a>(source_dir: &'a str, target_dir: &'a str) -> Vec<&'a str> {
-    vec!["cp", "-r",
-        source_dir,
-        target_dir]
-}
 
 fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) {
     use self::CompileTarget::*;
@@ -708,6 +673,7 @@ pub enum CompileTarget {
     Mir,
     Hir,
     Wasm,
+    WasmPack,
 }
 
 impl CompileTarget {
@@ -718,6 +684,7 @@ impl CompileTarget {
             CompileTarget::Mir               => "mir",
             CompileTarget::Hir               => "hir",
             CompileTarget::Wasm              => "wat",
+            CompileTarget::WasmPack          => "wasm",
         };
         OsStr::new(ext)
     }
@@ -733,6 +700,7 @@ impl fmt::Display for CompileTarget {
             Mir               => "Rust MIR".fmt(f),
             Hir               => "Rust HIR".fmt(f),
             Wasm              => "WebAssembly".fmt(f),
+            WasmPack          => "WasmPack".fmt(f),
         }
     }
 }
@@ -751,7 +719,7 @@ impl Channel {
         match *self {
             Stable => "rust-stable",
             Beta => "rust-beta",
-            Nightly => "unique-nightly",
+            Nightly => "rust-nightly",
         }
     }
 }
