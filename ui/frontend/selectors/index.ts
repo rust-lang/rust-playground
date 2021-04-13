@@ -151,6 +151,7 @@ const getOutputs = (state: State) => [
   state.output.miri,
   state.output.macroExpansion,
   state.output.wasm,
+  state.output.wasmPack,
 ];
 
 export const getSomethingToShow = createSelector(
