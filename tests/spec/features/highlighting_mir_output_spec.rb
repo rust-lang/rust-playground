@@ -12,7 +12,7 @@ RSpec.feature "Highlighting MIR output", type: :feature, js: true do
   end
 
   scenario "error locations are links" do
-    within('.output-mir') do
+    within(:output, :mir) do
       click_link('src/main.rs:4:14: 4:19', match: :first)
     end
     expect(editor).to have_highlighted_text('a + b')

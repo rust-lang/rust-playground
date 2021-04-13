@@ -1,3 +1,4 @@
+
 import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url from 'url';
@@ -121,6 +122,8 @@ export enum ActionType {
   RequestVersionsLoad = 'REQUEST_VERSIONS_LOAD',
   VersionsLoadSucceeded = 'VERSIONS_LOAD_SUCCEEDED',
   NotificationSeen = 'NOTIFICATION_SEEN',
+  BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
+  SplitRatioChanged = 'SPLIT_RATIO_CHANGED',
 }
 
 const setPage = (page: Page) =>
@@ -700,6 +703,12 @@ const notificationSeen = (notification: Notification) =>
 
 export const seenRustSurvey2020 = () => notificationSeen(Notification.RustSurvey2020);
 
+export const browserWidthChanged = (isSmall: boolean) =>
+  createAction(ActionType.BrowserWidthChanged, { isSmall });
+
+export const splitRatioChanged = () =>
+  createAction(ActionType.SplitRatioChanged);
+
 function parseChannel(s: string): Channel | null {
   switch (s) {
     case 'stable':
@@ -852,4 +861,6 @@ export type Action =
   | ReturnType<typeof requestVersionsLoad>
   | ReturnType<typeof receiveVersionsLoadSuccess>
   | ReturnType<typeof notificationSeen>
+  | ReturnType<typeof browserWidthChanged>
+  | ReturnType<typeof splitRatioChanged>
   ;

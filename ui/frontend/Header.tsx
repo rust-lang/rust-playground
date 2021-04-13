@@ -15,8 +15,10 @@ import ToolsMenu from './ToolsMenu';
 import * as actions from './actions';
 import * as selectors from './selectors';
 
+import styles from './Header.module.css';
+
 const Header: React.SFC = () => (
-  <div className="header">
+  <div data-test-id="header" className={styles.container}>
     <HeaderSet id="build">
       <SegmentedButtonSet>
         <ExecuteButton />
@@ -58,7 +60,7 @@ interface HeaderSetProps {
 }
 
 const HeaderSet: React.SFC<HeaderSetProps> = ({ id, children }) => (
-  <div className={`header__set header__set--${id}`}>{children}</div>
+  <div className={id == 'channel-mode' ? styles.setChannelMode : styles.set}>{children}</div>
 );
 
 const ExecuteButton: React.SFC = () => {
@@ -69,7 +71,7 @@ const ExecuteButton: React.SFC = () => {
 
   return (
     <SegmentedButton isBuild onClick={execute}>
-      <HeaderButton rightIcon={<BuildIcon />}>
+      <HeaderButton bold rightIcon={<BuildIcon />}>
         {executionLabel}
       </HeaderButton>
     </SegmentedButton>

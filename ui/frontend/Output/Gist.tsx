@@ -8,12 +8,14 @@ import * as selectors from '../selectors';
 
 import Loader from './Loader';
 
+import styles from './Gist.module.css';
+
 const Gist: React.SFC = () => {
   const showLoader = useSelector(selectors.showGistLoaderSelector);
 
   return (
-    <div className="output-gist">
-      {showLoader ? <Loader /> : <Links />}
+    <div>
+      { showLoader ? <Loader /> : <Links />}
     </div>
   );
 };
@@ -33,15 +35,13 @@ class Copied extends React.PureComponent<CopiedProps, CopiedState> {
   }
 
   public render() {
-    const copiedClass = this.state.copied ? 'output-gist-copy--active' : '';
-
     return (
-      <p className={`output-gist-copy ${copiedClass}`}>
-        <a href={this.props.href} className="output-gist-copy-link">{this.props.children}</a>
+      <p className={this.state.copied ? styles.active : styles.container}>
+        <a href={this.props.href}>{this.props.children}</a>
         <CopyToClipboard text={this.props.href} onCopy={this.copied}>
-          <button className="output-gist-copy-button"><ClipboardIcon /></button>
+          <button className={styles.button}><ClipboardIcon /></button>
         </CopyToClipboard>
-        <span className="output-gist-copy-text">Copied!</span>
+        <span className={styles.text}>Copied!</span>
       </p>
     );
   }

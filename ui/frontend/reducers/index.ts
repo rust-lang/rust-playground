@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 
+import browser from './browser';
 import code from './code';
 import configuration from './configuration';
 import crates from './crates';
@@ -12,6 +13,7 @@ import selection from './selection';
 import versions from './versions';
 
 const playgroundApp = combineReducers({
+  browser,
   code,
   configuration,
   crates,

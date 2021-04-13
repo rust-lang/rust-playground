@@ -1,10 +1,12 @@
 import React from 'react';
 
+import styles from './Loader.module.css';
+
 const Loader: React.SFC = () => (
-  <div className="loader">
-    <span className="loader-dot">⬤</span>
-    <span className="loader-dot">⬤</span>
-    <span className="loader-dot">⬤</span>
+  <div>
+    <span className={styles.dot}>⬤</span>
+    <span className={styles.dot}>⬤</span>
+    <span className={styles.dot}>⬤</span>
   </div>
 );
 

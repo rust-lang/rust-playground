@@ -6,6 +6,9 @@ import * as selectors from './selectors';
 
 import ButtonMenuItem from './ButtonMenuItem';
 import MenuGroup from './MenuGroup';
+import MenuAside from './MenuAside';
+
+import styles from './BuildMenu.module.css';
 
 interface BuildMenuProps {
   close: () => void;
@@ -40,15 +43,15 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => {
     <MenuGroup title="What do you want to do?">
       <ButtonMenuItem name="Run" onClick={execute}>
         Build and run the code, showing the output.
-        Equivalent to <code className="build-menu__code">cargo run</code>.
+        Equivalent to <code className={styles.code}>cargo run</code>.
       </ButtonMenuItem>
       <ButtonMenuItem name="Build" onClick={compile}>
         Build the code without running it.
-        Equivalent to <code className="build-menu__code">cargo build</code>.
+        Equivalent to <code className={styles.code}>cargo build</code>.
       </ButtonMenuItem>
       <ButtonMenuItem name="Test" onClick={test}>
         Build the code and run all the tests.
-        Equivalent to <code className="build-menu__code">cargo test</code>.
+        Equivalent to <code className={styles.code}>cargo test</code>.
       </ButtonMenuItem>
       <ButtonMenuItem name="ASM" onClick={compileToAssembly}>
         Build and show the resulting assembly code.
@@ -72,17 +75,17 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => {
 };
 
 const HirAside: React.SFC = () => (
-  <p className="build-menu__aside">
+  <MenuAside>
     Note: HIR currently requires using the Nightly channel, selecting this
     option will switch to Nightly.
-  </p>
+  </MenuAside>
 );
 
 const WasmAside: React.SFC = () => (
-  <p className="build-menu__aside">
+  <MenuAside>
     Note: WASM currently requires using the Nightly channel, selecting this
     option will switch to Nightly.
-  </p>
+  </MenuAside>
 );
 
 export default BuildMenu;

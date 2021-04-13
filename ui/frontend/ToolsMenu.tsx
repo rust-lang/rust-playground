@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import ButtonMenuItem from './ButtonMenuItem';
 import MenuGroup from './MenuGroup';
+import MenuAside from './MenuAside';
 
 import * as selectors from './selectors';
 import * as actions from './actions';
@@ -45,13 +46,13 @@ const ToolsMenu: React.SFC<ToolsMenuProps> = props => {
         name="Rustfmt"
         onClick={format}>
         <div>Format this code with Rustfmt.</div>
-        <div className="tools-menu__aside">{rustfmtVersion} ({rustfmtVersionDetails})</div>
+        <MenuAside>{rustfmtVersion} ({rustfmtVersionDetails})</MenuAside>
       </ButtonMenuItem>
       <ButtonMenuItem
         name="Clippy"
         onClick={clippy}>
         <div>Catch common mistakes and improve the code using the Clippy linter.</div>
-        <div className="tools-menu__aside">{clippyVersion} ({clippyVersionDetails})</div>
+        <MenuAside>{clippyVersion} ({clippyVersionDetails})</MenuAside>
       </ButtonMenuItem>
       <ButtonMenuItem
         name="Miri"
@@ -60,7 +61,7 @@ const ToolsMenu: React.SFC<ToolsMenuProps> = props => {
           Execute this program in the Miri interpreter to detect certain
           cases of undefined behavior (like out-of-bounds memory access).
         </div>
-        <div className="tools-menu__aside">{miriVersion} ({miriVersionDetails})</div>
+        <MenuAside>{miriVersion} ({miriVersionDetails})</MenuAside>
       </ButtonMenuItem>
       <ButtonMenuItem
         name="Expand macros"
@@ -68,7 +69,7 @@ const ToolsMenu: React.SFC<ToolsMenuProps> = props => {
         <div>
           Expand macros in code using the nightly compiler.
         </div>
-        <div className="tools-menu__aside">{nightlyVersion} ({nightlyVersionDetails})</div>
+        <MenuAside>{nightlyVersion} ({nightlyVersionDetails})</MenuAside>
       </ButtonMenuItem>
     </MenuGroup>
   );

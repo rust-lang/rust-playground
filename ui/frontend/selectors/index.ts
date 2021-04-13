@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 import * as url from 'url';
 
 import { State } from '../reducers';
-import { Backtrace, Channel, Edition, PrimaryActionAuto, PrimaryActionCore } from '../types';
+import { Backtrace, Channel, Edition, Orientation, PrimaryActionAuto, PrimaryActionCore, AceResizeKey } from '../types';
 
 const codeSelector = (state: State) => state.code;
 
@@ -273,3 +273,32 @@ export const formatRequestSelector = createSelector(
   editionSelector,
   (code, edition) => ({ code, edition }),
 );
+
+const focus = (state: State) => state.output.meta.focus;
+export const isOutputFocused = createSelector(
+  focus,
+  (focus) => !!focus,
+);
+
+const orientationConfig = (state: State) => state.configuration.orientation;
+const browserWidthIsSmall = (state: State) => state.browser.isSmall;
+
+export const orientation = createSelector(
+  orientationConfig,
+  browserWidthIsSmall,
+  (orientation, widthIsSmall) => {
+    if (orientation == Orientation.Automatic) {
+      if (widthIsSmall) { return Orientation.Horizontal } else { return Orientation.Vertical }
+    } else {
+      return orientation;
+    }
+  }
+)
+
+const ratioGeneration = (state: State) => state.browser.ratioGeneration;
+
+export const aceResizeKey = createSelector(
+  focus,
+  ratioGeneration,
+  (focus, ratioGeneration): AceResizeKey => [focus, ratioGeneration],
+)

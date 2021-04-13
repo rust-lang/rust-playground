@@ -13,16 +13,14 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     editor.set 'fn main() { [1,2,3,4]; }'
     in_tools_menu { click_on("Rustfmt") }
 
-    within('.editor') do
-      expect(editor).to have_line '[1, 2, 3, 4];'
-    end
+    expect(editor).to have_line '[1, 2, 3, 4];'
   end
 
   scenario "linting code with Clippy" do
     editor.set code_with_lint_warnings
     in_tools_menu { click_on("Clippy") }
 
-    within(".output-stderr") do
+    within(:output, :stderr) do
       expect(page).to have_content 'deny(clippy::eq_op)'
       expect(page).to have_content 'warn(clippy::zero_divided_by_zero)'
     end
@@ -43,7 +41,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     editor.set code_with_undefined_behavior
     in_tools_menu { click_on("Miri") }
 
-    within(".output-stderr") do
+    within(:output, :stderr) do
       expect(page).to have_content %r{pointer must be in-bounds at offset 1, but is outside bounds of alloc\d+ which has size 0}, wait: 10
 
     end
@@ -62,7 +60,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     editor.set code_that_uses_macros
     in_tools_menu { click_on("Expand macros") }
 
-    within(".output-stdout") do
+    within(:output, :stdout) do
       # First-party
       expect(page).to have_content('core::fmt::Arguments::new_v1')
 

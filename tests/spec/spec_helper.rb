@@ -63,5 +63,17 @@ end
 Capybara.save_path = "./test-failures"
 
 Capybara.modify_selector(:link_or_button) do
-  expression_filter(:build_button) {|xpath, name| xpath[XPath.css('.button-menu-item__name').contains(name)] }
+  expression_filter(:build_button) {|xpath, name| xpath[XPath.css('[data-test-id="button-menu-item__name"]').contains(name)] }
+end
+
+Capybara.add_selector(:header) do
+  css { |_id| "[data-test-id = 'header']" }
+end
+
+Capybara.add_selector(:output) do
+  css do |id|
+    id_s = 'output'
+    id_s += "-#{id}" if id
+    "[data-test-id = '#{id_s}']"
+  end
 end

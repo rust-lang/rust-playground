@@ -2,6 +2,8 @@ import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { Manager, Popper, Reference } from 'react-popper';
 import { Portal } from 'react-portal';
 
+import styles from './PopButton.module.css';
+
 const POPPER_MODIFIERS = [
   // Issue #303
   { name: 'computeStyles', options: { gpuAcceleration: false } },
@@ -47,17 +49,17 @@ const PopButton: React.SFC<NewPopProps> = ({ Button, Menu }) => {
         <Popper placement="bottom" innerRef={menuRef} modifiers={POPPER_MODIFIERS}>
           {({ ref, style, arrowProps, placement }) => (
             <div
-              className="popper"
+              className={styles.container}
               ref={ref}
               style={style}
               data-placement={placement}
             >
               <div
-                className="popper__arrow"
+                className={styles.arrow}
                 ref={arrowProps.ref}
                 style={arrowProps.style}
               />
-              <div className="popper__content">
+              <div className={styles.content}>
                 <Menu close={close} />
               </div>
             </div>

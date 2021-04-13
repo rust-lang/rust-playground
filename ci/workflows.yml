@@ -336,6 +336,10 @@ workflows:
             run: >-
               yarn --cwd ui/frontend/ test:lint
 
+          - name: "Style"
+            run: >-
+              yarn --cwd ui/frontend/ test:style
+
           - name: "Build frontend"
             run: >-
               yarn --cwd ui/frontend/ run build:production

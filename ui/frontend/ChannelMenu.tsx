@@ -9,6 +9,8 @@ import * as selectors from './selectors';
 import State from './state';
 import { Channel } from './types';
 
+import styles from './ChannelMenu.module.css';
+
 interface ChannelMenuProps {
   close: () => void;
 }
@@ -62,7 +64,7 @@ const ChannelMenu: React.SFC<ChannelMenuProps> = props => {
 };
 
 const Desc: React.SFC<{}> = ({ children }) => (
-  <p className="channel-menu__description">{children}</p>
+  <p className={styles.description}>{children}</p>
 );
 
 export default ChannelMenu;

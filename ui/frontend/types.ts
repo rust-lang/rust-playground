@@ -120,3 +120,5 @@ export enum Focus {
 export enum Notification {
   RustSurvey2020 = 'rust-survey-2020',
 }
+
+export type AceResizeKey = [Focus, number];

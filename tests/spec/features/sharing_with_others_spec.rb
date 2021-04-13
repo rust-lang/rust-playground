@@ -16,7 +16,7 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
     in_mode_menu { click_on("Release") }
     in_advanced_options_menu { choose("2018") }
 
-    within('.header') { click_on 'Share' }
+    within(:header) { click_on 'Share' }
 
     # Save the links before we navigate away
     perma_link = find_link("Permalink to the playground")[:href]

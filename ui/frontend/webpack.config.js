@@ -40,12 +40,22 @@ module.exports = function(_, argv) {
         false :
         'inline-source-map';
 
+  const localIdentName = isProduction ?
+         "[hash:base64]" :
+         "[path][name]__[local]--[hash:base64]";
+
   return {
-    entry: {
-      app: ['./index.tsx', './index.scss'],
-    },
+    entry: './index.tsx',
 
     devtool,
+
+    cache: {
+      type: 'filesystem',
+
+      buildDependencies: {
+        config: [__filename],
+      },
+    },
 
     output: {
       publicPath: 'assets/',
@@ -71,22 +81,37 @@ module.exports = function(_, argv) {
           use: ['babel-loader', 'ts-loader'],
         },
         {
-          test: /\.scss$/,
+          test: /prismjs\/themes\/.*css$/,
+          type: 'asset/resource',
+        },
+        {
+          test: /\.css$/,
+          include: /node_modules/,
           use: [
             MiniCssExtractPlugin.loader,
             "css-loader",
             "postcss-loader",
-            "sass-loader",
+          ],
+        },
+        {
+          test: /\.module.css$/,
+          exclude: /node_modules/,
+          use: [
+            MiniCssExtractPlugin.loader,
+            {
+              loader: "css-loader",
+              options: {
+                modules: {
+                  localIdentName,
+                },
+              },
+            },
+            "postcss-loader",
           ],
         },
         {
           test: /\.svg$/,
-          use: {
-            loader: 'svg-url-loader',
-            options: {
-              noquotes: true,
-            },
-          },
+          type: 'asset/inline',
         },
       ],
     },

@@ -13,18 +13,18 @@ RSpec.feature "A backtrace is shown for certain errors", type: :feature, js: tru
   context "backtraces are enabled" do
     before do
       in_advanced_options_menu { choose 'enabled' }
-      within('.header') { click_on("Run") }
+      within(:header) { click_on("Run") }
     end
 
     scenario "a backtrace is shown" do
-      within('.output-stderr') do
+      within(:output, :stderr) do
         expect(page).to have_content 'stack backtrace:'
         expect(page).to have_content 'rust_begin_unwind'
       end
     end
 
     scenario "filenames link to that line of code" do
-      within('.output-stderr') do
+      within(:output, :stderr) do
         expect(page).to have_link('main.rs:2')
         expect(page).to have_link('main.rs:6')
       end
@@ -33,11 +33,11 @@ RSpec.feature "A backtrace is shown for certain errors", type: :feature, js: tru
 
   context "backtraces are disabled" do
     before do
-      within('.header') { click_on("Run") }
+      within(:header) { click_on("Run") }
     end
 
     scenario "the backtrace suggestion is a link" do
-      within('.output-stderr') do
+      within(:output, :stderr) do
         expect(page).to have_link(text: /Run with .* a backtrace/i)
       end
     end

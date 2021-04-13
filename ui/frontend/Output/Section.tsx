@@ -2,6 +2,8 @@ import React from 'react';
 
 import Header from './Header';
 
+import styles from './Section.module.css';
+
 interface SectionProps {
   kind: string;
   label: string;
@@ -9,9 +11,9 @@ interface SectionProps {
 
 const Section: React.SFC<SectionProps> = ({ kind, label, children }) => (
   children && (
-    <div className={`output-${kind}`}>
+    <div data-test-id={`output-${kind}`}>
       <Header label={label} />
-      <pre><code>{children}</code></pre>
+      <pre><code className={styles.code}>{children}</code></pre>
     </div>
   )
 );

@@ -5,7 +5,7 @@ class Editor
   end
 
   def set(text)
-    page.within('.editor .ace_text-input', visible: :any) do
+    page.within('.ace_text-input', visible: :any) do
       page.execute_script <<~JS
         window.rustPlayground.setCode(#{text.to_json});
       JS
@@ -17,7 +17,7 @@ class Editor
   end
 
   def has_highlighted_text?(text)
-    page.within('.editor .ace_text-input', visible: :any) do
+    page.within('.ace_text-input', visible: :any) do
       selected = page.evaluate_script <<~JS
         (() => {
           const editor = document.querySelector('.ace_editor').env.editor;

@@ -1,0 +1,16 @@
+.container {
+  composes: -menuItemFullButton from './shared.module.css';
+
+  &:hover {
+    color: var(--header-tint);
+  }
+}
+
+.name {
+  composes: -menuItemTitle from './shared.module.css';
+  margin: 0;
+}
+
+.description {
+  margin: 0;
+}

@@ -2,26 +2,30 @@ import React from 'react';
 
 import { ExpandableIcon } from './Icon';
 
+import styles from './HeaderButton.module.css';
+
 interface HeaderButtonProps {
+  bold?: boolean;
   icon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   isExpandable?: boolean;
 }
 
-const HeaderButton: React.SFC<HeaderButtonProps> = ({ icon, rightIcon, isExpandable, children }) => {
-  const c = ['header-button'];
+const HeaderButton: React.SFC<HeaderButtonProps> = ({ bold, icon, rightIcon, isExpandable, children }) => {
+  const c = [styles.container];
 
-  if (icon) { c.push('header-button--has-left-icon'); }
-  if (rightIcon) { c.push('header-button--has-right-icon'); }
-  if (isExpandable) { c.push('header-button--expandable'); }
-  if ((icon || rightIcon) && !isExpandable && !children) { c.push('header-button--icon-only'); }
+  if (bold) { c.push(styles.bold); }
+  if (icon) { c.push(styles.hasLeftIcon); }
+  if (rightIcon) { c.push(styles.hasRightIcon); }
+  if (isExpandable) { c.push(styles.expandable); }
+  if ((icon || rightIcon) && !isExpandable && !children) { c.push(styles.iconOnly); }
 
   return (
     <div className={c.join(' ')}>
-      {icon && <div className="header-button__left-icon">{icon}</div>}
-      {children}
-      {rightIcon && <div className="header-button__right-icon">{rightIcon}</div>}
-      {isExpandable && <div className="header-button__drop"><ExpandableIcon /></div>}
+      {icon && <div className={styles.leftIcon}>{icon}</div>}
+      { children}
+      { rightIcon && <div className={styles.rightIcon}>{rightIcon}</div>}
+      { isExpandable && <div className={styles.drop}><ExpandableIcon /></div>}
     </div>
   );
 };
