@@ -26,6 +26,7 @@ const useDispatchAndClose = (action: () => void, close: () => void) => {
 const BuildMenu: React.SFC<BuildMenuProps> = props => {
   const isHirAvailable = useSelector(selectors.isHirAvailable);
   const isWasmAvailable = useSelector(selectors.isWasmAvailable);
+  const isWasmPackAvailable = useSelector(selectors.isWasmPackAvailable);
 
   const compile = useDispatchAndClose(actions.performCompile, props.close);
   const compileToAssembly = useDispatchAndClose(actions.performCompileToAssembly, props.close);
@@ -33,6 +34,7 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => {
   const compileToMir = useDispatchAndClose(actions.performCompileToMir, props.close);
   const compileToHir = useDispatchAndClose(actions.performCompileToNightlyHir, props.close);
   const compileToWasm = useDispatchAndClose(actions.performCompileToNightlyWasm, props.close);
+  const compileToWasmPack = useDispatchAndClose(actions.performCompileToNightlyWasmPack, props.close);
   const execute = useDispatchAndClose(actions.performExecute, props.close);
   const test = useDispatchAndClose(actions.performTest, props.close);
 
@@ -67,6 +69,10 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => {
         Build a WebAssembly module for web browsers, in the .WAT textual representation.
         {!isWasmAvailable && <WasmAside />}
       </ButtonMenuItem>
+      <ButtonMenuItem name="WASM PACK" onClick={compileToWasmPack}>
+        Build a WebAssembly frontend for web browsers. Rendering in Iframe
+        {!isWasmPackAvailable && <WasmPackAside />}
+      </ButtonMenuItem>
     </MenuGroup>
   );
 };
@@ -85,4 +91,10 @@ const WasmAside: React.SFC = () => (
   </p>
 );
 
+const WasmPackAside: React.SFC = () => (
+  <p className="build-menu__aside">
+    Note: WASM PACK currently requires using the Nightly channel, selecting this
+    option will switch to Nightly.
+  </p>
+);
 export default BuildMenu;
