@@ -194,14 +194,14 @@ impl Sandbox {
         })
     }
 
-
+    // Greatly inspired from https://gitlab.com/strwrite/seed-playground
     pub fn wasm_pack(&self, req: &WasmPackRequest) -> Result<WasmPackResponse> {
         use CompileTarget::*;
         use CrateType::*;
 
         let compile_req = CompileRequest{
             backtrace: false, 
-            channel: Channel::Nightly,
+            channel: Channel::WasmPack,
             code: req.code.clone(),
             crate_type: Library(LibraryType::Cdylib),
             edition: Some(Edition::Rust2018),
@@ -710,6 +710,7 @@ pub enum Channel {
     Stable,
     Beta,
     Nightly,
+    WasmPack,
 }
 
 impl Channel {
@@ -720,6 +721,7 @@ impl Channel {
             Stable => "rust-stable",
             Beta => "rust-beta",
             Nightly => "rust-nightly",
+            WasmPack => "rust-wasm-pack",
         }
     }
 }
