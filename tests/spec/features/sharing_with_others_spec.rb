@@ -22,7 +22,6 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
     perma_link = find_link("Permalink to the playground")[:href]
     direct_link = find_link("Direct link to the gist")[:href]
     urlo_link = find_link("Open a new thread in the Rust user forum")[:href]
-    issue_link = find_link("Open an issue on the Rust GitHub repository")[:href]
 
     # Navigate away so we can tell that we go back to the same page
     visit 'about:blank'
@@ -41,10 +40,6 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
     # Need to be logged in to URLO for this link to work
     expect(urlo_link).to match(%r{https://users.rust-lang.org/new-topic})
     expect(urlo_link).to match(%{automated%20test})
-
-    # Need to be logged in to GitHub for this link to work
-    expect(issue_link).to match(%r{https://github.com/rust-lang/rust/issues/new})
-    expect(issue_link).to match(%{automated%20test})
   end
 
   def editor
