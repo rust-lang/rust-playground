@@ -19,9 +19,7 @@ $vertical-border-color: #cacaca;
 }
 
 .arrow {
-  position: absolute;
   border: $arrow-size solid transparent;
-  margin: $arrow-size;
 }
 
 .container[data-placement^='bottom'] .arrow {
