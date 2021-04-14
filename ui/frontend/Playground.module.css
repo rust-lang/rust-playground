@@ -40,6 +40,10 @@ $splitSecondaryDimension: 1fr;
 .splitRowsGutter {
   composes: -gutter;
   cursor: row-resize;
+}
+
+.splitRowsGutterHandle {
+  pointer-events: none;
   transform: rotate(90deg);
 }
 

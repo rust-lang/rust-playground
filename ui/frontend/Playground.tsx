@@ -44,7 +44,9 @@ const SplitRows: React.SFC<SplitProps> = ({ resizeComplete }) => (
     }) => (
       <div className={styles.splitRows} {...getGridProps()}>
         <div className={styles.editor}><Editor /></div>
-        <div className={styles.splitRowsGutter} {...getGutterProps('row', 1)}>⣿</div>
+        <div className={styles.splitRowsGutter} {...getGutterProps('row', 1)}>
+          <span className={styles.splitRowsGutterHandle}>⣿</span>
+        </div>
         <div className={styles.output}><Output /></div>
       </div>
     )} />
