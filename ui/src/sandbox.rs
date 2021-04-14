@@ -222,18 +222,12 @@ impl Sandbox {
             None => String::new() // TODO: return proper error?
         };
 
-        let (wasm_bg, wasm_js) = if res.success {
-            (Some(res.code), Some(js_code))
-        } else {
-            (None, None)
-        };
-
         Ok(WasmPackResponse {
             success: res.success,
             stdout: res.stdout,
             stderr: res.stderr,
-            wasm_bg: wasm_bg,
-            wasm_js: wasm_js
+            wasm_bg: res.code,
+            wasm_js: js_code
         })
     }
 
@@ -1002,8 +996,8 @@ impl CrateTypeRequest for WasmPackRequest {
 
 #[derive(Debug, Clone)]
 pub struct WasmPackResponse {
-    pub wasm_js: Option<String>,
-    pub wasm_bg: Option<String>,
+    pub wasm_js: String,
+    pub wasm_bg: String,
     pub success: bool,
     pub stdout: String,
     pub stderr: String,
