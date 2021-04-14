@@ -7,24 +7,25 @@ export const FunctionalIFrameComponent = ({
   ...props
 }) => {
   const [contentRef, setContentRef] = useState(null)
-  const mountNode =
-    contentRef?.contentWindow?.document?.body
+  const document =
+    contentRef?.contentWindow?.document;
+  const mountNode = document?.body;
 
   useEffect(() => {
-    const script = document.createElement('script');
-
-    script.src = url;
-    script.type = 'module';
-    script.async = true;
-
-    mountNode && mountNode.appendChild(script);
+    if (document) {
+      const script = document.createElement('script');
+      script.src = url;
+      script.type = 'module';
+      script.async = true;
+      mountNode && mountNode.appendChild(script);
+    }
 
     return () => {
       if (mountNode) {
         mountNode.innerHTML = ''
       }
     };
-  }, [mountNode, url]);
+  }, [mountNode, document, url]);
 
   return (
     <iframe {...props} ref={setContentRef} scrolling='no' className='container'>

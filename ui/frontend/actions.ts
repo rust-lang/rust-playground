@@ -433,8 +433,8 @@ function performCompileToWasmPack({ request, success, failure }): ThunkAction {
 const requestCompileWasmPack = () =>
   createAction(ActionType.CompileWasmPackRequest);
 
-const receiveCompileWasmPackSuccess = ({ wasm_js, wasm_bg, stdout, stderr }) =>
-  createAction(ActionType.CompileWasmPackSucceeded, { wasm_js, wasm_bg, stdout, stderr });
+const receiveCompileWasmPackSuccess = ({ wasm_js, wasm_bg, stdout, stderr, success }) =>
+  createAction(ActionType.CompileWasmPackSucceeded, { wasm_js, wasm_bg, stdout, stderr, success });
 
 const receiveCompileWasmPackFailure = ({ error }) =>
   createAction(ActionType.CompileWasmPackFailed, { error });
