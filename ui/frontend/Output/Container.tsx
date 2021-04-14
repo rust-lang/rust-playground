@@ -20,12 +20,14 @@ export const FunctionalIFrameComponent = ({
     mountNode && mountNode.appendChild(script);
 
     return () => {
-
+      if (mountNode) {
+        mountNode.innerHTML = ''
+      }
     };
-  }, [contentRef, mountNode, url]);
+  }, [mountNode, url]);
 
   return (
-    <iframe {...props} ref={setContentRef} className='container'>
+    <iframe {...props} ref={setContentRef} scrolling='no' className='container'>
       {mountNode && createPortal(children, mountNode)}
     </iframe>
   )
