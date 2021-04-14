@@ -129,6 +129,7 @@ module.exports = function(_, argv) {
       new CopyPlugin({
         patterns: [
           { from: 'robots.txt', to: '..' },
+          { from: 'assets/favicon', to: '..' },
         ],
       }),
       new MiniCssExtractPlugin({
