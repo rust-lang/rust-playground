@@ -1,17 +1,8 @@
 [package]
-authors = [
-    "Kelly Thomas Kline <kellytk@sw-e.org>",
-    "Samuel Rounce <me@samuelrounce.co.uk>"
-]
-categories = ["gui", "wasm", "web-programming"]
-description = "yew-wasm-pack-minimal demonstrates the minimum code and tooling necessary for a frontend web app with simple deployable artifacts consisting of one HTML file, one JavaScript file, and one WebAssembly file, using Yew, wasm-bindgen, and wasm-pack."
-edition = "2018"
-keywords = ["yew", "wasm", "wasm-bindgen", "web"]
-license = "MIT/Apache-2.0"
-name = "yew-wasm-pack-minimal"
-readme = "README.md"
-repository = "https://github.com/yewstack/yew-wasm-pack-minimal"
+name = "hello_world"
 version = "0.1.0"
+authors = ["The wasm-bindgen Developers"]
+edition = "2018"
 
 [lib]
 crate-type = ["cdylib"]

@@ -194,14 +194,14 @@ impl Sandbox {
         })
     }
 
-
+    // Greatly inspired from https://gitlab.com/strwrite/seed-playground
     pub fn wasm_pack(&self, req: &WasmPackRequest) -> Result<WasmPackResponse> {
         use CompileTarget::*;
         use CrateType::*;
 
         let compile_req = CompileRequest{
             backtrace: false, 
-            channel: Channel::Nightly,
+            channel: Channel::WasmPack,
             code: req.code.clone(),
             crate_type: Library(LibraryType::Cdylib),
             edition: Some(Edition::Rust2018),
@@ -222,18 +222,12 @@ impl Sandbox {
             None => String::new() // TODO: return proper error?
         };
 
-        let (wasm_bg, wasm_js) = if res.success {
-            (Some(res.code), Some(js_code))
-        } else {
-            (None, None)
-        };
-
         Ok(WasmPackResponse {
             success: res.success,
             stdout: res.stdout,
             stderr: res.stderr,
-            wasm_bg: wasm_bg,
-            wasm_js: wasm_js
+            wasm_bg: res.code,
+            wasm_js: js_code
         })
     }
 
@@ -710,6 +704,7 @@ pub enum Channel {
     Stable,
     Beta,
     Nightly,
+    WasmPack,
 }
 
 impl Channel {
@@ -720,6 +715,7 @@ impl Channel {
             Stable => "rust-stable",
             Beta => "rust-beta",
             Nightly => "rust-nightly",
+            WasmPack => "rust-wasm-pack",
         }
     }
 }
@@ -1000,8 +996,8 @@ impl CrateTypeRequest for WasmPackRequest {
 
 #[derive(Debug, Clone)]
 pub struct WasmPackResponse {
-    pub wasm_js: Option<String>,
-    pub wasm_bg: Option<String>,
+    pub wasm_js: String,
+    pub wasm_bg: String,
     pub success: bool,
     pub stdout: String,
     pub stderr: String,

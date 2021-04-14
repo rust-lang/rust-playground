@@ -711,9 +711,11 @@ struct WasmPackRequest {
 
 #[derive(Debug, Clone, Serialize)]
 struct WasmPackResponse {
-    wasm_js: Option<String>,
-    wasm_bg: Option<String>,
-    error: Option<String>
+    success: bool,
+    wasm_js: String,
+    wasm_bg: String,
+    stdout: String,
+    stderr: String,
 }
 
 impl TryFrom<CompileRequest> for sandbox::CompileRequest {
@@ -965,19 +967,12 @@ impl TryFrom<WasmPackRequest> for sandbox::WasmPackRequest {
 
 impl From<sandbox::WasmPackResponse> for WasmPackResponse {
     fn from(me: sandbox::WasmPackResponse) -> Self {
-        if me.success {
-            WasmPackResponse {
-                wasm_bg: me.wasm_bg,
-                wasm_js: me.wasm_js,
-                error: None,
-            }
-        } else {
-            let result = me.stderr + &me.stdout;
-            WasmPackResponse {
-                wasm_bg: None,
-                wasm_js: None,
-                error: Some(result),
-            }
+        WasmPackResponse {
+            success: me.success,
+            wasm_bg: me.wasm_bg,
+            wasm_js: me.wasm_js,
+            stdout: me.stdout,
+            stderr: me.stderr,
         }
     }
 }

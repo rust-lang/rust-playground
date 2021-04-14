@@ -19,7 +19,8 @@ while (( "$#" )); do
 
     shift
 done
-
+# Greatly inspired from https://gitlab.com/strwrite/seed-playground
+# --dev flag disables the wasm-opt for optimization downloaded from networks
 wasm-pack build --target web --out-name package --dev
 
 cat pkg/package_bg.wasm | base64 > "${output}.wasm"
