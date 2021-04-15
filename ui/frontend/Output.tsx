@@ -10,7 +10,7 @@ import Gist from './Output/Gist';
 import Section from './Output/Section';
 import SimplePane, { SimplePaneProps } from './Output/SimplePane';
 import PaneWithMir from './Output/PaneWithMir';
-import Iframe from './Output/IFrame';
+import PaneWithWasmPack from './Output/PaneWithWasmPack';
 import * as selectors from './selectors';
 
 const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
@@ -93,7 +93,7 @@ const Output: React.SFC = () => {
         {focus === Focus.Hir && <PaneWithMir {...hir} kind="hir" />}
         {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
         {focus === Focus.Gist && <Gist />}
-        {focus === Focus.WasmPack && <Iframe {...wasmPack} kind="wasm-pack" />}
+        {focus === Focus.WasmPack && <PaneWithWasmPack {...wasmPack} kind="wasm-pack" />}
       </div>
     );
   }
