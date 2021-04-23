@@ -398,8 +398,7 @@ impl Sandbox {
             "cargo",
             "rustc",
             "--",
-            "-Zunstable-options",
-            "--pretty=expanded",
+            "-Zunpretty=expanded",
         ]);
 
         log::debug!("Macro expansion command is {:?}", cmd);
