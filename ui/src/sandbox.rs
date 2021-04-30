@@ -615,7 +615,8 @@ pub enum ProcessAssembly {
     Filter,
     Raw,
 }
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum CompileTarget {
     Assembly(AssemblyFlavor, DemangleAssembly, ProcessAssembly),
     LlvmIr,
@@ -651,7 +652,7 @@ impl fmt::Display for CompileTarget {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Channel {
     Stable,
     Beta,
@@ -670,13 +671,13 @@ impl Channel {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Mode {
     Debug,
     Release,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Edition {
     Rust2015,
     Rust2018,
@@ -693,7 +694,7 @@ impl Edition {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum CrateType {
     Binary,
     Library(LibraryType),
@@ -710,7 +711,7 @@ impl CrateType {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum LibraryType {
     Lib,
     Dylib,
