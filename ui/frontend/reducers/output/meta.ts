@@ -35,6 +35,9 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.CompileWasmRequest:
       return { ...state, focus: Focus.Wasm };
 
+    case ActionType.CompileWasmPackRequest:
+      return { ...state, focus: Focus.WasmPack };
+
     case ActionType.CompileAssemblyRequest:
       return { ...state, focus: Focus.Asm };
 

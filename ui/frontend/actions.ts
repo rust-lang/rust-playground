@@ -39,6 +39,7 @@ const routes = {
   clippy: { pathname: '/clippy' },
   miri: { pathname: '/miri' },
   macroExpansion: { pathname: '/macro-expansion' },
+  wasmPack: { pathname: '/wasm-pack' },
   meta: {
     crates: { pathname: '/meta/crates' },
     version: {
@@ -93,6 +94,9 @@ export enum ActionType {
   CompileWasmRequest = 'COMPILE_WASM_REQUEST',
   CompileWasmSucceeded = 'COMPILE_WASM_SUCCEEDED',
   CompileWasmFailed = 'COMPILE_WASM_FAILED',
+  CompileWasmPackRequest = 'COMPILE_WASM_PACK_REQUEST',
+  CompileWasmPackSucceeded = 'COMPILE_WASM_PACK_SUCCEEDED',
+  CompileWasmPackFailed = 'COMPILE_WASM_PACK_FAILED',
   EditCode = 'EDIT_CODE',
   AddMainFunction = 'ADD_MAIN_FUNCTION',
   AddImport = 'ADD_IMPORT',
@@ -263,7 +267,7 @@ const performCommonExecute = (crateType, tests): ThunkAction => (dispatch, getSt
 };
 
 function performAutoOnly(): ThunkAction {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const state = getState();
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
@@ -285,7 +289,7 @@ interface CompileRequestBody extends ExecuteRequestBody {
 
 function performCompileShow(target, { request, success, failure }): ThunkAction {
   // TODO: Check a cache
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     dispatch(request());
 
     const state = getState();
@@ -409,7 +413,45 @@ const performCompileToNightlyWasmOnly = (): ThunkAction => dispatch => {
   dispatch(changeChannel(Channel.Nightly));
   dispatch(performCompileToWasm());
 };
+interface WasmPackRequestBody {
+  code: string;
+}
 
+function performCompileToWasmPack({ request, success, failure }): ThunkAction {
+  // TODO: Check a cache
+  return function (dispatch, getState) {
+    dispatch(request());
+
+    const state = getState();
+    const { code } = state;
+    const body: WasmPackRequestBody = {
+      code,
+    };
+    return jsonPost(routes.wasmPack, body)
+      .then(json => dispatch(success(json)))
+      .catch(json => dispatch(failure(json)));
+  };
+}
+
+const requestCompileWasmPack = () =>
+  createAction(ActionType.CompileWasmPackRequest);
+
+const receiveCompileWasmPackSuccess = ({ wasm_js, wasm_bg, stdout, stderr, success }) =>
+  createAction(ActionType.CompileWasmPackSucceeded, { wasm_js, wasm_bg, stdout, stderr, success });
+
+const receiveCompileWasmPackFailure = ({ error }) =>
+  createAction(ActionType.CompileWasmPackFailed, { error });
+
+const performCompileToNightlyWasmPackOnly = (): ThunkAction => dispatch => {
+  dispatch(changeChannel(Channel.Nightly));
+  dispatch(performCompileToWasmPack(
+    {
+      request: requestCompileWasmPack,
+      success: receiveCompileWasmPackSuccess,
+      failure: receiveCompileWasmPackFailure,
+    }
+  ));
+};
 const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Asm]: performCompileToAssemblyOnly,
   [PrimaryActionCore.Compile]: performCompileOnly,
@@ -420,6 +462,7 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Hir]: performCompileToHirOnly,
   [PrimaryActionCore.Mir]: performCompileToMirOnly,
   [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
+  [PrimaryActionCore.WasmPack]: performCompileToNightlyWasmPackOnly,
 };
 
 export const performPrimaryAction = (): ThunkAction => (dispatch, getState) => {
@@ -449,6 +492,8 @@ export const performCompileToNightlyHir =
   performAndSwitchPrimaryAction(performCompileToNightlyHirOnly, PrimaryActionCore.Hir);
 export const performCompileToNightlyWasm =
   performAndSwitchPrimaryAction(performCompileToNightlyWasmOnly, PrimaryActionCore.Wasm);
+export const performCompileToNightlyWasmPack =
+  performAndSwitchPrimaryAction(performCompileToNightlyWasmPackOnly, PrimaryActionCore.WasmPack);
 
 export const editCode = (code: string) =>
   createAction(ActionType.EditCode, { code });
@@ -491,7 +536,7 @@ const receiveFormatFailure = (body: FormatResponseBody) =>
 
 export function performFormat(): ThunkAction {
   // TODO: Check a cache
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     dispatch(requestFormat());
 
     const body: FormatRequestBody = formatRequestSelector(getState());
@@ -525,7 +570,7 @@ const receiveClippyFailure = ({ error }) =>
 
 export function performClippy(): ThunkAction {
   // TODO: Check a cache
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     dispatch(requestClippy());
 
     const body: ClippyRequestBody = clippyRequestSelector(getState());
@@ -552,7 +597,7 @@ const receiveMiriFailure = ({ error }) =>
 
 export function performMiri(): ThunkAction {
   // TODO: Check a cache
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     dispatch(requestMiri());
 
     const { code, configuration: {
@@ -582,7 +627,7 @@ const receiveMacroExpansionFailure = ({ error }) =>
 
 export function performMacroExpansion(): ThunkAction {
   // TODO: Check a cache
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     dispatch(requestMacroExpansion());
 
     const { code, configuration: {
@@ -620,7 +665,7 @@ type PerformGistLoadProps =
   Pick<GistSuccessProps, Exclude<keyof GistSuccessProps, 'url' | 'code' | 'stdout' | 'stderr'>>;
 
 export function performGistLoad({ id, channel, mode, edition }: PerformGistLoadProps): ThunkAction {
-  return function(dispatch, _getState) {
+  return function (dispatch, _getState) {
     dispatch(requestGistLoad());
     const u = url.resolve(routes.meta.gist.pathname, id);
     jsonGet(u)
@@ -639,7 +684,7 @@ const receiveGistSaveFailure = ({ error }) => // eslint-disable-line no-unused-v
   createAction(ActionType.GistSaveFailed, { error });
 
 export function performGistSave(): ThunkAction {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     dispatch(requestGistSave());
 
     const { code, configuration: { channel, mode, edition }, output: { execute: { stdout, stderr } } } = getState();
@@ -657,7 +702,7 @@ const receiveCratesLoadSuccess = ({ crates }) =>
   createAction(ActionType.CratesLoadSucceeded, { crates });
 
 export function performCratesLoad(): ThunkAction {
-  return function(dispatch) {
+  return function (dispatch) {
     dispatch(requestCratesLoad());
 
     return jsonGet(routes.meta.crates)
@@ -673,7 +718,7 @@ const receiveVersionsLoadSuccess = ({ stable, beta, nightly, rustfmt, clippy, mi
   createAction(ActionType.VersionsLoadSucceeded, { stable, beta, nightly, rustfmt, clippy, miri });
 
 export function performVersionsLoad(): ThunkAction {
-  return function(dispatch) {
+  return function (dispatch) {
     dispatch(requestVersionsLoad());
 
     const stable = jsonGet(routes.meta.version.stable);
@@ -751,7 +796,7 @@ export function indexPageLoad({
   mode: modeString = 'debug',
   edition: editionString,
 }): ThunkAction {
-  return function(dispatch) {
+  return function (dispatch) {
     const channel = parseChannel(version);
     const mode = parseMode(modeString);
     let edition = parseEdition(editionString);
@@ -792,7 +837,7 @@ export function helpPageLoad() {
 }
 
 export function showExample(code): ThunkAction {
-  return function(dispatch) {
+  return function (dispatch) {
     dispatch(navigateToIndex());
     dispatch(editCode(code));
   };
@@ -832,6 +877,9 @@ export type Action =
   | ReturnType<typeof requestCompileWasm>
   | ReturnType<typeof receiveCompileWasmSuccess>
   | ReturnType<typeof receiveCompileWasmFailure>
+  | ReturnType<typeof requestCompileWasmPack>
+  | ReturnType<typeof receiveCompileWasmPackSuccess>
+  | ReturnType<typeof receiveCompileWasmPackFailure>
   | ReturnType<typeof editCode>
   | ReturnType<typeof addMainFunction>
   | ReturnType<typeof addImport>

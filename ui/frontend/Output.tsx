@@ -10,6 +10,7 @@ import Gist from './Output/Gist';
 import Section from './Output/Section';
 import SimplePane, { SimplePaneProps } from './Output/SimplePane';
 import PaneWithMir from './Output/PaneWithMir';
+import PaneWithWasmPack from './Output/PaneWithWasmPack';
 import * as selectors from './selectors';
 
 import styles from './Output.module.css';
@@ -47,7 +48,10 @@ interface PaneWithCodeProps extends SimplePaneProps {
 
 const Output: React.SFC = () => {
   const somethingToShow = useSelector(selectors.getSomethingToShow);
-  const { meta: { focus }, execute, format, clippy, miri, macroExpansion, assembly, llvmIr, mir, hir, wasm, gist } =
+  const { meta: { focus },
+    execute, format, clippy, miri,
+    macroExpansion, assembly, llvmIr, mir,
+    hir, wasm, gist, wasmPack } =
     useSelector((state: State) => state.output);
 
   const dispatch = useDispatch();
@@ -63,6 +67,7 @@ const Output: React.SFC = () => {
   const focusHir = useCallback(() => dispatch(actions.changeFocus(Focus.Hir)), [dispatch]);
   const focusWasm = useCallback(() => dispatch(actions.changeFocus(Focus.Wasm)), [dispatch]);
   const focusGist = useCallback(() => dispatch(actions.changeFocus(Focus.Gist)), [dispatch]);
+  const focusWasmPack = useCallback(() => dispatch(actions.changeFocus(Focus.WasmPack)), [dispatch]);
 
   if (!somethingToShow) {
     return null;
@@ -86,6 +91,7 @@ const Output: React.SFC = () => {
         {focus === Focus.Hir && <PaneWithMir {...hir} kind="hir" />}
         {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
         {focus === Focus.Gist && <Gist />}
+        {focus === Focus.WasmPack && <PaneWithWasmPack {...wasmPack} kind="wasm-pack" />}
       </div>
     );
   }
@@ -137,6 +143,10 @@ const Output: React.SFC = () => {
           label="Share"
           onClick={focusGist}
           tabProps={gist} />
+        <Tab kind={Focus.WasmPack} focus={focus}
+          label="WASM PACK"
+          onClick={focusWasmPack}
+          tabProps={wasmPack} />
         {close}
       </div>
       { body}

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -eu
+
+# Rewrite our arguments to be `cargo build` instead of `cargo wasm`;
+# this assumes that the command will always be `cargo wasm ...`. We
+# capture the output directory in order to place the result file.
+shift # Ignore "wasm"
+args=()
+while (( "$#" )); do
+    if [[ "$1" == "--" ]] ; then
+        : # Ignore
+    elif [[ "$1" == "-o" ]] ; then
+        shift
+        output="$1"
+    else
+        args+="$1"
+    fi
+
+    shift
+done
+# Greatly inspired from https://gitlab.com/strwrite/seed-playground
+# --dev flag disables the wasm-opt for optimization downloaded from networks
+wasm-pack build --target web --out-name package --dev
+
+cat pkg/package_bg.wasm | base64 > "${output}.wasm"
+cat pkg/package.js | base64 > "${output}.js"
+

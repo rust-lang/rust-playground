@@ -12,6 +12,7 @@ import meta from './meta';
 import mir from './mir';
 import miri from './miri';
 import wasm from './wasm';
+import wasmPack from './wasmPack';
 
 const output = combineReducers({
   meta,
@@ -26,6 +27,7 @@ const output = combineReducers({
   wasm,
   execute,
   gist,
+  wasmPack,
 });
 
 export type State = ReturnType<typeof output>;

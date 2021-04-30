@@ -78,6 +78,7 @@ export enum PrimaryActionCore {
   Mir = 'mir',
   Test = 'test',
   Wasm = 'wasm',
+  WasmPack = 'wasm-pack',
 }
 
 export type PrimaryAction = PrimaryActionCore | PrimaryActionAuto;
@@ -115,6 +116,7 @@ export enum Focus {
   Execute = 'execute',
   Format = 'format',
   Gist = 'gist',
+  WasmPack = 'wasm-pack',
 }
 
 export enum Notification {
