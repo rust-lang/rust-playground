@@ -90,8 +90,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     in_build_menu { click_on("MIR") }
 
     within(:output, :result) do
-      expect(page).to have_content 'StorageLive'
-      expect(page).to have_content 'StorageDead'
+      expect(page).to have_content 'bb0: {'
     end
   end
 
