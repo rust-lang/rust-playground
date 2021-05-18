@@ -20,6 +20,10 @@ fn main() {
     let mut cargo_toml: Value = toml::from_str(&input)
         .unwrap_or_else(|e| panic!("Cannot parse {} as TOML: {}", input_filename.display(), e));
 
+    if env::var_os("PLAYGROUND_FEATURE_EDITION2021").is_some() {
+        cargo_toml = set_feature_edition2021(cargo_toml);
+    }
+
     if let Ok(edition) = env::var("PLAYGROUND_EDITION") {
         cargo_toml = set_edition(cargo_toml, &edition);
     }
@@ -60,6 +64,22 @@ fn ensure_string_in_vec(values: &mut Vec<String>, val: &str) {
     if !values.iter().any(|f| f == val) {
         values.push(val.into());
     }
+}
+
+fn set_feature_edition2021(cargo_toml: Value) -> Value {
+    #[derive(Debug, Serialize, Deserialize)]
+    #[serde(rename_all = "kebab-case")]
+    struct CargoToml {
+        #[serde(default)]
+        cargo_features: Vec<String>,
+        #[serde(flatten)]
+        other: Other,
+    }
+
+    modify(cargo_toml, |mut cargo_toml: CargoToml| {
+        ensure_string_in_vec(&mut cargo_toml.cargo_features, "edition2021");
+        cargo_toml
+    })
 }
 
 fn set_edition(cargo_toml: Value, edition: &str) -> Value {

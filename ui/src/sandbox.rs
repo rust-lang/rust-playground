@@ -681,6 +681,7 @@ pub enum Mode {
 pub enum Edition {
     Rust2015,
     Rust2018,
+    Rust2021, // TODO - add parallel tests for 2021
 }
 
 impl Edition {
@@ -690,6 +691,7 @@ impl Edition {
         match *self {
             Rust2015 => "2015",
             Rust2018 => "2018",
+            Rust2021 => "2021",
         }
     }
 }
@@ -751,6 +753,10 @@ impl DockerCommandExt for Command {
 
     fn apply_edition(&mut self, req: impl EditionRequest) {
         if let Some(edition) = req.edition() {
+            if edition == Edition::Rust2021 {
+                self.args(&["--env", &format!("PLAYGROUND_FEATURE_EDITION2021=true")]);
+            }
+
             self.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
         }
     }

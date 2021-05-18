@@ -29,6 +29,7 @@ const AdvancedOptionsMenu: React.SFC = () => {
       >
         <option value={Edition.Rust2015}>2015</option>
         <option value={Edition.Rust2018}>2018</option>
+        <option value={Edition.Rust2021}>2021</option>
       </SelectConfig>
 
       <EitherConfig
