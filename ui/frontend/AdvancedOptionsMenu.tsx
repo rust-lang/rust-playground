@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import * as actions from './actions';
-import { Either as EitherConfig } from './ConfigElement';
+import { Either as EitherConfig, Select as SelectConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
 import { State } from './reducers';
 import * as selectors from './selectors';
@@ -21,14 +21,15 @@ const AdvancedOptionsMenu: React.SFC = () => {
 
   return (
     <MenuGroup title="Advanced options">
-      <EitherConfig
-        id="edition"
+      <SelectConfig
         name="Edition"
-        a={Edition.Rust2015}
-        b={Edition.Rust2018}
         value={edition}
         isNotDefault={isEditionSet}
-        onChange={changeEdition} />
+        onChange={changeEdition}
+      >
+        <option value={Edition.Rust2015}>2015</option>
+        <option value={Edition.Rust2018}>2018</option>
+      </SelectConfig>
 
       <EitherConfig
         id="backtrace"

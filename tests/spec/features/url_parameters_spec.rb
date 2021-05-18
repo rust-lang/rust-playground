@@ -26,7 +26,7 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
   RSpec::Matchers.define :have_edition do |expected|
     match do |actual|
       in_advanced_options_menu do
-        expect(page).to have_checked_field(expected, visible: false)
+        expect(page).to have_select(selected: expected)
       end
     end
   end

@@ -11,7 +11,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
   end
 
   scenario "using the 2015 edition" do
-    in_advanced_options_menu { choose '2015' }
+    in_advanced_options_menu { select '2015' }
     click_on("Run")
 
     within(:output, :stderr) do
@@ -21,7 +21,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
   end
 
   scenario "using the 2018 edition" do
-    in_advanced_options_menu { choose '2018' }
+    in_advanced_options_menu { select '2018' }
     click_on("Run")
 
     within(:output, :stderr) do
