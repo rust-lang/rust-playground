@@ -119,9 +119,9 @@ export const getChannelLabel = (state: State) => {
   return `${channel}`;
 };
 
-export const getEditionSet = createSelector(
+export const isEditionDefault = createSelector(
   editionSelector,
-  edition => edition !== Edition.Rust2018,
+  edition => edition == Edition.Rust2018,
 );
 
 export const getBacktraceSet = (state: State) => (
@@ -129,9 +129,9 @@ export const getBacktraceSet = (state: State) => (
 );
 
 export const getAdvancedOptionsSet = createSelector(
-  getEditionSet, getBacktraceSet,
-  (editionSet, backtraceSet) => (
-    editionSet || backtraceSet
+  isEditionDefault, getBacktraceSet,
+  (editionDefault, backtraceSet) => (
+    !editionDefault || backtraceSet
   ),
 );
 

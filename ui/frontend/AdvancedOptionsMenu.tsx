@@ -9,7 +9,7 @@ import * as selectors from './selectors';
 import { Backtrace, Edition } from './types';
 
 const AdvancedOptionsMenu: React.SFC = () => {
-  const isEditionSet = useSelector(selectors.getEditionSet);
+  const isEditionDefault = useSelector(selectors.isEditionDefault);
   const edition = useSelector((state: State) => state.configuration.edition);
   const isBacktraceSet = useSelector(selectors.getBacktraceSet);
   const backtrace = useSelector((state: State) => state.configuration.backtrace);
@@ -24,7 +24,7 @@ const AdvancedOptionsMenu: React.SFC = () => {
       <SelectConfig
         name="Edition"
         value={edition}
-        isNotDefault={isEditionSet}
+        isNotDefault={!isEditionDefault}
         onChange={changeEdition}
       >
         <option value={Edition.Rust2015}>2015</option>
