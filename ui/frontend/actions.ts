@@ -746,6 +746,8 @@ function parseEdition(s: string): Edition | null {
       return Edition.Rust2015;
     case '2018':
       return Edition.Rust2018;
+    case '2021':
+      return Edition.Rust2021;
     default:
       return null;
   }
