@@ -10,7 +10,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
     editor.set(rust_2018_code)
   end
 
-  scenario "using the 2015 channel" do
+  scenario "using the 2015 edition" do
     in_advanced_options_menu { choose '2015' }
     click_on("Run")
 
@@ -20,7 +20,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
     end
   end
 
-  scenario "using the 2018 channel" do
+  scenario "using the 2018 edition" do
     in_advanced_options_menu { choose '2018' }
     click_on("Run")
 
