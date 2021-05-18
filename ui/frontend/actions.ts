@@ -165,8 +165,15 @@ export const changeChannel = (channel: Channel) =>
 export const changeMode = (mode: Mode) =>
   createAction(ActionType.ChangeMode, { mode });
 
-export const changeEdition = (edition: Edition) =>
+const changeEditionRaw = (edition: Edition) =>
   createAction(ActionType.ChangeEdition, { edition });
+
+export const changeEdition = (edition: Edition): ThunkAction => dispatch => {
+  if (edition == Edition.Rust2021) {
+    dispatch(changeChannel(Channel.Nightly));
+  }
+  dispatch(changeEditionRaw(edition));
+}
 
 export const changeBacktrace = (backtrace: Backtrace) =>
   createAction(ActionType.ChangeBacktrace, { backtrace });
@@ -805,7 +812,7 @@ export type Action =
   | ReturnType<typeof changeBacktrace>
   | ReturnType<typeof changeChannel>
   | ReturnType<typeof changeDemangleAssembly>
-  | ReturnType<typeof changeEdition>
+  | ReturnType<typeof changeEditionRaw>
   | ReturnType<typeof changeEditor>
   | ReturnType<typeof changeFocus>
   | ReturnType<typeof changeKeybinding>
