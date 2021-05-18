@@ -303,3 +303,8 @@ export const aceResizeKey = createSelector(
   ratioGeneration,
   (focus, ratioGeneration): AceResizeKey => [focus, ratioGeneration],
 )
+
+export const offerCrateAutocompleteOnUse = createSelector(
+  editionSelector,
+  (edition) => edition !== Edition.Rust2015,
+);
