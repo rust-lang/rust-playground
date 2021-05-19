@@ -14,7 +14,7 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
 
     in_channel_menu { click_on("Nightly") }
     in_mode_menu { click_on("Release") }
-    in_advanced_options_menu { choose("2018") }
+    in_advanced_options_menu { select("2018") }
 
     within(:header) { click_on 'Share' }
 

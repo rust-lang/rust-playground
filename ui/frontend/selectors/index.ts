@@ -108,6 +108,7 @@ export const isNightlyChannel = (state: State) => (
 );
 export const isWasmAvailable = isNightlyChannel;
 export const isHirAvailable = isNightlyChannel;
+export const isRust2021Available = isNightlyChannel;
 
 export const getModeLabel = (state: State) => {
   const { configuration: { mode } } = state;
@@ -119,9 +120,9 @@ export const getChannelLabel = (state: State) => {
   return `${channel}`;
 };
 
-export const getEditionSet = createSelector(
+export const isEditionDefault = createSelector(
   editionSelector,
-  edition => edition !== Edition.Rust2018,
+  edition => edition == Edition.Rust2018,
 );
 
 export const getBacktraceSet = (state: State) => (
@@ -129,9 +130,9 @@ export const getBacktraceSet = (state: State) => (
 );
 
 export const getAdvancedOptionsSet = createSelector(
-  getEditionSet, getBacktraceSet,
-  (editionSet, backtraceSet) => (
-    editionSet || backtraceSet
+  isEditionDefault, getBacktraceSet,
+  (editionDefault, backtraceSet) => (
+    !editionDefault || backtraceSet
   ),
 );
 
@@ -302,3 +303,8 @@ export const aceResizeKey = createSelector(
   ratioGeneration,
   (focus, ratioGeneration): AceResizeKey => [focus, ratioGeneration],
 )
+
+export const offerCrateAutocompleteOnUse = createSelector(
+  editionSelector,
+  (edition) => edition !== Edition.Rust2015,
+);

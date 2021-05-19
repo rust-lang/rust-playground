@@ -52,9 +52,10 @@ export const Select: React.SFC<SelectProps> = ({ value, onChange, children, ...r
 interface ConfigElementProps {
   name: string;
   isNotDefault?: boolean;
+  aside?: JSX.Element,
 }
 
-const ConfigElement: React.SFC<ConfigElementProps> = ({ name, isNotDefault, children }) => (
+const ConfigElement: React.SFC<ConfigElementProps> = ({ name, isNotDefault, aside, children }) => (
   <MenuItem>
     <div className={styles.container}>
       <span className={isNotDefault ? styles.notDefault : styles.name}>{name}</span>
@@ -62,5 +63,6 @@ const ConfigElement: React.SFC<ConfigElementProps> = ({ name, isNotDefault, chil
         {children}
       </div>
     </div>
+    {aside}
   </MenuItem>
 );

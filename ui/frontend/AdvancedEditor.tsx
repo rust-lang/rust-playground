@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
-import { aceResizeKey } from './selectors';
+import { aceResizeKey, offerCrateAutocompleteOnUse } from './selectors';
 
 import State from './state';
-import { AceResizeKey, CommonEditorProps, Crate, Edition, PairCharacters, Position, Selection } from './types';
+import { AceResizeKey, CommonEditorProps, Crate, PairCharacters, Position, Selection } from './types';
 
 import styles from './Editor.module.css';
 
@@ -478,7 +478,7 @@ const mapStateToProps = (state: State) => {
     pairCharacters,
     keybinding: keybinding === 'ace' ? null : keybinding,
     resizeKey: aceResizeKey(state),
-    autocompleteOnUse: state.configuration.edition === Edition.Rust2018,
+    autocompleteOnUse: offerCrateAutocompleteOnUse(state),
   };
 };
 

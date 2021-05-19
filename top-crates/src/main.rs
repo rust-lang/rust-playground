@@ -58,6 +58,7 @@ struct TomlPackage {
     name: String,
     version: String,
     authors: Vec<String>,
+    resolver: String,
 }
 
 /// A mapping of a crates name to its identifier used in source code
@@ -447,6 +448,7 @@ fn main() {
             name: "playground".to_owned(),
             version: "0.0.1".to_owned(),
             authors: vec!["The Rust Playground".to_owned()],
+            resolver: "2".to_owned(),
         },
         profile: Profiles {
             dev: Profile {
