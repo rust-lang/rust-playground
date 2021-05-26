@@ -19,8 +19,7 @@ It has a number of features, including:
    stable, beta, or nightly version of Rust.
 1. The top 100 popular crates (ranked by all-time downloads), crates
    that are part of the [Rust Cookbook][] and all of their
-   dependencies are available for use. Just add `extern foo` to use
-   them!
+   dependencies are available for use!
 1. The ability to quickly load and save your code to a
    GitHub [Gist][gist] and share it with your friends.
 1. [rustfmt][] and [Clippy][clippy] can be run against the source code.
@@ -29,8 +28,8 @@ It has a number of features, including:
 
 [Rust Cookbook]: https://rust-lang-nursery.github.io/rust-cookbook/
 [gist]: https://gist.github.com/
-[rustfmt]: https://github.com/rust-lang-nursery/rustfmt
-[clippy]: https://github.com/Manishearth/rust-clippy
+[rustfmt]: https://github.com/rust-lang/rustfmt
+[clippy]: https://github.com/rust-lang/rust-clippy
 
 ## Architecture
 
@@ -43,8 +42,8 @@ potential contributors! If you are interested in contributing, please
 feel free to ask a question and we might even be able to point out
 some useful resources.
 
-[react]: https://facebook.github.io/react/
-[iron]: http://ironframework.io/
+[react]: https://reactjs.org/
+[iron]: https://github.com/iron/iron
 [docker]: https://www.docker.com/
 
 ## Resource Limits
