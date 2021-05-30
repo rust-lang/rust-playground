@@ -24,7 +24,7 @@ version = "=1.2.0"
 
 [dependencies.ahash]
 package = "ahash"
-version = "=0.7.2"
+version = "=0.7.4"
 
 [dependencies.aho_corasick]
 package = "aho-corasick"
@@ -109,7 +109,7 @@ version = "=1.0.1"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.0.67"
+version = "=1.0.68"
 
 [dependencies.cfg_if]
 package = "cfg-if"
@@ -146,7 +146,7 @@ version = "=1.2.1"
 
 [dependencies.crossbeam]
 package = "crossbeam"
-version = "=0.8.0"
+version = "=0.8.1"
 
 [dependencies.crossbeam_channel]
 package = "crossbeam-channel"
@@ -158,15 +158,15 @@ version = "=0.8.0"
 
 [dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.4"
+version = "=0.9.5"
 
 [dependencies.crossbeam_queue]
 package = "crossbeam-queue"
-version = "=0.3.1"
+version = "=0.3.2"
 
 [dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.4"
+version = "=0.8.5"
 
 [dependencies.crypto_mac]
 package = "crypto-mac"
@@ -303,7 +303,7 @@ version = "=0.14.4"
 
 [dependencies.getrandom]
 package = "getrandom"
-version = "=0.2.2"
+version = "=0.2.3"
 
 [dependencies.getrandom_0_1_16]
 package = "getrandom"
@@ -359,7 +359,7 @@ version = "=1.4.1"
 
 [dependencies.httpdate]
 package = "httpdate"
-version = "=1.0.0"
+version = "=1.0.1"
 
 [dependencies.humantime]
 package = "humantime"
@@ -367,7 +367,7 @@ version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=0.14.7"
+version = "=0.14.8"
 features = ["full"]
 
 [dependencies.hyper_tls]
@@ -416,7 +416,7 @@ version = "=1.4.0"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.94"
+version = "=0.2.95"
 
 [dependencies.libm]
 package = "libm"
@@ -480,7 +480,7 @@ version = "=0.7.0"
 
 [dependencies.memoffset]
 package = "memoffset"
-version = "=0.6.3"
+version = "=0.6.4"
 
 [dependencies.mime]
 package = "mime"
@@ -581,7 +581,7 @@ version = "=0.9.63"
 
 [dependencies.ordered_float]
 package = "ordered-float"
-version = "=2.2.0"
+version = "=2.5.0"
 
 [dependencies.parking_lot]
 package = "parking_lot"
@@ -669,7 +669,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.26"
+version = "=1.0.27"
 features = ["span-locations"]
 
 [dependencies.proc_macro_hack]
@@ -798,6 +798,10 @@ version = "=0.5.0"
 
 [dependencies.semver]
 package = "semver"
+version = "=1.0.1"
+
+[dependencies.semver_0_11_0]
+package = "semver"
 version = "=0.11.0"
 
 [dependencies.semver_parser]
@@ -902,7 +906,7 @@ version = "=0.12.4"
 
 [dependencies.tar]
 package = "tar"
-version = "=0.4.33"
+version = "=0.4.35"
 
 [dependencies.tempfile]
 package = "tempfile"
@@ -926,11 +930,11 @@ version = "=0.11.0"
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.24"
+version = "=1.0.25"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.24"
+version = "=1.0.25"
 
 [dependencies.thread_id]
 package = "thread-id"
@@ -975,7 +979,7 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.6.0"
+version = "=1.6.1"
 features = ["full", "test-util"]
 
 [dependencies.tokio_native_tls]
@@ -1036,7 +1040,7 @@ version = "=0.3.5"
 
 [dependencies.unicode_normalization]
 package = "unicode-normalization"
-version = "=0.1.17"
+version = "=0.1.18"
 
 [dependencies.unicode_segmentation]
 package = "unicode-segmentation"

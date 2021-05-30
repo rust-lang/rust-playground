@@ -16,7 +16,7 @@
   },
   {
     "name": "ahash",
-    "version": "0.7.2",
+    "version": "0.7.4",
     "id": "ahash"
   },
   {
@@ -121,7 +121,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.67",
+    "version": "1.0.68",
     "id": "cc"
   },
   {
@@ -166,7 +166,7 @@
   },
   {
     "name": "crossbeam",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "id": "crossbeam"
   },
   {
@@ -181,17 +181,17 @@
   },
   {
     "name": "crossbeam-epoch",
-    "version": "0.9.4",
+    "version": "0.9.5",
     "id": "crossbeam_epoch"
   },
   {
     "name": "crossbeam-queue",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "id": "crossbeam_queue"
   },
   {
     "name": "crossbeam-utils",
-    "version": "0.8.4",
+    "version": "0.8.5",
     "id": "crossbeam_utils"
   },
   {
@@ -356,7 +356,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "id": "getrandom"
   },
   {
@@ -426,7 +426,7 @@
   },
   {
     "name": "httpdate",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "httpdate"
   },
   {
@@ -436,7 +436,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.14.7",
+    "version": "0.14.8",
     "id": "hyper"
   },
   {
@@ -496,7 +496,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.94",
+    "version": "0.2.95",
     "id": "libc"
   },
   {
@@ -576,7 +576,7 @@
   },
   {
     "name": "memoffset",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "id": "memoffset"
   },
   {
@@ -706,7 +706,7 @@
   },
   {
     "name": "ordered-float",
-    "version": "2.2.0",
+    "version": "2.5.0",
     "id": "ordered_float"
   },
   {
@@ -826,7 +826,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.26",
+    "version": "1.0.27",
     "id": "proc_macro2"
   },
   {
@@ -971,8 +971,13 @@
   },
   {
     "name": "semver",
-    "version": "0.11.0",
+    "version": "1.0.1",
     "id": "semver"
+  },
+  {
+    "name": "semver",
+    "version": "0.11.0",
+    "id": "semver_0_11_0"
   },
   {
     "name": "semver-parser",
@@ -1096,7 +1101,7 @@
   },
   {
     "name": "tar",
-    "version": "0.4.33",
+    "version": "0.4.35",
     "id": "tar"
   },
   {
@@ -1126,12 +1131,12 @@
   },
   {
     "name": "thiserror",
-    "version": "1.0.24",
+    "version": "1.0.25",
     "id": "thiserror"
   },
   {
     "name": "thiserror-impl",
-    "version": "1.0.24",
+    "version": "1.0.25",
     "id": "thiserror_impl"
   },
   {
@@ -1186,7 +1191,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "id": "tokio"
   },
   {
@@ -1261,7 +1266,7 @@
   },
   {
     "name": "unicode-normalization",
-    "version": "0.1.17",
+    "version": "0.1.18",
     "id": "unicode_normalization"
   },
   {
