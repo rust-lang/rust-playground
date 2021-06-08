@@ -70,6 +70,7 @@ export enum PrimaryActionAuto {
 }
 
 export enum PrimaryActionCore {
+  Ast = 'ast',
   Asm = 'asm',
   Compile = 'compile',
   Execute = 'execute',
@@ -111,6 +112,7 @@ export enum Focus {
   LlvmIr = 'llvm-ir',
   Mir = 'mir',
   Hir = 'hir',
+  Ast = 'ast',
   Wasm = 'wasm',
   Asm = 'asm',
   Execute = 'execute',

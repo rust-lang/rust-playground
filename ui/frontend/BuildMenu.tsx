@@ -28,6 +28,7 @@ const useDispatchAndClose = (action: () => void, close: () => void) => {
 
 const BuildMenu: React.SFC<BuildMenuProps> = props => {
   const isHirAvailable = useSelector(selectors.isHirAvailable);
+  const isAstAvailable = useSelector(selectors.isAstAvailable);
   const isWasmAvailable = useSelector(selectors.isWasmAvailable);
 
   const compile = useDispatchAndClose(actions.performCompile, props.close);
@@ -35,6 +36,7 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => {
   const compileToLLVM = useDispatchAndClose(actions.performCompileToLLVM, props.close);
   const compileToMir = useDispatchAndClose(actions.performCompileToMir, props.close);
   const compileToHir = useDispatchAndClose(actions.performCompileToNightlyHir, props.close);
+  const compileToAst = useDispatchAndClose(actions.performCompileToNightlyAst, props.close);
   const compileToWasm = useDispatchAndClose(actions.performCompileToNightlyWasm, props.close);
   const execute = useDispatchAndClose(actions.performExecute, props.close);
   const test = useDispatchAndClose(actions.performTest, props.close);
@@ -66,6 +68,10 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => {
         Build and show the resulting HIR, Rust’s syntax-based intermediate representation.
         {!isHirAvailable && <HirAside />}
       </ButtonMenuItem>
+      <ButtonMenuItem name="AST" onClick={compileToAst}>
+        Build and show the resulting AST.
+        {!isAstAvailable && <HirAside />}
+      </ButtonMenuItem>
       <ButtonMenuItem name="WASM" onClick={compileToWasm}>
         Build a WebAssembly module for web browsers, in the .WAT textual representation.
         {!isWasmAvailable && <WasmAside />}
@@ -77,6 +83,13 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => {
 const HirAside: React.SFC = () => (
   <MenuAside>
     Note: HIR currently requires using the Nightly channel, selecting this
+    option will switch to Nightly.
+  </MenuAside>
+);
+
+const AstAside: React.SFC = () => (
+  <MenuAside>
+    Note: AST currently requires using the Nightly channel, selecting this
     option will switch to Nightly.
   </MenuAside>
 );
