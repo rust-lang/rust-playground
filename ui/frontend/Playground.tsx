@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Split from 'react-split-grid';
+import Split from 'split-grid';
 
 import Editor from './Editor';
 import Header from './Header';
@@ -12,74 +12,31 @@ import * as actions from './actions';
 
 import styles from './Playground.module.css';
 
-const NoOutput: React.SFC = () => (
-  <div className={styles.editor}><Editor /></div>
-);
-
-const PlainRows: React.SFC = () => (
-  <div className={styles.plainRows}>
-    <div className={styles.editor}><Editor /></div>
-    <div className={styles.output}><Output /></div>
-  </div>
-);
-
-const PlainColumns: React.SFC = () => (
-  <div className={styles.plainColumns}>
-    <div className={styles.editor}><Editor /></div>
-    <div className={styles.output}><Output /></div>
-  </div>
-);
-
-interface SplitProps {
-  resizeComplete: () => void;
+const TRACK_OPTION_NAME = {
+  [Orientation.Horizontal]: 'rowGutters',
+  [Orientation.Vertical]: 'columnGutters',
 }
 
-const SplitRows: React.SFC<SplitProps> = ({ resizeComplete }) => (
-  <Split
-    minSize={100}
-    onDragEnd={resizeComplete}
-    render={({
-      getGridProps,
-      getGutterProps,
-    }) => (
-      <div className={styles.splitRows} {...getGridProps()}>
-        <div className={styles.editor}><Editor /></div>
-        <div className={styles.splitRowsGutter} {...getGutterProps('row', 1)}>
-          <span className={styles.splitRowsGutterHandle}>⣿</span>
-        </div>
-        <div className={styles.output}><Output /></div>
-      </div>
-    )} />
-)
-
-const SplitColumns: React.SFC<SplitProps> = ({ resizeComplete }) => (
-  <Split
-    minSize={100}
-    onDragEnd={resizeComplete}
-    render={({
-      getGridProps,
-      getGutterProps,
-    }) => (
-      <div className={styles.splitColumns} {...getGridProps()}>
-        <div className={styles.editor}><Editor /></div>
-        <div className={styles.splitColumnsGutter} {...getGutterProps('column', 1)}>⣿</div>
-        <div className={styles.output}><Output /></div>
-      </div>
-    )} />
-)
-
-const ORIENTATION_PLAIN_MAP = {
-  [Orientation.Horizontal]: PlainRows,
-  [Orientation.Vertical]: PlainColumns,
+const FOCUSED_GRID_STYLE = {
+  [Orientation.Horizontal]: styles.resizeableAreaRowOutputFocused,
+  [Orientation.Vertical]: styles.resizeableAreaColumnOutputFocused,
 }
 
-const ORIENTATION_SPLIT_MAP = {
-  [Orientation.Horizontal]: SplitRows,
-  [Orientation.Vertical]: SplitColumns,
+const UNFOCUSED_GRID_STYLE = {
+  [Orientation.Horizontal]: styles.resizeableAreaRowOutputUnfocused,
+  [Orientation.Vertical]: styles.resizeableAreaColumnOutputUnfocused,
 }
 
-const Playground: React.SFC = () => {
-  const showNotifications = useSelector(selectors.anyNotificationsToShowSelector);
+const HANDLE_STYLES = {
+  [Orientation.Horizontal]: [styles.splitRowsGutter, styles.splitRowsGutterHandle],
+  [Orientation.Vertical]: [styles.splitColumnsGutter, ''],
+}
+
+// We drop down to lower-level split-grid code and use some hooks
+// because we want to reduce the number of times that the Editor
+// component is remounted. Each time it's remounted, we see a flicker and
+// lose state (like undo history).
+const ResizableArea: React.SFC = () => {
   const somethingToShow = useSelector(selectors.getSomethingToShow);
   const isFocused = useSelector(selectors.isOutputFocused);
   const orientation = useSelector(selectors.orientation);
@@ -87,28 +44,59 @@ const Playground: React.SFC = () => {
   const dispatch = useDispatch();
   const resizeComplete = useCallback(() => dispatch(actions.splitRatioChanged()), [dispatch]);
 
-  let Foo;
-  if (!somethingToShow) {
-    Foo = NoOutput;
-  } else {
-    if (isFocused) {
-      Foo = ORIENTATION_SPLIT_MAP[orientation];
-    } else {
-      Foo = ORIENTATION_PLAIN_MAP[orientation];
-    }
-  }
+  const grid = useRef(null);
+  const dragHandle = useRef(null);
+
+  // Reset styles left on the grid from split-grid when we change orientation or focus.
+  useEffect(() => {
+    grid.current.style['grid-template-columns'] = null;
+    grid.current.style['grid-template-rows'] = null;
+
+    resizeComplete();
+  }, [orientation, isFocused, resizeComplete])
+
+  useEffect(() => {
+    const split = Split({
+      minSize: 100,
+      [TRACK_OPTION_NAME[orientation]]: [{
+        track: 1,
+        element: dragHandle.current,
+      }],
+      onDragEnd: resizeComplete,
+    });
+
+    return () => split.destroy();
+  }, [orientation, isFocused, somethingToShow, resizeComplete])
+
+  const gridStyles = isFocused ? FOCUSED_GRID_STYLE : UNFOCUSED_GRID_STYLE;
+  const gridStyle = gridStyles[orientation];
+  const [handleOuterStyle, handleInnerStyle] = HANDLE_STYLES[orientation];
+
+  return (
+    <div ref={grid} className={gridStyle}>
+      <div className={styles.editor}><Editor /></div>
+      { isFocused &&
+        <div ref={dragHandle} className={handleOuterStyle}>
+          <span className={handleInnerStyle}>⣿</span>
+        </div>
+      }
+      { somethingToShow && <div className={styles.output}><Output /></div>}
+    </div>
+  );
+};
+
+const Playground: React.SFC = () => {
+  const showNotifications = useSelector(selectors.anyNotificationsToShowSelector);
 
   return (
     <>
       <div className={styles.container}>
-        <div>
-          <Header />
-        </div>
-        <Foo resizeComplete={resizeComplete} />
+        <Header />
+        <ResizableArea />
       </div>
       { showNotifications && <Notifications />}
     </>
   );
-};
+}
 
 export default Playground;
