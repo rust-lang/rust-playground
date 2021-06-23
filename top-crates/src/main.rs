@@ -314,10 +314,9 @@ fn main() {
             summary,
             ResolveOpts {
                 dev_deps: false,
-                features: RequestedFeatures {
+                features: RequestedFeatures::DepFeatures {
                     features: Default::default(),
                     uses_default_features: true,
-                    all_features: false,
                 },
             },
         ));
