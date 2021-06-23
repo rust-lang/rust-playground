@@ -54,6 +54,10 @@ version = "=0.4.8"
 package = "arrayvec"
 version = "=0.7.1"
 
+[dependencies.async_recursion]
+package = "async-recursion"
+version = "=0.3.2"
+
 [dependencies.async_trait]
 package = "async-trait"
 version = "=0.1.50"

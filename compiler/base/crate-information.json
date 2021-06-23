@@ -55,6 +55,11 @@
     "id": "arrayvec"
   },
   {
+    "name": "async-recursion",
+    "version": "0.3.2",
+    "id": "async_recursion"
+  },
+  {
     "name": "async-trait",
     "version": "0.1.50",
     "id": "async_trait"
