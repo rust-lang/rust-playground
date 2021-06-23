@@ -12,7 +12,7 @@ codegen-units = 1
 incremental = false
 [dependencies.addr2line]
 package = "addr2line"
-version = "=0.15.1"
+version = "=0.15.2"
 
 [dependencies.adler]
 package = "adler"
@@ -40,11 +40,11 @@ version = "=0.11.0"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.40"
+version = "=1.0.41"
 
 [dependencies.approx]
 package = "approx"
-version = "=0.4.0"
+version = "=0.5.0"
 
 [dependencies.arc_swap]
 package = "arc-swap"
@@ -52,7 +52,11 @@ version = "=0.4.8"
 
 [dependencies.arrayvec]
 package = "arrayvec"
-version = "=0.7.0"
+version = "=0.7.1"
+
+[dependencies.async_recursion]
+package = "async-recursion"
+version = "=0.3.2"
 
 [dependencies.async_trait]
 package = "async-trait"
@@ -68,7 +72,7 @@ version = "=1.0.1"
 
 [dependencies.backtrace]
 package = "backtrace"
-version = "=0.3.59"
+version = "=0.3.60"
 
 [dependencies.base64]
 package = "base64"
@@ -96,8 +100,8 @@ version = "=0.2.16"
 
 [dependencies.bytemuck]
 package = "bytemuck"
-version = "=1.5.1"
-features = ["bytemuck_derive", "derive", "extern_crate_alloc", "extern_crate_std", "zeroable_maybe_uninit"]
+version = "=1.7.0"
+features = ["derive", "extern_crate_alloc", "extern_crate_std", "min_const_generics", "zeroable_maybe_uninit"]
 
 [dependencies.byteorder]
 package = "byteorder"
@@ -138,7 +142,7 @@ version = "=0.4.8"
 
 [dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.1.4"
+version = "=0.1.5"
 
 [dependencies.crc32fast]
 package = "crc32fast"
@@ -214,7 +218,7 @@ version = "=0.8.28"
 
 [dependencies.env_logger]
 package = "env_logger"
-version = "=0.8.3"
+version = "=0.8.4"
 
 [dependencies.error_chain]
 package = "error-chain"
@@ -367,7 +371,7 @@ version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=0.14.8"
+version = "=0.14.9"
 features = ["full"]
 
 [dependencies.hyper_tls]
@@ -396,11 +400,11 @@ version = "=0.1.4"
 
 [dependencies.ipnet]
 package = "ipnet"
-version = "=2.3.0"
+version = "=2.3.1"
 
 [dependencies.itertools]
 package = "itertools"
-version = "=0.10.0"
+version = "=0.10.1"
 
 [dependencies.itoa]
 package = "itoa"
@@ -416,7 +420,7 @@ version = "=1.4.0"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.95"
+version = "=0.2.97"
 
 [dependencies.libm]
 package = "libm"
@@ -496,12 +500,16 @@ version = "=0.3.7"
 
 [dependencies.mio]
 package = "mio"
-version = "=0.7.11"
+version = "=0.7.13"
 features = ["net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
 package = "nalgebra"
-version = "=0.26.2"
+version = "=0.27.1"
+
+[dependencies.nalgebra_macros]
+package = "nalgebra-macros"
+version = "=0.1.0"
 
 [dependencies.native_tls]
 package = "native-tls"
@@ -509,7 +517,7 @@ version = "=0.2.7"
 
 [dependencies.ndarray]
 package = "ndarray"
-version = "=0.15.2"
+version = "=0.15.3"
 
 [dependencies.net2]
 package = "net2"
@@ -526,10 +534,6 @@ version = "=0.4.0"
 [dependencies.num_complex]
 package = "num-complex"
 version = "=0.4.0"
-
-[dependencies.num_complex_0_3_1]
-package = "num-complex"
-version = "=0.3.1"
 
 [dependencies.num_cpus]
 package = "num_cpus"
@@ -557,11 +561,11 @@ version = "=0.2.14"
 
 [dependencies.object]
 package = "object"
-version = "=0.24.0"
+version = "=0.25.3"
 
 [dependencies.once_cell]
 package = "once_cell"
-version = "=1.7.2"
+version = "=1.8.0"
 
 [dependencies.opaque_debug]
 package = "opaque-debug"
@@ -569,7 +573,7 @@ version = "=0.3.0"
 
 [dependencies.openssl]
 package = "openssl"
-version = "=0.10.34"
+version = "=0.10.35"
 
 [dependencies.openssl_probe]
 package = "openssl-probe"
@@ -577,11 +581,11 @@ version = "=0.1.4"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.63"
+version = "=0.9.65"
 
 [dependencies.ordered_float]
 package = "ordered-float"
-version = "=2.5.0"
+version = "=2.5.1"
 
 [dependencies.parking_lot]
 package = "parking_lot"
@@ -690,7 +694,7 @@ version = "=1.0.9"
 
 [dependencies.rand]
 package = "rand"
-version = "=0.8.3"
+version = "=0.8.4"
 features = ["serde1", "small_rng"]
 
 [dependencies.rand_0_7_3]
@@ -699,7 +703,7 @@ version = "=0.7.3"
 
 [dependencies.rand_chacha]
 package = "rand_chacha"
-version = "=0.3.0"
+version = "=0.3.1"
 
 [dependencies.rand_chacha_0_2_2]
 package = "rand_chacha"
@@ -707,7 +711,7 @@ version = "=0.2.2"
 
 [dependencies.rand_core]
 package = "rand_core"
-version = "=0.6.2"
+version = "=0.6.3"
 features = ["alloc", "getrandom", "serde", "serde1", "std"]
 
 [dependencies.rand_core_0_5_1]
@@ -716,11 +720,11 @@ version = "=0.5.1"
 
 [dependencies.rand_distr]
 package = "rand_distr"
-version = "=0.4.0"
+version = "=0.4.1"
 
 [dependencies.rand_hc]
 package = "rand_hc"
-version = "=0.3.0"
+version = "=0.3.1"
 
 [dependencies.rand_pcg]
 package = "rand_pcg"
@@ -744,7 +748,7 @@ version = "=1.5.4"
 
 [dependencies.regex_automata]
 package = "regex-automata"
-version = "=0.1.9"
+version = "=0.1.10"
 
 [dependencies.regex_syntax]
 package = "regex-syntax"
@@ -756,7 +760,7 @@ version = "=0.5.3"
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.11.3"
+version = "=0.11.4"
 features = ["blocking", "cookies", "json", "multipart"]
 
 [dependencies.ring]
@@ -770,11 +774,11 @@ features = ["bundled-full"]
 
 [dependencies.rustc_demangle]
 package = "rustc-demangle"
-version = "=0.1.19"
+version = "=0.1.20"
 
 [dependencies.rustc_version]
 package = "rustc_version"
-version = "=0.3.3"
+version = "=0.4.0"
 
 [dependencies.ryu]
 package = "ryu"
@@ -798,11 +802,7 @@ version = "=0.5.0"
 
 [dependencies.semver]
 package = "semver"
-version = "=1.0.1"
-
-[dependencies.semver_0_11_0]
-package = "semver"
-version = "=0.11.0"
+version = "=1.0.3"
 
 [dependencies.semver_parser]
 package = "semver-parser"
@@ -840,7 +840,7 @@ version = "=0.9.5"
 
 [dependencies.simba]
 package = "simba"
-version = "=0.4.0"
+version = "=0.5.1"
 
 [dependencies.siphasher]
 package = "siphasher"
@@ -897,12 +897,8 @@ version = "=2.4.0"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.72"
+version = "=1.0.73"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
-
-[dependencies.synstructure]
-package = "synstructure"
-version = "=0.12.4"
 
 [dependencies.tar]
 package = "tar"
@@ -922,7 +918,7 @@ version = "=1.1.2"
 
 [dependencies.textwrap]
 package = "textwrap"
-version = "=0.13.4"
+version = "=0.14.0"
 
 [dependencies.textwrap_0_11_0]
 package = "textwrap"
@@ -954,7 +950,7 @@ version = "=0.6.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.2.26"
+version = "=0.2.27"
 
 [dependencies.time_0_1_44]
 package = "time"
@@ -966,7 +962,7 @@ version = "=0.1.1"
 
 [dependencies.time_macros_impl]
 package = "time-macros-impl"
-version = "=0.1.1"
+version = "=0.1.2"
 
 [dependencies.tinyvec]
 package = "tinyvec"
@@ -979,7 +975,7 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.6.1"
+version = "=1.7.1"
 features = ["full", "test-util"]
 
 [dependencies.tokio_native_tls]
@@ -1038,9 +1034,13 @@ version = "=2.6.0"
 package = "unicode-bidi"
 version = "=0.3.5"
 
+[dependencies.unicode_linebreak]
+package = "unicode-linebreak"
+version = "=0.1.1"
+
 [dependencies.unicode_normalization]
 package = "unicode-normalization"
-version = "=0.1.18"
+version = "=0.1.19"
 
 [dependencies.unicode_segmentation]
 package = "unicode-segmentation"
@@ -1069,11 +1069,6 @@ version = "=2.2.2"
 [dependencies.utf8]
 package = "utf-8"
 version = "=0.7.6"
-
-[dependencies.uuid]
-package = "uuid"
-version = "=0.8.2"
-features = ["serde", "v1", "v3", "v4", "v5"]
 
 [dependencies.vec_map]
 package = "vec_map"

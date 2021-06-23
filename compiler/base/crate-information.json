@@ -1,7 +1,7 @@
 [
   {
     "name": "addr2line",
-    "version": "0.15.1",
+    "version": "0.15.2",
     "id": "addr2line"
   },
   {
@@ -36,12 +36,12 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.40",
+    "version": "1.0.41",
     "id": "anyhow"
   },
   {
     "name": "approx",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "id": "approx"
   },
   {
@@ -51,8 +51,13 @@
   },
   {
     "name": "arrayvec",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "id": "arrayvec"
+  },
+  {
+    "name": "async-recursion",
+    "version": "0.3.2",
+    "id": "async_recursion"
   },
   {
     "name": "async-trait",
@@ -71,7 +76,7 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.59",
+    "version": "0.3.60",
     "id": "backtrace"
   },
   {
@@ -106,7 +111,7 @@
   },
   {
     "name": "bytemuck",
-    "version": "1.5.1",
+    "version": "1.7.0",
     "id": "bytemuck"
   },
   {
@@ -156,7 +161,7 @@
   },
   {
     "name": "cpufeatures",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "id": "cpufeatures"
   },
   {
@@ -246,7 +251,7 @@
   },
   {
     "name": "env_logger",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "id": "env_logger"
   },
   {
@@ -436,7 +441,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.14.8",
+    "version": "0.14.9",
     "id": "hyper"
   },
   {
@@ -471,12 +476,12 @@
   },
   {
     "name": "ipnet",
-    "version": "2.3.0",
+    "version": "2.3.1",
     "id": "ipnet"
   },
   {
     "name": "itertools",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "id": "itertools"
   },
   {
@@ -496,7 +501,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.95",
+    "version": "0.2.97",
     "id": "libc"
   },
   {
@@ -596,13 +601,18 @@
   },
   {
     "name": "mio",
-    "version": "0.7.11",
+    "version": "0.7.13",
     "id": "mio"
   },
   {
     "name": "nalgebra",
-    "version": "0.26.2",
+    "version": "0.27.1",
     "id": "nalgebra"
+  },
+  {
+    "name": "nalgebra-macros",
+    "version": "0.1.0",
+    "id": "nalgebra_macros"
   },
   {
     "name": "native-tls",
@@ -611,7 +621,7 @@
   },
   {
     "name": "ndarray",
-    "version": "0.15.2",
+    "version": "0.15.3",
     "id": "ndarray"
   },
   {
@@ -638,11 +648,6 @@
     "name": "num-complex",
     "version": "0.4.0",
     "id": "num_complex"
-  },
-  {
-    "name": "num-complex",
-    "version": "0.3.1",
-    "id": "num_complex_0_3_1"
   },
   {
     "name": "num-integer",
@@ -676,12 +681,12 @@
   },
   {
     "name": "object",
-    "version": "0.24.0",
+    "version": "0.25.3",
     "id": "object"
   },
   {
     "name": "once_cell",
-    "version": "1.7.2",
+    "version": "1.8.0",
     "id": "once_cell"
   },
   {
@@ -691,7 +696,7 @@
   },
   {
     "name": "openssl",
-    "version": "0.10.34",
+    "version": "0.10.35",
     "id": "openssl"
   },
   {
@@ -701,12 +706,12 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.63",
+    "version": "0.9.65",
     "id": "openssl_sys"
   },
   {
     "name": "ordered-float",
-    "version": "2.5.0",
+    "version": "2.5.1",
     "id": "ordered_float"
   },
   {
@@ -841,7 +846,7 @@
   },
   {
     "name": "rand",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "id": "rand"
   },
   {
@@ -851,7 +856,7 @@
   },
   {
     "name": "rand_chacha",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "id": "rand_chacha"
   },
   {
@@ -861,7 +866,7 @@
   },
   {
     "name": "rand_core",
-    "version": "0.6.2",
+    "version": "0.6.3",
     "id": "rand_core"
   },
   {
@@ -871,12 +876,12 @@
   },
   {
     "name": "rand_distr",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "id": "rand_distr"
   },
   {
     "name": "rand_hc",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "id": "rand_hc"
   },
   {
@@ -906,7 +911,7 @@
   },
   {
     "name": "regex-automata",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "id": "regex_automata"
   },
   {
@@ -921,7 +926,7 @@
   },
   {
     "name": "reqwest",
-    "version": "0.11.3",
+    "version": "0.11.4",
     "id": "reqwest"
   },
   {
@@ -936,12 +941,12 @@
   },
   {
     "name": "rustc-demangle",
-    "version": "0.1.19",
+    "version": "0.1.20",
     "id": "rustc_demangle"
   },
   {
     "name": "rustc_version",
-    "version": "0.3.3",
+    "version": "0.4.0",
     "id": "rustc_version"
   },
   {
@@ -971,13 +976,8 @@
   },
   {
     "name": "semver",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "id": "semver"
-  },
-  {
-    "name": "semver",
-    "version": "0.11.0",
-    "id": "semver_0_11_0"
   },
   {
     "name": "semver-parser",
@@ -1021,7 +1021,7 @@
   },
   {
     "name": "simba",
-    "version": "0.4.0",
+    "version": "0.5.1",
     "id": "simba"
   },
   {
@@ -1091,13 +1091,8 @@
   },
   {
     "name": "syn",
-    "version": "1.0.72",
+    "version": "1.0.73",
     "id": "syn"
-  },
-  {
-    "name": "synstructure",
-    "version": "0.12.4",
-    "id": "synstructure"
   },
   {
     "name": "tar",
@@ -1121,7 +1116,7 @@
   },
   {
     "name": "textwrap",
-    "version": "0.13.4",
+    "version": "0.14.0",
     "id": "textwrap"
   },
   {
@@ -1161,7 +1156,7 @@
   },
   {
     "name": "time",
-    "version": "0.2.26",
+    "version": "0.2.27",
     "id": "time"
   },
   {
@@ -1176,7 +1171,7 @@
   },
   {
     "name": "time-macros-impl",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "id": "time_macros_impl"
   },
   {
@@ -1191,7 +1186,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.6.1",
+    "version": "1.7.1",
     "id": "tokio"
   },
   {
@@ -1265,8 +1260,13 @@
     "id": "unicode_bidi"
   },
   {
+    "name": "unicode-linebreak",
+    "version": "0.1.1",
+    "id": "unicode_linebreak"
+  },
+  {
     "name": "unicode-normalization",
-    "version": "0.1.18",
+    "version": "0.1.19",
     "id": "unicode_normalization"
   },
   {
@@ -1303,11 +1303,6 @@
     "name": "utf-8",
     "version": "0.7.6",
     "id": "utf8"
-  },
-  {
-    "name": "uuid",
-    "version": "0.8.2",
-    "id": "uuid"
   },
   {
     "name": "vec_map",
