@@ -5,36 +5,35 @@
   padding-bottom: 1em;
 }
 
-.-parent {
+.-resizeableArea {
   composes: -autoSize from './shared.module.css';
   display: grid;
 }
 
-$plainPrimaryDimension: 1fr auto;
-
-.plainRows {
-  composes: -parent;
-  grid-template-rows: $plainPrimaryDimension;
+.resizeableAreaRowOutputUnfocused {
+  composes: -resizeableArea;
+  grid-template-rows: 1fr auto;
 }
 
-.plainColumns {
-  composes: -parent;
-  grid-template-columns: $plainPrimaryDimension;
+.resizeableAreaRowOutputFocused {
+  composes: -resizeableArea;
+  grid-template-rows: 1fr 12px 1fr;
+}
+
+.resizeableAreaColumnOutputUnfocused {
+  composes: -resizeableArea;
+  grid-template-columns: 1fr auto;
+}
+
+.resizeableAreaColumnOutputFocused {
+  composes: -resizeableArea;
+  grid-template-columns: 1fr 12px 1fr;
 }
 
 .-gutter {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-$splitPrimaryDimension: 1fr 12px 1fr;
-$splitSecondaryDimension: 1fr;
-
-.splitRows {
-  composes: -parent;
-  grid-template-columns: $splitSecondaryDimension;
-  grid-template-rows: $splitPrimaryDimension;
 }
 
 .splitRowsGutter {
@@ -45,12 +44,6 @@ $splitSecondaryDimension: 1fr;
 .splitRowsGutterHandle {
   pointer-events: none;
   transform: rotate(90deg);
-}
-
-.splitColumns {
-  composes: -parent;
-  grid-template-columns: $splitPrimaryDimension;
-  grid-template-rows: $splitSecondaryDimension;
 }
 
 .splitColumnsGutter {
