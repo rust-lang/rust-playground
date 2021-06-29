@@ -81,33 +81,37 @@ module.exports = function(_, argv) {
           use: ['babel-loader', 'ts-loader'],
         },
         {
-          test: /prismjs\/themes\/.*css$/,
-          type: 'asset/resource',
-        },
-        {
           test: /\.css$/,
-          include: /node_modules/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            "css-loader",
-            "postcss-loader",
-          ],
-        },
-        {
-          test: /\.module.css$/,
-          exclude: /node_modules/,
-          use: [
-            MiniCssExtractPlugin.loader,
+          oneOf: [
             {
-              loader: "css-loader",
-              options: {
-                modules: {
-                  localIdentName,
-                },
-              },
+              test: /prismjs\/themes/,
+              type: 'asset/resource',
             },
-            "postcss-loader",
-          ],
+            {
+              test: /\.module.css$/,
+              exclude: /node_modules/,
+              use: [
+                MiniCssExtractPlugin.loader,
+                {
+                  loader: "css-loader",
+                  options: {
+                    modules: {
+                      localIdentName,
+                    },
+                  },
+                },
+                "postcss-loader",
+              ],
+            },
+            {
+              include: /node_modules/,
+              use: [
+                MiniCssExtractPlugin.loader,
+                "css-loader",
+                "postcss-loader",
+              ],
+            },
+          ]
         },
         {
           test: /\.svg$/,
