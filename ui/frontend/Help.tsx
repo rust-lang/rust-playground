@@ -77,7 +77,7 @@ fn main() {
 
 const Help: React.SFC = () => {
   return (
-    <section className={`help ${styles.container}`}>
+    <section className={styles.container}>
       <h1>The Rust Playground</h1>
       <Link action={actions.navigateToIndex}>Return to the playground</Link>
 
