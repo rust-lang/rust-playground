@@ -9,14 +9,11 @@ default = ['fork-bomb-prevention']
 fork-bomb-prevention = []
 
 [dependencies]
-bodyparser = "0.8.0"
-corsware = "0.2.0"
+actix-web = "3.3.2"
 env_logger = "0.8.2"
-iron = "0.6.0"
 lazy_static = "1.0.0"
 log = "0.4.0"
 tempdir = "0.3.7"
-mount = "0.4.0"
 petgraph = "0.5.0"
 regex = "1.0.0"
 rustc-demangle = "0.1.5"
@@ -25,12 +22,12 @@ serde_derive = "1.0"
 serde_json = "1.0"
 hubcaps = "0.6.0"
 tokio = { version = "0.2.9", features = ["macros", "time", "process", "rt-threaded"] }
-router = "0.6.0"
 openssl-probe = "0.1.2"
 dotenv = "0.15.0"
 snafu = "0.6.0"
 prometheus = "0.12.0"
 strum = { version = "0.20.0", features = ["derive"] }
-
-[dependencies.playground-middleware]
-git = "https://github.com/integer32llc/playground-middleware"
+actix-cors = "0.5.4"
+futures-util = "0.3.15"
+actix-files = "0.5.0"
+fern = "0.6.0"

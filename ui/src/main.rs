@@ -1,28 +1,22 @@
 #![deny(rust_2018_idioms)]
 
-use corsware::{AllowedOrigins, CorsMiddleware, UniCase};
-use iron::{
-    headers::ContentType,
-    method::Method::{Get, Post},
-    modifiers::Header,
-    prelude::*,
-    status,
+use actix_web::{
+    http::header,
+    middleware::{Condition, Logger},
+    web::{self, Json, ServiceConfig},
+    App, HttpRequest, HttpResponse, HttpServer, ResponseError,
 };
 use lazy_static::lazy_static;
-use mount::Mount;
-use playground_middleware::{
-    Cache, FileLogger, GuessContentType, ModifyWith, Prefix, Rewrite, Staticfile, StatisticLogger,
-};
+use middleware::Cache;
 use prometheus::{Encoder, TextEncoder};
-use router::Router;
-use serde::{de::DeserializeOwned, Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use serde_json::json;
 use snafu::{ResultExt, Snafu};
 use std::{
-    any::Any,
     convert::{TryFrom, TryInto},
     env,
     path::PathBuf,
-    sync::{Arc, Mutex},
+    sync::Mutex,
     time::{Duration, Instant},
 };
 
@@ -35,6 +29,7 @@ const DEFAULT_LOG_FILE: &str = "access-log.csv";
 
 mod asm_cleanup;
 mod gist;
+mod middleware;
 mod sandbox;
 
 const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
@@ -43,348 +38,227 @@ const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
 
 const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
 
-fn main() {
+#[actix_web::main]
+async fn main() {
     // Dotenv may be unable to load environment variables, but that's ok in production
     let _ = dotenv::dotenv();
     openssl_probe::init_ssl_cert_env_vars();
     env_logger::init();
 
-    let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT").expect("Must specify PLAYGROUND_UI_ROOT").into();
-    let gh_token = env::var("PLAYGROUND_GITHUB_TOKEN").expect("Must specify PLAYGROUND_GITHUB_TOKEN");
+    let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT")
+        .expect("Must specify PLAYGROUND_UI_ROOT")
+        .into();
+    let gh_token =
+        env::var("PLAYGROUND_GITHUB_TOKEN").expect("Must specify PLAYGROUND_GITHUB_TOKEN");
 
     let address = env::var("PLAYGROUND_UI_ADDRESS").unwrap_or_else(|_| DEFAULT_ADDRESS.to_string());
-    let port = env::var("PLAYGROUND_UI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(DEFAULT_PORT);
+    let port = env::var("PLAYGROUND_UI_PORT")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(DEFAULT_PORT);
     let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or_else(|_| DEFAULT_LOG_FILE.to_string());
     let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
     let metrics_token = env::var("PLAYGROUND_METRICS_TOKEN").ok();
 
-    let files = Staticfile::new(&root).expect("Unable to open root directory");
-    let mut files = Chain::new(files);
     let one_day = Duration::new(ONE_DAY_IN_SECONDS, 0);
     let one_year = Duration::new(ONE_YEAR_IN_SECONDS, 0);
 
-    files.link_after(ModifyWith::new(Cache::new(one_day)));
-    files.link_after(Prefix::new(&["assets"], Cache::new(one_year)));
-    files.link_after(GuessContentType::new(ContentType::html().0));
+    fern::Dispatch::new()
+        .level(log::LevelFilter::Debug)
+        .chain(fern::log_file(logfile).expect("could not open log file"))
+        .apply()
+        .expect("error applying logger");
 
-    let mut gist_router = Router::new();
-    gist_router.post("/", meta_gist_create, "gist_create");
-    gist_router.get("/:id", meta_gist_get, "gist_get");
-
-    let mut mount = Mount::new();
-    mount.mount("/", files);
-    mount.mount("/compile", compile);
-    mount.mount("/execute", execute);
-    mount.mount("/format", format);
-    mount.mount("/clippy", clippy);
-    mount.mount("/miri", miri);
-    mount.mount("/macro-expansion", macro_expansion);
-    mount.mount("/meta/crates", meta_crates);
-    mount.mount("/meta/version/stable", meta_version_stable);
-    mount.mount("/meta/version/beta", meta_version_beta);
-    mount.mount("/meta/version/nightly", meta_version_nightly);
-    mount.mount("/meta/version/rustfmt", meta_version_rustfmt);
-    mount.mount("/meta/version/clippy", meta_version_clippy);
-    mount.mount("/meta/version/miri", meta_version_miri);
-    mount.mount("/meta/gist", gist_router);
-    mount.mount("/evaluate.json", evaluate);
-
-    mount.mount("/metrics", metrics);
-
-    let mut chain = Chain::new(mount);
-    let file_logger = FileLogger::new(logfile).expect("Unable to create file logger");
-    let logger = StatisticLogger::new(file_logger);
-    let rewrite = Rewrite::new(vec![vec!["help".into()]], "/index.html".into());
+    // TODO: let rewrite = Rewrite::new(vec![vec!["help".into()]], "/index.html".into());
     let gh_token = GhToken::new(gh_token);
 
-    chain.link_around(logger);
-    chain.link_before(rewrite);
-    chain.link_before(gh_token);
-
-    if let Some(metrics_token) = metrics_token {
-        let metrics_token = MetricsToken::new(metrics_token);
-        chain.link_before(metrics_token);
-    }
-
-    if cors_enabled {
-        chain.link_around(CorsMiddleware {
-            // A null origin occurs when you make a request from a
-            // page hosted on a filesystem, such as when you read the
-            // Rust book locally
-            allowed_origins: AllowedOrigins::Any { allow_null: true },
-            allowed_headers: vec![UniCase("Content-Type".to_owned())],
-            allowed_methods: vec![Get, Post],
-            exposed_headers: vec![],
-            allow_credentials: false,
-            max_age_seconds: ONE_HOUR_IN_SECONDS,
-            prefer_wildcard: true,
-        });
-    }
+    let metrics_token_cfg = |cfg: &mut ServiceConfig| {
+        if let Some(metrics_token) = metrics_token {
+            cfg.data(MetricsToken::new(metrics_token));
+        }
+    };
 
     log::info!("Starting the server on http://{}:{}", address, port);
-    Iron::new(chain).http((&*address, port)).expect("Unable to start server");
+
+    HttpServer::new(move || {
+        let cors = Condition::new(
+            cors_enabled,
+            actix_cors::Cors::default()
+                .allowed_origin("*")
+                .allowed_header(header::CONTENT_TYPE)
+                .allowed_methods(vec!["GET", "POST"])
+                .max_age(ONE_HOUR_IN_SECONDS as usize)
+                .send_wildcard(),
+        );
+
+        App::new()
+            .data(gh_token.clone())
+            .wrap(Logger::default())
+            //.wrap(rewrite)
+            .wrap(cors)
+            .configure(metrics_token_cfg.clone())
+            .service(
+                web::scope("/")
+                    .wrap(Cache::new(one_day).assets_cache(&["assets"], one_year))
+                    .service(actix_files::Files::new("/", root.clone())),
+            )
+            .route("/compile", web::get().to(compile))
+            .route("/execute", web::get().to(execute))
+            .route("/format", web::get().to(format))
+            .route("/clippy", web::get().to(clippy))
+            .route("/miri", web::get().to(miri))
+            .route("/macro-expansion", web::get().to(macro_expansion))
+            .route("/meta/crates", web::get().to(meta_crates))
+            .route("/meta/version/stable", web::get().to(meta_version_stable))
+            .route("/meta/version/beta", web::get().to(meta_version_beta))
+            .route("/meta/version/nightly", web::get().to(meta_version_nightly))
+            .route("/meta/version/rustfmt", web::get().to(meta_version_rustfmt))
+            .route("/meta/version/clippy", web::get().to(meta_version_clippy))
+            .route("/meta/version/miri", web::get().to(meta_version_miri))
+            .route("/meta/gist", web::post().to(meta_gist_create))
+            .route("/meta/gist/{id}", web::get().to(meta_gist_get))
+            .route("/evaluate.json", web::get().to(evaluate))
+            .route("/metrics", web::get().to(metrics))
+    })
+    .bind((&*address, port))
+    .expect("Unable to start server")
+    .run()
+    .await
+    .expect("Unable to start server");
 }
 
 #[derive(Debug, Clone)]
-struct GhToken(Arc<String>);
+struct GhToken(String);
 
 impl GhToken {
     fn new(token: String) -> Self {
-        GhToken(Arc::new(token))
+        GhToken(token)
     }
-}
-
-impl iron::BeforeMiddleware for GhToken {
-    fn before(&self, req: &mut Request<'_, '_>) -> IronResult<()> {
-        req.extensions.insert::<Self>(self.clone());
-        Ok(())
-    }
-}
-
-impl iron::typemap::Key for GhToken {
-    type Value = Self;
 }
 
 #[derive(Debug, Clone)]
-struct MetricsToken(Arc<String>);
+struct MetricsToken(String);
 
 impl MetricsToken {
     fn new(token: String) -> Self {
-        MetricsToken(Arc::new(token))
+        MetricsToken(token)
     }
 }
 
-impl iron::BeforeMiddleware for MetricsToken {
-    fn before(&self, req: &mut Request<'_, '_>) -> IronResult<()> {
-        req.extensions.insert::<Self>(self.clone());
-        Ok(())
-    }
+async fn compile(sandbox: Sandbox, req: Json<CompileRequest>) -> Result<Json<CompileResponse>> {
+    let req = req.into_inner().try_into()?;
+    track_metric(req, |req| sandbox.compile(&req))
+        .map(|res| Json(res.into()))
+        .context(Compilation)
 }
 
-impl iron::typemap::Key for MetricsToken {
-    type Value = Self;
+async fn execute(sandbox: Sandbox, req: Json<ExecuteRequest>) -> Result<Json<ExecuteResponse>> {
+    let req = req.into_inner().try_into()?;
+    track_metric(req, |req| sandbox.execute(&req))
+        .map(|res| Json(res.into()))
+        .context(Execution)
 }
 
-fn compile(req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox(req, |sandbox, req: CompileRequest| {
-        let req = req.try_into()?;
-        track_metric(req, |req| sandbox.compile(&req))
-            .map(CompileResponse::from)
-            .context(Compilation)
+async fn format(sandbox: Sandbox, req: Json<FormatRequest>) -> Result<Json<FormatResponse>> {
+    let req = req.into_inner().try_into()?;
+    track_metric(req, |req| sandbox.format(&req))
+        .map(|res| Json(res.into()))
+        .context(Formatting)
+}
+
+async fn clippy(sandbox: Sandbox, req: Json<ClippyRequest>) -> Result<Json<ClippyResponse>> {
+    let req = req.into_inner().try_into()?;
+    track_metric(req, |req| sandbox.clippy(&req))
+        .map(|res| Json(res.into()))
+        .context(Linting)
+}
+
+async fn miri(sandbox: Sandbox, req: Json<MiriRequest>) -> Result<Json<MiriResponse>> {
+    let req = req.into_inner().try_into()?;
+    track_metric(req, |req| sandbox.miri(&req))
+        .map(|res| Json(res.into()))
+        .context(Interpreting)
+}
+
+async fn macro_expansion(
+    sandbox: Sandbox,
+    req: Json<MacroExpansionRequest>,
+) -> Result<Json<MacroExpansionResponse>> {
+    let req = req.into_inner().try_into()?;
+    track_metric(req, |req| sandbox.macro_expansion(&req))
+        .map(|res| Json(res.into()))
+        .context(Expansion)
+}
+
+async fn meta_crates(sandbox: Sandbox) -> Result<Json<MetaCratesResponse>> {
+    track_metric_no_request(metrics::Endpoint::MetaCrates, || cached(sandbox).crates())
+        .map(|res| Json(res.into()))
+}
+
+async fn meta_version_stable(sandbox: Sandbox) -> Result<Json<MetaVersionResponse>> {
+    track_metric_no_request(metrics::Endpoint::MetaVersionStable, || {
+        cached(sandbox).version_stable()
     })
+    .map(|res| Json(res.into()))
 }
 
-fn execute(req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox(req, |sandbox, req: ExecuteRequest| {
-        let req = req.try_into()?;
-        track_metric(req, |req| sandbox.execute(&req))
-            .map(ExecuteResponse::from)
-            .context(Execution)
+async fn meta_version_beta(sandbox: Sandbox) -> Result<Json<MetaVersionResponse>> {
+    track_metric_no_request(metrics::Endpoint::MetaVersionBeta, || {
+        cached(sandbox).version_beta()
     })
+    .map(|res| Json(res.into()))
 }
 
-fn format(req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox(req, |sandbox, req: FormatRequest| {
-        let req = req.try_into()?;
-        track_metric(req, |req| sandbox.format(&req))
-            .map(FormatResponse::from)
-            .context(Formatting)
+async fn meta_version_nightly(sandbox: Sandbox) -> Result<Json<MetaVersionResponse>> {
+    track_metric_no_request(metrics::Endpoint::MetaVersionNightly, || {
+        cached(sandbox).version_nightly()
     })
+    .map(|res| Json(res.into()))
 }
 
-fn clippy(req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox(req, |sandbox, req: ClippyRequest| {
-        let req = req.try_into()?;
-        track_metric(req, |req| sandbox.clippy(&req))
-            .map(ClippyResponse::from)
-            .context(Linting)
+async fn meta_version_rustfmt(sandbox: Sandbox) -> Result<Json<MetaVersionResponse>> {
+    track_metric_no_request(metrics::Endpoint::MetaVersionRustfmt, || {
+        cached(sandbox).version_rustfmt()
     })
+    .map(|res| Json(res.into()))
 }
 
-fn miri(req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox(req, |sandbox, req: MiriRequest| {
-        let req = req.try_into()?;
-        track_metric(req, |req| sandbox.miri(&req))
-            .map(MiriResponse::from)
-            .context(Interpreting)
+async fn meta_version_clippy(sandbox: Sandbox) -> Result<Json<MetaVersionResponse>> {
+    track_metric_no_request(metrics::Endpoint::MetaVersionClippy, || {
+        cached(sandbox).version_clippy()
     })
+    .map(|res| Json(res.into()))
 }
 
-fn macro_expansion(req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox(req, |sandbox, req: MacroExpansionRequest| {
-        let req = req.try_into()?;
-        track_metric(req, |req| sandbox.macro_expansion(&req))
-            .map(MacroExpansionResponse::from)
-            .context(Expansion)
+async fn meta_version_miri(sandbox: Sandbox) -> Result<Json<MetaVersionResponse>> {
+    track_metric_no_request(metrics::Endpoint::MetaVersionMiri, || {
+        cached(sandbox).version_miri()
     })
+    .map(|res| Json(res.into()))
 }
 
-fn meta_crates(_req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox_no_request(|sandbox| {
-        track_metric_no_request(metrics::Endpoint::MetaCrates, || cached(sandbox).crates())
-            .map(MetaCratesResponse::from)
-    })
+async fn meta_gist_create(
+    req: Json<MetaGistCreateRequest>,
+    token: web::Data<GhToken>,
+) -> Json<MetaGistResponse> {
+    let gist = gist::create(token.0.clone(), req.into_inner().code).await;
+    Json(MetaGistResponse::from(gist))
 }
 
-fn meta_version_stable(_req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox_no_request(|sandbox| {
-        track_metric_no_request(metrics::Endpoint::MetaVersionStable, || {
-            cached(sandbox).version_stable()
-        })
-        .map(MetaVersionResponse::from)
-    })
-}
-
-fn meta_version_beta(_req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox_no_request(|sandbox| {
-        track_metric_no_request(metrics::Endpoint::MetaVersionBeta, || {
-            cached(sandbox).version_beta()
-        })
-        .map(MetaVersionResponse::from)
-    })
-}
-
-fn meta_version_nightly(_req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox_no_request(|sandbox| {
-        track_metric_no_request(metrics::Endpoint::MetaVersionNightly, || {
-            cached(sandbox).version_nightly()
-        })
-        .map(MetaVersionResponse::from)
-    })
-}
-
-fn meta_version_rustfmt(_req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox_no_request(|sandbox| {
-        track_metric_no_request(metrics::Endpoint::MetaVersionRustfmt, || {
-            cached(sandbox).version_rustfmt()
-        })
-        .map(MetaVersionResponse::from)
-    })
-}
-
-fn meta_version_clippy(_req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox_no_request(|sandbox| {
-        track_metric_no_request(metrics::Endpoint::MetaVersionClippy, || {
-            cached(sandbox).version_clippy()
-        })
-        .map(MetaVersionResponse::from)
-    })
-}
-
-fn meta_version_miri(_req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox_no_request(|sandbox| {
-        track_metric_no_request(metrics::Endpoint::MetaVersionMiri, || {
-            cached(sandbox).version_miri()
-        })
-        .map(MetaVersionResponse::from)
-    })
-}
-
-fn meta_gist_create(req: &mut Request<'_, '_>) -> IronResult<Response> {
-    let token = req.extensions.get::<GhToken>().unwrap().0.as_ref().clone();
-    serialize_to_response(deserialize_from_request(req, |r: MetaGistCreateRequest| {
-        let gist = gist::create(token, r.code);
-        Ok(MetaGistResponse::from(gist))
-    }))
-}
-
-fn meta_gist_get(req: &mut Request<'_, '_>) -> IronResult<Response> {
-    match req.extensions.get::<Router>().unwrap().find("id") {
-        Some(id) => {
-            let token = req.extensions.get::<GhToken>().unwrap().0.as_ref().clone();
-            let gist = gist::load(token, id);
-            serialize_to_response(Ok(MetaGistResponse::from(gist)))
-        }
-        None => {
-            Ok(Response::with(status::UnprocessableEntity))
-        }
-    }
+async fn meta_gist_get(id: web::Path<String>, token: web::Data<GhToken>) -> Json<MetaGistResponse> {
+    let gist = gist::load(token.as_ref().0.clone(), id.as_ref()).await;
+    Json(MetaGistResponse::from(gist))
 }
 
 // This is a backwards compatibilty shim. The Rust homepage and the
 // documentation use this to run code in place.
-fn evaluate(req: &mut Request<'_, '_>) -> IronResult<Response> {
-    with_sandbox(req, |sandbox, req: EvaluateRequest| {
-        let req = req.try_into()?;
-        track_metric_force_endpoint(req, metrics::Endpoint::Evaluate, |req| {
-            sandbox.execute(&req)
-        })
-        .map(EvaluateResponse::from)
-        .context(Evaluation)
+async fn evaluate(sandbox: Sandbox, req: Json<EvaluateRequest>) -> Result<Json<EvaluateResponse>> {
+    let req = req.into_inner().try_into()?;
+    track_metric_force_endpoint(req, metrics::Endpoint::Evaluate, |req| {
+        sandbox.execute(&req)
     })
-}
-
-fn with_sandbox<Req, Resp, F>(req: &mut Request<'_, '_>, f: F) -> IronResult<Response>
-where
-    F: FnOnce(Sandbox, Req) -> Result<Resp>,
-    Req: DeserializeOwned + Clone + Any + 'static,
-    Resp: Serialize,
-{
-    serialize_to_response(run_handler(req, f))
-}
-
-fn with_sandbox_no_request<Resp, F>(f: F) -> IronResult<Response>
-where
-    F: FnOnce(Sandbox) -> Result<Resp>,
-    Resp: Serialize,
-{
-    serialize_to_response(run_handler_no_request(f))
-}
-
-fn run_handler<Req, Resp, F>(req: &mut Request<'_, '_>, f: F) -> Result<Resp>
-where
-    F: FnOnce(Sandbox, Req) -> Result<Resp>,
-    Req: DeserializeOwned + Clone + Any + 'static,
-{
-    deserialize_from_request(req, |req| {
-        let sandbox = Sandbox::new().context(SandboxCreation)?;
-        f(sandbox, req)
-    })
-}
-
-fn deserialize_from_request<Req, Resp, F>(req: &mut Request<'_, '_>, f: F) -> Result<Resp>
-where
-    F: FnOnce(Req) -> Result<Resp>,
-    Req: DeserializeOwned + Clone + Any + 'static,
-{
-    let body = req.get::<bodyparser::Struct<Req>>()
-        .context(Deserialization)?;
-
-    let req = body.ok_or(Error::RequestMissing)?;
-
-    let resp = f(req)?;
-
-    Ok(resp)
-}
-
-fn run_handler_no_request<Resp, F>(f: F) -> Result<Resp>
-where
-    F: FnOnce(Sandbox) -> Result<Resp>,
-{
-    let sandbox = Sandbox::new().context(SandboxCreation)?;
-    let resp = f(sandbox)?;
-    Ok(resp)
-}
-
-fn serialize_to_response<Resp>(response: Result<Resp>) -> IronResult<Response>
-where
-    Resp: Serialize,
-{
-    let response = response.and_then(|resp| {
-        let resp = serde_json::ser::to_string(&resp).context(Serialization)?;
-        Ok(resp)
-    });
-
-    match response {
-        Ok(body) => Ok(Response::with((status::Ok, Header(ContentType::json()), body))),
-        Err(err) => {
-            let err = ErrorJson { error: err.to_string() };
-            match serde_json::ser::to_string(&err) {
-                Ok(error_str) => Ok(Response::with((status::InternalServerError, Header(ContentType::json()), error_str))),
-                Err(_) => Ok(Response::with((status::InternalServerError, Header(ContentType::json()), FATAL_ERROR_JSON))),
-            }
-        },
-    }
+    .map(|res| Json(res.into()))
+    .context(Evaluation)
 }
 
 #[derive(Debug, Clone)]
@@ -398,36 +272,38 @@ struct SandboxCacheInfo<T> {
 struct SandboxCacheOne<T>(Mutex<Option<SandboxCacheInfo<T>>>);
 
 impl<T> Default for SandboxCacheOne<T> {
-    fn default() -> Self { SandboxCacheOne(Mutex::default()) }
+    fn default() -> Self {
+        SandboxCacheOne(Mutex::default())
+    }
 }
 
 impl<T> SandboxCacheOne<T>
 where
-    T: Clone
+    T: Clone,
 {
     fn clone_or_populate<F>(&self, populator: F) -> Result<T>
     where
-        F: FnOnce() -> sandbox::Result<T>
+        F: FnOnce() -> sandbox::Result<T>,
     {
         let mut cache = self.0.lock().map_err(|_| Error::CachePoisoned)?;
 
         match cache.clone() {
             Some(cached) => {
-                if cached.time.elapsed() > Duration::from_secs(SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS) {
+                if cached.time.elapsed()
+                    > Duration::from_secs(SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS)
+                {
                     SandboxCacheOne::populate(&mut *cache, populator)
                 } else {
                     Ok(cached.value)
                 }
-            },
-            None => {
-                SandboxCacheOne::populate(&mut *cache, populator)
             }
+            None => SandboxCacheOne::populate(&mut *cache, populator),
         }
     }
 
     fn populate<F>(cache: &mut Option<SandboxCacheInfo<T>>, populator: F) -> Result<T>
     where
-        F: FnOnce() -> sandbox::Result<T>
+        F: FnOnce() -> sandbox::Result<T>,
     {
         let value = populator().context(Caching)?;
         *cache = Some(SandboxCacheInfo {
@@ -459,43 +335,45 @@ struct CachedSandbox<'a> {
 
 impl<'a> CachedSandbox<'a> {
     fn crates(&self) -> Result<Vec<sandbox::CrateInformation>> {
-        self.cache.crates.clone_or_populate(|| self.sandbox.crates())
+        self.cache
+            .crates
+            .clone_or_populate(|| self.sandbox.crates())
     }
 
     fn version_stable(&self) -> Result<sandbox::Version> {
-        self.cache.version_stable.clone_or_populate(|| {
-            self.sandbox.version(sandbox::Channel::Stable)
-        })
+        self.cache
+            .version_stable
+            .clone_or_populate(|| self.sandbox.version(sandbox::Channel::Stable))
     }
 
     fn version_beta(&self) -> Result<sandbox::Version> {
-        self.cache.version_beta.clone_or_populate(|| {
-            self.sandbox.version(sandbox::Channel::Beta)
-        })
+        self.cache
+            .version_beta
+            .clone_or_populate(|| self.sandbox.version(sandbox::Channel::Beta))
     }
 
     fn version_nightly(&self) -> Result<sandbox::Version> {
-        self.cache.version_nightly.clone_or_populate(|| {
-            self.sandbox.version(sandbox::Channel::Nightly)
-        })
+        self.cache
+            .version_nightly
+            .clone_or_populate(|| self.sandbox.version(sandbox::Channel::Nightly))
     }
 
     fn version_clippy(&self) -> Result<sandbox::Version> {
-        self.cache.version_clippy.clone_or_populate(|| {
-            self.sandbox.version_clippy()
-        })
+        self.cache
+            .version_clippy
+            .clone_or_populate(|| self.sandbox.version_clippy())
     }
 
     fn version_rustfmt(&self) -> Result<sandbox::Version> {
-        self.cache.version_rustfmt.clone_or_populate(|| {
-            self.sandbox.version_rustfmt()
-        })
+        self.cache
+            .version_rustfmt
+            .clone_or_populate(|| self.sandbox.version_rustfmt())
     }
 
     fn version_miri(&self) -> Result<sandbox::Version> {
-        self.cache.version_miri.clone_or_populate(|| {
-            self.sandbox.version_miri()
-        })
+        self.cache
+            .version_miri
+            .clone_or_populate(|| self.sandbox.version_miri())
     }
 }
 
@@ -941,26 +819,29 @@ mod metrics {
     }
 }
 
-fn authorized_for_metrics(req: &mut Request<'_, '_>) -> bool {
-    use iron::headers::{Authorization, Bearer};
-
+fn authorized_for_metrics(req: HttpRequest, token: Option<MetricsToken>) -> bool {
     // If not configured, allow it to be public
-    let token = match req.extensions.get::<MetricsToken>() {
+    let token = match token {
         Some(token) => token,
         None => return true,
     };
 
-    let authorization = match req.headers.get::<Authorization<Bearer>>() {
+    let authorization = match req.headers().get(header::AUTHORIZATION) {
         Some(a) => a,
         None => return false,
     };
 
-    authorization.0.token.as_str() == token.0.as_str()
+    authorization
+        .to_str()
+        .ok()
+        .and_then(|h| h.strip_prefix("Bearer"))
+        .map(str::trim)
+        == Some(token.0.as_str())
 }
 
-fn metrics(req: &mut Request<'_, '_>) -> IronResult<Response> {
-    if !authorized_for_metrics(req) {
-        return Ok(Response::with((status::Unauthorized, "Unauthorized")));
+async fn metrics(req: HttpRequest, token: Option<web::Data<MetricsToken>>) -> HttpResponse {
+    if !authorized_for_metrics(req, token.map(|t| t.as_ref().clone())) {
+        return HttpResponse::Unauthorized().finish();
     }
 
     let metric_families = prometheus::gather();
@@ -969,7 +850,7 @@ fn metrics(req: &mut Request<'_, '_>) -> IronResult<Response> {
 
     encoder.encode(&metric_families, &mut buffer).unwrap();
 
-    Ok(Response::with((status::Ok, buffer)))
+    HttpResponse::Ok().body(buffer)
 }
 
 #[derive(Debug, Snafu)]
@@ -994,8 +875,6 @@ pub enum Error {
     Caching { source: sandbox::Error },
     #[snafu(display("Unable to serialize response: {}", source))]
     Serialization { source: serde_json::Error },
-    #[snafu(display("Unable to deserialize request: {}", source))]
-    Deserialization { source: bodyparser::BodyError },
     #[snafu(display("The value {:?} is not a valid target", value))]
     InvalidTarget { value: String },
     #[snafu(display("The value {:?} is not a valid assembly flavor", value))]
@@ -1018,10 +897,18 @@ pub enum Error {
     CachePoisoned,
 }
 
-type Result<T, E = Error> = ::std::result::Result<T, E>;
+impl ResponseError for Error {
+    fn error_response(&self) -> actix_web::HttpResponse {
+        let mut resp = actix_web::HttpResponse::new(self.status_code());
+        resp.headers_mut().insert(
+            header::CONTENT_TYPE,
+            header::HeaderValue::from_static("application/json"),
+        );
+        resp.set_body(json!({ "error": self.to_string() }).into())
+    }
+}
 
-const FATAL_ERROR_JSON: &str =
-    r#"{"error": "Multiple cascading errors occurred, abandon all hope"}"#;
+type Result<T, E = Error> = ::std::result::Result<T, E>;
 
 #[derive(Debug, Clone, Serialize)]
 struct ErrorJson {
@@ -1206,8 +1093,12 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
         };
 
         let target = match (target, assembly_flavor, demangle, process_assembly) {
-            (sandbox::CompileTarget::Assembly(_, _, _), Some(flavor), Some(demangle), Some(process)) =>
-                sandbox::CompileTarget::Assembly(flavor, demangle, process),
+            (
+                sandbox::CompileTarget::Assembly(_, _, _),
+                Some(flavor),
+                Some(demangle),
+                Some(process),
+            ) => sandbox::CompileTarget::Assembly(flavor, demangle, process),
             _ => target,
         };
 
@@ -1349,13 +1240,16 @@ impl From<sandbox::MacroExpansionResponse> for MacroExpansionResponse {
 
 impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
     fn from(me: Vec<sandbox::CrateInformation>) -> Self {
-        let crates = me.into_iter()
-            .map(|cv| CrateInformation { name: cv.name, version: cv.version, id: cv.id })
+        let crates = me
+            .into_iter()
+            .map(|cv| CrateInformation {
+                name: cv.name,
+                version: cv.version,
+                id: cv.id,
+            })
             .collect();
 
-        MetaCratesResponse {
-            crates,
-        }
+        MetaCratesResponse { crates }
     }
 }
 
@@ -1385,7 +1279,11 @@ impl TryFrom<EvaluateRequest> for sandbox::ExecuteRequest {
     fn try_from(me: EvaluateRequest) -> Result<Self> {
         Ok(sandbox::ExecuteRequest {
             channel: parse_channel(&me.version)?,
-            mode: if me.optimize != "0" { sandbox::Mode::Release } else { sandbox::Mode::Debug },
+            mode: if me.optimize != "0" {
+                sandbox::Mode::Release
+            } else {
+                sandbox::Mode::Debug
+            },
             edition: parse_edition(&me.edition)?,
             crate_type: sandbox::CrateType::Binary,
             tests: me.tests,
@@ -1423,9 +1321,11 @@ impl From<sandbox::ExecuteResponse> for EvaluateResponse {
 
 fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
     Ok(match s {
-        "asm" => sandbox::CompileTarget::Assembly(sandbox::AssemblyFlavor::Att,
-                                                  sandbox::DemangleAssembly::Demangle,
-                                                  sandbox::ProcessAssembly::Filter),
+        "asm" => sandbox::CompileTarget::Assembly(
+            sandbox::AssemblyFlavor::Att,
+            sandbox::DemangleAssembly::Demangle,
+            sandbox::ProcessAssembly::Filter,
+        ),
         "llvm-ir" => sandbox::CompileTarget::LlvmIr,
         "mir" => sandbox::CompileTarget::Mir,
         "hir" => sandbox::CompileTarget::Hir,
@@ -1438,7 +1338,7 @@ fn parse_assembly_flavor(s: &str) -> Result<sandbox::AssemblyFlavor> {
     Ok(match s {
         "att" => sandbox::AssemblyFlavor::Att,
         "intel" => sandbox::AssemblyFlavor::Intel,
-        value => InvalidAssemblyFlavor { value }.fail()?
+        value => InvalidAssemblyFlavor { value }.fail()?,
     })
 }
 
@@ -1454,7 +1354,7 @@ fn parse_process_assembly(s: &str) -> Result<sandbox::ProcessAssembly> {
     Ok(match s {
         "filter" => sandbox::ProcessAssembly::Filter,
         "raw" => sandbox::ProcessAssembly::Raw,
-        value => InvalidProcessAssembly { value }.fail()?
+        value => InvalidProcessAssembly { value }.fail()?,
     })
 }
 
