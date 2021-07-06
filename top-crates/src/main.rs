@@ -19,6 +19,7 @@ use std::{
     collections::{BTreeMap, BTreeSet, HashSet},
     fs::File,
     io::{Read, Write},
+    path::{Path, PathBuf},
 };
 
 const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
@@ -267,7 +268,7 @@ fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
     }
 }
 
-fn write_manifest(manifest: TomlManifest, path: &str) {
+fn write_manifest(manifest: TomlManifest, path: impl AsRef<Path>) {
     let mut f = File::create(path).expect("Unable to create Cargo.toml");
     let content = toml::to_vec(&manifest).expect("Couldn't serialize TOML");
     f.write_all(&content).expect("Couldn't write Cargo.toml");
@@ -463,13 +464,19 @@ fn main() {
     };
 
     // Write manifest file.
-    let cargo_toml = "../compiler/base/Cargo.toml";
-    write_manifest(manifest, cargo_toml);
-    println!("wrote {}", cargo_toml);
+    let base_directory: PathBuf = std::env::args_os()
+        .nth(1)
+        .unwrap_or_else(|| "../compiler/base".into())
+        .into();
 
-    let path = "../compiler/base/crate-information.json";
-    let mut f = File::create(path).unwrap_or_else(|e| panic!("Unable to create {}: {}", path, e));
+    let cargo_toml = base_directory.join("Cargo.toml");
+    write_manifest(manifest, &cargo_toml);
+    println!("wrote {}", cargo_toml.display());
+
+    let path = base_directory.join("crate-information.json");
+    let mut f = File::create(&path)
+        .unwrap_or_else(|e| panic!("Unable to create {}: {}", path.display(), e));
     serde_json::to_writer_pretty(&mut f, &infos)
-        .unwrap_or_else(|e| panic!("Unable to write {}: {}", path, e));
-    println!("Wrote {}", path);
+        .unwrap_or_else(|e| panic!("Unable to write {}: {}", path.display(), e));
+    println!("Wrote {}", path.display());
 }
