@@ -1140,7 +1140,6 @@ version = "0.1.0"
 dependencies = [
  "cargo",
  "itertools",
- "lazy_static",
  "reqwest",
  "serde",
  "serde_derive",

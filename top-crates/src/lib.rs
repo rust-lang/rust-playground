@@ -13,11 +13,9 @@ use cargo::{
     util::Config,
 };
 use itertools::Itertools;
-use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet, HashSet},
-    fs::File,
     io::Read,
 };
 
@@ -52,12 +50,12 @@ pub struct CrateInformation {
 }
 
 /// Hand-curated changes to the crate list
-#[derive(Debug, Deserialize)]
-struct Modifications {
+#[derive(Debug, Default, Deserialize)]
+pub struct Modifications {
     #[serde(default)]
-    exclusions: Vec<String>,
+    pub exclusions: Vec<String>,
     #[serde(default)]
-    additions: BTreeSet<String>,
+    pub additions: BTreeSet<String>,
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -88,19 +86,6 @@ impl Modifications {
     fn excluded(&self, name: &str) -> bool {
         self.exclusions.iter().any(|n| n == name)
     }
-}
-
-lazy_static! {
-    static ref MODIFICATIONS: Modifications = {
-        let mut f = File::open("crate-modifications.toml")
-            .expect("unable to open crate modifications file");
-
-        let mut d = Vec::new();
-        f.read_to_end(&mut d)
-            .expect("unable to read crate modifications file");
-
-        toml::from_slice(&d).expect("unable to parse crate modifications file")
-    };
 }
 
 fn simple_get(url: &str) -> reqwest::Result<reqwest::blocking::Response> {
@@ -148,9 +133,9 @@ impl TopCrates {
     }
 
     /// Add crates that have been hand-picked
-    fn add_curated_crates(&mut self) {
+    fn add_curated_crates(&mut self, modifications: &Modifications) {
         self.crates.extend({
-            MODIFICATIONS
+            modifications
                 .additions
                 .iter()
                 .cloned()
@@ -234,7 +219,7 @@ fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
     }
 }
 
-pub fn generate_info() -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
+pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
     // Setup to interact with cargo.
     let config = Config::default().expect("Unable to create default Cargo config");
     let _lock = config.acquire_package_cache_lock();
@@ -244,13 +229,13 @@ pub fn generate_info() -> (BTreeMap<String, DependencySpec>, Vec<CrateInformatio
 
     let mut top = TopCrates::download();
     top.add_rust_cookbook_crates();
-    top.add_curated_crates();
+    top.add_curated_crates(modifications);
 
     // Find the newest (non-prerelease, non-yanked) versions of all
     // the interesting crates.
     let mut summaries = Vec::new();
     for Crate { name } in &top.crates {
-        if MODIFICATIONS.excluded(name) {
+        if modifications.excluded(name) {
             continue;
         }
 
@@ -326,7 +311,7 @@ pub fn generate_info() -> (BTreeMap<String, DependencySpec>, Vec<CrateInformatio
     let package_ids: Vec<_> = resolve
         .iter()
         .filter(|pkg| valid_for_our_platform.contains(pkg))
-        .filter(|pkg| !MODIFICATIONS.excluded(pkg.name().as_str()))
+        .filter(|pkg| !modifications.excluded(pkg.name().as_str()))
         .collect();
 
     let mut sources = SourceMap::new();
