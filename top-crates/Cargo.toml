@@ -1,6 +1,6 @@
 [package]
 authors = ["Jake Goulding <jake.goulding@integer32.com>"]
-name = "top-crates"
+name = "rust-playground-top-crates"
 version = "0.1.0"
 edition = "2018"
 
