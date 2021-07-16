@@ -36,7 +36,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.41",
+    "version": "1.0.42",
     "id": "anyhow"
   },
   {
@@ -126,7 +126,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.68",
+    "version": "1.0.69",
     "id": "cc"
   },
   {
@@ -276,7 +276,7 @@
   },
   {
     "name": "fixedbitset",
-    "version": "0.2.0",
+    "version": "0.4.0",
     "id": "fixedbitset"
   },
   {
@@ -395,11 +395,6 @@
     "id": "hashbrown"
   },
   {
-    "name": "hashbrown",
-    "version": "0.9.1",
-    "id": "hashbrown_0_9_1"
-  },
-  {
     "name": "hashlink",
     "version": "0.7.0",
     "id": "hashlink"
@@ -441,7 +436,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.14.9",
+    "version": "0.14.10",
     "id": "hyper"
   },
   {
@@ -461,18 +456,13 @@
   },
   {
     "name": "indexmap",
-    "version": "1.6.2",
+    "version": "1.7.0",
     "id": "indexmap"
   },
   {
     "name": "instant",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "id": "instant"
-  },
-  {
-    "name": "iovec",
-    "version": "0.1.4",
-    "id": "iovec"
   },
   {
     "name": "ipnet",
@@ -501,7 +491,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.97",
+    "version": "0.2.98",
     "id": "libc"
   },
   {
@@ -606,7 +596,7 @@
   },
   {
     "name": "nalgebra",
-    "version": "0.27.1",
+    "version": "0.28.0",
     "id": "nalgebra"
   },
   {
@@ -711,7 +701,7 @@
   },
   {
     "name": "ordered-float",
-    "version": "2.5.1",
+    "version": "2.7.0",
     "id": "ordered_float"
   },
   {
@@ -741,7 +731,7 @@
   },
   {
     "name": "petgraph",
-    "version": "0.5.1",
+    "version": "0.6.0",
     "id": "petgraph"
   },
   {
@@ -776,7 +766,7 @@
   },
   {
     "name": "pin-project-lite",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "id": "pin_project_lite"
   },
   {
@@ -1086,7 +1076,7 @@
   },
   {
     "name": "subtle",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "id": "subtle"
   },
   {
@@ -1116,7 +1106,7 @@
   },
   {
     "name": "textwrap",
-    "version": "0.14.0",
+    "version": "0.14.2",
     "id": "textwrap"
   },
   {
@@ -1126,12 +1116,12 @@
   },
   {
     "name": "thiserror",
-    "version": "1.0.25",
+    "version": "1.0.26",
     "id": "thiserror"
   },
   {
     "name": "thiserror-impl",
-    "version": "1.0.25",
+    "version": "1.0.26",
     "id": "thiserror_impl"
   },
   {
@@ -1186,7 +1176,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.7.1",
+    "version": "1.8.1",
     "id": "tokio"
   },
   {
@@ -1271,7 +1261,7 @@
   },
   {
     "name": "unicode-segmentation",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "id": "unicode_segmentation"
   },
   {
