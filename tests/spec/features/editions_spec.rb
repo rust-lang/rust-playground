@@ -24,7 +24,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
     click_on("Run")
 
     within(:output, :stderr) do
-      expect(page).to have_content "thread 'main' panicked at 'Box<Any>'"
+      expect(page).to have_content "thread 'main' panicked at 'Box<dyn Any>'"
     end
   end
 
