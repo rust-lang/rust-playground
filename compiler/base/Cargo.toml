@@ -12,7 +12,7 @@ codegen-units = 1
 incremental = false
 [dependencies.addr2line]
 package = "addr2line"
-version = "=0.15.2"
+version = "=0.16.0"
 
 [dependencies.adler]
 package = "adler"
@@ -60,7 +60,7 @@ version = "=0.3.2"
 
 [dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.50"
+version = "=0.1.51"
 
 [dependencies.atty]
 package = "atty"
@@ -72,7 +72,7 @@ version = "=1.0.1"
 
 [dependencies.backtrace]
 package = "backtrace"
-version = "=0.3.60"
+version = "=0.3.61"
 
 [dependencies.base64]
 package = "base64"
@@ -136,10 +136,6 @@ version = "=2.33.3"
 package = "color_quant"
 version = "=1.1.0"
 
-[dependencies.const_fn]
-package = "const_fn"
-version = "=0.4.8"
-
 [dependencies.cpufeatures]
 package = "cpufeatures"
 version = "=0.1.5"
@@ -158,7 +154,7 @@ version = "=0.5.1"
 
 [dependencies.crossbeam_deque]
 package = "crossbeam-deque"
-version = "=0.8.0"
+version = "=0.8.1"
 
 [dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
@@ -319,7 +315,7 @@ version = "=0.11.2"
 
 [dependencies.gimli]
 package = "gimli"
-version = "=0.24.0"
+version = "=0.25.0"
 
 [dependencies.glob]
 package = "glob"
@@ -553,7 +549,7 @@ version = "=0.2.14"
 
 [dependencies.object]
 package = "object"
-version = "=0.25.3"
+version = "=0.26.0"
 
 [dependencies.once_cell]
 package = "once_cell"
@@ -794,7 +790,7 @@ version = "=0.5.0"
 
 [dependencies.semver]
 package = "semver"
-version = "=1.0.3"
+version = "=1.0.4"
 
 [dependencies.semver_parser]
 package = "semver-parser"
@@ -802,16 +798,16 @@ version = "=0.10.2"
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.126"
+version = "=1.0.127"
 features = ["derive", "rc"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.126"
+version = "=1.0.127"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.64"
+version = "=1.0.66"
 features = ["raw_value"]
 
 [dependencies.serde_urlencoded]
@@ -836,7 +832,7 @@ version = "=0.5.1"
 
 [dependencies.siphasher]
 package = "siphasher"
-version = "=0.3.5"
+version = "=0.3.6"
 
 [dependencies.slab]
 package = "slab"
@@ -852,16 +848,12 @@ version = "=0.3.1"
 
 [dependencies.socket2]
 package = "socket2"
-version = "=0.4.0"
+version = "=0.4.1"
 features = ["all"]
 
 [dependencies.spin]
 package = "spin"
 version = "=0.5.2"
-
-[dependencies.standback]
-package = "standback"
-version = "=0.2.17"
 
 [dependencies.string_cache]
 package = "string_cache"
@@ -942,19 +934,11 @@ version = "=0.6.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.2.27"
+version = "=0.3.0"
 
 [dependencies.time_0_1_44]
 package = "time"
 version = "=0.1.44"
-
-[dependencies.time_macros]
-package = "time-macros"
-version = "=0.1.1"
-
-[dependencies.time_macros_impl]
-package = "time-macros-impl"
-version = "=0.1.2"
 
 [dependencies.tinyvec]
 package = "tinyvec"
@@ -1028,7 +1012,7 @@ version = "=0.3.5"
 
 [dependencies.unicode_linebreak]
 package = "unicode-linebreak"
-version = "=0.1.1"
+version = "=0.1.2"
 
 [dependencies.unicode_normalization]
 package = "unicode-normalization"

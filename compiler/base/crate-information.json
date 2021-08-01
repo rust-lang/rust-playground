@@ -1,7 +1,7 @@
 [
   {
     "name": "addr2line",
-    "version": "0.15.2",
+    "version": "0.16.0",
     "id": "addr2line"
   },
   {
@@ -61,7 +61,7 @@
   },
   {
     "name": "async-trait",
-    "version": "0.1.50",
+    "version": "0.1.51",
     "id": "async_trait"
   },
   {
@@ -76,7 +76,7 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.60",
+    "version": "0.3.61",
     "id": "backtrace"
   },
   {
@@ -155,11 +155,6 @@
     "id": "color_quant"
   },
   {
-    "name": "const_fn",
-    "version": "0.4.8",
-    "id": "const_fn"
-  },
-  {
     "name": "cpufeatures",
     "version": "0.1.5",
     "id": "cpufeatures"
@@ -181,7 +176,7 @@
   },
   {
     "name": "crossbeam-deque",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "id": "crossbeam_deque"
   },
   {
@@ -376,7 +371,7 @@
   },
   {
     "name": "gimli",
-    "version": "0.24.0",
+    "version": "0.25.0",
     "id": "gimli"
   },
   {
@@ -671,7 +666,7 @@
   },
   {
     "name": "object",
-    "version": "0.25.3",
+    "version": "0.26.0",
     "id": "object"
   },
   {
@@ -966,7 +961,7 @@
   },
   {
     "name": "semver",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "id": "semver"
   },
   {
@@ -976,7 +971,7 @@
   },
   {
     "name": "serde",
-    "version": "1.0.126",
+    "version": "1.0.127",
     "id": "serde"
   },
   {
@@ -986,12 +981,12 @@
   },
   {
     "name": "serde_derive",
-    "version": "1.0.126",
+    "version": "1.0.127",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.64",
+    "version": "1.0.66",
     "id": "serde_json"
   },
   {
@@ -1016,7 +1011,7 @@
   },
   {
     "name": "siphasher",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "id": "siphasher"
   },
   {
@@ -1036,18 +1031,13 @@
   },
   {
     "name": "socket2",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "id": "socket2"
   },
   {
     "name": "spin",
     "version": "0.5.2",
     "id": "spin"
-  },
-  {
-    "name": "standback",
-    "version": "0.2.17",
-    "id": "standback"
   },
   {
     "name": "string_cache",
@@ -1146,23 +1136,13 @@
   },
   {
     "name": "time",
-    "version": "0.2.27",
+    "version": "0.3.0",
     "id": "time"
   },
   {
     "name": "time",
     "version": "0.1.44",
     "id": "time_0_1_44"
-  },
-  {
-    "name": "time-macros",
-    "version": "0.1.1",
-    "id": "time_macros"
-  },
-  {
-    "name": "time-macros-impl",
-    "version": "0.1.2",
-    "id": "time_macros_impl"
   },
   {
     "name": "tinyvec",
@@ -1251,7 +1231,7 @@
   },
   {
     "name": "unicode-linebreak",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "id": "unicode_linebreak"
   },
   {
