@@ -1,9 +1,4 @@
-use hubcaps::{
-    self,
-    gists::{self, Content, GistOptions},
-    Credentials, Github,
-};
-use std::collections::HashMap;
+use octocrab::Octocrab;
 
 const FILENAME: &str = "playground.rs";
 const DESCRIPTION: &str = "Code shared from the Rust Playground";
@@ -14,12 +9,12 @@ pub struct Gist {
     pub code: String,
 }
 
-impl From<gists::Gist> for Gist {
-    fn from(other: gists::Gist) -> Self {
+impl From<octocrab::models::gists::Gist> for Gist {
+    fn from(other: octocrab::models::gists::Gist) -> Self {
         let mut files: Vec<_> = other
             .files
             .into_iter()
-            .map(|(name, file)| (name, file.content.unwrap_or_default()))
+            .map(|(name, file)| (name, file.content))
             .collect();
 
         files.sort_by(|(name1, _), (name2, _)| name1.cmp(name2));
@@ -34,8 +29,8 @@ impl From<gists::Gist> for Gist {
 
         Gist {
             id: other.id,
-            url: other.html_url,
-            code: code,
+            url: other.html_url.into(),
+            code,
         }
     }
 }
@@ -48,24 +43,16 @@ pub async fn create(token: String, code: String) -> Gist {
     // TODO: Better reporting of failures
 }
 
-pub async fn create_future(token: String, code: String) -> hubcaps::Result<Gist> {
-    let github = github(token)?;
-
-    let file = Content {
-        filename: None,
-        content: code,
-    };
-
-    let mut files = HashMap::new();
-    files.insert(FILENAME.into(), file);
-
-    let options = GistOptions {
-        description: Some(DESCRIPTION.into()),
-        public: Some(false),
-        files,
-    };
-
-    github.gists().create(&options).await.map(Into::into)
+pub async fn create_future(token: String, code: String) -> octocrab::Result<Gist> {
+    github(token)?
+        .gists()
+        .create()
+        .description(DESCRIPTION)
+        .public(false)
+        .file(FILENAME, code)
+        .send()
+        .await
+        .map(Into::into)
 }
 
 #[tokio::main]
@@ -74,12 +61,14 @@ pub async fn load(token: String, id: &str) -> Gist {
     // TODO: Better reporting of a 404
 }
 
-pub async fn load_future(token: String, id: &str) -> hubcaps::Result<Gist> {
+pub async fn load_future(token: String, id: &str) -> octocrab::Result<Gist> {
     let github = github(token)?;
 
     github.gists().get(id).await.map(Into::into)
 }
 
-fn github(token: String) -> hubcaps::Result<Github> {
-    Github::new("The Rust Playground", Credentials::Token(token))
+fn github(token: String) -> octocrab::Result<Octocrab> {
+    octocrab::OctocrabBuilder::new()
+        .personal_token(token)
+        .build()
 }

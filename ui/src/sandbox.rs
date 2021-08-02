@@ -70,7 +70,7 @@ pub enum Error {
     UnableToRemoveCompiler { source: io::Error },
     #[snafu(display("Compiler execution took longer than {} ms", timeout.as_millis()))]
     CompilerExecutionTimedOut {
-        source: tokio::time::Elapsed,
+        source: tokio::time::error::Elapsed,
         timeout: Duration,
     },
 
