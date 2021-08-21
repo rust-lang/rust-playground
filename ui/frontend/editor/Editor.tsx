@@ -7,6 +7,7 @@ import { CommonEditorProps, Editor as EditorType, Position, Selection } from '..
 import { State } from '../reducers';
 
 import styles from './Editor.module.css';
+import MonacoEditor from './MonacoEditor';
 
 class CodeByteOffsets {
   readonly code: string;
@@ -107,6 +108,12 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
   }
 }
 
+const editorMap = {
+  [EditorType.Simple]: SimpleEditor,
+  [EditorType.Ace]: AceEditor,
+  [EditorType.Monaco]: MonacoEditor,
+};
+
 const Editor: React.SFC = () => {
   const code = useSelector((state: State) => state.code);
   const editor = useSelector((state: State) => state.configuration.editor);
@@ -118,7 +125,7 @@ const Editor: React.SFC = () => {
   const execute = useCallback(() => dispatch(actions.performPrimaryAction()), [dispatch]);
   const onEditCode = useCallback((c) => dispatch(actions.editCode(c)), [dispatch]);
 
-  const SelectedEditor = editor === EditorType.Simple ? SimpleEditor : AceEditor;
+  const SelectedEditor = editorMap[editor];
 
   return (
     <div className={styles.container}>

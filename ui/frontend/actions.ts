@@ -64,6 +64,7 @@ export enum ActionType {
   ChangeEditor = 'CHANGE_EDITOR',
   ChangeKeybinding = 'CHANGE_KEYBINDING',
   ChangeAceTheme = 'CHANGE_ACE_THEME',
+  ChangeMonacoTheme = 'CHANGE_MONACO_THEME',
   ChangePairCharacters = 'CHANGE_PAIR_CHARACTERS',
   ChangeOrientation = 'CHANGE_ORIENTATION',
   ChangeAssemblyFlavor = 'CHANGE_ASSEMBLY_FLAVOR',
@@ -140,6 +141,9 @@ export const changeKeybinding = (keybinding: string) =>
 
 export const changeAceTheme = (theme: string) =>
   createAction(ActionType.ChangeAceTheme, { theme });
+
+export const changeMonacoTheme = (theme: string) =>
+  createAction(ActionType.ChangeMonacoTheme, { theme });
 
 export const changePairCharacters = (pairCharacters: PairCharacters) =>
   createAction(ActionType.ChangePairCharacters, { pairCharacters });
@@ -817,6 +821,7 @@ export type Action =
   | ReturnType<typeof changePrimaryAction>
   | ReturnType<typeof changeProcessAssembly>
   | ReturnType<typeof changeAceTheme>
+  | ReturnType<typeof changeMonacoTheme>
   | ReturnType<typeof requestExecute>
   | ReturnType<typeof receiveExecuteSuccess>
   | ReturnType<typeof receiveExecuteFailure>

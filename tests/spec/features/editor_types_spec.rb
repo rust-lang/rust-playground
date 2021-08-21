@@ -7,7 +7,7 @@ RSpec.feature "Editing in different editors", type: :feature, js: true do
   before { visit '/' }
 
   scenario "using the simple editor" do
-    in_config_menu { choose("simple") }
+    in_config_menu { select("simple") }
 
     fill_in('editor-simple', with: simple_editor_code)
 

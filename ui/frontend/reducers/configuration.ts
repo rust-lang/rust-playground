@@ -21,6 +21,9 @@ export interface State {
     theme: string;
     pairCharacters: PairCharacters;
   };
+  monaco: {
+    theme: string;
+  };
   orientation: Orientation;
   assemblyFlavor: AssemblyFlavor;
   demangleAssembly: DemangleAssembly;
@@ -38,6 +41,9 @@ const DEFAULT: State = {
     keybinding: 'ace',
     theme: 'github',
     pairCharacters: PairCharacters.Enabled,
+  },
+  monaco: {
+    theme: 'vscode-dark-plus',
   },
   orientation: Orientation.Automatic,
   assemblyFlavor: AssemblyFlavor.Att,
@@ -66,6 +72,10 @@ export default function configuration(state = DEFAULT, action: Action): State {
     case ActionType.ChangePairCharacters: {
       const { ace } = state;
       return { ...state, ace: { ...ace, pairCharacters: action.pairCharacters } };
+    }
+    case ActionType.ChangeMonacoTheme: {
+      const { monaco } = state;
+      return { ...state, monaco: { ...monaco, theme: action.theme } };
     }
     case ActionType.ChangeOrientation:
       return { ...state, orientation: action.orientation };

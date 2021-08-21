@@ -3,12 +3,20 @@
   position: relative;
 }
 
-.ace {
+.-advanced {
   composes: -bodyMonospace -autoSize from '../shared.module.css';
   position: absolute;
 }
 
+.ace {
+  composes: -advanced;
+}
+
+.monaco {
+  composes: -advanced;
+}
+
 .simple {
-  composes: ace;
+  composes: -advanced;
   border: none;
 }
