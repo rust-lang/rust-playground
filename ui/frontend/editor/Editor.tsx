@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import * as actions from './actions';
-import AdvancedEditor from './AdvancedEditor';
-import { CommonEditorProps, Editor as EditorType, Position, Selection } from './types';
-import { State } from './reducers';
+import * as actions from '../actions';
+import AceEditor from './AceEditor';
+import { CommonEditorProps, Editor as EditorType, Position, Selection } from '../types';
+import { State } from '../reducers';
 
 import styles from './Editor.module.css';
 
@@ -118,7 +118,7 @@ const Editor: React.SFC = () => {
   const execute = useCallback(() => dispatch(actions.performPrimaryAction()), [dispatch]);
   const onEditCode = useCallback((c) => dispatch(actions.editCode(c)), [dispatch]);
 
-  const SelectedEditor = editor === EditorType.Simple ? SimpleEditor : AdvancedEditor;
+  const SelectedEditor = editor === EditorType.Simple ? SimpleEditor : AceEditor;
 
   return (
     <div className={styles.container}>

@@ -22,17 +22,17 @@ interface ConfigMenuProps {
 }
 
 const ConfigMenu: React.SFC<ConfigMenuProps> = () => {
-  const keybinding = useSelector((state: State) => state.configuration.keybinding);
-  const theme = useSelector((state: State) => state.configuration.theme);
+  const keybinding = useSelector((state: State) => state.configuration.ace.keybinding);
+  const aceTheme = useSelector((state: State) => state.configuration.ace.theme);
   const orientation = useSelector((state: State) => state.configuration.orientation);
   const editorStyle = useSelector((state: State) => state.configuration.editor);
-  const pairCharacters = useSelector((state: State) => state.configuration.pairCharacters);
+  const pairCharacters = useSelector((state: State) => state.configuration.ace.pairCharacters);
   const assemblyFlavor = useSelector((state: State) => state.configuration.assemblyFlavor);
   const demangleAssembly = useSelector((state: State) => state.configuration.demangleAssembly);
   const processAssembly = useSelector((state: State) => state.configuration.processAssembly);
 
   const dispatch = useDispatch();
-  const changeTheme = useCallback((t) => dispatch(actions.changeTheme(t)), [dispatch]);
+  const changeAceTheme = useCallback((t) => dispatch(actions.changeAceTheme(t)), [dispatch]);
   const changeKeybinding = useCallback((k) => dispatch(actions.changeKeybinding(k)), [dispatch]);
   const changeOrientation = useCallback((o) => dispatch(actions.changeOrientation(o)), [dispatch]);
   const changeEditorStyle = useCallback((e) => dispatch(actions.changeEditor(e)), [dispatch]);
@@ -48,11 +48,11 @@ const ConfigMenu: React.SFC<ConfigMenuProps> = () => {
           id="editor-style"
           name="Style"
           a={Editor.Simple}
-          b={Editor.Advanced}
+          b={Editor.Ace}
           value={editorStyle}
           onChange={changeEditorStyle} />
 
-        {editorStyle === Editor.Advanced && (
+        {editorStyle === Editor.Ace && (
           <Fragment>
             <SelectConfig
               name="Keybinding"
@@ -64,8 +64,8 @@ const ConfigMenu: React.SFC<ConfigMenuProps> = () => {
 
             <SelectConfig
               name="Theme"
-              value={theme}
-              onChange={changeTheme}
+              value={aceTheme}
+              onChange={changeAceTheme}
             >
               {ACE_THEMES.map(t => <option key={t} value={t}>{t}</option>)}
             </SelectConfig>

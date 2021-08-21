@@ -1,0 +1,14 @@
+.container {
+  composes: -autoSize from '../shared.module.css';
+  position: relative;
+}
+
+.ace {
+  composes: -bodyMonospace -autoSize from '../shared.module.css';
+  position: absolute;
+}
+
+.simple {
+  composes: ace;
+  border: none;
+}

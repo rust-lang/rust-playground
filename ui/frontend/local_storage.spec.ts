@@ -20,13 +20,24 @@ describe('restoring saved state', () => {
 
   test('serialized data is kept', () => {
     const parsed = easyDeserialize({
-      configuration: { theme: 'xcode' },
+      configuration: { orientation: 'vertical' },
       code: 'not default code',
       notifications: { seenRustSurvey2018: true },
     });
 
-    expect(parsed.configuration.theme).toEqual('xcode');
+    expect(parsed.configuration.orientation).toEqual('vertical');
     expect(parsed.code).toEqual('not default code');
     expect(parsed.notifications.seenRustSurvey2018).toBe(true);
+  });
+
+  test('data is migrated', () => {
+    const parsed = easyDeserialize({
+      configuration: { editor: 'advanced', theme: 'xcode', keybinding: 'vi', pairCharacters: 'disabled' },
+    });
+
+    expect(parsed.configuration.editor).toEqual('ace');
+    expect(parsed.configuration.ace.theme).toEqual('xcode');
+    expect(parsed.configuration.ace.keybinding).toEqual('vi');
+    expect(parsed.configuration.ace.pairCharacters).toEqual('disabled');
   });
 });
