@@ -10,7 +10,7 @@ use cargo::{
         Dependency, Package, Source, SourceId, TargetKind,
     },
     sources::RegistrySource,
-    util::Config,
+    util::{Config, VersionExt},
 };
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -241,7 +241,7 @@ pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, Depende
 
         // Query the registry for a summary of this crate.
         // Usefully, this doesn't seem to include yanked versions
-        let dep = Dependency::parse_no_deprecated(name, None, crates_io)
+        let dep = Dependency::parse(name, None, crates_io)
             .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
         let matches = source.query_vec(&dep).unwrap_or_else(|e| {
@@ -271,7 +271,7 @@ pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, Depende
     // Resolve transitive dependencies.
     let mut registry = PackageRegistry::new(&config).expect("Unable to create package registry");
     registry.lock_patches();
-    let try_to_use = HashSet::new();
+    let try_to_use = Default::default();
     let resolve = resolver::resolve(&summaries, &[], &mut registry, &try_to_use, None, true)
         .expect("Unable to resolve dependencies");
 
