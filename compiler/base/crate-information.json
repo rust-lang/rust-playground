@@ -36,7 +36,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.42",
+    "version": "1.0.43",
     "id": "anyhow"
   },
   {
@@ -96,7 +96,7 @@
   },
   {
     "name": "bitflags",
-    "version": "1.2.1",
+    "version": "1.3.2",
     "id": "bitflags"
   },
   {
@@ -121,12 +121,12 @@
   },
   {
     "name": "bytes",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "id": "bytes"
   },
   {
     "name": "cc",
-    "version": "1.0.69",
+    "version": "1.0.70",
     "id": "cc"
   },
   {
@@ -156,7 +156,7 @@
   },
   {
     "name": "cpufeatures",
-    "version": "0.1.5",
+    "version": "0.2.1",
     "id": "cpufeatures"
   },
   {
@@ -266,7 +266,7 @@
   },
   {
     "name": "filetime",
-    "version": "0.2.14",
+    "version": "0.2.15",
     "id": "filetime"
   },
   {
@@ -276,7 +276,7 @@
   },
   {
     "name": "flate2",
-    "version": "1.0.20",
+    "version": "1.0.21",
     "id": "flate2"
   },
   {
@@ -306,47 +306,47 @@
   },
   {
     "name": "futures",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "id": "futures"
   },
   {
     "name": "futures-channel",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "id": "futures_core"
   },
   {
     "name": "futures-executor",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "id": "futures_io"
   },
   {
     "name": "futures-macro",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "id": "futures_macro"
   },
   {
     "name": "futures-sink",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "id": "futures_sink"
   },
   {
     "name": "futures-task",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "id": "futures_task"
   },
   {
     "name": "futures-util",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "id": "futures_util"
   },
   {
@@ -381,7 +381,7 @@
   },
   {
     "name": "h2",
-    "version": "0.3.3",
+    "version": "0.3.4",
     "id": "h2"
   },
   {
@@ -411,12 +411,12 @@
   },
   {
     "name": "http-body",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "id": "http_body"
   },
   {
     "name": "httparse",
-    "version": "1.4.1",
+    "version": "1.5.1",
     "id": "httparse"
   },
   {
@@ -431,7 +431,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.14.11",
+    "version": "0.14.12",
     "id": "hyper"
   },
   {
@@ -471,7 +471,7 @@
   },
   {
     "name": "itoa",
-    "version": "0.4.7",
+    "version": "0.4.8",
     "id": "itoa"
   },
   {
@@ -486,7 +486,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.98",
+    "version": "0.2.101",
     "id": "libc"
   },
   {
@@ -506,7 +506,7 @@
   },
   {
     "name": "lock_api",
-    "version": "0.4.4",
+    "version": "0.4.5",
     "id": "lock_api"
   },
   {
@@ -541,7 +541,7 @@
   },
   {
     "name": "matches",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "id": "matches"
   },
   {
@@ -556,7 +556,7 @@
   },
   {
     "name": "memchr",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "id": "memchr"
   },
   {
@@ -591,7 +591,7 @@
   },
   {
     "name": "nalgebra",
-    "version": "0.28.0",
+    "version": "0.29.0",
     "id": "nalgebra"
   },
   {
@@ -601,7 +601,7 @@
   },
   {
     "name": "native-tls",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "id": "native_tls"
   },
   {
@@ -626,7 +626,7 @@
   },
   {
     "name": "num-bigint",
-    "version": "0.4.0",
+    "version": "0.4.2",
     "id": "num_bigint"
   },
   {
@@ -666,7 +666,7 @@
   },
   {
     "name": "object",
-    "version": "0.26.0",
+    "version": "0.26.2",
     "id": "object"
   },
   {
@@ -681,7 +681,7 @@
   },
   {
     "name": "openssl",
-    "version": "0.10.35",
+    "version": "0.10.36",
     "id": "openssl"
   },
   {
@@ -691,22 +691,22 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.65",
+    "version": "0.9.66",
     "id": "openssl_sys"
   },
   {
     "name": "ordered-float",
-    "version": "2.7.0",
+    "version": "2.8.0",
     "id": "ordered_float"
   },
   {
     "name": "parking_lot",
-    "version": "0.11.1",
+    "version": "0.11.2",
     "id": "parking_lot"
   },
   {
     "name": "parking_lot_core",
-    "version": "0.8.3",
+    "version": "0.8.5",
     "id": "parking_lot_core"
   },
   {
@@ -816,7 +816,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.28",
+    "version": "1.0.29",
     "id": "proc_macro2"
   },
   {
@@ -926,7 +926,7 @@
   },
   {
     "name": "rustc-demangle",
-    "version": "0.1.20",
+    "version": "0.1.21",
     "id": "rustc_demangle"
   },
   {
@@ -938,6 +938,11 @@
     "name": "ryu",
     "version": "1.0.5",
     "id": "ryu"
+  },
+  {
+    "name": "safe_arch",
+    "version": "0.6.0",
+    "id": "safe_arch"
   },
   {
     "name": "same-file",
@@ -971,7 +976,7 @@
   },
   {
     "name": "serde",
-    "version": "1.0.127",
+    "version": "1.0.130",
     "id": "serde"
   },
   {
@@ -981,12 +986,12 @@
   },
   {
     "name": "serde_derive",
-    "version": "1.0.127",
+    "version": "1.0.130",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.66",
+    "version": "1.0.67",
     "id": "serde_json"
   },
   {
@@ -996,27 +1001,27 @@
   },
   {
     "name": "serde_yaml",
-    "version": "0.8.17",
+    "version": "0.8.21",
     "id": "serde_yaml"
   },
   {
     "name": "sha2",
-    "version": "0.9.5",
+    "version": "0.9.8",
     "id": "sha2"
   },
   {
     "name": "simba",
-    "version": "0.5.1",
+    "version": "0.6.0",
     "id": "simba"
   },
   {
     "name": "siphasher",
-    "version": "0.3.6",
+    "version": "0.3.7",
     "id": "siphasher"
   },
   {
     "name": "slab",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "id": "slab"
   },
   {
@@ -1071,12 +1076,12 @@
   },
   {
     "name": "syn",
-    "version": "1.0.74",
+    "version": "1.0.76",
     "id": "syn"
   },
   {
     "name": "tar",
-    "version": "0.4.35",
+    "version": "0.4.37",
     "id": "tar"
   },
   {
@@ -1106,12 +1111,12 @@
   },
   {
     "name": "thiserror",
-    "version": "1.0.26",
+    "version": "1.0.29",
     "id": "thiserror"
   },
   {
     "name": "thiserror-impl",
-    "version": "1.0.26",
+    "version": "1.0.29",
     "id": "thiserror_impl"
   },
   {
@@ -1136,7 +1141,7 @@
   },
   {
     "name": "time",
-    "version": "0.3.0",
+    "version": "0.3.2",
     "id": "time"
   },
   {
@@ -1146,7 +1151,7 @@
   },
   {
     "name": "tinyvec",
-    "version": "1.3.1",
+    "version": "1.4.0",
     "id": "tinyvec"
   },
   {
@@ -1156,7 +1161,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.9.0",
+    "version": "1.11.0",
     "id": "tokio"
   },
   {
@@ -1171,7 +1176,7 @@
   },
   {
     "name": "tokio-util",
-    "version": "0.6.7",
+    "version": "0.6.8",
     "id": "tokio_util"
   },
   {
@@ -1191,7 +1196,7 @@
   },
   {
     "name": "tracing-core",
-    "version": "0.1.18",
+    "version": "0.1.19",
     "id": "tracing_core"
   },
   {
@@ -1211,7 +1216,7 @@
   },
   {
     "name": "typenum",
-    "version": "1.13.0",
+    "version": "1.14.0",
     "id": "typenum"
   },
   {
@@ -1226,7 +1231,7 @@
   },
   {
     "name": "unicode-bidi",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "id": "unicode_bidi"
   },
   {
@@ -1298,6 +1303,11 @@
     "name": "weezl",
     "version": "0.1.5",
     "id": "weezl"
+  },
+  {
+    "name": "wide",
+    "version": "0.7.0",
+    "id": "wide"
   },
   {
     "name": "winapi",
