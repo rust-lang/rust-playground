@@ -11,7 +11,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
   scenario "errors are highlighted" do
     within(:output, :stderr) do
       expect(page).to have_css '.error', text: '1 generic argument but 2 generic arguments were supplied'
-      expect(page).to have_css '.error', text: 'aborting due to 2 previous errors'
+      expect(page).to have_css '.error', text: 'due to 2 previous errors'
       expect(page).to have_css '.error', text: /Could not compile `playground`/i
     end
   end

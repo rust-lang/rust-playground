@@ -40,7 +40,7 @@ version = "=0.11.0"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.42"
+version = "=1.0.43"
 
 [dependencies.approx]
 package = "approx"
@@ -88,7 +88,7 @@ version = "=0.6.3"
 
 [dependencies.bitflags]
 package = "bitflags"
-version = "=1.2.1"
+version = "=1.3.2"
 
 [dependencies.block_buffer]
 package = "block-buffer"
@@ -109,11 +109,11 @@ version = "=1.4.3"
 
 [dependencies.bytes]
 package = "bytes"
-version = "=1.0.1"
+version = "=1.1.0"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.0.69"
+version = "=1.0.70"
 
 [dependencies.cfg_if]
 package = "cfg-if"
@@ -138,7 +138,7 @@ version = "=1.1.0"
 
 [dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.1.5"
+version = "=0.2.1"
 
 [dependencies.crc32fast]
 package = "crc32fast"
@@ -230,7 +230,7 @@ version = "=0.1.9"
 
 [dependencies.filetime]
 package = "filetime"
-version = "=0.2.14"
+version = "=0.2.15"
 
 [dependencies.fixedbitset]
 package = "fixedbitset"
@@ -238,7 +238,7 @@ version = "=0.4.0"
 
 [dependencies.flate2]
 package = "flate2"
-version = "=1.0.20"
+version = "=1.0.21"
 
 [dependencies.fnv]
 package = "fnv"
@@ -262,40 +262,40 @@ version = "=0.1.4"
 
 [dependencies.futures]
 package = "futures"
-version = "=0.3.16"
+version = "=0.3.17"
 features = ["compat", "io-compat", "thread-pool"]
 
 [dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.16"
+version = "=0.3.17"
 
 [dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.16"
+version = "=0.3.17"
 
 [dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.16"
+version = "=0.3.17"
 
 [dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.16"
+version = "=0.3.17"
 
 [dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.16"
+version = "=0.3.17"
 
 [dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.16"
+version = "=0.3.17"
 
 [dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.16"
+version = "=0.3.17"
 
 [dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.16"
+version = "=0.3.17"
 
 [dependencies.generic_array]
 package = "generic-array"
@@ -323,7 +323,7 @@ version = "=0.3.0"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.3.3"
+version = "=0.3.4"
 
 [dependencies.hashbrown]
 package = "hashbrown"
@@ -347,11 +347,11 @@ version = "=0.2.4"
 
 [dependencies.http_body]
 package = "http-body"
-version = "=0.4.2"
+version = "=0.4.3"
 
 [dependencies.httparse]
 package = "httparse"
-version = "=1.4.1"
+version = "=1.5.1"
 
 [dependencies.httpdate]
 package = "httpdate"
@@ -363,7 +363,7 @@ version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=0.14.11"
+version = "=0.14.12"
 features = ["full"]
 
 [dependencies.hyper_tls]
@@ -396,7 +396,7 @@ version = "=0.10.1"
 
 [dependencies.itoa]
 package = "itoa"
-version = "=0.4.7"
+version = "=0.4.8"
 
 [dependencies.jpeg_decoder]
 package = "jpeg-decoder"
@@ -408,7 +408,7 @@ version = "=1.4.0"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.98"
+version = "=0.2.101"
 
 [dependencies.libm]
 package = "libm"
@@ -424,7 +424,7 @@ version = "=0.5.4"
 
 [dependencies.lock_api]
 package = "lock_api"
-version = "=0.4.4"
+version = "=0.4.5"
 
 [dependencies.log]
 package = "log"
@@ -452,7 +452,7 @@ version = "=0.1.0"
 
 [dependencies.matches]
 package = "matches"
-version = "=0.1.8"
+version = "=0.1.9"
 
 [dependencies.matrixmultiply]
 package = "matrixmultiply"
@@ -464,7 +464,7 @@ version = "=0.9.1"
 
 [dependencies.memchr]
 package = "memchr"
-version = "=2.4.0"
+version = "=2.4.1"
 
 [dependencies.memmap]
 package = "memmap"
@@ -493,7 +493,7 @@ features = ["net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
 package = "nalgebra"
-version = "=0.28.0"
+version = "=0.29.0"
 
 [dependencies.nalgebra_macros]
 package = "nalgebra-macros"
@@ -501,7 +501,7 @@ version = "=0.1.0"
 
 [dependencies.native_tls]
 package = "native-tls"
-version = "=0.2.7"
+version = "=0.2.8"
 
 [dependencies.ndarray]
 package = "ndarray"
@@ -517,7 +517,7 @@ version = "=0.4.0"
 
 [dependencies.num_bigint]
 package = "num-bigint"
-version = "=0.4.0"
+version = "=0.4.2"
 
 [dependencies.num_complex]
 package = "num-complex"
@@ -549,7 +549,7 @@ version = "=0.2.14"
 
 [dependencies.object]
 package = "object"
-version = "=0.26.0"
+version = "=0.26.2"
 
 [dependencies.once_cell]
 package = "once_cell"
@@ -561,7 +561,7 @@ version = "=0.3.0"
 
 [dependencies.openssl]
 package = "openssl"
-version = "=0.10.35"
+version = "=0.10.36"
 
 [dependencies.openssl_probe]
 package = "openssl-probe"
@@ -569,19 +569,19 @@ version = "=0.1.4"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.65"
+version = "=0.9.66"
 
 [dependencies.ordered_float]
 package = "ordered-float"
-version = "=2.7.0"
+version = "=2.8.0"
 
 [dependencies.parking_lot]
 package = "parking_lot"
-version = "=0.11.1"
+version = "=0.11.2"
 
 [dependencies.parking_lot_core]
 package = "parking_lot_core"
-version = "=0.8.3"
+version = "=0.8.5"
 
 [dependencies.paste]
 package = "paste"
@@ -661,7 +661,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.28"
+version = "=1.0.29"
 features = ["span-locations"]
 
 [dependencies.proc_macro_hack]
@@ -762,7 +762,7 @@ features = ["bundled-full"]
 
 [dependencies.rustc_demangle]
 package = "rustc-demangle"
-version = "=0.1.20"
+version = "=0.1.21"
 
 [dependencies.rustc_version]
 package = "rustc_version"
@@ -771,6 +771,10 @@ version = "=0.4.0"
 [dependencies.ryu]
 package = "ryu"
 version = "=1.0.5"
+
+[dependencies.safe_arch]
+package = "safe_arch"
+version = "=0.6.0"
 
 [dependencies.same_file]
 package = "same-file"
@@ -798,16 +802,16 @@ version = "=0.10.2"
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.127"
+version = "=1.0.130"
 features = ["derive", "rc"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.127"
+version = "=1.0.130"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.66"
+version = "=1.0.67"
 features = ["raw_value"]
 
 [dependencies.serde_urlencoded]
@@ -820,23 +824,23 @@ version = "=0.7.0"
 
 [dependencies.serde_yaml]
 package = "serde_yaml"
-version = "=0.8.17"
+version = "=0.8.21"
 
 [dependencies.sha2]
 package = "sha2"
-version = "=0.9.5"
+version = "=0.9.8"
 
 [dependencies.simba]
 package = "simba"
-version = "=0.5.1"
+version = "=0.6.0"
 
 [dependencies.siphasher]
 package = "siphasher"
-version = "=0.3.6"
+version = "=0.3.7"
 
 [dependencies.slab]
 package = "slab"
-version = "=0.4.3"
+version = "=0.4.4"
 
 [dependencies.smallvec]
 package = "smallvec"
@@ -881,12 +885,12 @@ version = "=2.4.1"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.74"
+version = "=1.0.76"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.tar]
 package = "tar"
-version = "=0.4.35"
+version = "=0.4.37"
 
 [dependencies.tempfile]
 package = "tempfile"
@@ -910,11 +914,11 @@ version = "=0.11.0"
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.26"
+version = "=1.0.29"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.26"
+version = "=1.0.29"
 
 [dependencies.thread_id]
 package = "thread-id"
@@ -934,7 +938,7 @@ version = "=0.6.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.3.0"
+version = "=0.3.2"
 
 [dependencies.time_0_1_44]
 package = "time"
@@ -942,8 +946,8 @@ version = "=0.1.44"
 
 [dependencies.tinyvec]
 package = "tinyvec"
-version = "=1.3.1"
-features = ["alloc", "grab_spare_slice", "rustc_1_40", "serde"]
+version = "=1.4.0"
+features = ["alloc", "grab_spare_slice", "rustc_1_40", "rustc_1_55", "serde"]
 
 [dependencies.tinyvec_macros]
 package = "tinyvec_macros"
@@ -951,7 +955,7 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.9.0"
+version = "=1.11.0"
 features = ["full", "test-util"]
 
 [dependencies.tokio_native_tls]
@@ -964,7 +968,7 @@ version = "=0.7.2"
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.6.7"
+version = "=0.6.8"
 
 [dependencies.toml]
 package = "toml"
@@ -980,7 +984,7 @@ version = "=0.1.26"
 
 [dependencies.tracing_core]
 package = "tracing-core"
-version = "=0.1.18"
+version = "=0.1.19"
 
 [dependencies.traitobject]
 package = "traitobject"
@@ -996,7 +1000,7 @@ version = "=0.3.3"
 
 [dependencies.typenum]
 package = "typenum"
-version = "=1.13.0"
+version = "=1.14.0"
 
 [dependencies.ucd_trie]
 package = "ucd-trie"
@@ -1008,7 +1012,7 @@ version = "=2.6.0"
 
 [dependencies.unicode_bidi]
 package = "unicode-bidi"
-version = "=0.3.5"
+version = "=0.3.6"
 
 [dependencies.unicode_linebreak]
 package = "unicode-linebreak"
@@ -1065,6 +1069,10 @@ version = "=0.3.0"
 [dependencies.weezl]
 package = "weezl"
 version = "=0.1.5"
+
+[dependencies.wide]
+package = "wide"
+version = "=0.7.0"
 
 [dependencies.winapi]
 package = "winapi"
