@@ -108,7 +108,6 @@ export const isNightlyChannel = (state: State) => (
 );
 export const isWasmAvailable = isNightlyChannel;
 export const isHirAvailable = isNightlyChannel;
-export const isRust2021Available = isNightlyChannel;
 
 export const getModeLabel = (state: State) => {
   const { configuration: { mode } } = state;
