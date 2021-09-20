@@ -249,15 +249,15 @@ export const codeUrlSelector = createSelector(
 const notificationsSelector = (state: State) => state.notifications;
 
 const NOW = new Date();
-const RUST_SURVEY_2020_END = new Date('2020-09-24T23:59:59Z');
-const RUST_SURVEY_2020_OPEN = NOW <= RUST_SURVEY_2020_END;
-export const showRustSurvey2020Selector = createSelector(
+const RUST_2021_DEFAULT_END = new Date('2022-01-01T00:00:00Z');
+const RUST_2021_DEFAULT_OPEN = NOW <= RUST_2021_DEFAULT_END;
+export const showRust2021IsDefaultSelector = createSelector(
   notificationsSelector,
-  notifications => RUST_SURVEY_2020_OPEN && !notifications.seenRustSurvey2020,
+  notifications => RUST_2021_DEFAULT_OPEN && !notifications.seenRust2021IsDefault,
 );
 
 export const anyNotificationsToShowSelector = createSelector(
-  showRustSurvey2020Selector,
+  showRust2021IsDefaultSelector,
   allNotifications => allNotifications,
 );
 
