@@ -42,7 +42,7 @@ const DEFAULT: State = {
   primaryAction: PrimaryActionAuto.Auto,
   channel: Channel.Stable,
   mode: Mode.Debug,
-  edition: Edition.Rust2018,
+  edition: Edition.Rust2021,
   backtrace: Backtrace.Disabled,
 };
 

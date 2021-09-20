@@ -104,7 +104,7 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
 
   scenario "loading without code or an edition" do
     visit '/'
-    expect(page).to have_edition('2018')
+    expect(page).to have_edition('2021')
   end
 
   def editor

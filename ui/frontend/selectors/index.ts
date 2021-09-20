@@ -122,7 +122,7 @@ export const getChannelLabel = (state: State) => {
 
 export const isEditionDefault = createSelector(
   editionSelector,
-  edition => edition == Edition.Rust2018,
+  edition => edition == Edition.Rust2021,
 );
 
 export const getBacktraceSet = (state: State) => (
