@@ -753,10 +753,6 @@ impl DockerCommandExt for Command {
 
     fn apply_edition(&mut self, req: impl EditionRequest) {
         if let Some(edition) = req.edition() {
-            if edition == Edition::Rust2021 {
-                self.args(&["--env", &format!("PLAYGROUND_FEATURE_EDITION2021=true")]);
-            }
-
             self.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
         }
     }
