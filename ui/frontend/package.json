@@ -57,7 +57,7 @@
     "html-webpack-plugin": "^5.2.0",
     "jest": "^27.0.0",
     "json-loader": "^0.5.4",
-    "mini-css-extract-plugin": "^1.3.9",
+    "mini-css-extract-plugin": "^2.0.0",
     "normalize.css": "^8.0.0",
     "postcss": "^8.2.7",
     "postcss-loader": "^6.1.0",
