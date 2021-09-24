@@ -107,6 +107,7 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
 
     editor.setOptions({
       enableBasicAutocompletion: true,
+      fixedWidthGutter: true,
     });
 
     const danglingElement = child.current;
