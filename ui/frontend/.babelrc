@@ -5,7 +5,9 @@
       "modules": false,
       "useBuiltIns": "entry",
     }],
-    "@babel/react"
+    [ "@babel/react", {
+      "runtime": "automatic",
+    }],
   ],
   "plugins": [
     "lodash",

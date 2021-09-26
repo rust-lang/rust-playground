@@ -42,7 +42,7 @@ export function configureRustErrors({
       },
     },
     'backtrace': {
-      pattern: /at src\/.*\n/,
+      pattern: /at \.\/src\/.*\n/,
       inside: {
         'backtrace-location': /src\/main.rs:(\d+)/,
       },
@@ -51,7 +51,7 @@ export function configureRustErrors({
   };
 
   Prism.languages.rust_mir = {
-    'mir-source': /src\/.*.rs:\d+:\d+: \d+:\d+/,
+    'mir-source': /src\/[A-Za-z0-9_.\-]+\.rs:\d+:\d+: \d+:\d+/,
   }
 
   Prism.hooks.add('wrap', env => {

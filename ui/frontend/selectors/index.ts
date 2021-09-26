@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 import * as url from 'url';
 
 import { State } from '../reducers';
-import { Backtrace, Channel, Edition, PrimaryActionAuto, PrimaryActionCore } from '../types';
+import { Backtrace, Channel, Edition, Orientation, PrimaryActionAuto, PrimaryActionCore, AceResizeKey } from '../types';
 
 const codeSelector = (state: State) => state.code;
 
@@ -71,6 +71,7 @@ const LABELS: { [index in PrimaryActionCore]: string } = {
   [PrimaryActionCore.Compile]: 'Build',
   [PrimaryActionCore.Execute]: 'Run',
   [PrimaryActionCore.LlvmIr]: 'Show LLVM IR',
+  [PrimaryActionCore.Hir]: 'Show HIR',
   [PrimaryActionCore.Mir]: 'Show MIR',
   [PrimaryActionCore.Test]: 'Test',
   [PrimaryActionCore.Wasm]: 'Show WASM',
@@ -102,9 +103,12 @@ export const miriVersionDetailsText = createSelector([getMiri], versionDetails);
 
 const editionSelector = (state: State) => state.configuration.edition;
 
-export const isWasmAvailable = (state: State) => (
+export const isNightlyChannel = (state: State) => (
   state.configuration.channel === Channel.Nightly
 );
+export const isWasmAvailable = isNightlyChannel;
+export const isHirAvailable = isNightlyChannel;
+export const isRust2021Available = isNightlyChannel;
 
 export const getModeLabel = (state: State) => {
   const { configuration: { mode } } = state;
@@ -116,9 +120,9 @@ export const getChannelLabel = (state: State) => {
   return `${channel}`;
 };
 
-export const getEditionSet = createSelector(
+export const isEditionDefault = createSelector(
   editionSelector,
-  edition => edition !== Edition.Rust2018,
+  edition => edition == Edition.Rust2018,
 );
 
 export const getBacktraceSet = (state: State) => (
@@ -126,9 +130,9 @@ export const getBacktraceSet = (state: State) => (
 );
 
 export const getAdvancedOptionsSet = createSelector(
-  getEditionSet, getBacktraceSet,
-  (editionSet, backtraceSet) => (
-    editionSet || backtraceSet
+  isEditionDefault, getBacktraceSet,
+  (editionDefault, backtraceSet) => (
+    !editionDefault || backtraceSet
   ),
 );
 
@@ -142,6 +146,7 @@ const getOutputs = (state: State) => [
   state.output.gist,
   state.output.llvmIr,
   state.output.mir,
+  state.output.hir,
   state.output.miri,
   state.output.macroExpansion,
   state.output.wasm,
@@ -233,15 +238,6 @@ export const urloUrlSelector = createSelector(
   },
 );
 
-export const issueUrlSelector = createSelector(
-  snippetSelector,
-  snippet => {
-    const newIssueUrl = url.parse('https://github.com/rust-lang/rust/issues/new', true);
-    newIssueUrl.query = { body: snippet };
-    return url.format(newIssueUrl);
-  },
-);
-
 export const codeUrlSelector = createSelector(
   baseUrlSelector, urlQuerySelector, gistSelector,
   (baseUrl, query, gist) => {
@@ -254,15 +250,15 @@ export const codeUrlSelector = createSelector(
 const notificationsSelector = (state: State) => state.notifications;
 
 const NOW = new Date();
-const RUST_2018_DEFAULT_END = new Date('2019-01-01T00:00:00Z');
-const RUST_2018_DEFAULT_OPEN = NOW <= RUST_2018_DEFAULT_END;
-export const showRust2018IsDefaultSelector = createSelector(
+const RUST_SURVEY_2020_END = new Date('2020-09-24T23:59:59Z');
+const RUST_SURVEY_2020_OPEN = NOW <= RUST_SURVEY_2020_END;
+export const showRustSurvey2020Selector = createSelector(
   notificationsSelector,
-  notifications => RUST_2018_DEFAULT_OPEN && !notifications.seenRust2018IsDefault,
+  notifications => RUST_SURVEY_2020_OPEN && !notifications.seenRustSurvey2020,
 );
 
 export const anyNotificationsToShowSelector = createSelector(
-  showRust2018IsDefaultSelector,
+  showRustSurvey2020Selector,
   allNotifications => allNotifications,
 );
 
@@ -277,4 +273,38 @@ export const formatRequestSelector = createSelector(
   codeSelector,
   editionSelector,
   (code, edition) => ({ code, edition }),
+);
+
+const focus = (state: State) => state.output.meta.focus;
+export const isOutputFocused = createSelector(
+  focus,
+  (focus) => !!focus,
+);
+
+const orientationConfig = (state: State) => state.configuration.orientation;
+const browserWidthIsSmall = (state: State) => state.browser.isSmall;
+
+export const orientation = createSelector(
+  orientationConfig,
+  browserWidthIsSmall,
+  (orientation, widthIsSmall) => {
+    if (orientation == Orientation.Automatic) {
+      if (widthIsSmall) { return Orientation.Horizontal } else { return Orientation.Vertical }
+    } else {
+      return orientation;
+    }
+  }
+)
+
+const ratioGeneration = (state: State) => state.browser.ratioGeneration;
+
+export const aceResizeKey = createSelector(
+  focus,
+  ratioGeneration,
+  (focus, ratioGeneration): AceResizeKey => [focus, ratioGeneration],
+)
+
+export const offerCrateAutocompleteOnUse = createSelector(
+  editionSelector,
+  (edition) => edition !== Edition.Rust2015,
 );

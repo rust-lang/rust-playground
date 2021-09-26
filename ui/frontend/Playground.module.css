@@ -1,0 +1,62 @@
+.container {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  padding-bottom: 1em;
+}
+
+.-resizeableArea {
+  composes: -autoSize from './shared.module.css';
+  display: grid;
+}
+
+.resizeableAreaRowOutputUnfocused {
+  composes: -resizeableArea;
+  grid-template-rows: 1fr auto;
+}
+
+.resizeableAreaRowOutputFocused {
+  composes: -resizeableArea;
+  grid-template-rows: 1fr 12px 1fr;
+}
+
+.resizeableAreaColumnOutputUnfocused {
+  composes: -resizeableArea;
+  grid-template-columns: 1fr auto;
+}
+
+.resizeableAreaColumnOutputFocused {
+  composes: -resizeableArea;
+  grid-template-columns: 1fr 12px 1fr;
+}
+
+.-gutter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splitRowsGutter {
+  composes: -gutter;
+  cursor: row-resize;
+}
+
+.splitRowsGutterHandle {
+  pointer-events: none;
+  transform: rotate(90deg);
+}
+
+.splitColumnsGutter {
+  composes: -gutter;
+  cursor: col-resize;
+}
+
+.editor {
+  composes: -autoSize from './shared.module.css';
+  border: 4px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.output {
+  composes: -autoSize from './shared.module.css';
+}

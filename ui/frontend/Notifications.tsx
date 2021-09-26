@@ -7,29 +7,32 @@ import { Close } from './Icon';
 import * as actions from './actions';
 import * as selectors from './selectors';
 
-const EDITION_URL = 'https://doc.rust-lang.org/edition-guide/';
+import styles from './Notifications.module.css';
+
+const SURVEY_URL = 'https://blog.rust-lang.org/2020/09/10/survey-launch.html';
 
 const Notifications: React.SFC = () => {
   return (
     <Portal>
-      <div className="notifications">
-        <Rust2018IsDefaultNotification />
+      <div className={styles.container}>
+        <Rust2020SurveyNotification />
       </div>
     </Portal>
   );
 };
 
-const Rust2018IsDefaultNotification: React.SFC = () => {
-  const showRust2018IsDefault = useSelector(selectors.showRust2018IsDefaultSelector);
+const Rust2020SurveyNotification: React.SFC = () => {
+  const showRust2020Survey = useSelector(selectors.showRustSurvey2020Selector);
 
   const dispatch = useDispatch();
-  const seenRust2018IsDefault = useCallback(() => dispatch(actions.seenRust2018IsDefault()), [dispatch]);
+  const seenRustSurvey2020 = useCallback(() => dispatch(actions.seenRustSurvey2020()), [dispatch]);
 
-  return showRust2018IsDefault && (
-    <Notification onClose={seenRust2018IsDefault}>
-      As of Rust 1.31, the default edition of Rust is now Rust
-        2018. Learn more about editions in the <a href={EDITION_URL}>Edition Guide</a>.
-  To specify which edition to use, use the advanced compilation options menu.
+  return showRust2020Survey && (
+    <Notification onClose={seenRustSurvey2020}>
+      We want to know your opinions! Your responses to
+      the <a href={SURVEY_URL}>2020 State of Rust Survey</a> will
+      help the project understand its strengths and weaknesses
+      and establish development priorities for the future!
     </Notification>
   );
 };
@@ -39,9 +42,9 @@ interface NotificationProps {
 }
 
 const Notification: React.SFC<NotificationProps> = ({ onClose, children }) => (
-  <div className="notifications__notification">
-    <div className="notifications__notification-content">{children}</div>
-    <button className="notifications__close" onClick={onClose}><Close /></button>
+  <div className={styles.notification}>
+    <div className={styles.notificationContent}>{children}</div>
+    <button className={styles.close} onClick={onClose}><Close /></button>
   </div>
 );
 

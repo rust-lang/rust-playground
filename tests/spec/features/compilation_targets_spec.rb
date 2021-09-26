@@ -22,21 +22,21 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
 
     scenario "choosing to run the code" do
       in_build_menu { click_on(build_button: "Run") }
-      within('.output-stdout') do
+      within(:output, :stdout) do
         expect(page).to have_content 'Hello, world!'
       end
     end
 
     scenario "choosing to build the code" do
       in_build_menu { click_on(build_button: "Build") }
-      within('.output-stderr') do
+      within(:output, :stderr) do
         expect(page).to have_content 'function is never used: `main`'
       end
     end
 
     scenario "choosing to test the code" do
       in_build_menu { click_on(build_button: "Test") }
-      within('.output-stdout') do
+      within(:output, :stdout) do
         expect(page).to have_content "panicked at 'assertion failed: false'"
       end
     end
@@ -50,7 +50,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     scenario "compiling to assembly" do
       in_build_menu { click_on("assembly") }
 
-      within('.output-code') do
+      within(:output, :code) do
         # We demangle the symbols
         expect(page).to have_content 'playground::main:'
 
@@ -67,7 +67,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     scenario "compiling to assembly" do
       in_build_menu { click_on("assembly") }
 
-      within('.output-code') do
+      within(:output, :code) do
         # We demangle the symbols
         expect(page).to have_content 'playground::main:'
 
@@ -79,7 +79,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   scenario "compiling to LLVM IR" do
     in_build_menu { click_on("LLVM IR") }
 
-    within('.output-code') do
+    within(:output, :code) do
       expect(page).to have_content 'ModuleID'
       expect(page).to have_content 'target datalayout'
       expect(page).to have_content 'target triple'
@@ -89,16 +89,27 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   scenario "compiling to MIR" do
     in_build_menu { click_on("MIR") }
 
-    within('.output-result') do
-      expect(page).to have_content 'StorageLive'
-      expect(page).to have_content 'StorageDead'
+    within(:output, :result) do
+      expect(page).to have_content 'bb0: {'
+    end
+  end
+
+  scenario "compiling to HIR" do
+    editor.set <<~EOF
+      fn demo() -> impl std::fmt::Display { 42 }
+    EOF
+
+    in_build_menu { click_on("HIR") }
+
+    within(:output, :result) do
+      expect(page).to have_content 'fn demo() -> /*impl Trait*/ { 42 }'
     end
   end
 
   scenario "compiling to WebAssembly" do
     in_build_menu { click_on("WASM") }
 
-    within('.output-code') do
+    within(:output, :code) do
       expect(page).to have_content '(module'
       expect(page).to have_content '(block'
     end
@@ -110,7 +121,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     scenario "it shows the compilation error" do
       in_build_menu { click_on("MIR") }
 
-      within('.output-stderr') do
+      within(:output, :stderr) do
         expect(page).to have_content 'an unclosed delimiter'
       end
     end

@@ -2,8 +2,10 @@ import React from 'react';
 
 import Link, { LinkProps } from './uss-router/Link';
 
+import styles from './SegmentedButton.module.css';
+
 export const SegmentedButtonSet: React.SFC = ({ children }) => (
-  <div className="segmented-button">{children}</div>
+  <div className={styles.container}>{children}</div>
 );
 
 type Button = JSX.IntrinsicElements['button'];
@@ -17,7 +19,7 @@ export const SegmentedButton = React.forwardRef<HTMLButtonElement, SegmentedButt
     <button
       ref={ref}
       {...props}
-      className={`segmented-button__button ${isBuild ? 'segmented-button__button--build' : ''}`}
+      className={isBuild ? styles.buttonBuild : styles.button}
     >
       {children}
     </button>
@@ -30,7 +32,7 @@ export const SegmentedLink = React.forwardRef<HTMLAnchorElement, LinkProps>(
     <Link
       ref={ref}
       {...props}
-      className={'segmented-button__button'}
+      className={styles.button}
     >
       {children}
     </Link>

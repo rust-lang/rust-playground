@@ -13,29 +13,25 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
     EOF
     click_on("Build")
 
-    within('.output-warning') do
+    within(:output, :warning) do
       click_on("add a main function")
     end
 
-    within('.editor') do
-      expect(editor).to have_line 'println!("Hello, world!")'
-    end
+    expect(editor).to have_line 'println!("Hello, world!")'
   end
 
   scenario "using an unstable feature offers adding the feature flag" do
     in_channel_menu { click_on("Nightly") }
     editor.set <<~EOF
-      fn foo<const T: usize>() {}
+      extern "avr-interrupt" fn dummy() {}
     EOF
     click_on("Build")
 
-    within('.output-stderr') do
-      click_on("add `#![feature(const_generics)]`")
+    within(:output, :stderr) do
+      click_on("add `#![feature(abi_avr_interrupt)]`")
     end
 
-    within('.editor') do
-      expect(editor).to have_line '#![feature(const_generics)]'
-    end
+    expect(editor).to have_line '#![feature(abi_avr_interrupt)]'
   end
 
   scenario "using a type that hasn't been imported offers importing it" do
@@ -44,13 +40,11 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
     EOF
     click_on("Build")
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       click_on("use std::collections::HashMap;")
     end
 
-    within('.editor') do
-      expect(editor).to have_line 'use std::collections::HashMap;'
-    end
+    expect(editor).to have_line 'use std::collections::HashMap;'
   end
 
   scenario "triggering a panic offers enabling backtraces" do
@@ -61,11 +55,11 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
     EOF
     click_on("Run")
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       click_on("run with `RUST_BACKTRACE=1` environment variable to display a backtrace")
     end
 
-    within('.output-stderr') do
+    within(:output, :stderr) do
       expect(page).to have_content("stack backtrace:")
     end
   end

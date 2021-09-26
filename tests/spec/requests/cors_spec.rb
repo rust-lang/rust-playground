@@ -1,7 +1,9 @@
+
+
 require 'net/http'
 require 'spec_helper'
 
-RSpec.feature "Cross-origin requests", type: :request do
+RSpec.feature "Cross-origin requests", :cors, type: :request do
   let(:evaluate_json_uri) { URI.join(Capybara.app_host, '/evaluate.json') }
 
   it "allows preflight requests for POSTing to evaluate.json" do

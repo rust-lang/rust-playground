@@ -1,3 +1,4 @@
+
 import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url from 'url';
@@ -83,6 +84,9 @@ export enum ActionType {
   CompileLlvmIrRequest = 'COMPILE_LLVM_IR_REQUEST',
   CompileLlvmIrSucceeded = 'COMPILE_LLVM_IR_SUCCEEDED',
   CompileLlvmIrFailed = 'COMPILE_LLVM_IR_FAILED',
+  CompileHirRequest = 'COMPILE_HIR_REQUEST',
+  CompileHirSucceeded = 'COMPILE_HIR_SUCCEEDED',
+  CompileHirFailed = 'COMPILE_HIR_FAILED',
   CompileMirRequest = 'COMPILE_MIR_REQUEST',
   CompileMirSucceeded = 'COMPILE_MIR_SUCCEEDED',
   CompileMirFailed = 'COMPILE_MIR_FAILED',
@@ -121,6 +125,8 @@ export enum ActionType {
   ResetEditorToEmpty = 'RESET_EDITOR_TO_EMPTY',
   ResetEditorToMinimal = 'RESET_EDITOR_TO_MINIMAL',
   ResetEditorToHelloWorld = 'RESET_EDITOR_TO_HELLOWORLD',
+  BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
+  SplitRatioChanged = 'SPLIT_RATIO_CHANGED',
 }
 
 const setPage = (page: Page) =>
@@ -162,8 +168,15 @@ export const changeChannel = (channel: Channel) =>
 export const changeMode = (mode: Mode) =>
   createAction(ActionType.ChangeMode, { mode });
 
-export const changeEdition = (edition: Edition) =>
+const changeEditionRaw = (edition: Edition) =>
   createAction(ActionType.ChangeEdition, { edition });
+
+export const changeEdition = (edition: Edition): ThunkAction => dispatch => {
+  if (edition == Edition.Rust2021) {
+    dispatch(changeChannel(Channel.Nightly));
+  }
+  dispatch(changeEditionRaw(edition));
+}
 
 export const changeBacktrace = (backtrace: Backtrace) =>
   createAction(ActionType.ChangeBacktrace, { backtrace });
@@ -349,6 +362,27 @@ const performCompileToLLVMOnly = () =>
     failure: receiveCompileLlvmIrFailure,
   });
 
+const requestCompileHir = () =>
+  createAction(ActionType.CompileHirRequest);
+
+const receiveCompileHirSuccess = ({ code, stdout, stderr }) =>
+  createAction(ActionType.CompileHirSucceeded, { code, stdout, stderr });
+
+const receiveCompileHirFailure = ({ error }) =>
+  createAction(ActionType.CompileHirFailed, { error });
+
+const performCompileToHirOnly = () =>
+  performCompileShow('hir', {
+    request: requestCompileHir,
+    success: receiveCompileHirSuccess,
+    failure: receiveCompileHirFailure,
+  });
+
+const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
+  dispatch(changeChannel(Channel.Nightly));
+  dispatch(performCompileToHirOnly());
+};
+
 const requestCompileMir = () =>
   createAction(ActionType.CompileMirRequest);
 
@@ -393,6 +427,7 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Test]: performTestOnly,
   [PrimaryActionAuto.Auto]: performAutoOnly,
   [PrimaryActionCore.LlvmIr]: performCompileToLLVMOnly,
+  [PrimaryActionCore.Hir]: performCompileToHirOnly,
   [PrimaryActionCore.Mir]: performCompileToMirOnly,
   [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
 };
@@ -420,6 +455,8 @@ export const performCompileToLLVM =
   performAndSwitchPrimaryAction(performCompileToLLVMOnly, PrimaryActionCore.LlvmIr);
 export const performCompileToMir =
   performAndSwitchPrimaryAction(performCompileToMirOnly, PrimaryActionCore.Mir);
+export const performCompileToNightlyHir =
+  performAndSwitchPrimaryAction(performCompileToNightlyHirOnly, PrimaryActionCore.Hir);
 export const performCompileToNightlyWasm =
   performAndSwitchPrimaryAction(performCompileToNightlyWasmOnly, PrimaryActionCore.Wasm);
 
@@ -683,7 +720,13 @@ export function performVersionsLoad(): ThunkAction {
 const notificationSeen = (notification: Notification) =>
   createAction(ActionType.NotificationSeen, { notification });
 
-export const seenRust2018IsDefault = () => notificationSeen(Notification.Rust2018IsDefault);
+export const seenRustSurvey2020 = () => notificationSeen(Notification.RustSurvey2020);
+
+export const browserWidthChanged = (isSmall: boolean) =>
+  createAction(ActionType.BrowserWidthChanged, { isSmall });
+
+export const splitRatioChanged = () =>
+  createAction(ActionType.SplitRatioChanged);
 
 function parseChannel(s: string): Channel | null {
   switch (s) {
@@ -715,6 +758,8 @@ function parseEdition(s: string): Edition | null {
       return Edition.Rust2015;
     case '2018':
       return Edition.Rust2018;
+    case '2021':
+      return Edition.Rust2021;
     default:
       return null;
   }
@@ -781,7 +826,7 @@ export type Action =
   | ReturnType<typeof changeBacktrace>
   | ReturnType<typeof changeChannel>
   | ReturnType<typeof changeDemangleAssembly>
-  | ReturnType<typeof changeEdition>
+  | ReturnType<typeof changeEditionRaw>
   | ReturnType<typeof changeEditor>
   | ReturnType<typeof changeFocus>
   | ReturnType<typeof changeKeybinding>
@@ -802,6 +847,9 @@ export type Action =
   | ReturnType<typeof requestCompileMir>
   | ReturnType<typeof receiveCompileMirSuccess>
   | ReturnType<typeof receiveCompileMirFailure>
+  | ReturnType<typeof requestCompileHir>
+  | ReturnType<typeof receiveCompileHirSuccess>
+  | ReturnType<typeof receiveCompileHirFailure>
   | ReturnType<typeof requestCompileWasm>
   | ReturnType<typeof receiveCompileWasmSuccess>
   | ReturnType<typeof receiveCompileWasmFailure>
@@ -837,4 +885,6 @@ export type Action =
   | ReturnType<typeof resetEditorToEmpty>
   | ReturnType<typeof resetEditorToMinimal>
   | ReturnType<typeof resetEditorToHello>
+  | ReturnType<typeof browserWidthChanged>
+  | ReturnType<typeof splitRatioChanged>
   ;

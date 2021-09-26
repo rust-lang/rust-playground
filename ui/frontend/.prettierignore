@@ -1,0 +1,10 @@
+build
+node_modules
+
+# Not for these ready yet
+.babelrc
+*.js
+*.json
+*.ts
+*.tsx
+*.scss

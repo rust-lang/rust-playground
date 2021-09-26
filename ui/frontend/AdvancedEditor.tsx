@@ -1,8 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
+import { aceResizeKey, offerCrateAutocompleteOnUse } from './selectors';
 
 import State from './state';
-import { CommonEditorProps, Crate, Edition, Focus, PairCharacters, Position, Selection } from './types';
+import { AceResizeKey, CommonEditorProps, Crate, PairCharacters, Position, Selection } from './types';
+
+import styles from './Editor.module.css';
 
 type Ace = typeof import('ace-builds');
 type AceEditor = import('ace-builds').Ace.Editor;
@@ -67,7 +70,7 @@ interface AdvancedEditorProps {
   selection: Selection;
   theme: string;
   crates: Crate[];
-  focus?: Focus;
+  resizeKey?: AceResizeKey;
   pairCharacters: PairCharacters;
 }
 
@@ -104,6 +107,7 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
 
     editor.setOptions({
       enableBasicAutocompletion: true,
+      fixedWidthGutter: true,
     });
 
     const danglingElement = child.current;
@@ -281,14 +285,14 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
   // 4. Try to scroll
   //
   // Ace doesn't know that we changed the visible area and so
-  // doesn't recalculate. Knowing if the focus changed is enough
-  // to force such a recalculation.
-  useEditorProp(editor, props.focus, useCallback((editor, _focus) => {
+  // doesn't recalculate. We track factors that lead to this case to
+  // force such a recalculation.
+  useEditorProp(editor, props.resizeKey, useCallback((editor, _resizeKey) => {
     editor.resize();
   }, []));
 
   return (
-    <div className="editor-advanced" ref={child} />
+    <div className={styles.advanced} ref={child} />
   );
 };
 
@@ -321,7 +325,7 @@ interface AdvancedEditorAsyncProps {
   selection: Selection;
   theme: string;
   crates: Crate[];
-  focus?: Focus;
+  resizeKey?: AceResizeKey;
   pairCharacters: PairCharacters;
 }
 
@@ -462,7 +466,7 @@ interface AdvancedEditorAsyncState {
 interface PropsFromState {
   theme: string;
   keybinding?: string;
-  focus?: Focus;
+  resizeKey?: AceResizeKey;
   autocompleteOnUse: boolean;
   pairCharacters: PairCharacters;
 }
@@ -474,8 +478,8 @@ const mapStateToProps = (state: State) => {
     theme,
     pairCharacters,
     keybinding: keybinding === 'ace' ? null : keybinding,
-    focus: state.output.meta.focus,
-    autocompleteOnUse: state.configuration.edition === Edition.Rust2018,
+    resizeKey: aceResizeKey(state),
+    autocompleteOnUse: offerCrateAutocompleteOnUse(state),
   };
 };
 

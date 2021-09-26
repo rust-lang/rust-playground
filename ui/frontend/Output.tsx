@@ -12,11 +12,12 @@ import SimplePane, { SimplePaneProps } from './Output/SimplePane';
 import PaneWithMir from './Output/PaneWithMir';
 import * as selectors from './selectors';
 
+import styles from './Output.module.css';
+
 const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
   if (selectors.hasProperties(tabProps)) {
-    const selected = focus === kind ? 'output-tab-selected' : '';
     return (
-      <button className={`output-tab ${selected}`}
+      <button className={focus === kind ? styles.tabSelected : styles.tab}
         onClick={onClick}>
         {label}
       </button>
@@ -46,7 +47,7 @@ interface PaneWithCodeProps extends SimplePaneProps {
 
 const Output: React.SFC = () => {
   const somethingToShow = useSelector(selectors.getSomethingToShow);
-  const { meta: { focus }, execute, format, clippy, miri, macroExpansion, assembly, llvmIr, mir, wasm, gist } =
+  const { meta: { focus }, execute, format, clippy, miri, macroExpansion, assembly, llvmIr, mir, hir, wasm, gist } =
     useSelector((state: State) => state.output);
 
   const dispatch = useDispatch();
@@ -59,6 +60,7 @@ const Output: React.SFC = () => {
   const focusAssembly = useCallback(() => dispatch(actions.changeFocus(Focus.Asm)), [dispatch]);
   const focusLlvmIr = useCallback(() => dispatch(actions.changeFocus(Focus.LlvmIr)), [dispatch]);
   const focusMir = useCallback(() => dispatch(actions.changeFocus(Focus.Mir)), [dispatch]);
+  const focusHir = useCallback(() => dispatch(actions.changeFocus(Focus.Hir)), [dispatch]);
   const focusWasm = useCallback(() => dispatch(actions.changeFocus(Focus.Wasm)), [dispatch]);
   const focusGist = useCallback(() => dispatch(actions.changeFocus(Focus.Gist)), [dispatch]);
 
@@ -69,13 +71,10 @@ const Output: React.SFC = () => {
   let close = null;
   let body = null;
   if (focus) {
-    close = (
-      <button className="output-tab output-tab-close"
-        onClick={focusClose}>Close</button>
-    );
+    close = <button className={styles.tabClose} onClick={focusClose}>Close</button>;
 
     body = (
-      <div className="output-body">
+      <div className={styles.body}>
         {focus === Focus.Execute && <Execute />}
         {focus === Focus.Format && <SimplePane {...format} kind="format" />}
         {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
@@ -84,6 +83,7 @@ const Output: React.SFC = () => {
         {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
         {focus === Focus.LlvmIr && <PaneWithCode {...llvmIr} kind="llvm-ir" />}
         {focus === Focus.Mir && <PaneWithMir {...mir} kind="mir" />}
+        {focus === Focus.Hir && <PaneWithMir {...hir} kind="hir" />}
         {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
         {focus === Focus.Gist && <Gist />}
       </div>
@@ -91,8 +91,8 @@ const Output: React.SFC = () => {
   }
 
   return (
-    <div className="output">
-      <div className="output-tabs">
+    <div className={styles.container} data-test-id="output">
+      <div className={styles.tabs}>
         <Tab kind={Focus.Execute} focus={focus}
           label="Execution"
           onClick={focusExecute}
@@ -125,6 +125,10 @@ const Output: React.SFC = () => {
           label="MIR"
           onClick={focusMir}
           tabProps={mir} />
+        <Tab kind={Focus.Hir} focus={focus}
+          label="HIR"
+          onClick={focusHir}
+          tabProps={hir} />
         <Tab kind={Focus.Wasm} focus={focus}
           label="WASM"
           onClick={focusWasm}
@@ -135,7 +139,7 @@ const Output: React.SFC = () => {
           tabProps={gist} />
         {close}
       </div>
-      {body}
+      { body}
     </div>
   );
 };

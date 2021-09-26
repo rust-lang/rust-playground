@@ -74,6 +74,7 @@ export enum PrimaryActionCore {
   Compile = 'compile',
   Execute = 'execute',
   LlvmIr = 'llvm-ir',
+  Hir = 'hir',
   Mir = 'mir',
   Test = 'test',
   Wasm = 'wasm',
@@ -95,6 +96,7 @@ export enum Mode {
 export enum Edition {
   Rust2015 = '2015',
   Rust2018 = '2018',
+  Rust2021 = '2021',
 }
 
 export enum Backtrace {
@@ -108,6 +110,7 @@ export enum Focus {
   MacroExpansion = 'macro-expansion',
   LlvmIr = 'llvm-ir',
   Mir = 'mir',
+  Hir = 'hir',
   Wasm = 'wasm',
   Asm = 'asm',
   Execute = 'execute',
@@ -116,5 +119,7 @@ export enum Focus {
 }
 
 export enum Notification {
-  Rust2018IsDefault = 'rust-2018-is-default',
+  RustSurvey2020 = 'rust-survey-2020',
 }
+
+export type AceResizeKey = [Focus, number];

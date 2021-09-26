@@ -1,5 +1,5 @@
 use serde_derive::Deserialize;
-use snafu::{ResultExt, Snafu};
+use snafu::{OptionExt, ResultExt, Snafu};
 use std::{
     collections::BTreeMap,
     ffi::OsStr,
@@ -57,10 +57,20 @@ pub enum Error {
     UnableToCreateSourceFile { source: io::Error },
     #[snafu(display("Unable to set permissions for source file: {}", source))]
     UnableToSetSourcePermissions { source: io::Error },
-    #[snafu(display("Unable to execute the compiler: {}", source))]
-    UnableToExecuteCompiler { source: io::Error },
+
+    #[snafu(display("Unable to start the compiler: {}", source))]
+    UnableToStartCompiler { source: io::Error },
+    #[snafu(display("Unable to find the compiler ID"))]
+    MissingCompilerId,
+    #[snafu(display("Unable to wait for the compiler: {}", source))]
+    UnableToWaitForCompiler { source: io::Error },
+    #[snafu(display("Unable to get output from the compiler: {}", source))]
+    UnableToGetOutputFromCompiler { source: io::Error },
+    #[snafu(display("Unable to remove the compiler: {}", source))]
+    UnableToRemoveCompiler { source: io::Error },
     #[snafu(display("Compiler execution took longer than {} ms", timeout.as_millis()))]
     CompilerExecutionTimedOut { source: tokio::time::Elapsed, timeout: Duration },
+
     #[snafu(display("Unable to read output file: {}", source))]
     UnableToReadOutput { source: io::Error },
     #[snafu(display("Unable to read crate information: {}", source))]
@@ -159,6 +169,8 @@ impl Sandbox {
             if process == ProcessAssembly::Filter {
                 code = super::asm_cleanup::filter_asm(&code);
             }
+        } else if CompileTarget::Hir == req.target {
+            // TODO: Run rustfmt on the generated HIR.
         }
 
         Ok(CompileResponse {
@@ -386,8 +398,7 @@ impl Sandbox {
             "cargo",
             "rustc",
             "--",
-            "-Zunstable-options",
-            "--pretty=expanded",
+            "-Zunpretty=expanded",
         ]);
 
         log::debug!("Macro expansion command is {:?}", cmd);
@@ -417,21 +428,28 @@ impl Sandbox {
     }
 }
 
-fn basic_secure_docker_command() -> Command {
-    let mut cmd = Command::new("docker");
+macro_rules! docker_command {
+    ($($arg:expr),* $(,)?) => ({
+        let mut cmd = Command::new("docker");
+        $( cmd.arg($arg); )*
+        cmd
+    });
+}
 
-    cmd
-        .arg("run")
-        .arg("--rm")
-        .arg("--cap-drop=ALL")
+fn basic_secure_docker_command() -> Command {
+    let mut cmd = docker_command!(
+        "run",
+        "--detach",
+        "--cap-drop=ALL",
         // Needed to allow overwriting the file
-        .arg("--cap-add=DAC_OVERRIDE")
-        .arg("--security-opt=no-new-privileges")
-        .args(&["--workdir", "/playground"])
-        .args(&["--net", "none"])
-        .args(&["--memory", "256m"])
-        .args(&["--memory-swap", "320m"])
-        .args(&["--env", &format!("PLAYGROUND_TIMEOUT={}", DOCKER_PROCESS_TIMEOUT_SOFT.as_secs())]);
+        "--cap-add=DAC_OVERRIDE",
+        "--security-opt=no-new-privileges",
+        "--workdir", "/playground",
+        "--net", "none",
+        "--memory", "512m",
+        "--memory-swap", "640m",
+        "--env", format!("PLAYGROUND_TIMEOUT={}", DOCKER_PROCESS_TIMEOUT_SOFT.as_secs()),
+    );
 
     if cfg!(feature = "fork-bomb-prevention") {
         cmd.args(&["--pids-limit", "512"]);
@@ -462,7 +480,13 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
     }
 
     if let Some(target) = target {
-        cmd.extend(&["--", "-o", "/playground-result/compilation"]);
+        cmd.extend(&["--", "-o"]);
+        if target == Hir {
+            // -Zunpretty=hir only emits the HIR, not the binary itself
+            cmd.push("/playground-result/compilation.hir");
+        } else {
+            cmd.push("/playground-result/compilation");
+        }
 
         match target {
             Assembly(flavor, _, _) => {
@@ -484,6 +508,7 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
             },
             LlvmIr => cmd.push("--emit=llvm-ir"),
             Mir => cmd.push("--emit=mir"),
+            Hir => cmd.push("-Zunpretty=hir"),
             Wasm => { /* handled by cargo-wasm wrapper */ },
          }
     }
@@ -519,12 +544,58 @@ fn read(path: &Path) -> Result<Option<String>> {
 
 #[tokio::main]
 async fn run_command_with_timeout(mut command: Command) -> Result<std::process::Output> {
+    use std::os::unix::process::ExitStatusExt;
+
     let timeout = DOCKER_PROCESS_TIMEOUT_HARD;
 
-    tokio::time::timeout(timeout, command.output())
+    let output = command.output()
         .await
-        .context(CompilerExecutionTimedOut { timeout })?
-        .context(UnableToExecuteCompiler)
+        .context(UnableToStartCompiler)?;
+
+    // Exit early, in case we don't have the container
+    if !output.status.success() {
+        return Ok(output);
+    }
+
+    let output = String::from_utf8_lossy(&output.stdout);
+    let id = output.lines().next().context(MissingCompilerId)?.trim();
+
+    // ----------
+
+    let mut command = docker_command!("wait", id);
+
+    let timed_out = match tokio::time::timeout(timeout, command.output()).await {
+        Ok(Ok(o)) => {
+            // Didn't time out, didn't fail to run
+            let o = String::from_utf8_lossy(&o.stdout);
+            let code = o.lines().next().unwrap_or("").trim().parse().unwrap_or(i32::MAX);
+            Ok(ExitStatusExt::from_raw(code))
+        }
+        Ok(e) => return e.context(UnableToWaitForCompiler), // Failed to run
+        Err(e) => Err(e), // Timed out
+    };
+
+    // ----------
+
+    let mut command = docker_command!("logs", id);
+    let mut output = command.output().await.context(UnableToGetOutputFromCompiler)?;
+
+    // ----------
+
+    let mut command = docker_command!(
+        "rm",
+        // Kills container if still running
+        "--force",
+        id
+    );
+    command.stdout(std::process::Stdio::null());
+    command.status().await.context(UnableToRemoveCompiler)?;
+
+    let code = timed_out.context(CompilerExecutionTimedOut { timeout })?;
+
+    output.status = code;
+
+    Ok(output)
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -544,11 +615,13 @@ pub enum ProcessAssembly {
     Filter,
     Raw,
 }
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum CompileTarget {
     Assembly(AssemblyFlavor, DemangleAssembly, ProcessAssembly),
     LlvmIr,
     Mir,
+    Hir,
     Wasm,
 }
 
@@ -558,6 +631,7 @@ impl CompileTarget {
             CompileTarget::Assembly(_, _, _) => "s",
             CompileTarget::LlvmIr            => "ll",
             CompileTarget::Mir               => "mir",
+            CompileTarget::Hir               => "hir",
             CompileTarget::Wasm              => "wat",
         };
         OsStr::new(ext)
@@ -572,12 +646,13 @@ impl fmt::Display for CompileTarget {
             Assembly(_, _, _) => "assembly".fmt(f),
             LlvmIr            => "LLVM IR".fmt(f),
             Mir               => "Rust MIR".fmt(f),
+            Hir               => "Rust HIR".fmt(f),
             Wasm              => "WebAssembly".fmt(f),
         }
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Channel {
     Stable,
     Beta,
@@ -596,16 +671,17 @@ impl Channel {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Mode {
     Debug,
     Release,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Edition {
     Rust2015,
     Rust2018,
+    Rust2021, // TODO - add parallel tests for 2021
 }
 
 impl Edition {
@@ -615,11 +691,12 @@ impl Edition {
         match *self {
             Rust2015 => "2015",
             Rust2018 => "2018",
+            Rust2021 => "2021",
         }
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum CrateType {
     Binary,
     Library(LibraryType),
@@ -636,7 +713,7 @@ impl CrateType {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum LibraryType {
     Lib,
     Dylib,
@@ -853,6 +930,22 @@ pub struct MacroExpansionResponse {
 mod test {
     use super::*;
 
+    // Running the tests completely in parallel causes spurious
+    // failures due to my resource-limited Docker
+    // environment. Additionally, we have some tests that *require*
+    // that no other Docker processes are running.
+    fn one_test_at_a_time() -> impl Drop {
+        use lazy_static::lazy_static;
+        use std::sync::Mutex;
+
+        lazy_static! {
+            static ref DOCKER_SINGLETON: Mutex<()> = Default::default();
+        }
+
+        // We can't poison the empty tuple
+        DOCKER_SINGLETON.lock().unwrap_or_else(|e| e.into_inner())
+    }
+
     const HELLO_WORLD_CODE: &'static str = r#"
     fn main() {
         println!("Hello, world!");
@@ -900,6 +993,7 @@ mod test {
 
     #[test]
     fn basic_functionality() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest::default();
 
         let sb = Sandbox::new().expect("Unable to create sandbox");
@@ -922,6 +1016,7 @@ mod test {
 
     #[test]
     fn debug_mode() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             code: COMPILATION_MODE_CODE.to_string(),
             ..ExecuteRequest::default()
@@ -935,6 +1030,7 @@ mod test {
 
     #[test]
     fn release_mode() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             mode: Mode::Release,
             code: COMPILATION_MODE_CODE.to_string(),
@@ -959,6 +1055,7 @@ mod test {
 
     #[test]
     fn stable_channel() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Stable,
             code: VERSION_CODE.to_string(),
@@ -975,6 +1072,7 @@ mod test {
 
     #[test]
     fn beta_channel() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Beta,
             code: VERSION_CODE.to_string(),
@@ -991,6 +1089,7 @@ mod test {
 
     #[test]
     fn nightly_channel() {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Nightly,
             code: VERSION_CODE.to_string(),
@@ -1016,6 +1115,7 @@ mod test {
 
     #[test]
     fn rust_edition_default() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Nightly,
             code: EDITION_CODE.to_string(),
@@ -1030,6 +1130,7 @@ mod test {
 
     #[test]
     fn rust_edition_2015() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Nightly,
             code: EDITION_CODE.to_string(),
@@ -1045,6 +1146,7 @@ mod test {
 
     #[test]
     fn rust_edition_2018() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             channel: Channel::Nightly,
             code: EDITION_CODE.to_string(),
@@ -1072,6 +1174,7 @@ mod test {
 
     #[test]
     fn backtrace_disabled() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             code: BACKTRACE_CODE.to_string(),
             backtrace: false,
@@ -1089,6 +1192,7 @@ mod test {
 
     #[test]
     fn backtrace_enabled() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = ExecuteRequest {
             code: BACKTRACE_CODE.to_string(),
             backtrace: true,
@@ -1106,6 +1210,7 @@ mod test {
 
     #[test]
     fn output_llvm_ir() {
+        let _singleton = one_test_at_a_time();
         let req = CompileRequest {
             target: CompileTarget::LlvmIr,
             ..CompileRequest::default()
@@ -1121,6 +1226,7 @@ mod test {
 
     #[test]
     fn output_assembly() {
+        let _singleton = one_test_at_a_time();
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Raw),
             ..CompileRequest::default()
@@ -1137,6 +1243,7 @@ mod test {
 
     #[test]
     fn output_demangled_assembly() {
+        let _singleton = one_test_at_a_time();
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Demangle, ProcessAssembly::Raw),
             ..CompileRequest::default()
@@ -1152,6 +1259,7 @@ mod test {
     #[test]
     #[should_panic]
     fn output_filtered_assembly() {
+        let _singleton = one_test_at_a_time();
         let req = CompileRequest {
             target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Filter),
             ..CompileRequest::default()
@@ -1166,6 +1274,7 @@ mod test {
 
     #[test]
     fn formatting_code() {
+        let _singleton = one_test_at_a_time();
         let req = FormatRequest {
             code: "fn foo () { method_call(); }".to_string(),
             edition: None,
@@ -1188,6 +1297,7 @@ mod test {
 
     #[test]
     fn formatting_code_edition_2015() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = FormatRequest {
             code: FORMAT_IN_EDITION_2018.to_string(),
             edition: Some(Edition::Rust2015),
@@ -1201,6 +1311,7 @@ mod test {
 
     #[test]
     fn formatting_code_edition_2018() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let req = FormatRequest {
             code: FORMAT_IN_EDITION_2018.to_string(),
             edition: Some(Edition::Rust2018),
@@ -1221,6 +1332,7 @@ mod test {
 
     #[test]
     fn linting_code() {
+        let _singleton = one_test_at_a_time();
         let code = r#"
         fn main() {
             let a = 0.0 / 0.0;
@@ -1242,6 +1354,7 @@ mod test {
 
     #[test]
     fn linting_code_options() {
+        let _singleton = one_test_at_a_time();
         let code = r#"
         use itertools::Itertools; // Edition 2018 feature
 
@@ -1266,6 +1379,7 @@ mod test {
 
     #[test]
     fn interpreting_code() -> Result<()> {
+        let _singleton = one_test_at_a_time();
         let code = r#"
         fn main() {
             let mut a: [u8; 0] = [];
@@ -1282,13 +1396,14 @@ mod test {
         let resp = sb.miri(&req)?;
 
         assert!(resp.stderr.contains("pointer must be in-bounds at offset 1"), "was: {}", resp.stderr);
-        assert!(resp.stderr.contains("outside bounds of allocation"), "was: {}", resp.stderr);
+        assert!(resp.stderr.contains("outside bounds of alloc"), "was: {}", resp.stderr);
         assert!(resp.stderr.contains("which has size 0"), "was: {}", resp.stderr);
         Ok(())
     }
 
     #[test]
     fn network_connections_are_disabled() {
+        let _singleton = one_test_at_a_time();
         let code = r#"
             fn main() {
                 match ::std::net::TcpStream::connect("google.com:80") {
@@ -1311,6 +1426,7 @@ mod test {
 
     #[test]
     fn memory_usage_is_limited() {
+        let _singleton = one_test_at_a_time();
         let code = r#"
             fn main() {
                 let megabyte = 1024 * 1024;
@@ -1332,6 +1448,7 @@ mod test {
 
     #[test]
     fn wallclock_time_is_limited() {
+        let _singleton = one_test_at_a_time();
         let code = r#"
             fn main() {
                 let a_long_time = std::time::Duration::from_secs(20);
@@ -1352,6 +1469,7 @@ mod test {
 
     #[test]
     fn wallclock_time_is_limited_from_outside() {
+        let _singleton = one_test_at_a_time();
         let code = r##"
             use std::{process::Command, thread, time::Duration};
 
@@ -1374,6 +1492,17 @@ mod test {
             }
         "##;
 
+        #[tokio::main]
+        async fn docker_process_count() -> usize {
+            let mut cmd = docker_command!("ps", "-a");
+            let output = cmd.output().await.expect("Unable to get process count");
+            let output = String::from_utf8_lossy(&output.stdout);
+            // Skip one line of header
+            output.lines().skip(1).count()
+        }
+
+        assert_eq!(0, docker_process_count(), "There must be no running docker processes");
+
         let req = ExecuteRequest {
             code: code.to_string(),
             ..ExecuteRequest::default()
@@ -1385,10 +1514,13 @@ mod test {
             Err(Error::CompilerExecutionTimedOut{..}) => {/* Ok */}
             Err(e) => panic!("Got the wrong error: {}", e),
         }
+
+        assert_eq!(0, docker_process_count(), "A docker process continues to run");
     }
 
     #[test]
     fn number_of_pids_is_limited() {
+        let _singleton = one_test_at_a_time();
         let forkbomb = r##"
             fn main() {
                 ::std::process::Command::new("sh").arg("-c").arg(r#"

@@ -2,6 +2,8 @@ import React from 'react';
 
 import MenuItem from './MenuItem';
 
+import styles from './ConfigElement.module.css';
+
 interface EitherProps extends ConfigElementProps {
   id: string;
   a: string;
@@ -15,7 +17,7 @@ interface EitherProps extends ConfigElementProps {
 export const Either: React.SFC<EitherProps> =
   ({ id, a, b, aLabel = a, bLabel = b, value, onChange, ...rest }) => (
     <ConfigElement {...rest}>
-      <div className="config-element__toggle">
+      <div className={styles.toggle}>
         <input id={`${id}-a`}
           name={id}
           value={a}
@@ -41,7 +43,7 @@ interface SelectProps extends ConfigElementProps {
 
 export const Select: React.SFC<SelectProps> = ({ value, onChange, children, ...rest }) => (
   <ConfigElement {...rest}>
-    <select className="config-element__select" value={value} onChange={e => onChange(e.target.value)}>
+    <select className={styles.select} value={value} onChange={e => onChange(e.target.value)}>
       {children}
     </select>
   </ConfigElement>
@@ -50,15 +52,17 @@ export const Select: React.SFC<SelectProps> = ({ value, onChange, children, ...r
 interface ConfigElementProps {
   name: string;
   isNotDefault?: boolean;
+  aside?: JSX.Element,
 }
 
-const ConfigElement: React.SFC<ConfigElementProps> = ({ name, isNotDefault, children }) => (
+const ConfigElement: React.SFC<ConfigElementProps> = ({ name, isNotDefault, aside, children }) => (
   <MenuItem>
-    <div className="config-element">
-      <span className={`config-element__name ${isNotDefault ? 'config-element__name--not-default' : ''}`}>{name}</span>
-      <div className="config-element__value">
+    <div className={styles.container}>
+      <span className={isNotDefault ? styles.notDefault : styles.name}>{name}</span>
+      <div className={styles.value}>
         {children}
       </div>
     </div>
+    {aside}
   </MenuItem>
 );

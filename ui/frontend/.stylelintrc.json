@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-css-modules",
+    "stylelint-config-idiomatic-order"
+  ],
+  "rules": {
+    "value-keyword-case": ["lower", {
+      "ignoreProperties": [
+        "composes"
+      ]
+    }]
+  }
+}
