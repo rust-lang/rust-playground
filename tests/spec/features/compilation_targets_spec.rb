@@ -54,7 +54,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
         # We demangle the symbols
         expect(page).to have_content 'playground::main:'
 
-        expect(page).to have_content 'movq %rdi, %rax'
+        expect(page).to have_content 'addq $40, %rsp'
       end
     end
   end
@@ -71,7 +71,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
         # We demangle the symbols
         expect(page).to have_content 'playground::main:'
 
-        expect(page).to have_content 'mov rax, rdi'
+        expect(page).to have_content 'add rsp, 40'
       end
     end
   end
