@@ -31,6 +31,9 @@ export default function meta(state = DEFAULT, action: Action) {
 
     case ActionType.CompileHirRequest:
       return { ...state, focus: Focus.Hir };
+    
+    case ActionType.CompileAstRequest:
+      return { ...state, focus: Focus.Ast };
 
     case ActionType.CompileWasmRequest:
       return { ...state, focus: Focus.Wasm };

@@ -71,6 +71,7 @@ const LABELS: { [index in PrimaryActionCore]: string } = {
   [PrimaryActionCore.Compile]: 'Build',
   [PrimaryActionCore.Execute]: 'Run',
   [PrimaryActionCore.LlvmIr]: 'Show LLVM IR',
+  [PrimaryActionCore.Ast]: 'Show AST',
   [PrimaryActionCore.Hir]: 'Show HIR',
   [PrimaryActionCore.Mir]: 'Show MIR',
   [PrimaryActionCore.Test]: 'Test',
@@ -108,6 +109,7 @@ export const isNightlyChannel = (state: State) => (
 );
 export const isWasmAvailable = isNightlyChannel;
 export const isHirAvailable = isNightlyChannel;
+export const isAstAvailable = isNightlyChannel;
 export const isRust2021Available = isNightlyChannel;
 
 export const getModeLabel = (state: State) => {
@@ -147,6 +149,7 @@ const getOutputs = (state: State) => [
   state.output.llvmIr,
   state.output.mir,
   state.output.hir,
+  state.output.ast,
   state.output.miri,
   state.output.macroExpansion,
   state.output.wasm,

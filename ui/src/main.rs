@@ -1429,6 +1429,7 @@ fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
         "llvm-ir" => sandbox::CompileTarget::LlvmIr,
         "mir" => sandbox::CompileTarget::Mir,
         "hir" => sandbox::CompileTarget::Hir,
+        "ast" => sandbox::CompileTarget::Ast,
         "wasm" => sandbox::CompileTarget::Wasm,
         value => InvalidTarget { value }.fail()?,
     })

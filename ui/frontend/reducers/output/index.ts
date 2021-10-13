@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 
 import assembly from './assembly';
+import ast from './ast';
 import clippy from './clippy';
 import execute from './execute';
 import format from './format';
@@ -23,6 +24,7 @@ const output = combineReducers({
   llvmIr,
   mir,
   hir,
+  ast,
   wasm,
   execute,
   gist,

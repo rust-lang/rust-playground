@@ -484,6 +484,9 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
         if target == Hir {
             // -Zunpretty=hir only emits the HIR, not the binary itself
             cmd.push("/playground-result/compilation.hir");
+        } else if target == Ast {
+            // -Zunpretty=ast-tree only emits the AST, not the binary itself
+            cmd.push("/playground-result/compilation.ast");
         } else {
             cmd.push("/playground-result/compilation");
         }
@@ -509,6 +512,7 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
             LlvmIr => cmd.push("--emit=llvm-ir"),
             Mir => cmd.push("--emit=mir"),
             Hir => cmd.push("-Zunpretty=hir"),
+            Ast => cmd.push("-Zunpretty=ast-tree"),
             Wasm => { /* handled by cargo-wasm wrapper */ },
          }
     }
@@ -622,6 +626,7 @@ pub enum CompileTarget {
     LlvmIr,
     Mir,
     Hir,
+    Ast,
     Wasm,
 }
 
@@ -632,6 +637,7 @@ impl CompileTarget {
             CompileTarget::LlvmIr            => "ll",
             CompileTarget::Mir               => "mir",
             CompileTarget::Hir               => "hir",
+            CompileTarget::Ast               => "ast",
             CompileTarget::Wasm              => "wat",
         };
         OsStr::new(ext)
@@ -647,6 +653,7 @@ impl fmt::Display for CompileTarget {
             LlvmIr            => "LLVM IR".fmt(f),
             Mir               => "Rust MIR".fmt(f),
             Hir               => "Rust HIR".fmt(f),
+            Ast               => "Rust AST".fmt(f),
             Wasm              => "WebAssembly".fmt(f),
         }
     }
