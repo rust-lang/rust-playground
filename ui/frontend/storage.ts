@@ -1,12 +1,13 @@
 import { merge } from 'lodash';
 import { StoreEnhancer, StoreEnhancerStoreCreator } from 'redux';
+import { DeepPartial } from 'ts-essentials';
 
 type SimpleStorage = Pick<Storage, 'getItem' | 'setItem'>;
 
 interface Config<S> {
   storageFactory: () => SimpleStorage;
   serialize: (state: S) => string;
-  deserialize: (state: string) => S;
+  deserialize: (state: string) => DeepPartial<S>;
 }
 
 export class InMemoryStorage {
