@@ -25,8 +25,11 @@ const allKeybindings = allKeybindingNames.concat(['ace']).sort();
 const allThemes = allThemeNames;
 
 // The name is nicer to debug with, but changing names breaks long-term-caching
-const developmentFilenameTemplate = '[name]-[chunkhash]';
-const productionFilenameTemplate = '[chunkhash]';
+const developmentFilenameTemplate = '[name]-[contenthash]';
+const developmentChunkFilenameTemplate = '[name]-[chunkhash]';
+
+const productionFilenameTemplate = '[contenthash]';
+const productionChunkFilenameTemplate = '[chunkhash]';
 
 module.exports = function(_, argv) {
   const isProduction = argv.mode === 'production';
@@ -34,6 +37,10 @@ module.exports = function(_, argv) {
         isProduction ?
         productionFilenameTemplate :
         developmentFilenameTemplate;
+  const chunkFilenameTemplate =
+        isProduction ?
+        productionChunkFilenameTemplate :
+        developmentChunkFilenameTemplate;
 
   const devtool =
         isProduction ?
@@ -61,7 +68,7 @@ module.exports = function(_, argv) {
       publicPath: 'assets/',
       path: `${__dirname}/build/assets`,
       filename: `${filenameTemplate}.js`,
-      chunkFilename: `${filenameTemplate}.js`,
+      chunkFilename: `${chunkFilenameTemplate}.js`,
     },
 
     resolve: {
@@ -137,7 +144,7 @@ module.exports = function(_, argv) {
       }),
       new MiniCssExtractPlugin({
         filename: `${filenameTemplate}.css`,
-        chunkFilename: `${filenameTemplate}.css`,
+        chunkFilename: `${chunkFilenameTemplate}.css`,
       }),
       ...(isProduction ? [new CompressionPlugin()] : []),
     ],
