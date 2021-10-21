@@ -708,7 +708,7 @@ export function performVersionsLoad(): ThunkAction {
 const notificationSeen = (notification: Notification) =>
   createAction(ActionType.NotificationSeen, { notification });
 
-export const seenRustSurvey2020 = () => notificationSeen(Notification.RustSurvey2020);
+export const seenRust2021IsDefault = () => notificationSeen(Notification.Rust2021IsDefault);
 
 export const browserWidthChanged = (isSmall: boolean) =>
   createAction(ActionType.BrowserWidthChanged, { isSmall });

@@ -9,30 +9,29 @@ import * as selectors from './selectors';
 
 import styles from './Notifications.module.css';
 
-const SURVEY_URL = 'https://blog.rust-lang.org/2020/09/10/survey-launch.html';
+const EDITION_URL = 'https://doc.rust-lang.org/edition-guide/';
 
 const Notifications: React.SFC = () => {
   return (
     <Portal>
       <div className={styles.container}>
-        <Rust2020SurveyNotification />
+        <Rust2021IsDefaultNotification />
       </div>
     </Portal>
   );
 };
 
-const Rust2020SurveyNotification: React.SFC = () => {
-  const showRust2020Survey = useSelector(selectors.showRustSurvey2020Selector);
+const Rust2021IsDefaultNotification: React.SFC = () => {
+  const showRust2021IsDefault = useSelector(selectors.showRust2021IsDefaultSelector);
 
   const dispatch = useDispatch();
-  const seenRustSurvey2020 = useCallback(() => dispatch(actions.seenRustSurvey2020()), [dispatch]);
+  const seenRust2021IsDefault = useCallback(() => dispatch(actions.seenRust2021IsDefault()), [dispatch]);
 
-  return showRust2020Survey && (
-    <Notification onClose={seenRustSurvey2020}>
-      We want to know your opinions! Your responses to
-      the <a href={SURVEY_URL}>2020 State of Rust Survey</a> will
-      help the project understand its strengths and weaknesses
-      and establish development priorities for the future!
+  return showRust2021IsDefault && (
+    <Notification onClose={seenRust2021IsDefault}>
+      As of Rust 1.56, the default edition of Rust is now Rust
+      2021. Learn more about editions in the <a href={EDITION_URL}>Edition Guide</a>.
+      To specify which edition to use, use the advanced compilation options menu.
     </Notification>
   );
 };

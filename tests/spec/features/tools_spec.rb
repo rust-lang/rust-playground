@@ -64,7 +64,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
       expect(page).to have_content('core::fmt::Arguments::new_v1')
 
       # Third-party procedural macro
-      expect(page).to have_content('block_on(async')
+      expect(page).to have_content('block_on(body)')
 
       # User-specified declarative macro
       expect(page).to have_content('fn created_by_macro() -> i32 { 42 }')
