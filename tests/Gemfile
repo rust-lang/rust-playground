@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 source 'https://rubygems.org'
-ruby '2.7.4'
+ruby '3.0.2'
 
 gem 'capybara', '~> 3.35'
 gem 'rspec', '~> 3.10'
