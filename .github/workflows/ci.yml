@@ -218,6 +218,8 @@ jobs:
       run: yarn --cwd ui/frontend/ test
     - name: Lint
       run: yarn --cwd ui/frontend/ test:lint
+    - name: Style
+      run: yarn --cwd ui/frontend/ test:style
     - name: Build frontend
       run: yarn --cwd ui/frontend/ run build:production
     - name: Save frontend artifact
