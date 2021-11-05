@@ -368,9 +368,9 @@ workflows:
           - *checkout_pr
 
           - name: "Configure Ruby"
-            uses: actions/setup-ruby@v1
+            uses: ruby/setup-ruby@v1
             with:
-              ruby-version: '2.7'
+              ruby-version: '3.0'
 
           - name: "Cache bundler intermediate products"
             uses: actions/cache@v2
