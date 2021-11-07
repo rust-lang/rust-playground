@@ -3,8 +3,6 @@
 name: Validate everything
 'on':
   push:
-    branches:
-    - master
   pull_request_target:
     types:
     - labeled
@@ -218,6 +216,8 @@ jobs:
       run: yarn --cwd ui/frontend/ test
     - name: Lint
       run: yarn --cwd ui/frontend/ test:lint
+    - name: Style
+      run: yarn --cwd ui/frontend/ test:style
     - name: Build frontend
       run: yarn --cwd ui/frontend/ run build:production
     - name: Save frontend artifact
@@ -243,9 +243,9 @@ jobs:
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
     - name: Configure Ruby
-      uses: actions/setup-ruby@v1
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '2.7'
+        ruby-version: 3.0.2
     - name: Cache bundler intermediate products
       uses: actions/cache@v2
       with:
