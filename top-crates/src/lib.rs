@@ -27,13 +27,6 @@ struct TopCrates {
     crates: Vec<Crate>,
 }
 
-/// A single crate from crates.io
-#[derive(Debug, Deserialize)]
-struct OneCrate {
-    #[serde(rename = "crate")]
-    krate: Crate,
-}
-
 /// The shared description of a crate
 #[derive(Debug, Deserialize)]
 struct Crate {
