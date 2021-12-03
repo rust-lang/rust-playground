@@ -30,13 +30,8 @@
     "id": "ansi_term"
   },
   {
-    "name": "ansi_term",
-    "version": "0.11.0",
-    "id": "ansi_term_0_11_0"
-  },
-  {
     "name": "anyhow",
-    "version": "1.0.45",
+    "version": "1.0.51",
     "id": "anyhow"
   },
   {
@@ -126,7 +121,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.71",
+    "version": "1.0.72",
     "id": "cc"
   },
   {
@@ -141,7 +136,7 @@
   },
   {
     "name": "clap",
-    "version": "2.33.3",
+    "version": "2.34.0",
     "id": "clap"
   },
   {
@@ -156,7 +151,7 @@
   },
   {
     "name": "crc32fast",
-    "version": "1.2.1",
+    "version": "1.3.0",
     "id": "crc32fast"
   },
   {
@@ -301,47 +296,47 @@
   },
   {
     "name": "futures",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "id": "futures"
   },
   {
     "name": "futures-channel",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "id": "futures_core"
   },
   {
     "name": "futures-executor",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "id": "futures_io"
   },
   {
     "name": "futures-macro",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "id": "futures_macro"
   },
   {
     "name": "futures-sink",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "id": "futures_sink"
   },
   {
     "name": "futures-task",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "id": "futures_task"
   },
   {
     "name": "futures-util",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "id": "futures_util"
   },
   {
@@ -390,6 +385,11 @@
     "id": "hashlink"
   },
   {
+    "name": "heck",
+    "version": "0.3.3",
+    "id": "heck"
+  },
+  {
     "name": "hmac",
     "version": "0.11.0",
     "id": "hmac"
@@ -416,7 +416,7 @@
   },
   {
     "name": "httpdate",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "id": "httpdate"
   },
   {
@@ -426,7 +426,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.14.14",
+    "version": "0.14.15",
     "id": "hyper"
   },
   {
@@ -481,7 +481,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.107",
+    "version": "0.2.108",
     "id": "libc"
   },
   {
@@ -541,7 +541,7 @@
   },
   {
     "name": "matrixmultiply",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "id": "matrixmultiply"
   },
   {
@@ -561,7 +561,7 @@
   },
   {
     "name": "memoffset",
-    "version": "0.6.4",
+    "version": "0.6.5",
     "id": "memoffset"
   },
   {
@@ -571,7 +571,7 @@
   },
   {
     "name": "miniz_oxide",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "id": "miniz_oxide"
   },
   {
@@ -586,8 +586,13 @@
   },
   {
     "name": "mio",
-    "version": "0.7.14",
+    "version": "0.8.0",
     "id": "mio"
+  },
+  {
+    "name": "mio",
+    "version": "0.7.14",
+    "id": "mio_0_7_14"
   },
   {
     "name": "nalgebra",
@@ -606,7 +611,7 @@
   },
   {
     "name": "ndarray",
-    "version": "0.15.3",
+    "version": "0.15.4",
     "id": "ndarray"
   },
   {
@@ -686,7 +691,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.70",
+    "version": "0.9.71",
     "id": "openssl_sys"
   },
   {
@@ -815,11 +820,6 @@
     "id": "proc_macro_hack"
   },
   {
-    "name": "proc-macro-nested",
-    "version": "0.1.7",
-    "id": "proc_macro_nested"
-  },
-  {
     "name": "proc-macro2",
     "version": "1.0.32",
     "id": "proc_macro2"
@@ -916,7 +916,7 @@
   },
   {
     "name": "reqwest",
-    "version": "0.11.6",
+    "version": "0.11.7",
     "id": "reqwest"
   },
   {
@@ -941,7 +941,7 @@
   },
   {
     "name": "ryu",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "id": "ryu"
   },
   {
@@ -996,7 +996,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.69",
+    "version": "1.0.72",
     "id": "serde_json"
   },
   {
@@ -1081,7 +1081,7 @@
   },
   {
     "name": "syn",
-    "version": "1.0.81",
+    "version": "1.0.82",
     "id": "syn"
   },
   {
@@ -1146,7 +1146,7 @@
   },
   {
     "name": "time",
-    "version": "0.3.4",
+    "version": "0.3.5",
     "id": "time"
   },
   {
@@ -1156,7 +1156,7 @@
   },
   {
     "name": "tinyvec",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "id": "tinyvec"
   },
   {
@@ -1166,7 +1166,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.13.0",
+    "version": "1.14.0",
     "id": "tokio"
   },
   {
