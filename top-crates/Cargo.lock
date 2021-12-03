@@ -1163,7 +1163,7 @@ dependencies = [
 
 [[package]]
 name = "rust-playground-top-crates"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "cargo",
  "itertools",
