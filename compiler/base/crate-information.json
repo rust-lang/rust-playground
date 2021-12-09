@@ -96,8 +96,13 @@
   },
   {
     "name": "block-buffer",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "id": "block_buffer"
+  },
+  {
+    "name": "block-buffer",
+    "version": "0.9.0",
+    "id": "block_buffer_0_9_0"
   },
   {
     "name": "bstr",
@@ -185,6 +190,11 @@
     "id": "crossbeam_utils"
   },
   {
+    "name": "crypto-common",
+    "version": "0.1.0",
+    "id": "crypto_common"
+  },
+  {
     "name": "crypto-mac",
     "version": "0.11.1",
     "id": "crypto_mac"
@@ -216,8 +226,13 @@
   },
   {
     "name": "digest",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "id": "digest"
+  },
+  {
+    "name": "digest",
+    "version": "0.9.0",
+    "id": "digest_0_9_0"
   },
   {
     "name": "dtoa",
@@ -231,7 +246,7 @@
   },
   {
     "name": "encoding_rs",
-    "version": "0.8.29",
+    "version": "0.8.30",
     "id": "encoding_rs"
   },
   {
@@ -371,7 +386,7 @@
   },
   {
     "name": "h2",
-    "version": "0.3.7",
+    "version": "0.3.8",
     "id": "h2"
   },
   {
@@ -461,7 +476,7 @@
   },
   {
     "name": "itertools",
-    "version": "0.10.1",
+    "version": "0.10.3",
     "id": "itertools"
   },
   {
@@ -481,7 +496,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.108",
+    "version": "0.2.109",
     "id": "libc"
   },
   {
@@ -491,7 +506,7 @@
   },
   {
     "name": "libsqlite3-sys",
-    "version": "0.23.1",
+    "version": "0.23.2",
     "id": "libsqlite3_sys"
   },
   {
@@ -781,7 +796,7 @@
   },
   {
     "name": "pkg-config",
-    "version": "0.3.22",
+    "version": "0.3.23",
     "id": "pkg_config"
   },
   {
@@ -821,7 +836,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.32",
+    "version": "1.0.33",
     "id": "proc_macro2"
   },
   {
@@ -926,7 +941,7 @@
   },
   {
     "name": "rusqlite",
-    "version": "0.26.1",
+    "version": "0.26.3",
     "id": "rusqlite"
   },
   {
@@ -981,7 +996,7 @@
   },
   {
     "name": "serde",
-    "version": "1.0.130",
+    "version": "1.0.131",
     "id": "serde"
   },
   {
@@ -991,7 +1006,7 @@
   },
   {
     "name": "serde_derive",
-    "version": "1.0.130",
+    "version": "1.0.131",
     "id": "serde_derive"
   },
   {

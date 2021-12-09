@@ -88,6 +88,10 @@ version = "=1.3.2"
 
 [dependencies.block_buffer]
 package = "block-buffer"
+version = "=0.10.0"
+
+[dependencies.block_buffer_0_9_0]
+package = "block-buffer"
 version = "=0.9.0"
 
 [dependencies.bstr]
@@ -160,6 +164,10 @@ version = "=0.3.2"
 package = "crossbeam-utils"
 version = "=0.8.5"
 
+[dependencies.crypto_common]
+package = "crypto-common"
+version = "=0.1.0"
+
 [dependencies.crypto_mac]
 package = "crypto-mac"
 version = "=0.11.1"
@@ -190,6 +198,10 @@ version = "=2.2.0"
 
 [dependencies.digest]
 package = "digest"
+version = "=0.10.0"
+
+[dependencies.digest_0_9_0]
+package = "digest"
 version = "=0.9.0"
 
 [dependencies.dtoa]
@@ -202,7 +214,7 @@ version = "=1.6.1"
 
 [dependencies.encoding_rs]
 package = "encoding_rs"
-version = "=0.8.29"
+version = "=0.8.30"
 
 [dependencies.env_logger]
 package = "env_logger"
@@ -315,7 +327,7 @@ version = "=0.3.0"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.3.7"
+version = "=0.3.8"
 
 [dependencies.hashbrown]
 package = "hashbrown"
@@ -388,7 +400,7 @@ version = "=2.3.1"
 
 [dependencies.itertools]
 package = "itertools"
-version = "=0.10.1"
+version = "=0.10.3"
 
 [dependencies.itoa]
 package = "itoa"
@@ -404,7 +416,7 @@ version = "=1.4.0"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.108"
+version = "=0.2.109"
 
 [dependencies.libm]
 package = "libm"
@@ -412,7 +424,7 @@ version = "=0.2.1"
 
 [dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.23.1"
+version = "=0.23.2"
 
 [dependencies.linked_hash_map]
 package = "linked-hash-map"
@@ -642,7 +654,7 @@ version = "=0.1.0"
 
 [dependencies.pkg_config]
 package = "pkg-config"
-version = "=0.3.22"
+version = "=0.3.23"
 
 [dependencies.png]
 package = "png"
@@ -670,7 +682,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.32"
+version = "=1.0.33"
 features = ["span-locations"]
 
 [dependencies.proc_macro_hack]
@@ -762,7 +774,7 @@ version = "=0.16.20"
 
 [dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.26.1"
+version = "=0.26.3"
 features = ["bundled-full"]
 
 [dependencies.rustc_demangle]
@@ -807,12 +819,12 @@ version = "=0.10.2"
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.130"
+version = "=1.0.131"
 features = ["derive", "rc"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.130"
+version = "=1.0.131"
 
 [dependencies.serde_json]
 package = "serde_json"
