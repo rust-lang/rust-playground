@@ -702,6 +702,7 @@ const notificationSeen = (notification: Notification) =>
   createAction(ActionType.NotificationSeen, { notification });
 
 export const seenRust2021IsDefault = () => notificationSeen(Notification.Rust2021IsDefault);
+export const seenRustSurvey2021 = () => notificationSeen(Notification.RustSurvey2021);
 
 export const browserWidthChanged = (isSmall: boolean) =>
   createAction(ActionType.BrowserWidthChanged, { isSmall });

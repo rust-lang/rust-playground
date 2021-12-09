@@ -249,6 +249,7 @@ export const codeUrlSelector = createSelector(
 const notificationsSelector = (state: State) => state.notifications;
 
 const NOW = new Date();
+
 const RUST_2021_DEFAULT_END = new Date('2022-01-01T00:00:00Z');
 const RUST_2021_DEFAULT_OPEN = NOW <= RUST_2021_DEFAULT_END;
 export const showRust2021IsDefaultSelector = createSelector(
@@ -256,9 +257,17 @@ export const showRust2021IsDefaultSelector = createSelector(
   notifications => RUST_2021_DEFAULT_OPEN && !notifications.seenRust2021IsDefault,
 );
 
+const RUST_SURVEY_2021_END = new Date('2021-12-22T00:00:00Z');
+const RUST_SURVEY_2021_OPEN = NOW <= RUST_SURVEY_2021_END;
+export const showRustSurvey2021Selector = createSelector(
+  notificationsSelector,
+  notifications => RUST_SURVEY_2021_OPEN && !notifications.seenRustSurvey2021,
+);
+
 export const anyNotificationsToShowSelector = createSelector(
   showRust2021IsDefaultSelector,
-  allNotifications => allNotifications,
+  showRustSurvey2021Selector,
+  (...allNotifications) => allNotifications.some(n => n),
 );
 
 export const clippyRequestSelector = createSelector(
