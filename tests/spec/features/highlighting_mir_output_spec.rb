@@ -12,6 +12,8 @@ RSpec.feature "Highlighting MIR output", type: :feature, js: true do
   end
 
   scenario "error locations are links" do
+    pending "Double notifications block the text to click on"
+
     within(:output, :mir) do
       click_link('src/main.rs:4:14: 4:19', match: :first)
     end
