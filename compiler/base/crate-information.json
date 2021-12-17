@@ -56,7 +56,7 @@
   },
   {
     "name": "async-trait",
-    "version": "0.1.51",
+    "version": "0.1.52",
     "id": "async_trait"
   },
   {
@@ -100,18 +100,13 @@
     "id": "block_buffer"
   },
   {
-    "name": "block-buffer",
-    "version": "0.9.0",
-    "id": "block_buffer_0_9_0"
-  },
-  {
     "name": "bstr",
     "version": "0.2.17",
     "id": "bstr"
   },
   {
     "name": "bytemuck",
-    "version": "1.7.2",
+    "version": "1.7.3",
     "id": "bytemuck"
   },
   {
@@ -191,13 +186,8 @@
   },
   {
     "name": "crypto-common",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "id": "crypto_common"
-  },
-  {
-    "name": "crypto-mac",
-    "version": "0.11.1",
-    "id": "crypto_mac"
   },
   {
     "name": "csv",
@@ -226,18 +216,8 @@
   },
   {
     "name": "digest",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "id": "digest"
-  },
-  {
-    "name": "digest",
-    "version": "0.9.0",
-    "id": "digest_0_9_0"
-  },
-  {
-    "name": "dtoa",
-    "version": "0.4.8",
-    "id": "dtoa"
   },
   {
     "name": "either",
@@ -311,47 +291,47 @@
   },
   {
     "name": "futures",
-    "version": "0.3.18",
+    "version": "0.3.17",
     "id": "futures"
   },
   {
     "name": "futures-channel",
-    "version": "0.3.18",
+    "version": "0.3.17",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.3.18",
+    "version": "0.3.17",
     "id": "futures_core"
   },
   {
     "name": "futures-executor",
-    "version": "0.3.18",
+    "version": "0.3.17",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.3.18",
+    "version": "0.3.17",
     "id": "futures_io"
   },
   {
     "name": "futures-macro",
-    "version": "0.3.18",
+    "version": "0.3.17",
     "id": "futures_macro"
   },
   {
     "name": "futures-sink",
-    "version": "0.3.18",
+    "version": "0.3.17",
     "id": "futures_sink"
   },
   {
     "name": "futures-task",
-    "version": "0.3.18",
+    "version": "0.3.17",
     "id": "futures_task"
   },
   {
     "name": "futures-util",
-    "version": "0.3.18",
+    "version": "0.3.17",
     "id": "futures_util"
   },
   {
@@ -386,7 +366,7 @@
   },
   {
     "name": "h2",
-    "version": "0.3.8",
+    "version": "0.3.9",
     "id": "h2"
   },
   {
@@ -401,12 +381,12 @@
   },
   {
     "name": "heck",
-    "version": "0.3.3",
+    "version": "0.4.0",
     "id": "heck"
   },
   {
     "name": "hmac",
-    "version": "0.11.0",
+    "version": "0.12.0",
     "id": "hmac"
   },
   {
@@ -441,7 +421,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.14.15",
+    "version": "0.14.16",
     "id": "hyper"
   },
   {
@@ -481,8 +461,13 @@
   },
   {
     "name": "itoa",
-    "version": "0.4.8",
+    "version": "1.0.1",
     "id": "itoa"
+  },
+  {
+    "name": "itoa",
+    "version": "0.4.8",
+    "id": "itoa_0_4_8"
   },
   {
     "name": "jpeg-decoder",
@@ -496,7 +481,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.109",
+    "version": "0.2.112",
     "id": "libc"
   },
   {
@@ -561,7 +546,7 @@
   },
   {
     "name": "md-5",
-    "version": "0.9.1",
+    "version": "0.10.0",
     "id": "md5"
   },
   {
@@ -686,7 +671,7 @@
   },
   {
     "name": "once_cell",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "id": "once_cell"
   },
   {
@@ -706,7 +691,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.71",
+    "version": "0.9.72",
     "id": "openssl_sys"
   },
   {
@@ -746,7 +731,7 @@
   },
   {
     "name": "phf",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "id": "phf"
   },
   {
@@ -796,7 +781,7 @@
   },
   {
     "name": "pkg-config",
-    "version": "0.3.23",
+    "version": "0.3.24",
     "id": "pkg_config"
   },
   {
@@ -811,7 +796,7 @@
   },
   {
     "name": "postgres-protocol",
-    "version": "0.6.2",
+    "version": "0.6.3",
     "id": "postgres_protocol"
   },
   {
@@ -835,8 +820,13 @@
     "id": "proc_macro_hack"
   },
   {
+    "name": "proc-macro-nested",
+    "version": "0.1.7",
+    "id": "proc_macro_nested"
+  },
+  {
     "name": "proc-macro2",
-    "version": "1.0.33",
+    "version": "1.0.34",
     "id": "proc_macro2"
   },
   {
@@ -956,7 +946,7 @@
   },
   {
     "name": "ryu",
-    "version": "1.0.6",
+    "version": "1.0.9",
     "id": "ryu"
   },
   {
@@ -996,7 +986,7 @@
   },
   {
     "name": "serde",
-    "version": "1.0.131",
+    "version": "1.0.132",
     "id": "serde"
   },
   {
@@ -1006,12 +996,12 @@
   },
   {
     "name": "serde_derive",
-    "version": "1.0.131",
+    "version": "1.0.132",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.72",
+    "version": "1.0.73",
     "id": "serde_json"
   },
   {
@@ -1021,12 +1011,12 @@
   },
   {
     "name": "serde_yaml",
-    "version": "0.8.21",
+    "version": "0.8.23",
     "id": "serde_yaml"
   },
   {
     "name": "sha2",
-    "version": "0.9.8",
+    "version": "0.10.0",
     "id": "sha2"
   },
   {
@@ -1101,7 +1091,7 @@
   },
   {
     "name": "tar",
-    "version": "0.4.37",
+    "version": "0.4.38",
     "id": "tar"
   },
   {
@@ -1181,7 +1171,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.14.0",
+    "version": "1.15.0",
     "id": "tokio"
   },
   {
@@ -1326,7 +1316,7 @@
   },
   {
     "name": "wide",
-    "version": "0.7.1",
+    "version": "0.7.3",
     "id": "wide"
   },
   {

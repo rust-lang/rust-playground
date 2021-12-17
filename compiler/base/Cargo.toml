@@ -56,7 +56,7 @@ version = "=0.3.2"
 
 [dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.51"
+version = "=0.1.52"
 
 [dependencies.atty]
 package = "atty"
@@ -90,18 +90,14 @@ version = "=1.3.2"
 package = "block-buffer"
 version = "=0.10.0"
 
-[dependencies.block_buffer_0_9_0]
-package = "block-buffer"
-version = "=0.9.0"
-
 [dependencies.bstr]
 package = "bstr"
 version = "=0.2.17"
 
 [dependencies.bytemuck]
 package = "bytemuck"
-version = "=1.7.2"
-features = ["derive", "extern_crate_alloc", "extern_crate_std", "min_const_generics", "zeroable_maybe_uninit"]
+version = "=1.7.3"
+features = ["derive", "extern_crate_alloc", "extern_crate_std", "min_const_generics", "wasm_simd", "zeroable_maybe_uninit"]
 
 [dependencies.byteorder]
 package = "byteorder"
@@ -166,11 +162,7 @@ version = "=0.8.5"
 
 [dependencies.crypto_common]
 package = "crypto-common"
-version = "=0.1.0"
-
-[dependencies.crypto_mac]
-package = "crypto-mac"
-version = "=0.11.1"
+version = "=0.1.1"
 
 [dependencies.csv]
 package = "csv"
@@ -198,15 +190,7 @@ version = "=2.2.0"
 
 [dependencies.digest]
 package = "digest"
-version = "=0.10.0"
-
-[dependencies.digest_0_9_0]
-package = "digest"
-version = "=0.9.0"
-
-[dependencies.dtoa]
-package = "dtoa"
-version = "=0.4.8"
+version = "=0.10.1"
 
 [dependencies.either]
 package = "either"
@@ -266,40 +250,40 @@ version = "=0.1.4"
 
 [dependencies.futures]
 package = "futures"
-version = "=0.3.18"
+version = "=0.3.17"
 features = ["compat", "io-compat", "thread-pool"]
 
 [dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.18"
+version = "=0.3.17"
 
 [dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.18"
+version = "=0.3.17"
 
 [dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.18"
+version = "=0.3.17"
 
 [dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.18"
+version = "=0.3.17"
 
 [dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.18"
+version = "=0.3.17"
 
 [dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.18"
+version = "=0.3.17"
 
 [dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.18"
+version = "=0.3.17"
 
 [dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.18"
+version = "=0.3.17"
 
 [dependencies.generic_array]
 package = "generic-array"
@@ -327,7 +311,7 @@ version = "=0.3.0"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.3.8"
+version = "=0.3.9"
 
 [dependencies.hashbrown]
 package = "hashbrown"
@@ -339,11 +323,11 @@ version = "=0.7.0"
 
 [dependencies.heck]
 package = "heck"
-version = "=0.3.3"
+version = "=0.4.0"
 
 [dependencies.hmac]
 package = "hmac"
-version = "=0.11.0"
+version = "=0.12.0"
 
 [dependencies.html5ever]
 package = "html5ever"
@@ -371,7 +355,7 @@ version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=0.14.15"
+version = "=0.14.16"
 features = ["full"]
 
 [dependencies.hyper_tls]
@@ -404,6 +388,10 @@ version = "=0.10.3"
 
 [dependencies.itoa]
 package = "itoa"
+version = "=1.0.1"
+
+[dependencies.itoa_0_4_8]
+package = "itoa"
 version = "=0.4.8"
 
 [dependencies.jpeg_decoder]
@@ -416,7 +404,7 @@ version = "=1.4.0"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.109"
+version = "=0.2.112"
 
 [dependencies.libm]
 package = "libm"
@@ -468,7 +456,7 @@ version = "=0.3.2"
 
 [dependencies.md5]
 package = "md-5"
-version = "=0.9.1"
+version = "=0.10.0"
 
 [dependencies.memchr]
 package = "memchr"
@@ -566,7 +554,7 @@ version = "=0.27.1"
 
 [dependencies.once_cell]
 package = "once_cell"
-version = "=1.8.0"
+version = "=1.9.0"
 
 [dependencies.opaque_debug]
 package = "opaque-debug"
@@ -582,7 +570,7 @@ version = "=0.1.4"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.71"
+version = "=0.9.72"
 
 [dependencies.ordered_float]
 package = "ordered-float"
@@ -614,7 +602,7 @@ version = "=0.6.0"
 
 [dependencies.phf]
 package = "phf"
-version = "=0.10.0"
+version = "=0.10.1"
 
 [dependencies.phf_0_8_0]
 package = "phf"
@@ -654,7 +642,7 @@ version = "=0.1.0"
 
 [dependencies.pkg_config]
 package = "pkg-config"
-version = "=0.3.23"
+version = "=0.3.24"
 
 [dependencies.png]
 package = "png"
@@ -666,7 +654,7 @@ version = "=0.19.2"
 
 [dependencies.postgres_protocol]
 package = "postgres-protocol"
-version = "=0.6.2"
+version = "=0.6.3"
 
 [dependencies.postgres_types]
 package = "postgres-types"
@@ -682,12 +670,16 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.33"
+version = "=1.0.34"
 features = ["span-locations"]
 
 [dependencies.proc_macro_hack]
 package = "proc-macro-hack"
 version = "=0.5.19"
+
+[dependencies.proc_macro_nested]
+package = "proc-macro-nested"
+version = "=0.1.7"
 
 [dependencies.quick_error]
 package = "quick-error"
@@ -787,7 +779,7 @@ version = "=0.4.0"
 
 [dependencies.ryu]
 package = "ryu"
-version = "=1.0.6"
+version = "=1.0.9"
 
 [dependencies.safe_arch]
 package = "safe_arch"
@@ -819,16 +811,16 @@ version = "=0.10.2"
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.131"
+version = "=1.0.132"
 features = ["derive", "rc"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.131"
+version = "=1.0.132"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.72"
+version = "=1.0.73"
 features = ["raw_value"]
 
 [dependencies.serde_urlencoded]
@@ -841,11 +833,11 @@ version = "=0.7.0"
 
 [dependencies.serde_yaml]
 package = "serde_yaml"
-version = "=0.8.21"
+version = "=0.8.23"
 
 [dependencies.sha2]
 package = "sha2"
-version = "=0.9.8"
+version = "=0.10.0"
 
 [dependencies.simba]
 package = "simba"
@@ -907,7 +899,7 @@ features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.tar]
 package = "tar"
-version = "=0.4.37"
+version = "=0.4.38"
 
 [dependencies.tempfile]
 package = "tempfile"
@@ -972,7 +964,7 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.14.0"
+version = "=1.15.0"
 features = ["full", "test-util"]
 
 [dependencies.tokio_native_tls]
@@ -1089,7 +1081,7 @@ version = "=0.1.5"
 
 [dependencies.wide]
 package = "wide"
-version = "=0.7.1"
+version = "=0.7.3"
 
 [dependencies.winapi]
 package = "winapi"
