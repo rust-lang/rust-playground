@@ -58,7 +58,7 @@ end
 Capybara.default_driver = Capybara.javascript_driver = :firefox
 Capybara.app_host = "http://#{ADDRESS}:#{PORT}"
 Capybara.run_server = false
-Capybara.default_max_wait_time = 5
+Capybara.default_max_wait_time = ENV.fetch('CAPYBARA_WAIT', 5).to_f
 Capybara.automatic_label_click = true
 
 Capybara::Screenshot.register_driver(:firefox) do |driver, path|
