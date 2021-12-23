@@ -222,7 +222,7 @@ const maybeOutput = (code: string | undefined, whenPresent: (_: string) => void)
   if (code && code.length !== 0) { whenPresent(code); }
 };
 
-const snippetSelector = createSelector(
+export const snippetSelector = createSelector(
   gistSelector, permalinkSelector,
   (gist, permalink) => {
     let snippet = '';
