@@ -2,7 +2,14 @@
 
 use serde::{Deserialize, Serialize};
 use snafu::Snafu;
-use std::{convert::TryFrom, env, path::PathBuf, sync::Arc, time::Duration};
+use std::{
+    convert::TryFrom,
+    env,
+    net::SocketAddr,
+    path::{Path, PathBuf},
+    sync::Arc,
+    time::Duration,
+};
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
@@ -11,6 +18,7 @@ const DEFAULT_LOG_FILE: &str = "access-log.csv";
 mod asm_cleanup;
 mod gist;
 mod sandbox;
+mod server_axum;
 mod server_iron;
 
 const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
@@ -27,10 +35,16 @@ fn main() {
     env_logger::init();
 
     let config = Config::from_env();
-    server_iron::serve(config);
+
+    if config.use_axum() {
+        server_axum::serve(config);
+    } else {
+        server_iron::serve(config);
+    }
 }
 
 struct Config {
+    axum_enabled: bool,
     address: String,
     cors_enabled: bool,
     gh_token: String,
@@ -61,8 +75,11 @@ impl Config {
             env::var("PLAYGROUND_LOG_FILE").unwrap_or_else(|_| DEFAULT_LOG_FILE.to_string());
         let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
 
+        let axum_enabled = env::var_os("PLAYGROUND_SERVER_AXUM").is_some();
+
         Self {
             address,
+            axum_enabled,
             cors_enabled,
             gh_token,
             logfile,
@@ -70,6 +87,35 @@ impl Config {
             port,
             root,
         }
+    }
+
+    fn use_axum(&self) -> bool {
+        self.axum_enabled
+    }
+
+    fn root_path(&self) -> &Path {
+        &self.root
+    }
+
+    fn asset_path(&self) -> PathBuf {
+        self.root.join("assets")
+    }
+
+    fn use_cors(&self) -> bool {
+        self.cors_enabled
+    }
+
+    fn metrics_token(&self) -> Option<MetricsToken> {
+        self.metrics_token.clone().map(|t| MetricsToken(t.into()))
+    }
+
+    fn github_token(&self) -> GhToken {
+        GhToken(self.gh_token.clone().into())
+    }
+
+    fn server_socket_addr(&self) -> SocketAddr {
+        let address = self.address.parse().expect("Invalid address");
+        SocketAddr::new(address, self.port)
     }
 }
 
@@ -95,7 +141,7 @@ mod metrics {
     use lazy_static::lazy_static;
     use prometheus::{self, register_histogram_vec, HistogramVec};
     use regex::Regex;
-    use std::time::Instant;
+    use std::{future::Future, time::Instant};
 
     use crate::sandbox::{self, Channel, CompileTarget, CrateType, Edition, Mode};
 
@@ -519,6 +565,42 @@ mod metrics {
 
         response
     }
+
+    pub(crate) async fn track_metric_no_request_async<B, Fut, Resp>(
+        endpoint: Endpoint,
+        body: B,
+    ) -> crate::Result<Resp>
+    where
+        B: FnOnce() -> Fut,
+        Fut: Future<Output = crate::Result<Resp>>,
+    {
+        let start = Instant::now();
+        let response = body().await;
+        let elapsed = start.elapsed();
+
+        let outcome = if response.is_ok() {
+            Outcome::Success
+        } else {
+            Outcome::ErrorServer
+        };
+        let labels = Labels {
+            endpoint,
+            outcome,
+            target: None,
+            channel: None,
+            mode: None,
+            edition: None,
+            crate_type: None,
+            tests: None,
+            backtrace: None,
+        };
+        let values = &labels.to_values();
+        let histogram = REQUESTS.with_label_values(values);
+
+        histogram.observe(elapsed.as_secs_f64());
+
+        response
+    }
 }
 
 #[derive(Debug, Snafu)]
@@ -541,6 +623,10 @@ pub enum Error {
     Interpreting { source: sandbox::Error },
     #[snafu(display("Caching operation failed: {}", source))]
     Caching { source: sandbox::Error },
+    #[snafu(display("Gist creation failed: {}", source))]
+    GistCreation { source: octocrab::Error },
+    #[snafu(display("Gist loading failed: {}", source))]
+    GistLoading { source: octocrab::Error },
     #[snafu(display("Unable to serialize response: {}", source))]
     Serialization { source: serde_json::Error },
     #[snafu(display("Unable to deserialize request: {}", source))]
@@ -565,6 +651,8 @@ pub enum Error {
     RequestMissing,
     #[snafu(display("The cache has been poisoned"))]
     CachePoisoned,
+    #[snafu(display("Could not execute a sandbox worker: {}", source))]
+    SpawnBlockingSandbox { source: tokio::task::JoinError },
 }
 
 type Result<T, E = Error> = ::std::result::Result<T, E>;

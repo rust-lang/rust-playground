@@ -39,6 +39,7 @@ pub(crate) fn serve(config: Config) {
         logfile,
         cors_enabled,
         metrics_token,
+        axum_enabled: _,
     } = config;
 
     let files = Staticfile::new(&root).expect("Unable to open root directory");
