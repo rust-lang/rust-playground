@@ -69,7 +69,10 @@ pub enum Error {
     #[snafu(display("Unable to remove the compiler: {}", source))]
     UnableToRemoveCompiler { source: io::Error },
     #[snafu(display("Compiler execution took longer than {} ms", timeout.as_millis()))]
-    CompilerExecutionTimedOut { source: tokio::time::Elapsed, timeout: Duration },
+    CompilerExecutionTimedOut {
+        source: tokio::time::Elapsed,
+        timeout: Duration,
+    },
 
     #[snafu(display("Unable to read output file: {}", source))]
     UnableToReadOutput { source: io::Error },
@@ -117,7 +120,8 @@ impl Sandbox {
         let output_dir = scratch.path().join("output");
 
         fs::create_dir(&output_dir).context(UnableToCreateOutputDirSnafu)?;
-        fs::set_permissions(&output_dir, wide_open_permissions()).context(UnableToSetOutputPermissionsSnafu)?;
+        fs::set_permissions(&output_dir, wide_open_permissions())
+            .context(UnableToSetOutputPermissionsSnafu)?;
 
         Ok(Sandbox {
             scratch,
@@ -136,8 +140,7 @@ impl Sandbox {
         // The compiler writes the file to a name like
         // `compilation-3b75174cac3d47fb.ll`, so we just find the
         // first with the right extension.
-        let file =
-            fs::read_dir(&self.output_dir)
+        let file = fs::read_dir(&self.output_dir)
             .context(UnableToReadOutputSnafu)?
             .flat_map(|entry| entry)
             .map(|entry| entry.path())
@@ -154,14 +157,17 @@ impl Sandbox {
                 // to the compiler's error instead of failing the
                 // request.
                 use self::fmt::Write;
-                write!(&mut stderr, "\nUnable to locate file for {} output", req.target)
-                    .expect("Unable to write to a string");
+                write!(
+                    &mut stderr,
+                    "\nUnable to locate file for {} output",
+                    req.target
+                )
+                .expect("Unable to write to a string");
                 String::new()
             }
         };
 
         if let CompileTarget::Assembly(_, demangle, process) = req.target {
-
             if demangle == DemangleAssembly::Demangle {
                 code = super::asm_cleanup::demangle_asm(&code);
             }
@@ -254,11 +260,10 @@ impl Sandbox {
 
         let output = run_command_with_timeout(command)?;
 
-        let crate_info: Vec<CrateInformationInner> = ::serde_json::from_slice(&output.stdout).context(UnableToParseCrateInformationSnafu)?;
+        let crate_info: Vec<CrateInformationInner> =
+            ::serde_json::from_slice(&output.stdout).context(UnableToParseCrateInformationSnafu)?;
 
-        let crates = crate_info.into_iter()
-            .map(Into::into)
-            .collect();
+        let crates = crate_info.into_iter().map(Into::into).collect();
 
         Ok(crates)
     }
@@ -271,21 +276,32 @@ impl Sandbox {
         let output = run_command_with_timeout(command)?;
         let version_output = vec_to_str(output.stdout)?;
 
-        let mut info: BTreeMap<String, String> = version_output.lines().skip(1).filter_map(|line| {
-            let mut pieces = line.splitn(2, ':').fuse();
-            match (pieces.next(), pieces.next()) {
-                (Some(name), Some(value)) => Some((name.trim().into(), value.trim().into())),
-                _ => None
-            }
-        }).collect();
+        let mut info: BTreeMap<String, String> = version_output
+            .lines()
+            .skip(1)
+            .filter_map(|line| {
+                let mut pieces = line.splitn(2, ':').fuse();
+                match (pieces.next(), pieces.next()) {
+                    (Some(name), Some(value)) => Some((name.trim().into(), value.trim().into())),
+                    _ => None,
+                }
+            })
+            .collect();
 
         let release = info.remove("release").ok_or(Error::VersionReleaseMissing)?;
-        let commit_hash = info.remove("commit-hash").ok_or(Error::VersionHashMissing)?;
-        let commit_date = info.remove("commit-date").ok_or(Error::VersionDateMissing)?;
+        let commit_hash = info
+            .remove("commit-hash")
+            .ok_or(Error::VersionHashMissing)?;
+        let commit_date = info
+            .remove("commit-date")
+            .ok_or(Error::VersionDateMissing)?;
 
-        Ok(Version { release, commit_hash, commit_date })
+        Ok(Version {
+            release,
+            commit_hash,
+            commit_date,
+        })
     }
-
 
     pub fn version_rustfmt(&self) -> Result<Version> {
         let mut command = basic_secure_docker_command();
@@ -315,18 +331,34 @@ impl Sandbox {
         let commit_hash = parts.next().unwrap_or("").trim_start_matches('(').into();
         let commit_date = parts.next().unwrap_or("").trim_end_matches(')').into();
 
-        Ok(Version { release, commit_hash, commit_date })
+        Ok(Version {
+            release,
+            commit_hash,
+            commit_date,
+        })
     }
 
     fn write_source_code(&self, code: &str) -> Result<()> {
         fs::write(&self.input_file, code).context(UnableToCreateSourceFileSnafu)?;
-        fs::set_permissions(&self.input_file, wide_open_permissions()).context(UnableToSetSourcePermissionsSnafu)?;
+        fs::set_permissions(&self.input_file, wide_open_permissions())
+            .context(UnableToSetSourcePermissionsSnafu)?;
 
-        log::debug!("Wrote {} bytes of source to {}", code.len(), self.input_file.display());
+        log::debug!(
+            "Wrote {} bytes of source to {}",
+            code.len(),
+            self.input_file.display()
+        );
         Ok(())
     }
 
-    fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, tests: bool, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) -> Command {
+    fn compile_command(
+        &self,
+        target: CompileTarget,
+        channel: Channel,
+        mode: Mode,
+        tests: bool,
+        req: impl CrateTypeRequest + EditionRequest + BacktraceRequest,
+    ) -> Command {
         let mut cmd = self.docker_command(Some(req.crate_type()));
         set_execution_environment(&mut cmd, Some(target), &req);
 
@@ -339,7 +371,13 @@ impl Sandbox {
         cmd
     }
 
-    fn execute_command(&self, channel: Channel, mode: Mode, tests: bool, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) -> Command {
+    fn execute_command(
+        &self,
+        channel: Channel,
+        mode: Mode,
+        tests: bool,
+        req: impl CrateTypeRequest + EditionRequest + BacktraceRequest,
+    ) -> Command {
         let mut cmd = self.docker_command(Some(req.crate_type()));
         set_execution_environment(&mut cmd, None, &req);
 
@@ -420,9 +458,10 @@ impl Sandbox {
 
         let mut cmd = basic_secure_docker_command();
 
-        cmd
-            .arg("--volume").arg(&mount_input_file)
-            .arg("--volume").arg(&mount_output_dir);
+        cmd.arg("--volume")
+            .arg(&mount_input_file)
+            .arg("--volume")
+            .arg(&mount_output_dir);
 
         cmd
     }
@@ -446,11 +485,19 @@ fn basic_secure_docker_command() -> Command {
         // Needed to allow overwriting the file
         "--cap-add=DAC_OVERRIDE",
         "--security-opt=no-new-privileges",
-        "--workdir", "/playground",
-        "--net", "none",
-        "--memory", "512m",
-        "--memory-swap", "640m",
-        "--env", format!("PLAYGROUND_TIMEOUT={}", DOCKER_PROCESS_TIMEOUT_SOFT.as_secs()),
+        "--workdir",
+        "/playground",
+        "--net",
+        "none",
+        "--memory",
+        "512m",
+        "--memory-swap",
+        "640m",
+        "--env",
+        format!(
+            "PLAYGROUND_TIMEOUT={}",
+            DOCKER_PROCESS_TIMEOUT_SOFT.as_secs()
+        ),
     );
 
     if cfg!(feature = "fork-bomb-prevention") {
@@ -462,7 +509,13 @@ fn basic_secure_docker_command() -> Command {
     cmd
 }
 
-fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode: Mode, req: impl CrateTypeRequest, tests: bool) -> Vec<&'static str> {
+fn build_execution_command(
+    target: Option<CompileTarget>,
+    channel: Channel,
+    mode: Mode,
+    req: impl CrateTypeRequest,
+    tests: bool,
+) -> Vec<&'static str> {
     use self::CompileTarget::*;
     use self::CrateType::*;
     use self::Mode::*;
@@ -471,10 +524,10 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
 
     match (target, req.crate_type(), tests) {
         (Some(Wasm), _, _) => cmd.push("wasm"),
-        (Some(_), _, _)    => cmd.push("rustc"),
-        (_, _, true)       => cmd.push("test"),
+        (Some(_), _, _) => cmd.push("rustc"),
+        (_, _, true) => cmd.push("test"),
         (_, Library(_), _) => cmd.push("build"),
-        (_, _, _)          => cmd.push("run"),
+        (_, _, _) => cmd.push("run"),
     }
 
     if mode == Release {
@@ -507,18 +560,22 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
                     Att => cmd.push("llvm-args=-x86-asm-syntax=att"),
                     Intel => cmd.push("llvm-args=-x86-asm-syntax=intel"),
                 }
-            },
+            }
             LlvmIr => cmd.push("--emit=llvm-ir"),
             Mir => cmd.push("--emit=mir"),
             Hir => cmd.push("-Zunpretty=hir"),
-            Wasm => { /* handled by cargo-wasm wrapper */ },
-         }
+            Wasm => { /* handled by cargo-wasm wrapper */ }
+        }
     }
 
     cmd
 }
 
-fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) {
+fn set_execution_environment(
+    cmd: &mut Command,
+    target: Option<CompileTarget>,
+    req: impl CrateTypeRequest + EditionRequest + BacktraceRequest,
+) {
     use self::CompileTarget::*;
 
     if let Some(Wasm) = target {
@@ -550,9 +607,7 @@ async fn run_command_with_timeout(mut command: Command) -> Result<std::process::
 
     let timeout = DOCKER_PROCESS_TIMEOUT_HARD;
 
-    let output = command.output()
-        .await
-        .context(UnableToStartCompilerSnafu)?;
+    let output = command.output().await.context(UnableToStartCompilerSnafu)?;
 
     // Exit early, in case we don't have the container
     if !output.status.success() {
@@ -560,7 +615,11 @@ async fn run_command_with_timeout(mut command: Command) -> Result<std::process::
     }
 
     let output = String::from_utf8_lossy(&output.stdout);
-    let id = output.lines().next().context(MissingCompilerIdSnafu)?.trim();
+    let id = output
+        .lines()
+        .next()
+        .context(MissingCompilerIdSnafu)?
+        .trim();
 
     // ----------
 
@@ -570,28 +629,38 @@ async fn run_command_with_timeout(mut command: Command) -> Result<std::process::
         Ok(Ok(o)) => {
             // Didn't time out, didn't fail to run
             let o = String::from_utf8_lossy(&o.stdout);
-            let code = o.lines().next().unwrap_or("").trim().parse().unwrap_or(i32::MAX);
+            let code = o
+                .lines()
+                .next()
+                .unwrap_or("")
+                .trim()
+                .parse()
+                .unwrap_or(i32::MAX);
             Ok(ExitStatusExt::from_raw(code))
         }
         Ok(e) => return e.context(UnableToWaitForCompilerSnafu), // Failed to run
-        Err(e) => Err(e), // Timed out
+        Err(e) => Err(e),                                        // Timed out
     };
 
     // ----------
 
     let mut command = docker_command!("logs", id);
-    let mut output = command.output().await.context(UnableToGetOutputFromCompilerSnafu)?;
+    let mut output = command
+        .output()
+        .await
+        .context(UnableToGetOutputFromCompilerSnafu)?;
 
     // ----------
 
     let mut command = docker_command!(
-        "rm",
-        // Kills container if still running
-        "--force",
-        id
+        "rm", // Kills container if still running
+        "--force", id
     );
     command.stdout(std::process::Stdio::null());
-    command.status().await.context(UnableToRemoveCompilerSnafu)?;
+    command
+        .status()
+        .await
+        .context(UnableToRemoveCompilerSnafu)?;
 
     let code = timed_out.context(CompilerExecutionTimedOutSnafu { timeout })?;
 
@@ -631,10 +700,10 @@ impl CompileTarget {
     fn extension(&self) -> &'static OsStr {
         let ext = match *self {
             CompileTarget::Assembly(_, _, _) => "s",
-            CompileTarget::LlvmIr            => "ll",
-            CompileTarget::Mir               => "mir",
-            CompileTarget::Hir               => "hir",
-            CompileTarget::Wasm              => "wat",
+            CompileTarget::LlvmIr => "ll",
+            CompileTarget::Mir => "mir",
+            CompileTarget::Hir => "hir",
+            CompileTarget::Wasm => "wat",
         };
         OsStr::new(ext)
     }
@@ -646,10 +715,10 @@ impl fmt::Display for CompileTarget {
 
         match *self {
             Assembly(_, _, _) => "assembly".fmt(f),
-            LlvmIr            => "LLVM IR".fmt(f),
-            Mir               => "Rust MIR".fmt(f),
-            Hir               => "Rust HIR".fmt(f),
-            Wasm              => "WebAssembly".fmt(f),
+            LlvmIr => "LLVM IR".fmt(f),
+            Mir => "Rust MIR".fmt(f),
+            Hir => "Rust HIR".fmt(f),
+            Wasm => "WebAssembly".fmt(f),
         }
     }
 }
@@ -722,7 +791,7 @@ pub enum LibraryType {
     Rlib,
     Staticlib,
     Cdylib,
-    ProcMacro
+    ProcMacro,
 }
 
 impl LibraryType {
@@ -749,13 +818,19 @@ trait DockerCommandExt {
 impl DockerCommandExt for Command {
     fn apply_crate_type(&mut self, req: impl CrateTypeRequest) {
         if let CrateType::Library(lib) = req.crate_type() {
-            self.args(&["--env", &format!("PLAYGROUND_CRATE_TYPE={}", lib.cargo_ident())]);
+            self.args(&[
+                "--env",
+                &format!("PLAYGROUND_CRATE_TYPE={}", lib.cargo_ident()),
+            ]);
         }
     }
 
     fn apply_edition(&mut self, req: impl EditionRequest) {
         if let Some(edition) = req.edition() {
-            self.args(&["--env", &format!("PLAYGROUND_EDITION={}", edition.cargo_ident())]);
+            self.args(&[
+                "--env",
+                &format!("PLAYGROUND_EDITION={}", edition.cargo_ident()),
+            ]);
         }
     }
 
@@ -771,7 +846,9 @@ trait CrateTypeRequest {
 }
 
 impl<R: CrateTypeRequest> CrateTypeRequest for &'_ R {
-    fn crate_type(&self) -> CrateType { (*self).crate_type() }
+    fn crate_type(&self) -> CrateType {
+        (*self).crate_type()
+    }
 }
 
 trait EditionRequest {
@@ -779,7 +856,9 @@ trait EditionRequest {
 }
 
 impl<R: EditionRequest> EditionRequest for &'_ R {
-    fn edition(&self) -> Option<Edition> { (*self).edition() }
+    fn edition(&self) -> Option<Edition> {
+        (*self).edition()
+    }
 }
 
 trait BacktraceRequest {
@@ -787,7 +866,9 @@ trait BacktraceRequest {
 }
 
 impl<R: BacktraceRequest> BacktraceRequest for &'_ R {
-    fn backtrace(&self) -> bool { (*self).backtrace() }
+    fn backtrace(&self) -> bool {
+        (*self).backtrace()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -803,15 +884,21 @@ pub struct CompileRequest {
 }
 
 impl CrateTypeRequest for CompileRequest {
-    fn crate_type(&self) -> CrateType { self.crate_type }
+    fn crate_type(&self) -> CrateType {
+        self.crate_type
+    }
 }
 
 impl EditionRequest for CompileRequest {
-    fn edition(&self) -> Option<Edition> { self.edition }
+    fn edition(&self) -> Option<Edition> {
+        self.edition
+    }
 }
 
 impl BacktraceRequest for CompileRequest {
-    fn backtrace(&self) -> bool { self.backtrace }
+    fn backtrace(&self) -> bool {
+        self.backtrace
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -834,15 +921,21 @@ pub struct ExecuteRequest {
 }
 
 impl CrateTypeRequest for ExecuteRequest {
-    fn crate_type(&self) -> CrateType { self.crate_type }
+    fn crate_type(&self) -> CrateType {
+        self.crate_type
+    }
 }
 
 impl EditionRequest for ExecuteRequest {
-    fn edition(&self) -> Option<Edition> { self.edition }
+    fn edition(&self) -> Option<Edition> {
+        self.edition
+    }
 }
 
 impl BacktraceRequest for ExecuteRequest {
-    fn backtrace(&self) -> bool { self.backtrace }
+    fn backtrace(&self) -> bool {
+        self.backtrace
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -859,7 +952,9 @@ pub struct FormatRequest {
 }
 
 impl EditionRequest for FormatRequest {
-    fn edition(&self) -> Option<Edition> { self.edition }
+    fn edition(&self) -> Option<Edition> {
+        self.edition
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -878,11 +973,15 @@ pub struct ClippyRequest {
 }
 
 impl CrateTypeRequest for ClippyRequest {
-    fn crate_type(&self) -> CrateType { self.crate_type }
+    fn crate_type(&self) -> CrateType {
+        self.crate_type
+    }
 }
 
 impl EditionRequest for ClippyRequest {
-    fn edition(&self) -> Option<Edition> { self.edition }
+    fn edition(&self) -> Option<Edition> {
+        self.edition
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -899,7 +998,9 @@ pub struct MiriRequest {
 }
 
 impl EditionRequest for MiriRequest {
-    fn edition(&self) -> Option<Edition> { self.edition }
+    fn edition(&self) -> Option<Edition> {
+        self.edition
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -1172,7 +1273,8 @@ mod test {
     }
     "#;
 
-    const BACKTRACE_NOTE: &str = "run with `RUST_BACKTRACE=1` environment variable to display a backtrace";
+    const BACKTRACE_NOTE: &str =
+        "run with `RUST_BACKTRACE=1` environment variable to display a backtrace";
 
     #[test]
     fn backtrace_disabled() -> Result<()> {
@@ -1187,7 +1289,11 @@ mod test {
         let resp = sb.execute(&req)?;
 
         assert!(resp.stderr.contains(BACKTRACE_NOTE), "Was: {}", resp.stderr);
-        assert!(!resp.stderr.contains("stack backtrace:"), "Was: {}", resp.stderr);
+        assert!(
+            !resp.stderr.contains("stack backtrace:"),
+            "Was: {}",
+            resp.stderr
+        );
 
         Ok(())
     }
@@ -1204,8 +1310,16 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.execute(&req)?;
 
-        assert!(!resp.stderr.contains(BACKTRACE_NOTE), "Was: {}", resp.stderr);
-        assert!(resp.stderr.contains("stack backtrace:"), "Was: {}", resp.stderr);
+        assert!(
+            !resp.stderr.contains(BACKTRACE_NOTE),
+            "Was: {}",
+            resp.stderr
+        );
+        assert!(
+            resp.stderr.contains("stack backtrace:"),
+            "Was: {}",
+            resp.stderr
+        );
 
         Ok(())
     }
@@ -1230,7 +1344,11 @@ mod test {
     fn output_assembly() {
         let _singleton = one_test_at_a_time();
         let req = CompileRequest {
-            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Raw),
+            target: CompileTarget::Assembly(
+                AssemblyFlavor::Att,
+                DemangleAssembly::Mangle,
+                ProcessAssembly::Raw,
+            ),
             ..CompileRequest::default()
         };
 
@@ -1247,7 +1365,11 @@ mod test {
     fn output_demangled_assembly() {
         let _singleton = one_test_at_a_time();
         let req = CompileRequest {
-            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Demangle, ProcessAssembly::Raw),
+            target: CompileTarget::Assembly(
+                AssemblyFlavor::Att,
+                DemangleAssembly::Demangle,
+                ProcessAssembly::Raw,
+            ),
             ..CompileRequest::default()
         };
 
@@ -1263,7 +1385,11 @@ mod test {
     fn output_filtered_assembly() {
         let _singleton = one_test_at_a_time();
         let req = CompileRequest {
-            target: CompileTarget::Assembly(AssemblyFlavor::Att, DemangleAssembly::Mangle, ProcessAssembly::Filter),
+            target: CompileTarget::Assembly(
+                AssemblyFlavor::Att,
+                DemangleAssembly::Mangle,
+                ProcessAssembly::Filter,
+            ),
             ..CompileRequest::default()
         };
 
@@ -1326,7 +1452,10 @@ mod test {
         assert_eq!(lines[0], r#"fn main() {"#);
         assert_eq!(lines[1], r#"    use std::num::ParseIntError;"#);
         assert_eq!(lines[2], r#"    let result: Result<i32, ParseIntError> ="#);
-        assert_eq!(lines[3], r#"        try { "1".parse::<i32>()? + "2".parse::<i32>()? + "3".parse::<i32>()? };"#);
+        assert_eq!(
+            lines[3],
+            r#"        try { "1".parse::<i32>()? + "2".parse::<i32>()? + "3".parse::<i32>()? };"#
+        );
         assert_eq!(lines[4], r#"    assert_eq!(result, Ok(6));"#);
         assert_eq!(lines[5], r#"}"#);
         Ok(())
@@ -1397,9 +1526,22 @@ mod test {
         let sb = Sandbox::new()?;
         let resp = sb.miri(&req)?;
 
-        assert!(resp.stderr.contains("pointer must be in-bounds at offset 1"), "was: {}", resp.stderr);
-        assert!(resp.stderr.contains("outside bounds of alloc"), "was: {}", resp.stderr);
-        assert!(resp.stderr.contains("which has size 0"), "was: {}", resp.stderr);
+        assert!(
+            resp.stderr
+                .contains("pointer must be in-bounds at offset 1"),
+            "was: {}",
+            resp.stderr
+        );
+        assert!(
+            resp.stderr.contains("outside bounds of alloc"),
+            "was: {}",
+            resp.stderr
+        );
+        assert!(
+            resp.stderr.contains("which has size 0"),
+            "was: {}",
+            resp.stderr
+        );
         Ok(())
     }
 
@@ -1503,7 +1645,11 @@ mod test {
             output.lines().skip(1).count()
         }
 
-        assert_eq!(0, docker_process_count(), "There must be no running docker processes");
+        assert_eq!(
+            0,
+            docker_process_count(),
+            "There must be no running docker processes"
+        );
 
         let req = ExecuteRequest {
             code: code.to_string(),
@@ -1513,11 +1659,15 @@ mod test {
         let sb = Sandbox::new().expect("Unable to create sandbox");
         match sb.execute(&req) {
             Ok(_) => panic!("Expected an error"),
-            Err(Error::CompilerExecutionTimedOut{..}) => {/* Ok */}
+            Err(Error::CompilerExecutionTimedOut { .. }) => { /* Ok */ }
             Err(e) => panic!("Got the wrong error: {}", e),
         }
 
-        assert_eq!(0, docker_process_count(), "A docker process continues to run");
+        assert_eq!(
+            0,
+            docker_process_count(),
+            "A docker process continues to run"
+        );
     }
 
     #[test]

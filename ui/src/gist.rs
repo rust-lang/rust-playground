@@ -16,7 +16,8 @@ pub struct Gist {
 
 impl From<gists::Gist> for Gist {
     fn from(other: gists::Gist) -> Self {
-        let mut files: Vec<_> = other.files
+        let mut files: Vec<_> = other
+            .files
             .into_iter()
             .map(|(name, file)| (name, file.content.unwrap_or_default()))
             .collect();
@@ -25,12 +26,10 @@ impl From<gists::Gist> for Gist {
 
         let code = match files.len() {
             0 | 1 => files.into_iter().map(|(_, content)| content).collect(),
-            _ => {
-                files
-                    .into_iter()
-                    .map(|(name, content)| format!("// {}\n{}\n\n", name, content))
-                    .collect()
-            }
+            _ => files
+                .into_iter()
+                .map(|(name, content)| format!("// {}\n{}\n\n", name, content))
+                .collect(),
         };
 
         Gist {
@@ -66,28 +65,19 @@ pub async fn create_future(token: String, code: String) -> hubcaps::Result<Gist>
         files,
     };
 
-    github
-        .gists()
-        .create(&options)
-        .await
-        .map(Into::into)
+    github.gists().create(&options).await.map(Into::into)
 }
 
 #[tokio::main]
 pub async fn load(token: String, id: &str) -> Gist {
-    load_future(token, id).await
-        .expect("Unable to load gist")
+    load_future(token, id).await.expect("Unable to load gist")
     // TODO: Better reporting of a 404
 }
 
 pub async fn load_future(token: String, id: &str) -> hubcaps::Result<Gist> {
     let github = github(token)?;
 
-    github
-        .gists()
-        .get(id)
-        .await
-        .map(Into::into)
+    github.gists().get(id).await.map(Into::into)
 }
 
 fn github(token: String) -> hubcaps::Result<Github> {
