@@ -38,10 +38,11 @@ mod gist;
 mod sandbox;
 
 const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
-const ONE_DAY_IN_SECONDS: u64 = 60 * 60 * 24;
-const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
+const ONE_HOUR: Duration = Duration::from_secs(ONE_HOUR_IN_SECONDS as u64);
+const ONE_DAY: Duration = Duration::from_secs(60 * 60 * 24);
+const ONE_YEAR: Duration = Duration::from_secs(60 * 60 * 24 * 365);
 
-const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
+const SANDBOX_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
 
 fn main() {
     // Dotenv may be unable to load environment variables, but that's ok in production
@@ -66,11 +67,9 @@ fn main() {
 
     let files = Staticfile::new(&root).expect("Unable to open root directory");
     let mut files = Chain::new(files);
-    let one_day = Duration::new(ONE_DAY_IN_SECONDS, 0);
-    let one_year = Duration::new(ONE_YEAR_IN_SECONDS, 0);
 
-    files.link_after(ModifyWith::new(Cache::new(one_day)));
-    files.link_after(Prefix::new(&["assets"], Cache::new(one_year)));
+    files.link_after(ModifyWith::new(Cache::new(ONE_DAY)));
+    files.link_after(Prefix::new(&["assets"], Cache::new(ONE_YEAR)));
     files.link_after(GuessContentType::new(ContentType::html().0));
 
     let mut gist_router = Router::new();
@@ -436,9 +435,7 @@ where
 
         match cache.clone() {
             Some(cached) => {
-                if cached.time.elapsed()
-                    > Duration::from_secs(SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS)
-                {
+                if cached.time.elapsed() > SANDBOX_CACHE_TIME_TO_LIVE {
                     SandboxCacheOne::populate(&mut *cache, populator)
                 } else {
                     Ok(cached.value)
