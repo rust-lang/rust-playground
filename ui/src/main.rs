@@ -50,20 +50,15 @@ fn main() {
     openssl_probe::init_ssl_cert_env_vars();
     env_logger::init();
 
-    let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT")
-        .expect("Must specify PLAYGROUND_UI_ROOT")
-        .into();
-    let gh_token =
-        env::var("PLAYGROUND_GITHUB_TOKEN").expect("Must specify PLAYGROUND_GITHUB_TOKEN");
-
-    let address = env::var("PLAYGROUND_UI_ADDRESS").unwrap_or_else(|_| DEFAULT_ADDRESS.to_string());
-    let port = env::var("PLAYGROUND_UI_PORT")
-        .ok()
-        .and_then(|p| p.parse().ok())
-        .unwrap_or(DEFAULT_PORT);
-    let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or_else(|_| DEFAULT_LOG_FILE.to_string());
-    let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
-    let metrics_token = env::var("PLAYGROUND_METRICS_TOKEN").ok();
+    let Config {
+        root,
+        gh_token,
+        address,
+        port,
+        logfile,
+        cors_enabled,
+        metrics_token,
+    } = Config::from_env();
 
     let files = Staticfile::new(&root).expect("Unable to open root directory");
     let mut files = Chain::new(files);
@@ -130,6 +125,49 @@ fn main() {
     Iron::new(chain)
         .http((&*address, port))
         .expect("Unable to start server");
+}
+
+struct Config {
+    address: String,
+    cors_enabled: bool,
+    gh_token: String,
+    logfile: String,
+    metrics_token: Option<String>,
+    port: u16,
+    root: PathBuf,
+}
+
+impl Config {
+    fn from_env() -> Self {
+        let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT")
+            .expect("Must specify PLAYGROUND_UI_ROOT")
+            .into();
+
+        let address =
+            env::var("PLAYGROUND_UI_ADDRESS").unwrap_or_else(|_| DEFAULT_ADDRESS.to_string());
+        let port = env::var("PLAYGROUND_UI_PORT")
+            .ok()
+            .and_then(|p| p.parse().ok())
+            .unwrap_or(DEFAULT_PORT);
+
+        let gh_token =
+            env::var("PLAYGROUND_GITHUB_TOKEN").expect("Must specify PLAYGROUND_GITHUB_TOKEN");
+        let metrics_token = env::var("PLAYGROUND_METRICS_TOKEN").ok();
+
+        let logfile =
+            env::var("PLAYGROUND_LOG_FILE").unwrap_or_else(|_| DEFAULT_LOG_FILE.to_string());
+        let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
+
+        Self {
+            address,
+            cors_enabled,
+            gh_token,
+            logfile,
+            metrics_token,
+            port,
+            root,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
