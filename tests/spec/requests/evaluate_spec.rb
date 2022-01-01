@@ -47,6 +47,7 @@ RSpec.feature "evaluate.json endpoint", type: :request do
     Net::HTTP.start(evaluate_json_uri.host, evaluate_json_uri.port) do |http|
       request = Net::HTTP::Post.new(evaluate_json_uri)
       request.body = body
+      request['Content-Type'] = 'application/json'
 
       response = http.request(request)
 
