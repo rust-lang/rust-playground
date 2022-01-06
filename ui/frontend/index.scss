@@ -7,6 +7,11 @@ $border: 1px solid $border-color;
 
 $primary-font: 'Open Sans', sans-serif;
 
+// Disable page navigation on swipe
+html, body {
+    overscroll-behavior-x: none;
+}
+
 // Modify normalized styles
 button,
 input,
