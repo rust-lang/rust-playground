@@ -194,6 +194,43 @@ impl Sandbox {
         })
     }
 
+    // Greatly inspired from https://gitlab.com/strwrite/seed-playground
+    pub fn wasm_pack(&self, req: &WasmPackRequest) -> Result<WasmPackResponse> {
+        use CompileTarget::*;
+        use CrateType::*;
+
+        let compile_req = CompileRequest{
+            backtrace: false, 
+            channel: Channel::WasmPack,
+            code: req.code.clone(),
+            crate_type: Library(LibraryType::Cdylib),
+            edition: Some(Edition::Rust2018),
+            mode: Mode::Debug,
+            target: WasmPack,
+            tests: false,
+        };
+        let res = self.compile(&compile_req)?;
+        let js_file =
+            fs::read_dir(&self.output_dir)
+            .context(UnableToReadOutput)?
+            .flat_map(|entry| entry)
+            .map(|entry| entry.path())
+            .find(|path| path.extension() == Some(OsStr::new("js")));
+
+        let js_code = match js_file {
+            Some(file) => read(&file)?.unwrap_or_else(String::new),
+            None => String::new() // TODO: return proper error?
+        };
+
+        Ok(WasmPackResponse {
+            success: res.success,
+            stdout: res.stdout,
+            stderr: res.stderr,
+            wasm_bg: res.code,
+            wasm_js: js_code
+        })
+    }
+
     pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
         self.write_source_code(&req.code)?;
         let command = self.format_command(req);
@@ -418,10 +455,14 @@ impl Sandbox {
         mount_output_dir.push(":");
         mount_output_dir.push("/playground-result");
 
+        // let mut mount_output_wasm = self.scratch.as_path().join("pkg").as_os_str().to_os_string();
+        // mount_output_wasm.push(":");
+        // mount_output_wasm.push("/playground/pkg");
         let mut cmd = basic_secure_docker_command();
 
         cmd
             .arg("--volume").arg(&mount_input_file)
+            // .arg("--volume").arg(&mount_output_wasm)
             .arg("--volume").arg(&mount_output_dir);
 
         cmd
@@ -470,6 +511,7 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
     let mut cmd = vec!["cargo"];
 
     match (target, req.crate_type(), tests) {
+        (Some(WasmPack), _, _) => cmd.push("pack"),
         (Some(Wasm), _, _) => cmd.push("wasm"),
         (Some(_), _, _)    => cmd.push("rustc"),
         (_, _, true)       => cmd.push("test"),
@@ -512,11 +554,13 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
             Mir => cmd.push("--emit=mir"),
             Hir => cmd.push("-Zunpretty=hir"),
             Wasm => { /* handled by cargo-wasm wrapper */ },
+            WasmPack => { /* handled by cargo-wasmpack wrapper */ },
          }
-    }
-
+    }   
+    log::debug!("{:?}", &cmd);
     cmd
 }
+
 
 fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, req: impl CrateTypeRequest + EditionRequest + BacktraceRequest) {
     use self::CompileTarget::*;
@@ -625,6 +669,7 @@ pub enum CompileTarget {
     Mir,
     Hir,
     Wasm,
+    WasmPack,
 }
 
 impl CompileTarget {
@@ -635,6 +680,7 @@ impl CompileTarget {
             CompileTarget::Mir               => "mir",
             CompileTarget::Hir               => "hir",
             CompileTarget::Wasm              => "wat",
+            CompileTarget::WasmPack          => "wasm",
         };
         OsStr::new(ext)
     }
@@ -650,6 +696,7 @@ impl fmt::Display for CompileTarget {
             Mir               => "Rust MIR".fmt(f),
             Hir               => "Rust HIR".fmt(f),
             Wasm              => "WebAssembly".fmt(f),
+            WasmPack          => "WasmPack".fmt(f),
         }
     }
 }
@@ -659,6 +706,7 @@ pub enum Channel {
     Stable,
     Beta,
     Nightly,
+    WasmPack,
 }
 
 impl Channel {
@@ -669,6 +717,7 @@ impl Channel {
             Stable => "rust-stable",
             Beta => "rust-beta",
             Nightly => "rust-nightly",
+            WasmPack => "rust-wasm-pack",
         }
     }
 }
@@ -928,6 +977,35 @@ pub struct MacroExpansionResponse {
     pub stderr: String,
 }
 
+#[derive(Debug, Clone)]
+pub struct WasmPackRequest {
+    pub code: String,
+    pub crate_type: CrateType,
+    pub output_name: String,
+}
+
+impl Default for WasmPackRequest {
+    fn default() -> Self {
+        WasmPackRequest {
+            code: String::from(""),
+            crate_type: CrateType::Library(LibraryType::Rlib),
+            output_name: "wasm".to_string(),
+        }
+    }
+}
+
+impl CrateTypeRequest for WasmPackRequest {
+    fn crate_type(&self) -> CrateType { self.crate_type }
+}
+
+#[derive(Debug, Clone)]
+pub struct WasmPackResponse {
+    pub wasm_js: String,
+    pub wasm_bg: String,
+    pub success: bool,
+    pub stdout: String,
+    pub stderr: String,
+}
 #[cfg(test)]
 mod test {
     use super::*;
