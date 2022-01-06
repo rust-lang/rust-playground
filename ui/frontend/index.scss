@@ -44,6 +44,454 @@ $header-accent-border: #bdbdbd;
 $header-border-radius: 4px;
 $header-transition: 0.2s ease-in-out;
 
+.header {
+  display: flex;
+  font-size: 12px;
+
+  padding: 1.25em 0;
+
+  &__set {
+    margin-right: 0.5em;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &--reset {
+      margin-right: auto;
+    }
+  }
+
+  button:enabled {
+    cursor: pointer;
+  }
+}
+
+@mixin active-button($bg-dark) {
+  background: linear-gradient($bg-dark, #ededed);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.2);
+
+  border-top-color: #bababa;
+  border-bottom-color: #d6d6d6;
+}
+
+.segmented-button {
+  display: flex;
+  align-items: center;
+
+  border-radius: $header-border-radius;
+  box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.4), inset 0 1px 0px white;
+
+  &__button {
+    @include button-reset;
+
+    $bg-light: #fff;
+    $bg-dark: #f9f9f9;
+
+    background-color: $bg-light;
+    background: linear-gradient($bg-light, $bg-dark);
+    color: #444;
+
+    border: 1px solid $header-main-border;
+
+    &:first-child {
+      border-top-left-radius: $header-border-radius;
+      border-bottom-left-radius: $header-border-radius;
+    }
+
+    &:last-child {
+      border-top-right-radius: $header-border-radius;
+      border-bottom-right-radius: $header-border-radius;
+    }
+
+    &:not(:first-child) {
+      border-left: none;
+    }
+
+    &:not(:last-child) {
+      border-right: 1px solid $header-main-border;
+    }
+
+    &:hover {
+      background: linear-gradient($bg-light, #f3f3f3);
+      color: #333;
+    }
+
+    &:active {
+      @include active-button($bg-dark);
+    }
+
+    &--build {
+      $rust-dark: #80331a;
+
+      background: $rust;
+      color: white;
+
+      border-color: hsl(15, 66.7%, 32%);
+
+      &:not(:last-child) {
+        // Silly specificity
+        border-right-width: 0;
+      }
+
+      .header-button {
+        font-weight: 700;
+      }
+
+      &:hover {
+        background: $rust-dark;
+        color: white;
+      }
+
+      &:active {
+        background: $rust-dark;
+        border-top-color: $rust-dark;
+        border-bottom-color: $rust-dark;
+      }
+    }
+  }
+}
+
+.popper {
+  z-index: 10;
+  font-size: 12px;
+
+  // Prevents the popper from shifting when adding it to the DOM
+  // triggers showing the scrollbars.
+  // https://github.com/FezVrasta/popper.js/issues/457#issuecomment-367692177
+  top: 0;
+
+  $fg-color: #222;
+  $bg-color: white;
+  $arrow-size: 10px;
+  $vertical-border-color: #cacaca;
+
+  &__arrow {
+    position: absolute;
+    margin: $arrow-size;
+    border: $arrow-size solid transparent;
+  }
+
+  &[data-placement^="bottom"] &__arrow {
+    margin-top: 0;
+    border-top-width: 0;
+    border-bottom-color: $bg-color;
+  }
+
+  &__content {
+    background: $bg-color;
+    color: $fg-color;
+
+    margin: $arrow-size;
+
+    border-radius: $header-border-radius;
+
+    box-shadow: 0 1px 4px -2px rgba(0, 0, 0, 0.6), inset 0 1px 0px white;
+
+    border-left: 1px solid $vertical-border-color;
+    border-right: 1px solid $vertical-border-color;
+    border-bottom: 1px solid $header-accent-border;
+  }
+
+  button:enabled {
+    cursor: pointer;
+  }
+}
+
+.menu-group {
+  width: 27em;
+  padding: 0.75em 1em 0 1em;
+
+  &:last-child {
+    padding-bottom: 0.75em;
+  }
+
+  line-height: normal;
+
+  &__title {
+    margin: 0;
+
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 11px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid $header-main-border;
+  }
+
+  &__content {
+    padding: 1em 0.25em;
+  }
+}
+
+.menu-item {
+  margin-bottom: 1em;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@mixin menu-item-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@mixin full-menu-button {
+  @include button-reset;
+
+  width: 100%;
+  transition: color $header-transition;
+  user-select: text;
+}
+
+.button-menu-item {
+  @include full-menu-button;
+
+  &:hover {
+    color: $header-tint;
+  }
+
+  &__name {
+    @include menu-item-title;
+    margin: 0;
+  }
+
+  &__description {
+    margin: 0;
+  }
+}
+
+.selectable-item {
+  @include full-menu-button;
+
+  &__header {
+    display: flex;
+    align-items: center;
+  }
+
+  &__name {
+    @include menu-item-title;
+  }
+
+  &__description {
+    padding-left: 2em;
+  }
+
+  &:hover {
+    color: $header-tint;
+  }
+
+  &--selected {
+    font-weight: 600;
+    color: $header-tint;
+  }
+
+  &__checkmark {
+    margin-right: 0.5em;
+
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  &:hover &__checkmark {
+    opacity: 0.5;
+    color: $header-tint;
+  }
+
+  &--selected &__checkmark,
+  &--selected:hover &__checkmark {
+    opacity: 1;
+  }
+}
+
+.build-menu {
+  &__code {
+    background: #EEE;
+    padding: 0 0.25em;
+  }
+
+  &__aside {
+    margin: 0.25em 0 0 0;
+    color: #888;
+  }
+}
+
+.channel-menu {
+  &__description {
+    margin: 0;
+  }
+}
+
+.advanced-options-menu {
+  &__aside {
+    margin: 0.25em 0 1em 0;
+    color: #888;
+  }
+}
+
+.tools-menu {
+  &__aside {
+    margin: 0.25em 0 0 0;
+    color: #888;
+  }
+}
+
+.config-element {
+  display: flex;
+  align-items: center;
+
+  &__name {
+    flex: 1;
+    font-size: 13px;
+
+    &--not-default {
+      font-weight: 600;
+      color: $header-tint;
+    }
+  }
+
+  &__value {
+    flex: 1;
+  }
+
+  &__select {
+    width: 100%;
+  }
+
+  &__toggle {
+    display: flex;
+
+    input {
+      display: none;
+    }
+
+    label {
+      $border: 1px solid #bbb;
+
+      flex: 1;
+      padding: 0 1em;
+
+      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 600;
+      color: #777;
+      text-align: center;
+
+      cursor: pointer;
+
+      border: $border;
+      border-top-left-radius: $header-border-radius;
+      border-bottom-left-radius: $header-border-radius;
+      border-right-width: 0;
+
+      ~ label {
+        border-right-width: 1px;
+        border-left: $border;
+        border-radius: 0 $header-border-radius $header-border-radius 0;
+      }
+
+      &:hover {
+        background: hsla(208, 100%, 43%, 0.1);
+      }
+    }
+
+    :checked + label {
+      border-color: $header-tint;
+      background: $header-tint;
+      color: #fff;
+
+      ~ label {
+        border-left-width: 0;
+      }
+    }
+  }
+}
+
+.header-button {
+  height: 3em;
+  padding: 0 1.25em;
+  display: flex;
+  align-items: center;
+
+  text-transform: uppercase;
+  text-decoration: none;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  &--expandable {
+    padding-right: 1em;
+  }
+
+  &--has-left-icon {
+    padding-left: 1em;
+  }
+
+  &--has-right-icon {
+    padding-right: 1em;
+  }
+
+  &--icon-only {
+    padding: 0 0.75em;
+  }
+
+  &__left-icon {
+    margin-right: 0.5em;
+  }
+
+  &--icon-only &__left-icon {
+    margin-right: 0;
+  }
+
+  &__drop {
+    margin-left: 0.75em;
+  }
+
+  &__right-icon {
+    margin-left: 0.75em;
+  }
+}
+
+.icon {
+  display: block;
+  fill: currentColor;
+}
+
+.notifications {
+    position: absolute;
+    z-index: 10;
+
+    $buffer: 0.5em;
+
+    bottom: $buffer;
+    left: $buffer;
+    right: $buffer;
+
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 50em;
+
+    background: white;
+    border: 2px solid #428bca;
+
+    &__notification {
+      display: flex;
+    }
+
+    $space: 0.25em;
+
+    &__notification-content {
+      padding: $space 0 $space $space;
+    }
+
+    &__close {
+      @include button-reset;
+      padding: $space;
+      background: #e1e1db;
+      cursor: pointer;
+    }
+}
+
 :root {
   --rust: #{$rust};
   --rust-dark: #80331a;
