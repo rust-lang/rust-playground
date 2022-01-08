@@ -28,7 +28,7 @@ tokio = { version = "0.2.9", features = ["macros", "time", "process", "rt-thread
 router = "0.6.0"
 openssl-probe = "0.1.2"
 dotenv = "0.15.0"
-snafu = "0.6.0"
+snafu = "0.7.0"
 prometheus = "0.13.0"
 strum = { version = "0.23.0", features = ["derive"] }
 
