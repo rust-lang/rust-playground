@@ -97,7 +97,7 @@ pub struct Sandbox {
 }
 
 fn vec_to_str(v: Vec<u8>) -> Result<String> {
-    String::from_utf8(v).context(OutputNotUtf8)
+    String::from_utf8(v).context(OutputNotUtf8Snafu)
 }
 
 // We must create a world-writable files (rustfmt) and directories
@@ -112,12 +112,12 @@ fn wide_open_permissions() -> std::fs::Permissions {
 
 impl Sandbox {
     pub fn new() -> Result<Self> {
-        let scratch = TempDir::new("playground").context(UnableToCreateTempDir)?;
+        let scratch = TempDir::new("playground").context(UnableToCreateTempDirSnafu)?;
         let input_file = scratch.path().join("input.rs");
         let output_dir = scratch.path().join("output");
 
-        fs::create_dir(&output_dir).context(UnableToCreateOutputDir)?;
-        fs::set_permissions(&output_dir, wide_open_permissions()).context(UnableToSetOutputPermissions)?;
+        fs::create_dir(&output_dir).context(UnableToCreateOutputDirSnafu)?;
+        fs::set_permissions(&output_dir, wide_open_permissions()).context(UnableToSetOutputPermissionsSnafu)?;
 
         Ok(Sandbox {
             scratch,
@@ -138,7 +138,7 @@ impl Sandbox {
         // first with the right extension.
         let file =
             fs::read_dir(&self.output_dir)
-            .context(UnableToReadOutput)?
+            .context(UnableToReadOutputSnafu)?
             .flat_map(|entry| entry)
             .map(|entry| entry.path())
             .find(|path| path.extension() == Some(req.target.extension()));
@@ -254,7 +254,7 @@ impl Sandbox {
 
         let output = run_command_with_timeout(command)?;
 
-        let crate_info: Vec<CrateInformationInner> = ::serde_json::from_slice(&output.stdout).context(UnableToParseCrateInformation)?;
+        let crate_info: Vec<CrateInformationInner> = ::serde_json::from_slice(&output.stdout).context(UnableToParseCrateInformationSnafu)?;
 
         let crates = crate_info.into_iter()
             .map(Into::into)
@@ -319,8 +319,8 @@ impl Sandbox {
     }
 
     fn write_source_code(&self, code: &str) -> Result<()> {
-        fs::write(&self.input_file, code).context(UnableToCreateSourceFile)?;
-        fs::set_permissions(&self.input_file, wide_open_permissions()).context(UnableToSetSourcePermissions)?;
+        fs::write(&self.input_file, code).context(UnableToCreateSourceFileSnafu)?;
+        fs::set_permissions(&self.input_file, wide_open_permissions()).context(UnableToSetSourcePermissionsSnafu)?;
 
         log::debug!("Wrote {} bytes of source to {}", code.len(), self.input_file.display());
         Ok(())
@@ -535,12 +535,12 @@ fn read(path: &Path) -> Result<Option<String>> {
     let f = match File::open(path) {
         Ok(f) => f,
         Err(ref e) if e.kind() == ErrorKind::NotFound => return Ok(None),
-        e => e.context(UnableToReadOutput)?,
+        e => e.context(UnableToReadOutputSnafu)?,
     };
     let mut f = BufReader::new(f);
 
     let mut s = String::new();
-    f.read_to_string(&mut s).context(UnableToReadOutput)?;
+    f.read_to_string(&mut s).context(UnableToReadOutputSnafu)?;
     Ok(Some(s))
 }
 
@@ -552,7 +552,7 @@ async fn run_command_with_timeout(mut command: Command) -> Result<std::process::
 
     let output = command.output()
         .await
-        .context(UnableToStartCompiler)?;
+        .context(UnableToStartCompilerSnafu)?;
 
     // Exit early, in case we don't have the container
     if !output.status.success() {
@@ -560,7 +560,7 @@ async fn run_command_with_timeout(mut command: Command) -> Result<std::process::
     }
 
     let output = String::from_utf8_lossy(&output.stdout);
-    let id = output.lines().next().context(MissingCompilerId)?.trim();
+    let id = output.lines().next().context(MissingCompilerIdSnafu)?.trim();
 
     // ----------
 
@@ -573,14 +573,14 @@ async fn run_command_with_timeout(mut command: Command) -> Result<std::process::
             let code = o.lines().next().unwrap_or("").trim().parse().unwrap_or(i32::MAX);
             Ok(ExitStatusExt::from_raw(code))
         }
-        Ok(e) => return e.context(UnableToWaitForCompiler), // Failed to run
+        Ok(e) => return e.context(UnableToWaitForCompilerSnafu), // Failed to run
         Err(e) => Err(e), // Timed out
     };
 
     // ----------
 
     let mut command = docker_command!("logs", id);
-    let mut output = command.output().await.context(UnableToGetOutputFromCompiler)?;
+    let mut output = command.output().await.context(UnableToGetOutputFromCompilerSnafu)?;
 
     // ----------
 
@@ -591,9 +591,9 @@ async fn run_command_with_timeout(mut command: Command) -> Result<std::process::
         id
     );
     command.stdout(std::process::Stdio::null());
-    command.status().await.context(UnableToRemoveCompiler)?;
+    command.status().await.context(UnableToRemoveCompilerSnafu)?;
 
-    let code = timed_out.context(CompilerExecutionTimedOut { timeout })?;
+    let code = timed_out.context(CompilerExecutionTimedOutSnafu { timeout })?;
 
     output.status = code;
 

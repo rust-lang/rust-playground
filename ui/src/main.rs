@@ -170,7 +170,7 @@ fn compile(req: &mut Request<'_, '_>) -> IronResult<Response> {
         let req = req.try_into()?;
         track_metric(req, |req| sandbox.compile(&req))
             .map(CompileResponse::from)
-            .context(Compilation)
+            .context(CompilationSnafu)
     })
 }
 
@@ -179,7 +179,7 @@ fn execute(req: &mut Request<'_, '_>) -> IronResult<Response> {
         let req = req.try_into()?;
         track_metric(req, |req| sandbox.execute(&req))
             .map(ExecuteResponse::from)
-            .context(Execution)
+            .context(ExecutionSnafu)
     })
 }
 
@@ -188,7 +188,7 @@ fn format(req: &mut Request<'_, '_>) -> IronResult<Response> {
         let req = req.try_into()?;
         track_metric(req, |req| sandbox.format(&req))
             .map(FormatResponse::from)
-            .context(Formatting)
+            .context(FormattingSnafu)
     })
 }
 
@@ -197,7 +197,7 @@ fn clippy(req: &mut Request<'_, '_>) -> IronResult<Response> {
         let req = req.try_into()?;
         track_metric(req, |req| sandbox.clippy(&req))
             .map(ClippyResponse::from)
-            .context(Linting)
+            .context(LintingSnafu)
     })
 }
 
@@ -206,7 +206,7 @@ fn miri(req: &mut Request<'_, '_>) -> IronResult<Response> {
         let req = req.try_into()?;
         track_metric(req, |req| sandbox.miri(&req))
             .map(MiriResponse::from)
-            .context(Interpreting)
+            .context(InterpretingSnafu)
     })
 }
 
@@ -215,7 +215,7 @@ fn macro_expansion(req: &mut Request<'_, '_>) -> IronResult<Response> {
         let req = req.try_into()?;
         track_metric(req, |req| sandbox.macro_expansion(&req))
             .map(MacroExpansionResponse::from)
-            .context(Expansion)
+            .context(ExpansionSnafu)
     })
 }
 
@@ -310,7 +310,7 @@ fn evaluate(req: &mut Request<'_, '_>) -> IronResult<Response> {
             sandbox.execute(&req)
         })
         .map(EvaluateResponse::from)
-        .context(Evaluation)
+        .context(EvaluationSnafu)
     })
 }
 
@@ -337,7 +337,7 @@ where
     Req: DeserializeOwned + Clone + Any + 'static,
 {
     deserialize_from_request(req, |req| {
-        let sandbox = Sandbox::new().context(SandboxCreation)?;
+        let sandbox = Sandbox::new().context(SandboxCreationSnafu)?;
         f(sandbox, req)
     })
 }
@@ -348,7 +348,7 @@ where
     Req: DeserializeOwned + Clone + Any + 'static,
 {
     let body = req.get::<bodyparser::Struct<Req>>()
-        .context(Deserialization)?;
+        .context(DeserializationSnafu)?;
 
     let req = body.ok_or(Error::RequestMissing)?;
 
@@ -361,7 +361,7 @@ fn run_handler_no_request<Resp, F>(f: F) -> Result<Resp>
 where
     F: FnOnce(Sandbox) -> Result<Resp>,
 {
-    let sandbox = Sandbox::new().context(SandboxCreation)?;
+    let sandbox = Sandbox::new().context(SandboxCreationSnafu)?;
     let resp = f(sandbox)?;
     Ok(resp)
 }
@@ -371,7 +371,7 @@ where
     Resp: Serialize,
 {
     let response = response.and_then(|resp| {
-        let resp = serde_json::ser::to_string(&resp).context(Serialization)?;
+        let resp = serde_json::ser::to_string(&resp).context(SerializationSnafu)?;
         Ok(resp)
     });
 
@@ -429,7 +429,7 @@ where
     where
         F: FnOnce() -> sandbox::Result<T>
     {
-        let value = populator().context(Caching)?;
+        let value = populator().context(CachingSnafu)?;
         *cache = Some(SandboxCacheInfo {
             value: value.clone(),
             time: Instant::now(),
@@ -1430,7 +1430,7 @@ fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
         "mir" => sandbox::CompileTarget::Mir,
         "hir" => sandbox::CompileTarget::Hir,
         "wasm" => sandbox::CompileTarget::Wasm,
-        value => InvalidTarget { value }.fail()?,
+        value => InvalidTargetSnafu { value }.fail()?,
     })
 }
 
@@ -1438,7 +1438,7 @@ fn parse_assembly_flavor(s: &str) -> Result<sandbox::AssemblyFlavor> {
     Ok(match s {
         "att" => sandbox::AssemblyFlavor::Att,
         "intel" => sandbox::AssemblyFlavor::Intel,
-        value => InvalidAssemblyFlavor { value }.fail()?
+        value => InvalidAssemblyFlavorSnafu { value }.fail()?
     })
 }
 
@@ -1446,7 +1446,7 @@ fn parse_demangle_assembly(s: &str) -> Result<sandbox::DemangleAssembly> {
     Ok(match s {
         "demangle" => sandbox::DemangleAssembly::Demangle,
         "mangle" => sandbox::DemangleAssembly::Mangle,
-        value => InvalidDemangleAssembly { value }.fail()?,
+        value => InvalidDemangleAssemblySnafu { value }.fail()?,
     })
 }
 
@@ -1454,7 +1454,7 @@ fn parse_process_assembly(s: &str) -> Result<sandbox::ProcessAssembly> {
     Ok(match s {
         "filter" => sandbox::ProcessAssembly::Filter,
         "raw" => sandbox::ProcessAssembly::Raw,
-        value => InvalidProcessAssembly { value }.fail()?
+        value => InvalidProcessAssemblySnafu { value }.fail()?
     })
 }
 
@@ -1463,7 +1463,7 @@ fn parse_channel(s: &str) -> Result<sandbox::Channel> {
         "stable" => sandbox::Channel::Stable,
         "beta" => sandbox::Channel::Beta,
         "nightly" => sandbox::Channel::Nightly,
-        value => InvalidChannel { value }.fail()?,
+        value => InvalidChannelSnafu { value }.fail()?,
     })
 }
 
@@ -1471,7 +1471,7 @@ fn parse_mode(s: &str) -> Result<sandbox::Mode> {
     Ok(match s {
         "debug" => sandbox::Mode::Debug,
         "release" => sandbox::Mode::Release,
-        value => InvalidMode { value }.fail()?,
+        value => InvalidModeSnafu { value }.fail()?,
     })
 }
 
@@ -1481,7 +1481,7 @@ fn parse_edition(s: &str) -> Result<Option<sandbox::Edition>> {
         "2015" => Some(sandbox::Edition::Rust2015),
         "2018" => Some(sandbox::Edition::Rust2018),
         "2021" => Some(sandbox::Edition::Rust2021),
-        value => InvalidEdition { value }.fail()?,
+        value => InvalidEditionSnafu { value }.fail()?,
     })
 }
 
@@ -1495,7 +1495,7 @@ fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
         "staticlib" => Library(Staticlib),
         "cdylib" => Library(Cdylib),
         "proc-macro" => Library(ProcMacro),
-        value => InvalidCrateType { value }.fail()?,
+        value => InvalidCrateTypeSnafu { value }.fail()?,
     })
 }
 
