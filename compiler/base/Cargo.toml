@@ -36,7 +36,7 @@ version = "=0.12.1"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.51"
+version = "=1.0.52"
 
 [dependencies.approx]
 package = "approx"
@@ -52,7 +52,7 @@ version = "=0.7.2"
 
 [dependencies.async_recursion]
 package = "async-recursion"
-version = "=0.3.2"
+version = "=1.0.0"
 
 [dependencies.async_trait]
 package = "async-trait"
@@ -122,7 +122,8 @@ features = ["serde"]
 
 [dependencies.clap]
 package = "clap"
-version = "=2.34.0"
+version = "=3.0.5"
+features = ["unstable-doc"]
 
 [dependencies.color_quant]
 package = "color_quant"
@@ -222,7 +223,7 @@ version = "=0.2.15"
 
 [dependencies.fixedbitset]
 package = "fixedbitset"
-version = "=0.4.0"
+version = "=0.4.1"
 
 [dependencies.flate2]
 package = "flate2"
@@ -250,44 +251,44 @@ version = "=0.1.4"
 
 [dependencies.futures]
 package = "futures"
-version = "=0.3.17"
+version = "=0.3.19"
 features = ["compat", "io-compat", "thread-pool"]
 
 [dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.17"
+version = "=0.3.19"
 
 [dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.17"
+version = "=0.3.19"
 
 [dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.17"
+version = "=0.3.19"
 
 [dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.17"
+version = "=0.3.19"
 
 [dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.17"
+version = "=0.3.19"
 
 [dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.17"
+version = "=0.3.19"
 
 [dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.17"
+version = "=0.3.19"
 
 [dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.17"
+version = "=0.3.19"
 
 [dependencies.generic_array]
 package = "generic-array"
-version = "=0.14.4"
+version = "=0.14.5"
 
 [dependencies.getrandom]
 package = "getrandom"
@@ -311,7 +312,7 @@ version = "=0.3.0"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.3.9"
+version = "=0.3.10"
 
 [dependencies.hashbrown]
 package = "hashbrown"
@@ -335,7 +336,7 @@ version = "=0.25.1"
 
 [dependencies.http]
 package = "http"
-version = "=0.2.5"
+version = "=0.2.6"
 
 [dependencies.http_body]
 package = "http-body"
@@ -372,7 +373,7 @@ version = "=0.23.14"
 
 [dependencies.indexmap]
 package = "indexmap"
-version = "=1.7.0"
+version = "=1.8.0"
 
 [dependencies.instant]
 package = "instant"
@@ -498,7 +499,7 @@ features = ["net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
 package = "nalgebra"
-version = "=0.29.0"
+version = "=0.30.0"
 
 [dependencies.nalgebra_macros]
 package = "nalgebra-macros"
@@ -526,7 +527,7 @@ version = "=0.4.0"
 
 [dependencies.num_cpus]
 package = "num_cpus"
-version = "=1.13.0"
+version = "=1.13.1"
 
 [dependencies.num_integer]
 package = "num-integer"
@@ -574,7 +575,11 @@ version = "=0.9.72"
 
 [dependencies.ordered_float]
 package = "ordered-float"
-version = "=2.8.0"
+version = "=2.10.0"
+
+[dependencies.os_str_bytes]
+package = "os_str_bytes"
+version = "=6.0.0"
 
 [dependencies.parking_lot]
 package = "parking_lot"
@@ -626,15 +631,15 @@ version = "=0.8.0"
 
 [dependencies.pin_project]
 package = "pin-project"
-version = "=1.0.8"
+version = "=1.0.10"
 
 [dependencies.pin_project_internal]
 package = "pin-project-internal"
-version = "=1.0.8"
+version = "=1.0.10"
 
 [dependencies.pin_project_lite]
 package = "pin-project-lite"
-version = "=0.2.7"
+version = "=0.2.8"
 
 [dependencies.pin_utils]
 package = "pin-utils"
@@ -662,7 +667,7 @@ version = "=0.2.2"
 
 [dependencies.ppv_lite86]
 package = "ppv-lite86"
-version = "=0.2.15"
+version = "=0.2.16"
 
 [dependencies.precomputed_hash]
 package = "precomputed-hash"
@@ -670,16 +675,12 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.34"
+version = "=1.0.36"
 features = ["span-locations"]
 
 [dependencies.proc_macro_hack]
 package = "proc-macro-hack"
 version = "=0.5.19"
-
-[dependencies.proc_macro_nested]
-package = "proc-macro-nested"
-version = "=0.1.7"
 
 [dependencies.quick_error]
 package = "quick-error"
@@ -687,7 +688,7 @@ version = "=2.0.1"
 
 [dependencies.quote]
 package = "quote"
-version = "=1.0.10"
+version = "=1.0.14"
 
 [dependencies.rand]
 package = "rand"
@@ -757,7 +758,7 @@ version = "=0.5.3"
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.11.7"
+version = "=0.11.8"
 features = ["blocking", "cookies", "json", "multipart"]
 
 [dependencies.ring]
@@ -811,16 +812,16 @@ version = "=0.10.2"
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.132"
+version = "=1.0.133"
 features = ["derive", "rc"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.132"
+version = "=1.0.133"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.73"
+version = "=1.0.74"
 features = ["raw_value"]
 
 [dependencies.serde_urlencoded]
@@ -837,11 +838,11 @@ version = "=0.8.23"
 
 [dependencies.sha2]
 package = "sha2"
-version = "=0.10.0"
+version = "=0.10.1"
 
 [dependencies.simba]
 package = "simba"
-version = "=0.6.0"
+version = "=0.7.0"
 
 [dependencies.siphasher]
 package = "siphasher"
@@ -884,17 +885,13 @@ version = "=0.1.2"
 package = "strsim"
 version = "=0.10.0"
 
-[dependencies.strsim_0_8_0]
-package = "strsim"
-version = "=0.8.0"
-
 [dependencies.subtle]
 package = "subtle"
 version = "=2.4.1"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.82"
+version = "=1.0.85"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.tar]
@@ -916,10 +913,6 @@ version = "=1.1.2"
 [dependencies.textwrap]
 package = "textwrap"
 version = "=0.14.2"
-
-[dependencies.textwrap_0_11_0]
-package = "textwrap"
-version = "=0.11.0"
 
 [dependencies.thiserror]
 package = "thiserror"
@@ -1009,7 +1002,7 @@ version = "=0.3.3"
 
 [dependencies.typenum]
 package = "typenum"
-version = "=1.14.0"
+version = "=1.15.0"
 
 [dependencies.ucd_trie]
 package = "ucd-trie"
@@ -1065,7 +1058,7 @@ version = "=0.8.2"
 
 [dependencies.version_check]
 package = "version_check"
-version = "=0.9.3"
+version = "=0.9.4"
 
 [dependencies.walkdir]
 package = "walkdir"
