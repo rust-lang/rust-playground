@@ -15,7 +15,7 @@ use playground_middleware::{
 };
 use prometheus::{Encoder, TextEncoder};
 use router::Router;
-use serde::{de::DeserializeOwned, Serialize, Deserialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use snafu::{ResultExt, Snafu};
 use std::{
     any::Any,
@@ -38,10 +38,11 @@ mod gist;
 mod sandbox;
 
 const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
-const ONE_DAY_IN_SECONDS: u64 = 60 * 60 * 24;
-const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
+const ONE_HOUR: Duration = Duration::from_secs(ONE_HOUR_IN_SECONDS as u64);
+const ONE_DAY: Duration = Duration::from_secs(60 * 60 * 24);
+const ONE_YEAR: Duration = Duration::from_secs(60 * 60 * 24 * 365);
 
-const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
+const SANDBOX_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
 
 fn main() {
     // Dotenv may be unable to load environment variables, but that's ok in production
@@ -49,22 +50,26 @@ fn main() {
     openssl_probe::init_ssl_cert_env_vars();
     env_logger::init();
 
-    let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT").expect("Must specify PLAYGROUND_UI_ROOT").into();
-    let gh_token = env::var("PLAYGROUND_GITHUB_TOKEN").expect("Must specify PLAYGROUND_GITHUB_TOKEN");
+    let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT")
+        .expect("Must specify PLAYGROUND_UI_ROOT")
+        .into();
+    let gh_token =
+        env::var("PLAYGROUND_GITHUB_TOKEN").expect("Must specify PLAYGROUND_GITHUB_TOKEN");
 
     let address = env::var("PLAYGROUND_UI_ADDRESS").unwrap_or_else(|_| DEFAULT_ADDRESS.to_string());
-    let port = env::var("PLAYGROUND_UI_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(DEFAULT_PORT);
+    let port = env::var("PLAYGROUND_UI_PORT")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(DEFAULT_PORT);
     let logfile = env::var("PLAYGROUND_LOG_FILE").unwrap_or_else(|_| DEFAULT_LOG_FILE.to_string());
     let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
     let metrics_token = env::var("PLAYGROUND_METRICS_TOKEN").ok();
 
     let files = Staticfile::new(&root).expect("Unable to open root directory");
     let mut files = Chain::new(files);
-    let one_day = Duration::new(ONE_DAY_IN_SECONDS, 0);
-    let one_year = Duration::new(ONE_YEAR_IN_SECONDS, 0);
 
-    files.link_after(ModifyWith::new(Cache::new(one_day)));
-    files.link_after(Prefix::new(&["assets"], Cache::new(one_year)));
+    files.link_after(ModifyWith::new(Cache::new(ONE_DAY)));
+    files.link_after(Prefix::new(&["assets"], Cache::new(ONE_YEAR)));
     files.link_after(GuessContentType::new(ContentType::html().0));
 
     let mut gist_router = Router::new();
@@ -122,7 +127,9 @@ fn main() {
     }
 
     log::info!("Starting the server on http://{}:{}", address, port);
-    Iron::new(chain).http((&*address, port)).expect("Unable to start server");
+    Iron::new(chain)
+        .http((&*address, port))
+        .expect("Unable to start server");
 }
 
 #[derive(Debug, Clone)]
@@ -295,9 +302,7 @@ fn meta_gist_get(req: &mut Request<'_, '_>) -> IronResult<Response> {
             let gist = gist::load(token, id);
             serialize_to_response(Ok(MetaGistResponse::from(gist)))
         }
-        None => {
-            Ok(Response::with(status::UnprocessableEntity))
-        }
+        None => Ok(Response::with(status::UnprocessableEntity)),
     }
 }
 
@@ -347,7 +352,8 @@ where
     F: FnOnce(Req) -> Result<Resp>,
     Req: DeserializeOwned + Clone + Any + 'static,
 {
-    let body = req.get::<bodyparser::Struct<Req>>()
+    let body = req
+        .get::<bodyparser::Struct<Req>>()
         .context(DeserializationSnafu)?;
 
     let req = body.ok_or(Error::RequestMissing)?;
@@ -376,14 +382,28 @@ where
     });
 
     match response {
-        Ok(body) => Ok(Response::with((status::Ok, Header(ContentType::json()), body))),
+        Ok(body) => Ok(Response::with((
+            status::Ok,
+            Header(ContentType::json()),
+            body,
+        ))),
         Err(err) => {
-            let err = ErrorJson { error: err.to_string() };
+            let err = ErrorJson {
+                error: err.to_string(),
+            };
             match serde_json::ser::to_string(&err) {
-                Ok(error_str) => Ok(Response::with((status::InternalServerError, Header(ContentType::json()), error_str))),
-                Err(_) => Ok(Response::with((status::InternalServerError, Header(ContentType::json()), FATAL_ERROR_JSON))),
+                Ok(error_str) => Ok(Response::with((
+                    status::InternalServerError,
+                    Header(ContentType::json()),
+                    error_str,
+                ))),
+                Err(_) => Ok(Response::with((
+                    status::InternalServerError,
+                    Header(ContentType::json()),
+                    FATAL_ERROR_JSON,
+                ))),
             }
-        },
+        }
     }
 }
 
@@ -398,36 +418,36 @@ struct SandboxCacheInfo<T> {
 struct SandboxCacheOne<T>(Mutex<Option<SandboxCacheInfo<T>>>);
 
 impl<T> Default for SandboxCacheOne<T> {
-    fn default() -> Self { SandboxCacheOne(Mutex::default()) }
+    fn default() -> Self {
+        SandboxCacheOne(Mutex::default())
+    }
 }
 
 impl<T> SandboxCacheOne<T>
 where
-    T: Clone
+    T: Clone,
 {
     fn clone_or_populate<F>(&self, populator: F) -> Result<T>
     where
-        F: FnOnce() -> sandbox::Result<T>
+        F: FnOnce() -> sandbox::Result<T>,
     {
         let mut cache = self.0.lock().map_err(|_| Error::CachePoisoned)?;
 
         match cache.clone() {
             Some(cached) => {
-                if cached.time.elapsed() > Duration::from_secs(SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS) {
+                if cached.time.elapsed() > SANDBOX_CACHE_TIME_TO_LIVE {
                     SandboxCacheOne::populate(&mut *cache, populator)
                 } else {
                     Ok(cached.value)
                 }
-            },
-            None => {
-                SandboxCacheOne::populate(&mut *cache, populator)
             }
+            None => SandboxCacheOne::populate(&mut *cache, populator),
         }
     }
 
     fn populate<F>(cache: &mut Option<SandboxCacheInfo<T>>, populator: F) -> Result<T>
     where
-        F: FnOnce() -> sandbox::Result<T>
+        F: FnOnce() -> sandbox::Result<T>,
     {
         let value = populator().context(CachingSnafu)?;
         *cache = Some(SandboxCacheInfo {
@@ -459,43 +479,45 @@ struct CachedSandbox<'a> {
 
 impl<'a> CachedSandbox<'a> {
     fn crates(&self) -> Result<Vec<sandbox::CrateInformation>> {
-        self.cache.crates.clone_or_populate(|| self.sandbox.crates())
+        self.cache
+            .crates
+            .clone_or_populate(|| self.sandbox.crates())
     }
 
     fn version_stable(&self) -> Result<sandbox::Version> {
-        self.cache.version_stable.clone_or_populate(|| {
-            self.sandbox.version(sandbox::Channel::Stable)
-        })
+        self.cache
+            .version_stable
+            .clone_or_populate(|| self.sandbox.version(sandbox::Channel::Stable))
     }
 
     fn version_beta(&self) -> Result<sandbox::Version> {
-        self.cache.version_beta.clone_or_populate(|| {
-            self.sandbox.version(sandbox::Channel::Beta)
-        })
+        self.cache
+            .version_beta
+            .clone_or_populate(|| self.sandbox.version(sandbox::Channel::Beta))
     }
 
     fn version_nightly(&self) -> Result<sandbox::Version> {
-        self.cache.version_nightly.clone_or_populate(|| {
-            self.sandbox.version(sandbox::Channel::Nightly)
-        })
+        self.cache
+            .version_nightly
+            .clone_or_populate(|| self.sandbox.version(sandbox::Channel::Nightly))
     }
 
     fn version_clippy(&self) -> Result<sandbox::Version> {
-        self.cache.version_clippy.clone_or_populate(|| {
-            self.sandbox.version_clippy()
-        })
+        self.cache
+            .version_clippy
+            .clone_or_populate(|| self.sandbox.version_clippy())
     }
 
     fn version_rustfmt(&self) -> Result<sandbox::Version> {
-        self.cache.version_rustfmt.clone_or_populate(|| {
-            self.sandbox.version_rustfmt()
-        })
+        self.cache
+            .version_rustfmt
+            .clone_or_populate(|| self.sandbox.version_rustfmt())
     }
 
     fn version_miri(&self) -> Result<sandbox::Version> {
-        self.cache.version_miri.clone_or_populate(|| {
-            self.sandbox.version_miri()
-        })
+        self.cache
+            .version_miri
+            .clone_or_populate(|| self.sandbox.version_miri())
     }
 }
 
@@ -1206,8 +1228,12 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
         };
 
         let target = match (target, assembly_flavor, demangle, process_assembly) {
-            (sandbox::CompileTarget::Assembly(_, _, _), Some(flavor), Some(demangle), Some(process)) =>
-                sandbox::CompileTarget::Assembly(flavor, demangle, process),
+            (
+                sandbox::CompileTarget::Assembly(_, _, _),
+                Some(flavor),
+                Some(demangle),
+                Some(process),
+            ) => sandbox::CompileTarget::Assembly(flavor, demangle, process),
             _ => target,
         };
 
@@ -1349,13 +1375,16 @@ impl From<sandbox::MacroExpansionResponse> for MacroExpansionResponse {
 
 impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
     fn from(me: Vec<sandbox::CrateInformation>) -> Self {
-        let crates = me.into_iter()
-            .map(|cv| CrateInformation { name: cv.name, version: cv.version, id: cv.id })
+        let crates = me
+            .into_iter()
+            .map(|cv| CrateInformation {
+                name: cv.name,
+                version: cv.version,
+                id: cv.id,
+            })
             .collect();
 
-        MetaCratesResponse {
-            crates,
-        }
+        MetaCratesResponse { crates }
     }
 }
 
@@ -1385,7 +1414,11 @@ impl TryFrom<EvaluateRequest> for sandbox::ExecuteRequest {
     fn try_from(me: EvaluateRequest) -> Result<Self> {
         Ok(sandbox::ExecuteRequest {
             channel: parse_channel(&me.version)?,
-            mode: if me.optimize != "0" { sandbox::Mode::Release } else { sandbox::Mode::Debug },
+            mode: if me.optimize != "0" {
+                sandbox::Mode::Release
+            } else {
+                sandbox::Mode::Debug
+            },
             edition: parse_edition(&me.edition)?,
             crate_type: sandbox::CrateType::Binary,
             tests: me.tests,
@@ -1423,9 +1456,11 @@ impl From<sandbox::ExecuteResponse> for EvaluateResponse {
 
 fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
     Ok(match s {
-        "asm" => sandbox::CompileTarget::Assembly(sandbox::AssemblyFlavor::Att,
-                                                  sandbox::DemangleAssembly::Demangle,
-                                                  sandbox::ProcessAssembly::Filter),
+        "asm" => sandbox::CompileTarget::Assembly(
+            sandbox::AssemblyFlavor::Att,
+            sandbox::DemangleAssembly::Demangle,
+            sandbox::ProcessAssembly::Filter,
+        ),
         "llvm-ir" => sandbox::CompileTarget::LlvmIr,
         "mir" => sandbox::CompileTarget::Mir,
         "hir" => sandbox::CompileTarget::Hir,
@@ -1438,7 +1473,7 @@ fn parse_assembly_flavor(s: &str) -> Result<sandbox::AssemblyFlavor> {
     Ok(match s {
         "att" => sandbox::AssemblyFlavor::Att,
         "intel" => sandbox::AssemblyFlavor::Intel,
-        value => InvalidAssemblyFlavorSnafu { value }.fail()?
+        value => InvalidAssemblyFlavorSnafu { value }.fail()?,
     })
 }
 
@@ -1454,7 +1489,7 @@ fn parse_process_assembly(s: &str) -> Result<sandbox::ProcessAssembly> {
     Ok(match s {
         "filter" => sandbox::ProcessAssembly::Filter,
         "raw" => sandbox::ProcessAssembly::Raw,
-        value => InvalidProcessAssemblySnafu { value }.fail()?
+        value => InvalidProcessAssemblySnafu { value }.fail()?,
     })
 }
 

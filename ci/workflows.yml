@@ -262,6 +262,14 @@ workflows:
         steps:
           - *checkout_pr
 
+          - name: "Install Rust"
+            uses: actions-rs/toolchain@v1
+            with:
+              profile: minimal
+              toolchain: stable
+              override: true
+              components: rustfmt
+
           - name: "Cache Cargo intermediate products"
             uses: actions/cache@v2
             with:
@@ -270,6 +278,12 @@ workflows:
                 ~/.cargo/git
                 ui/target
               key: ${{ runner.os }}-cargo-${{ hashFiles('ui/**/Cargo.lock') }}-2
+
+          - name: "Format"
+            uses: actions-rs/cargo@v1
+            with:
+              command: fmt
+              args: --manifest-path ui/Cargo.toml --all -- --check
 
           - name: "Build backend"
             run: >-

@@ -12,9 +12,11 @@ pub fn demangle_asm(block: &str) -> String {
         static ref DEMANGLE_REGEX: Regex = Regex::new(r"_[a-zA-Z0-9._$]*").unwrap();
     }
 
-    DEMANGLE_REGEX.replace_all(block, |caps: &Captures<'_>| {
-        format!("{:#}", demangle(caps.get(0).map_or("", |m| m.as_str())))
-    }).to_string()
+    DEMANGLE_REGEX
+        .replace_all(block, |caps: &Captures<'_>| {
+            format!("{:#}", demangle(caps.get(0).map_or("", |m| m.as_str())))
+        })
+        .to_string()
 }
 
 enum LineType<'a> {
@@ -29,7 +31,6 @@ enum LineType<'a> {
 
 // Removes unused labels and directives from assembly
 pub fn filter_asm(block: &str) -> String {
-
     use self::LineType::*;
 
     lazy_static! {
@@ -82,10 +83,16 @@ pub fn filter_asm(block: &str) -> String {
         if OPCODE_REGEX.is_match(line) {
             line_info.push(Opcode);
             // Skip the opcode, just add operands
-            for label_ref_cap in LABEL_REF_REGEX.captures_iter(line).skip(1).filter_map(|cap| cap.get(1)) {
+            for label_ref_cap in LABEL_REF_REGEX
+                .captures_iter(line)
+                .skip(1)
+                .filter_map(|cap| cap.get(1))
+            {
                 opcode_operands.insert(label_ref_cap.as_str());
             }
-        } else if let Some(label_decl_cap) = LABEL_DECL_REGEX.captures(line).and_then(|cap| cap.get(1)) {
+        } else if let Some(label_decl_cap) =
+            LABEL_DECL_REGEX.captures(line).and_then(|cap| cap.get(1))
+        {
             line_info.push(LabelDecl(label_decl_cap.as_str()));
             labels.insert(label_decl_cap.as_str());
             current_label = label_decl_cap.as_str();
@@ -93,11 +100,16 @@ pub fn filter_asm(block: &str) -> String {
             line_info.push(Data(current_label));
             // These will be checked for references to other labels later on
             // Skip the data type, just capture its reference
-            for label_ref_cap in LABEL_REF_REGEX.captures_iter(line).skip(1).filter_map(|cap| cap.get(1)) {
+            for label_ref_cap in LABEL_REF_REGEX
+                .captures_iter(line)
+                .skip(1)
+                .filter_map(|cap| cap.get(1))
+            {
                 // Create a graph of how data labels reference each other
                 label_graph.add_edge(current_label, label_ref_cap.as_str(), 1);
             }
-        } else if let Some(function_cap) = FUNCTION_REGEX.captures(line).and_then(|cap| cap.get(1)) {
+        } else if let Some(function_cap) = FUNCTION_REGEX.captures(line).and_then(|cap| cap.get(1))
+        {
             line_info.push(FunctionDecl);
             opcode_operands.insert(function_cap.as_str());
         // DIRECTIVE_REGEX must be checked after FUNCTION_REGEX and DATA_REGEX, matches them too
@@ -132,16 +144,16 @@ pub fn filter_asm(block: &str) -> String {
             Opcode | Misc => {
                 filtered_asm.push_str(line);
                 filtered_asm.push('\n');
-            },
+            }
             Data(data) if used_labels.contains(&data) => {
                 filtered_asm.push_str(line);
                 filtered_asm.push('\n');
-            },
+            }
             LabelDecl(label) if used_labels.contains(&label) => {
                 filtered_asm.push('\n');
                 filtered_asm.push_str(line);
                 filtered_asm.push('\n');
-            },
+            }
             _ => (),
         }
     }
@@ -155,97 +167,127 @@ mod test {
     fn demangles() {
         assert_eq!(
             super::demangle_asm("_ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE"),
-            "core::fmt::Arguments::new_v1");
-        }
+            "core::fmt::Arguments::new_v1"
+        );
+    }
 
     #[test]
     fn many_demangles() {
         assert_eq!(
             super::demangle_asm(".section.text._ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE,\"ax\",@progbits\n .p2align4, 0x90\n .type_ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE,@function"),
             ".section.text.core::fmt::Arguments::new_v1,\"ax\",@progbits\n .p2align4, 0x90\n .typecore::fmt::Arguments::new_v1,@function");
-        }
+    }
 
     #[test]
     fn demangle_pass_through() {
         assert_eq!(
             super::demangle_asm("push rbp\n mov rbp, rsp"),
-            "push rbp\n mov rbp, rsp");
+            "push rbp\n mov rbp, rsp"
+        );
     }
 
     #[test]
     fn one_directive_removed() {
         assert_eq!(
             super::filter_asm("  .filesystem1 \"<println macros>\"\n  movq%rsp, %rbp\n"),
-            "  movq%rsp, %rbp\n");
+            "  movq%rsp, %rbp\n"
+        );
     }
 
     #[test]
     fn many_directives_removed() {
         assert_eq!(
             super::filter_asm(" .cfi_def_cfa_register %rbp\n subq$80, %rsp\n .text\n"),
-            " subq$80, %rsp\n");
+            " subq$80, %rsp\n"
+        );
     }
 
     #[test]
     fn used_label_kept() {
         assert_eq!(
             super::filter_asm(".Lcfi0:\n  callq    .Lcfi0\n"),
-            "\n.Lcfi0:\n  callq    .Lcfi0\n");
+            "\n.Lcfi0:\n  callq    .Lcfi0\n"
+        );
     }
 
     #[test]
     fn unused_label_removed() {
         assert_eq!(
-        super::filter_asm("addq    $16, %rsp\n    popq    %rbp\n    retq\n.Lfunc_end31:\nstr.0:\n"),
-        "addq    $16, %rsp\n    popq    %rbp\n    retq\n");
+            super::filter_asm(
+                "addq    $16, %rsp\n    popq    %rbp\n    retq\n.Lfunc_end31:\nstr.0:\n"
+            ),
+            "addq    $16, %rsp\n    popq    %rbp\n    retq\n"
+        );
     }
 
     #[test]
     fn used_data_kept() {
-        assert_eq!(super::filter_asm("ref.2:\n  .quad 1\n  jmp ref.2\n"),
-        "\nref.2:\n  .quad 1\n  jmp ref.2\n")
+        assert_eq!(
+            super::filter_asm("ref.2:\n  .quad 1\n  jmp ref.2\n"),
+            "\nref.2:\n  .quad 1\n  jmp ref.2\n"
+        )
     }
 
     #[test]
     fn unused_data_removed() {
-        assert_eq!(super::filter_asm("str.0:\n  .ascii \"Hello, world\"\n  pop rbp\n"),
-        "  pop rbp\n");
+        assert_eq!(
+            super::filter_asm("str.0:\n  .ascii \"Hello, world\"\n  pop rbp\n"),
+            "  pop rbp\n"
+        );
     }
 
     #[test]
     fn blank_lines_removed() {
-        assert_eq!(super::filter_asm("  mov rbp, rsp\nmain:\n  jmp core::fmt::Arguments\n  \n"),
-        "  mov rbp, rsp\n  jmp core::fmt::Arguments\n")
+        assert_eq!(
+            super::filter_asm("  mov rbp, rsp\nmain:\n  jmp core::fmt::Arguments\n  \n"),
+            "  mov rbp, rsp\n  jmp core::fmt::Arguments\n"
+        )
     }
 
     #[test]
     fn functions_kept() {
-        assert_eq!(super::filter_asm("  .type main,@function\nmain:\n  pushq %rax\n"),
-        "\nmain:\n  pushq %rax\n");
+        assert_eq!(
+            super::filter_asm("  .type main,@function\nmain:\n  pushq %rax\n"),
+            "\nmain:\n  pushq %rax\n"
+        );
     }
     #[test]
     fn used_data_ref_label_kept() {
-        assert_eq!(super::filter_asm(".Lcfi0:\n  .quad .Lcfi1\n  mov .Lcfi0\n.Lcfi1:\n  addq $16, %rsp\n"),
-        "\n.Lcfi0:\n  .quad .Lcfi1\n  mov .Lcfi0\n\n.Lcfi1:\n  addq $16, %rsp\n");
+        assert_eq!(
+            super::filter_asm(".Lcfi0:\n  .quad .Lcfi1\n  mov .Lcfi0\n.Lcfi1:\n  addq $16, %rsp\n"),
+            "\n.Lcfi0:\n  .quad .Lcfi1\n  mov .Lcfi0\n\n.Lcfi1:\n  addq $16, %rsp\n"
+        );
     }
     #[test]
     fn unused_data_ref_label_removed() {
-        assert_eq!(super::filter_asm(".Lcfi0:\n  .quad 1\n  mov .Lcfi0\n.Lcfi1:\n  addq $16, %rsp\n"),
-        "\n.Lcfi0:\n  .quad 1\n  mov .Lcfi0\n  addq $16, %rsp\n");
+        assert_eq!(
+            super::filter_asm(".Lcfi0:\n  .quad 1\n  mov .Lcfi0\n.Lcfi1:\n  addq $16, %rsp\n"),
+            "\n.Lcfi0:\n  .quad 1\n  mov .Lcfi0\n  addq $16, %rsp\n"
+        );
     }
     #[test]
     fn used_data_ref_label_graph_walk() {
-        assert_eq!(super::filter_asm("main:\n  .quad ref.1\n  mov main\nref.1:\n  .quad ref.2\nref.2:\n  .quad 1"),
-        "\nmain:\n  .quad ref.1\n  mov main\n\nref.1:\n  .quad ref.2\n\nref.2:\n  .quad 1\n");
+        assert_eq!(
+            super::filter_asm(
+                "main:\n  .quad ref.1\n  mov main\nref.1:\n  .quad ref.2\nref.2:\n  .quad 1"
+            ),
+            "\nmain:\n  .quad ref.1\n  mov main\n\nref.1:\n  .quad ref.2\n\nref.2:\n  .quad 1\n"
+        );
     }
     #[test]
     fn label_with_comment_recognized() {
-        assert_eq!(super::filter_asm(".LBB6_10:  # =>Comment\n movq %r15, %rsi\n movq %rbx, %rdx\n ja .LBB6_10\n"),
-        "\n.LBB6_10:  # =>Comment\n movq %r15, %rsi\n movq %rbx, %rdx\n ja .LBB6_10\n");
+        assert_eq!(
+            super::filter_asm(
+                ".LBB6_10:  # =>Comment\n movq %r15, %rsi\n movq %rbx, %rdx\n ja .LBB6_10\n"
+            ),
+            "\n.LBB6_10:  # =>Comment\n movq %r15, %rsi\n movq %rbx, %rdx\n ja .LBB6_10\n"
+        );
     }
     #[test]
     fn comment_retained() {
-        assert_eq!(super::filter_asm("# %bb.0:\n subq $24, %rsp\n"),
-        "# %bb.0:\n subq $24, %rsp\n")
+        assert_eq!(
+            super::filter_asm("# %bb.0:\n subq $24, %rsp\n"),
+            "# %bb.0:\n subq $24, %rsp\n"
+        )
     }
 }
