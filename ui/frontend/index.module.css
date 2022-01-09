@@ -17,6 +17,7 @@ input,
 optgroup,
 select,
 textarea {
+  color: text;
   font-family: var(--primary-font);
 }
 
