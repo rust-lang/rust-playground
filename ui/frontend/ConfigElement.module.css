@@ -48,7 +48,7 @@
     }
 
     &:hover {
-      background: hsla(208, 100%, 43%, 0.1);
+      background: hsl(208deg 100% 43% / 10%);
     }
   }
 
