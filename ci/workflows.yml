@@ -334,7 +334,7 @@ workflows:
           - name: "Configure node"
             uses: actions/setup-node@v1
             with:
-              node-version: 14.15
+              node-version: 14.18
 
           - name: "Install dependencies"
             run: >-
