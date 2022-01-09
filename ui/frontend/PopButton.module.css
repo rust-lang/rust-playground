@@ -22,7 +22,7 @@ $vertical-border-color: #cacaca;
   border: $arrow-size solid transparent;
 }
 
-.container[data-placement^='bottom'] .arrow {
+.container[data-popper-placement^='bottom'] .arrow {
   border-top-width: 0;
   border-bottom-color: $bg-color;
   margin-top: 0;

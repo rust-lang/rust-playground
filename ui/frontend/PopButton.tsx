@@ -1,13 +1,8 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react';
-import { Manager, Popper, Reference } from 'react-popper';
+import React, { useCallback, useState, useEffect } from 'react';
+import { usePopper } from 'react-popper';
 import { Portal } from 'react-portal';
 
 import styles from './PopButton.module.css';
-
-const POPPER_MODIFIERS = [
-  // Issue #303
-  { name: 'computeStyles', options: { gpuAcceleration: false } },
-];
 
 interface NewPopProps {
   Button: React.ComponentType<{
@@ -21,52 +16,59 @@ const PopButton: React.SFC<NewPopProps> = ({ Button, Menu }) => {
   const toggle = useCallback(() => setOpen(v => !v), []);
   const close = useCallback(() => setOpen(false), []);
 
-  const buttonRef = useRef<HTMLElement>();
-  const menuRef = useRef<HTMLElement>();
+  const [referenceElement, setReferenceElement] = useState(null);
+  const [popperElement, setPopperElement] = useState(null);
+  const [arrowElement, setArrowElement] = useState(null);
+
+  const { styles: popperStyles, attributes: popperAttributes } = usePopper(referenceElement, popperElement, {
+    modifiers: [
+      { name: 'arrow', options: { element: arrowElement } },
+      // Issue #303
+      { name: 'computeStyles', options: { gpuAcceleration: false } },
+    ],
+  });
 
   useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
     const handleClickOutside = (event) => {
-      if (buttonRef.current && buttonRef.current.contains(event.target)) {
+      if (referenceElement && referenceElement.contains(event.target)) {
         // They are clicking on the button, so let that go ahead and close us.
         return;
       }
 
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      if (popperElement && !popperElement.contains(event.target)) {
         close();
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [close]);
+  }, [isOpen, referenceElement, popperElement, close]);
 
   return (
-    <Manager>
-      <Reference innerRef={buttonRef}>
-        {({ ref }) => <Button ref={ref} toggle={toggle} />}
-      </Reference>
+    <>
+      <Button ref={setReferenceElement} toggle={toggle} />
+
       {isOpen && <Portal>
-        <Popper placement="bottom" innerRef={menuRef} modifiers={POPPER_MODIFIERS}>
-          {({ ref, style, arrowProps, placement }) => (
-            <div
-              className={styles.container}
-              ref={ref}
-              style={style}
-              data-placement={placement}
-            >
-              <div
-                className={styles.arrow}
-                ref={arrowProps.ref}
-                style={arrowProps.style}
-              />
-              <div className={styles.content}>
-                <Menu close={close} />
-              </div>
-            </div>
-          )}
-        </Popper>
+        <div
+          ref={setPopperElement}
+          className={styles.container}
+          style={popperStyles.popper}
+          {...popperAttributes.popper}>
+          <div
+            ref={setArrowElement}
+            className={styles.arrow}
+            style={popperStyles.arrow}
+            {...popperAttributes.arrow} />
+          <div className={styles.content}>
+            <Menu close={close} />
+          </div>
+        </div>
       </Portal>}
-    </Manager>
+    </>
   );
 };
 
