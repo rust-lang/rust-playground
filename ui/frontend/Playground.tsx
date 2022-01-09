@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Split from 'split-grid';
 
-import Editor from './Editor';
+import Editor from './editor/Editor';
 import Header from './Header';
 import Notifications from './Notifications';
 import Output from './Output';

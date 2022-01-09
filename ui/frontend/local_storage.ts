@@ -4,17 +4,56 @@
 
 import State from './state';
 import storage from './storage';
+import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, PairCharacters, ProcessAssembly } from './types';
 
-const CURRENT_VERSION = 1;
+const CURRENT_VERSION = 2;
 
-export function serialize(state: State) {
-  return JSON.stringify({
+interface V2Configuration {
+  version: 2;
+  configuration: {
+    editor: Editor;
+    ace: {
+      keybinding: string;
+      theme: string;
+      pairCharacters: PairCharacters;
+    }
+    orientation: Orientation;
+    assemblyFlavor: AssemblyFlavor;
+    demangleAssembly: DemangleAssembly;
+    processAssembly: ProcessAssembly;
+  };
+  code: string;
+  notifications: any;
+}
+
+interface V1Configuration {
+  version: 1;
+  configuration: {
+    editor: 'simple' | 'advanced';
+    keybinding: string;
+    theme: string;
+    pairCharacters: PairCharacters;
+    orientation: Orientation;
+    assemblyFlavor: AssemblyFlavor;
+    demangleAssembly: DemangleAssembly;
+    processAssembly: ProcessAssembly;
+  };
+  code: string;
+  notifications: any;
+}
+
+type CurrentConfiguration = V2Configuration;
+
+export function serialize(state: State): string {
+  const conf: CurrentConfiguration = {
     version: CURRENT_VERSION,
     configuration: {
       editor: state.configuration.editor,
-      keybinding: state.configuration.keybinding,
-      theme: state.configuration.theme,
-      pairCharacters: state.configuration.pairCharacters,
+      ace: {
+        keybinding: state.configuration.ace.keybinding,
+        theme: state.configuration.ace.theme,
+        pairCharacters: state.configuration.ace.pairCharacters,
+      },
       orientation: state.configuration.orientation,
       assemblyFlavor: state.configuration.assemblyFlavor,
       demangleAssembly: state.configuration.demangleAssembly,
@@ -22,20 +61,47 @@ export function serialize(state: State) {
     },
     code: state.code,
     notifications: state.notifications,
-  });
+  };
+  return JSON.stringify(conf);
 }
 
-export function deserialize(savedState) {
+function migrateV1(state: V1Configuration): CurrentConfiguration {
+  const { editor, theme, keybinding, pairCharacters, ...configuration } = state.configuration;
+  const step: V2Configuration = {
+    ...state,
+    configuration: {
+      ...configuration,
+      ace: { theme, keybinding, pairCharacters },
+      editor: editor === 'advanced' ? Editor.Ace : Editor.Simple,
+    },
+    version: 2,
+  };
+  return migrateV2(step);
+}
+
+function migrateV2(state: V2Configuration): CurrentConfiguration {
+  return state;
+}
+
+function migrate(state: V1Configuration | V2Configuration): CurrentConfiguration {
+  switch (state.version) {
+    case 1: return migrateV1(state);
+    case 2: return migrateV2(state);
+    default: return undefined
+  }
+}
+
+export function deserialize(savedState: string) {
   if (!savedState) { return undefined; }
+
   const parsedState = JSON.parse(savedState);
   if (!parsedState) { return undefined; }
-  if (parsedState.version !== CURRENT_VERSION) { return undefined; }
 
-  // This assumes that the keys we serialize with match the keys in the
-  // live state. If that's no longer true, an additional renaming step
-  // needs to be added.
-  delete parsedState.version;
-  return parsedState;
+  const result = migrate(parsedState);
+  if (!result) { return undefined; }
+
+  delete result.version;
+  return result;
 }
 
 export default storage({

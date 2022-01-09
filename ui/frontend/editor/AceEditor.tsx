@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
-import { aceResizeKey, offerCrateAutocompleteOnUse } from './selectors';
+import { aceResizeKey, offerCrateAutocompleteOnUse } from '../selectors';
 
-import State from './state';
-import { AceResizeKey, CommonEditorProps, Crate, PairCharacters, Position, Selection } from './types';
+import State from '../state';
+import { AceResizeKey, CommonEditorProps, Crate, PairCharacters, Position, Selection } from '../types';
 
 import styles from './Editor.module.css';
 
 type Ace = typeof import('ace-builds');
-type AceEditor = import('ace-builds').Ace.Editor;
+type AceModule = import('ace-builds').Ace.Editor;
 type AceCompleter = import('ace-builds').Ace.Completer;
 
-const displayExternCrateAutocomplete = (editor: AceEditor, autocompleteOnUse: boolean) => {
+const displayExternCrateAutocomplete = (editor: AceModule, autocompleteOnUse: boolean) => {
   const { session } = editor;
   const pos = editor.getCursorPosition();
   const line = session.getLine(pos.row);
@@ -55,11 +55,11 @@ function useRafDebouncedFunction<A extends any[]>(fn: (...args: A) => void, onCa
   }, [fn, onCall, timeout]);
 }
 
-interface AdvancedEditorProps extends AdvancedEditorAsyncProps {
+interface AceEditorProps extends AceEditorAsyncProps {
   ace: Ace;
 }
 
-interface AdvancedEditorProps {
+interface AceEditorProps {
   ace: Ace;
   autocompleteOnUse: boolean;
   code: string;
@@ -75,7 +75,7 @@ interface AdvancedEditorProps {
 }
 
 // Run an effect when the editor or prop changes
-function useEditorProp<T>(editor: AceEditor, prop: T, whenPresent: (editor: AceEditor, prop: T) => void) {
+function useEditorProp<T>(editor: AceModule, prop: T, whenPresent: (editor: AceModule, prop: T) => void) {
   useEffect(() => {
     if (editor) {
       return whenPresent(editor, prop);
@@ -83,8 +83,8 @@ function useEditorProp<T>(editor: AceEditor, prop: T, whenPresent: (editor: AceE
   }, [editor, prop, whenPresent]);
 }
 
-const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
-  const [editor, setEditor] = useState<AceEditor>(null);
+const AceEditor: React.SFC<AceEditorProps> = props => {
+  const [editor, setEditor] = useState<AceModule>(null);
   const child = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -292,7 +292,7 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
   }, []));
 
   return (
-    <div className={styles.advanced} ref={child} />
+    <div className={styles.ace} ref={child} />
   );
 };
 
@@ -315,7 +315,7 @@ enum LoadState {
 //
 // Themes and keybindings can be changed at runtime.
 
-interface AdvancedEditorAsyncProps {
+interface AceEditorAsyncProps {
   autocompleteOnUse: boolean;
   code: string;
   execute: () => any;
@@ -329,7 +329,7 @@ interface AdvancedEditorAsyncProps {
   pairCharacters: PairCharacters;
 }
 
-class AdvancedEditorAsync extends React.Component<AdvancedEditorAsyncProps, AdvancedEditorAsyncState> {
+class AceEditorAsync extends React.Component<AceEditorAsyncProps, AceEditorAsyncState> {
   public constructor(props) {
     super(props);
     this.state = {
@@ -342,7 +342,7 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorAsyncProps, Adva
   public render() {
     if (this.isLoaded()) {
       const { ace, theme, keybinding } = this.state;
-      return <AdvancedEditor {...this.props} ace={ace} theme={theme} keybinding={keybinding} />;
+      return <AceEditor {...this.props} ace={ace} theme={theme} keybinding={keybinding} />;
     } else {
       return <div>Loading the ACE editor...</div>;
     }
@@ -447,13 +447,13 @@ class AdvancedEditorAsync extends React.Component<AdvancedEditorAsyncProps, Adva
 
   private async requireLibraries() {
     return import(
-      /* webpackChunkName: "advanced-editor" */
-      './advanced-editor'
+      /* webpackChunkName: "ace-editor" */
+      './ace-editor'
     );
   }
 }
 
-interface AdvancedEditorAsyncState {
+interface AceEditorAsyncState {
   theme?: string;
   keybinding?: string;
   themeState: LoadState;
@@ -472,7 +472,7 @@ interface PropsFromState {
 }
 
 const mapStateToProps = (state: State) => {
-  const { configuration: { theme, keybinding, pairCharacters } } = state;
+  const { configuration: { ace: { theme, keybinding, pairCharacters } } } = state;
 
   return {
     theme,
@@ -483,4 +483,4 @@ const mapStateToProps = (state: State) => {
   };
 };
 
-export default connect<PropsFromState, undefined, CommonEditorProps>(mapStateToProps)(AdvancedEditorAsync);
+export default connect<PropsFromState, undefined, CommonEditorProps>(mapStateToProps)(AceEditorAsync);

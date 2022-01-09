@@ -63,7 +63,8 @@ export enum ActionType {
   SetPage = 'SET_PAGE',
   ChangeEditor = 'CHANGE_EDITOR',
   ChangeKeybinding = 'CHANGE_KEYBINDING',
-  ChangeTheme = 'CHANGE_THEME',
+  ChangeAceTheme = 'CHANGE_ACE_THEME',
+  ChangeMonacoTheme = 'CHANGE_MONACO_THEME',
   ChangePairCharacters = 'CHANGE_PAIR_CHARACTERS',
   ChangeOrientation = 'CHANGE_ORIENTATION',
   ChangeAssemblyFlavor = 'CHANGE_ASSEMBLY_FLAVOR',
@@ -138,8 +139,11 @@ export const changeEditor = (editor: Editor) =>
 export const changeKeybinding = (keybinding: string) =>
   createAction(ActionType.ChangeKeybinding, { keybinding });
 
-export const changeTheme = (theme: string) =>
-  createAction(ActionType.ChangeTheme, { theme });
+export const changeAceTheme = (theme: string) =>
+  createAction(ActionType.ChangeAceTheme, { theme });
+
+export const changeMonacoTheme = (theme: string) =>
+  createAction(ActionType.ChangeMonacoTheme, { theme });
 
 export const changePairCharacters = (pairCharacters: PairCharacters) =>
   createAction(ActionType.ChangePairCharacters, { pairCharacters });
@@ -701,8 +705,7 @@ export function performVersionsLoad(): ThunkAction {
 const notificationSeen = (notification: Notification) =>
   createAction(ActionType.NotificationSeen, { notification });
 
-export const seenRust2021IsDefault = () => notificationSeen(Notification.Rust2021IsDefault);
-export const seenRustSurvey2021 = () => notificationSeen(Notification.RustSurvey2021);
+export const seenMonicoEditorAvailable = () => notificationSeen(Notification.MonacoEditorAvailable);
 
 export const browserWidthChanged = (isSmall: boolean) =>
   createAction(ActionType.BrowserWidthChanged, { isSmall });
@@ -816,7 +819,8 @@ export type Action =
   | ReturnType<typeof changeOrientation>
   | ReturnType<typeof changePrimaryAction>
   | ReturnType<typeof changeProcessAssembly>
-  | ReturnType<typeof changeTheme>
+  | ReturnType<typeof changeAceTheme>
+  | ReturnType<typeof changeMonacoTheme>
   | ReturnType<typeof requestExecute>
   | ReturnType<typeof receiveExecuteSuccess>
   | ReturnType<typeof receiveExecuteFailure>

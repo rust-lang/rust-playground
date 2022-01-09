@@ -5,6 +5,7 @@ const HtmlPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const glob = require('glob');
 const basename = require('basename');
 
@@ -120,6 +121,15 @@ module.exports = function(_, argv) {
             },
           ]
         },
+        // This inlines the codicon.ttf file from Monaco. Using a
+        // regular file fails because it looks for
+        // `/assets/assets/...`. Inlining saves a file, and it's
+        // pretty small compared to the rest of Monaco.
+        {
+          test: /\.ttf$/,
+          include: /node_modules\/monaco-editor/,
+          type: 'asset/inline',
+        },
         {
           test: /\.svg$/,
           type: 'asset/inline',
@@ -145,6 +155,10 @@ module.exports = function(_, argv) {
       new MiniCssExtractPlugin({
         filename: `${filenameTemplate}.css`,
         chunkFilename: `${chunkFilenameTemplate}.css`,
+      }),
+      new MonacoWebpackPlugin({
+        filename: `${filenameTemplate}.worker.js`,
+        languages: ['rust'],
       }),
       ...(isProduction ? [new CompressionPlugin()] : []),
     ],

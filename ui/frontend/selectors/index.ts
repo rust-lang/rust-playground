@@ -250,23 +250,15 @@ const notificationsSelector = (state: State) => state.notifications;
 
 const NOW = new Date();
 
-const RUST_2021_DEFAULT_END = new Date('2022-01-01T00:00:00Z');
-const RUST_2021_DEFAULT_OPEN = NOW <= RUST_2021_DEFAULT_END;
-export const showRust2021IsDefaultSelector = createSelector(
+const MONACO_EDITOR_AVAILABLE_END = new Date('2022-02-15T00:00:00Z');
+const MONACO_EDITOR_AVAILABLE_OPEN = NOW <= MONACO_EDITOR_AVAILABLE_END;
+export const showMonicoEditorAvailableSelector = createSelector(
   notificationsSelector,
-  notifications => RUST_2021_DEFAULT_OPEN && !notifications.seenRust2021IsDefault,
-);
-
-const RUST_SURVEY_2021_END = new Date('2021-12-22T00:00:00Z');
-const RUST_SURVEY_2021_OPEN = NOW <= RUST_SURVEY_2021_END;
-export const showRustSurvey2021Selector = createSelector(
-  notificationsSelector,
-  notifications => RUST_SURVEY_2021_OPEN && !notifications.seenRustSurvey2021,
+  notifications => MONACO_EDITOR_AVAILABLE_OPEN && !notifications.seenMonacoEditorAvailable,
 );
 
 export const anyNotificationsToShowSelector = createSelector(
-  showRust2021IsDefaultSelector,
-  showRustSurvey2021Selector,
+  showMonicoEditorAvailableSelector,
   (...allNotifications) => allNotifications.some(n => n),
 );
 

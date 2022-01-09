@@ -36,7 +36,8 @@ export interface CommonEditorProps {
 
 export enum Editor {
   Simple = 'simple',
-  Advanced = 'advanced',
+  Ace = 'ace',
+  Monaco = 'monaco',
 }
 
 export enum PairCharacters {
@@ -119,8 +120,7 @@ export enum Focus {
 }
 
 export enum Notification {
-  Rust2021IsDefault = 'rust-2021-is-default',
-  RustSurvey2021 = 'rust-survey-2021',
+  MonacoEditorAvailable = 'monaco-editor-available',
 }
 
 export type AceResizeKey = [Focus, number];
