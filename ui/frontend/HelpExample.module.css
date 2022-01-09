@@ -7,7 +7,7 @@
   top: 0;
   right: 0;
   border: none;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgb(255 255 255 / 80%);
   border-bottom-left-radius: 0.5em;
   cursor: pointer;
   opacity: 0;
