@@ -78,6 +78,8 @@ pub enum Error {
     UnableToReadOutput { source: io::Error },
     #[snafu(display("Unable to read crate information: {}", source))]
     UnableToParseCrateInformation { source: ::serde_json::Error },
+    #[snafu(display("Unable to parse cargo output: {}", source))]
+    UnableToParseCargoOutput { source: io::Error },
     #[snafu(display("Output was not valid UTF-8: {}", source))]
     OutputNotUtf8 { source: string::FromUtf8Error },
     #[snafu(display("Output was missing"))]
@@ -146,8 +148,9 @@ impl Sandbox {
             .map(|entry| entry.path())
             .find(|path| path.extension() == Some(req.target.extension()));
 
-        let stdout = vec_to_str(output.stdout)?;
+        let (stdout, stderr_tail) = parse_json_output(output.stdout)?;
         let mut stderr = vec_to_str(output.stderr)?;
+        stderr.push_str(&stderr_tail);
 
         let mut code = match file {
             Some(file) => read(&file)?.unwrap_or_else(String::new),
@@ -193,10 +196,14 @@ impl Sandbox {
 
         let output = run_command_with_timeout(command)?;
 
+        let (stdout, stderr_tail) = parse_json_output(output.stdout)?;
+        let mut stderr = vec_to_str(output.stderr)?;
+        stderr.push_str(&stderr_tail);
+
         Ok(ExecuteResponse {
             success: output.status.success(),
-            stdout: vec_to_str(output.stdout)?,
-            stderr: vec_to_str(output.stderr)?,
+            stdout,
+            stderr,
         })
     }
 
@@ -568,7 +575,71 @@ fn build_execution_command(
         }
     }
 
+    cmd.push("--message-format=json");
+
     cmd
+}
+
+fn parse_json_output(output: Vec<u8>) -> Result<(String, String)> {
+    let mut composed_stderr_string = String::new();
+    let mut composed_stdout_string = String::new();
+
+    let mut metadata_stream = cargo_metadata::Message::parse_stream(&output[..]);
+
+    while let Some(msg) = metadata_stream.next() {
+
+        let message = msg.context(UnableToParseCargoOutputSnafu)?;
+
+        match message {
+            cargo_metadata::Message::TextLine(line) => {
+                composed_stdout_string.push_str(&(line + "\n"))
+            }
+
+            cargo_metadata::Message::CompilerMessage(cargo_metadata::CompilerMessage {
+                message,
+                ..
+            }) => {
+                composed_stderr_string.push_str(&parse_diagnostic(message));
+            }
+
+            _ => {}
+        }
+    }
+
+    Ok((composed_stdout_string, composed_stderr_string))
+}
+
+fn parse_diagnostic(diagnostic: cargo_metadata::diagnostic::Diagnostic) -> String {
+    let mut diagnostic_string = String::new();
+
+    if let Some(rendered_msg) = diagnostic.rendered {
+        diagnostic_string.push_str(&rendered_msg);
+    } else {
+        diagnostic_string.push_str(&diagnostic.message);
+    }
+
+    for span in diagnostic.spans {
+        if span.file_name != "src/lib.rs" && span.file_name != "src/main.rs" {
+            continue;
+        }
+
+        let label = if let Some(label) = span.suggested_replacement {
+            label
+        } else {
+            continue;
+        };
+
+        diagnostic_string.push_str(&format!(
+            "\n[[Line {} Col {} - Line {} Col {}: {}]]",
+            span.line_start, span.column_start, span.line_end, span.column_end, label
+        ));
+    }
+
+    for children in diagnostic.children {
+        diagnostic_string.push_str(&parse_diagnostic(children));
+    }
+
+    diagnostic_string
 }
 
 fn set_execution_environment(

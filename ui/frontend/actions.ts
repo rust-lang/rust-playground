@@ -96,7 +96,7 @@ export enum ActionType {
   CompileWasmFailed = 'COMPILE_WASM_FAILED',
   EditCode = 'EDIT_CODE',
   AddMainFunction = 'ADD_MAIN_FUNCTION',
-  AddImport = 'ADD_IMPORT',
+  ApplySuggestion = 'ADD_SUGGESTION',
   EnableFeatureGate = 'ENABLE_FEATURE_GATE',
   GotoPosition = 'GOTO_POSITION',
   SelectText = 'SELECT_TEXT',
@@ -460,8 +460,8 @@ export const editCode = (code: string) =>
 export const addMainFunction = () =>
   createAction(ActionType.AddMainFunction);
 
-export const addImport = (code: string) =>
-  createAction(ActionType.AddImport, { code });
+export const applySuggestion = (startline: number, startcol: number, endline: number, endcol: number, suggestion: string) =>
+  createAction(ActionType.ApplySuggestion, { startline, startcol, endline, endcol, suggestion });
 
 export const enableFeatureGate = (featureGate: string) =>
   createAction(ActionType.EnableFeatureGate, { featureGate });
@@ -841,7 +841,7 @@ export type Action =
   | ReturnType<typeof receiveCompileWasmFailure>
   | ReturnType<typeof editCode>
   | ReturnType<typeof addMainFunction>
-  | ReturnType<typeof addImport>
+  | ReturnType<typeof applySuggestion>
   | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof gotoPosition>
   | ReturnType<typeof selectText>

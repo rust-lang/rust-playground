@@ -18,7 +18,7 @@ import {
   enableFeatureGate,
   gotoPosition,
   selectText,
-  addImport,
+  applySuggestion,
   performCratesLoad,
   performVersionsLoad,
   reExecuteWithBacktrace,
@@ -61,7 +61,7 @@ configureRustErrors({
   enableFeatureGate: featureGate => store.dispatch(enableFeatureGate(featureGate)),
   gotoPosition: (line, col) => store.dispatch(gotoPosition(line, col)),
   selectText: (start, end) => store.dispatch(selectText(start, end)),
-  addImport: (code) => store.dispatch(addImport(code)),
+  applySuggestion: (startline, startcol, endline, endcol, suggestion) => store.dispatch(applySuggestion(startline, startcol, endline, endcol, suggestion)),
   reExecuteWithBacktrace: () => store.dispatch(reExecuteWithBacktrace()),
   getChannel: () => store.getState().configuration.channel,
 });
