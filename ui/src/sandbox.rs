@@ -590,7 +590,7 @@ fn parse_json_output(output: Vec<u8>) -> Result<(String, String)> {
 
     let mut metadata_stream = cargo_metadata::Message::parse_stream(&output[..]);
 
-    while let Some(msg) = metadata_stream.next() {
+    for msg in metadata_stream {
         let message = msg.context(UnableToParseCargoOutputSnafu)?;
 
         match message {
