@@ -533,8 +533,14 @@ fn build_execution_command(
         (Some(Wasm), _, _) => cmd.push("wasm"),
         (Some(_), _, _) => cmd.push("rustc"),
         (_, _, true) => cmd.push("test"),
-        (_, Library(_), _) => cmd.push("build"),
-        (_, _, _) => cmd.push("run"),
+        (_, Library(_), _) => {
+            cmd.push("build");
+            cmd.push("--message-format=json");
+        }
+        (_, _, _) => {
+            cmd.push("run");
+            cmd.push("--message-format=json")
+        }
     }
 
     if mode == Release {
@@ -575,8 +581,6 @@ fn build_execution_command(
         }
     }
 
-    cmd.push("--message-format=json");
-
     cmd
 }
 
@@ -587,7 +591,6 @@ fn parse_json_output(output: Vec<u8>) -> Result<(String, String)> {
     let mut metadata_stream = cargo_metadata::Message::parse_stream(&output[..]);
 
     while let Some(msg) = metadata_stream.next() {
-
         let message = msg.context(UnableToParseCargoOutputSnafu)?;
 
         match message {
