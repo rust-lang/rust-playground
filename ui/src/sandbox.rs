@@ -602,7 +602,7 @@ fn parse_json_output(output: Vec<u8>) -> Result<(String, String)> {
                 message,
                 ..
             }) => {
-                composed_stderr_string.push_str(&parse_diagnostic(message));
+                composed_stderr_string.push_str(&parse_diagnostic(message, true));
             }
 
             _ => {}
@@ -612,13 +612,18 @@ fn parse_json_output(output: Vec<u8>) -> Result<(String, String)> {
     Ok((composed_stdout_string, composed_stderr_string))
 }
 
-fn parse_diagnostic(diagnostic: cargo_metadata::diagnostic::Diagnostic) -> String {
+fn parse_diagnostic(
+    diagnostic: cargo_metadata::diagnostic::Diagnostic,
+    should_output_message: bool,
+) -> String {
     let mut diagnostic_string = String::new();
 
-    if let Some(rendered_msg) = diagnostic.rendered {
-        diagnostic_string.push_str(&rendered_msg);
-    } else {
-        diagnostic_string.push_str(&diagnostic.message);
+    if should_output_message {
+        if let Some(rendered_msg) = diagnostic.rendered {
+            diagnostic_string.push_str(&rendered_msg);
+        } else {
+            diagnostic_string.push_str(&diagnostic.message);
+        }
     }
 
     for span in diagnostic.spans {
@@ -636,6 +641,10 @@ fn parse_diagnostic(diagnostic: cargo_metadata::diagnostic::Diagnostic) -> Strin
             "\n[[Line {} Col {} - Line {} Col {}: {}]]",
             span.line_start, span.column_start, span.line_end, span.column_end, label
         ));
+    }
+
+    for children in diagnostic.children {
+        diagnostic_string.push_str(&parse_diagnostic(children, false));
     }
 
     diagnostic_string
