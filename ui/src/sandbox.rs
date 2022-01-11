@@ -638,10 +638,6 @@ fn parse_diagnostic(diagnostic: cargo_metadata::diagnostic::Diagnostic) -> Strin
         ));
     }
 
-    for children in diagnostic.children {
-        diagnostic_string.push_str(&parse_diagnostic(children));
-    }
-
     diagnostic_string
 }
 
