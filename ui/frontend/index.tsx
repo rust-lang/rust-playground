@@ -61,7 +61,8 @@ configureRustErrors({
   enableFeatureGate: featureGate => store.dispatch(enableFeatureGate(featureGate)),
   gotoPosition: (line, col) => store.dispatch(gotoPosition(line, col)),
   selectText: (start, end) => store.dispatch(selectText(start, end)),
-  applySuggestion: (startline, startcol, endline, endcol, suggestion) => store.dispatch(applySuggestion(startline, startcol, endline, endcol, suggestion)),
+  applySuggestion: (startline, startcol, endline, endcol, suggestion) =>
+    store.dispatch(applySuggestion(startline, startcol, endline, endcol, suggestion)),
   reExecuteWithBacktrace: () => store.dispatch(reExecuteWithBacktrace()),
   getChannel: () => store.getState().configuration.channel,
 });

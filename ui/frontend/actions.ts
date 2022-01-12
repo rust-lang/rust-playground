@@ -460,8 +460,9 @@ export const editCode = (code: string) =>
 export const addMainFunction = () =>
   createAction(ActionType.AddMainFunction);
 
-export const applySuggestion = (startline: number, startcol: number, endline: number, endcol: number, suggestion: string) =>
-  createAction(ActionType.ApplySuggestion, { startline, startcol, endline, endcol, suggestion });
+export const applySuggestion =
+  (startline: number, startcol: number, endline: number, endcol: number, suggestion: string) =>
+    createAction(ActionType.ApplySuggestion, { startline, startcol, endline, endcol, suggestion });
 
 export const enableFeatureGate = (featureGate: string) =>
   createAction(ActionType.EnableFeatureGate, { featureGate });
