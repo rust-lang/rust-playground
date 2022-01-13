@@ -30,9 +30,9 @@ export function configureRustErrors({
     },
     'error-location': /-->\s+(\/playground\/)?src\/.*\n/,
     'import-suggestion-outer': {
-      pattern: /\[\[Line\s\d+\sCol\s\d+\s-\sLine\s\d+\sCol\s\d+:\s[.\s\S]+?\]\]/,
+      pattern: /\[\[Line\s\d+\sCol\s\d+\s-\sLine\s\d+\sCol\s\d+:\s[.\s\S]*?\]\]/,
       inside: {
-        'import-suggestion': /\[\[Line\s\d+\sCol\s\d+\s-\sLine\s\d+\sCol\s\d+:\s[.\s\S]+?\]\]/,
+        'import-suggestion': /\[\[Line\s\d+\sCol\s\d+\s-\sLine\s\d+\sCol\s\d+:\s[.\s\S]*?\]\]/,
       },
     },
     'rust-errors-help': {
@@ -87,7 +87,7 @@ export function configureRustErrors({
       env.attributes['data-col'] = col;
     }
     if (env.type === 'import-suggestion') {
-      const errorMatch = /\[\[Line\s(\d+)\sCol\s(\d+)\s-\sLine\s(\d+)\sCol\s(\d+):\s([.\s\S]+?)\]\]/.exec(env.content);
+      const errorMatch = /\[\[Line\s(\d+)\sCol\s(\d+)\s-\sLine\s(\d+)\sCol\s(\d+):\s([.\s\S]*?)\]\]/.exec(env.content);
       const [_, startLine, startCol, endLine, endCol, importSuggestion] = errorMatch;
       env.tag = 'a';
       env.attributes.href = '#';
