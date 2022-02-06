@@ -72,8 +72,7 @@ export const grammar: languages.IMonarchLanguage = {
   tokenizer: {
     root: [
       [/r"/, { token: 'string.quote', next: '@rawstring0' }],
-      [/r#"/, { token: 'string.quote', next: '@rawstring1' }],
-      [/r##"/, { token: 'string.quote', next: '@rawstring2' }],
+      [/r(#+)"/, { token: 'string.quote', next: '@rawstring1.$1' }],
       // identifiers and keywords
       [/[a-z_$][\w$]*/, {
         cases: {
@@ -134,9 +133,15 @@ export const grammar: languages.IMonarchLanguage = {
     ],
 
     rawstring0: [[/[^"]+/, 'string'], [/"/, { token: 'string.quote', next: '@pop' }]],
-    rawstring1: [[/[^"#]+/, 'string'], [/"#/, { token: 'string.quote', next: '@pop' }]],
-    rawstring2: [[/[^"##]+/, 'string'], [/"##/, { token: 'string.quote', next: '@pop' }]],
-
+    rawstring1: [
+      [/"(#+)/, {
+        cases: {
+          '$1==$S2': { token: 'string.quote', next: '@pop' },
+          '@default': { token: 'string' },
+        },
+      }],
+      [/./, 'string'],
+    ],
     string: [
       [/[^\\"]+/, 'string'],
       [/@escapes/, 'string.escape'],
