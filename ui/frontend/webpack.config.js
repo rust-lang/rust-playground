@@ -158,7 +158,7 @@ module.exports = function(_, argv) {
       }),
       new MonacoWebpackPlugin({
         filename: `${filenameTemplate}.worker.js`,
-        languages: ['rust'],
+        languages: [],
       }),
       ...(isProduction ? [new CompressionPlugin()] : []),
     ],

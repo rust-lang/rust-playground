@@ -71,6 +71,8 @@ export const grammar: languages.IMonarchLanguage = {
   // The main tokenizer for our languages
   tokenizer: {
     root: [
+      [/r"/, { token: 'string.quote', next: '@rawstring0' }],
+      [/r(#+)"/, { token: 'string.quote', next: '@rawstring1.$1' }],
       // identifiers and keywords
       [/[a-z_$][\w$]*/, {
         cases: {
@@ -130,6 +132,16 @@ export const grammar: languages.IMonarchLanguage = {
       [/[\/*]/, 'comment'],
     ],
 
+    rawstring0: [[/[^"]+/, 'string'], [/"/, { token: 'string.quote', next: '@pop' }]],
+    rawstring1: [
+      [/"(#+)/, {
+        cases: {
+          '$1==$S2': { token: 'string.quote', next: '@pop' },
+          '@default': { token: 'string' },
+        },
+      }],
+      [/./, 'string'],
+    ],
     string: [
       [/[^\\"]+/, 'string'],
       [/@escapes/, 'string.escape'],
@@ -157,7 +169,71 @@ export const themeVsDarkPlus: editor.IStandaloneThemeData = {
   colors: {},
   rules: [
     { token: 'keyword.control', foreground: 'C586C0' },
+    { token: 'string.escape', foreground: 'D7BA7D' },
+    { token: 'keyword.controlFlow', foreground: 'C586C0' },
     { token: 'variable', foreground: '9CDCFE' },
+    { token: 'parameter', foreground: '9CDCFE' },
+    { token: 'property', foreground: '9CDCFE' },
     { token: 'support.function', foreground: 'DCDCAA' },
+    { token: 'function', foreground: 'DCDCAA' },
+    { token: 'member', foreground: '4FC1FF' },
+    { token: 'variable.constant', foreground: '4FC1FF' },
+    { token: 'macro', foreground: '569CD6' },
+    { token: 'typeParameter', foreground: '4EC9B0' },
+    { token: 'interface', foreground: '4EC9B0' },
+    { token: 'namespace', foreground: '4EC9B0' },
+    { token: 'variable.mutable', fontStyle: 'underline' },
+    { token: 'parameter.mutable', fontStyle: 'underline' },
+  ],
+};
+
+export const semanticTokensLegend: languages.SemanticTokensLegend = {
+  tokenTypes: [
+    'comment',
+    'string',
+    'keyword',
+    'number',
+    'regexp',
+    'operator',
+    'namespace',
+    'type',
+    'struct',
+    'class',
+    'interface',
+    'enum',
+    'typeParameter',
+    'function',
+    'member',
+    'macro',
+    'variable',
+    'parameter',
+    'property',
+    'label',
+    'unsupported',
+  ],
+  tokenModifiers: [
+    'documentation',
+    'declaration',
+    'definition',
+    'static',
+    'abstract',
+    'deprecated',
+    'readonly',
+    'default_library',
+    'async',
+    'attribute',
+    'callable',
+    'constant',
+    'consuming',
+    'controlFlow',
+    'crateRoot',
+    'injected',
+    'intraDocLink',
+    'library',
+    'mutable',
+    'public',
+    'reference',
+    'trait',
+    'unsafe',
   ],
 };
