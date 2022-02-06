@@ -19,6 +19,7 @@ module.exports = {
     'max-len': ['error', {
       'code': 120,
     }],
+    'no-trailing-spaces': 'error',
     'quotes': ['error', 'single'],
 
     '@typescript-eslint/explicit-function-return-type': 'off',
