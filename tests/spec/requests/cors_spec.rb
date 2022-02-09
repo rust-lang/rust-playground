@@ -17,7 +17,7 @@ RSpec.feature "Cross-origin requests", :cors, type: :request do
 
       expect(response['access-control-allow-headers']).to match(/content-type/i)
       expect(response['access-control-allow-methods'].split(',').map(&:strip)).to match_array([/GET/i, /POST/i])
-      expect(response['access-control-allow-origin']).to eq('*')
+      expect(response['access-control-allow-origin']).to eq('*').or eq('https://rust-lang.org')
       expect(response['access-control-max-age']).to eq('3600')
       expect(response['vary'].split(',').map(&:strip)).to match_array([/origin/i, /access-control-request-method/i, /access-control-request-headers/i])
     end

@@ -9,6 +9,9 @@ default = ['fork-bomb-prevention']
 fork-bomb-prevention = []
 
 [dependencies]
+async-trait = "0.1.52"
+axum = { version = "0.4.5", features = ["headers"] }
+axum-extra = "0.1.2"
 bodyparser = "0.8.0"
 corsware = "0.2.0"
 dotenv = "0.15.0"
@@ -31,6 +34,7 @@ snafu = "0.7.0"
 strum = { version = "0.23.0", features = ["derive"] }
 tempdir = "0.3.7"
 tokio = { version = "1.9", features = ["macros", "time", "process", "rt-multi-thread"] }
+tower-http = { version = "0.2.2", features = ["cors", "fs", "set-header", "trace"] }
 
 [dependencies.playground-middleware]
 git = "https://github.com/integer32llc/playground-middleware"
