@@ -1,18 +1,10 @@
 use serde_derive::Deserialize;
-use snafu::{OptionExt, ResultExt, Snafu};
-use std::{
-    collections::BTreeMap,
-    ffi::OsStr,
-    fmt,
-    fs::{self, File},
-    io::{self, prelude::*, BufReader, ErrorKind},
-    os::unix::fs::PermissionsExt,
-    path::{Path, PathBuf},
-    string,
-    time::Duration,
+use snafu::{ResultExt, Snafu};
+use std::{ffi::OsStr, fmt, io, os::unix::fs::PermissionsExt, string, time::Duration};
+use tokio::{
+    process::Command,
+    runtime::{Builder, Runtime},
 };
-use tempdir::TempDir;
-use tokio::process::Command;
 
 const DOCKER_PROCESS_TIMEOUT_SOFT: Duration = Duration::from_secs(10);
 const DOCKER_PROCESS_TIMEOUT_HARD: Duration = Duration::from_secs(12);
@@ -93,10 +85,8 @@ pub enum Error {
 pub type Result<T, E = Error> = ::std::result::Result<T, E>;
 
 pub struct Sandbox {
-    #[allow(dead_code)]
-    scratch: TempDir,
-    input_file: PathBuf,
-    output_dir: PathBuf,
+    runtime: Runtime,
+    sandbox: fut::Sandbox,
 }
 
 fn vec_to_str(v: Vec<u8>) -> Result<String> {
@@ -115,355 +105,57 @@ fn wide_open_permissions() -> std::fs::Permissions {
 
 impl Sandbox {
     pub fn new() -> Result<Self> {
-        let scratch = TempDir::new("playground").context(UnableToCreateTempDirSnafu)?;
-        let input_file = scratch.path().join("input.rs");
-        let output_dir = scratch.path().join("output");
+        let runtime = Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .expect("Failed building the Runtime");
+        let sandbox = runtime.block_on(fut::Sandbox::new())?;
 
-        fs::create_dir(&output_dir).context(UnableToCreateOutputDirSnafu)?;
-        fs::set_permissions(&output_dir, wide_open_permissions())
-            .context(UnableToSetOutputPermissionsSnafu)?;
-
-        Ok(Sandbox {
-            scratch,
-            input_file,
-            output_dir,
-        })
+        Ok(Self { runtime, sandbox })
     }
 
     pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
-        self.write_source_code(&req.code)?;
-
-        let command = self.compile_command(req.target, req.channel, req.mode, req.tests, req);
-
-        let output = run_command_with_timeout(command)?;
-
-        // The compiler writes the file to a name like
-        // `compilation-3b75174cac3d47fb.ll`, so we just find the
-        // first with the right extension.
-        let file = fs::read_dir(&self.output_dir)
-            .context(UnableToReadOutputSnafu)?
-            .flat_map(|entry| entry)
-            .map(|entry| entry.path())
-            .find(|path| path.extension() == Some(req.target.extension()));
-
-        let stdout = vec_to_str(output.stdout)?;
-        let mut stderr = vec_to_str(output.stderr)?;
-
-        let mut code = match file {
-            Some(file) => read(&file)?.unwrap_or_else(String::new),
-            None => {
-                // If we didn't find the file, it's *most* likely that
-                // the user's code was invalid. Tack on our own error
-                // to the compiler's error instead of failing the
-                // request.
-                use self::fmt::Write;
-                write!(
-                    &mut stderr,
-                    "\nUnable to locate file for {} output",
-                    req.target
-                )
-                .expect("Unable to write to a string");
-                String::new()
-            }
-        };
-
-        if let CompileTarget::Assembly(_, demangle, process) = req.target {
-            if demangle == DemangleAssembly::Demangle {
-                code = super::asm_cleanup::demangle_asm(&code);
-            }
-
-            if process == ProcessAssembly::Filter {
-                code = super::asm_cleanup::filter_asm(&code);
-            }
-        } else if CompileTarget::Hir == req.target {
-            // TODO: Run rustfmt on the generated HIR.
-        }
-
-        Ok(CompileResponse {
-            success: output.status.success(),
-            code,
-            stdout,
-            stderr,
-        })
+        self.runtime.block_on(self.sandbox.compile(req))
     }
 
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
-        self.write_source_code(&req.code)?;
-        let command = self.execute_command(req.channel, req.mode, req.tests, req);
-
-        let output = run_command_with_timeout(command)?;
-
-        Ok(ExecuteResponse {
-            success: output.status.success(),
-            stdout: vec_to_str(output.stdout)?,
-            stderr: vec_to_str(output.stderr)?,
-        })
+        self.runtime.block_on(self.sandbox.execute(req))
     }
 
     pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
-        self.write_source_code(&req.code)?;
-        let command = self.format_command(req);
-
-        let output = run_command_with_timeout(command)?;
-
-        Ok(FormatResponse {
-            success: output.status.success(),
-            code: read(self.input_file.as_ref())?.context(OutputMissingSnafu)?,
-            stdout: vec_to_str(output.stdout)?,
-            stderr: vec_to_str(output.stderr)?,
-        })
+        self.runtime.block_on(self.sandbox.format(req))
     }
 
     pub fn clippy(&self, req: &ClippyRequest) -> Result<ClippyResponse> {
-        self.write_source_code(&req.code)?;
-        let command = self.clippy_command(req);
-
-        let output = run_command_with_timeout(command)?;
-
-        Ok(ClippyResponse {
-            success: output.status.success(),
-            stdout: vec_to_str(output.stdout)?,
-            stderr: vec_to_str(output.stderr)?,
-        })
+        self.runtime.block_on(self.sandbox.clippy(req))
     }
 
     pub fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
-        self.write_source_code(&req.code)?;
-        let command = self.miri_command(req);
-
-        let output = run_command_with_timeout(command)?;
-
-        Ok(MiriResponse {
-            success: output.status.success(),
-            stdout: vec_to_str(output.stdout)?,
-            stderr: vec_to_str(output.stderr)?,
-        })
+        self.runtime.block_on(self.sandbox.miri(req))
     }
 
     pub fn macro_expansion(&self, req: &MacroExpansionRequest) -> Result<MacroExpansionResponse> {
-        self.write_source_code(&req.code)?;
-        let command = self.macro_expansion_command(req);
-
-        let output = run_command_with_timeout(command)?;
-
-        Ok(MacroExpansionResponse {
-            success: output.status.success(),
-            stdout: vec_to_str(output.stdout)?,
-            stderr: vec_to_str(output.stderr)?,
-        })
+        self.runtime.block_on(self.sandbox.macro_expansion(req))
     }
 
     pub fn crates(&self) -> Result<Vec<CrateInformation>> {
-        let mut command = basic_secure_docker_command();
-        command.args(&[Channel::Stable.container_name()]);
-        command.args(&["cat", "crate-information.json"]);
-
-        let output = run_command_with_timeout(command)?;
-
-        let crate_info: Vec<CrateInformationInner> =
-            ::serde_json::from_slice(&output.stdout).context(UnableToParseCrateInformationSnafu)?;
-
-        let crates = crate_info.into_iter().map(Into::into).collect();
-
-        Ok(crates)
+        self.runtime.block_on(self.sandbox.crates())
     }
 
     pub fn version(&self, channel: Channel) -> Result<Version> {
-        let mut command = basic_secure_docker_command();
-        command.args(&[channel.container_name()]);
-        command.args(&["rustc", "--version", "--verbose"]);
-
-        let output = run_command_with_timeout(command)?;
-        let version_output = vec_to_str(output.stdout)?;
-
-        let mut info: BTreeMap<String, String> = version_output
-            .lines()
-            .skip(1)
-            .filter_map(|line| {
-                let mut pieces = line.splitn(2, ':').fuse();
-                match (pieces.next(), pieces.next()) {
-                    (Some(name), Some(value)) => Some((name.trim().into(), value.trim().into())),
-                    _ => None,
-                }
-            })
-            .collect();
-
-        let release = info.remove("release").context(VersionReleaseMissingSnafu)?;
-        let commit_hash = info
-            .remove("commit-hash")
-            .context(VersionHashMissingSnafu)?;
-        let commit_date = info
-            .remove("commit-date")
-            .context(VersionDateMissingSnafu)?;
-
-        Ok(Version {
-            release,
-            commit_hash,
-            commit_date,
-        })
+        self.runtime.block_on(self.sandbox.version(channel))
     }
 
     pub fn version_rustfmt(&self) -> Result<Version> {
-        let mut command = basic_secure_docker_command();
-        command.args(&["rustfmt", "cargo", "fmt", "--version"]);
-        self.cargo_tool_version(command)
+        self.runtime.block_on(self.sandbox.version_rustfmt())
     }
 
     pub fn version_clippy(&self) -> Result<Version> {
-        let mut command = basic_secure_docker_command();
-        command.args(&["clippy", "cargo", "clippy", "--version"]);
-        self.cargo_tool_version(command)
+        self.runtime.block_on(self.sandbox.version_clippy())
     }
 
     pub fn version_miri(&self) -> Result<Version> {
-        let mut command = basic_secure_docker_command();
-        command.args(&["miri", "cargo", "miri", "--version"]);
-        self.cargo_tool_version(command)
-    }
-
-    // Parses versions of the shape `toolname 0.0.0 (0000000 0000-00-00)`
-    fn cargo_tool_version(&self, command: Command) -> Result<Version> {
-        let output = run_command_with_timeout(command)?;
-        let version_output = vec_to_str(output.stdout)?;
-        let mut parts = version_output.split_whitespace().fuse().skip(1);
-
-        let release = parts.next().unwrap_or("").into();
-        let commit_hash = parts.next().unwrap_or("").trim_start_matches('(').into();
-        let commit_date = parts.next().unwrap_or("").trim_end_matches(')').into();
-
-        Ok(Version {
-            release,
-            commit_hash,
-            commit_date,
-        })
-    }
-
-    fn write_source_code(&self, code: &str) -> Result<()> {
-        fs::write(&self.input_file, code).context(UnableToCreateSourceFileSnafu)?;
-        fs::set_permissions(&self.input_file, wide_open_permissions())
-            .context(UnableToSetSourcePermissionsSnafu)?;
-
-        log::debug!(
-            "Wrote {} bytes of source to {}",
-            code.len(),
-            self.input_file.display()
-        );
-        Ok(())
-    }
-
-    fn compile_command(
-        &self,
-        target: CompileTarget,
-        channel: Channel,
-        mode: Mode,
-        tests: bool,
-        req: impl CrateTypeRequest + EditionRequest + BacktraceRequest,
-    ) -> Command {
-        let mut cmd = self.docker_command(Some(req.crate_type()));
-        set_execution_environment(&mut cmd, Some(target), &req);
-
-        let execution_cmd = build_execution_command(Some(target), channel, mode, &req, tests);
-
-        cmd.arg(&channel.container_name()).args(&execution_cmd);
-
-        log::debug!("Compilation command is {:?}", cmd);
-
-        cmd
-    }
-
-    fn execute_command(
-        &self,
-        channel: Channel,
-        mode: Mode,
-        tests: bool,
-        req: impl CrateTypeRequest + EditionRequest + BacktraceRequest,
-    ) -> Command {
-        let mut cmd = self.docker_command(Some(req.crate_type()));
-        set_execution_environment(&mut cmd, None, &req);
-
-        let execution_cmd = build_execution_command(None, channel, mode, &req, tests);
-
-        cmd.arg(&channel.container_name()).args(&execution_cmd);
-
-        log::debug!("Execution command is {:?}", cmd);
-
-        cmd
-    }
-
-    fn format_command(&self, req: impl EditionRequest) -> Command {
-        let crate_type = CrateType::Binary;
-
-        let mut cmd = self.docker_command(Some(crate_type));
-
-        cmd.apply_edition(req);
-
-        cmd.arg("rustfmt").args(&["cargo", "fmt"]);
-
-        log::debug!("Formatting command is {:?}", cmd);
-
-        cmd
-    }
-
-    fn clippy_command(&self, req: impl CrateTypeRequest + EditionRequest) -> Command {
-        let mut cmd = self.docker_command(Some(req.crate_type()));
-
-        cmd.apply_crate_type(&req);
-        cmd.apply_edition(&req);
-
-        cmd.arg("clippy").args(&["cargo", "clippy"]);
-
-        log::debug!("Clippy command is {:?}", cmd);
-
-        cmd
-    }
-
-    fn miri_command(&self, req: impl EditionRequest) -> Command {
-        let mut cmd = self.docker_command(None);
-        cmd.apply_edition(req);
-
-        cmd.arg("miri").args(&["cargo", "miri-playground"]);
-
-        log::debug!("Miri command is {:?}", cmd);
-
-        cmd
-    }
-
-    fn macro_expansion_command(&self, req: impl EditionRequest) -> Command {
-        let mut cmd = self.docker_command(None);
-        cmd.apply_edition(req);
-
-        cmd.arg(&Channel::Nightly.container_name()).args(&[
-            "cargo",
-            "rustc",
-            "--",
-            "-Zunpretty=expanded",
-        ]);
-
-        log::debug!("Macro expansion command is {:?}", cmd);
-
-        cmd
-    }
-
-    fn docker_command(&self, crate_type: Option<CrateType>) -> Command {
-        let crate_type = crate_type.unwrap_or(CrateType::Binary);
-
-        let mut mount_input_file = self.input_file.as_os_str().to_os_string();
-        mount_input_file.push(":");
-        mount_input_file.push("/playground/");
-        mount_input_file.push(crate_type.file_name());
-
-        let mut mount_output_dir = self.output_dir.as_os_str().to_os_string();
-        mount_output_dir.push(":");
-        mount_output_dir.push("/playground-result");
-
-        let mut cmd = basic_secure_docker_command();
-
-        cmd.arg("--volume")
-            .arg(&mount_input_file)
-            .arg("--volume")
-            .arg(&mount_output_dir);
-
-        cmd
+        self.runtime.block_on(self.sandbox.version_miri())
     }
 }
 
@@ -588,85 +280,501 @@ fn set_execution_environment(
     cmd.apply_backtrace(&req);
 }
 
-fn read(path: &Path) -> Result<Option<String>> {
-    let f = match File::open(path) {
-        Ok(f) => f,
-        Err(ref e) if e.kind() == ErrorKind::NotFound => return Ok(None),
-        e => e.context(UnableToReadOutputSnafu)?,
+pub mod fut {
+    use snafu::prelude::*;
+    use std::{
+        collections::BTreeMap,
+        ffi::OsStr,
+        io::ErrorKind,
+        path::{Path, PathBuf},
     };
-    let mut f = BufReader::new(f);
+    use tempdir::TempDir;
+    use tokio::{fs, process::Command, time};
 
-    let mut s = String::new();
-    f.read_to_string(&mut s).context(UnableToReadOutputSnafu)?;
-    Ok(Some(s))
-}
+    use super::{
+        basic_secure_docker_command, build_execution_command, set_execution_environment,
+        vec_to_str, wide_open_permissions, BacktraceRequest, Channel, ClippyRequest,
+        ClippyResponse, CompileRequest, CompileResponse, CompileTarget,
+        CompilerExecutionTimedOutSnafu, CrateInformation, CrateInformationInner, CrateType,
+        CrateTypeRequest, DemangleAssembly, DockerCommandExt, EditionRequest, ExecuteRequest,
+        ExecuteResponse, FormatRequest, FormatResponse, MacroExpansionRequest,
+        MacroExpansionResponse, MiriRequest, MiriResponse, MissingCompilerIdSnafu, Mode,
+        OutputMissingSnafu, ProcessAssembly, Result, UnableToCreateOutputDirSnafu,
+        UnableToCreateSourceFileSnafu, UnableToCreateTempDirSnafu,
+        UnableToGetOutputFromCompilerSnafu, UnableToParseCrateInformationSnafu,
+        UnableToReadOutputSnafu, UnableToRemoveCompilerSnafu, UnableToSetOutputPermissionsSnafu,
+        UnableToSetSourcePermissionsSnafu, UnableToStartCompilerSnafu,
+        UnableToWaitForCompilerSnafu, Version, VersionDateMissingSnafu, VersionHashMissingSnafu,
+        VersionReleaseMissingSnafu, DOCKER_PROCESS_TIMEOUT_HARD,
+    };
 
-#[tokio::main]
-async fn run_command_with_timeout(mut command: Command) -> Result<std::process::Output> {
-    use std::os::unix::process::ExitStatusExt;
-
-    let timeout = DOCKER_PROCESS_TIMEOUT_HARD;
-
-    let output = command.output().await.context(UnableToStartCompilerSnafu)?;
-
-    // Exit early, in case we don't have the container
-    if !output.status.success() {
-        return Ok(output);
+    pub struct Sandbox {
+        #[allow(dead_code)]
+        scratch: TempDir,
+        input_file: PathBuf,
+        output_dir: PathBuf,
     }
 
-    let output = String::from_utf8_lossy(&output.stdout);
-    let id = output
-        .lines()
-        .next()
-        .context(MissingCompilerIdSnafu)?
-        .trim();
+    impl Sandbox {
+        pub async fn new() -> Result<Self> {
+            // `TempDir` performs *synchronous* filesystem operations
+            // now and when it's dropped. We accept that under the
+            // assumption that the specific operations will be quick
+            // enough.
+            let scratch = TempDir::new("playground").context(UnableToCreateTempDirSnafu)?;
+            let input_file = scratch.path().join("input.rs");
+            let output_dir = scratch.path().join("output");
 
-    // ----------
+            fs::create_dir(&output_dir)
+                .await
+                .context(UnableToCreateOutputDirSnafu)?;
+            fs::set_permissions(&output_dir, wide_open_permissions())
+                .await
+                .context(UnableToSetOutputPermissionsSnafu)?;
 
-    let mut command = docker_command!("wait", id);
-
-    let timed_out = match tokio::time::timeout(timeout, command.output()).await {
-        Ok(Ok(o)) => {
-            // Didn't time out, didn't fail to run
-            let o = String::from_utf8_lossy(&o.stdout);
-            let code = o
-                .lines()
-                .next()
-                .unwrap_or("")
-                .trim()
-                .parse()
-                .unwrap_or(i32::MAX);
-            Ok(ExitStatusExt::from_raw(code))
+            Ok(Sandbox {
+                scratch,
+                input_file,
+                output_dir,
+            })
         }
-        Ok(e) => return e.context(UnableToWaitForCompilerSnafu), // Failed to run
-        Err(e) => Err(e),                                        // Timed out
-    };
 
-    // ----------
+        pub async fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
+            self.write_source_code(&req.code).await?;
 
-    let mut command = docker_command!("logs", id);
-    let mut output = command
-        .output()
-        .await
-        .context(UnableToGetOutputFromCompilerSnafu)?;
+            let command = self.compile_command(req.target, req.channel, req.mode, req.tests, req);
 
-    // ----------
+            let output = run_command_with_timeout(command).await?;
 
-    let mut command = docker_command!(
-        "rm", // Kills container if still running
-        "--force", id
-    );
-    command.stdout(std::process::Stdio::null());
-    command
-        .status()
-        .await
-        .context(UnableToRemoveCompilerSnafu)?;
+            // The compiler writes the file to a name like
+            // `compilation-3b75174cac3d47fb.ll`, so we just find the
+            // first with the right extension.
+            async fn path_to_first_file_with_extension(
+                dir: &Path,
+                extension: &OsStr,
+            ) -> Result<Option<PathBuf>> {
+                let mut files = fs::read_dir(dir).await.context(UnableToReadOutputSnafu)?;
 
-    let code = timed_out.context(CompilerExecutionTimedOutSnafu { timeout })?;
+                while let Some(entry) = files.next_entry().await.transpose() {
+                    if let Ok(entry) = entry {
+                        let path = entry.path();
+                        if path.extension() == Some(extension) {
+                            return Ok(Some(path));
+                        }
+                    }
+                }
 
-    output.status = code;
+                Ok(None)
+            }
 
-    Ok(output)
+            let file =
+                path_to_first_file_with_extension(&self.output_dir, req.target.extension()).await?;
+            let stdout = vec_to_str(output.stdout)?;
+            let mut stderr = vec_to_str(output.stderr)?;
+
+            let mut code = match file {
+                Some(file) => read(&file).await?.unwrap_or_default(),
+                None => {
+                    // If we didn't find the file, it's *most* likely that
+                    // the user's code was invalid. Tack on our own error
+                    // to the compiler's error instead of failing the
+                    // request.
+                    use std::fmt::Write;
+                    write!(
+                        &mut stderr,
+                        "\nUnable to locate file for {} output",
+                        req.target
+                    )
+                    .expect("Unable to write to a string");
+                    String::new()
+                }
+            };
+
+            if let CompileTarget::Assembly(_, demangle, process) = req.target {
+                if demangle == DemangleAssembly::Demangle {
+                    code = crate::asm_cleanup::demangle_asm(&code);
+                }
+
+                if process == ProcessAssembly::Filter {
+                    code = crate::asm_cleanup::filter_asm(&code);
+                }
+            } else if CompileTarget::Hir == req.target {
+                // TODO: Run rustfmt on the generated HIR.
+            }
+
+            Ok(CompileResponse {
+                success: output.status.success(),
+                code,
+                stdout,
+                stderr,
+            })
+        }
+
+        pub async fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
+            self.write_source_code(&req.code).await?;
+            let command = self.execute_command(req.channel, req.mode, req.tests, req);
+
+            let output = run_command_with_timeout(command).await?;
+
+            Ok(ExecuteResponse {
+                success: output.status.success(),
+                stdout: vec_to_str(output.stdout)?,
+                stderr: vec_to_str(output.stderr)?,
+            })
+        }
+
+        pub async fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
+            self.write_source_code(&req.code).await?;
+            let command = self.format_command(req);
+
+            let output = run_command_with_timeout(command).await?;
+
+            Ok(FormatResponse {
+                success: output.status.success(),
+                code: read(self.input_file.as_ref())
+                    .await?
+                    .context(OutputMissingSnafu)?,
+                stdout: vec_to_str(output.stdout)?,
+                stderr: vec_to_str(output.stderr)?,
+            })
+        }
+
+        pub async fn clippy(&self, req: &ClippyRequest) -> Result<ClippyResponse> {
+            self.write_source_code(&req.code).await?;
+            let command = self.clippy_command(req);
+
+            let output = run_command_with_timeout(command).await?;
+
+            Ok(ClippyResponse {
+                success: output.status.success(),
+                stdout: vec_to_str(output.stdout)?,
+                stderr: vec_to_str(output.stderr)?,
+            })
+        }
+
+        pub async fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
+            self.write_source_code(&req.code).await?;
+            let command = self.miri_command(req);
+
+            let output = run_command_with_timeout(command).await?;
+
+            Ok(MiriResponse {
+                success: output.status.success(),
+                stdout: vec_to_str(output.stdout)?,
+                stderr: vec_to_str(output.stderr)?,
+            })
+        }
+
+        pub async fn macro_expansion(
+            &self,
+            req: &MacroExpansionRequest,
+        ) -> Result<MacroExpansionResponse> {
+            self.write_source_code(&req.code).await?;
+            let command = self.macro_expansion_command(req);
+
+            let output = run_command_with_timeout(command).await?;
+
+            Ok(MacroExpansionResponse {
+                success: output.status.success(),
+                stdout: vec_to_str(output.stdout)?,
+                stderr: vec_to_str(output.stderr)?,
+            })
+        }
+
+        pub async fn crates(&self) -> Result<Vec<CrateInformation>> {
+            let mut command = basic_secure_docker_command();
+            command.args(&[Channel::Stable.container_name()]);
+            command.args(&["cat", "crate-information.json"]);
+
+            let output = run_command_with_timeout(command).await?;
+
+            let crate_info: Vec<CrateInformationInner> =
+                ::serde_json::from_slice(&output.stdout)
+                    .context(UnableToParseCrateInformationSnafu)?;
+
+            let crates = crate_info.into_iter().map(Into::into).collect();
+
+            Ok(crates)
+        }
+
+        pub async fn version(&self, channel: Channel) -> Result<Version> {
+            let mut command = basic_secure_docker_command();
+            command.args(&[channel.container_name()]);
+            command.args(&["rustc", "--version", "--verbose"]);
+
+            let output = run_command_with_timeout(command).await?;
+            let version_output = vec_to_str(output.stdout)?;
+
+            let mut info: BTreeMap<String, String> = version_output
+                .lines()
+                .skip(1)
+                .filter_map(|line| {
+                    let mut pieces = line.splitn(2, ':').fuse();
+                    match (pieces.next(), pieces.next()) {
+                        (Some(name), Some(value)) => {
+                            Some((name.trim().into(), value.trim().into()))
+                        }
+                        _ => None,
+                    }
+                })
+                .collect();
+
+            let release = info.remove("release").context(VersionReleaseMissingSnafu)?;
+            let commit_hash = info
+                .remove("commit-hash")
+                .context(VersionHashMissingSnafu)?;
+            let commit_date = info
+                .remove("commit-date")
+                .context(VersionDateMissingSnafu)?;
+
+            Ok(Version {
+                release,
+                commit_hash,
+                commit_date,
+            })
+        }
+
+        pub async fn version_rustfmt(&self) -> Result<Version> {
+            let mut command = basic_secure_docker_command();
+            command.args(&["rustfmt", "cargo", "fmt", "--version"]);
+            self.cargo_tool_version(command).await
+        }
+
+        pub async fn version_clippy(&self) -> Result<Version> {
+            let mut command = basic_secure_docker_command();
+            command.args(&["clippy", "cargo", "clippy", "--version"]);
+            self.cargo_tool_version(command).await
+        }
+
+        pub async fn version_miri(&self) -> Result<Version> {
+            let mut command = basic_secure_docker_command();
+            command.args(&["miri", "cargo", "miri", "--version"]);
+            self.cargo_tool_version(command).await
+        }
+
+        // Parses versions of the shape `toolname 0.0.0 (0000000 0000-00-00)`
+        async fn cargo_tool_version(&self, command: Command) -> Result<Version> {
+            let output = run_command_with_timeout(command).await?;
+            let version_output = vec_to_str(output.stdout)?;
+            let mut parts = version_output.split_whitespace().fuse().skip(1);
+
+            let release = parts.next().unwrap_or("").into();
+            let commit_hash = parts.next().unwrap_or("").trim_start_matches('(').into();
+            let commit_date = parts.next().unwrap_or("").trim_end_matches(')').into();
+
+            Ok(Version {
+                release,
+                commit_hash,
+                commit_date,
+            })
+        }
+
+        async fn write_source_code(&self, code: &str) -> Result<()> {
+            fs::write(&self.input_file, code)
+                .await
+                .context(UnableToCreateSourceFileSnafu)?;
+            fs::set_permissions(&self.input_file, wide_open_permissions())
+                .await
+                .context(UnableToSetSourcePermissionsSnafu)?;
+
+            log::debug!(
+                "Wrote {} bytes of source to {}",
+                code.len(),
+                self.input_file.display()
+            );
+            Ok(())
+        }
+
+        fn compile_command(
+            &self,
+            target: CompileTarget,
+            channel: Channel,
+            mode: Mode,
+            tests: bool,
+            req: impl CrateTypeRequest + EditionRequest + BacktraceRequest,
+        ) -> Command {
+            let mut cmd = self.docker_command(Some(req.crate_type()));
+            set_execution_environment(&mut cmd, Some(target), &req);
+
+            let execution_cmd = build_execution_command(Some(target), channel, mode, &req, tests);
+
+            cmd.arg(&channel.container_name()).args(&execution_cmd);
+
+            log::debug!("Compilation command is {:?}", cmd);
+
+            cmd
+        }
+
+        fn execute_command(
+            &self,
+            channel: Channel,
+            mode: Mode,
+            tests: bool,
+            req: impl CrateTypeRequest + EditionRequest + BacktraceRequest,
+        ) -> Command {
+            let mut cmd = self.docker_command(Some(req.crate_type()));
+            set_execution_environment(&mut cmd, None, &req);
+
+            let execution_cmd = build_execution_command(None, channel, mode, &req, tests);
+
+            cmd.arg(&channel.container_name()).args(&execution_cmd);
+
+            log::debug!("Execution command is {:?}", cmd);
+
+            cmd
+        }
+
+        fn format_command(&self, req: impl EditionRequest) -> Command {
+            let crate_type = CrateType::Binary;
+
+            let mut cmd = self.docker_command(Some(crate_type));
+
+            cmd.apply_edition(req);
+
+            cmd.arg("rustfmt").args(&["cargo", "fmt"]);
+
+            log::debug!("Formatting command is {:?}", cmd);
+
+            cmd
+        }
+
+        fn clippy_command(&self, req: impl CrateTypeRequest + EditionRequest) -> Command {
+            let mut cmd = self.docker_command(Some(req.crate_type()));
+
+            cmd.apply_crate_type(&req);
+            cmd.apply_edition(&req);
+
+            cmd.arg("clippy").args(&["cargo", "clippy"]);
+
+            log::debug!("Clippy command is {:?}", cmd);
+
+            cmd
+        }
+
+        fn miri_command(&self, req: impl EditionRequest) -> Command {
+            let mut cmd = self.docker_command(None);
+            cmd.apply_edition(req);
+
+            cmd.arg("miri").args(&["cargo", "miri-playground"]);
+
+            log::debug!("Miri command is {:?}", cmd);
+
+            cmd
+        }
+
+        fn macro_expansion_command(&self, req: impl EditionRequest) -> Command {
+            let mut cmd = self.docker_command(None);
+            cmd.apply_edition(req);
+
+            cmd.arg(&Channel::Nightly.container_name()).args(&[
+                "cargo",
+                "rustc",
+                "--",
+                "-Zunpretty=expanded",
+            ]);
+
+            log::debug!("Macro expansion command is {:?}", cmd);
+
+            cmd
+        }
+
+        fn docker_command(&self, crate_type: Option<CrateType>) -> Command {
+            let crate_type = crate_type.unwrap_or(CrateType::Binary);
+
+            let mut mount_input_file = self.input_file.as_os_str().to_os_string();
+            mount_input_file.push(":");
+            mount_input_file.push("/playground/");
+            mount_input_file.push(crate_type.file_name());
+
+            let mut mount_output_dir = self.output_dir.as_os_str().to_os_string();
+            mount_output_dir.push(":");
+            mount_output_dir.push("/playground-result");
+
+            let mut cmd = basic_secure_docker_command();
+
+            cmd.arg("--volume")
+                .arg(&mount_input_file)
+                .arg("--volume")
+                .arg(&mount_output_dir);
+
+            cmd
+        }
+    }
+
+    async fn run_command_with_timeout(mut command: Command) -> Result<std::process::Output> {
+        use std::os::unix::process::ExitStatusExt;
+
+        let timeout = DOCKER_PROCESS_TIMEOUT_HARD;
+
+        let output = command.output().await.context(UnableToStartCompilerSnafu)?;
+
+        // Exit early, in case we don't have the container
+        if !output.status.success() {
+            return Ok(output);
+        }
+
+        let output = String::from_utf8_lossy(&output.stdout);
+        let id = output
+            .lines()
+            .next()
+            .context(MissingCompilerIdSnafu)?
+            .trim();
+
+        // ----------
+
+        let mut command = docker_command!("wait", id);
+
+        let timed_out = match time::timeout(timeout, command.output()).await {
+            Ok(Ok(o)) => {
+                // Didn't time out, didn't fail to run
+                let o = String::from_utf8_lossy(&o.stdout);
+                let code = o
+                    .lines()
+                    .next()
+                    .unwrap_or("")
+                    .trim()
+                    .parse()
+                    .unwrap_or(i32::MAX);
+                Ok(ExitStatusExt::from_raw(code))
+            }
+            Ok(e) => return e.context(UnableToWaitForCompilerSnafu), // Failed to run
+            Err(e) => Err(e),                                        // Timed out
+        };
+
+        // ----------
+
+        let mut command = docker_command!("logs", id);
+        let mut output = command
+            .output()
+            .await
+            .context(UnableToGetOutputFromCompilerSnafu)?;
+
+        // ----------
+
+        let mut command = docker_command!(
+            "rm", // Kills container if still running
+            "--force", id
+        );
+        command.stdout(std::process::Stdio::null());
+        command
+            .status()
+            .await
+            .context(UnableToRemoveCompilerSnafu)?;
+
+        let code = timed_out.context(CompilerExecutionTimedOutSnafu { timeout })?;
+
+        output.status = code;
+
+        Ok(output)
+    }
+
+    async fn read(path: &Path) -> Result<Option<String>> {
+        match fs::read_to_string(path).await {
+            Ok(s) => Ok(Some(s)),
+            Err(e) if e.kind() == ErrorKind::NotFound => Ok(None),
+            Err(e) => Err(e).context(UnableToReadOutputSnafu),
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
