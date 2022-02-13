@@ -208,7 +208,7 @@ impl Sandbox {
 
         Ok(FormatResponse {
             success: output.status.success(),
-            code: read(self.input_file.as_ref())?.ok_or(Error::OutputMissing)?,
+            code: read(self.input_file.as_ref())?.context(OutputMissingSnafu)?,
             stdout: vec_to_str(output.stdout)?,
             stderr: vec_to_str(output.stderr)?,
         })
@@ -288,13 +288,13 @@ impl Sandbox {
             })
             .collect();
 
-        let release = info.remove("release").ok_or(Error::VersionReleaseMissing)?;
+        let release = info.remove("release").context(VersionReleaseMissingSnafu)?;
         let commit_hash = info
             .remove("commit-hash")
-            .ok_or(Error::VersionHashMissing)?;
+            .context(VersionHashMissingSnafu)?;
         let commit_date = info
             .remove("commit-date")
-            .ok_or(Error::VersionDateMissing)?;
+            .context(VersionDateMissingSnafu)?;
 
         Ok(Version {
             release,
