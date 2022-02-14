@@ -1,17 +1,17 @@
 use crate::{
     gist,
     metrics::{
-        track_metric, track_metric_force_endpoint, track_metric_no_request_async, Endpoint,
-        GenerateLabels, SuccessDetails,
+        track_metric_async, track_metric_force_endpoint_async, track_metric_no_request_async,
+        Endpoint, GenerateLabels, SuccessDetails,
     },
-    sandbox::{self, Channel, Sandbox},
+    sandbox::{self, fut::Sandbox, Channel},
     CachingSnafu, ClippyRequest, ClippyResponse, CompilationSnafu, CompileRequest, CompileResponse,
     Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluationSnafu, ExecuteRequest,
     ExecuteResponse, ExecutionSnafu, ExpansionSnafu, FormatRequest, FormatResponse,
     FormattingSnafu, GhToken, GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu, LintingSnafu,
     MacroExpansionRequest, MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest,
     MetaGistResponse, MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result,
-    SandboxCreationSnafu, SpawnBlockingSandboxSnafu, ONE_HOUR, SANDBOX_CACHE_TIME_TO_LIVE,
+    SandboxCreationSnafu, ONE_HOUR, SANDBOX_CACHE_TIME_TO_LIVE,
 };
 use async_trait::async_trait;
 use axum::{
@@ -24,9 +24,11 @@ use axum::{
     AddExtensionLayer, Router,
 };
 use axum_extra::middleware;
-use snafu::{IntoError, ResultExt};
+use futures::{future::BoxFuture, FutureExt};
+use snafu::{prelude::*, IntoError};
 use std::{
     convert::{TryFrom, TryInto},
+    future::Future,
     mem, path,
     sync::Arc,
     time::Instant,
@@ -133,7 +135,7 @@ async fn evaluate(Json(req): Json<EvaluateRequest>) -> Result<Json<EvaluateRespo
     with_sandbox_force_endpoint(
         req,
         Endpoint::Evaluate,
-        |sb, req| sb.execute(req),
+        |sb, req| async move { sb.execute(req).await }.boxed(),
         EvaluationSnafu,
     )
     .await
@@ -141,62 +143,81 @@ async fn evaluate(Json(req): Json<EvaluateRequest>) -> Result<Json<EvaluateRespo
 }
 
 async fn compile(Json(req): Json<CompileRequest>) -> Result<Json<CompileResponse>> {
-    with_sandbox(req, |sb, req| sb.compile(req), CompilationSnafu)
-        .await
-        .map(Json)
+    with_sandbox(
+        req,
+        |sb, req| async move { sb.compile(req).await }.boxed(),
+        CompilationSnafu,
+    )
+    .await
+    .map(Json)
 }
 
 async fn execute(Json(req): Json<ExecuteRequest>) -> Result<Json<ExecuteResponse>> {
-    with_sandbox(req, |sb, req| sb.execute(req), ExecutionSnafu)
-        .await
-        .map(Json)
+    with_sandbox(
+        req,
+        |sb, req| async move { sb.execute(req).await }.boxed(),
+        ExecutionSnafu,
+    )
+    .await
+    .map(Json)
 }
 
 async fn format(Json(req): Json<FormatRequest>) -> Result<Json<FormatResponse>> {
-    with_sandbox(req, |sb, req| sb.format(req), FormattingSnafu)
-        .await
-        .map(Json)
+    with_sandbox(
+        req,
+        |sb, req| async move { sb.format(req).await }.boxed(),
+        FormattingSnafu,
+    )
+    .await
+    .map(Json)
 }
 
 async fn clippy(Json(req): Json<ClippyRequest>) -> Result<Json<ClippyResponse>> {
-    with_sandbox(req, |sb, req| sb.clippy(req), LintingSnafu)
-        .await
-        .map(Json)
+    with_sandbox(
+        req,
+        |sb, req| async move { sb.clippy(req).await }.boxed(),
+        LintingSnafu,
+    )
+    .await
+    .map(Json)
 }
 
 async fn miri(Json(req): Json<MiriRequest>) -> Result<Json<MiriResponse>> {
-    with_sandbox(req, |sb, req| sb.miri(req), InterpretingSnafu)
-        .await
-        .map(Json)
+    with_sandbox(
+        req,
+        |sb, req| async move { sb.miri(req).await }.boxed(),
+        InterpretingSnafu,
+    )
+    .await
+    .map(Json)
 }
 
 async fn macro_expansion(
     Json(req): Json<MacroExpansionRequest>,
 ) -> Result<Json<MacroExpansionResponse>> {
-    with_sandbox(req, |sb, req| sb.macro_expansion(req), ExpansionSnafu)
-        .await
-        .map(Json)
+    with_sandbox(
+        req,
+        |sb, req| async move { sb.macro_expansion(req).await }.boxed(),
+        ExpansionSnafu,
+    )
+    .await
+    .map(Json)
 }
 
 async fn with_sandbox<F, Req, Resp, SbReq, SbResp, Ctx>(req: Req, f: F, ctx: Ctx) -> Result<Resp>
 where
-    F: FnOnce(Sandbox, &SbReq) -> sandbox::Result<SbResp>,
-    F: Send + 'static,
-    Req: Send + 'static,
+    for<'req> F: FnOnce(Sandbox, &'req SbReq) -> BoxFuture<'req, sandbox::Result<SbResp>>,
     Resp: From<SbResp>,
-    Resp: Send + 'static,
     SbReq: TryFrom<Req, Error = Error> + GenerateLabels,
     SbResp: SuccessDetails,
     Ctx: IntoError<Error, Source = sandbox::Error>,
-    Ctx: Send + 'static,
 {
-    sandbox_shim(|sandbox| {
-        let request = req.try_into()?;
-        track_metric(request, |request| f(sandbox, &request))
-            .map(Into::into)
-            .context(ctx)
-    })
-    .await
+    let sandbox = Sandbox::new().await.context(SandboxCreationSnafu)?;
+    let request = req.try_into()?;
+    track_metric_async(request, |request| f(sandbox, request))
+        .await
+        .map(Into::into)
+        .context(ctx)
 }
 
 async fn with_sandbox_force_endpoint<F, Req, Resp, SbReq, SbResp, Ctx>(
@@ -206,23 +227,18 @@ async fn with_sandbox_force_endpoint<F, Req, Resp, SbReq, SbResp, Ctx>(
     ctx: Ctx,
 ) -> Result<Resp>
 where
-    F: FnOnce(Sandbox, &SbReq) -> sandbox::Result<SbResp>,
-    F: Send + 'static,
-    Req: Send + 'static,
+    for<'req> F: FnOnce(Sandbox, &'req SbReq) -> BoxFuture<'req, sandbox::Result<SbResp>>,
     Resp: From<SbResp>,
-    Resp: Send + 'static,
     SbReq: TryFrom<Req, Error = Error> + GenerateLabels,
     SbResp: SuccessDetails,
     Ctx: IntoError<Error, Source = sandbox::Error>,
-    Ctx: Send + 'static,
 {
-    sandbox_shim(move |sandbox| {
-        let request = req.try_into()?;
-        track_metric_force_endpoint(request, endpoint, |request| f(sandbox, &request))
-            .map(Into::into)
-            .context(ctx)
-    })
-    .await
+    let sandbox = Sandbox::new().await.context(SandboxCreationSnafu)?;
+    let request = req.try_into()?;
+    track_metric_force_endpoint_async(request, endpoint, |request| f(sandbox, request))
+        .await
+        .map(Into::into)
+        .context(ctx)
 }
 
 async fn meta_crates(
@@ -371,14 +387,19 @@ struct SandboxCache {
 impl SandboxCache {
     async fn crates(&self) -> Result<MetaCratesResponse> {
         self.crates
-            .fetch(|sandbox| Ok(sandbox.crates().context(CachingSnafu)?.into()))
+            .fetch(
+                |sandbox| async move { Ok(sandbox.crates().await.context(CachingSnafu)?.into()) },
+            )
             .await
     }
 
     async fn version_stable(&self) -> Result<MetaVersionResponse> {
         self.version_stable
-            .fetch(|sandbox| {
-                let version = sandbox.version(Channel::Stable).context(CachingSnafu)?;
+            .fetch(|sandbox| async move {
+                let version = sandbox
+                    .version(Channel::Stable)
+                    .await
+                    .context(CachingSnafu)?;
                 Ok(version.into())
             })
             .await
@@ -386,8 +407,8 @@ impl SandboxCache {
 
     async fn version_beta(&self) -> Result<MetaVersionResponse> {
         self.version_beta
-            .fetch(|sandbox| {
-                let version = sandbox.version(Channel::Beta).context(CachingSnafu)?;
+            .fetch(|sandbox| async move {
+                let version = sandbox.version(Channel::Beta).await.context(CachingSnafu)?;
                 Ok(version.into())
             })
             .await
@@ -395,8 +416,11 @@ impl SandboxCache {
 
     async fn version_nightly(&self) -> Result<MetaVersionResponse> {
         self.version_nightly
-            .fetch(|sandbox| {
-                let version = sandbox.version(Channel::Nightly).context(CachingSnafu)?;
+            .fetch(|sandbox| async move {
+                let version = sandbox
+                    .version(Channel::Nightly)
+                    .await
+                    .context(CachingSnafu)?;
                 Ok(version.into())
             })
             .await
@@ -404,19 +428,29 @@ impl SandboxCache {
 
     async fn version_rustfmt(&self) -> Result<MetaVersionResponse> {
         self.version_rustfmt
-            .fetch(|sandbox| Ok(sandbox.version_rustfmt().context(CachingSnafu)?.into()))
+            .fetch(|sandbox| async move {
+                Ok(sandbox
+                    .version_rustfmt()
+                    .await
+                    .context(CachingSnafu)?
+                    .into())
+            })
             .await
     }
 
     async fn version_clippy(&self) -> Result<MetaVersionResponse> {
         self.version_clippy
-            .fetch(|sandbox| Ok(sandbox.version_clippy().context(CachingSnafu)?.into()))
+            .fetch(|sandbox| async move {
+                Ok(sandbox.version_clippy().await.context(CachingSnafu)?.into())
+            })
             .await
     }
 
     async fn version_miri(&self) -> Result<MetaVersionResponse> {
         self.version_miri
-            .fetch(|sandbox| Ok(sandbox.version_miri().context(CachingSnafu)?.into()))
+            .fetch(|sandbox| async move {
+                Ok(sandbox.version_miri().await.context(CachingSnafu)?.into())
+            })
             .await
     }
 }
@@ -432,12 +466,12 @@ impl<T> Default for CacheOne<T> {
 
 impl<T> CacheOne<T>
 where
-    T: Clone + Send + 'static,
+    T: Clone,
 {
-    async fn fetch<F>(&self, generator: F) -> Result<T>
+    async fn fetch<F, FFut>(&self, generator: F) -> Result<T>
     where
-        F: FnOnce(Sandbox) -> Result<T>,
-        F: Send + 'static,
+        F: FnOnce(Sandbox) -> FFut,
+        FFut: Future<Output = Result<T>>,
     {
         let data = &mut *self.0.lock().await;
         match data {
@@ -452,12 +486,13 @@ where
         }
     }
 
-    async fn set_value<F>(data: &mut Option<CacheInfo<T>>, generator: F) -> Result<T>
+    async fn set_value<F, FFut>(data: &mut Option<CacheInfo<T>>, generator: F) -> Result<T>
     where
-        F: FnOnce(Sandbox) -> Result<T>,
-        F: Send + 'static,
+        F: FnOnce(Sandbox) -> FFut,
+        FFut: Future<Output = Result<T>>,
     {
-        let value = sandbox_shim(generator).await?;
+        let sandbox = Sandbox::new().await.context(SandboxCreationSnafu)?;
+        let value = generator(sandbox).await?;
 
         *data = Some(CacheInfo::build(&value));
 
@@ -493,21 +528,6 @@ impl IntoResponse for Error {
         })
         .into_response()
     }
-}
-
-async fn sandbox_shim<F, R>(f: F) -> Result<R>
-where
-    F: FnOnce(Sandbox) -> Result<R>,
-    F: Send + 'static,
-    R: Send + 'static,
-{
-    // Running blocking sandbox code here until we completely move off of Iron
-    tokio::task::spawn_blocking(|| {
-        let sandbox = Sandbox::new().context(SandboxCreationSnafu)?;
-        f(sandbox)
-    })
-    .await
-    .context(SpawnBlockingSandboxSnafu)?
 }
 
 /// This type only exists so that we can recover from the `axum::Json`
