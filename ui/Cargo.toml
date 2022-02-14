@@ -14,6 +14,7 @@ axum = { version = "0.4.5", features = ["headers"] }
 axum-extra = "0.1.2"
 bodyparser = "0.8.0"
 corsware = "0.2.0"
+cargo_metadata = "0.14.1"
 dotenv = "0.15.0"
 env_logger = "0.9.0"
 iron = "0.6.0"

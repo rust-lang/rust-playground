@@ -6,7 +6,7 @@ export function configureRustErrors({
   getChannel,
   gotoPosition,
   selectText,
-  addImport,
+  applySuggestion,
   reExecuteWithBacktrace,
 }) {
   Prism.languages.rust_errors = {
@@ -30,9 +30,9 @@ export function configureRustErrors({
     },
     'error-location': /-->\s+(\/playground\/)?src\/.*\n/,
     'import-suggestion-outer': {
-      pattern: /\|\s+use\s+([^;]+);/,
+      pattern: /\[\[Line\s\d+\sCol\s\d+\s-\sLine\s\d+\sCol\s\d+:\s[.\s\S]*?\]\]/,
       inside: {
-        'import-suggestion': /use\s+.*/,
+        'import-suggestion': /\[\[Line\s\d+\sCol\s\d+\s-\sLine\s\d+\sCol\s\d+:\s[.\s\S]*?\]\]/,
       },
     },
     'rust-errors-help': {
@@ -87,9 +87,16 @@ export function configureRustErrors({
       env.attributes['data-col'] = col;
     }
     if (env.type === 'import-suggestion') {
+      const errorMatch = /\[\[Line\s(\d+)\sCol\s(\d+)\s-\sLine\s(\d+)\sCol\s(\d+):\s([.\s\S]*?)\]\]/.exec(env.content);
+      const [_, startLine, startCol, endLine, endCol, importSuggestion] = errorMatch;
       env.tag = 'a';
       env.attributes.href = '#';
-      env.attributes['data-suggestion'] = env.content;
+      env.attributes['data-startline'] = startLine;
+      env.attributes['data-startcol'] = startCol;
+      env.attributes['data-endline'] = endLine;
+      env.attributes['data-endcol'] = endCol;
+      env.attributes['data-suggestion'] = importSuggestion;
+      env.content = 'Apply \"' + importSuggestion.trim() + '\"\n';
     }
     if (env.type === 'feature-gate') {
       const [_, featureGate] = /feature\((.*?)\)/.exec(env.content);
@@ -134,10 +141,10 @@ export function configureRustErrors({
 
     const importSuggestions = env.element.querySelectorAll('.import-suggestion');
     Array.from(importSuggestions).forEach((link: HTMLAnchorElement) => {
-      const { suggestion } = link.dataset;
+      const { startline, startcol, endline, endcol, suggestion } = link.dataset;
       link.onclick = (e) => {
         e.preventDefault();
-        addImport(suggestion + '\n');
+        applySuggestion(startline, startcol, endline, endcol, suggestion);
       };
     });
 
