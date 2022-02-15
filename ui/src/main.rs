@@ -138,6 +138,7 @@ impl MetricsToken {
 }
 
 mod metrics {
+    use futures::future::BoxFuture;
     use lazy_static::lazy_static;
     use prometheus::{self, register_histogram_vec, HistogramVec};
     use regex::Regex;
@@ -531,6 +532,58 @@ mod metrics {
         response
     }
 
+    pub(crate) async fn track_metric_async<Req, B, Resp>(
+        request: Req,
+        body: B,
+    ) -> sandbox::Result<Resp>
+    where
+        Req: GenerateLabels,
+        for<'req> B: FnOnce(&'req Req) -> BoxFuture<'req, sandbox::Result<Resp>>,
+        Resp: SuccessDetails,
+    {
+        track_metric_common_async(request, body, |_| {}).await
+    }
+
+    pub(crate) async fn track_metric_force_endpoint_async<Req, B, Resp>(
+        request: Req,
+        endpoint: Endpoint,
+        body: B,
+    ) -> sandbox::Result<Resp>
+    where
+        Req: GenerateLabels,
+        for<'req> B: FnOnce(&'req Req) -> BoxFuture<'req, sandbox::Result<Resp>>,
+        Resp: SuccessDetails,
+    {
+        track_metric_common_async(request, body, |labels| labels.endpoint = endpoint).await
+    }
+
+    async fn track_metric_common_async<Req, B, Resp, F>(
+        request: Req,
+        body: B,
+        f: F,
+    ) -> sandbox::Result<Resp>
+    where
+        Req: GenerateLabels,
+        for<'req> B: FnOnce(&'req Req) -> BoxFuture<'req, sandbox::Result<Resp>>,
+        Resp: SuccessDetails,
+        F: FnOnce(&mut Labels),
+    {
+        let start = Instant::now();
+        let response = body(&request).await;
+        let elapsed = start.elapsed();
+
+        let outcome = SuccessDetails::for_sandbox_result(&response);
+        let mut labels = request.generate_labels(outcome);
+        f(&mut labels);
+        let values = &labels.to_values();
+
+        let histogram = REQUESTS.with_label_values(values);
+
+        histogram.observe(elapsed.as_secs_f64());
+
+        response
+    }
+
     pub(crate) fn track_metric_no_request<B, Resp>(
         endpoint: Endpoint,
         body: B,
@@ -651,8 +704,6 @@ pub enum Error {
     RequestMissing,
     #[snafu(display("The cache has been poisoned"))]
     CachePoisoned,
-    #[snafu(display("Could not execute a sandbox worker: {}", source))]
-    SpawnBlockingSandbox { source: tokio::task::JoinError },
 }
 
 type Result<T, E = Error> = ::std::result::Result<T, E>;
