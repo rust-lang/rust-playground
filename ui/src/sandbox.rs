@@ -1,3 +1,4 @@
+use regex::Regex;
 use serde_derive::Deserialize;
 use snafu::{ResultExt, Snafu};
 use std::{ffi::OsStr, fmt, io, os::unix::fs::PermissionsExt, string, time::Duration};
@@ -280,6 +281,27 @@ fn set_execution_environment(
     cmd.apply_backtrace(&req);
 }
 
+fn parse_magic_comments(code: &str) -> Vec<(&'static str, String)> {
+    lazy_static::lazy_static! {
+        pub static ref MIRIFLAGS: Regex = Regex::new(r#"(///|//!|//)\s*MIRIFLAGS\s*=\s*(.*)"#).unwrap();
+    }
+
+    fn match_of(line: &str, pat: &Regex) -> Option<String> {
+        pat.captures(line.trim())
+            .and_then(|caps| caps.get(2))
+            .map(|mat| mat.as_str().trim_matches(&['\'', '"'][..]).to_string())
+    }
+
+    let mut settings = Vec::new();
+    if let Some(first_line) = code.trim().lines().next() {
+        if let Some(miri_flags) = match_of(first_line, &*MIRIFLAGS) {
+            settings.push(("MIRIFLAGS", miri_flags));
+        }
+    }
+
+    settings
+}
+
 pub mod fut {
     use snafu::prelude::*;
     use std::{
@@ -292,9 +314,9 @@ pub mod fut {
     use tokio::{fs, process::Command, time};
 
     use super::{
-        basic_secure_docker_command, build_execution_command, set_execution_environment,
-        vec_to_str, wide_open_permissions, BacktraceRequest, Channel, ClippyRequest,
-        ClippyResponse, CompileRequest, CompileResponse, CompileTarget,
+        basic_secure_docker_command, build_execution_command, parse_magic_comments,
+        set_execution_environment, vec_to_str, wide_open_permissions, BacktraceRequest, Channel,
+        ClippyRequest, ClippyResponse, CompileRequest, CompileResponse, CompileTarget,
         CompilerExecutionTimedOutSnafu, CrateInformation, CrateInformationInner, CrateType,
         CrateTypeRequest, DemangleAssembly, DockerCommandExt, EditionRequest, ExecuteRequest,
         ExecuteResponse, FormatRequest, FormatResponse, MacroExpansionRequest,
@@ -454,7 +476,9 @@ pub mod fut {
 
         pub async fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
             self.write_source_code(&req.code).await?;
-            let command = self.miri_command(req);
+
+            let settings = parse_magic_comments(&req.code);
+            let command = self.miri_command(settings, req);
 
             let output = run_command_with_timeout(command).await?;
 
@@ -651,9 +675,22 @@ pub mod fut {
             cmd
         }
 
-        fn miri_command(&self, req: impl EditionRequest) -> Command {
+        fn miri_command(
+            &self,
+            env_settings: Vec<(&'static str, String)>,
+            req: impl EditionRequest,
+        ) -> Command {
             let mut cmd = self.docker_command(None);
             cmd.apply_edition(req);
+
+            let miri_env =
+                if let Some((_, flags)) = env_settings.iter().find(|(k, _)| k == &"MIRIFLAGS") {
+                    format!("MIRIFLAGS={} -Zmiri-disable-isolation", flags)
+                } else {
+                    "MIRIFLAGS=-Zmiri-disable-isolation".to_string()
+                };
+
+            cmd.args(&["--env", &miri_env]);
 
             cmd.arg("miri").args(&["cargo", "miri-playground"]);
 
@@ -1647,6 +1684,111 @@ mod test {
         );
         assert!(
             resp.stderr.contains("which has size 0"),
+            "was: {}",
+            resp.stderr
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn magic_comments() {
+        let _singleton = one_test_at_a_time();
+
+        let expected = vec![("MIRIFLAGS", "-Zmiri-tag-raw-pointers".to_string())];
+
+        // Every comment syntax
+        let code = r#"//MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
+        assert_eq!(parse_magic_comments(code), expected);
+
+        let code = r#"///MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
+        assert_eq!(parse_magic_comments(code), expected);
+
+        let code = r#"//!MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
+        assert_eq!(parse_magic_comments(code), expected);
+
+        // Whitespace is ignored
+        let code = r#"// MIRIFLAGS = -Zmiri-tag-raw-pointers"#;
+        assert_eq!(parse_magic_comments(code), expected);
+
+        // Both quotes are stripped
+        let code = r#"//MIRIFLAGS='-Zmiri-tag-raw-pointers'"#;
+        assert_eq!(parse_magic_comments(code), expected);
+
+        let code = r#"//MIRIFLAGS="-Zmiri-tag-raw-pointers""#;
+        assert_eq!(parse_magic_comments(code), expected);
+
+        // Leading spaces are ignored
+        let code = r#"
+            //MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
+        assert_eq!(parse_magic_comments(code), expected);
+
+        let expected = vec![(
+            "MIRIFLAGS",
+            "-Zmiri-tag-raw-pointers -Zmiri-symbolic-alignment-check".to_string(),
+        )];
+
+        // Doesn't break up flags even if they contain whitespace
+        let code = r#"//MIRIFLAGS="-Zmiri-tag-raw-pointers -Zmiri-symbolic-alignment-check""#;
+        assert_eq!(parse_magic_comments(code), expected);
+
+        // Even if they aren't wrapped in quoted (possibly dubious)
+        let code = r#"//MIRIFLAGS=-Zmiri-tag-raw-pointers -Zmiri-symbolic-alignment-check"#;
+        assert_eq!(parse_magic_comments(code), expected);
+    }
+
+    #[test]
+    fn miriflags_work() -> Result<()> {
+        let _singleton = one_test_at_a_time();
+
+        let code = r#"
+        fn main() {
+            let a = 0u8;
+            let ptr = &a as *const u8 as usize as *const u8;
+            unsafe {
+                println!("{}", *ptr);
+            }
+        }
+        "#;
+
+        let req = MiriRequest {
+            code: code.to_string(),
+            edition: None,
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.miri(&req)?;
+
+        assert!(resp.success);
+
+        let code = r#"
+        // MIRIFLAGS=-Zmiri-tag-raw-pointers
+        fn main() {
+            let a = 0u8;
+            let ptr = &a as *const u8 as usize as *const u8;
+            unsafe {
+                println!("{}", *ptr);
+            }
+        }
+        "#;
+
+        let req = MiriRequest {
+            code: code.to_string(),
+            edition: None,
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.miri(&req)?;
+
+        assert!(!resp.success);
+
+        assert!(
+            resp.stderr
+                .contains("trying to reborrow for SharedReadOnly"),
+            "was: {}",
+            resp.stderr
+        );
+        assert!(
+            resp.stderr.contains("but parent tag"),
             "was: {}",
             resp.stderr
         );
