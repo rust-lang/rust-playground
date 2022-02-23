@@ -683,14 +683,9 @@ pub mod fut {
             let mut cmd = self.docker_command(None);
             cmd.apply_edition(req);
 
-            let miri_env =
-                if let Some((_, flags)) = env_settings.iter().find(|(k, _)| k == &"MIRIFLAGS") {
-                    format!("MIRIFLAGS={} -Zmiri-disable-isolation", flags)
-                } else {
-                    "MIRIFLAGS=-Zmiri-disable-isolation".to_string()
-                };
-
-            cmd.args(&["--env", &miri_env]);
+            if let Some((_, flags)) = env_settings.iter().find(|(k, _)| k == &"MIRIFLAGS") {
+                cmd.args(&["--env", &format!("MIRIFLAGS={}", flags)]);
+            }
 
             cmd.arg("miri").args(&["cargo", "miri-playground"]);
 

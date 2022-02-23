@@ -81,7 +81,7 @@
     "webpack-cli": "^4.5.0"
   },
   "engines": {
-    "node": "^16.13.1"
+    "node": "^17.3.0"
   },
   "scripts": {
     "test": "jest",

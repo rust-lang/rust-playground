@@ -37,7 +37,8 @@ const CLIPPY_EXAMPLE = `fn main() {
     }
 }`;
 
-const MIRI_EXAMPLE = `fn main() {
+const MIRI_EXAMPLE = `// MIRIFLAGS=-Zmiri-disable-isolation
+fn main() {
     let mut a: [u8; 0] = [];
     unsafe {
         *a.get_unchecked_mut(1) = 1;
@@ -154,7 +155,9 @@ const Help: React.SFC = () => {
             <a href={MIRI_URL}>Miri</a> is an interpreter for Rust’s mid-level intermediate
             representation (MIR) and can be used to detect certain kinds of undefined behavior
           in your unsafe Rust code. Click on the <strong>Miri</strong> button in
-          the <strong>Tools</strong> menu to check.
+          the <strong>Tools</strong> menu to check. When running code with Miri, if the first
+          source line is a comment following a bash-like syntax for setting environment
+          variables, it will be used to set the <Code>MIRIFLAGS</Code> environment variable.
           </p>
 
           <Example code={MIRI_EXAMPLE} />
