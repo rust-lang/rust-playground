@@ -12,7 +12,7 @@
     "isomorphic-fetch": "^3.0.0",
     "lodash": "^4.17.0",
     "monaco-editor": "^0.31.1",
-    "prismjs": "^1.6.0",
+    "prismjs": "^1.27.0",
     "qs": "^6.4.0",
     "react": "^17.0.1",
     "react-copy-to-clipboard": "^5.0.1",
