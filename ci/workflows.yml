@@ -490,13 +490,27 @@ workflows:
               name: frontend
               path: server/build/
 
-          - name: "Push backend"
+          - name: "Push backend (i32)"
             run: |-
               aws s3 cp server/ui s3://playground-artifacts-i32
 
-          - name: "Push frontend"
+          - name: "Push frontend (i32)"
             run: |-
               aws s3 sync server/build/ s3://playground-artifacts-i32/build
+
+          - name: "Configure AWS credentials (rust-lang)"
+            uses: aws-actions/configure-aws-credentials@v1
+            with:
+              role-to-assume: arn:aws:iam::890664054962:role/upload-playground-artifacts
+              aws-region: us-west-1
+
+          - name: "Push backend (rust-lang)"
+            run: |-
+              aws s3 cp server/ui s3://rust-playground-artifacts
+
+          - name: "Push frontend (rust-lang)"
+            run: |-
+              aws s3 sync server/build/ s3://rust-playground-artifacts/build
 
   cron:
     name: "Scheduled rebuild"
