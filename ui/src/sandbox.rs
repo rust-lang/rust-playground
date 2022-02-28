@@ -293,7 +293,7 @@ fn parse_miri_flags(code: &str) -> Option<String> {
     }
 
     for line in code.trim().lines() {
-        let line = line.trim_end();
+        let line = line.trim();
         if let Some(miri_flags) = match_of(line, &*MIRIFLAGS) {
             return Some(miri_flags);
         }
@@ -1704,13 +1704,8 @@ fn main() {}
 //MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
         assert_eq!(parse_miri_flags(code), expected);
 
-        // A leading space on the first line is ignored
+        // Leading whitespace is ignored, flags still parse
         let code = r#" //MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
-        assert_eq!(parse_miri_flags(code), expected);
-
-        // But on any other line, it disagles the magic
-        let code = r#"
-            //MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
         assert_eq!(parse_miri_flags(code), expected);
 
         let expected = Some("-Zmiri-tag-raw-pointers -Zmiri-symbolic-alignment-check".to_string());
