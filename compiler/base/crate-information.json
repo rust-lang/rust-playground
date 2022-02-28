@@ -31,7 +31,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.53",
+    "version": "1.0.55",
     "id": "anyhow"
   },
   {
@@ -66,7 +66,7 @@
   },
   {
     "name": "autocfg",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "id": "autocfg"
   },
   {
@@ -101,7 +101,7 @@
   },
   {
     "name": "block-buffer",
-    "version": "0.10.1",
+    "version": "0.10.2",
     "id": "block_buffer"
   },
   {
@@ -126,7 +126,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.72",
+    "version": "1.0.73",
     "id": "cc"
   },
   {
@@ -141,7 +141,7 @@
   },
   {
     "name": "clap",
-    "version": "3.0.14",
+    "version": "3.1.3",
     "id": "clap"
   },
   {
@@ -156,7 +156,7 @@
   },
   {
     "name": "crc32fast",
-    "version": "1.3.1",
+    "version": "1.3.2",
     "id": "crc32fast"
   },
   {
@@ -191,7 +191,7 @@
   },
   {
     "name": "crypto-common",
-    "version": "0.1.1",
+    "version": "0.1.3",
     "id": "crypto_common"
   },
   {
@@ -215,59 +215,19 @@
     "id": "deflate"
   },
   {
-    "name": "deflate",
-    "version": "0.9.1",
-    "id": "deflate_0_9_1"
-  },
-  {
     "name": "derivative",
     "version": "2.2.0",
     "id": "derivative"
   },
   {
     "name": "digest",
-    "version": "0.10.1",
+    "version": "0.10.3",
     "id": "digest"
   },
   {
     "name": "either",
     "version": "1.6.1",
     "id": "either"
-  },
-  {
-    "name": "encoding",
-    "version": "0.2.33",
-    "id": "encoding"
-  },
-  {
-    "name": "encoding-index-japanese",
-    "version": "1.20141219.5",
-    "id": "encoding_index_japanese"
-  },
-  {
-    "name": "encoding-index-korean",
-    "version": "1.20141219.5",
-    "id": "encoding_index_korean"
-  },
-  {
-    "name": "encoding-index-simpchinese",
-    "version": "1.20141219.5",
-    "id": "encoding_index_simpchinese"
-  },
-  {
-    "name": "encoding-index-singlebyte",
-    "version": "1.20141219.5",
-    "id": "encoding_index_singlebyte"
-  },
-  {
-    "name": "encoding-index-tradchinese",
-    "version": "1.20141219.5",
-    "id": "encoding_index_tradchinese"
-  },
-  {
-    "name": "encoding_index_tests",
-    "version": "0.1.4",
-    "id": "encoding_index_tests"
   },
   {
     "name": "encoding_rs",
@@ -321,7 +281,7 @@
   },
   {
     "name": "flume",
-    "version": "0.10.10",
+    "version": "0.10.11",
     "id": "flume"
   },
   {
@@ -351,47 +311,47 @@
   },
   {
     "name": "futures",
-    "version": "0.3.19",
+    "version": "0.3.21",
     "id": "futures"
   },
   {
     "name": "futures-channel",
-    "version": "0.3.19",
+    "version": "0.3.21",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.3.19",
+    "version": "0.3.21",
     "id": "futures_core"
   },
   {
     "name": "futures-executor",
-    "version": "0.3.19",
+    "version": "0.3.21",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.3.19",
+    "version": "0.3.21",
     "id": "futures_io"
   },
   {
     "name": "futures-macro",
-    "version": "0.3.19",
+    "version": "0.3.21",
     "id": "futures_macro"
   },
   {
     "name": "futures-sink",
-    "version": "0.3.19",
+    "version": "0.3.21",
     "id": "futures_sink"
   },
   {
     "name": "futures-task",
-    "version": "0.3.19",
+    "version": "0.3.21",
     "id": "futures_task"
   },
   {
     "name": "futures-util",
-    "version": "0.3.19",
+    "version": "0.3.21",
     "id": "futures_util"
   },
   {
@@ -401,7 +361,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "id": "getrandom"
   },
   {
@@ -456,7 +416,7 @@
   },
   {
     "name": "hmac",
-    "version": "0.12.0",
+    "version": "0.12.1",
     "id": "hmac"
   },
   {
@@ -476,7 +436,7 @@
   },
   {
     "name": "httparse",
-    "version": "1.5.1",
+    "version": "1.6.0",
     "id": "httparse"
   },
   {
@@ -491,7 +451,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.14.16",
+    "version": "0.14.17",
     "id": "hyper"
   },
   {
@@ -506,7 +466,7 @@
   },
   {
     "name": "image",
-    "version": "0.24.0",
+    "version": "0.24.1",
     "id": "image"
   },
   {
@@ -546,7 +506,7 @@
   },
   {
     "name": "jpeg-decoder",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "id": "jpeg_decoder"
   },
   {
@@ -566,17 +526,17 @@
   },
   {
     "name": "libc",
-    "version": "0.2.117",
+    "version": "0.2.119",
     "id": "libc"
   },
   {
     "name": "libm",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "id": "libm"
   },
   {
     "name": "libsqlite3-sys",
-    "version": "0.23.2",
+    "version": "0.24.0",
     "id": "libsqlite3_sys"
   },
   {
@@ -631,7 +591,7 @@
   },
   {
     "name": "md-5",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "id": "md5"
   },
   {
@@ -668,11 +628,6 @@
     "name": "mio",
     "version": "0.8.0",
     "id": "mio"
-  },
-  {
-    "name": "mio",
-    "version": "0.7.14",
-    "id": "mio_0_7_14"
   },
   {
     "name": "nalgebra",
@@ -801,7 +756,7 @@
   },
   {
     "name": "parking_lot_core",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "id": "parking_lot_core"
   },
   {
@@ -886,7 +841,7 @@
   },
   {
     "name": "png",
-    "version": "0.17.2",
+    "version": "0.17.4",
     "id": "png"
   },
   {
@@ -931,7 +886,7 @@
   },
   {
     "name": "rand",
-    "version": "0.8.4",
+    "version": "0.8.5",
     "id": "rand"
   },
   {
@@ -1021,7 +976,7 @@
   },
   {
     "name": "rusqlite",
-    "version": "0.26.3",
+    "version": "0.27.0",
     "id": "rusqlite"
   },
   {
@@ -1066,7 +1021,7 @@
   },
   {
     "name": "semver",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "id": "semver"
   },
   {
@@ -1091,7 +1046,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.78",
+    "version": "1.0.79",
     "id": "serde_json"
   },
   {
@@ -1106,7 +1061,7 @@
   },
   {
     "name": "sha2",
-    "version": "0.10.1",
+    "version": "0.10.2",
     "id": "sha2"
   },
   {
@@ -1201,8 +1156,13 @@
   },
   {
     "name": "textwrap",
-    "version": "0.14.2",
+    "version": "0.15.0",
     "id": "textwrap"
+  },
+  {
+    "name": "textwrap",
+    "version": "0.14.2",
+    "id": "textwrap_0_14_2"
   },
   {
     "name": "thiserror",
@@ -1256,7 +1216,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.16.1",
+    "version": "1.17.0",
     "id": "tokio"
   },
   {
@@ -1286,7 +1246,7 @@
   },
   {
     "name": "tracing",
-    "version": "0.1.30",
+    "version": "0.1.31",
     "id": "tracing"
   },
   {
@@ -1336,7 +1296,7 @@
   },
   {
     "name": "unicode-segmentation",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "id": "unicode_segmentation"
   },
   {
