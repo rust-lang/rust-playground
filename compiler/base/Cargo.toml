@@ -36,7 +36,7 @@ version = "=0.12.1"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.53"
+version = "=1.0.55"
 
 [dependencies.approx]
 package = "approx"
@@ -64,7 +64,7 @@ version = "=0.2.14"
 
 [dependencies.autocfg]
 package = "autocfg"
-version = "=1.0.1"
+version = "=1.1.0"
 
 [dependencies.backtrace]
 package = "backtrace"
@@ -92,7 +92,7 @@ version = "=1.3.2"
 
 [dependencies.block_buffer]
 package = "block-buffer"
-version = "=0.10.1"
+version = "=0.10.2"
 
 [dependencies.bstr]
 package = "bstr"
@@ -113,7 +113,7 @@ version = "=1.1.0"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.0.72"
+version = "=1.0.73"
 
 [dependencies.cfg_if]
 package = "cfg-if"
@@ -126,7 +126,7 @@ features = ["serde"]
 
 [dependencies.clap]
 package = "clap"
-version = "=3.0.14"
+version = "=3.1.3"
 features = ["unstable-doc"]
 
 [dependencies.color_quant]
@@ -139,7 +139,7 @@ version = "=0.2.1"
 
 [dependencies.crc32fast]
 package = "crc32fast"
-version = "=1.3.1"
+version = "=1.3.2"
 
 [dependencies.crossbeam]
 package = "crossbeam"
@@ -167,7 +167,7 @@ version = "=0.8.7"
 
 [dependencies.crypto_common]
 package = "crypto-common"
-version = "=0.1.1"
+version = "=0.1.3"
 
 [dependencies.csv]
 package = "csv"
@@ -189,49 +189,17 @@ version = "=1.0.4"
 package = "deflate"
 version = "=1.0.0"
 
-[dependencies.deflate_0_9_1]
-package = "deflate"
-version = "=0.9.1"
-
 [dependencies.derivative]
 package = "derivative"
 version = "=2.2.0"
 
 [dependencies.digest]
 package = "digest"
-version = "=0.10.1"
+version = "=0.10.3"
 
 [dependencies.either]
 package = "either"
 version = "=1.6.1"
-
-[dependencies.encoding]
-package = "encoding"
-version = "=0.2.33"
-
-[dependencies.encoding_index_japanese]
-package = "encoding-index-japanese"
-version = "=1.20141219.5"
-
-[dependencies.encoding_index_korean]
-package = "encoding-index-korean"
-version = "=1.20141219.5"
-
-[dependencies.encoding_index_simpchinese]
-package = "encoding-index-simpchinese"
-version = "=1.20141219.5"
-
-[dependencies.encoding_index_singlebyte]
-package = "encoding-index-singlebyte"
-version = "=1.20141219.5"
-
-[dependencies.encoding_index_tests]
-package = "encoding_index_tests"
-version = "=0.1.4"
-
-[dependencies.encoding_index_tradchinese]
-package = "encoding-index-tradchinese"
-version = "=1.20141219.5"
 
 [dependencies.encoding_rs]
 package = "encoding_rs"
@@ -275,7 +243,7 @@ version = "=1.0.22"
 
 [dependencies.flume]
 package = "flume"
-version = "=0.10.10"
+version = "=0.10.11"
 
 [dependencies.fnv]
 package = "fnv"
@@ -299,40 +267,40 @@ version = "=0.1.5"
 
 [dependencies.futures]
 package = "futures"
-version = "=0.3.19"
+version = "=0.3.21"
 features = ["compat", "io-compat", "thread-pool"]
 
 [dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.19"
+version = "=0.3.21"
 
 [dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.19"
+version = "=0.3.21"
 
 [dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.19"
+version = "=0.3.21"
 
 [dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.19"
+version = "=0.3.21"
 
 [dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.19"
+version = "=0.3.21"
 
 [dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.19"
+version = "=0.3.21"
 
 [dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.19"
+version = "=0.3.21"
 
 [dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.19"
+version = "=0.3.21"
 
 [dependencies.generic_array]
 package = "generic-array"
@@ -340,7 +308,7 @@ version = "=0.14.5"
 
 [dependencies.getrandom]
 package = "getrandom"
-version = "=0.2.4"
+version = "=0.2.5"
 
 [dependencies.getrandom_0_1_16]
 package = "getrandom"
@@ -384,7 +352,7 @@ version = "=0.4.0"
 
 [dependencies.hmac]
 package = "hmac"
-version = "=0.12.0"
+version = "=0.12.1"
 
 [dependencies.html5ever]
 package = "html5ever"
@@ -400,7 +368,7 @@ version = "=0.4.4"
 
 [dependencies.httparse]
 package = "httparse"
-version = "=1.5.1"
+version = "=1.6.0"
 
 [dependencies.httpdate]
 package = "httpdate"
@@ -412,7 +380,7 @@ version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=0.14.16"
+version = "=0.14.17"
 features = ["full"]
 
 [dependencies.hyper_tls]
@@ -425,7 +393,7 @@ version = "=0.2.3"
 
 [dependencies.image]
 package = "image"
-version = "=0.24.0"
+version = "=0.24.1"
 
 [dependencies.indexmap]
 package = "indexmap"
@@ -457,7 +425,7 @@ version = "=0.4.8"
 
 [dependencies.jpeg_decoder]
 package = "jpeg-decoder"
-version = "=0.2.1"
+version = "=0.2.2"
 
 [dependencies.jpeg_decoder_0_1_22]
 package = "jpeg-decoder"
@@ -473,15 +441,15 @@ version = "=0.5.1"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.117"
+version = "=0.2.119"
 
 [dependencies.libm]
 package = "libm"
-version = "=0.2.1"
+version = "=0.2.2"
 
 [dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.23.2"
+version = "=0.24.0"
 
 [dependencies.linked_hash_map]
 package = "linked-hash-map"
@@ -525,7 +493,7 @@ version = "=0.3.2"
 
 [dependencies.md5]
 package = "md-5"
-version = "=0.10.0"
+version = "=0.10.1"
 
 [dependencies.memchr]
 package = "memchr"
@@ -554,11 +522,6 @@ version = "=0.4.4"
 [dependencies.mio]
 package = "mio"
 version = "=0.8.0"
-features = ["net", "os-ext", "os-poll"]
-
-[dependencies.mio_0_7_14]
-package = "mio"
-version = "=0.7.14"
 features = ["net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
@@ -659,7 +622,7 @@ version = "=0.11.2"
 
 [dependencies.parking_lot_core]
 package = "parking_lot_core"
-version = "=0.9.0"
+version = "=0.9.1"
 
 [dependencies.parking_lot_core_0_8_5]
 package = "parking_lot_core"
@@ -727,7 +690,7 @@ version = "=0.3.24"
 
 [dependencies.png]
 package = "png"
-version = "=0.17.2"
+version = "=0.17.4"
 
 [dependencies.postgres]
 package = "postgres"
@@ -764,7 +727,7 @@ version = "=1.0.15"
 
 [dependencies.rand]
 package = "rand"
-version = "=0.8.4"
+version = "=0.8.5"
 features = ["serde1", "small_rng"]
 
 [dependencies.rand_0_7_3]
@@ -839,7 +802,7 @@ version = "=0.16.20"
 
 [dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.26.3"
+version = "=0.27.0"
 features = ["bundled-full"]
 
 [dependencies.rustc_demangle]
@@ -876,7 +839,7 @@ version = "=0.5.0"
 
 [dependencies.semver]
 package = "semver"
-version = "=1.0.5"
+version = "=1.0.6"
 
 [dependencies.semver_parser]
 package = "semver-parser"
@@ -893,7 +856,7 @@ version = "=1.0.136"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.78"
+version = "=1.0.79"
 features = ["raw_value"]
 
 [dependencies.serde_urlencoded]
@@ -910,7 +873,7 @@ version = "=0.8.23"
 
 [dependencies.sha2]
 package = "sha2"
-version = "=0.10.1"
+version = "=0.10.2"
 
 [dependencies.simba]
 package = "simba"
@@ -988,6 +951,10 @@ version = "=1.1.2"
 
 [dependencies.textwrap]
 package = "textwrap"
+version = "=0.15.0"
+
+[dependencies.textwrap_0_14_2]
+package = "textwrap"
 version = "=0.14.2"
 
 [dependencies.thiserror]
@@ -1033,7 +1000,7 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.16.1"
+version = "=1.17.0"
 features = ["full", "test-util"]
 
 [dependencies.tokio_native_tls]
@@ -1058,7 +1025,7 @@ version = "=0.3.1"
 
 [dependencies.tracing]
 package = "tracing"
-version = "=0.1.30"
+version = "=0.1.31"
 
 [dependencies.tracing_core]
 package = "tracing-core"
@@ -1098,7 +1065,7 @@ version = "=0.1.19"
 
 [dependencies.unicode_segmentation]
 package = "unicode-segmentation"
-version = "=1.8.0"
+version = "=1.9.0"
 
 [dependencies.unicode_width]
 package = "unicode-width"
