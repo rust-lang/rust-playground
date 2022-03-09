@@ -383,6 +383,7 @@ jobs:
     - name: Configure AWS credentials (rust-lang)
       uses: aws-actions/configure-aws-credentials@v1
       with:
+        role-skip-session-tagging: true
         role-to-assume: arn:aws:iam::890664054962:role/upload-playground-artifacts
         aws-region: us-west-1
     - name: Push backend (rust-lang)
