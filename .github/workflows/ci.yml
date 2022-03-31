@@ -381,6 +381,12 @@ jobs:
     - name: Push frontend (i32)
       run: aws s3 sync server/build/ s3://playground-artifacts-i32/build
     - name: Configure AWS credentials (rust-lang)
+      env:
+        AWS_ACCESS_KEY_ID: ''
+        AWS_SECRET_ACCESS_KEY: ''
+        AWS_SESSION_TOKEN: ''
+        AWS_DEFAULT_REGION: ''
+        AWS_REGION: ''
       uses: aws-actions/configure-aws-credentials@v1
       with:
         role-skip-session-tagging: true
