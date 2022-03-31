@@ -36,7 +36,7 @@ version = "=0.12.1"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.55"
+version = "=1.0.56"
 
 [dependencies.approx]
 package = "approx"
@@ -100,7 +100,7 @@ version = "=0.2.17"
 
 [dependencies.bytemuck]
 package = "bytemuck"
-version = "=1.7.3"
+version = "=1.8.0"
 features = ["derive", "extern_crate_alloc", "extern_crate_std", "min_const_generics", "wasm_simd", "zeroable_maybe_uninit"]
 
 [dependencies.byteorder]
@@ -126,7 +126,7 @@ features = ["serde"]
 
 [dependencies.clap]
 package = "clap"
-version = "=3.1.3"
+version = "=3.1.6"
 features = ["unstable-doc"]
 
 [dependencies.color_quant]
@@ -135,7 +135,7 @@ version = "=1.1.0"
 
 [dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.2.1"
+version = "=0.2.2"
 
 [dependencies.crc32fast]
 package = "crc32fast"
@@ -147,7 +147,7 @@ version = "=0.8.1"
 
 [dependencies.crossbeam_channel]
 package = "crossbeam-channel"
-version = "=0.5.2"
+version = "=0.5.4"
 
 [dependencies.crossbeam_deque]
 package = "crossbeam-deque"
@@ -155,15 +155,15 @@ version = "=0.8.1"
 
 [dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.7"
+version = "=0.9.8"
 
 [dependencies.crossbeam_queue]
 package = "crossbeam-queue"
-version = "=0.3.4"
+version = "=0.3.5"
 
 [dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.7"
+version = "=0.8.8"
 
 [dependencies.crypto_common]
 package = "crypto-common"
@@ -243,7 +243,7 @@ version = "=1.0.22"
 
 [dependencies.flume]
 package = "flume"
-version = "=0.10.11"
+version = "=0.10.12"
 
 [dependencies.fnv]
 package = "fnv"
@@ -328,7 +328,7 @@ version = "=0.3.0"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.3.11"
+version = "=0.3.12"
 
 [dependencies.half]
 package = "half"
@@ -356,7 +356,7 @@ version = "=0.12.1"
 
 [dependencies.html5ever]
 package = "html5ever"
-version = "=0.25.1"
+version = "=0.25.2"
 
 [dependencies.http]
 package = "http"
@@ -380,7 +380,7 @@ version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=0.14.17"
+version = "=0.14.18"
 features = ["full"]
 
 [dependencies.hyper_tls]
@@ -409,7 +409,7 @@ version = "=0.1.12"
 
 [dependencies.ipnet]
 package = "ipnet"
-version = "=2.3.1"
+version = "=2.4.0"
 
 [dependencies.itertools]
 package = "itertools"
@@ -441,7 +441,7 @@ version = "=0.5.1"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.119"
+version = "=0.2.121"
 
 [dependencies.libm]
 package = "libm"
@@ -449,7 +449,7 @@ version = "=0.2.2"
 
 [dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.24.0"
+version = "=0.24.1"
 
 [dependencies.linked_hash_map]
 package = "linked-hash-map"
@@ -461,7 +461,7 @@ version = "=0.4.6"
 
 [dependencies.log]
 package = "log"
-version = "=0.4.14"
+version = "=0.4.16"
 
 [dependencies.log4rs]
 package = "log4rs"
@@ -521,7 +521,7 @@ version = "=0.4.4"
 
 [dependencies.mio]
 package = "mio"
-version = "=0.8.0"
+version = "=0.8.2"
 features = ["net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
@@ -534,7 +534,7 @@ version = "=0.1.0"
 
 [dependencies.nanorand]
 package = "nanorand"
-version = "=0.6.1"
+version = "=0.7.0"
 
 [dependencies.native_tls]
 package = "native-tls"
@@ -574,7 +574,7 @@ version = "=0.4.0"
 
 [dependencies.num_threads]
 package = "num_threads"
-version = "=0.1.3"
+version = "=0.1.5"
 
 [dependencies.num_traits]
 package = "num-traits"
@@ -586,7 +586,7 @@ version = "=0.27.1"
 
 [dependencies.once_cell]
 package = "once_cell"
-version = "=1.9.0"
+version = "=1.10.0"
 
 [dependencies.opaque_debug]
 package = "opaque-debug"
@@ -690,7 +690,7 @@ version = "=0.3.24"
 
 [dependencies.png]
 package = "png"
-version = "=0.17.4"
+version = "=0.17.5"
 
 [dependencies.postgres]
 package = "postgres"
@@ -723,7 +723,7 @@ version = "=0.5.19"
 
 [dependencies.quote]
 package = "quote"
-version = "=1.0.15"
+version = "=1.0.16"
 
 [dependencies.rand]
 package = "rand"
@@ -777,7 +777,7 @@ version = "=1.9.1"
 
 [dependencies.regex]
 package = "regex"
-version = "=1.5.4"
+version = "=1.5.5"
 
 [dependencies.regex_automata]
 package = "regex-automata"
@@ -793,7 +793,7 @@ version = "=0.5.3"
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.11.9"
+version = "=0.11.10"
 features = ["blocking", "cookies", "json", "multipart"]
 
 [dependencies.ring]
@@ -881,7 +881,7 @@ version = "=0.7.1"
 
 [dependencies.siphasher]
 package = "siphasher"
-version = "=0.3.9"
+version = "=0.3.10"
 
 [dependencies.slab]
 package = "slab"
@@ -930,7 +930,7 @@ version = "=2.4.1"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.86"
+version = "=1.0.89"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.tar]
@@ -947,15 +947,11 @@ version = "=0.4.2"
 
 [dependencies.termcolor]
 package = "termcolor"
-version = "=1.1.2"
+version = "=1.1.3"
 
 [dependencies.textwrap]
 package = "textwrap"
 version = "=0.15.0"
-
-[dependencies.textwrap_0_14_2]
-package = "textwrap"
-version = "=0.14.2"
 
 [dependencies.thiserror]
 package = "thiserror"
@@ -983,7 +979,7 @@ version = "=0.7.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.3.7"
+version = "=0.3.9"
 
 [dependencies.time_0_1_44]
 package = "time"
@@ -1025,11 +1021,11 @@ version = "=0.3.1"
 
 [dependencies.tracing]
 package = "tracing"
-version = "=0.1.31"
+version = "=0.1.32"
 
 [dependencies.tracing_core]
 package = "tracing-core"
-version = "=0.1.22"
+version = "=0.1.23"
 
 [dependencies.traitobject]
 package = "traitobject"
