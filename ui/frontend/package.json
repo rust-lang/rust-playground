@@ -17,7 +17,7 @@
     "react": "^17.0.1",
     "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^17.0.1",
-    "react-monaco-editor": "^0.46.0",
+    "react-monaco-editor": "^0.47.0",
     "react-popper": "^2.0.0",
     "react-portal": "^4.1.4",
     "react-prism": "^4.0.0",
