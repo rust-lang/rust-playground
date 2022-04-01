@@ -19,11 +19,11 @@ use axum::{
     handler::Handler,
     headers::{authorization::Bearer, Authorization},
     http::{header, uri::PathAndQuery, HeaderValue, Method, Request, StatusCode, Uri},
+    middleware,
     response::IntoResponse,
     routing::{get, get_service, post, MethodRouter},
     Router,
 };
-use axum_extra::middleware;
 use futures::{future::BoxFuture, FutureExt};
 use snafu::{prelude::*, IntoError};
 use std::{

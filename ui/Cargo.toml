@@ -10,8 +10,7 @@ fork-bomb-prevention = []
 
 [dependencies]
 async-trait = "0.1.52"
-axum = { version = "0.4.5", features = ["headers"] }
-axum-extra = "0.1.2"
+axum = { version = "0.5", features = ["headers"] }
 bodyparser = "0.8.0"
 corsware = "0.2.0"
 dotenv = "0.15.0"
