@@ -19,11 +19,11 @@ use axum::{
     handler::Handler,
     headers::{authorization::Bearer, Authorization},
     http::{header, uri::PathAndQuery, HeaderValue, Method, Request, StatusCode, Uri},
+    middleware,
     response::IntoResponse,
     routing::{get, get_service, post, MethodRouter},
-    AddExtensionLayer, Router,
+    Router,
 };
-use axum_extra::middleware;
 use futures::{future::BoxFuture, FutureExt};
 use snafu::{prelude::*, IntoError};
 use std::{
@@ -71,17 +71,17 @@ pub(crate) async fn serve(config: Config) {
         .route("/meta/gist", post(meta_gist_create))
         .route("/meta/gist/:id", get(meta_gist_get))
         .route("/metrics", get(metrics))
-        .layer(AddExtensionLayer::new(Arc::new(SandboxCache::default())))
-        .layer(AddExtensionLayer::new(config.github_token()));
+        .layer(Extension(Arc::new(SandboxCache::default())))
+        .layer(Extension(config.github_token()));
 
     if let Some(token) = config.metrics_token() {
-        app = app.layer(AddExtensionLayer::new(token))
+        app = app.layer(Extension(token))
     }
 
     if config.use_cors() {
         app = app.layer({
             CorsLayer::new()
-                .allow_origin(cors::any())
+                .allow_origin(cors::Any)
                 .allow_headers([header::CONTENT_TYPE])
                 .allow_methods([Method::GET, Method::POST])
                 .allow_credentials(false)
