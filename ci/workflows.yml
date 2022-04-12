@@ -447,6 +447,9 @@ workflows:
         needs:
           - run_integration_tests
         if: github.event_name == 'push' && github.event.ref == 'refs/heads/master'
+        permissions:
+          contents: read
+          id-token: write
 
         steps:
           - *login_ghcr
@@ -456,13 +459,6 @@ workflows:
             with:
               username: ${{ env.DOCKER_HUB_USERNAME }}
               password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
-          - name: "Login to AWS"
-            uses: aws-actions/configure-aws-credentials@v1
-            with:
-              aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              aws-region: us-east-2
 
           - *pull_containers
           - *rename_all_containers
@@ -490,6 +486,13 @@ workflows:
               name: frontend
               path: server/build/
 
+          - name: "Configure AWS credentials (i32)"
+            uses: aws-actions/configure-aws-credentials@v1
+            with:
+              aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              aws-region: us-east-2
+
           - name: "Push backend (i32)"
             run: |-
               aws s3 cp server/ui s3://playground-artifacts-i32
@@ -499,12 +502,6 @@ workflows:
               aws s3 sync server/build/ s3://playground-artifacts-i32/build
 
           - name: "Configure AWS credentials (rust-lang)"
-            env:
-              AWS_ACCESS_KEY_ID: ""
-              AWS_SECRET_ACCESS_KEY: ""
-              AWS_SESSION_TOKEN: ""
-              AWS_DEFAULT_REGION: ""
-              AWS_REGION: ""
             uses: aws-actions/configure-aws-credentials@v1
             with:
               role-skip-session-tagging: true
@@ -518,6 +515,7 @@ workflows:
           - name: "Push frontend (rust-lang)"
             run: |-
               aws s3 sync server/build/ s3://rust-playground-artifacts/build
+
 
   cron:
     name: "Scheduled rebuild"
