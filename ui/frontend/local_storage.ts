@@ -16,7 +16,10 @@ interface V2Configuration {
       keybinding: string;
       theme: string;
       pairCharacters: PairCharacters;
-    }
+    };
+    monaco: {
+      theme: string;
+    };
     orientation: Orientation;
     assemblyFlavor: AssemblyFlavor;
     demangleAssembly: DemangleAssembly;
@@ -54,6 +57,9 @@ export function serialize(state: State): string {
         theme: state.configuration.ace.theme,
         pairCharacters: state.configuration.ace.pairCharacters,
       },
+      monaco: {
+        theme: state.configuration.monaco.theme,
+      },
       orientation: state.configuration.orientation,
       assemblyFlavor: state.configuration.assemblyFlavor,
       demangleAssembly: state.configuration.demangleAssembly,
@@ -72,6 +78,7 @@ function migrateV1(state: V1Configuration): CurrentConfiguration {
     configuration: {
       ...configuration,
       ace: { theme, keybinding, pairCharacters },
+      monaco: { theme: 'vscode-dark-plus' },
       editor: editor === 'advanced' ? Editor.Ace : Editor.Simple,
     },
     version: 2,
