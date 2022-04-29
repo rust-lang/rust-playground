@@ -13,18 +13,14 @@ use std::{
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
-const DEFAULT_LOG_FILE: &str = "access-log.csv";
 
 mod asm_cleanup;
 mod gist;
 mod sandbox;
 mod server_axum;
-mod server_iron;
 
 const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
 const ONE_HOUR: Duration = Duration::from_secs(ONE_HOUR_IN_SECONDS as u64);
-const ONE_DAY: Duration = Duration::from_secs(60 * 60 * 24);
-const ONE_YEAR: Duration = Duration::from_secs(60 * 60 * 24 * 365);
 
 const SANDBOX_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
 
@@ -35,20 +31,13 @@ fn main() {
     env_logger::init();
 
     let config = Config::from_env();
-
-    if config.use_axum() {
-        server_axum::serve(config);
-    } else {
-        server_iron::serve(config);
-    }
+    server_axum::serve(config);
 }
 
 struct Config {
-    axum_enabled: bool,
     address: String,
     cors_enabled: bool,
     gh_token: String,
-    logfile: String,
     metrics_token: Option<String>,
     port: u16,
     root: PathBuf,
@@ -71,26 +60,16 @@ impl Config {
             env::var("PLAYGROUND_GITHUB_TOKEN").expect("Must specify PLAYGROUND_GITHUB_TOKEN");
         let metrics_token = env::var("PLAYGROUND_METRICS_TOKEN").ok();
 
-        let logfile =
-            env::var("PLAYGROUND_LOG_FILE").unwrap_or_else(|_| DEFAULT_LOG_FILE.to_string());
         let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
-
-        let axum_enabled = env::var_os("PLAYGROUND_SERVER_AXUM").is_some();
 
         Self {
             address,
-            axum_enabled,
             cors_enabled,
             gh_token,
-            logfile,
             metrics_token,
             port,
             root,
         }
-    }
-
-    fn use_axum(&self) -> bool {
-        self.axum_enabled
     }
 
     fn root_path(&self) -> &Path {
@@ -106,11 +85,11 @@ impl Config {
     }
 
     fn metrics_token(&self) -> Option<MetricsToken> {
-        self.metrics_token.clone().map(|t| MetricsToken(t.into()))
+        self.metrics_token.as_deref().map(MetricsToken::new)
     }
 
     fn github_token(&self) -> GhToken {
-        GhToken(self.gh_token.clone().into())
+        GhToken::new(&self.gh_token)
     }
 
     fn server_socket_addr(&self) -> SocketAddr {
@@ -123,8 +102,8 @@ impl Config {
 struct GhToken(Arc<String>);
 
 impl GhToken {
-    fn new(token: String) -> Self {
-        GhToken(Arc::new(token))
+    fn new(token: impl Into<String>) -> Self {
+        GhToken(Arc::new(token.into()))
     }
 }
 
@@ -132,8 +111,8 @@ impl GhToken {
 struct MetricsToken(Arc<String>);
 
 impl MetricsToken {
-    fn new(token: String) -> Self {
-        MetricsToken(Arc::new(token))
+    fn new(token: impl Into<String>) -> Self {
+        MetricsToken(Arc::new(token.into()))
     }
 }
 
@@ -487,51 +466,6 @@ mod metrics {
         }
     }
 
-    pub(crate) fn track_metric<Req, B, Resp>(request: Req, body: B) -> sandbox::Result<Resp>
-    where
-        Req: GenerateLabels,
-        B: FnOnce(&Req) -> sandbox::Result<Resp>,
-        Resp: SuccessDetails,
-    {
-        track_metric_common(request, body, |_| {})
-    }
-
-    pub(crate) fn track_metric_force_endpoint<Req, B, Resp>(
-        request: Req,
-        endpoint: Endpoint,
-        body: B,
-    ) -> sandbox::Result<Resp>
-    where
-        Req: GenerateLabels,
-        B: FnOnce(&Req) -> sandbox::Result<Resp>,
-        Resp: SuccessDetails,
-    {
-        track_metric_common(request, body, |labels| labels.endpoint = endpoint)
-    }
-
-    fn track_metric_common<Req, B, Resp, F>(request: Req, body: B, f: F) -> sandbox::Result<Resp>
-    where
-        Req: GenerateLabels,
-        B: FnOnce(&Req) -> sandbox::Result<Resp>,
-        Resp: SuccessDetails,
-        F: FnOnce(&mut Labels),
-    {
-        let start = Instant::now();
-        let response = body(&request);
-        let elapsed = start.elapsed();
-
-        let outcome = SuccessDetails::for_sandbox_result(&response);
-        let mut labels = request.generate_labels(outcome);
-        f(&mut labels);
-        let values = &labels.to_values();
-
-        let histogram = REQUESTS.with_label_values(values);
-
-        histogram.observe(elapsed.as_secs_f64());
-
-        response
-    }
-
     pub(crate) async fn track_metric_async<Req, B, Resp>(
         request: Req,
         body: B,
@@ -577,41 +511,6 @@ mod metrics {
         f(&mut labels);
         let values = &labels.to_values();
 
-        let histogram = REQUESTS.with_label_values(values);
-
-        histogram.observe(elapsed.as_secs_f64());
-
-        response
-    }
-
-    pub(crate) fn track_metric_no_request<B, Resp>(
-        endpoint: Endpoint,
-        body: B,
-    ) -> crate::Result<Resp>
-    where
-        B: FnOnce() -> crate::Result<Resp>,
-    {
-        let start = Instant::now();
-        let response = body();
-        let elapsed = start.elapsed();
-
-        let outcome = if response.is_ok() {
-            Outcome::Success
-        } else {
-            Outcome::ErrorServer
-        };
-        let labels = Labels {
-            endpoint,
-            outcome,
-            target: None,
-            channel: None,
-            mode: None,
-            edition: None,
-            crate_type: None,
-            tests: None,
-            backtrace: None,
-        };
-        let values = &labels.to_values();
         let histogram = REQUESTS.with_label_values(values);
 
         histogram.observe(elapsed.as_secs_f64());
@@ -682,8 +581,6 @@ pub enum Error {
     GistLoading { source: octocrab::Error },
     #[snafu(display("Unable to serialize response: {}", source))]
     Serialization { source: serde_json::Error },
-    #[snafu(display("Unable to deserialize request: {}", source))]
-    Deserialization { source: bodyparser::BodyError },
     #[snafu(display("The value {:?} is not a valid target", value))]
     InvalidTarget { value: String },
     #[snafu(display("The value {:?} is not a valid assembly flavor", value))]
@@ -707,9 +604,6 @@ pub enum Error {
 }
 
 type Result<T, E = Error> = ::std::result::Result<T, E>;
-
-const FATAL_ERROR_JSON: &str =
-    r#"{"error": "Multiple cascading errors occurred, abandon all hope"}"#;
 
 #[derive(Debug, Clone, Serialize)]
 struct ErrorJson {

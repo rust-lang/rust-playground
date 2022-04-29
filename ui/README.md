@@ -12,7 +12,6 @@ of choice.
 | `PLAYGROUND_GITHUB_TOKEN`  | **Yes**    |                   | The [GitHub API token][gist] to read and write Gists                      |
 | `PLAYGROUND_UI_ADDRESS`    | No         | 127.0.0.1         | The address to listen on                                                  |
 | `PLAYGROUND_UI_PORT`       | No         | 5000              | The port to listen on                                                     |
-| `PLAYGROUND_LOG_FILE`      | No         | access-log.csv    | The file to record accesses                                               |
 | `PLAYGROUND_METRICS_TOKEN` | No         |                   | If set, will require authentication for the metrics endpoint              |
 | `PLAYGROUND_CORS_ENABLED`  | No         |                   | If set, will enable CORS support                                          |
 | `TMPDIR`                   | No         | system-provided   | Where compilation artifacts will be saved. Must be accessible to Docker   |

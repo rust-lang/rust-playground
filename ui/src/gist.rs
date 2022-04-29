@@ -35,14 +35,6 @@ impl From<octocrab::models::gists::Gist> for Gist {
     }
 }
 
-#[tokio::main]
-pub async fn create(token: String, code: String) -> Gist {
-    create_future(token, code)
-        .await
-        .expect("Unable to create gist")
-    // TODO: Better reporting of failures
-}
-
 pub async fn create_future(token: String, code: String) -> octocrab::Result<Gist> {
     github(token)?
         .gists()
@@ -53,12 +45,6 @@ pub async fn create_future(token: String, code: String) -> octocrab::Result<Gist
         .send()
         .await
         .map(Into::into)
-}
-
-#[tokio::main]
-pub async fn load(token: String, id: &str) -> Gist {
-    load_future(token, id).await.expect("Unable to load gist")
-    // TODO: Better reporting of a 404
 }
 
 pub async fn load_future(token: String, id: &str) -> octocrab::Result<Gist> {
