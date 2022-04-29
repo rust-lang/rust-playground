@@ -355,7 +355,7 @@ where
             Ok(Extension(expected)) => {
                 match TypedHeader::<Authorization<Bearer>>::from_request(req).await {
                     Ok(TypedHeader(Authorization(actual))) => {
-                        if actual.token() == &*expected.0 {
+                        if actual.token() == *expected.0 {
                             Ok(Self)
                         } else {
                             Err(Self::FAILURE)

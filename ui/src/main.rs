@@ -191,7 +191,7 @@ mod metrics {
             "backtrace",
         ];
 
-        fn to_values(&self) -> [&'static str; Self::COUNT] {
+        fn as_values(&self) -> [&'static str; Self::COUNT] {
             let Self {
                 endpoint,
                 outcome,
@@ -509,7 +509,7 @@ mod metrics {
         let outcome = SuccessDetails::for_sandbox_result(&response);
         let mut labels = request.generate_labels(outcome);
         f(&mut labels);
-        let values = &labels.to_values();
+        let values = &labels.as_values();
 
         let histogram = REQUESTS.with_label_values(values);
 
@@ -546,7 +546,7 @@ mod metrics {
             tests: None,
             backtrace: None,
         };
-        let values = &labels.to_values();
+        let values = &labels.as_values();
         let histogram = REQUESTS.with_label_values(values);
 
         histogram.observe(elapsed.as_secs_f64());
