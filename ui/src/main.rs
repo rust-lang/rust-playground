@@ -281,19 +281,19 @@ struct MacroExpansionResponse {
     stderr: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 struct CrateInformation {
     name: String,
     version: String,
     id: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 struct MetaCratesResponse {
     crates: Vec<CrateInformation>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 struct MetaVersionResponse {
     version: String,
     hash: String,
