@@ -290,14 +290,14 @@ struct CrateInformation {
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 struct MetaCratesResponse {
-    crates: Vec<CrateInformation>,
+    crates: Arc<[CrateInformation]>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 struct MetaVersionResponse {
-    version: String,
-    hash: String,
-    date: String,
+    version: Arc<str>,
+    hash: Arc<str>,
+    date: Arc<str>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -513,9 +513,9 @@ impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
 impl From<sandbox::Version> for MetaVersionResponse {
     fn from(me: sandbox::Version) -> Self {
         MetaVersionResponse {
-            version: me.release,
-            hash: me.commit_hash,
-            date: me.commit_date,
+            version: me.release.into(),
+            hash: me.commit_hash.into(),
+            date: me.commit_date.into(),
         }
     }
 }

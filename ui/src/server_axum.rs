@@ -420,9 +420,6 @@ type Stamped<T> = (T, SystemTime);
 
 #[derive(Debug, Default)]
 struct SandboxCache {
-    // PERF: Since we clone these a lot, it could be more efficient to
-    // change them to contain `Arc`s. e.g., `Vec<Foo>` could become
-    // `Arc<[Foo]>`.
     crates: CacheOne<MetaCratesResponse>,
     version_stable: CacheOne<MetaVersionResponse>,
     version_beta: CacheOne<MetaVersionResponse>,
