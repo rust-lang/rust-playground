@@ -11,7 +11,7 @@ use crate::{
     FormattingSnafu, GhToken, GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu, LintingSnafu,
     MacroExpansionRequest, MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest,
     MetaGistResponse, MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result,
-    SandboxCreationSnafu, ONE_HOUR, SANDBOX_CACHE_TIME_TO_LIVE,
+    SandboxCreationSnafu,
 };
 use async_trait::async_trait;
 use axum::{
@@ -32,7 +32,7 @@ use std::{
     mem, path,
     str::FromStr,
     sync::Arc,
-    time::{Instant, SystemTime, UNIX_EPOCH},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 use tokio::sync::Mutex;
 use tower_http::{
@@ -41,6 +41,12 @@ use tower_http::{
     set_header::SetResponseHeader,
     trace::TraceLayer,
 };
+
+const ONE_HOUR: Duration = Duration::from_secs(60 * 60);
+const CORS_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
+
+const TEN_MINUTES: Duration = Duration::from_secs(10 * 60);
+const SANDBOX_CACHE_TIME_TO_LIVE: Duration = TEN_MINUTES;
 
 const MAX_AGE_ONE_DAY: HeaderValue = HeaderValue::from_static("public, max-age=86400");
 const MAX_AGE_ONE_YEAR: HeaderValue = HeaderValue::from_static("public, max-age=31536000");
@@ -86,7 +92,7 @@ pub(crate) async fn serve(config: Config) {
                 .allow_headers([header::CONTENT_TYPE])
                 .allow_methods([Method::GET, Method::POST])
                 .allow_credentials(false)
-                .max_age(ONE_HOUR)
+                .max_age(CORS_CACHE_TIME_TO_LIVE)
         });
     }
 

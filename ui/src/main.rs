@@ -8,7 +8,6 @@ use std::{
     net::SocketAddr,
     path::{Path, PathBuf},
     sync::Arc,
-    time::Duration,
 };
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
@@ -19,11 +18,6 @@ mod gist;
 mod metrics;
 mod sandbox;
 mod server_axum;
-
-const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
-const ONE_HOUR: Duration = Duration::from_secs(ONE_HOUR_IN_SECONDS as u64);
-
-const SANDBOX_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
 
 fn main() {
     // Dotenv may be unable to load environment variables, but that's ok in production
