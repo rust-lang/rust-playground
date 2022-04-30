@@ -224,7 +224,7 @@ pub mod fut {
         io::ErrorKind,
         path::{Path, PathBuf},
     };
-    use tempdir::TempDir;
+    use tempfile::TempDir;
     use tokio::{fs, process::Command, time};
 
     use super::{
@@ -257,7 +257,10 @@ pub mod fut {
             // now and when it's dropped. We accept that under the
             // assumption that the specific operations will be quick
             // enough.
-            let scratch = TempDir::new("playground").context(UnableToCreateTempDirSnafu)?;
+            let scratch = tempfile::Builder::new()
+                .prefix("playground")
+                .tempdir()
+                .context(UnableToCreateTempDirSnafu)?;
             let input_file = scratch.path().join("input.rs");
             let output_dir = scratch.path().join("output");
 
