@@ -1,13 +1,12 @@
-
-
 require 'net/http'
 require 'spec_helper'
+require_relative './connection'
 
 RSpec.feature "Cross-origin requests", :cors, type: :request do
   let(:evaluate_json_uri) { URI.join(Capybara.app_host, '/evaluate.json') }
 
   it "allows preflight requests for POSTing to evaluate.json" do
-    Net::HTTP.start(evaluate_json_uri.host, evaluate_json_uri.port) do |http|
+    start_http(evaluate_json_uri) do |http|
       request = Net::HTTP::Options.new(evaluate_json_uri)
       request['origin'] = 'https://rust-lang.org'
       request['access-control-request-headers'] = 'content-type'

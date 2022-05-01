@@ -30,6 +30,7 @@ require 'capybara/rspec'
 require 'webdrivers'
 require 'capybara-screenshot/rspec'
 
+PROTOCOL = ENV.fetch('PLAYGROUND_UI_PROTOCOL', 'http')
 ADDRESS = ENV.fetch('PLAYGROUND_UI_ADDRESS', '127.0.0.1')
 PORT = ENV.fetch('PLAYGROUND_UI_PORT', '5000')
 
@@ -56,7 +57,7 @@ Capybara.register_driver :firefox do |app|
 end
 
 Capybara.default_driver = Capybara.javascript_driver = :firefox
-Capybara.app_host = "http://#{ADDRESS}:#{PORT}"
+Capybara.app_host = "#{PROTOCOL}://#{ADDRESS}:#{PORT}"
 Capybara.run_server = false
 Capybara.default_max_wait_time = ENV.fetch('CAPYBARA_WAIT', 5).to_f
 Capybara.automatic_label_click = true
