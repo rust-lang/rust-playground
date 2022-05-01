@@ -1,5 +1,6 @@
 require 'net/http'
 require 'spec_helper'
+require_relative './connection'
 
 RSpec.feature "Caching headers are provided for assets ", type: :request do
   let(:index_uri) { URI(Capybara.app_host) }
@@ -8,7 +9,7 @@ RSpec.feature "Caching headers are provided for assets ", type: :request do
     let(:one_day_s) { 24 * 60 * 60 }
 
     it "is cached for one day" do
-      Net::HTTP.start(index_uri.host, index_uri.port) do |http|
+      start_http(index_uri) do |http|
         request = Net::HTTP::Get.new(index_uri)
         response = http.request(request)
 
@@ -26,7 +27,7 @@ RSpec.feature "Caching headers are provided for assets ", type: :request do
     let(:one_year_s) { 365 * 24 * 60 * 60 }
 
     it 'is cached for one year' do
-      Net::HTTP.start(asset_uri.host, asset_uri.port) do |http|
+      start_http(asset_uri) do |http|
         request = Net::HTTP::Get.new(asset_uri)
         response = http.request(request)
         expect(response['cache-control']).to match(/public.*max-age.*=.*#{one_year_s}/)

@@ -2,6 +2,7 @@
 
 require 'net/http'
 require 'spec_helper'
+require_relative './connection'
 
 RSpec.feature "JSON argument deserialization", type: :request do
   let(:evaluate_json_uri) { URI.join(Capybara.app_host, '/evaluate.json') }
@@ -10,7 +11,7 @@ RSpec.feature "JSON argument deserialization", type: :request do
     let(:body) { JSON.generate({}) }
 
     it "responds with a JSON error" do
-      Net::HTTP.start(evaluate_json_uri.host, evaluate_json_uri.port) do |http|
+      start_http(evaluate_json_uri) do |http|
         request = Net::HTTP::Post.new(evaluate_json_uri)
         request.body = body
         request['Content-Type'] = 'application/json'
@@ -28,7 +29,7 @@ RSpec.feature "JSON argument deserialization", type: :request do
     let(:body) { 'lolhello' }
 
     it "responds with a JSON error" do
-      Net::HTTP.start(evaluate_json_uri.host, evaluate_json_uri.port) do |http|
+      start_http(evaluate_json_uri) do |http|
         request = Net::HTTP::Post.new(evaluate_json_uri)
         request.body = body
         request['Content-Type'] = 'text/plain'
