@@ -1634,7 +1634,7 @@ mod test {
         let sb = Sandbox::new().await.expect("Unable to create sandbox");
         let resp = sb.execute(&req).await.expect("Unable to execute code");
 
-        assert!(resp.stderr.contains("Killed"));
+        assert!(resp.stderr.contains("Killed"), "was: {}", resp.stderr);
     }
 
     #[tokio::test]
@@ -1655,7 +1655,7 @@ mod test {
         let sb = Sandbox::new().await.expect("Unable to create sandbox");
         let resp = sb.execute(&req).await.expect("Unable to execute code");
 
-        assert!(resp.stderr.contains("Killed"));
+        assert!(resp.stderr.contains("Killed"), "was: {}", resp.stderr);
     }
 
     #[tokio::test]
