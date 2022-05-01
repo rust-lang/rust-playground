@@ -1574,21 +1574,26 @@ mod test {
         let resp = sb.miri(&req).await?;
 
         assert!(
-            resp.stderr
-                .contains("pointer must be in-bounds at offset 1"),
+            resp.stderr.contains("Undefined Behavior"),
             "was: {}",
             resp.stderr
         );
         assert!(
-            resp.stderr.contains("outside bounds of alloc"),
+            resp.stderr.contains("pointer to 1 byte"),
             "was: {}",
             resp.stderr
         );
         assert!(
-            resp.stderr.contains("which has size 0"),
+            resp.stderr.contains("starting at offset 0"),
             "was: {}",
             resp.stderr
         );
+        assert!(
+            resp.stderr.contains("is out-of-bounds"),
+            "was: {}",
+            resp.stderr
+        );
+        assert!(resp.stderr.contains("has size 0"), "was: {}", resp.stderr);
         Ok(())
     }
 
