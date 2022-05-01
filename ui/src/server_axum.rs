@@ -11,13 +11,13 @@ use crate::{
     FormattingSnafu, GhToken, GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu, LintingSnafu,
     MacroExpansionRequest, MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest,
     MetaGistResponse, MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result,
-    SandboxCreationSnafu, ONE_HOUR, SANDBOX_CACHE_TIME_TO_LIVE,
+    SandboxCreationSnafu,
 };
 use async_trait::async_trait;
 use axum::{
     extract::{self, Extension, Path, TypedHeader},
     handler::Handler,
-    headers::{authorization::Bearer, Authorization},
+    headers::{authorization::Bearer, Authorization, CacheControl, ETag, IfNoneMatch},
     http::{header, uri::PathAndQuery, HeaderValue, Method, Request, StatusCode, Uri},
     middleware,
     response::IntoResponse,
@@ -30,8 +30,9 @@ use std::{
     convert::{TryFrom, TryInto},
     future::Future,
     mem, path,
+    str::FromStr,
     sync::Arc,
-    time::Instant,
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 use tokio::sync::Mutex;
 use tower_http::{
@@ -40,6 +41,12 @@ use tower_http::{
     set_header::SetResponseHeader,
     trace::TraceLayer,
 };
+
+const ONE_HOUR: Duration = Duration::from_secs(60 * 60);
+const CORS_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
+
+const TEN_MINUTES: Duration = Duration::from_secs(10 * 60);
+const SANDBOX_CACHE_TIME_TO_LIVE: Duration = TEN_MINUTES;
 
 const MAX_AGE_ONE_DAY: HeaderValue = HeaderValue::from_static("public, max-age=86400");
 const MAX_AGE_ONE_YEAR: HeaderValue = HeaderValue::from_static("public, max-age=31536000");
@@ -85,7 +92,7 @@ pub(crate) async fn serve(config: Config) {
                 .allow_headers([header::CONTENT_TYPE])
                 .allow_methods([Method::GET, Method::POST])
                 .allow_credentials(false)
-                .max_age(ONE_HOUR)
+                .max_age(CORS_CACHE_TIME_TO_LIVE)
         });
     }
 
@@ -243,58 +250,103 @@ where
 
 async fn meta_crates(
     Extension(cache): Extension<Arc<SandboxCache>>,
-) -> Result<Json<MetaCratesResponse>> {
-    track_metric_no_request_async(Endpoint::MetaCrates, || cache.crates())
-        .await
-        .map(Json)
+    if_none_match: Option<TypedHeader<IfNoneMatch>>,
+) -> Result<impl IntoResponse> {
+    // Json<MetaCratesResponse
+    let value = track_metric_no_request_async(Endpoint::MetaCrates, || cache.crates()).await?;
+
+    apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_stable(
     Extension(cache): Extension<Arc<SandboxCache>>,
-) -> Result<Json<MetaVersionResponse>> {
-    track_metric_no_request_async(Endpoint::MetaVersionStable, || cache.version_stable())
-        .await
-        .map(Json)
+    if_none_match: Option<TypedHeader<IfNoneMatch>>,
+) -> Result<impl IntoResponse> {
+    let value =
+        track_metric_no_request_async(Endpoint::MetaVersionStable, || cache.version_stable())
+            .await?;
+    apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_beta(
     Extension(cache): Extension<Arc<SandboxCache>>,
-) -> Result<Json<MetaVersionResponse>> {
-    track_metric_no_request_async(Endpoint::MetaVersionBeta, || cache.version_beta())
-        .await
-        .map(Json)
+    if_none_match: Option<TypedHeader<IfNoneMatch>>,
+) -> Result<impl IntoResponse> {
+    let value =
+        track_metric_no_request_async(Endpoint::MetaVersionBeta, || cache.version_beta()).await?;
+    apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_nightly(
     Extension(cache): Extension<Arc<SandboxCache>>,
-) -> Result<Json<MetaVersionResponse>> {
-    track_metric_no_request_async(Endpoint::MetaVersionNightly, || cache.version_nightly())
-        .await
-        .map(Json)
+    if_none_match: Option<TypedHeader<IfNoneMatch>>,
+) -> Result<impl IntoResponse> {
+    let value =
+        track_metric_no_request_async(Endpoint::MetaVersionNightly, || cache.version_nightly())
+            .await?;
+    apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_rustfmt(
     Extension(cache): Extension<Arc<SandboxCache>>,
-) -> Result<Json<MetaVersionResponse>> {
-    track_metric_no_request_async(Endpoint::MetaVersionRustfmt, || cache.version_rustfmt())
-        .await
-        .map(Json)
+    if_none_match: Option<TypedHeader<IfNoneMatch>>,
+) -> Result<impl IntoResponse> {
+    let value =
+        track_metric_no_request_async(Endpoint::MetaVersionRustfmt, || cache.version_rustfmt())
+            .await?;
+    apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_clippy(
     Extension(cache): Extension<Arc<SandboxCache>>,
-) -> Result<Json<MetaVersionResponse>> {
-    track_metric_no_request_async(Endpoint::MetaVersionClippy, || cache.version_clippy())
-        .await
-        .map(Json)
+    if_none_match: Option<TypedHeader<IfNoneMatch>>,
+) -> Result<impl IntoResponse> {
+    let value =
+        track_metric_no_request_async(Endpoint::MetaVersionClippy, || cache.version_clippy())
+            .await?;
+    apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_miri(
     Extension(cache): Extension<Arc<SandboxCache>>,
-) -> Result<Json<MetaVersionResponse>> {
-    track_metric_no_request_async(Endpoint::MetaVersionMiri, || cache.version_miri())
-        .await
-        .map(Json)
+    if_none_match: Option<TypedHeader<IfNoneMatch>>,
+) -> Result<impl IntoResponse> {
+    let value =
+        track_metric_no_request_async(Endpoint::MetaVersionMiri, || cache.version_miri()).await?;
+    apply_timestamped_caching(value, if_none_match)
+}
+
+fn apply_timestamped_caching<T>(
+    value: Stamped<T>,
+    if_none_match: Option<TypedHeader<IfNoneMatch>>,
+) -> Result<impl IntoResponse>
+where
+    Json<T>: IntoResponse,
+{
+    let (value, timestamp) = value;
+
+    let timestamp = timestamp.duration_since(UNIX_EPOCH).unwrap();
+    let etag = format!(r#""pg-ts-{}""#, timestamp.as_secs());
+    let etag = ETag::from_str(&etag).unwrap();
+
+    let cache_control = CacheControl::new()
+        .with_max_age(SANDBOX_CACHE_TIME_TO_LIVE)
+        .with_public();
+
+    let use_fresh = if_none_match.map_or(true, |if_none_match| {
+        if_none_match.0.precondition_passes(&etag)
+    });
+
+    let etag = TypedHeader(etag);
+    let cache_control = TypedHeader(cache_control);
+
+    let response = if use_fresh {
+        (StatusCode::OK, Json(value)).into_response()
+    } else {
+        StatusCode::NOT_MODIFIED.into_response()
+    };
+
+    Ok((etag, cache_control, response))
 }
 
 async fn meta_gist_create(
@@ -355,7 +407,7 @@ where
             Ok(Extension(expected)) => {
                 match TypedHeader::<Authorization<Bearer>>::from_request(req).await {
                     Ok(TypedHeader(Authorization(actual))) => {
-                        if actual.token() == &*expected.0 {
+                        if actual.token() == *expected.0 {
                             Ok(Self)
                         } else {
                             Err(Self::FAILURE)
@@ -370,11 +422,10 @@ where
     }
 }
 
+type Stamped<T> = (T, SystemTime);
+
 #[derive(Debug, Default)]
 struct SandboxCache {
-    // PERF: Since we clone these a lot, it could be more efficient to
-    // change them to contain `Arc`s. e.g., `Vec<Foo>` could become
-    // `Arc<[Foo]>`.
     crates: CacheOne<MetaCratesResponse>,
     version_stable: CacheOne<MetaVersionResponse>,
     version_beta: CacheOne<MetaVersionResponse>,
@@ -385,7 +436,7 @@ struct SandboxCache {
 }
 
 impl SandboxCache {
-    async fn crates(&self) -> Result<MetaCratesResponse> {
+    async fn crates(&self) -> Result<Stamped<MetaCratesResponse>> {
         self.crates
             .fetch(
                 |sandbox| async move { Ok(sandbox.crates().await.context(CachingSnafu)?.into()) },
@@ -393,7 +444,7 @@ impl SandboxCache {
             .await
     }
 
-    async fn version_stable(&self) -> Result<MetaVersionResponse> {
+    async fn version_stable(&self) -> Result<Stamped<MetaVersionResponse>> {
         self.version_stable
             .fetch(|sandbox| async move {
                 let version = sandbox
@@ -405,7 +456,7 @@ impl SandboxCache {
             .await
     }
 
-    async fn version_beta(&self) -> Result<MetaVersionResponse> {
+    async fn version_beta(&self) -> Result<Stamped<MetaVersionResponse>> {
         self.version_beta
             .fetch(|sandbox| async move {
                 let version = sandbox.version(Channel::Beta).await.context(CachingSnafu)?;
@@ -414,7 +465,7 @@ impl SandboxCache {
             .await
     }
 
-    async fn version_nightly(&self) -> Result<MetaVersionResponse> {
+    async fn version_nightly(&self) -> Result<Stamped<MetaVersionResponse>> {
         self.version_nightly
             .fetch(|sandbox| async move {
                 let version = sandbox
@@ -426,7 +477,7 @@ impl SandboxCache {
             .await
     }
 
-    async fn version_rustfmt(&self) -> Result<MetaVersionResponse> {
+    async fn version_rustfmt(&self) -> Result<Stamped<MetaVersionResponse>> {
         self.version_rustfmt
             .fetch(|sandbox| async move {
                 Ok(sandbox
@@ -438,7 +489,7 @@ impl SandboxCache {
             .await
     }
 
-    async fn version_clippy(&self) -> Result<MetaVersionResponse> {
+    async fn version_clippy(&self) -> Result<Stamped<MetaVersionResponse>> {
         self.version_clippy
             .fetch(|sandbox| async move {
                 Ok(sandbox.version_clippy().await.context(CachingSnafu)?.into())
@@ -446,7 +497,7 @@ impl SandboxCache {
             .await
     }
 
-    async fn version_miri(&self) -> Result<MetaVersionResponse> {
+    async fn version_miri(&self) -> Result<Stamped<MetaVersionResponse>> {
         self.version_miri
             .fetch(|sandbox| async move {
                 Ok(sandbox.version_miri().await.context(CachingSnafu)?.into())
@@ -466,9 +517,9 @@ impl<T> Default for CacheOne<T> {
 
 impl<T> CacheOne<T>
 where
-    T: Clone,
+    T: Clone + PartialEq,
 {
-    async fn fetch<F, FFut>(&self, generator: F) -> Result<T>
+    async fn fetch<F, FFut>(&self, generator: F) -> Result<Stamped<T>>
     where
         F: FnOnce(Sandbox) -> FFut,
         FFut: Future<Output = Result<T>>,
@@ -476,8 +527,8 @@ where
         let data = &mut *self.0.lock().await;
         match data {
             Some(info) => {
-                if info.creation_time.elapsed() <= SANDBOX_CACHE_TIME_TO_LIVE {
-                    Ok(info.value.clone())
+                if info.validation_time.elapsed() <= SANDBOX_CACHE_TIME_TO_LIVE {
+                    Ok(info.stamped_value())
                 } else {
                     Self::set_value(data, generator).await
                 }
@@ -486,7 +537,7 @@ where
         }
     }
 
-    async fn set_value<F, FFut>(data: &mut Option<CacheInfo<T>>, generator: F) -> Result<T>
+    async fn set_value<F, FFut>(data: &mut Option<CacheInfo<T>>, generator: F) -> Result<Stamped<T>>
     where
         F: FnOnce(Sandbox) -> FFut,
         FFut: Future<Output = Result<T>>,
@@ -494,7 +545,27 @@ where
         let sandbox = Sandbox::new().await.context(SandboxCreationSnafu)?;
         let value = generator(sandbox).await?;
 
-        *data = Some(CacheInfo::build(&value));
+        let old_info = data.take();
+        let new_info = CacheInfo::build(value);
+
+        let info = match old_info {
+            Some(mut old_value) => {
+                if old_value.value == new_info.value {
+                    // The value hasn't changed; record that we have
+                    // checked recently, but keep the creation time to
+                    // preserve caching.
+                    old_value.validation_time = new_info.validation_time;
+                    old_value
+                } else {
+                    new_info
+                }
+            }
+            None => new_info,
+        };
+
+        let value = info.stamped_value();
+
+        *data = Some(info);
 
         Ok(value)
     }
@@ -503,21 +574,27 @@ where
 #[derive(Debug)]
 struct CacheInfo<T> {
     value: T,
-    creation_time: Instant,
+    creation_time: SystemTime,
+    validation_time: Instant,
 }
 
 impl<T> CacheInfo<T> {
-    fn build(value: &T) -> Self
-    where
-        T: Clone,
-    {
-        let value = value.clone();
-        let creation_time = Instant::now();
+    fn build(value: T) -> Self {
+        let creation_time = SystemTime::now();
+        let validation_time = Instant::now();
 
         Self {
             value,
             creation_time,
+            validation_time,
         }
+    }
+
+    fn stamped_value(&self) -> Stamped<T>
+    where
+        T: Clone,
+    {
+        (self.value.clone(), self.creation_time)
     }
 }
 

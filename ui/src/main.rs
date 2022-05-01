@@ -8,25 +8,16 @@ use std::{
     net::SocketAddr,
     path::{Path, PathBuf},
     sync::Arc,
-    time::Duration,
 };
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
-const DEFAULT_LOG_FILE: &str = "access-log.csv";
 
 mod asm_cleanup;
 mod gist;
+mod metrics;
 mod sandbox;
 mod server_axum;
-mod server_iron;
-
-const ONE_HOUR_IN_SECONDS: u32 = 60 * 60;
-const ONE_HOUR: Duration = Duration::from_secs(ONE_HOUR_IN_SECONDS as u64);
-const ONE_DAY: Duration = Duration::from_secs(60 * 60 * 24);
-const ONE_YEAR: Duration = Duration::from_secs(60 * 60 * 24 * 365);
-
-const SANDBOX_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
 
 fn main() {
     // Dotenv may be unable to load environment variables, but that's ok in production
@@ -35,20 +26,13 @@ fn main() {
     env_logger::init();
 
     let config = Config::from_env();
-
-    if config.use_axum() {
-        server_axum::serve(config);
-    } else {
-        server_iron::serve(config);
-    }
+    server_axum::serve(config);
 }
 
 struct Config {
-    axum_enabled: bool,
     address: String,
     cors_enabled: bool,
     gh_token: String,
-    logfile: String,
     metrics_token: Option<String>,
     port: u16,
     root: PathBuf,
@@ -71,26 +55,16 @@ impl Config {
             env::var("PLAYGROUND_GITHUB_TOKEN").expect("Must specify PLAYGROUND_GITHUB_TOKEN");
         let metrics_token = env::var("PLAYGROUND_METRICS_TOKEN").ok();
 
-        let logfile =
-            env::var("PLAYGROUND_LOG_FILE").unwrap_or_else(|_| DEFAULT_LOG_FILE.to_string());
         let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
-
-        let axum_enabled = env::var_os("PLAYGROUND_SERVER_AXUM").is_some();
 
         Self {
             address,
-            axum_enabled,
             cors_enabled,
             gh_token,
-            logfile,
             metrics_token,
             port,
             root,
         }
-    }
-
-    fn use_axum(&self) -> bool {
-        self.axum_enabled
     }
 
     fn root_path(&self) -> &Path {
@@ -106,11 +80,11 @@ impl Config {
     }
 
     fn metrics_token(&self) -> Option<MetricsToken> {
-        self.metrics_token.clone().map(|t| MetricsToken(t.into()))
+        self.metrics_token.as_deref().map(MetricsToken::new)
     }
 
     fn github_token(&self) -> GhToken {
-        GhToken(self.gh_token.clone().into())
+        GhToken::new(&self.gh_token)
     }
 
     fn server_socket_addr(&self) -> SocketAddr {
@@ -123,8 +97,8 @@ impl Config {
 struct GhToken(Arc<String>);
 
 impl GhToken {
-    fn new(token: String) -> Self {
-        GhToken(Arc::new(token))
+    fn new(token: impl Into<String>) -> Self {
+        GhToken(Arc::new(token.into()))
     }
 }
 
@@ -132,527 +106,8 @@ impl GhToken {
 struct MetricsToken(Arc<String>);
 
 impl MetricsToken {
-    fn new(token: String) -> Self {
-        MetricsToken(Arc::new(token))
-    }
-}
-
-mod metrics {
-    use futures::future::BoxFuture;
-    use lazy_static::lazy_static;
-    use prometheus::{self, register_histogram_vec, HistogramVec};
-    use regex::Regex;
-    use std::{future::Future, time::Instant};
-
-    use crate::sandbox::{self, Channel, CompileTarget, CrateType, Edition, Mode};
-
-    lazy_static! {
-        pub(crate) static ref REQUESTS: HistogramVec = register_histogram_vec!(
-            "playground_request_duration_seconds",
-            "Number of requests made",
-            Labels::LABELS,
-            vec![0.1, 1.0, 2.5, 5.0, 10.0, 15.0]
-        )
-        .unwrap();
-    }
-
-    #[derive(Debug, Copy, Clone, strum::IntoStaticStr)]
-    pub(crate) enum Endpoint {
-        Compile,
-        Execute,
-        Format,
-        Miri,
-        Clippy,
-        MacroExpansion,
-        MetaCrates,
-        MetaVersionStable,
-        MetaVersionBeta,
-        MetaVersionNightly,
-        MetaVersionRustfmt,
-        MetaVersionClippy,
-        MetaVersionMiri,
-        Evaluate,
-    }
-
-    #[derive(Debug, Copy, Clone, strum::IntoStaticStr)]
-    pub(crate) enum Outcome {
-        Success,
-        ErrorServer,
-        ErrorTimeoutSoft,
-        ErrorTimeoutHard,
-        ErrorUserCode,
-    }
-
-    #[derive(Debug, Copy, Clone)]
-    pub(crate) struct Labels {
-        endpoint: Endpoint,
-        outcome: Outcome,
-
-        target: Option<CompileTarget>,
-        channel: Option<Channel>,
-        mode: Option<Mode>,
-        edition: Option<Option<Edition>>,
-        crate_type: Option<CrateType>,
-        tests: Option<bool>,
-        backtrace: Option<bool>,
-    }
-
-    impl Labels {
-        const COUNT: usize = 9;
-
-        const LABELS: &'static [&'static str; Self::COUNT] = &[
-            "endpoint",
-            "outcome",
-            "target",
-            "channel",
-            "mode",
-            "edition",
-            "crate_type",
-            "tests",
-            "backtrace",
-        ];
-
-        fn to_values(&self) -> [&'static str; Self::COUNT] {
-            let Self {
-                endpoint,
-                outcome,
-                target,
-                channel,
-                mode,
-                edition,
-                crate_type,
-                tests,
-                backtrace,
-            } = *self;
-
-            fn b(v: Option<bool>) -> &'static str {
-                v.map_or("", |v| if v { "true" } else { "false" })
-            }
-
-            let target = target.map_or("", Into::into);
-            let channel = channel.map_or("", Into::into);
-            let mode = mode.map_or("", Into::into);
-            let edition = match edition {
-                None => "",
-                Some(None) => "Unspecified",
-                Some(Some(v)) => v.into(),
-            };
-            let crate_type = crate_type.map_or("", Into::into);
-            let tests = b(tests);
-            let backtrace = b(backtrace);
-
-            [
-                endpoint.into(),
-                outcome.into(),
-                target,
-                channel,
-                mode,
-                edition,
-                crate_type,
-                tests,
-                backtrace,
-            ]
-        }
-    }
-
-    pub(crate) trait GenerateLabels {
-        fn generate_labels(&self, outcome: Outcome) -> Labels;
-    }
-
-    impl<T> GenerateLabels for &'_ T
-    where
-        T: GenerateLabels,
-    {
-        fn generate_labels(&self, outcome: Outcome) -> Labels {
-            T::generate_labels(self, outcome)
-        }
-    }
-
-    impl GenerateLabels for sandbox::CompileRequest {
-        fn generate_labels(&self, outcome: Outcome) -> Labels {
-            let Self {
-                target,
-                channel,
-                crate_type,
-                mode,
-                edition,
-                tests,
-                backtrace,
-                code: _,
-            } = *self;
-
-            Labels {
-                endpoint: Endpoint::Compile,
-                outcome,
-
-                target: Some(target),
-                channel: Some(channel),
-                mode: Some(mode),
-                edition: Some(edition),
-                crate_type: Some(crate_type),
-                tests: Some(tests),
-                backtrace: Some(backtrace),
-            }
-        }
-    }
-
-    impl GenerateLabels for sandbox::ExecuteRequest {
-        fn generate_labels(&self, outcome: Outcome) -> Labels {
-            let Self {
-                channel,
-                mode,
-                edition,
-                crate_type,
-                tests,
-                backtrace,
-                code: _,
-            } = *self;
-
-            Labels {
-                endpoint: Endpoint::Execute,
-                outcome,
-
-                target: None,
-                channel: Some(channel),
-                mode: Some(mode),
-                edition: Some(edition),
-                crate_type: Some(crate_type),
-                tests: Some(tests),
-                backtrace: Some(backtrace),
-            }
-        }
-    }
-
-    impl GenerateLabels for sandbox::FormatRequest {
-        fn generate_labels(&self, outcome: Outcome) -> Labels {
-            let Self { edition, code: _ } = *self;
-
-            Labels {
-                endpoint: Endpoint::Format,
-                outcome,
-
-                target: None,
-                channel: None,
-                mode: None,
-                edition: Some(edition),
-                crate_type: None,
-                tests: None,
-                backtrace: None,
-            }
-        }
-    }
-
-    impl GenerateLabels for sandbox::ClippyRequest {
-        fn generate_labels(&self, outcome: Outcome) -> Labels {
-            let Self {
-                code: _,
-                edition,
-                crate_type,
-            } = *self;
-
-            Labels {
-                endpoint: Endpoint::Clippy,
-                outcome,
-
-                target: None,
-                channel: None,
-                mode: None,
-                edition: Some(edition),
-                crate_type: Some(crate_type),
-                tests: None,
-                backtrace: None,
-            }
-        }
-    }
-
-    impl GenerateLabels for sandbox::MiriRequest {
-        fn generate_labels(&self, outcome: Outcome) -> Labels {
-            let Self { code: _, edition } = *self;
-
-            Labels {
-                endpoint: Endpoint::Miri,
-                outcome,
-
-                target: None,
-                channel: None,
-                mode: None,
-                edition: Some(edition),
-                crate_type: None,
-                tests: None,
-                backtrace: None,
-            }
-        }
-    }
-
-    impl GenerateLabels for sandbox::MacroExpansionRequest {
-        fn generate_labels(&self, outcome: Outcome) -> Labels {
-            let Self { code: _, edition } = *self;
-
-            Labels {
-                endpoint: Endpoint::MacroExpansion,
-                outcome,
-
-                target: None,
-                channel: None,
-                mode: None,
-                edition: Some(edition),
-                crate_type: None,
-                tests: None,
-                backtrace: None,
-            }
-        }
-    }
-
-    pub(crate) trait SuccessDetails: Sized {
-        fn success_details(&self) -> Outcome;
-
-        fn for_sandbox_result(r: &Result<Self, sandbox::Error>) -> Outcome {
-            use sandbox::Error::*;
-
-            match r {
-                Ok(v) => v.success_details(),
-                Err(CompilerExecutionTimedOut { .. }) => Outcome::ErrorTimeoutHard,
-                Err(_) => Outcome::ErrorServer,
-            }
-        }
-    }
-
-    fn common_success_details(success: bool, stderr: &str) -> Outcome {
-        lazy_static! {
-            // Memory allocation failures are "Aborted"
-            static ref SOFT_TIMEOUT_REGEX: Regex = Regex::new("entrypoint.sh.*Killed.*timeout").unwrap();
-        }
-
-        match success {
-            true => Outcome::Success,
-            false => {
-                if stderr
-                    .lines()
-                    .next_back()
-                    .map_or(false, |l| SOFT_TIMEOUT_REGEX.is_match(l))
-                {
-                    Outcome::ErrorTimeoutSoft
-                } else {
-                    Outcome::ErrorUserCode
-                }
-            }
-        }
-    }
-
-    impl SuccessDetails for sandbox::CompileResponse {
-        fn success_details(&self) -> Outcome {
-            common_success_details(self.success, &self.stderr)
-        }
-    }
-
-    impl SuccessDetails for sandbox::ExecuteResponse {
-        fn success_details(&self) -> Outcome {
-            common_success_details(self.success, &self.stderr)
-        }
-    }
-
-    impl SuccessDetails for sandbox::FormatResponse {
-        fn success_details(&self) -> Outcome {
-            common_success_details(self.success, &self.stderr)
-        }
-    }
-
-    impl SuccessDetails for sandbox::ClippyResponse {
-        fn success_details(&self) -> Outcome {
-            common_success_details(self.success, &self.stderr)
-        }
-    }
-
-    impl SuccessDetails for sandbox::MiriResponse {
-        fn success_details(&self) -> Outcome {
-            common_success_details(self.success, &self.stderr)
-        }
-    }
-
-    impl SuccessDetails for sandbox::MacroExpansionResponse {
-        fn success_details(&self) -> Outcome {
-            common_success_details(self.success, &self.stderr)
-        }
-    }
-
-    impl SuccessDetails for Vec<sandbox::CrateInformation> {
-        fn success_details(&self) -> Outcome {
-            Outcome::Success
-        }
-    }
-
-    impl SuccessDetails for sandbox::Version {
-        fn success_details(&self) -> Outcome {
-            Outcome::Success
-        }
-    }
-
-    pub(crate) fn track_metric<Req, B, Resp>(request: Req, body: B) -> sandbox::Result<Resp>
-    where
-        Req: GenerateLabels,
-        B: FnOnce(&Req) -> sandbox::Result<Resp>,
-        Resp: SuccessDetails,
-    {
-        track_metric_common(request, body, |_| {})
-    }
-
-    pub(crate) fn track_metric_force_endpoint<Req, B, Resp>(
-        request: Req,
-        endpoint: Endpoint,
-        body: B,
-    ) -> sandbox::Result<Resp>
-    where
-        Req: GenerateLabels,
-        B: FnOnce(&Req) -> sandbox::Result<Resp>,
-        Resp: SuccessDetails,
-    {
-        track_metric_common(request, body, |labels| labels.endpoint = endpoint)
-    }
-
-    fn track_metric_common<Req, B, Resp, F>(request: Req, body: B, f: F) -> sandbox::Result<Resp>
-    where
-        Req: GenerateLabels,
-        B: FnOnce(&Req) -> sandbox::Result<Resp>,
-        Resp: SuccessDetails,
-        F: FnOnce(&mut Labels),
-    {
-        let start = Instant::now();
-        let response = body(&request);
-        let elapsed = start.elapsed();
-
-        let outcome = SuccessDetails::for_sandbox_result(&response);
-        let mut labels = request.generate_labels(outcome);
-        f(&mut labels);
-        let values = &labels.to_values();
-
-        let histogram = REQUESTS.with_label_values(values);
-
-        histogram.observe(elapsed.as_secs_f64());
-
-        response
-    }
-
-    pub(crate) async fn track_metric_async<Req, B, Resp>(
-        request: Req,
-        body: B,
-    ) -> sandbox::Result<Resp>
-    where
-        Req: GenerateLabels,
-        for<'req> B: FnOnce(&'req Req) -> BoxFuture<'req, sandbox::Result<Resp>>,
-        Resp: SuccessDetails,
-    {
-        track_metric_common_async(request, body, |_| {}).await
-    }
-
-    pub(crate) async fn track_metric_force_endpoint_async<Req, B, Resp>(
-        request: Req,
-        endpoint: Endpoint,
-        body: B,
-    ) -> sandbox::Result<Resp>
-    where
-        Req: GenerateLabels,
-        for<'req> B: FnOnce(&'req Req) -> BoxFuture<'req, sandbox::Result<Resp>>,
-        Resp: SuccessDetails,
-    {
-        track_metric_common_async(request, body, |labels| labels.endpoint = endpoint).await
-    }
-
-    async fn track_metric_common_async<Req, B, Resp, F>(
-        request: Req,
-        body: B,
-        f: F,
-    ) -> sandbox::Result<Resp>
-    where
-        Req: GenerateLabels,
-        for<'req> B: FnOnce(&'req Req) -> BoxFuture<'req, sandbox::Result<Resp>>,
-        Resp: SuccessDetails,
-        F: FnOnce(&mut Labels),
-    {
-        let start = Instant::now();
-        let response = body(&request).await;
-        let elapsed = start.elapsed();
-
-        let outcome = SuccessDetails::for_sandbox_result(&response);
-        let mut labels = request.generate_labels(outcome);
-        f(&mut labels);
-        let values = &labels.to_values();
-
-        let histogram = REQUESTS.with_label_values(values);
-
-        histogram.observe(elapsed.as_secs_f64());
-
-        response
-    }
-
-    pub(crate) fn track_metric_no_request<B, Resp>(
-        endpoint: Endpoint,
-        body: B,
-    ) -> crate::Result<Resp>
-    where
-        B: FnOnce() -> crate::Result<Resp>,
-    {
-        let start = Instant::now();
-        let response = body();
-        let elapsed = start.elapsed();
-
-        let outcome = if response.is_ok() {
-            Outcome::Success
-        } else {
-            Outcome::ErrorServer
-        };
-        let labels = Labels {
-            endpoint,
-            outcome,
-            target: None,
-            channel: None,
-            mode: None,
-            edition: None,
-            crate_type: None,
-            tests: None,
-            backtrace: None,
-        };
-        let values = &labels.to_values();
-        let histogram = REQUESTS.with_label_values(values);
-
-        histogram.observe(elapsed.as_secs_f64());
-
-        response
-    }
-
-    pub(crate) async fn track_metric_no_request_async<B, Fut, Resp>(
-        endpoint: Endpoint,
-        body: B,
-    ) -> crate::Result<Resp>
-    where
-        B: FnOnce() -> Fut,
-        Fut: Future<Output = crate::Result<Resp>>,
-    {
-        let start = Instant::now();
-        let response = body().await;
-        let elapsed = start.elapsed();
-
-        let outcome = if response.is_ok() {
-            Outcome::Success
-        } else {
-            Outcome::ErrorServer
-        };
-        let labels = Labels {
-            endpoint,
-            outcome,
-            target: None,
-            channel: None,
-            mode: None,
-            edition: None,
-            crate_type: None,
-            tests: None,
-            backtrace: None,
-        };
-        let values = &labels.to_values();
-        let histogram = REQUESTS.with_label_values(values);
-
-        histogram.observe(elapsed.as_secs_f64());
-
-        response
+    fn new(token: impl Into<String>) -> Self {
+        MetricsToken(Arc::new(token.into()))
     }
 }
 
@@ -682,8 +137,6 @@ pub enum Error {
     GistLoading { source: octocrab::Error },
     #[snafu(display("Unable to serialize response: {}", source))]
     Serialization { source: serde_json::Error },
-    #[snafu(display("Unable to deserialize request: {}", source))]
-    Deserialization { source: bodyparser::BodyError },
     #[snafu(display("The value {:?} is not a valid target", value))]
     InvalidTarget { value: String },
     #[snafu(display("The value {:?} is not a valid assembly flavor", value))]
@@ -707,9 +160,6 @@ pub enum Error {
 }
 
 type Result<T, E = Error> = ::std::result::Result<T, E>;
-
-const FATAL_ERROR_JSON: &str =
-    r#"{"error": "Multiple cascading errors occurred, abandon all hope"}"#;
 
 #[derive(Debug, Clone, Serialize)]
 struct ErrorJson {
@@ -825,23 +275,23 @@ struct MacroExpansionResponse {
     stderr: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 struct CrateInformation {
     name: String,
     version: String,
     id: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 struct MetaCratesResponse {
-    crates: Vec<CrateInformation>,
+    crates: Arc<[CrateInformation]>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 struct MetaVersionResponse {
-    version: String,
-    hash: String,
-    date: String,
+    version: Arc<str>,
+    hash: Arc<str>,
+    date: Arc<str>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -1057,9 +507,9 @@ impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
 impl From<sandbox::Version> for MetaVersionResponse {
     fn from(me: sandbox::Version) -> Self {
         MetaVersionResponse {
-            version: me.release,
-            hash: me.commit_hash,
-            date: me.commit_date,
+            version: me.release.into(),
+            hash: me.commit_hash.into(),
+            date: me.commit_date.into(),
         }
     }
 }

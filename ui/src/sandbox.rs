@@ -1,10 +1,7 @@
 use serde_derive::Deserialize;
 use snafu::{ResultExt, Snafu};
 use std::{ffi::OsStr, fmt, io, os::unix::fs::PermissionsExt, string, time::Duration};
-use tokio::{
-    process::Command,
-    runtime::{Builder, Runtime},
-};
+use tokio::process::Command;
 
 const DOCKER_PROCESS_TIMEOUT_SOFT: Duration = Duration::from_secs(10);
 const DOCKER_PROCESS_TIMEOUT_HARD: Duration = Duration::from_secs(12);
@@ -84,11 +81,6 @@ pub enum Error {
 
 pub type Result<T, E = Error> = ::std::result::Result<T, E>;
 
-pub struct Sandbox {
-    runtime: Runtime,
-    sandbox: fut::Sandbox,
-}
-
 fn vec_to_str(v: Vec<u8>) -> Result<String> {
     String::from_utf8(v).context(OutputNotUtf8Snafu)
 }
@@ -101,62 +93,6 @@ fn vec_to_str(v: Vec<u8>) -> Result<String> {
 // docker-machine.
 fn wide_open_permissions() -> std::fs::Permissions {
     PermissionsExt::from_mode(0o777)
-}
-
-impl Sandbox {
-    pub fn new() -> Result<Self> {
-        let runtime = Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .expect("Failed building the Runtime");
-        let sandbox = runtime.block_on(fut::Sandbox::new())?;
-
-        Ok(Self { runtime, sandbox })
-    }
-
-    pub fn compile(&self, req: &CompileRequest) -> Result<CompileResponse> {
-        self.runtime.block_on(self.sandbox.compile(req))
-    }
-
-    pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
-        self.runtime.block_on(self.sandbox.execute(req))
-    }
-
-    pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
-        self.runtime.block_on(self.sandbox.format(req))
-    }
-
-    pub fn clippy(&self, req: &ClippyRequest) -> Result<ClippyResponse> {
-        self.runtime.block_on(self.sandbox.clippy(req))
-    }
-
-    pub fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
-        self.runtime.block_on(self.sandbox.miri(req))
-    }
-
-    pub fn macro_expansion(&self, req: &MacroExpansionRequest) -> Result<MacroExpansionResponse> {
-        self.runtime.block_on(self.sandbox.macro_expansion(req))
-    }
-
-    pub fn crates(&self) -> Result<Vec<CrateInformation>> {
-        self.runtime.block_on(self.sandbox.crates())
-    }
-
-    pub fn version(&self, channel: Channel) -> Result<Version> {
-        self.runtime.block_on(self.sandbox.version(channel))
-    }
-
-    pub fn version_rustfmt(&self) -> Result<Version> {
-        self.runtime.block_on(self.sandbox.version_rustfmt())
-    }
-
-    pub fn version_clippy(&self) -> Result<Version> {
-        self.runtime.block_on(self.sandbox.version_clippy())
-    }
-
-    pub fn version_miri(&self) -> Result<Version> {
-        self.runtime.block_on(self.sandbox.version_miri())
-    }
 }
 
 macro_rules! docker_command {
@@ -288,7 +224,7 @@ pub mod fut {
         io::ErrorKind,
         path::{Path, PathBuf},
     };
-    use tempdir::TempDir;
+    use tempfile::TempDir;
     use tokio::{fs, process::Command, time};
 
     use super::{
@@ -321,7 +257,10 @@ pub mod fut {
             // now and when it's dropped. We accept that under the
             // assumption that the specific operations will be quick
             // enough.
-            let scratch = TempDir::new("playground").context(UnableToCreateTempDirSnafu)?;
+            let scratch = tempfile::Builder::new()
+                .prefix("playground")
+                .tempdir()
+                .context(UnableToCreateTempDirSnafu)?;
             let input_file = scratch.path().join("input.rs");
             let output_dir = scratch.path().join("output");
 

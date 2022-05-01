@@ -423,17 +423,6 @@ workflows:
               chmod +x ./server/ui && ./server/ui &
               bundle exec rspec
 
-          - name: "Run tests (Axum)"
-            env:
-              PLAYGROUND_UI_ROOT: server/build/
-              PLAYGROUND_CORS_ENABLED: true
-              PLAYGROUND_GITHUB_TOKEN: ${{ secrets.PLAYGROUND_GITHUB_TOKEN }}
-              PLAYGROUND_SERVER_AXUM: true
-            run: |-
-              killall -q ui || true
-              chmod +x ./server/ui && ./server/ui &
-              bundle exec rspec
-
           - name: "Preserve screenshots"
             if: ${{ failure() }}
             uses: actions/upload-artifact@v2

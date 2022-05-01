@@ -96,7 +96,7 @@ pub fn filter_asm(block: &str) -> String {
             line_info.push(LabelDecl(label_decl_cap.as_str()));
             labels.insert(label_decl_cap.as_str());
             current_label = label_decl_cap.as_str();
-        } else if DATA_REGEX.is_match(line) && current_label != "" {
+        } else if DATA_REGEX.is_match(line) && !current_label.is_empty() {
             line_info.push(Data(current_label));
             // These will be checked for references to other labels later on
             // Skip the data type, just capture its reference
