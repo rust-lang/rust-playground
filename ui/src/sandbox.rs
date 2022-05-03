@@ -1625,8 +1625,8 @@ mod test {
         let _singleton = one_test_at_a_time();
         let code = r#"
             fn main() {
-                let megabyte = 1024 * 1024;
-                let mut big = vec![0u8; 384 * megabyte];
+                let gigabyte = 1024 * 1024 * 1024;
+                let mut big = vec![0u8; 1 * gigabyte];
                 for i in &mut big { *i += 1; }
             }
         "#;
