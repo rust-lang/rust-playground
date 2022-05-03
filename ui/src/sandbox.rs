@@ -1,3 +1,4 @@
+use regex::Regex;
 use serde_derive::Deserialize;
 use snafu::{ResultExt, Snafu};
 use std::{ffi::OsStr, fmt, io, os::unix::fs::PermissionsExt, string, time::Duration};
@@ -216,6 +217,27 @@ fn set_execution_environment(
     cmd.apply_backtrace(&req);
 }
 
+fn parse_miri_flags(code: &str) -> Option<String> {
+    lazy_static::lazy_static! {
+        pub static ref MIRIFLAGS: Regex = Regex::new(r#"(///|//!|//)\s*MIRIFLAGS\s*=\s*(.*)"#).unwrap();
+    }
+
+    fn match_of(line: &str, pat: &Regex) -> Option<String> {
+        pat.captures(line)
+            .and_then(|caps| caps.get(2))
+            .map(|mat| mat.as_str().trim_matches(&['\'', '"'][..]).to_string())
+    }
+
+    for line in code.trim().lines() {
+        let line = line.trim();
+        if let Some(miri_flags) = match_of(line, &*MIRIFLAGS) {
+            return Some(miri_flags);
+        }
+    }
+
+    None
+}
+
 pub mod fut {
     use snafu::prelude::*;
     use std::{
@@ -228,9 +250,9 @@ pub mod fut {
     use tokio::{fs, process::Command, time};
 
     use super::{
-        basic_secure_docker_command, build_execution_command, set_execution_environment,
-        vec_to_str, wide_open_permissions, BacktraceRequest, Channel, ClippyRequest,
-        ClippyResponse, CompileRequest, CompileResponse, CompileTarget,
+        basic_secure_docker_command, build_execution_command, parse_miri_flags,
+        set_execution_environment, vec_to_str, wide_open_permissions, BacktraceRequest, Channel,
+        ClippyRequest, ClippyResponse, CompileRequest, CompileResponse, CompileTarget,
         CompilerExecutionTimedOutSnafu, CrateInformation, CrateInformationInner, CrateType,
         CrateTypeRequest, DemangleAssembly, DockerCommandExt, EditionRequest, ExecuteRequest,
         ExecuteResponse, FormatRequest, FormatResponse, MacroExpansionRequest,
@@ -393,7 +415,9 @@ pub mod fut {
 
         pub async fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
             self.write_source_code(&req.code).await?;
-            let command = self.miri_command(req);
+
+            let miri_flags = parse_miri_flags(&req.code);
+            let command = self.miri_command(miri_flags, req);
 
             let output = run_command_with_timeout(command).await?;
 
@@ -590,9 +614,13 @@ pub mod fut {
             cmd
         }
 
-        fn miri_command(&self, req: impl EditionRequest) -> Command {
+        fn miri_command(&self, miri_flags: Option<String>, req: impl EditionRequest) -> Command {
             let mut cmd = self.docker_command(None);
             cmd.apply_edition(req);
+
+            if let Some(flags) = miri_flags {
+                cmd.args(&["--env", &format!("MIRIFLAGS={}", flags)]);
+            }
 
             cmd.arg("miri").args(&["cargo", "miri-playground"]);
 
@@ -1575,17 +1603,114 @@ mod test {
 
         assert!(
             resp.stderr
-                .contains("pointer must be in-bounds at offset 1"),
+                .contains("has size 0, so pointer to 1 byte starting at offset 0 is out-of-bounds"),
+            "was: {}",
+            resp.stderr
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn magic_comments() {
+        let _singleton = one_test_at_a_time();
+
+        let expected = Some("-Zmiri-tag-raw-pointers".to_string());
+
+        // Every comment syntax
+        let code = r#"//MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
+        assert_eq!(parse_miri_flags(code), expected);
+
+        let code = r#"///MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
+        assert_eq!(parse_miri_flags(code), expected);
+
+        let code = r#"//!MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
+        assert_eq!(parse_miri_flags(code), expected);
+
+        // Whitespace is ignored
+        let code = r#"// MIRIFLAGS = -Zmiri-tag-raw-pointers"#;
+        assert_eq!(parse_miri_flags(code), expected);
+
+        // Both quotes are stripped
+        let code = r#"//MIRIFLAGS='-Zmiri-tag-raw-pointers'"#;
+        assert_eq!(parse_miri_flags(code), expected);
+
+        let code = r#"//MIRIFLAGS="-Zmiri-tag-raw-pointers""#;
+        assert_eq!(parse_miri_flags(code), expected);
+
+        // Leading code is ignored
+        let code = r#"
+fn main() {}
+//MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
+        assert_eq!(parse_miri_flags(code), expected);
+
+        // Leading whitespace is ignored, flags still parse
+        let code = r#" //MIRIFLAGS=-Zmiri-tag-raw-pointers"#;
+        assert_eq!(parse_miri_flags(code), expected);
+
+        let expected = Some("-Zmiri-tag-raw-pointers -Zmiri-symbolic-alignment-check".to_string());
+
+        // Doesn't break up flags even if they contain whitespace
+        let code = r#"//MIRIFLAGS="-Zmiri-tag-raw-pointers -Zmiri-symbolic-alignment-check""#;
+        assert_eq!(parse_miri_flags(code), expected);
+
+        // Even if they aren't wrapped in quoted (possibly dubious)
+        let code = r#"//MIRIFLAGS=-Zmiri-tag-raw-pointers -Zmiri-symbolic-alignment-check"#;
+        assert_eq!(parse_miri_flags(code), expected);
+    }
+
+    #[test]
+    fn miriflags_work() -> Result<()> {
+        let _singleton = one_test_at_a_time();
+
+        let code = r#"
+        fn main() {
+            let a = 0u8;
+            let ptr = &a as *const u8 as usize as *const u8;
+            unsafe {
+                println!("{}", *ptr);
+            }
+        }
+        "#;
+
+        let req = MiriRequest {
+            code: code.to_string(),
+            edition: None,
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.miri(&req)?;
+
+        assert!(resp.success);
+
+        let code = r#"
+        // MIRIFLAGS=-Zmiri-tag-raw-pointers
+        fn main() {
+            let a = 0u8;
+            let ptr = &a as *const u8 as usize as *const u8;
+            unsafe {
+                println!("{}", *ptr);
+            }
+        }
+        "#;
+
+        let req = MiriRequest {
+            code: code.to_string(),
+            edition: None,
+        };
+
+        let sb = Sandbox::new()?;
+        let resp = sb.miri(&req)?;
+
+        assert!(!resp.success);
+
+        assert!(
+            resp.stderr
+                .contains("trying to reborrow for SharedReadOnly"),
             "was: {}",
             resp.stderr
         );
         assert!(
-            resp.stderr.contains("outside bounds of alloc"),
-            "was: {}",
-            resp.stderr
-        );
-        assert!(
-            resp.stderr.contains("which has size 0"),
+            resp.stderr.contains("but parent tag"),
             "was: {}",
             resp.stderr
         );
