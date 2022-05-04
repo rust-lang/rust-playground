@@ -189,9 +189,17 @@ jobs:
         args: "--manifest-path ui/Cargo.toml --all -- --check"
     - name: Build backend
       run: |-
-        mkdir -p ui/target; docker run --rm -v $PWD/ui:/ui -v ~/.cargo/git:/home/rust/.cargo/git -v ~/.cargo/registry:/home/rust/.cargo/registry --workdir /ui ekidd/rust-musl-builder:stable bash -c '
+        mkdir -p ui/target; docker run --rm -v $PWD/ui:/ui -v ~/.cargo/git:/home/rust/.cargo/git -v ~/.cargo/registry:/home/rust/.cargo/registry --workdir /ui ekidd/rust-musl-builder:stable bash -c $'
           sudo chown -R rust:rust /home/rust/.cargo /ui/target;
-          cargo build --locked --target=x86_64-unknown-linux-musl --release
+
+          # Unit tests
+          cargo test --locked --target=x86_64-unknown-linux-musl --no-run;
+          test_bin=$(find target/x86_64-unknown-linux-musl/debug/deps/ -type f -perm -a=x);
+          mv "${test_bin}" target/unit_tests;
+
+          # Primary binary
+          cargo build --locked --target=x86_64-unknown-linux-musl --release;
+          mv target/x86_64-unknown-linux-musl/release/ui target/ui;
         '
     - name: Restore permissions
       run: sudo chown -R runner:docker ~/.cargo/ ui/target
@@ -199,7 +207,9 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: backend
-        path: ui/target/x86_64-unknown-linux-musl/release/ui
+        path: |
+          ui/target/ui
+          ui/target/unit_tests
   build_frontend:
     name: Build frontend
     runs-on: ubuntu-latest
@@ -293,6 +303,8 @@ jobs:
       with:
         name: frontend
         path: tests/server/build/
+    - name: Run unit tests
+      run: chmod +x ./server/unit_tests && ./server/unit_tests
     - name: Run tests
       env:
         PLAYGROUND_UI_ROOT: server/build/
