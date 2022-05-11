@@ -9,7 +9,8 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/integer32llc/rust-playground"
 
 [dependencies]
-cargo = "0.60.0"
+clap = { version = "3.1.18", features = ["derive"] }
+cargo = "0.61.1"
 itertools = "0.10.0"
 reqwest = { version = "0.11.0", features = ["blocking"] }
 serde = "1.0.1"

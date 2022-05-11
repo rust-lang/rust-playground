@@ -12,11 +12,13 @@ use cargo::{
     sources::RegistrySource,
     util::{Config, VersionExt},
 };
+use clap::Parser;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet, HashSet},
     io::Read,
+    path::PathBuf,
 };
 
 const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
@@ -64,6 +66,25 @@ pub struct DependencySpec {
     pub default_features: bool,
 }
 
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+pub struct Args {
+    /// The number of top crates to include in this playground deployment.
+    /// Default is 100.
+    #[clap(short, long, default_value_t = 100)]
+    pub top_n: u32,
+
+    /// The path to the directory containing the base image
+    /// Dockerfile. When cargo run at the root of the enlistment,
+    /// the default should be sufficient.
+    #[clap(short, long, default_value = "./compiler/base")]
+    pub base_directory: PathBuf,
+
+    /// Omit the cookbook packages.
+    #[clap(short, long)]
+    pub omit_cookbook: bool
+}
+
 fn exact_version<S>(version: &String, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,
@@ -90,10 +111,10 @@ fn simple_get(url: &str) -> reqwest::Result<reqwest::blocking::Response> {
 }
 
 impl TopCrates {
-    /// List top 100 crates by number of downloads on crates.io.
-    fn download() -> TopCrates {
+    /// List top N crates by number of downloads on crates.io.
+    fn download(args: &Args) -> TopCrates {
         let resp =
-            simple_get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
+            simple_get(&format!("https://crates.io/api/v1/crates?page=1&per_page={}&sort=downloads", args.top_n))
                 .expect("Could not fetch top crates");
         assert!(resp.status().is_success(), "Could not download top crates; HTTP status was {}", resp.status());
 
@@ -212,7 +233,7 @@ fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
     }
 }
 
-pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
+pub fn generate_info(modifications: &Modifications, args: &Args) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
     // Setup to interact with cargo.
     let config = Config::default().expect("Unable to create default Cargo config");
     let _lock = config.acquire_package_cache_lock();
@@ -220,13 +241,18 @@ pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, Depende
     let mut source = RegistrySource::remote(crates_io, &HashSet::new(), &config);
     source.update().expect("Unable to update registry");
 
-    let mut top = TopCrates::download();
-    top.add_rust_cookbook_crates();
+    let mut top = TopCrates::download(&args);
+
+    if !args.omit_cookbook {
+        top.add_rust_cookbook_crates();
+    }
+
     top.add_curated_crates(modifications);
 
     // Find the newest (non-prerelease, non-yanked) versions of all
     // the interesting crates.
     let mut summaries = Vec::new();
+
     for Crate { name } in &top.crates {
         if modifications.excluded(name) {
             continue;
@@ -379,6 +405,8 @@ pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, Depende
             first = false;
         }
     }
+
+    println!("{} total crates", infos.len());
 
     (dependencies, infos)
 }

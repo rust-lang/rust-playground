@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "ui",
+    "top-crates",
+    "deployment"
+]

@@ -1,5 +1,6 @@
 #![deny(rust_2018_idioms)]
 
+use clap::Parser;
 use rust_playground_top_crates::*;
 use serde::Serialize;
 use std::{
@@ -43,7 +44,9 @@ struct Profiles {
 }
 
 fn main() {
-    let mut f = File::open("crate-modifications.toml")
+    let args = Args::parse();
+
+    let mut f = File::open("top-crates/crate-modifications.toml")
         .expect("unable to open crate modifications file");
 
     let mut d = Vec::new();
@@ -52,7 +55,7 @@ fn main() {
 
     let modifications: Modifications = toml::from_slice(&d).expect("unable to parse crate modifications file");
 
-    let (dependencies, infos) = rust_playground_top_crates::generate_info(&modifications);
+    let (dependencies, infos) = rust_playground_top_crates::generate_info(&modifications, &args);
 
     // Construct playground's Cargo.toml.
     let manifest = TomlManifest {
@@ -76,10 +79,11 @@ fn main() {
     };
 
     // Write manifest file.
-    let base_directory: PathBuf = std::env::args_os()
-        .nth(1)
-        .unwrap_or_else(|| "../compiler/base".into())
-        .into();
+    let base_directory: PathBuf = args.base_directory;
+
+    println!("base_directory: {:#?}", base_directory);
+    
+    let base_directory = base_directory.canonicalize().expect("Failed to canonicalize base directory");
 
     let cargo_toml = base_directory.join("Cargo.toml");
     write_manifest(manifest, &cargo_toml);

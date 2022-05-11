@@ -1,4 +1,5 @@
-ARG base_image=shepmaster/rust-nightly:sources
+ARG repository
+ARG base_image=${repository}/rust-nightly:sources
 FROM ${base_image}
 
 RUN rustup component add clippy-preview

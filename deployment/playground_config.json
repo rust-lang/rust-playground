@@ -1,0 +1,50 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "Playground",
+    "version" : "2022-05-16 20:25:19UTC"
+  },
+  "servers" : [ {
+    "url" : "https://bv5ijpne75.execute-api.us-west-2.amazonaws.com/{basePath}",
+    "variables" : {
+      "basePath" : {
+        "default" : ""
+      }
+    }
+  } ],
+  "paths" : {
+    "/{proxy+}" : {
+      "parameters" : [ {
+        "name" : "proxy+",
+        "in" : "path",
+        "description" : "Generated path parameter for proxy+",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ],
+      "x-amazon-apigateway-any-method" : {
+        "responses" : {
+          "default" : {
+            "description" : "Default response for ANY /{proxy+}"
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "payloadFormatVersion" : "1.0",
+          "type" : "http_proxy",
+          "httpMethod" : "ANY",
+          "uri" : "http://ec2-35-84-188-118.us-west-2.compute.amazonaws.com/{proxy}",
+          "connectionType" : "INTERNET",
+          "timeoutInMillis" : 30000
+        }
+      }
+    }
+  },
+  "x-amazon-apigateway-cors" : {
+    "allowMethods" : [ "*" ],
+    "maxAge" : 0,
+    "allowCredentials" : false,
+    "allowOrigins" : [ "*" ]
+  },
+  "x-amazon-apigateway-importexport-version" : "1.0"
+}
