@@ -51,7 +51,7 @@ const DEFAULT: State = {
   processAssembly: ProcessAssembly.Filter,
   primaryAction: PrimaryActionAuto.Auto,
   channel: Channel.Stable,
-  mode: Mode.Debug,
+  mode: Mode.Release,
   edition: Edition.Rust2021,
   backtrace: Backtrace.Disabled,
 };
