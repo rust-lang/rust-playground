@@ -754,7 +754,7 @@ export function indexPageLoad({
   code,
   gist,
   version = 'stable',
-  mode: modeString = 'debug',
+  mode: modeString = 'release',
   edition: editionString,
 }): ThunkAction {
   return function(dispatch) {
