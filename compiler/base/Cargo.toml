@@ -36,7 +36,7 @@ version = "=0.12.1"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.56"
+version = "=1.0.57"
 
 [dependencies.approx]
 package = "approx"
@@ -44,7 +44,7 @@ version = "=0.5.1"
 
 [dependencies.arc_swap]
 package = "arc-swap"
-version = "=0.4.8"
+version = "=1.5.0"
 
 [dependencies.arrayvec]
 package = "arrayvec"
@@ -56,7 +56,7 @@ version = "=1.0.0"
 
 [dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.52"
+version = "=0.1.53"
 
 [dependencies.atty]
 package = "atty"
@@ -68,7 +68,7 @@ version = "=1.1.0"
 
 [dependencies.backtrace]
 package = "backtrace"
-version = "=0.3.64"
+version = "=0.3.65"
 
 [dependencies.base64]
 package = "base64"
@@ -100,7 +100,7 @@ version = "=0.2.17"
 
 [dependencies.bytemuck]
 package = "bytemuck"
-version = "=1.8.0"
+version = "=1.9.1"
 features = ["derive", "extern_crate_alloc", "extern_crate_std", "min_const_generics", "wasm_simd", "zeroable_maybe_uninit"]
 
 [dependencies.byteorder]
@@ -126,8 +126,12 @@ features = ["serde"]
 
 [dependencies.clap]
 package = "clap"
-version = "=3.1.6"
+version = "=3.1.18"
 features = ["unstable-doc"]
+
+[dependencies.clap_lex]
+package = "clap_lex"
+version = "=0.2.0"
 
 [dependencies.color_quant]
 package = "color_quant"
@@ -203,7 +207,7 @@ version = "=1.6.1"
 
 [dependencies.encoding_rs]
 package = "encoding_rs"
-version = "=0.8.30"
+version = "=0.8.31"
 
 [dependencies.env_logger]
 package = "env_logger"
@@ -215,7 +219,7 @@ version = "=0.12.4"
 
 [dependencies.exr]
 package = "exr"
-version = "=1.4.1"
+version = "=1.4.2"
 
 [dependencies.fallible_iterator]
 package = "fallible-iterator"
@@ -231,7 +235,7 @@ version = "=1.7.0"
 
 [dependencies.filetime]
 package = "filetime"
-version = "=0.2.15"
+version = "=0.2.16"
 
 [dependencies.fixedbitset]
 package = "fixedbitset"
@@ -239,7 +243,7 @@ version = "=0.4.1"
 
 [dependencies.flate2]
 package = "flate2"
-version = "=1.0.22"
+version = "=1.0.23"
 
 [dependencies.flume]
 package = "flume"
@@ -308,7 +312,7 @@ version = "=0.14.5"
 
 [dependencies.getrandom]
 package = "getrandom"
-version = "=0.2.5"
+version = "=0.2.6"
 
 [dependencies.getrandom_0_1_16]
 package = "getrandom"
@@ -328,7 +332,7 @@ version = "=0.3.0"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.3.12"
+version = "=0.3.13"
 
 [dependencies.half]
 package = "half"
@@ -336,7 +340,7 @@ version = "=1.8.2"
 
 [dependencies.hashbrown]
 package = "hashbrown"
-version = "=0.12.0"
+version = "=0.12.1"
 
 [dependencies.hashbrown_0_11_2]
 package = "hashbrown"
@@ -360,15 +364,15 @@ version = "=0.25.2"
 
 [dependencies.http]
 package = "http"
-version = "=0.2.6"
+version = "=0.2.7"
 
 [dependencies.http_body]
 package = "http-body"
-version = "=0.4.4"
+version = "=0.4.5"
 
 [dependencies.httparse]
 package = "httparse"
-version = "=1.6.0"
+version = "=1.7.1"
 
 [dependencies.httpdate]
 package = "httpdate"
@@ -393,23 +397,19 @@ version = "=0.2.3"
 
 [dependencies.image]
 package = "image"
-version = "=0.24.1"
+version = "=0.24.2"
 
 [dependencies.indexmap]
 package = "indexmap"
-version = "=1.8.0"
+version = "=1.8.1"
 
 [dependencies.inflate]
 package = "inflate"
 version = "=0.4.5"
 
-[dependencies.instant]
-package = "instant"
-version = "=0.1.12"
-
 [dependencies.ipnet]
 package = "ipnet"
-version = "=2.4.0"
+version = "=2.5.0"
 
 [dependencies.itertools]
 package = "itertools"
@@ -417,7 +417,7 @@ version = "=0.10.3"
 
 [dependencies.itoa]
 package = "itoa"
-version = "=1.0.1"
+version = "=1.0.2"
 
 [dependencies.itoa_0_4_8]
 package = "itoa"
@@ -425,11 +425,7 @@ version = "=0.4.8"
 
 [dependencies.jpeg_decoder]
 package = "jpeg-decoder"
-version = "=0.2.2"
-
-[dependencies.jpeg_decoder_0_1_22]
-package = "jpeg-decoder"
-version = "=0.1.22"
+version = "=0.2.6"
 
 [dependencies.lazy_static]
 package = "lazy_static"
@@ -441,7 +437,7 @@ version = "=0.5.1"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.121"
+version = "=0.2.126"
 
 [dependencies.libm]
 package = "libm"
@@ -449,7 +445,7 @@ version = "=0.2.2"
 
 [dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.24.1"
+version = "=0.24.2"
 
 [dependencies.linked_hash_map]
 package = "linked-hash-map"
@@ -457,15 +453,15 @@ version = "=0.5.4"
 
 [dependencies.lock_api]
 package = "lock_api"
-version = "=0.4.6"
+version = "=0.4.7"
 
 [dependencies.log]
 package = "log"
-version = "=0.4.16"
+version = "=0.4.17"
 
 [dependencies.log4rs]
 package = "log4rs"
-version = "=1.0.0"
+version = "=1.1.1"
 
 [dependencies.log_mdc]
 package = "log-mdc"
@@ -497,7 +493,7 @@ version = "=0.10.1"
 
 [dependencies.memchr]
 package = "memchr"
-version = "=2.4.1"
+version = "=2.5.0"
 
 [dependencies.memmap]
 package = "memmap"
@@ -515,18 +511,14 @@ version = "=0.3.16"
 package = "miniz_oxide"
 version = "=0.5.1"
 
-[dependencies.miniz_oxide_0_4_4]
-package = "miniz_oxide"
-version = "=0.4.4"
-
 [dependencies.mio]
 package = "mio"
-version = "=0.8.2"
+version = "=0.8.3"
 features = ["net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
 package = "nalgebra"
-version = "=0.30.1"
+version = "=0.31.0"
 
 [dependencies.nalgebra_macros]
 package = "nalgebra-macros"
@@ -538,7 +530,7 @@ version = "=0.7.0"
 
 [dependencies.native_tls]
 package = "native-tls"
-version = "=0.2.8"
+version = "=0.2.10"
 
 [dependencies.ndarray]
 package = "ndarray"
@@ -554,7 +546,7 @@ version = "=0.4.3"
 
 [dependencies.num_complex]
 package = "num-complex"
-version = "=0.4.0"
+version = "=0.4.1"
 
 [dependencies.num_cpus]
 package = "num_cpus"
@@ -562,11 +554,11 @@ version = "=1.13.1"
 
 [dependencies.num_integer]
 package = "num-integer"
-version = "=0.1.44"
+version = "=0.1.45"
 
 [dependencies.num_iter]
 package = "num-iter"
-version = "=0.1.42"
+version = "=0.1.43"
 
 [dependencies.num_rational]
 package = "num-rational"
@@ -574,19 +566,19 @@ version = "=0.4.0"
 
 [dependencies.num_threads]
 package = "num_threads"
-version = "=0.1.5"
+version = "=0.1.6"
 
 [dependencies.num_traits]
 package = "num-traits"
-version = "=0.2.14"
+version = "=0.2.15"
 
 [dependencies.object]
 package = "object"
-version = "=0.27.1"
+version = "=0.28.4"
 
 [dependencies.once_cell]
 package = "once_cell"
-version = "=1.10.0"
+version = "=1.12.0"
 
 [dependencies.opaque_debug]
 package = "opaque-debug"
@@ -594,7 +586,11 @@ version = "=0.3.0"
 
 [dependencies.openssl]
 package = "openssl"
-version = "=0.10.38"
+version = "=0.10.40"
+
+[dependencies.openssl_macros]
+package = "openssl-macros"
+version = "=0.1.0"
 
 [dependencies.openssl_probe]
 package = "openssl-probe"
@@ -602,7 +598,7 @@ version = "=0.1.5"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.72"
+version = "=0.9.73"
 
 [dependencies.ordered_float]
 package = "ordered-float"
@@ -610,27 +606,19 @@ version = "=2.10.0"
 
 [dependencies.os_str_bytes]
 package = "os_str_bytes"
-version = "=6.0.0"
+version = "=6.1.0"
 
 [dependencies.parking_lot]
 package = "parking_lot"
 version = "=0.12.0"
 
-[dependencies.parking_lot_0_11_2]
-package = "parking_lot"
-version = "=0.11.2"
-
 [dependencies.parking_lot_core]
 package = "parking_lot_core"
-version = "=0.9.1"
-
-[dependencies.parking_lot_core_0_8_5]
-package = "parking_lot_core"
-version = "=0.8.5"
+version = "=0.9.3"
 
 [dependencies.paste]
 package = "paste"
-version = "=1.0.6"
+version = "=1.0.7"
 
 [dependencies.percent_encoding]
 package = "percent-encoding"
@@ -658,6 +646,10 @@ version = "=0.8.0"
 
 [dependencies.phf_generator]
 package = "phf_generator"
+version = "=0.10.0"
+
+[dependencies.phf_generator_0_8_0]
+package = "phf_generator"
 version = "=0.8.0"
 
 [dependencies.phf_shared]
@@ -678,7 +670,7 @@ version = "=1.0.10"
 
 [dependencies.pin_project_lite]
 package = "pin-project-lite"
-version = "=0.2.8"
+version = "=0.2.9"
 
 [dependencies.pin_utils]
 package = "pin-utils"
@@ -686,7 +678,7 @@ version = "=0.1.0"
 
 [dependencies.pkg_config]
 package = "pkg-config"
-version = "=0.3.24"
+version = "=0.3.25"
 
 [dependencies.png]
 package = "png"
@@ -694,15 +686,15 @@ version = "=0.17.5"
 
 [dependencies.postgres]
 package = "postgres"
-version = "=0.19.2"
+version = "=0.19.3"
 
 [dependencies.postgres_protocol]
 package = "postgres-protocol"
-version = "=0.6.3"
+version = "=0.6.4"
 
 [dependencies.postgres_types]
 package = "postgres-types"
-version = "=0.2.2"
+version = "=0.2.3"
 
 [dependencies.ppv_lite86]
 package = "ppv-lite86"
@@ -714,7 +706,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.36"
+version = "=1.0.39"
 features = ["span-locations"]
 
 [dependencies.proc_macro_hack]
@@ -723,7 +715,7 @@ version = "=0.5.19"
 
 [dependencies.quote]
 package = "quote"
-version = "=1.0.16"
+version = "=1.0.18"
 
 [dependencies.rand]
 package = "rand"
@@ -755,10 +747,6 @@ version = "=0.5.1"
 package = "rand_distr"
 version = "=0.4.3"
 
-[dependencies.rand_hc]
-package = "rand_hc"
-version = "=0.3.1"
-
 [dependencies.rand_pcg]
 package = "rand_pcg"
 version = "=0.2.1"
@@ -769,15 +757,15 @@ version = "=0.2.1"
 
 [dependencies.rayon]
 package = "rayon"
-version = "=1.5.1"
+version = "=1.5.3"
 
 [dependencies.rayon_core]
 package = "rayon-core"
-version = "=1.9.1"
+version = "=1.9.3"
 
 [dependencies.regex]
 package = "regex"
-version = "=1.5.5"
+version = "=1.5.6"
 
 [dependencies.regex_automata]
 package = "regex-automata"
@@ -785,7 +773,7 @@ version = "=0.1.10"
 
 [dependencies.regex_syntax]
 package = "regex-syntax"
-version = "=0.6.25"
+version = "=0.6.26"
 
 [dependencies.remove_dir_all]
 package = "remove_dir_all"
@@ -815,7 +803,7 @@ version = "=0.4.0"
 
 [dependencies.ryu]
 package = "ryu"
-version = "=1.0.9"
+version = "=1.0.10"
 
 [dependencies.safe_arch]
 package = "safe_arch"
@@ -839,7 +827,7 @@ version = "=0.5.0"
 
 [dependencies.semver]
 package = "semver"
-version = "=1.0.6"
+version = "=1.0.9"
 
 [dependencies.semver_parser]
 package = "semver-parser"
@@ -847,16 +835,16 @@ version = "=0.10.2"
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.136"
+version = "=1.0.137"
 features = ["derive", "rc"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.136"
+version = "=1.0.137"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.79"
+version = "=1.0.81"
 features = ["raw_value"]
 
 [dependencies.serde_urlencoded]
@@ -869,7 +857,7 @@ version = "=0.7.0"
 
 [dependencies.serde_yaml]
 package = "serde_yaml"
-version = "=0.8.23"
+version = "=0.8.24"
 
 [dependencies.sha2]
 package = "sha2"
@@ -885,7 +873,7 @@ version = "=0.3.10"
 
 [dependencies.slab]
 package = "slab"
-version = "=0.4.5"
+version = "=0.4.6"
 
 [dependencies.smallvec]
 package = "smallvec"
@@ -902,7 +890,7 @@ features = ["all"]
 
 [dependencies.spin]
 package = "spin"
-version = "=0.9.2"
+version = "=0.9.3"
 
 [dependencies.spin_0_5_2]
 package = "spin"
@@ -910,11 +898,11 @@ version = "=0.5.2"
 
 [dependencies.string_cache]
 package = "string_cache"
-version = "=0.8.3"
+version = "=0.8.4"
 
 [dependencies.string_cache_codegen]
 package = "string_cache_codegen"
-version = "=0.5.1"
+version = "=0.5.2"
 
 [dependencies.stringprep]
 package = "stringprep"
@@ -930,7 +918,7 @@ version = "=2.4.1"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.89"
+version = "=1.0.95"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.tar]
@@ -943,7 +931,7 @@ version = "=3.3.0"
 
 [dependencies.tendril]
 package = "tendril"
-version = "=0.4.2"
+version = "=0.4.3"
 
 [dependencies.termcolor]
 package = "termcolor"
@@ -955,15 +943,15 @@ version = "=0.15.0"
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.30"
+version = "=1.0.31"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.30"
+version = "=1.0.31"
 
 [dependencies.thread_id]
 package = "thread-id"
-version = "=3.3.0"
+version = "=4.0.0"
 
 [dependencies.thread_local]
 package = "thread_local"
@@ -975,7 +963,7 @@ version = "=1.8.1"
 
 [dependencies.tiff]
 package = "tiff"
-version = "=0.7.1"
+version = "=0.7.2"
 
 [dependencies.time]
 package = "time"
@@ -987,7 +975,7 @@ version = "=0.1.44"
 
 [dependencies.tinyvec]
 package = "tinyvec"
-version = "=1.5.1"
+version = "=1.6.0"
 features = ["alloc", "grab_spare_slice", "rustc_1_40", "rustc_1_55", "serde", "std"]
 
 [dependencies.tinyvec_macros]
@@ -996,7 +984,7 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.17.0"
+version = "=1.18.2"
 features = ["full", "test-util"]
 
 [dependencies.tokio_native_tls]
@@ -1005,15 +993,15 @@ version = "=0.3.0"
 
 [dependencies.tokio_postgres]
 package = "tokio-postgres"
-version = "=0.7.5"
+version = "=0.7.6"
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.6.9"
+version = "=0.7.2"
 
 [dependencies.toml]
 package = "toml"
-version = "=0.5.8"
+version = "=0.5.9"
 
 [dependencies.tower_service]
 package = "tower-service"
@@ -1021,11 +1009,15 @@ version = "=0.3.1"
 
 [dependencies.tracing]
 package = "tracing"
-version = "=0.1.32"
+version = "=0.1.34"
+
+[dependencies.tracing_attributes]
+package = "tracing-attributes"
+version = "=0.1.21"
 
 [dependencies.tracing_core]
 package = "tracing-core"
-version = "=0.1.23"
+version = "=0.1.26"
 
 [dependencies.traitobject]
 package = "traitobject"
@@ -1049,7 +1041,11 @@ version = "=0.1.3"
 
 [dependencies.unicode_bidi]
 package = "unicode-bidi"
-version = "=0.3.7"
+version = "=0.3.8"
+
+[dependencies.unicode_ident]
+package = "unicode-ident"
+version = "=1.0.0"
 
 [dependencies.unicode_linebreak]
 package = "unicode-linebreak"
@@ -1069,7 +1065,7 @@ version = "=0.1.9"
 
 [dependencies.unicode_xid]
 package = "unicode-xid"
-version = "=0.2.2"
+version = "=0.2.3"
 
 [dependencies.unsafe_any]
 package = "unsafe-any"
@@ -1109,7 +1105,7 @@ version = "=0.3.0"
 
 [dependencies.weezl]
 package = "weezl"
-version = "=0.1.5"
+version = "=0.1.6"
 
 [dependencies.wide]
 package = "wide"
@@ -1121,7 +1117,7 @@ version = "=0.3.9"
 
 [dependencies.xattr]
 package = "xattr"
-version = "=0.2.2"
+version = "=0.2.3"
 
 [dependencies.xml5ever]
 package = "xml5ever"
