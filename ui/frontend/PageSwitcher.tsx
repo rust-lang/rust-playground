@@ -5,7 +5,7 @@ import Help from './Help';
 import Playground from './Playground';
 import { State } from './reducers';
 
-const PageSwitcher: React.SFC = () => {
+const PageSwitcher: React.FC = () => {
   const page = useSelector((state: State) => state.page);
 
   switch (page) {

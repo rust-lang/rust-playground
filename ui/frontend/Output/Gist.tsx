@@ -10,7 +10,7 @@ import Loader from './Loader';
 
 import styles from './Gist.module.css';
 
-const Gist: React.SFC = () => {
+const Gist: React.FC = () => {
   const showLoader = useSelector(selectors.showGistLoaderSelector);
 
   return (
@@ -52,7 +52,7 @@ class Copied extends React.PureComponent<CopiedProps, CopiedState> {
   }
 }
 
-const Links: React.SFC = () => {
+const Links: React.FC = () => {
   const codeUrl = useSelector(selectors.codeUrlSelector);
   const gistUrl = useSelector((state: State) => state.output.gist.url);
   const permalink = useSelector(selectors.permalinkSelector);
@@ -72,7 +72,7 @@ interface NewWindowProps {
   href: string;
 }
 
-const NewWindow: React.SFC<NewWindowProps> = props => (
+const NewWindow: React.FC<NewWindowProps> = props => (
   <p>
     <a href={props.href} target="_blank" rel="noopener noreferrer">{props.children}</a>
   </p>

@@ -11,7 +11,7 @@ interface NewPopProps {
   Menu: React.ComponentType<{ close: () => void }>;
 }
 
-const PopButton: React.SFC<NewPopProps> = ({ Button, Menu }) => {
+const PopButton: React.FC<NewPopProps> = ({ Button, Menu }) => {
   const [isOpen, setOpen] = useState(false);
   const toggle = useCallback(() => setOpen(v => !v), []);
   const close = useCallback(() => setOpen(false), []);

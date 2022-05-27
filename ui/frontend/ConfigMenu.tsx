@@ -25,7 +25,7 @@ const MONACO_THEMES = [
   'vs', 'vs-dark', 'vscode-dark-plus',
 ];
 
-const ConfigMenu: React.SFC<ConfigMenuProps> = () => {
+const ConfigMenu: React.FC<ConfigMenuProps> = () => {
   const keybinding = useSelector((state: State) => state.configuration.ace.keybinding);
   const aceTheme = useSelector((state: State) => state.configuration.ace.theme);
   const monacoTheme = useSelector((state: State) => state.configuration.monaco.theme);

@@ -75,7 +75,7 @@ fn main() {
     println!("{}", a_loop());
 }`;
 
-const Help: React.SFC = () => {
+const Help: React.FC = () => {
   return (
     <section className={styles.container}>
       <h1>The Rust Playground</h1>
@@ -316,10 +316,10 @@ const Help: React.SFC = () => {
   );
 };
 
-const H2: React.SFC = ({ children }) => <h2>{children}</h2>;
-const H3: React.SFC = ({ children }) => <h3>{children}</h3>;
+const H2: React.FC = ({ children }) => <h2>{children}</h2>;
+const H3: React.FC = ({ children }) => <h3>{children}</h3>;
 
-const LinkableSection: React.SFC<LinkableSectionProps> = ({
+const LinkableSection: React.FC<LinkableSectionProps> = ({
   id, header, level: Level, children,
 }) => (
   <div id={id}>
@@ -338,7 +338,7 @@ interface LinkableSectionProps {
   level: (ChildrenProps) => JSX.Element;
 }
 
-const Code: React.SFC = ({ children }) => (
+const Code: React.FC = ({ children }) => (
   <code className={styles.code}>{children}</code>
 );
 

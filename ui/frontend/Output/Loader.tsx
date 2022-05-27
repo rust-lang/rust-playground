@@ -3,7 +3,7 @@ import React from 'react';
 import GenericLoader from '../Loader';
 import Header from './Header';
 
-const Loader: React.SFC = () => (
+const Loader: React.FC = () => (
   <div>
     <Header label="Progress" />
     <GenericLoader />

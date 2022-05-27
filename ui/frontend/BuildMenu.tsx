@@ -27,7 +27,7 @@ const useDispatchAndClose = (action: () => actions.ThunkAction, close: () => voi
   );
 }
 
-const BuildMenu: React.SFC<BuildMenuProps> = props => {
+const BuildMenu: React.FC<BuildMenuProps> = props => {
   const isHirAvailable = useSelector(selectors.isHirAvailable);
   const isWasmAvailable = useSelector(selectors.isWasmAvailable);
 
@@ -75,14 +75,14 @@ const BuildMenu: React.SFC<BuildMenuProps> = props => {
   );
 };
 
-const HirAside: React.SFC = () => (
+const HirAside: React.FC = () => (
   <MenuAside>
     Note: HIR currently requires using the Nightly channel, selecting this
     option will switch to Nightly.
   </MenuAside>
 );
 
-const WasmAside: React.SFC = () => (
+const WasmAside: React.FC = () => (
   <MenuAside>
     Note: WASM currently requires using the Nightly channel, selecting this
     option will switch to Nightly.

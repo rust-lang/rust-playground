@@ -10,7 +10,7 @@ interface ButtonMenuItemProps extends Button {
   name: string;
 }
 
-const ButtonMenuItem: React.SFC<ButtonMenuItemProps> = ({ name, children, ...props }) => (
+const ButtonMenuItem: React.FC<ButtonMenuItemProps> = ({ name, children, ...props }) => (
   <MenuItem>
     <button className={styles.container} {...props}>
       <div className={styles.name} data-test-id="button-menu-item__name">{name}</div>

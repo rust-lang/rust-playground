@@ -11,7 +11,7 @@ import styles from './Notifications.module.css';
 
 const MONACO_EDITOR_URL = 'https://microsoft.github.io/monaco-editor/';
 
-const Notifications: React.SFC = () => {
+const Notifications: React.FC = () => {
   return (
     <Portal>
       <div className={styles.container}>
@@ -21,7 +21,7 @@ const Notifications: React.SFC = () => {
   );
 };
 
-const MonacoEditorAvailableNotification: React.SFC = () => {
+const MonacoEditorAvailableNotification: React.FC = () => {
   const monicoEditorAvailable = useSelector(selectors.showMonicoEditorAvailableSelector);
 
   const dispatch = useDispatch();
@@ -40,7 +40,7 @@ interface NotificationProps {
   onClose: () => void;
 }
 
-const Notification: React.SFC<NotificationProps> = ({ onClose, children }) => (
+const Notification: React.FC<NotificationProps> = ({ onClose, children }) => (
   <div className={styles.notification}>
     <div className={styles.notificationContent}>{children}</div>
     <button className={styles.close} onClick={onClose}><Close /></button>

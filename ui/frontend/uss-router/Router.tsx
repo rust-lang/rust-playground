@@ -6,7 +6,7 @@ interface RouterProps {
   router: boolean;
 }
 
-const Router: React.SFC<RouterProps> = (props) => {
+const Router: React.FC<RouterProps> = (props) => {
 
   return (
     <Context.Provider value={props.router}>

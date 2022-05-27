@@ -36,7 +36,7 @@ const HANDLE_STYLES = {
 // because we want to reduce the number of times that the Editor
 // component is remounted. Each time it's remounted, we see a flicker and
 // lose state (like undo history).
-const ResizableArea: React.SFC = () => {
+const ResizableArea: React.FC = () => {
   const somethingToShow = useSelector(selectors.getSomethingToShow);
   const isFocused = useSelector(selectors.isOutputFocused);
   const orientation = useSelector(selectors.orientation);
@@ -85,7 +85,7 @@ const ResizableArea: React.SFC = () => {
   );
 };
 
-const Playground: React.SFC = () => {
+const Playground: React.FC = () => {
   const showNotifications = useSelector(selectors.anyNotificationsToShowSelector);
 
   return (

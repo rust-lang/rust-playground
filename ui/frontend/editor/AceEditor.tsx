@@ -83,7 +83,7 @@ function useEditorProp<T>(editor: AceModule, prop: T, whenPresent: (editor: AceM
   }, [editor, prop, whenPresent]);
 }
 
-const AceEditor: React.SFC<AceEditorProps> = props => {
+const AceEditor: React.FC<AceEditorProps> = props => {
   const [editor, setEditor] = useState<AceModule>(null);
   const child = useRef<HTMLDivElement>(null);
 

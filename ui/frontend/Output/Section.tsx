@@ -9,7 +9,7 @@ interface SectionProps {
   label: string;
 }
 
-const Section: React.SFC<SectionProps> = ({ kind, label, children }) => (
+const Section: React.FC<SectionProps> = ({ kind, label, children }) => (
   children && (
     <div data-test-id={`output-${kind}`}>
       <Header label={label} />

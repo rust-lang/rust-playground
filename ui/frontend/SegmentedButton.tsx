@@ -4,7 +4,7 @@ import Link, { LinkProps } from './uss-router/Link';
 
 import styles from './SegmentedButton.module.css';
 
-export const SegmentedButtonSet: React.SFC = ({ children }) => (
+export const SegmentedButtonSet: React.FC = ({ children }) => (
   <div className={styles.container}>{children}</div>
 );
 

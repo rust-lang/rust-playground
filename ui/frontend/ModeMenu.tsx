@@ -12,7 +12,7 @@ interface ModeMenuProps {
   close: () => void;
 }
 
-const ModeMenu: React.SFC<ModeMenuProps> = props => {
+const ModeMenu: React.FC<ModeMenuProps> = props => {
   const mode = useSelector((state: State) => state.configuration.mode);
   const dispatch = useDispatch();
   const changeMode = useCallback((mode) => {

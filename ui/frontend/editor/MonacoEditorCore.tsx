@@ -32,7 +32,7 @@ const initEditor = (execute: () => any): EditorDidMount => (editor, monaco) => {
   });
 };
 
-const MonacoEditorCore: React.SFC<CommonEditorProps> = props => {
+const MonacoEditorCore: React.FC<CommonEditorProps> = props => {
   const theme = useSelector((s: State) => s.configuration.monaco.theme);
 
   return (
