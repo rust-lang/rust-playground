@@ -1,7 +1,7 @@
 [package]
 authors = ["Jake Goulding <jake.goulding@integer32.com>"]
 name = "rust-playground-top-crates"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2018"
 
 description = "Calculates what crates should be included in the playground"
@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/integer32llc/rust-playground"
 
 [dependencies]
-cargo = "0.60.0"
+cargo = "0.62.0"
 itertools = "0.10.0"
 reqwest = { version = "0.11.0", features = ["blocking"] }
 serde = "1.0.1"

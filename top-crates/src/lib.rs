@@ -16,7 +16,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet, HashSet},
-    io::Read,
+    io::Read, task::Poll,
 };
 
 const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
@@ -217,8 +217,9 @@ pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, Depende
     let config = Config::default().expect("Unable to create default Cargo config");
     let _lock = config.acquire_package_cache_lock();
     let crates_io = SourceId::crates_io(&config).expect("Unable to create crates.io source ID");
-    let mut source = RegistrySource::remote(crates_io, &HashSet::new(), &config);
-    source.update().expect("Unable to update registry");
+    let mut source = RegistrySource::remote(crates_io, &HashSet::new(), &config).expect("Unable to create registry source");
+    source.invalidate_cache();
+    source.block_until_ready().expect("Unable to wait for registry to be ready");
 
     let mut top = TopCrates::download();
     top.add_rust_cookbook_crates();
@@ -237,9 +238,11 @@ pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, Depende
         let dep = Dependency::parse(name, None, crates_io)
             .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
-        let matches = source.query_vec(&dep).unwrap_or_else(|e| {
-            panic!("Unable to query registry for {}: {}", name, e);
-        });
+        let matches = match source.query_vec(&dep) {
+            Poll::Ready(Ok(v)) => v,
+            Poll::Ready(Err(e)) => panic!("Unable to query registry for {}: {}", name, e),
+            Poll::Pending => panic!("Registry not ready to query"),
+        };
 
         // Find the newest non-prelease version
         let summary = matches

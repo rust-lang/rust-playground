@@ -53,7 +53,7 @@ const routes = {
   },
 };
 
-type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, Action>;
+export type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, Action>;
 
 const createAction = <T extends string, P extends {}>(type: T, props?: P) => (
   Object.assign({ type }, props)
