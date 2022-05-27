@@ -81,7 +81,7 @@ const Help: React.FC = () => {
       <h1>The Rust Playground</h1>
       <Link action={actions.navigateToIndex}>Return to the playground</Link>
 
-      <LinkableSection id="about" header="About" level={H2}>
+      <LinkableSection id="about" header="About" level="h2">
         <p>
           The playground is an <a href={REPO_URL}>open source project</a>.
           If you have any suggestions for features, issues with the
@@ -107,8 +107,8 @@ const Help: React.FC = () => {
         </p>
       </LinkableSection>
 
-      <LinkableSection id="features" header="Features" level={H2}>
-        <LinkableSection id="features-crates" header="Crates" level={H3}>
+      <LinkableSection id="features" header="Features" level="h2">
+        <LinkableSection id="features-crates" header="Crates" level="h3">
           <p>
             The playground provides the top 100 most downloaded crates
           from <a href={CRATES_IO_URL}>crates.io</a>, the crates from
@@ -126,7 +126,7 @@ const Help: React.FC = () => {
           </p>
         </LinkableSection>
 
-        <LinkableSection id="features-formatting" header="Formatting code" level={H3}>
+        <LinkableSection id="features-formatting" header="Formatting code" level="h3">
           <p>
             <a href={RUSTFMT_URL}>rustfmt</a> is a tool for formatting Rust code
           according to the Rust style guidelines. Click on the <strong>Format</strong>
@@ -137,7 +137,7 @@ const Help: React.FC = () => {
           <Example code={RUSTFMT_EXAMPLE} />
         </LinkableSection>
 
-        <LinkableSection id="features-linting" header="Linting code" level={H3}>
+        <LinkableSection id="features-linting" header="Linting code" level="h3">
           <p>
             <a href={CLIPPY_URL}>Clippy</a> is a collection of lints to catch common
           mistakes and improve your Rust code. Click on the <strong>Clippy</strong>
@@ -149,7 +149,7 @@ const Help: React.FC = () => {
           <Example code={CLIPPY_EXAMPLE} />
         </LinkableSection>
 
-        <LinkableSection id="features-miri" header="Checking code for undefined behavior" level={H3}>
+        <LinkableSection id="features-miri" header="Checking code for undefined behavior" level="h3">
           <p>
             <a href={MIRI_URL}>Miri</a> is an interpreter for Rust’s mid-level intermediate
             representation (MIR) and can be used to detect certain kinds of undefined behavior
@@ -160,7 +160,7 @@ const Help: React.FC = () => {
           <Example code={MIRI_EXAMPLE} />
         </LinkableSection>
 
-        <LinkableSection id="features-sharing" header="Sharing code" level={H3}>
+        <LinkableSection id="features-sharing" header="Sharing code" level="h3">
           <p>
             Once you have some code worth saving or sharing, click on the
             {' '}
@@ -171,7 +171,7 @@ const Help: React.FC = () => {
           </p>
         </LinkableSection>
 
-        <LinkableSection id="features-linking" header="Linking to the playground with initial code" level={H3}>
+        <LinkableSection id="features-linking" header="Linking to the playground with initial code" level="h3">
           <p>
             If you have a web page with Rust code that you’d like to
             show in action, you can link to the playground with the
@@ -183,7 +183,7 @@ const Help: React.FC = () => {
           <pre className={styles.code}><code>{LINK_EXAMPLE}</code></pre>
         </LinkableSection>
 
-        <LinkableSection id="features-tests" header="Executing tests" level={H3}>
+        <LinkableSection id="features-tests" header="Executing tests" level="h3">
           <p>
             If your code contains the <Code>#[test]</Code> attribute and does not
           contain a <Code>main</Code> method, <Code>cargo test</Code> will be
@@ -193,7 +193,7 @@ const Help: React.FC = () => {
           <Example code={TEST_EXAMPLE} />
         </LinkableSection>
 
-        <LinkableSection id="features-library" header="Compiling as a library" level={H3}>
+        <LinkableSection id="features-library" header="Compiling as a library" level="h3">
           <p>
             If your code contains the <Code>#![crate_type=&quot;lib&quot;]</Code> attribute,
             {' '}
@@ -204,7 +204,7 @@ const Help: React.FC = () => {
           <Example code={LIBRARY_EXAMPLE} />
         </LinkableSection>
 
-        <LinkableSection id="features-output-formats" header="Output formats" level={H3}>
+        <LinkableSection id="features-output-formats" header="Output formats" level="h3">
           <p>
             Instead of executing the code, you can also see intermediate
             output of the compiler as x86_64 assembly, LLVM IR, Rust MIR, or
@@ -217,7 +217,7 @@ const Help: React.FC = () => {
           <Example code={OUTPUT_EXAMPLE} />
         </LinkableSection>
 
-        <LinkableSection id="features-modes" header="Compilation modes" level={H3}>
+        <LinkableSection id="features-modes" header="Compilation modes" level="h3">
           <p>
             Rust has two primary compilation modes: <strong>Debug</strong> and
             {' '}
@@ -232,7 +232,7 @@ const Help: React.FC = () => {
           </p>
         </LinkableSection>
 
-        <LinkableSection id="features-channels" header="Rust channels" level={H3}>
+        <LinkableSection id="features-channels" header="Rust channels" level="h3">
           <p>
             Rust releases new <strong>stable</strong> versions every 6
           weeks. Between these stable releases, <strong>beta</strong> versions of the
@@ -247,7 +247,7 @@ const Help: React.FC = () => {
           </p>
         </LinkableSection>
 
-        <LinkableSection id="features-customization" header="Customization" level={H3}>
+        <LinkableSection id="features-customization" header="Customization" level="h3">
           <p>
             The <a href={ACE_URL}>Ajax.org Cloud9 Editor (Ace)</a> is used to
             provide a better interface for editing code. Ace comes with
@@ -265,7 +265,7 @@ const Help: React.FC = () => {
           </p>
         </LinkableSection>
 
-        <LinkableSection id="features-persistence" header="Persistence" level={H3}>
+        <LinkableSection id="features-persistence" header="Persistence" level="h3">
           <p>
             The most recently entered code will be automatically saved in your browser’s
             {' '}
@@ -280,7 +280,7 @@ const Help: React.FC = () => {
         </LinkableSection>
       </LinkableSection>
 
-      <LinkableSection id="limitations" header="Limitations" level={H2}>
+      <LinkableSection id="limitations" header="Limitations" level="h2">
         <p>
           To prevent the playground from being used to attack other computers and
           to ensure it is available for everyone to use, some limitations
@@ -316,9 +316,6 @@ const Help: React.FC = () => {
   );
 };
 
-const H2: React.FC = ({ children }) => <h2>{children}</h2>;
-const H3: React.FC = ({ children }) => <h3>{children}</h3>;
-
 const LinkableSection: React.FC<LinkableSectionProps> = ({
   id, header, level: Level, children,
 }) => (
@@ -335,7 +332,7 @@ const LinkableSection: React.FC<LinkableSectionProps> = ({
 interface LinkableSectionProps {
   id: string;
   header: string;
-  level: (ChildrenProps) => JSX.Element;
+  level: React.ElementType;
 }
 
 const Code: React.FC = ({ children }) => (
