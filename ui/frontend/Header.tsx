@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import AdvancedOptionsMenu from './AdvancedOptionsMenu';
 import BuildMenu from './BuildMenu';
@@ -14,6 +14,7 @@ import ToolsMenu from './ToolsMenu';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
+import { useAppDispatch } from './configureStore';
 
 import styles from './Header.module.css';
 
@@ -66,7 +67,7 @@ const HeaderSet: React.SFC<HeaderSetProps> = ({ id, children }) => (
 const ExecuteButton: React.SFC = () => {
   const executionLabel = useSelector(selectors.getExecutionLabel);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const execute = useCallback(() => dispatch(actions.performPrimaryAction()), [dispatch]);
 
   return (
@@ -129,7 +130,7 @@ const AdvancedOptionsMenuButton: React.SFC = () => {
 }
 
 const ShareButton: React.SFC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const gistSave = useCallback(() => dispatch(actions.performGistSave()), [dispatch]);
 
   return (

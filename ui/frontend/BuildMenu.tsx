@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
+import { useAppDispatch } from './configureStore';
 
 import ButtonMenuItem from './ButtonMenuItem';
 import MenuGroup from './MenuGroup';
@@ -14,8 +15,8 @@ interface BuildMenuProps {
   close: () => void;
 }
 
-const useDispatchAndClose = (action: () => void, close: () => void) => {
-  const dispatch = useDispatch();
+const useDispatchAndClose = (action: () => actions.ThunkAction, close: () => void) => {
+  const dispatch = useAppDispatch();
 
   return useCallback(
     () => {

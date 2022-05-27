@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import ButtonMenuItem from './ButtonMenuItem';
 import MenuGroup from './MenuGroup';
@@ -7,6 +7,7 @@ import MenuAside from './MenuAside';
 
 import * as selectors from './selectors';
 import * as actions from './actions';
+import { useAppDispatch } from './configureStore';
 
 interface ToolsMenuProps {
   close: () => void;
@@ -22,7 +23,7 @@ const ToolsMenu: React.SFC<ToolsMenuProps> = props => {
   const nightlyVersion = useSelector(selectors.nightlyVersionText);
   const nightlyVersionDetails = useSelector(selectors.nightlyVersionDetailsText);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const clippy = useCallback(() => {
     dispatch(actions.performClippy());
     props.close();

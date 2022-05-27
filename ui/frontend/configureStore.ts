@@ -29,3 +29,6 @@ export default function configureStore(window: Window) {
   );
   return createStore(playgroundApp, initialState, enhancers);
 }
+
+export type AppDispatch = ReturnType<typeof configureStore>['dispatch'];
+export const useAppDispatch = () => useDispatch<AppDispatch>()

@@ -1,13 +1,15 @@
 import React, { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import * as actions from '../actions';
+import { useAppDispatch } from '../configureStore';
+
 import AceEditor from './AceEditor';
+import MonacoEditor from './MonacoEditor';
 import { CommonEditorProps, Editor as EditorType, Position, Selection } from '../types';
 import { State } from '../reducers';
 
 import styles from './Editor.module.css';
-import MonacoEditor from './MonacoEditor';
 
 class CodeByteOffsets {
   readonly code: string;
@@ -121,7 +123,7 @@ const Editor: React.SFC = () => {
   const selection = useSelector((state: State) => state.selection);
   const crates = useSelector((state: State) => state.crates);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const execute = useCallback(() => dispatch(actions.performPrimaryAction()), [dispatch]);
   const onEditCode = useCallback((c) => dispatch(actions.editCode(c)), [dispatch]);
 
