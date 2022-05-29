@@ -57,17 +57,21 @@ export function configureRustErrors({
   Prism.hooks.add('wrap', env => {
     if (env.type === 'error-explanation') {
       const errorMatch = /E\d+/.exec(env.content);
-      const [errorCode] = errorMatch;
-      env.tag = 'a';
-      env.attributes.href = `https://doc.rust-lang.org/${getChannel()}/error-index.html#${errorCode}`;
-      env.attributes.target = '_blank';
+      if (errorMatch) {
+        const [errorCode] = errorMatch;
+        env.tag = 'a';
+        env.attributes.href = `https://doc.rust-lang.org/${getChannel()}/error-index.html#${errorCode}`;
+        env.attributes.target = '_blank';
+      }
     }
     if (env.type === 'see-issue') {
       const errorMatch = /\d+/.exec(env.content);
-      const [errorCode] = errorMatch;
-      env.tag = 'a';
-      env.attributes.href = `https://github.com/rust-lang/rust/issues/${errorCode}`;
-      env.attributes.target = '_blank';
+      if (errorMatch) {
+        const [errorCode] = errorMatch;
+        env.tag = 'a';
+        env.attributes.href = `https://github.com/rust-lang/rust/issues/${errorCode}`;
+        env.attributes.target = '_blank';
+      }
     }
     if (env.type === 'error-location') {
       let line;
@@ -78,8 +82,10 @@ export function configureRustErrors({
         col = errorMatchFull[2];
       } else {
         const errorMatchShort = /:(\d+)/.exec(env.content);
-        line = errorMatchShort[1];
-        col = '1';
+        if (errorMatchShort) {
+          line = errorMatchShort[1];
+          col = '1';
+        }
       }
       env.tag = 'a';
       env.attributes.href = '#';
@@ -92,10 +98,13 @@ export function configureRustErrors({
       env.attributes['data-suggestion'] = env.content;
     }
     if (env.type === 'feature-gate') {
-      const [_, featureGate] = /feature\((.*?)\)/.exec(env.content);
-      env.tag = 'a';
-      env.attributes.href = '#';
-      env.attributes['data-feature-gate'] = featureGate;
+      const featureMatch = /feature\((.*?)\)/.exec(env.content);
+      if (featureMatch) {
+        const [_, featureGate] = featureMatch;
+        env.tag = 'a';
+        env.attributes.href = '#';
+        env.attributes['data-feature-gate'] = featureGate;
+      }
     }
     if (env.type === 'backtrace-enable') {
       env.tag = 'a';
@@ -104,70 +113,86 @@ export function configureRustErrors({
     }
     if (env.type === 'backtrace-location') {
       const errorMatch = /:(\d+)/.exec(env.content);
-      const [_, line] = errorMatch;
-      env.tag = 'a';
-      env.attributes.href = '#';
-      env.attributes['data-line'] = line;
-      env.attributes['data-col'] = '1';
+      if (errorMatch) {
+        const [_, line] = errorMatch;
+        env.tag = 'a';
+        env.attributes.href = '#';
+        env.attributes['data-line'] = line;
+        env.attributes['data-col'] = '1';
+      }
     }
     if (env.type === 'mir-source') {
       const lineMatch = /(\d+):(\d+): (\d+):(\d+)/.exec(env.content);
-      const [_, startLine, startCol, endLine, endCol] = lineMatch;
-      env.tag = 'a';
-      env.attributes.href = '#';
-      env.attributes['data-start-line'] = startLine;
-      env.attributes['data-start-col'] = startCol;
-      env.attributes['data-end-line'] = endLine;
-      env.attributes['data-end-col'] = endCol;
+      if (lineMatch) {
+        const [_, startLine, startCol, endLine, endCol] = lineMatch;
+        env.tag = 'a';
+        env.attributes.href = '#';
+        env.attributes['data-start-line'] = startLine;
+        env.attributes['data-start-col'] = startCol;
+        env.attributes['data-end-line'] = endLine;
+        env.attributes['data-end-col'] = endCol;
+      }
     }
   });
 
   Prism.hooks.add('after-highlight', env => {
     const links = env.element.querySelectorAll('.error-location, .backtrace-location');
-    Array.from(links).forEach((link: HTMLAnchorElement) => {
-      const { line, col } = link.dataset;
-      link.onclick = e => {
-        e.preventDefault();
-        gotoPosition(line, col);
-      };
+    Array.from(links).forEach(link => {
+      if (link instanceof HTMLAnchorElement) {
+        const { line, col } = link.dataset;
+        link.onclick = e => {
+          e.preventDefault();
+          gotoPosition(line, col);
+        };
+      }
     });
 
     const importSuggestions = env.element.querySelectorAll('.import-suggestion');
-    Array.from(importSuggestions).forEach((link: HTMLAnchorElement) => {
-      const { suggestion } = link.dataset;
-      link.onclick = (e) => {
-        e.preventDefault();
-        addImport(suggestion + '\n');
-      };
+    Array.from(importSuggestions).forEach(link => {
+      if (link instanceof HTMLAnchorElement) {
+        const { suggestion } = link.dataset;
+        link.onclick = (e) => {
+          e.preventDefault();
+          addImport(suggestion + '\n');
+        };
+      }
     });
 
     const featureGateEnablers = env.element.querySelectorAll('.feature-gate');
-    Array.from(featureGateEnablers).forEach((link: HTMLAnchorElement) => {
-      link.onclick = e => {
-        e.preventDefault();
-        enableFeatureGate(link.dataset.featureGate);
-        gotoPosition(1, 1);
-      };
+    Array.from(featureGateEnablers).forEach(link => {
+      if (link instanceof HTMLAnchorElement) {
+        link.onclick = e => {
+          e.preventDefault();
+          enableFeatureGate(link.dataset.featureGate);
+          gotoPosition(1, 1);
+        };
+      }
     });
 
     const backtraceEnablers = env.element.querySelectorAll('.backtrace-enable');
-    Array.from(backtraceEnablers).forEach((link: HTMLAnchorElement) => {
-      link.onclick = e => {
-        e.preventDefault();
-        reExecuteWithBacktrace();
-      };
+    Array.from(backtraceEnablers).forEach(link => {
+      if (link instanceof HTMLAnchorElement) {
+        link.onclick = e => {
+          e.preventDefault();
+          reExecuteWithBacktrace();
+        };
+      }
     });
 
     const mirSourceLinks = env.element.querySelectorAll('.mir-source');
-    Array.from(mirSourceLinks).forEach((link: HTMLAnchorElement) => {
-      const { startLine, startCol, endLine, endCol } = link.dataset;
-      const start = makePosition(startLine, startCol);
-      const end = makePosition(endLine, endCol);
+    Array.from(mirSourceLinks).forEach(link => {
+      if (link instanceof HTMLAnchorElement) {
+        const { startLine, startCol, endLine, endCol } = link.dataset;
+        if (startLine && startCol && endLine && endCol) {
+          const start = makePosition(startLine, startCol);
+          const end = makePosition(endLine, endCol);
 
-      link.onclick = e => {
-        e.preventDefault();
-        selectText(start, end);
-      };
+          link.onclick = e => {
+            e.preventDefault();
+            selectText(start, end);
+          };
+        }
+      }
     });
   });
 }
