@@ -10,7 +10,7 @@ interface SectionProps {
 }
 
 const Section: React.FC<SectionProps> = ({ kind, label, children }) => (
-  children && (
+  React.Children.count(children) === 0 ? null : (
     <div data-test-id={`output-${kind}`}>
       <Header label={label} />
       <pre><code className={styles.code}>{children}</code></pre>
