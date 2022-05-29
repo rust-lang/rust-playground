@@ -180,7 +180,7 @@ export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
   dispatch(performExecuteOnly());
 };
 
-export const changeFocus = (focus: Focus) =>
+export const changeFocus = (focus?: Focus) =>
   createAction(ActionType.ChangeFocus, { focus });
 
 const requestExecute = () =>

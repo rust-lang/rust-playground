@@ -51,7 +51,7 @@ const Output: React.FC = () => {
     useSelector((state: State) => state.output);
 
   const dispatch = useDispatch();
-  const focusClose = useCallback(() => dispatch(actions.changeFocus(null)), [dispatch]);
+  const focusClose = useCallback(() => dispatch(actions.changeFocus()), [dispatch]);
   const focusExecute = useCallback(() => dispatch(actions.changeFocus(Focus.Execute)), [dispatch]);
   const focusFormat = useCallback(() => dispatch(actions.changeFocus(Focus.Format)), [dispatch]);
   const focusClippy = useCallback(() => dispatch(actions.changeFocus(Focus.Clippy)), [dispatch]);
@@ -68,8 +68,8 @@ const Output: React.FC = () => {
     return null;
   }
 
-  let close = null;
-  let body = null;
+  let close: React.ReactElement | null = null;
+  let body: React.ReactElement | null = null;
   if (focus) {
     close = <button className={styles.tabClose} onClick={focusClose}>Close</button>;
 
