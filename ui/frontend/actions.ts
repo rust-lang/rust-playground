@@ -705,7 +705,7 @@ export function performVersionsLoad(): ThunkAction {
 const notificationSeen = (notification: Notification) =>
   createAction(ActionType.NotificationSeen, { notification });
 
-export const seenMonicoEditorAvailable = () => notificationSeen(Notification.MonacoEditorAvailable);
+export const seenMonacoEditorAvailable = () => notificationSeen(Notification.MonacoEditorAvailable);
 
 export const browserWidthChanged = (isSmall: boolean) =>
   createAction(ActionType.BrowserWidthChanged, { isSmall });

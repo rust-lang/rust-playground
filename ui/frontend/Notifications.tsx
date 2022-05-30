@@ -22,13 +22,13 @@ const Notifications: React.FC = () => {
 };
 
 const MonacoEditorAvailableNotification: React.FC = () => {
-  const monicoEditorAvailable = useSelector(selectors.showMonicoEditorAvailableSelector);
+  const monacoEditorAvailable = useSelector(selectors.showMonacoEditorAvailableSelector);
 
   const dispatch = useDispatch();
-  const seenMonicoEditorAvailable = useCallback(() => dispatch(actions.seenMonicoEditorAvailable()), [dispatch]);
+  const seenMonacoEditorAvailable = useCallback(() => dispatch(actions.seenMonacoEditorAvailable()), [dispatch]);
 
-  return monicoEditorAvailable ? (
-    <Notification onClose={seenMonicoEditorAvailable}>
+  return monacoEditorAvailable ? (
+    <Notification onClose={seenMonacoEditorAvailable}>
       The <a href={MONACO_EDITOR_URL}>Monaco Editor</a>, the code editor
       that powers VS Code, is now available in the playground. Choose
       your preferred editor from the Config menu.
