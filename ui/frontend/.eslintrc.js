@@ -22,6 +22,9 @@ module.exports = {
     'no-trailing-spaces': 'error',
     'quotes': ['error', 'single'],
 
+    '@typescript-eslint/ban-ts-comment': ['error', {
+      'ts-ignore': 'allow-with-description',
+    }],
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/indent': ['error', 2],
     '@typescript-eslint/no-explicit-any': 'off',
