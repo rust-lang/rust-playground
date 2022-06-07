@@ -123,4 +123,4 @@ export enum Notification {
   MonacoEditorAvailable = 'monaco-editor-available',
 }
 
-export type AceResizeKey = [Focus, number];
+export type AceResizeKey = [Focus | undefined, number];

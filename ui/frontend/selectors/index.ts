@@ -199,20 +199,22 @@ export const permalinkSelector = createSelector(
 const codeBlock = (code: string, language = '') =>
   '```' + language + `\n${code}\n` + '```';
 
-const maybeOutput = (code: string, whenPresent: (_: string) => void) => {
-  const val = (code || '').trim();
-  if (val.length !== 0) { whenPresent(code); }
+const maybeOutput = (code: string | undefined, whenPresent: (_: string) => void) => {
+  if (code && code.length !== 0) { whenPresent(code); }
 };
 
 const snippetSelector = createSelector(
   gistSelector, permalinkSelector,
   (gist, permalink) => {
-    let snippet =
-      source`
-        ${codeBlock(gist.code, 'rust')}
+    let snippet = '';
+
+    maybeOutput(gist.code, code => {
+      snippet += source`
+        ${codeBlock(code, 'rust')}
 
         ([Playground](${permalink}))
       `;
+    });
 
     maybeOutput(gist.stdout, stdout => {
       snippet += '\n\n';
