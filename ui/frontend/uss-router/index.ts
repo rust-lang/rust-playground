@@ -1,5 +1,19 @@
 import { isEqual } from 'lodash';
 import { createStore } from 'redux';
+import { BrowserHistory } from 'history';
+
+interface CreateRouterArg {
+  store: any;
+  reducer: any;
+  history: BrowserHistory;
+  stateSelector: any;
+  stateToLocation: any;
+  locationToAction: any;
+}
+
+export interface RouterObject {
+  provisionalLocation: any;
+}
 
 export function createRouter({
   store,
@@ -8,7 +22,7 @@ export function createRouter({
   stateSelector,
   stateToLocation,
   locationToAction,
-}) {
+}: CreateRouterArg): RouterObject {
   let doingUpdateFromBrowser = false; // Avoid immediately PUSHing the state again
   let interestingPrevState;
 
