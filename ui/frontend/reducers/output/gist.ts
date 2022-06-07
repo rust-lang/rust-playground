@@ -4,15 +4,6 @@ import { finish, RequestsInProgress, start } from './sharedStateManagement';
 
 const DEFAULT: State = {
   requestsInProgress: 0,
-  id: null,
-  url: null,
-  code: null,
-  stdout: null,
-  stderr: null,
-  channel: null,
-  mode: null,
-  edition: null,
-  error: null,
 };
 
 interface State extends RequestsInProgress {

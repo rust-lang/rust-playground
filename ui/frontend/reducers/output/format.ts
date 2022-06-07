@@ -3,9 +3,6 @@ import { finish, start } from './sharedStateManagement';
 
 const DEFAULT: State = {
   requestsInProgress: 0,
-  stdout: null,
-  stderr: null,
-  error: null,
 };
 
 interface State {

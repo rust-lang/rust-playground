@@ -2,7 +2,6 @@ import { Action, ActionType } from '../../actions';
 import { Focus } from '../../types';
 
 const DEFAULT: State = {
-  focus: null,
 };
 
 interface State {
@@ -44,7 +43,7 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.RequestFormat:
       return { ...state, focus: Focus.Format };
     case ActionType.FormatSucceeded:
-      return { ...state, focus: null };
+      return { ...state, focus: undefined };
 
     case ActionType.RequestGistLoad:
     case ActionType.RequestGistSave:
