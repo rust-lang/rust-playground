@@ -8,7 +8,7 @@ interface PaneWithMirProps extends SimplePaneProps {
   code?: string;
 }
 
-const PaneWithMir: React.SFC<PaneWithMirProps> = ({ code, ...rest }) => (
+const PaneWithMir: React.FC<PaneWithMirProps> = ({ code, ...rest }) => (
   <SimplePane {...rest}>
     <div data-test-id="output-result">
       <Header label="Result" />

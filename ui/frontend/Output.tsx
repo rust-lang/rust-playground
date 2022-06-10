@@ -14,7 +14,7 @@ import * as selectors from './selectors';
 
 import styles from './Output.module.css';
 
-const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
+const Tab: React.FC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
   if (selectors.hasProperties(tabProps)) {
     return (
       <button className={focus === kind ? styles.tabSelected : styles.tab}
@@ -35,7 +35,7 @@ interface TabProps {
   tabProps: object;
 }
 
-const PaneWithCode: React.SFC<PaneWithCodeProps> = ({ code, ...rest }) => (
+const PaneWithCode: React.FC<PaneWithCodeProps> = ({ code, ...rest }) => (
   <SimplePane {...rest}>
     <Section kind="code" label="Result">{code}</Section>
   </SimplePane>
@@ -45,13 +45,13 @@ interface PaneWithCodeProps extends SimplePaneProps {
   code?: string;
 }
 
-const Output: React.SFC = () => {
+const Output: React.FC = () => {
   const somethingToShow = useSelector(selectors.getSomethingToShow);
   const { meta: { focus }, execute, format, clippy, miri, macroExpansion, assembly, llvmIr, mir, hir, wasm, gist } =
     useSelector((state: State) => state.output);
 
   const dispatch = useDispatch();
-  const focusClose = useCallback(() => dispatch(actions.changeFocus(null)), [dispatch]);
+  const focusClose = useCallback(() => dispatch(actions.changeFocus()), [dispatch]);
   const focusExecute = useCallback(() => dispatch(actions.changeFocus(Focus.Execute)), [dispatch]);
   const focusFormat = useCallback(() => dispatch(actions.changeFocus(Focus.Format)), [dispatch]);
   const focusClippy = useCallback(() => dispatch(actions.changeFocus(Focus.Clippy)), [dispatch]);
@@ -68,8 +68,8 @@ const Output: React.SFC = () => {
     return null;
   }
 
-  let close = null;
-  let body = null;
+  let close: React.ReactElement | null = null;
+  let body: React.ReactElement | null = null;
   if (focus) {
     close = <button className={styles.tabClose} onClick={focusClose}>Close</button>;
 

@@ -10,7 +10,7 @@ import SimplePane from './SimplePane';
 
 import styles from './Execute.module.css';
 
-const Execute: React.SFC = () => {
+const Execute: React.FC = () => {
   const details = useSelector((state: State) => state.output.execute);
   const isAutoBuild = useSelector(selectors.isAutoBuildSelector);
 
@@ -29,7 +29,7 @@ interface WarningProps {
   addMainFunction: () => any;
 }
 
-const Warning: React.SFC<WarningProps> = props => (
+const Warning: React.FC<WarningProps> = props => (
   <Section kind="warning" label="Warnings">
     No main function was detected, so your code was compiled
     {'\n'}

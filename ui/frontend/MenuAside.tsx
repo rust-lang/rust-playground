@@ -2,7 +2,7 @@ import React from 'react';
 
 import styles from './MenuAside.module.css';
 
-const MenuAside: React.SFC = ({ children }) => (
+const MenuAside: React.FC = ({ children }) => (
   <p className={styles.aside}>
     {children}
   </p>

@@ -252,13 +252,13 @@ const NOW = new Date();
 
 const MONACO_EDITOR_AVAILABLE_END = new Date('2022-02-15T00:00:00Z');
 const MONACO_EDITOR_AVAILABLE_OPEN = NOW <= MONACO_EDITOR_AVAILABLE_END;
-export const showMonicoEditorAvailableSelector = createSelector(
+export const showMonacoEditorAvailableSelector = createSelector(
   notificationsSelector,
   notifications => MONACO_EDITOR_AVAILABLE_OPEN && !notifications.seenMonacoEditorAvailable,
 );
 
 export const anyNotificationsToShowSelector = createSelector(
-  showMonicoEditorAvailableSelector,
+  showMonacoEditorAvailableSelector,
   (...allNotifications) => allNotifications.some(n => n),
 );
 

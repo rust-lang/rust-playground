@@ -11,7 +11,7 @@ export interface LinkProps extends SlimAnchor {
   onClick?: () => void;
 }
 
-const Link: React.SFC<LinkProps> = (props) => {
+const Link: React.FC<LinkProps> = (props) => {
   const dispatch = useDispatch();
   const router = useContext(Context);
   const { action, onClick, children, ...anchorProps } = props;

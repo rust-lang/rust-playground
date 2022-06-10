@@ -2,12 +2,6 @@ import { Action, ActionType } from '../actions';
 import { Version } from '../types';
 
 const DEFAULT: State = {
-  stable: null,
-  beta: null,
-  nightly: null,
-  rustfmt: null,
-  clippy: null,
-  miri: null,
 };
 
 export interface State {

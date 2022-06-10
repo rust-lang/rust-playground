@@ -9,8 +9,8 @@ interface SectionProps {
   label: string;
 }
 
-const Section: React.SFC<SectionProps> = ({ kind, label, children }) => (
-  children && (
+const Section: React.FC<SectionProps> = ({ kind, label, children }) => (
+  React.Children.count(children) === 0 ? null : (
     <div data-test-id={`output-${kind}`}>
       <Header label={label} />
       <pre><code className={styles.code}>{children}</code></pre>

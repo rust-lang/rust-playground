@@ -11,7 +11,7 @@ interface HeaderButtonProps {
   isExpandable?: boolean;
 }
 
-const HeaderButton: React.SFC<HeaderButtonProps> = ({ bold, icon, rightIcon, isExpandable, children }) => {
+const HeaderButton: React.FC<HeaderButtonProps> = ({ bold, icon, rightIcon, isExpandable, children }) => {
   const c = [styles.container];
 
   if (bold) { c.push(styles.bold); }

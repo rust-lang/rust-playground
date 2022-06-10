@@ -10,7 +10,7 @@ import Loader from './Loader';
 
 import styles from './Gist.module.css';
 
-const Gist: React.SFC = () => {
+const Gist: React.FC = () => {
   const showLoader = useSelector(selectors.showGistLoaderSelector);
 
   return (
@@ -52,7 +52,7 @@ class Copied extends React.PureComponent<CopiedProps, CopiedState> {
   }
 }
 
-const Links: React.SFC = () => {
+const Links: React.FC = () => {
   const codeUrl = useSelector(selectors.codeUrlSelector);
   const gistUrl = useSelector((state: State) => state.output.gist.url);
   const permalink = useSelector(selectors.permalinkSelector);
@@ -61,7 +61,7 @@ const Links: React.SFC = () => {
   return (
     <Fragment>
       <Copied href={permalink}>Permalink to the playground</Copied>
-      <Copied href={gistUrl}>Direct link to the gist</Copied>
+      { gistUrl ? <Copied href={gistUrl}>Direct link to the gist</Copied> : null }
       <Copied href={codeUrl}>Embedded code in link</Copied>
       <NewWindow href={urloUrl}>Open a new thread in the Rust user forum</NewWindow>
     </Fragment>
@@ -72,7 +72,7 @@ interface NewWindowProps {
   href: string;
 }
 
-const NewWindow: React.SFC<NewWindowProps> = props => (
+const NewWindow: React.FC<NewWindowProps> = props => (
   <p>
     <a href={props.href} target="_blank" rel="noopener noreferrer">{props.children}</a>
   </p>

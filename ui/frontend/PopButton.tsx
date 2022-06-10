@@ -7,18 +7,18 @@ import styles from './PopButton.module.css';
 interface NewPopProps {
   Button: React.ComponentType<{
     toggle: () => void;
-  } & React.RefAttributes<HTMLElement>>;
+  } & React.RefAttributes<HTMLButtonElement>>;
   Menu: React.ComponentType<{ close: () => void }>;
 }
 
-const PopButton: React.SFC<NewPopProps> = ({ Button, Menu }) => {
+const PopButton: React.FC<NewPopProps> = ({ Button, Menu }) => {
   const [isOpen, setOpen] = useState(false);
   const toggle = useCallback(() => setOpen(v => !v), []);
   const close = useCallback(() => setOpen(false), []);
 
-  const [referenceElement, setReferenceElement] = useState(null);
-  const [popperElement, setPopperElement] = useState(null);
-  const [arrowElement, setArrowElement] = useState(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
+  const [arrowElement, setArrowElement] = useState<HTMLElement | null>(null);
 
   const { styles: popperStyles, attributes: popperAttributes } = usePopper(referenceElement, popperElement, {
     modifiers: [

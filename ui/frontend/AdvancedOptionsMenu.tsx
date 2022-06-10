@@ -8,7 +8,7 @@ import { State } from './reducers';
 import * as selectors from './selectors';
 import { Backtrace, Edition } from './types';
 
-const AdvancedOptionsMenu: React.SFC = () => {
+const AdvancedOptionsMenu: React.FC = () => {
   const isEditionDefault = useSelector(selectors.isEditionDefault);
   const edition = useSelector((state: State) => state.configuration.edition);
   const isBacktraceSet = useSelector(selectors.getBacktraceSet);

@@ -180,7 +180,7 @@ export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
   dispatch(performExecuteOnly());
 };
 
-export const changeFocus = (focus: Focus) =>
+export const changeFocus = (focus?: Focus) =>
   createAction(ActionType.ChangeFocus, { focus });
 
 const requestExecute = () =>
@@ -705,7 +705,7 @@ export function performVersionsLoad(): ThunkAction {
 const notificationSeen = (notification: Notification) =>
   createAction(ActionType.NotificationSeen, { notification });
 
-export const seenMonicoEditorAvailable = () => notificationSeen(Notification.MonacoEditorAvailable);
+export const seenMonacoEditorAvailable = () => notificationSeen(Notification.MonacoEditorAvailable);
 
 export const browserWidthChanged = (isSmall: boolean) =>
   createAction(ActionType.BrowserWidthChanged, { isSmall });

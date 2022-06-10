@@ -3,13 +3,14 @@ import { connect } from 'react-redux';
 import { aceResizeKey, offerCrateAutocompleteOnUse } from '../selectors';
 
 import State from '../state';
-import { AceResizeKey, CommonEditorProps, Crate, PairCharacters, Position, Selection } from '../types';
+import { AceResizeKey, Crate, PairCharacters, Position, Selection } from '../types';
 
 import styles from './Editor.module.css';
 
 type Ace = typeof import('ace-builds');
 type AceModule = import('ace-builds').Ace.Editor;
 type AceCompleter = import('ace-builds').Ace.Completer;
+type AceCompletion = import('ace-builds').Ace.Completion;
 
 const displayExternCrateAutocomplete = (editor: AceModule, autocompleteOnUse: boolean) => {
   const { session } = editor;
@@ -23,7 +24,7 @@ const displayExternCrateAutocomplete = (editor: AceModule, autocompleteOnUse: bo
 
 const buildCrateAutocompleter = (autocompleteOnUse: boolean, crates: Crate[]): AceCompleter => ({
   getCompletions: (editor, _session, _pos, _prefix, callback) => {
-    let suggestions = [];
+    let suggestions: AceCompletion[] = [];
 
     if (displayExternCrateAutocomplete(editor, autocompleteOnUse)) {
       const len = crates.length;
@@ -64,7 +65,7 @@ interface AceEditorProps {
   autocompleteOnUse: boolean;
   code: string;
   execute: () => any;
-  keybinding?: string;
+  keybinding: string;
   onEditCode: (_: string) => any;
   position: Position;
   selection: Selection;
@@ -75,7 +76,7 @@ interface AceEditorProps {
 }
 
 // Run an effect when the editor or prop changes
-function useEditorProp<T>(editor: AceModule, prop: T, whenPresent: (editor: AceModule, prop: T) => void) {
+function useEditorProp<T>(editor: AceModule | null, prop: T, whenPresent: (editor: AceModule, prop: T) => void) {
   useEffect(() => {
     if (editor) {
       return whenPresent(editor, prop);
@@ -83,8 +84,8 @@ function useEditorProp<T>(editor: AceModule, prop: T, whenPresent: (editor: AceM
   }, [editor, prop, whenPresent]);
 }
 
-const AceEditor: React.SFC<AceEditorProps> = props => {
-  const [editor, setEditor] = useState<AceModule>(null);
+const AceEditor: React.FC<AceEditorProps> = props => {
+  const [editor, setEditor] = useState<AceModule | null>(null);
   const child = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -184,7 +185,7 @@ const AceEditor: React.SFC<AceEditorProps> = props => {
   // 4. When all else fails, we ignore the prop if the value to set is
   //    what Ace already has.
   const doingSetProp = useRef(false);
-  const previouslyNotified = useRef([]);
+  const previouslyNotified = useRef<string[]>([]);
   const onEditCodeDebounced = useRafDebouncedFunction(
     props.onEditCode,
     useCallback(code => previouslyNotified.current.push(code), [previouslyNotified]),
@@ -234,8 +235,9 @@ const AceEditor: React.SFC<AceEditorProps> = props => {
   }), [props.keybinding, props.ace]);
 
   useEditorProp(editor, keybindingProps, useCallback((editor, { keybinding, ace }) => {
-    const handler = keybinding ? `ace/keyboard/${keybinding}` : null;
-    editor.setKeyboardHandler(handler);
+    const handler = keybinding === 'ace' ? null : `ace/keyboard/${keybinding}`;
+    // @ts-ignore https://github.com/ajaxorg/ace/issues/4801
+    editor.setOption('keyboardHandler', handler);
 
     if (keybinding === 'vim') {
       const { CodeMirror: { Vim } } = ace.require('ace/keyboard/vim');
@@ -319,7 +321,7 @@ interface AceEditorAsyncProps {
   autocompleteOnUse: boolean;
   code: string;
   execute: () => any;
-  keybinding?: string;
+  keybinding: string;
   onEditCode: (_: string) => any;
   position: Position;
   selection: Selection;
@@ -342,7 +344,11 @@ class AceEditorAsync extends React.Component<AceEditorAsyncProps, AceEditorAsync
   public render() {
     if (this.isLoaded()) {
       const { ace, theme, keybinding } = this.state;
-      return <AceEditor {...this.props} ace={ace} theme={theme} keybinding={keybinding} />;
+      if (ace && theme && keybinding) {
+        return <AceEditor {...this.props} ace={ace} theme={theme} keybinding={keybinding} />;
+      } else {
+        return <div>Internal error while loading the ACE editor</div>;
+      }
     } else {
       return <div>Loading the ACE editor...</div>;
     }
@@ -395,7 +401,7 @@ class AceEditorAsync extends React.Component<AceEditorAsyncProps, AceEditorAsync
   }
 
   private isKeybindingBuiltin() {
-    return this.props.keybinding === null;
+    return this.props.keybinding === 'ace';
   }
 
   private isKeybindingLoadNeeded() {
@@ -404,14 +410,14 @@ class AceEditorAsync extends React.Component<AceEditorAsyncProps, AceEditorAsync
   }
 
   private async loadKeybinding() {
-    if (!this.isKeybindingLoadNeeded()) { return; }
-
     const { keybinding } = this.props;
 
     if (this.isKeybindingBuiltin()) {
       this.setState({ keybinding, keybindingState: LoadState.Loaded });
       return;
     }
+
+    if (!this.isKeybindingLoadNeeded()) { return; }
 
     this.setState({ keybindingState: LoadState.Loading });
 
@@ -465,22 +471,22 @@ interface AceEditorAsyncState {
 
 interface PropsFromState {
   theme: string;
-  keybinding?: string;
+  keybinding: string;
   resizeKey?: AceResizeKey;
   autocompleteOnUse: boolean;
   pairCharacters: PairCharacters;
 }
 
-const mapStateToProps = (state: State) => {
+const mapStateToProps = (state: State): PropsFromState => {
   const { configuration: { ace: { theme, keybinding, pairCharacters } } } = state;
 
   return {
     theme,
     pairCharacters,
-    keybinding: keybinding === 'ace' ? null : keybinding,
+    keybinding,
     resizeKey: aceResizeKey(state),
     autocompleteOnUse: offerCrateAutocompleteOnUse(state),
   };
 };
 
-export default connect<PropsFromState, undefined, CommonEditorProps>(mapStateToProps)(AceEditorAsync);
+export default connect(mapStateToProps)(AceEditorAsync);

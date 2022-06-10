@@ -12,7 +12,7 @@ interface SelectableMenuItemProps extends Button {
   selected: boolean;
 }
 
-const SelectableMenuItem: React.SFC<SelectableMenuItemProps> = ({ name, selected, children, ...props }) => (
+const SelectableMenuItem: React.FC<SelectableMenuItemProps> = ({ name, selected, children, ...props }) => (
   <MenuItem>
     <button className={selected ? styles.selected : styles.container} {...props}>
       <div className={styles.header}>

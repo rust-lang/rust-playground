@@ -13,7 +13,7 @@ interface ToolsMenuProps {
   close: () => void;
 }
 
-const ToolsMenu: React.SFC<ToolsMenuProps> = props => {
+const ToolsMenu: React.FC<ToolsMenuProps> = props => {
   const rustfmtVersion = useSelector(selectors.rustfmtVersionText);
   const rustfmtVersionDetails = useSelector(selectors.rustfmtVersionDetailsText);
   const clippyVersionDetails = useSelector(selectors.clippyVersionDetailsText);

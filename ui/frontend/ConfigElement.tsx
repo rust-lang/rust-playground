@@ -14,7 +14,7 @@ interface EitherProps extends ConfigElementProps {
   onChange: (_: string) => any;
 }
 
-export const Either: React.SFC<EitherProps> =
+export const Either: React.FC<EitherProps> =
   ({ id, a, b, aLabel = a, bLabel = b, value, onChange, ...rest }) => (
     <ConfigElement {...rest}>
       <div className={styles.toggle}>
@@ -41,7 +41,7 @@ interface SelectProps extends ConfigElementProps {
   onChange: (_: string) => any;
 }
 
-export const Select: React.SFC<SelectProps> = ({ value, onChange, children, ...rest }) => (
+export const Select: React.FC<SelectProps> = ({ value, onChange, children, ...rest }) => (
   <ConfigElement {...rest}>
     <select className={styles.select} value={value} onChange={e => onChange(e.target.value)}>
       {children}
@@ -55,7 +55,7 @@ interface ConfigElementProps {
   aside?: JSX.Element,
 }
 
-const ConfigElement: React.SFC<ConfigElementProps> = ({ name, isNotDefault, aside, children }) => (
+const ConfigElement: React.FC<ConfigElementProps> = ({ name, isNotDefault, aside, children }) => (
   <MenuItem>
     <div className={styles.container}>
       <span className={isNotDefault ? styles.notDefault : styles.name}>{name}</span>

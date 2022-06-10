@@ -6,7 +6,7 @@ interface HeaderProps {
   label: string;
 }
 
-const Header: React.SFC<HeaderProps> = ({ label }) => (
+const Header: React.FC<HeaderProps> = ({ label }) => (
   <span className={styles.container}>{label}</span>
 );
 

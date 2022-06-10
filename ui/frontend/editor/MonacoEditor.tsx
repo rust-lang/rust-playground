@@ -4,7 +4,7 @@ import { CommonEditorProps } from '../types';
 
 const MonacoEditorLazy = React.lazy(() => import('./MonacoEditorCore'));
 
-const MonacoEditor: React.SFC<CommonEditorProps> = props => (
+const MonacoEditor: React.FC<CommonEditorProps> = props => (
   <Suspense fallback={'Loading'}>
     <MonacoEditorLazy {...props} />
   </Suspense>

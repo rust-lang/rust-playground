@@ -2,8 +2,6 @@ import { Action, ActionType } from '../actions';
 import { Selection } from '../types';
 
 const DEFAULT: Selection = {
-  start: null,
-  end: null,
 };
 
 export default function position(state = DEFAULT, action: Action) {

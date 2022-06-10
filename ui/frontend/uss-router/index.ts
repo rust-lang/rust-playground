@@ -38,9 +38,9 @@ export function createRouter({
   };
 
   // Watch changes to the browser state
-  history.listen((nextLocation, historyAction) => {
-    if (historyAction === 'POP') {
-      dispatchBrowserLocationChange(nextLocation);
+  history.listen(({ action, location }) => {
+    if (action === 'POP') {
+      dispatchBrowserLocationChange(location);
     }
   });
 
