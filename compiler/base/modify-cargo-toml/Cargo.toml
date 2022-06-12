@@ -3,6 +3,8 @@ name = "modify-cargo-toml"
 version = "0.1.0"
 authors = ["Jake Goulding <jake.goulding@gmail.com>"]
 
+[workspace]
+
 [dependencies]
 serde = "1.0.78"
 toml = "0.5.1"

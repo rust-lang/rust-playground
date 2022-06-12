@@ -56,7 +56,7 @@ version = "=1.0.0"
 
 [dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.53"
+version = "=0.1.56"
 
 [dependencies.atty]
 package = "atty"
@@ -243,11 +243,11 @@ version = "=0.4.1"
 
 [dependencies.flate2]
 package = "flate2"
-version = "=1.0.23"
+version = "=1.0.24"
 
 [dependencies.flume]
 package = "flume"
-version = "=0.10.12"
+version = "=0.10.13"
 
 [dependencies.fnv]
 package = "fnv"
@@ -364,7 +364,7 @@ version = "=0.25.2"
 
 [dependencies.http]
 package = "http"
-version = "=0.2.7"
+version = "=0.2.8"
 
 [dependencies.http_body]
 package = "http-body"
@@ -384,7 +384,7 @@ version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=0.14.18"
+version = "=0.14.19"
 features = ["full"]
 
 [dependencies.hyper_tls]
@@ -401,7 +401,7 @@ version = "=0.24.2"
 
 [dependencies.indexmap]
 package = "indexmap"
-version = "=1.8.1"
+version = "=1.8.2"
 
 [dependencies.inflate]
 package = "inflate"
@@ -509,7 +509,7 @@ version = "=0.3.16"
 
 [dependencies.miniz_oxide]
 package = "miniz_oxide"
-version = "=0.5.1"
+version = "=0.5.3"
 
 [dependencies.mio]
 package = "mio"
@@ -598,7 +598,7 @@ version = "=0.1.5"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.73"
+version = "=0.9.74"
 
 [dependencies.ordered_float]
 package = "ordered-float"
@@ -610,7 +610,7 @@ version = "=6.1.0"
 
 [dependencies.parking_lot]
 package = "parking_lot"
-version = "=0.12.0"
+version = "=0.12.1"
 
 [dependencies.parking_lot_core]
 package = "parking_lot_core"
@@ -630,7 +630,7 @@ version = "=2.1.3"
 
 [dependencies.petgraph]
 package = "petgraph"
-version = "=0.6.0"
+version = "=0.6.2"
 
 [dependencies.phf]
 package = "phf"
@@ -827,7 +827,7 @@ version = "=0.5.0"
 
 [dependencies.semver]
 package = "semver"
-version = "=1.0.9"
+version = "=1.0.10"
 
 [dependencies.semver_parser]
 package = "semver-parser"
@@ -918,7 +918,7 @@ version = "=2.4.1"
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.95"
+version = "=1.0.96"
 features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 
 [dependencies.tar]
@@ -984,7 +984,7 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.18.2"
+version = "=1.19.2"
 features = ["full", "test-util"]
 
 [dependencies.tokio_native_tls]
@@ -997,7 +997,7 @@ version = "=0.7.6"
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.2"
+version = "=0.7.3"
 
 [dependencies.toml]
 package = "toml"
@@ -1009,15 +1009,11 @@ version = "=0.3.1"
 
 [dependencies.tracing]
 package = "tracing"
-version = "=0.1.34"
-
-[dependencies.tracing_attributes]
-package = "tracing-attributes"
-version = "=0.1.21"
+version = "=0.1.35"
 
 [dependencies.tracing_core]
 package = "tracing-core"
-version = "=0.1.26"
+version = "=0.1.27"
 
 [dependencies.traitobject]
 package = "traitobject"
