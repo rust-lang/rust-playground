@@ -56,7 +56,7 @@
   },
   {
     "name": "async-trait",
-    "version": "0.1.53",
+    "version": "0.1.56",
     "id": "async_trait"
   },
   {
@@ -281,12 +281,12 @@
   },
   {
     "name": "flate2",
-    "version": "1.0.23",
+    "version": "1.0.24",
     "id": "flate2"
   },
   {
     "name": "flume",
-    "version": "0.10.12",
+    "version": "0.10.13",
     "id": "flume"
   },
   {
@@ -431,7 +431,7 @@
   },
   {
     "name": "http",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "id": "http"
   },
   {
@@ -456,7 +456,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.14.18",
+    "version": "0.14.19",
     "id": "hyper"
   },
   {
@@ -476,7 +476,7 @@
   },
   {
     "name": "indexmap",
-    "version": "1.8.1",
+    "version": "1.8.2",
     "id": "indexmap"
   },
   {
@@ -611,7 +611,7 @@
   },
   {
     "name": "miniz_oxide",
-    "version": "0.5.1",
+    "version": "0.5.3",
     "id": "miniz_oxide"
   },
   {
@@ -726,7 +726,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.73",
+    "version": "0.9.74",
     "id": "openssl_sys"
   },
   {
@@ -741,7 +741,7 @@
   },
   {
     "name": "parking_lot",
-    "version": "0.12.0",
+    "version": "0.12.1",
     "id": "parking_lot"
   },
   {
@@ -766,7 +766,7 @@
   },
   {
     "name": "petgraph",
-    "version": "0.6.0",
+    "version": "0.6.2",
     "id": "petgraph"
   },
   {
@@ -1006,7 +1006,7 @@
   },
   {
     "name": "semver",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "id": "semver"
   },
   {
@@ -1116,7 +1116,7 @@
   },
   {
     "name": "syn",
-    "version": "1.0.95",
+    "version": "1.0.96",
     "id": "syn"
   },
   {
@@ -1196,7 +1196,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.18.2",
+    "version": "1.19.2",
     "id": "tokio"
   },
   {
@@ -1211,7 +1211,7 @@
   },
   {
     "name": "tokio-util",
-    "version": "0.7.2",
+    "version": "0.7.3",
     "id": "tokio_util"
   },
   {
@@ -1226,17 +1226,12 @@
   },
   {
     "name": "tracing",
-    "version": "0.1.34",
+    "version": "0.1.35",
     "id": "tracing"
   },
   {
-    "name": "tracing-attributes",
-    "version": "0.1.21",
-    "id": "tracing_attributes"
-  },
-  {
     "name": "tracing-core",
-    "version": "0.1.26",
+    "version": "0.1.27",
     "id": "tracing_core"
   },
   {
