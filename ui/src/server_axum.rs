@@ -4,7 +4,7 @@ use crate::{
         track_metric_async, track_metric_force_endpoint_async, track_metric_no_request_async,
         Endpoint, GenerateLabels, SuccessDetails,
     },
-    sandbox::{self, fut::Sandbox, Channel},
+    sandbox::{self, Channel, Sandbox},
     CachingSnafu, ClippyRequest, ClippyResponse, CompilationSnafu, CompileRequest, CompileResponse,
     Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluationSnafu, ExecuteRequest,
     ExecuteResponse, ExecutionSnafu, ExpansionSnafu, FormatRequest, FormatResponse,
