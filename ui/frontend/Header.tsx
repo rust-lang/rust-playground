@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import AdvancedOptionsMenu from './AdvancedOptionsMenu';
@@ -17,6 +17,9 @@ import * as selectors from './selectors';
 import { useAppDispatch } from './configureStore';
 
 import styles from './Header.module.css';
+import { enableIntellisense, getIntellisenseConfig } from './intellisense/config';
+import { State } from './reducers';
+import { Editor } from './types';
 
 const Header: React.FC = () => (
   <div data-test-id="header" className={styles.container}>
@@ -31,6 +34,11 @@ const Header: React.FC = () => (
         <ModeMenuButton />
         <ChannelMenuButton />
         <AdvancedOptionsMenuButton />
+      </SegmentedButtonSet>
+    </HeaderSet>
+    <HeaderSet id="intellisense">
+      <SegmentedButtonSet>
+        <IntellisenseButton />
       </SegmentedButtonSet>
     </HeaderSet>
     <HeaderSet id="share">
@@ -129,7 +137,31 @@ const AdvancedOptionsMenuButton: React.FC = () => {
   return <PopButton Button={Button} Menu={AdvancedOptionsMenu} />;
 }
 
-const ShareButton: React.FC = () => {
+const IntellisenseButton: React.FC = () => {
+  const [dismissed, setDismiss] = useState(false);
+  const dispatch = useAppDispatch();
+  const editorStyle = useSelector((state: State) => state.configuration.editor);
+  if (dismissed || !getIntellisenseConfig().suggest) {
+    return <></>;
+  }
+  const enable = () => {
+    if (editorStyle != Editor.Monaco) {
+      dispatch(actions.changeEditor(Editor.Monaco));
+    }
+    enableIntellisense();
+  };
+  const dismiss: React.MouseEventHandler = (e) => {
+    e.stopPropagation();
+    setDismiss(true);
+  };
+  return (
+    <SegmentedButton title="Download web version of rust-analyzer to provide intellisense features" onClick={enable}>
+      <HeaderButton>Enable Rust-analyzer<button onClick={dismiss}>Dismiss</button></HeaderButton>
+    </SegmentedButton>
+  );
+};
+
+const ShareButton: React.SFC = () => {
   const dispatch = useAppDispatch();
   const gistSave = useCallback(() => dispatch(actions.performGistSave()), [dispatch]);
 

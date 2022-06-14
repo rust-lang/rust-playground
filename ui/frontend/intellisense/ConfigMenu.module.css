@@ -1,0 +1,23 @@
+.root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: gray;
+    opacity: .7;
+    z-index: 5000;
+}
+
+.main {
+    position: fixed;
+    top: 10vh;
+    left: 10vw;
+    height: 80vh;
+    width: 80vw;
+    background-color: black;
+    color: white;
+    border-radius: 2rem;
+    padding: 2rem;
+    z-index: 5001;
+}

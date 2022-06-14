@@ -3,7 +3,7 @@
 import React, { Fragment, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Either as EitherConfig, Select as SelectConfig } from './ConfigElement';
+import { Either as EitherConfig, Select as SelectConfig, Button as ButtonConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
 
 import * as actions from './actions';
@@ -16,6 +16,8 @@ import {
   PairCharacters,
   ProcessAssembly,
 } from './types';
+import { isEnable, enableIntellisense } from './intellisense/config';
+import { configDialog } from './intellisense/ConfigMenu';
 
 interface ConfigMenuProps {
   close: () => void;
@@ -94,6 +96,15 @@ const ConfigMenu: React.FC<ConfigMenuProps> = () => {
             >
               {MONACO_THEMES.map(t => <option key={t} value={t}>{t}</option>)}
             </SelectConfig>
+            {isEnable()
+              ? <ButtonConfig id="intellisense"
+                name="Intellisense"
+                label="Config"
+                onClick={configDialog} />
+              : <ButtonConfig id="intellisense"
+                name="Intellisense"
+                label="Enable"
+                onClick={enableIntellisense} />}
           </Fragment>
         )}
       </MenuGroup>

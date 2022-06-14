@@ -6,6 +6,7 @@ import State from '../state';
 import { config, grammar, themeVsDarkPlus } from './rust_monaco_def';
 
 import styles from './Editor.module.css';
+import { enableOnMonaco } from '../intellisense';
 
 const MODE_ID = 'rust';
 
@@ -26,6 +27,7 @@ const initEditor = (execute: () => any): EditorDidMount => (editor, monaco) => {
   editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
     execute();
   });
+  enableOnMonaco(editor, monaco);
   // Ace's Vim mode runs code with :w, so let's do the same
   editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
     execute();
