@@ -1,7 +1,7 @@
 #![deny(rust_2018_idioms)]
 
 use serde::{Deserialize, Serialize};
-use snafu::Snafu;
+use snafu::prelude::*;
 use std::{
     convert::TryFrom,
     env,
@@ -32,7 +32,7 @@ fn main() {
 struct Config {
     address: String,
     cors_enabled: bool,
-    gh_token: String,
+    gh_token: Option<String>,
     metrics_token: Option<String>,
     port: u16,
     root: PathBuf,
@@ -51,8 +51,7 @@ impl Config {
             .and_then(|p| p.parse().ok())
             .unwrap_or(DEFAULT_PORT);
 
-        let gh_token =
-            env::var("PLAYGROUND_GITHUB_TOKEN").expect("Must specify PLAYGROUND_GITHUB_TOKEN");
+        let gh_token = env::var("PLAYGROUND_GITHUB_TOKEN").ok();
         let metrics_token = env::var("PLAYGROUND_METRICS_TOKEN").ok();
 
         let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
@@ -94,11 +93,18 @@ impl Config {
 }
 
 #[derive(Debug, Clone)]
-struct GhToken(Arc<String>);
+struct GhToken(Option<Arc<String>>);
 
 impl GhToken {
-    fn new(token: impl Into<String>) -> Self {
-        GhToken(Arc::new(token.into()))
+    fn new(token: &Option<String>) -> Self {
+        GhToken(token.clone().map(Arc::new))
+    }
+
+    fn must_get(&self) -> Result<String> {
+        self.0
+            .as_ref()
+            .map(|s| String::clone(s))
+            .context(NoGithubTokenSnafu)
     }
 }
 
@@ -135,6 +141,8 @@ pub enum Error {
     GistCreation { source: octocrab::Error },
     #[snafu(display("Gist loading failed: {}", source))]
     GistLoading { source: octocrab::Error },
+    #[snafu(display("PLAYGROUND_GITHUB_TOKEN not set up for reading/writing gists"))]
+    NoGithubToken,
     #[snafu(display("Unable to serialize response: {}", source))]
     Serialization { source: serde_json::Error },
     #[snafu(display("The value {:?} is not a valid target", value))]
