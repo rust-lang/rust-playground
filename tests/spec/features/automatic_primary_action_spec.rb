@@ -32,6 +32,33 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     end
   end
 
+  scenario "when the crate is a procedural macro" do
+    editor.set <<~EOF
+      #![crate_type = "proc-macro"]
+
+      use proc_macro::TokenStream;
+
+      /// Example:
+      /// ```
+      /// playground::demo!();
+      /// type T = aaa;
+      /// ```
+      #[proc_macro]
+      pub fn demo(_input: TokenStream) -> TokenStream {
+          eprintln!("wow wow");
+          "struct Aaa;".parse().unwrap()
+      }
+
+      /*
+      #[test]*/
+    EOF
+    click_on("Test")
+
+    within(:output, :stdout) do
+      expect(page).to have_content 'a struct with a similar name exists: `Aaa`'
+    end
+  end
+
   scenario "when the crate is a library with tests" do
     editor.set <<~EOF
       #![crate_type="lib"]

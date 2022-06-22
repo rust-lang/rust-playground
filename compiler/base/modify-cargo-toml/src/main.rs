@@ -114,14 +114,20 @@ fn set_crate_type(cargo_toml: Value, crate_type: &str) -> Value {
     #[derive(Debug, Default, Serialize, Deserialize)]
     #[serde(rename_all = "kebab-case")]
     struct Lib {
-        #[serde(default)]
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
         crate_type: Vec<String>,
+        #[serde(default)]
+        proc_macro: bool,
         #[serde(flatten)]
         other: Other,
     }
 
     modify(cargo_toml, |mut cargo_toml: CargoToml| {
-        ensure_string_in_vec(&mut cargo_toml.lib.crate_type, crate_type);
+        if crate_type == "proc-macro" {
+            cargo_toml.lib.proc_macro = true;
+        } else {
+            ensure_string_in_vec(&mut cargo_toml.lib.crate_type, crate_type);
+        }
         cargo_toml
     })
 }
