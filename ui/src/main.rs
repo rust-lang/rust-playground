@@ -23,7 +23,10 @@ fn main() {
     // Dotenv may be unable to load environment variables, but that's ok in production
     let _ = dotenv::dotenv();
     openssl_probe::init_ssl_cert_env_vars();
-    env_logger::init();
+
+    // Enable warn-level logging by default. env_logger's default is error only.
+    let env_logger_config = env_logger::Env::default().default_filter_or("warn");
+    env_logger::Builder::from_env(env_logger_config).init();
 
     let config = Config::from_env();
     server_axum::serve(config);
@@ -51,7 +54,12 @@ impl Config {
             .and_then(|p| p.parse().ok())
             .unwrap_or(DEFAULT_PORT);
 
-        let gh_token = env::var("PLAYGROUND_GITHUB_TOKEN").ok();
+        const PLAYGROUND_GITHUB_TOKEN: &str = "PLAYGROUND_GITHUB_TOKEN";
+        let gh_token = env::var(PLAYGROUND_GITHUB_TOKEN).ok();
+        if gh_token.is_none() {
+            log::warn!("Environment variable {} is not set, so reading and writing GitHub gists will not work", PLAYGROUND_GITHUB_TOKEN);
+        }
+
         let metrics_token = env::var("PLAYGROUND_METRICS_TOKEN").ok();
 
         let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
