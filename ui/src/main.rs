@@ -1,10 +1,10 @@
 #![deny(rust_2018_idioms)]
 
+use crate::env::PLAYGROUND_GITHUB_TOKEN;
 use serde::{Deserialize, Serialize};
 use snafu::prelude::*;
 use std::{
     convert::TryFrom,
-    env,
     net::SocketAddr,
     path::{Path, PathBuf},
     sync::Arc,
@@ -14,6 +14,7 @@ const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
 
 mod asm_cleanup;
+mod env;
 mod gist;
 mod metrics;
 mod sandbox;
@@ -54,7 +55,6 @@ impl Config {
             .and_then(|p| p.parse().ok())
             .unwrap_or(DEFAULT_PORT);
 
-        const PLAYGROUND_GITHUB_TOKEN: &str = "PLAYGROUND_GITHUB_TOKEN";
         let gh_token = env::var(PLAYGROUND_GITHUB_TOKEN).ok();
         if gh_token.is_none() {
             log::warn!("Environment variable {} is not set, so reading and writing GitHub gists will not work", PLAYGROUND_GITHUB_TOKEN);
@@ -149,7 +149,7 @@ pub enum Error {
     GistCreation { source: octocrab::Error },
     #[snafu(display("Gist loading failed: {}", source))]
     GistLoading { source: octocrab::Error },
-    #[snafu(display("PLAYGROUND_GITHUB_TOKEN not set up for reading/writing gists"))]
+    #[snafu(display("{PLAYGROUND_GITHUB_TOKEN} not set up for reading/writing gists"))]
     NoGithubToken,
     #[snafu(display("Unable to serialize response: {}", source))]
     Serialization { source: serde_json::Error },
