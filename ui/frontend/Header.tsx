@@ -32,6 +32,11 @@ const Header: React.SFC = () => (
         <AdvancedOptionsMenuButton />
       </SegmentedButtonSet>
     </HeaderSet>
+    <HeaderSet id="code">
+      <SegmentedButtonSet>
+        <GithubButton />
+      </SegmentedButtonSet>
+    </HeaderSet>
     <HeaderSet id="share">
       <SegmentedButtonSet>
         <ShareButton />
@@ -127,6 +132,18 @@ const AdvancedOptionsMenuButton: React.SFC = () => {
 
   return <PopButton Button={Button} Menu={AdvancedOptionsMenu} />;
 }
+
+const GithubButton: React.SFC = () => {
+  const onClick = () => {
+    window.open("https://github.com/Sunscreen-tech/Sunscreen");
+  };
+
+  return (
+    <SegmentedButton title="Visit the Sunscreen repository on Github" onClick={onClick}>
+      <HeaderButton>Sunscreen repo</HeaderButton>
+    </SegmentedButton>
+  );
+};
 
 const ShareButton: React.SFC = () => {
   const dispatch = useDispatch();
