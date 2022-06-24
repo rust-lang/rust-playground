@@ -265,6 +265,7 @@ fn assert_env_set(var: &str) {
  */
 fn install_ssh_key(ip_name: &str) -> Result<PathBuf> {
     let private_key = std::env::var("EC2_SECRET_KEY").unwrap();
+    let private_key = base64::decode(&private_key)?;
 
     info!("Dumping ssh key to file...");
 
@@ -274,7 +275,7 @@ fn install_ssh_key(ip_name: &str) -> Result<PathBuf> {
 
     permissions.set_mode(0o600);
     file.set_permissions(permissions)?;
-    file.write_all(private_key.as_bytes())?;
+    file.write_all(&private_key)?;
 
     let result = Command::new("ssh-keygen")
         .arg("-l")
