@@ -292,8 +292,6 @@ fn install_ssh_key(ip_name: &str) -> Result<PathBuf> {
     } else {
         info!("---stdout---\n{}", String::from_utf8_lossy(&result.stdout));
     }
-    
-    String::from_utf8_lossy(&result.stdout));
 
     info!("Fetching cert fingerprint...");
 
