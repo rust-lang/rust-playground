@@ -12,6 +12,9 @@ groupadd docker
 usermod -aG docker ubuntu
 systemctl enable docker
 
+wget http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1l-1ubuntu1_amd64.deb
+sudo dpkg -i libssl1.1_1.1.1l-1ubuntu1_amd64.deb
+
 echo "[Unit]" > /etc/systemd/system/playground.service
 echo "Description=The Rust Playground" >> /etc/systemd/system/playground.service
 echo "" >> /etc/systemd/system/playground.service
