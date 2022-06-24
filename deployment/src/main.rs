@@ -17,7 +17,7 @@ async fn get_image(ec2_client: &aws_sdk_ec2::Client) -> Result<Image, Error> {
 
     let image_filter = Filter::builder()
         .name("name")
-        .values("ubuntu/images/hvm-ssd/ubuntu-*-amd64*")
+        .values("ubuntu/images/hvm-ssd/ubuntu-*22.04*-amd64*")
         .build();
 
     let images = ec2_client
