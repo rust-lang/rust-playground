@@ -10,7 +10,6 @@ import { BuildIcon, ConfigIcon, HelpIcon, MoreOptionsActiveIcon, MoreOptionsIcon
 import ModeMenu from './ModeMenu';
 import PopButton from './PopButton';
 import { SegmentedButton, SegmentedButtonSet, SegmentedLink } from './SegmentedButton';
-import ToolsMenu from './ToolsMenu';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
@@ -40,11 +39,6 @@ const Header: React.SFC = () => (
     <HeaderSet id="share">
       <SegmentedButtonSet>
         <ShareButton />
-      </SegmentedButtonSet>
-    </HeaderSet>
-    <HeaderSet id="tools">
-      <SegmentedButtonSet>
-        <ToolsMenuButton />
       </SegmentedButtonSet>
     </HeaderSet>
     <HeaderSet id="config">
@@ -154,18 +148,6 @@ const ShareButton: React.SFC = () => {
       <HeaderButton>Share</HeaderButton>
     </SegmentedButton>
   );
-};
-
-
-const ToolsMenuButton: React.SFC = () => {
-  const Button = React.forwardRef<HTMLButtonElement, { toggle: () => void }>(({ toggle }, ref) => (
-    <SegmentedButton title="Run extra tools on the source code" ref={ref} onClick={toggle}>
-      <HeaderButton isExpandable>Tools</HeaderButton>
-    </SegmentedButton>
-  ));
-  Button.displayName = 'ToolsMenuButton.Button';
-
-  return <PopButton Button={Button} Menu={ToolsMenu} />;
 };
 
 const ConfigMenuButton: React.SFC = () => {
