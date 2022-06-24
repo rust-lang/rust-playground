@@ -276,6 +276,14 @@ fn install_ssh_key(ip_name: &str) -> Result<PathBuf> {
     file.set_permissions(permissions)?;
     file.write_all(private_key.as_bytes())?;
 
+    let result = Command::new("ssh-keygen")
+        .arg("-l")
+        .arg("-f")
+        .arg("identity.pem")
+        .output();
+
+    info!(format!("Key fingerprint {}", String::from_utf8_lossy(result.stdout)));
+
     info!("Fetching cert fingerprint...");
 
     let result = Command::new("ssh-keyscan")
