@@ -282,7 +282,7 @@ fn install_ssh_key(ip_name: &str) -> Result<PathBuf> {
         .arg("identity.pem")
         .output();
 
-    info!(format!("Key fingerprint {}", String::from_utf8_lossy(result.stdout)));
+    info!("Key fingerprint {}", String::from_utf8_lossy(result.stdout));
 
     info!("Fetching cert fingerprint...");
 
