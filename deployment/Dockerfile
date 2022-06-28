@@ -1,13 +1,10 @@
-FROM docker:dind
+FROM cruizba/ubuntu-dind
 
-EXPOSE 8080
+EXPOSE 8080/tcp
 
-COPY ./assets/playground.service /etc/systemd/system/playground.service
+ARG docker_repo
 
-COPY ../target/release/ui .
-COPY ../ui/frontend/build .
-COPY ../compiler/fetch.sh .
+COPY ./deployment/assets/playground.service /etc/systemd/system/playground.service
+COPY ./target/release/ui .
+COPY ./ui/frontend/build .
 
-RUN ./fetch.sh
-
-RUN systemctl start playground
