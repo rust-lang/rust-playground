@@ -1,7 +1,7 @@
 use serde_derive::Deserialize;
 use snafu::{ResultExt, Snafu};
 use std::{ffi::OsStr, fmt, io, os::unix::fs::PermissionsExt, string, time::Duration};
-use tokio::{process::Command};
+use tokio::process::Command;
 
 const DOCKER_PROCESS_TIMEOUT_SOFT: Duration = Duration::from_secs(10);
 const DOCKER_PROCESS_TIMEOUT_HARD: Duration = Duration::from_secs(12);
@@ -217,7 +217,6 @@ fn set_execution_environment(
 }
 
 pub mod fut {
-    use cached::{Cached, stores::SizedCache};
     use snafu::prelude::*;
     use std::{
         collections::BTreeMap,
@@ -226,7 +225,7 @@ pub mod fut {
         path::{Path, PathBuf},
     };
     use tempfile::TempDir;
-    use tokio::{sync::Mutex, fs, process::Command, time};
+    use tokio::{fs, process::Command, time};
 
     use super::{
         basic_secure_docker_command, build_execution_command, set_execution_environment,
@@ -250,7 +249,6 @@ pub mod fut {
         scratch: TempDir,
         input_file: PathBuf,
         output_dir: PathBuf,
-        execution_cache: Mutex<SizedCache<ExecuteRequest, ExecuteResponse>>,
     }
 
     impl Sandbox {
@@ -273,13 +271,10 @@ pub mod fut {
                 .await
                 .context(UnableToSetOutputPermissionsSnafu)?;
 
-            let execution_cache = Mutex::new(SizedCache::with_size(1_000));
-
             Ok(Sandbox {
                 scratch,
                 input_file,
                 output_dir,
-                execution_cache
             })
         }
 
@@ -355,31 +350,16 @@ pub mod fut {
         }
 
         pub async fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
-            let mut cache = self.execution_cache.lock().await;
-            let cached = cache.cache_get(req);
+            self.write_source_code(&req.code).await?;
+            let command = self.execute_command(req.channel, req.mode, req.tests, req);
 
-            match cached {
-                Some(v) => {
-                    Ok(v.clone())
-                },
-                None => {
-                    self.write_source_code(&req.code).await?;
-                    let command = self.execute_command(req.channel, req.mode, req.tests, req);
+            let output = run_command_with_timeout(command).await?;
 
-                    let output = run_command_with_timeout(command).await?;
-
-                    let response = ExecuteResponse {
-                        success: output.status.success(),
-                        stdout: vec_to_str(output.stdout)?,
-                        stderr: vec_to_str(output.stderr)?,
-                    };
-
-                    let mut cache = self.execution_cache.lock().await;
-                    cache.cache_set(req.clone(), response.clone());
-
-                    Ok(response)
-                }
-            }
+            Ok(ExecuteResponse {
+                success: output.status.success(),
+                stdout: vec_to_str(output.stdout)?,
+                stderr: vec_to_str(output.stderr)?,
+            })
         }
 
         pub async fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
@@ -790,7 +770,7 @@ impl fmt::Display for CompileTarget {
     }
 }
 
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, strum::IntoStaticStr)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Channel {
     Stable,
     Beta,
@@ -809,13 +789,13 @@ impl Channel {
     }
 }
 
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, strum::IntoStaticStr)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Mode {
     Debug,
     Release,
 }
 
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, strum::IntoStaticStr)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Edition {
     Rust2015,
     Rust2018,
@@ -834,7 +814,7 @@ impl Edition {
     }
 }
 
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, strum::IntoStaticStr)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum CrateType {
     Binary,
     Library(LibraryType),
@@ -851,7 +831,7 @@ impl CrateType {
     }
 }
 
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, strum::IntoStaticStr)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum LibraryType {
     Lib,
     Dylib,
@@ -976,7 +956,7 @@ pub struct CompileResponse {
     pub stderr: String,
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct ExecuteRequest {
     pub channel: Channel,
     pub mode: Mode,
