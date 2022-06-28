@@ -26,7 +26,7 @@ for channel in $channels_to_build; do
 
     docker tag "${full_name}" "${image_name}"
 
-    docker image save -o ${full_name} ${image_name}
+    docker image save -o ${image_name}.docker ${image_name}
 
     cd ..
 done
