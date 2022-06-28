@@ -19,23 +19,6 @@ for channel in $channels_to_build; do
     docker pull "${full_name}:munge" || true
     docker pull "${full_name}:sources" || true
 
-    # Prevent building the tool multiple times
-    # https://github.com/moby/moby/issues/34715
-    docker build -t "${full_name}:munge" \
-        --target munge \
-        --cache-from "${full_name}" \
-        --cache-from "${full_name}:munge" \
-        --build-arg channel="${channel}" \
-        .
-
-    docker build -t "${full_name}:sources" \
-        --target sources \
-        --cache-from "${full_name}" \
-        --cache-from "${full_name}:munge" \
-        --cache-from "${full_name}:sources" \
-        --build-arg channel="${channel}" \
-        .
-
     docker build -t "${full_name}" \
         --cache-from "${full_name}" \
         --cache-from "${full_name}:munge" \
@@ -45,9 +28,7 @@ for channel in $channels_to_build; do
 
     docker tag "${full_name}" "${image_name}"
 
-    docker push ${full_name}:munge
-    docker push ${full_name}:sources
-    docker push ${full_name}
+    docker image save -o ${full_name} ${image_name}
 
     cd ..
 done
@@ -68,6 +49,6 @@ for tool in $tools_to_build; do
 
     docker tag "${full_name}" "${image_name}"
 
-    docker push ${full_name}
+    docker image save -o ${full_name} ${image_name}
     cd ..
 done

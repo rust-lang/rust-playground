@@ -1,0 +1,9 @@
+{
+    "AWSEBDockerrunVersion": "2",
+    "containerDefinitions": [{
+        "name": "playground",
+        "image": "sunscreendeployment/playground",
+        "memory": 2048,
+        "privileged": true
+    }]
+}
