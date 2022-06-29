@@ -5,12 +5,24 @@ if [-z ${DOCKER_USER}]
 then
     echo "DOCKER_USER not specified"
     exit 1
+else
+    echo "Docker user: " $DOCKER_USER
 fi
 
 if [ -z ${DOCKER_PASSWORD} ]
 then
     echo "No DOCKER_PASSWORD specified for ${DOCKER_USER}"
     exit 1
+else
+    echo "Docker password: ****"
+fi
+
+if [ -z ${DEPLOYMENT_ID} ];
+then
+    echo "DEPLOYMENT_ID not set"
+    exit 1
+else
+    echo "Deployment ID: " $DEPLOYMENT_ID
 fi
 
 # Login to docker
@@ -20,15 +32,8 @@ repository=${DOCKER_REGISTRY}
 
 channels_to_build="${CHANNELS_TO_BUILD-stable beta nightly}"
 tools_to_build="${TOOLS_TO_BUILD-rustfmt clippy miri}"
-deployment_id = "${DEPLOYMENT_ID}"
 
-if [ -z ${deployment_id} ];
-then
-    echo "DEPLOYMENT_ID not set"
-    exit 1
-else
-    echo "Deployment ID: " $deployment_id
-fi
+deployment_id="${DEPLOYMENT_ID}"
 
 for channel in $channels_to_build; do
     cd "base"
