@@ -13,6 +13,7 @@ use cargo::{
     util::{Config, VersionExt},
 };
 use itertools::Itertools;
+use semver::Version;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet, HashSet},
@@ -38,7 +39,7 @@ struct Crate {
 #[derive(Debug, Serialize)]
 pub struct CrateInformation {
     pub name: String,
-    pub version: String,
+    pub version: Version,
     pub id: String,
 }
 
@@ -57,18 +58,25 @@ pub struct DependencySpec {
     #[serde(skip_serializing_if = "String::is_empty")]
     pub package: String,
     #[serde(serialize_with = "exact_version")]
-    pub version: String,
+    pub version: Version,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub features: Vec<String>,
     #[serde(skip_serializing_if = "is_true")]
     pub default_features: bool,
 }
 
-fn exact_version<S>(version: &String, serializer: S) -> Result<S::Ok, S::Error>
+fn exact_version<S>(version: &Version, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,
 {
-    format!("={}", version).serialize(serializer)
+    semver::Comparator {
+        op: semver::Op::Exact,
+        major: version.major,
+        minor: Some(version.minor),
+        patch: Some(version.patch),
+        pre: version.pre.clone(),
+    }
+    .serialize(serializer)
 }
 
 fn is_true(b: &bool) -> bool {
@@ -367,7 +375,7 @@ pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, Depende
                 exposed_name.clone(),
                 DependencySpec {
                     package: name.to_string(),
-                    version: version.to_string(),
+                    version: version.clone(),
                     features,
                     default_features,
                 },
@@ -375,7 +383,7 @@ pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, Depende
 
             infos.push(CrateInformation {
                 name: name.to_string(),
-                version: version.to_string(),
+                version: version.clone(),
                 id: exposed_name,
             });
 
