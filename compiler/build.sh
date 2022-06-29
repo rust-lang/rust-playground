@@ -45,7 +45,7 @@ for channel in $channels_to_build; do
     docker pull "${full_name}:munge" || true
     docker pull "${full_name}:sources" || true
 
-    docker build -t "${full_name}" \
+    docker build -t "${full_name}:${deployment_id}" \
         --cache-from "${full_name}" \
         --cache-from "${full_name}:munge" \
         --cache-from "${full_name}:sources" \
@@ -67,7 +67,7 @@ for tool in $tools_to_build; do
 
     docker pull "${full_name}" || true
 
-    docker build -t "${full_name}" \
+    docker build -t "${full_name}:${deployment_id}" \
         --build-arg repository=${repository} \
         .
 
