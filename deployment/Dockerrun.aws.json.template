@@ -2,7 +2,7 @@
     "AWSEBDockerrunVersion": 2,
     "containerDefinitions": [{
         "name": "playground",
-        "image": "sunscreendeployment/playground",
+        "image": "$image_name",
         "memory": 2048,
         "privileged": true,
         "portMappings": [
