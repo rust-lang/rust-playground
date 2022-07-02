@@ -7,7 +7,7 @@ use cargo::{
         registry::PackageRegistry,
         resolver::{self, features::RequestedFeatures, ResolveOpts, VersionPreferences},
         source::SourceMap,
-        Dependency, Package, Source, SourceId, TargetKind,
+        Dependency, Package, PackageId, Source, SourceId, TargetKind,
     },
     sources::RegistrySource,
     util::{interning::InternedString, Config, VersionExt},
@@ -272,6 +272,21 @@ fn make_global_state<'cfg>(
     }
 }
 
+fn bulk_download(global: &mut GlobalState<'_>, package_ids: &[PackageId]) -> Vec<Package> {
+    let mut sources = SourceMap::new();
+    sources.insert(Box::new(&mut global.source));
+
+    let package_set = PackageSet::new(package_ids, sources, global.config)
+        .expect("Unable to create a PackageSet");
+
+    package_set
+        .get_many(package_set.package_ids())
+        .expect("Unable to download packages")
+        .into_iter()
+        .map(Package::clone)
+        .collect()
+}
+
 pub fn generate_info(
     modifications: &Modifications,
 ) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
@@ -373,15 +388,7 @@ pub fn generate_info(
         .filter(|pkg| !global.modifications.excluded(pkg.name().as_str()))
         .collect();
 
-    let mut sources = SourceMap::new();
-    sources.insert(Box::new(&mut global.source));
-
-    let package_set = PackageSet::new(&package_ids, sources, global.config)
-        .expect("Unable to create a PackageSet");
-
-    let mut packages = package_set
-        .get_many(package_set.package_ids())
-        .expect("Unable to download packages");
+    let mut packages = bulk_download(&mut global, &package_ids);
 
     // Sort all packages by name then version (descending), so that
     // when we group them we know we get all the same crates together
