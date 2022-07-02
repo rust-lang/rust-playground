@@ -337,16 +337,10 @@ fn populate_initial_direct_dependencies(
     summaries
 }
 
-pub fn generate_info(
-    modifications: &Modifications,
-) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
-    // Setup to interact with cargo.
-    let config = Config::default().expect("Unable to create default Cargo config");
-    let _lock = config.acquire_package_cache_lock();
-    let mut global = make_global_state(&config, modifications);
-
-    let summaries = populate_initial_direct_dependencies(&mut global);
-
+fn compute_transitive_dependencies(
+    global: &mut GlobalState<'_>,
+    summaries: Vec<(Summary, ResolveOpts)>,
+) -> Vec<PackageId> {
     // Resolve transitive dependencies.
     let replacements = [];
     let version_prefs = VersionPreferences::default();
@@ -390,12 +384,23 @@ pub fn generate_info(
     }
 
     // Remove invalid and excluded packages that have been added due to resolution
-    let package_ids: Vec<_> = resolve
+    resolve
         .iter()
         .filter(|pkg| valid_for_our_platform.contains(pkg))
         .filter(|pkg| !global.modifications.excluded(pkg.name().as_str()))
-        .collect();
+        .collect()
+}
 
+pub fn generate_info(
+    modifications: &Modifications,
+) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
+    // Setup to interact with cargo.
+    let config = Config::default().expect("Unable to create default Cargo config");
+    let _lock = config.acquire_package_cache_lock();
+    let mut global = make_global_state(&config, modifications);
+
+    let summaries = populate_initial_direct_dependencies(&mut global);
+    let package_ids = compute_transitive_dependencies(&mut global, summaries);
     let packages = bulk_download(&mut global, &package_ids);
     let dependencies = generate_dependency_specs(packages);
     let infos = generate_crate_information(&dependencies);
