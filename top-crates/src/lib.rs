@@ -7,7 +7,7 @@ use cargo::{
         registry::PackageRegistry,
         resolver::{self, features::RequestedFeatures, ResolveOpts, VersionPreferences},
         source::SourceMap,
-        Dependency, Package, PackageId, Source, SourceId, Summary, TargetKind,
+        Dependency, Package, PackageId, Source, SourceId, Summary,
     },
     sources::RegistrySource,
     util::{interning::InternedString, Config, VersionExt},
@@ -425,14 +425,9 @@ fn generate_dependency_specs(mut packages: Vec<Package>) -> BTreeMap<String, Dep
             let version = pkg.version();
 
             let crate_name = pkg
-                .targets()
-                .iter()
-                .flat_map(|target| match target.kind() {
-                    TargetKind::Lib(_) => Some(target.crate_name()),
-                    _ => None,
-                })
-                .next()
-                .unwrap_or_else(|| panic!("{} did not have a library", name));
+                .library()
+                .unwrap_or_else(|| panic!("{} did not have a library", name))
+                .crate_name();
 
             // We see the newest version first. Any subsequent
             // versions will have their version appended so that they
