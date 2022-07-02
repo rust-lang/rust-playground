@@ -296,15 +296,16 @@ pub fn generate_info(
     let mut valid_for_our_platform: BTreeSet<_> =
         summaries.iter().map(|(s, _)| s.package_id()).collect();
 
-    let ct =
+    let compile_target =
         CompileTarget::new(PLAYGROUND_TARGET_PLATFORM).expect("Unable to create a CompileTarget");
-    let ck = CompileKind::Target(ct);
+    let compile_kind = CompileKind::Target(compile_target);
     let rustc = config
         .load_global_rustc(None)
         .expect("Unable to load the global rustc");
 
-    let ti = TargetInfo::new(&config, &[ck], &rustc, ck).expect("Unable to create a TargetInfo");
-    let cc = ti.cfg();
+    let target_info = TargetInfo::new(&config, &[compile_kind], &rustc, compile_kind)
+        .expect("Unable to create a TargetInfo");
+    let cc = target_info.cfg();
 
     let mut to_visit = valid_for_our_platform.clone();
 
