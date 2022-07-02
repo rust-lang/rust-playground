@@ -16,7 +16,8 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet, HashSet},
-    io::Read, task::Poll,
+    io::Read,
+    task::Poll,
 };
 
 const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
@@ -92,10 +93,13 @@ fn simple_get(url: &str) -> reqwest::Result<reqwest::blocking::Response> {
 impl TopCrates {
     /// List top 100 crates by number of downloads on crates.io.
     fn download() -> TopCrates {
-        let resp =
-            simple_get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
-                .expect("Could not fetch top crates");
-        assert!(resp.status().is_success(), "Could not download top crates; HTTP status was {}", resp.status());
+        let resp = simple_get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
+            .expect("Could not fetch top crates");
+        assert!(
+            resp.status().is_success(),
+            "Could not download top crates; HTTP status was {}",
+            resp.status(),
+        );
 
         serde_json::from_reader(resp).expect("Invalid JSON")
     }
@@ -105,7 +109,11 @@ impl TopCrates {
             "https://raw.githubusercontent.com/rust-lang-nursery/rust-cookbook/master/Cargo.toml",
         )
         .expect("Could not fetch cookbook manifest");
-        assert!(resp.status().is_success(), "Could not download cookbook; HTTP status was {}", resp.status());
+        assert!(
+            resp.status().is_success(),
+            "Could not download cookbook; HTTP status was {}",
+            resp.status(),
+        );
 
         let mut content = String::new();
         resp.read_to_string(&mut content)
@@ -212,14 +220,19 @@ fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
     }
 }
 
-pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
+pub fn generate_info(
+    modifications: &Modifications,
+) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
     // Setup to interact with cargo.
     let config = Config::default().expect("Unable to create default Cargo config");
     let _lock = config.acquire_package_cache_lock();
     let crates_io = SourceId::crates_io(&config).expect("Unable to create crates.io source ID");
-    let mut source = RegistrySource::remote(crates_io, &HashSet::new(), &config).expect("Unable to create registry source");
+    let mut source = RegistrySource::remote(crates_io, &HashSet::new(), &config)
+        .expect("Unable to create registry source");
     source.invalidate_cache();
-    source.block_until_ready().expect("Unable to wait for registry to be ready");
+    source
+        .block_until_ready()
+        .expect("Unable to wait for registry to be ready");
 
     let mut top = TopCrates::download();
     top.add_rust_cookbook_crates();
@@ -272,11 +285,15 @@ pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, Depende
         .expect("Unable to resolve dependencies");
 
     // Find crates incompatible with the playground's platform
-    let mut valid_for_our_platform: BTreeSet<_> = summaries.iter().map(|(s, _)| s.package_id()).collect();
+    let mut valid_for_our_platform: BTreeSet<_> =
+        summaries.iter().map(|(s, _)| s.package_id()).collect();
 
-    let ct = CompileTarget::new(PLAYGROUND_TARGET_PLATFORM).expect("Unable to create a CompileTarget");
+    let ct =
+        CompileTarget::new(PLAYGROUND_TARGET_PLATFORM).expect("Unable to create a CompileTarget");
     let ck = CompileKind::Target(ct);
-    let rustc = config.load_global_rustc(None).expect("Unable to load the global rustc");
+    let rustc = config
+        .load_global_rustc(None)
+        .expect("Unable to load the global rustc");
 
     let ti = TargetInfo::new(&config, &[ck], &rustc, ck).expect("Unable to create a TargetInfo");
     let cc = ti.cfg();
@@ -288,9 +305,10 @@ pub fn generate_info(modifications: &Modifications) -> (BTreeMap<String, Depende
 
         for package_id in to_visit {
             for (dep_pkg, deps) in resolve.deps(package_id) {
-
                 let for_this_platform = deps.iter().any(|dep| {
-                    dep.platform().map_or(true, |platform| platform.matches(PLAYGROUND_TARGET_PLATFORM, cc))
+                    dep.platform().map_or(true, |platform| {
+                        platform.matches(PLAYGROUND_TARGET_PLATFORM, cc)
+                    })
                 });
 
                 if for_this_platform {

@@ -279,11 +279,17 @@ workflows:
                 ui/target
               key: ${{ runner.os }}-cargo-${{ hashFiles('ui/**/Cargo.lock') }}-2
 
-          - name: "Format"
+          - name: "Format server"
             uses: actions-rs/cargo@v1
             with:
               command: fmt
-              args: --manifest-path ui/Cargo.toml --all -- --check
+              args: --manifest-path ui/Cargo.toml --all --check
+
+          - name: "Format top-crates"
+            uses: actions-rs/cargo@v1
+            with:
+              command: fmt
+              args: --manifest-path top-crates/Cargo.toml --check
 
           - name: "Build backend"
             run: >-

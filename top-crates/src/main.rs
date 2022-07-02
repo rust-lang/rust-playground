@@ -43,14 +43,15 @@ struct Profiles {
 }
 
 fn main() {
-    let mut f = File::open("crate-modifications.toml")
-        .expect("unable to open crate modifications file");
+    let mut f =
+        File::open("crate-modifications.toml").expect("unable to open crate modifications file");
 
     let mut d = Vec::new();
     f.read_to_end(&mut d)
         .expect("unable to read crate modifications file");
 
-    let modifications: Modifications = toml::from_slice(&d).expect("unable to parse crate modifications file");
+    let modifications: Modifications =
+        toml::from_slice(&d).expect("unable to parse crate modifications file");
 
     let (dependencies, infos) = rust_playground_top_crates::generate_info(&modifications);
 

@@ -182,11 +182,16 @@ jobs:
           ~/.cargo/git
           ui/target
         key: "${{ runner.os }}-cargo-${{ hashFiles('ui/**/Cargo.lock') }}-2"
-    - name: Format
+    - name: Format server
       uses: actions-rs/cargo@v1
       with:
         command: fmt
-        args: "--manifest-path ui/Cargo.toml --all -- --check"
+        args: "--manifest-path ui/Cargo.toml --all --check"
+    - name: Format top-crates
+      uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: "--manifest-path top-crates/Cargo.toml --check"
     - name: Build backend
       run: |-
         mkdir -p ui/target; docker run --rm -v $PWD/ui:/ui -v ~/.cargo/git:/home/rust/.cargo/git -v ~/.cargo/registry:/home/rust/.cargo/registry --workdir /ui ekidd/rust-musl-builder:stable bash -c $'
