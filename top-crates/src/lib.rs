@@ -408,8 +408,6 @@ pub fn generate_info(
     });
 
     let mut dependencies = BTreeMap::new();
-    let mut infos = Vec::new();
-
     for (name, pkgs) in &packages.into_iter().group_by(|pkg| pkg.name()) {
         let mut first = true;
 
@@ -451,15 +449,26 @@ pub fn generate_info(
                 },
             );
 
-            infos.push(CrateInformation {
-                name: name.to_string(),
-                version: version.clone(),
-                id: exposed_name,
-            });
-
             first = false;
         }
     }
 
+    let infos = generate_crate_information(&dependencies);
     (dependencies, infos)
+}
+
+fn generate_crate_information(
+    dependencies: &BTreeMap<String, DependencySpec>,
+) -> Vec<CrateInformation> {
+    let mut infos = Vec::new();
+
+    for (exposed_name, dependency_spec) in dependencies {
+        infos.push(CrateInformation {
+            name: dependency_spec.package.clone(),
+            version: dependency_spec.version.clone(),
+            id: exposed_name.clone(),
+        });
+    }
+
+    infos
 }
