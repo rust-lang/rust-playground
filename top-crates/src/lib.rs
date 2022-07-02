@@ -10,7 +10,7 @@ use cargo::{
         Dependency, Package, Source, SourceId, TargetKind,
     },
     sources::RegistrySource,
-    util::{Config, VersionExt},
+    util::{interning::InternedString, Config, VersionExt},
 };
 use itertools::Itertools;
 use semver::Version;
@@ -42,7 +42,7 @@ struct TopCrates {
 #[derive(Debug, Deserialize)]
 struct Crate {
     #[serde(rename = "id")]
-    name: String,
+    name: InternedString,
 }
 
 /// A mapping of a crates name to its identifier used in source code
@@ -57,9 +57,9 @@ pub struct CrateInformation {
 #[derive(Debug, Default, Deserialize)]
 pub struct Modifications {
     #[serde(default)]
-    pub exclusions: Vec<String>,
+    pub exclusions: Vec<InternedString>,
     #[serde(default)]
-    pub additions: BTreeSet<String>,
+    pub additions: BTreeSet<InternedString>,
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -69,8 +69,8 @@ pub struct DependencySpec {
     pub package: String,
     #[serde(serialize_with = "exact_version")]
     pub version: Version,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub features: Vec<String>,
+    #[serde(skip_serializing_if = "BTreeSet::is_empty")]
+    pub features: BTreeSet<InternedString>,
     #[serde(skip_serializing_if = "is_true")]
     pub default_features: bool,
 }
@@ -145,7 +145,7 @@ impl TopCrates {
             .expect("no dependencies found for cookbook manifest");
         self.crates.extend({
             dependencies.iter().map(|(name, _)| Crate {
-                name: name.to_string(),
+                name: InternedString::new(name),
             })
         })
     }
@@ -156,7 +156,7 @@ impl TopCrates {
             modifications
                 .additions
                 .iter()
-                .cloned()
+                .copied()
                 .map(|name| Crate { name })
         });
     }
@@ -172,14 +172,14 @@ impl TopCrates {
 ///     all-features = false
 ///
 /// All fields are optional.
-fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
+fn playground_metadata_features(pkg: &Package) -> Option<(BTreeSet<InternedString>, bool)> {
     let custom_metadata = pkg.manifest().custom_metadata()?;
     let playground_metadata = custom_metadata.get("playground")?;
 
     #[derive(Deserialize)]
     #[serde(default, rename_all = "kebab-case")]
     struct Metadata {
-        features: Vec<String>,
+        features: BTreeSet<InternedString>,
         default_features: bool,
         all_features: bool,
     }
@@ -187,7 +187,7 @@ fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
     impl Default for Metadata {
         fn default() -> Self {
             Metadata {
-                features: Vec::new(),
+                features: BTreeSet::new(),
                 default_features: true,
                 all_features: false,
             }
@@ -209,10 +209,10 @@ fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
 
     // If `all-features` is set then we ignore `features`.
     let summary = pkg.summary();
-    let mut enabled_features: BTreeSet<String> = if metadata.all_features {
-        summary.features().keys().map(ToString::to_string).collect()
+    let mut enabled_features: BTreeSet<InternedString> = if metadata.all_features {
+        summary.features().keys().copied().collect()
     } else {
-        metadata.features.into_iter().collect()
+        metadata.features
     };
 
     // If not opting out of default features, remove default features from the
@@ -222,16 +222,13 @@ fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
         if let Some(default_feature_names) = summary.features().get("default") {
             enabled_features.remove("default");
             for feature in default_feature_names {
-                enabled_features.remove(&feature.to_string());
+                enabled_features.remove(&InternedString::new(&feature.to_string()));
             }
         }
     }
 
     if !enabled_features.is_empty() || !metadata.default_features {
-        Some((
-            enabled_features.into_iter().collect(),
-            metadata.default_features,
-        ))
+        Some((enabled_features, metadata.default_features))
     } else {
         None
     }
@@ -290,8 +287,8 @@ pub fn generate_info(
     // Find the newest (non-prerelease, non-yanked) versions of all
     // the interesting crates.
     let mut summaries = Vec::new();
-    for Crate { name } in &top.crates {
-        if global.modifications.excluded(name) {
+    for Crate { name } in top.crates {
+        if global.modifications.excluded(&name) {
             continue;
         }
 
@@ -427,7 +424,7 @@ pub fn generate_info(
             };
 
             let (features, default_features) =
-                playground_metadata_features(&pkg).unwrap_or_else(|| (Vec::new(), true));
+                playground_metadata_features(&pkg).unwrap_or_else(|| (BTreeSet::new(), true));
 
             dependencies.insert(
                 exposed_name.clone(),
