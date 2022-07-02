@@ -350,7 +350,9 @@ fn extend_direct_dependencies(
 ) {
     // Add a direct dependency on each starting crate.
     let mut summaries = Vec::new();
+    let mut valid_for_our_platform = BTreeSet::new();
     for dep in mem::take(crates).into_values() {
+        valid_for_our_platform.insert(dep.summary.package_id());
         summaries.push((
             dep.summary,
             ResolveOpts {
@@ -378,12 +380,8 @@ fn extend_direct_dependencies(
     )
     .expect("Unable to resolve dependencies");
 
-    // Find crates incompatible with the playground's platform
-    let mut valid_for_our_platform: BTreeSet<_> =
-        summaries.iter().map(|(s, _)| s.package_id()).collect();
-
+    // Find transitive deps compatible with the playground's platform.
     let mut to_visit = valid_for_our_platform.clone();
-
     while !to_visit.is_empty() {
         let mut visit_next = BTreeSet::new();
 
