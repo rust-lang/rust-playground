@@ -5,7 +5,7 @@ use cargo::{
         compiler::{CompileKind, CompileTarget, TargetInfo},
         package::PackageSet,
         registry::PackageRegistry,
-        resolver::{self, features::RequestedFeatures, ResolveOpts},
+        resolver::{self, features::RequestedFeatures, ResolveOpts, VersionPreferences},
         source::SourceMap,
         Dependency, Package, Source, SourceId, TargetKind,
     },
@@ -257,7 +257,8 @@ fn make_global_state<'cfg>(
 
     // Source for obtaining packages from the crates.io registry.
     let crates_io = SourceId::crates_io(config).expect("Unable to create crates.io source ID");
-    let mut source = RegistrySource::remote(crates_io, &HashSet::new(), config)
+    let yanked_whitelist = HashSet::new();
+    let mut source = RegistrySource::remote(crates_io, &yanked_whitelist, config)
         .expect("Unable to create registry source");
     source.invalidate_cache();
     source
@@ -296,7 +297,8 @@ pub fn generate_info(
 
         // Query the registry for a summary of this crate.
         // Usefully, this doesn't seem to include yanked versions
-        let dep = Dependency::parse(name, None, global.crates_io)
+        let version = None;
+        let dep = Dependency::parse(name, version, global.crates_io)
             .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
         let matches = match global.source.query_vec(&dep) {
@@ -326,14 +328,17 @@ pub fn generate_info(
     }
 
     // Resolve transitive dependencies.
-    let try_to_use = Default::default();
+    let replacements = [];
+    let version_prefs = VersionPreferences::default();
+    let warnings = None;
+    let check_public_visible_dependencies = true;
     let resolve = resolver::resolve(
         &summaries,
-        &[],
+        &replacements,
         &mut global.registry,
-        &try_to_use,
-        None,
-        true,
+        &version_prefs,
+        warnings,
+        check_public_visible_dependencies,
     )
     .expect("Unable to resolve dependencies");
 
