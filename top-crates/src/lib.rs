@@ -7,7 +7,7 @@ use cargo::{
         registry::PackageRegistry,
         resolver::{self, features::RequestedFeatures, ResolveOpts, VersionPreferences},
         source::SourceMap,
-        Dependency, Package, PackageId, Source, SourceId, Summary,
+        Dependency, Package, PackageId, Source, SourceId, Summary, Target,
     },
     sources::RegistrySource,
     util::{interning::InternedString, Config, VersionExt},
@@ -18,6 +18,8 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet, HashSet},
     io::Read,
+    mem,
+    rc::Rc,
     task::Poll,
 };
 
@@ -73,6 +75,14 @@ pub struct DependencySpec {
     pub features: BTreeSet<InternedString>,
     #[serde(skip_serializing_if = "is_true")]
     pub default_features: bool,
+}
+
+#[derive(Debug)]
+struct ResolvedDep {
+    summary: Summary,
+    lib_target: Target,
+    features: BTreeSet<InternedString>,
+    uses_default_features: bool,
 }
 
 fn exact_version<S>(version: &Version, serializer: S) -> Result<S::Ok, S::Error>
@@ -289,14 +299,14 @@ fn bulk_download(global: &mut GlobalState<'_>, package_ids: &[PackageId]) -> Vec
 
 fn populate_initial_direct_dependencies(
     global: &mut GlobalState<'_>,
-) -> Vec<(Summary, ResolveOpts)> {
+) -> BTreeMap<PackageId, ResolvedDep> {
     let mut top = TopCrates::download();
     top.add_rust_cookbook_crates();
     top.add_curated_crates(global.modifications);
 
     // Find the newest (non-prerelease, non-yanked) versions of all
     // the interesting crates.
-    let mut summaries = Vec::new();
+    let mut package_ids = Vec::new();
     for Crate { name } in top.crates {
         if global.modifications.excluded(&name) {
             continue;
@@ -321,26 +331,50 @@ fn populate_initial_direct_dependencies(
             .max_by_key(|summary| summary.version().clone())
             .unwrap_or_else(|| panic!("Registry has no viable versions of {}", name));
 
-        // Add a dependency on this crate.
+        let package_id = PackageId::pure(name, summary.version().clone(), global.crates_io);
+        package_ids.push(package_id);
+    }
+
+    let packages = bulk_download(global, &package_ids);
+
+    let mut initial_direct_dependencies = BTreeMap::new();
+    for download in packages {
+        let id = download.package_id();
+        let lib_target = download
+            .library()
+            .unwrap_or_else(|| panic!("{} did not have a library", id))
+            .clone();
+        let dep = ResolvedDep {
+            summary: download.summary().clone(),
+            lib_target,
+            features: BTreeSet::new(),
+            uses_default_features: true,
+        };
+        initial_direct_dependencies.insert(id, dep);
+    }
+
+    initial_direct_dependencies
+}
+
+fn extend_direct_dependencies(
+    global: &mut GlobalState<'_>,
+    crates: &mut BTreeMap<PackageId, ResolvedDep>,
+) {
+    // Add a direct dependency on each starting crate.
+    let mut summaries = Vec::new();
+    for dep in mem::take(crates).into_values() {
         summaries.push((
-            summary,
+            dep.summary,
             ResolveOpts {
                 dev_deps: false,
                 features: RequestedFeatures::DepFeatures {
-                    features: Default::default(),
-                    uses_default_features: true,
+                    features: Rc::new(dep.features),
+                    uses_default_features: dep.uses_default_features,
                 },
             },
         ));
     }
 
-    summaries
-}
-
-fn compute_transitive_dependencies(
-    global: &mut GlobalState<'_>,
-    summaries: Vec<(Summary, ResolveOpts)>,
-) -> Vec<PackageId> {
     // Resolve transitive dependencies.
     let replacements = [];
     let version_prefs = VersionPreferences::default();
@@ -384,11 +418,28 @@ fn compute_transitive_dependencies(
     }
 
     // Remove invalid and excluded packages that have been added due to resolution
-    resolve
+    let package_ids = resolve
         .iter()
         .filter(|pkg| valid_for_our_platform.contains(pkg))
         .filter(|pkg| !global.modifications.excluded(pkg.name().as_str()))
-        .collect()
+        .collect_vec();
+
+    let packages = bulk_download(global, &package_ids);
+
+    for download in packages {
+        let id = download.package_id();
+        let lib_target = download
+            .library()
+            .unwrap_or_else(|| panic!("{} did not have a library", id))
+            .clone();
+        let dep = ResolvedDep {
+            summary: download.summary().clone(),
+            lib_target,
+            features: BTreeSet::new(),
+            uses_default_features: true,
+        };
+        crates.insert(id, dep);
+    }
 }
 
 pub fn generate_info(
@@ -399,41 +450,40 @@ pub fn generate_info(
     let _lock = config.acquire_package_cache_lock();
     let mut global = make_global_state(&config, modifications);
 
-    let summaries = populate_initial_direct_dependencies(&mut global);
-    let package_ids = compute_transitive_dependencies(&mut global, summaries);
-    let packages = bulk_download(&mut global, &package_ids);
-    let dependencies = generate_dependency_specs(packages);
+    let mut resolved_crates = populate_initial_direct_dependencies(&mut global);
+    extend_direct_dependencies(&mut global, &mut resolved_crates);
+    let dependencies = generate_dependency_specs(&resolved_crates);
     let infos = generate_crate_information(&dependencies);
     (dependencies, infos)
 }
 
-fn generate_dependency_specs(mut packages: Vec<Package>) -> BTreeMap<String, DependencySpec> {
+fn generate_dependency_specs(
+    crates: &BTreeMap<PackageId, ResolvedDep>,
+) -> BTreeMap<String, DependencySpec> {
     // Sort all packages by name then version (descending), so that
     // when we group them we know we get all the same crates together
     // and the newest version first.
-    packages.sort_by(|a, b| {
-        a.name()
-            .cmp(&b.name())
-            .then(a.version().cmp(&b.version()).reverse())
+    let mut crates = crates.values().collect_vec();
+    crates.sort_by(|a, b| {
+        let name_cmp = a.summary.name().as_str().cmp(b.summary.name().as_str());
+        let version_cmp = a.summary.version().cmp(b.summary.version());
+        name_cmp.then(version_cmp.reverse())
     });
 
     let mut dependencies = BTreeMap::new();
-    for (name, pkgs) in &packages.into_iter().group_by(|pkg| pkg.name()) {
+    for (name, pkgs) in &crates.iter().group_by(|dep| dep.summary.name()) {
         let mut first = true;
 
-        for pkg in pkgs {
-            let version = pkg.version();
-
-            let crate_name = pkg
-                .library()
-                .unwrap_or_else(|| panic!("{} did not have a library", name))
-                .crate_name();
+        for dep in pkgs {
+            let summary = &dep.summary;
+            let version = summary.version();
 
             // We see the newest version first. Any subsequent
             // versions will have their version appended so that they
             // are uniquely named
+            let crate_name = dep.lib_target.crate_name();
             let exposed_name = if first {
-                crate_name.clone()
+                crate_name
             } else {
                 format!(
                     "{}_{}_{}_{}",
@@ -441,16 +491,13 @@ fn generate_dependency_specs(mut packages: Vec<Package>) -> BTreeMap<String, Dep
                 )
             };
 
-            let (features, default_features) =
-                playground_metadata_features(&pkg).unwrap_or_else(|| (BTreeSet::new(), true));
-
             dependencies.insert(
-                exposed_name.clone(),
+                exposed_name,
                 DependencySpec {
                     package: name.to_string(),
                     version: version.clone(),
-                    features,
-                    default_features,
+                    features: dep.features.clone(),
+                    default_features: dep.uses_default_features,
                 },
             );
 
