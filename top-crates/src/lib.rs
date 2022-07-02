@@ -442,7 +442,15 @@ pub fn generate_info(
     let mut global = make_global_state(&config, modifications);
 
     let mut resolved_crates = populate_initial_direct_dependencies(&mut global);
-    extend_direct_dependencies(&mut global, &mut resolved_crates);
+
+    loop {
+        let num_crates_before = resolved_crates.len();
+        extend_direct_dependencies(&mut global, &mut resolved_crates);
+        if num_crates_before == resolved_crates.len() {
+            break;
+        }
+    }
+
     let dependencies = generate_dependency_specs(&resolved_crates);
     let infos = generate_crate_information(&dependencies);
     (dependencies, infos)
