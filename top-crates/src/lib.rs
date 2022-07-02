@@ -219,29 +219,13 @@ fn playground_metadata_features(pkg: &Package) -> Option<(BTreeSet<InternedStrin
 
     // If `all-features` is set then we ignore `features`.
     let summary = pkg.summary();
-    let mut enabled_features: BTreeSet<InternedString> = if metadata.all_features {
+    let enabled_features: BTreeSet<InternedString> = if metadata.all_features {
         summary.features().keys().copied().collect()
     } else {
         metadata.features
     };
 
-    // If not opting out of default features, remove default features from the
-    // explicit features list. This avoids ongoing spurious diffs in our
-    // generated Cargo.toml as default features are added to a library.
-    if metadata.default_features {
-        if let Some(default_feature_names) = summary.features().get("default") {
-            enabled_features.remove("default");
-            for feature in default_feature_names {
-                enabled_features.remove(&InternedString::new(&feature.to_string()));
-            }
-        }
-    }
-
-    if !enabled_features.is_empty() || !metadata.default_features {
-        Some((enabled_features, metadata.default_features))
-    } else {
-        None
-    }
+    Some((enabled_features, metadata.default_features))
 }
 
 fn make_global_state<'cfg>(
@@ -344,12 +328,16 @@ fn populate_initial_direct_dependencies(
             .library()
             .unwrap_or_else(|| panic!("{} did not have a library", id))
             .clone();
-        let dep = ResolvedDep {
+        let mut dep = ResolvedDep {
             summary: download.summary().clone(),
             lib_target,
             features: BTreeSet::new(),
             uses_default_features: true,
         };
+        if let Some((features, default_features)) = playground_metadata_features(&download) {
+            dep.features = features;
+            dep.uses_default_features = default_features;
+        }
         initial_direct_dependencies.insert(id, dep);
     }
 
@@ -432,12 +420,17 @@ fn extend_direct_dependencies(
             .library()
             .unwrap_or_else(|| panic!("{} did not have a library", id))
             .clone();
-        let dep = ResolvedDep {
+        let mut dep = ResolvedDep {
             summary: download.summary().clone(),
             lib_target,
-            features: BTreeSet::new(),
-            uses_default_features: true,
+            features: resolve.features(id).iter().copied().collect(),
+            // If enabled, all default features are already included in
+            // `features` by the resolver.
+            uses_default_features: false,
         };
+        if let Some((features, _default_features)) = playground_metadata_features(&download) {
+            dep.features.extend(features);
+        }
         crates.insert(id, dep);
     }
 }
@@ -491,13 +484,20 @@ fn generate_dependency_specs(
                 )
             };
 
+            let mut features = dep.features.clone();
+            let mut default_features = dep.uses_default_features;
+            if features.contains("default") || summary.features().get("default").is_none() {
+                features.remove("default");
+                default_features = true;
+            }
+
             dependencies.insert(
                 exposed_name,
                 DependencySpec {
                     package: name.to_string(),
                     version: version.clone(),
-                    features: dep.features.clone(),
-                    default_features: dep.uses_default_features,
+                    features,
+                    default_features,
                 },
             );
 
