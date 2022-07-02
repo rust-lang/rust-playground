@@ -396,8 +396,13 @@ pub fn generate_info(
         .filter(|pkg| !global.modifications.excluded(pkg.name().as_str()))
         .collect();
 
-    let mut packages = bulk_download(&mut global, &package_ids);
+    let packages = bulk_download(&mut global, &package_ids);
+    let dependencies = generate_dependency_specs(packages);
+    let infos = generate_crate_information(&dependencies);
+    (dependencies, infos)
+}
 
+fn generate_dependency_specs(mut packages: Vec<Package>) -> BTreeMap<String, DependencySpec> {
     // Sort all packages by name then version (descending), so that
     // when we group them we know we get all the same crates together
     // and the newest version first.
@@ -453,8 +458,7 @@ pub fn generate_info(
         }
     }
 
-    let infos = generate_crate_information(&dependencies);
-    (dependencies, infos)
+    dependencies
 }
 
 fn generate_crate_information(
