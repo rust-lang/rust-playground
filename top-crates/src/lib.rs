@@ -7,7 +7,7 @@ use cargo::{
         registry::PackageRegistry,
         resolver::{self, features::RequestedFeatures, ResolveOpts, VersionPreferences},
         source::SourceMap,
-        Dependency, Package, PackageId, Source, SourceId, TargetKind,
+        Dependency, Package, PackageId, Source, SourceId, Summary, TargetKind,
     },
     sources::RegistrySource,
     util::{interning::InternedString, Config, VersionExt},
@@ -287,14 +287,9 @@ fn bulk_download(global: &mut GlobalState<'_>, package_ids: &[PackageId]) -> Vec
         .collect()
 }
 
-pub fn generate_info(
-    modifications: &Modifications,
-) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
-    // Setup to interact with cargo.
-    let config = Config::default().expect("Unable to create default Cargo config");
-    let _lock = config.acquire_package_cache_lock();
-    let mut global = make_global_state(&config, modifications);
-
+fn populate_initial_direct_dependencies(
+    global: &mut GlobalState<'_>,
+) -> Vec<(Summary, ResolveOpts)> {
     let mut top = TopCrates::download();
     top.add_rust_cookbook_crates();
     top.add_curated_crates(global.modifications);
@@ -338,6 +333,19 @@ pub fn generate_info(
             },
         ));
     }
+
+    summaries
+}
+
+pub fn generate_info(
+    modifications: &Modifications,
+) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
+    // Setup to interact with cargo.
+    let config = Config::default().expect("Unable to create default Cargo config");
+    let _lock = config.acquire_package_cache_lock();
+    let mut global = make_global_state(&config, modifications);
+
+    let summaries = populate_initial_direct_dependencies(&mut global);
 
     // Resolve transitive dependencies.
     let replacements = [];
