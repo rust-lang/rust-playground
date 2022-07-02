@@ -23,6 +23,15 @@ use std::{
 
 const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
 
+struct GlobalState<'cfg> {
+    config: &'cfg Config,
+    target_info: TargetInfo,
+    registry: PackageRegistry<'cfg>,
+    crates_io: SourceId,
+    source: RegistrySource<'cfg>,
+    modifications: &'cfg Modifications,
+}
+
 /// The list of crates from crates.io
 #[derive(Debug, Deserialize)]
 struct TopCrates {
@@ -228,38 +237,69 @@ fn playground_metadata_features(pkg: &Package) -> Option<(Vec<String>, bool)> {
     }
 }
 
-pub fn generate_info(
-    modifications: &Modifications,
-) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
-    // Setup to interact with cargo.
-    let config = Config::default().expect("Unable to create default Cargo config");
-    let _lock = config.acquire_package_cache_lock();
-    let crates_io = SourceId::crates_io(&config).expect("Unable to create crates.io source ID");
-    let mut source = RegistrySource::remote(crates_io, &HashSet::new(), &config)
+fn make_global_state<'cfg>(
+    config: &'cfg Config,
+    modifications: &'cfg Modifications,
+) -> GlobalState<'cfg> {
+    // Information about the playground's target platform.
+    let compile_target =
+        CompileTarget::new(PLAYGROUND_TARGET_PLATFORM).expect("Unable to create a CompileTarget");
+    let compile_kind = CompileKind::Target(compile_target);
+    let rustc = config
+        .load_global_rustc(None)
+        .expect("Unable to load the global rustc");
+    let target_info = TargetInfo::new(config, &[compile_kind], &rustc, compile_kind)
+        .expect("Unable to create a TargetInfo");
+
+    // Registry of known packages.
+    let mut registry = PackageRegistry::new(config).expect("Unable to create package registry");
+    registry.lock_patches();
+
+    // Source for obtaining packages from the crates.io registry.
+    let crates_io = SourceId::crates_io(config).expect("Unable to create crates.io source ID");
+    let mut source = RegistrySource::remote(crates_io, &HashSet::new(), config)
         .expect("Unable to create registry source");
     source.invalidate_cache();
     source
         .block_until_ready()
         .expect("Unable to wait for registry to be ready");
 
+    GlobalState {
+        config,
+        target_info,
+        registry,
+        crates_io,
+        source,
+        modifications,
+    }
+}
+
+pub fn generate_info(
+    modifications: &Modifications,
+) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
+    // Setup to interact with cargo.
+    let config = Config::default().expect("Unable to create default Cargo config");
+    let _lock = config.acquire_package_cache_lock();
+    let mut global = make_global_state(&config, modifications);
+
     let mut top = TopCrates::download();
     top.add_rust_cookbook_crates();
-    top.add_curated_crates(modifications);
+    top.add_curated_crates(global.modifications);
 
     // Find the newest (non-prerelease, non-yanked) versions of all
     // the interesting crates.
     let mut summaries = Vec::new();
     for Crate { name } in &top.crates {
-        if modifications.excluded(name) {
+        if global.modifications.excluded(name) {
             continue;
         }
 
         // Query the registry for a summary of this crate.
         // Usefully, this doesn't seem to include yanked versions
-        let dep = Dependency::parse(name, None, crates_io)
+        let dep = Dependency::parse(name, None, global.crates_io)
             .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
-        let matches = match source.query_vec(&dep) {
+        let matches = match global.source.query_vec(&dep) {
             Poll::Ready(Ok(v)) => v,
             Poll::Ready(Err(e)) => panic!("Unable to query registry for {}: {}", name, e),
             Poll::Pending => panic!("Registry not ready to query"),
@@ -286,26 +326,20 @@ pub fn generate_info(
     }
 
     // Resolve transitive dependencies.
-    let mut registry = PackageRegistry::new(&config).expect("Unable to create package registry");
-    registry.lock_patches();
     let try_to_use = Default::default();
-    let resolve = resolver::resolve(&summaries, &[], &mut registry, &try_to_use, None, true)
-        .expect("Unable to resolve dependencies");
+    let resolve = resolver::resolve(
+        &summaries,
+        &[],
+        &mut global.registry,
+        &try_to_use,
+        None,
+        true,
+    )
+    .expect("Unable to resolve dependencies");
 
     // Find crates incompatible with the playground's platform
     let mut valid_for_our_platform: BTreeSet<_> =
         summaries.iter().map(|(s, _)| s.package_id()).collect();
-
-    let compile_target =
-        CompileTarget::new(PLAYGROUND_TARGET_PLATFORM).expect("Unable to create a CompileTarget");
-    let compile_kind = CompileKind::Target(compile_target);
-    let rustc = config
-        .load_global_rustc(None)
-        .expect("Unable to load the global rustc");
-
-    let target_info = TargetInfo::new(&config, &[compile_kind], &rustc, compile_kind)
-        .expect("Unable to create a TargetInfo");
-    let cc = target_info.cfg();
 
     let mut to_visit = valid_for_our_platform.clone();
 
@@ -316,7 +350,7 @@ pub fn generate_info(
             for (dep_pkg, deps) in resolve.deps(package_id) {
                 let for_this_platform = deps.iter().any(|dep| {
                     dep.platform().map_or(true, |platform| {
-                        platform.matches(PLAYGROUND_TARGET_PLATFORM, cc)
+                        platform.matches(PLAYGROUND_TARGET_PLATFORM, global.target_info.cfg())
                     })
                 });
 
@@ -334,14 +368,14 @@ pub fn generate_info(
     let package_ids: Vec<_> = resolve
         .iter()
         .filter(|pkg| valid_for_our_platform.contains(pkg))
-        .filter(|pkg| !modifications.excluded(pkg.name().as_str()))
+        .filter(|pkg| !global.modifications.excluded(pkg.name().as_str()))
         .collect();
 
     let mut sources = SourceMap::new();
-    sources.insert(Box::new(source));
+    sources.insert(Box::new(&mut global.source));
 
-    let package_set =
-        PackageSet::new(&package_ids, sources, &config).expect("Unable to create a PackageSet");
+    let package_set = PackageSet::new(&package_ids, sources, global.config)
+        .expect("Unable to create a PackageSet");
 
     let mut packages = package_set
         .get_many(package_set.package_ids())
