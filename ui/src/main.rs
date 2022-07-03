@@ -1,10 +1,10 @@
 #![deny(rust_2018_idioms)]
 
+use crate::env::PLAYGROUND_GITHUB_TOKEN;
 use serde::{Deserialize, Serialize};
-use snafu::Snafu;
+use snafu::prelude::*;
 use std::{
     convert::TryFrom,
-    env,
     net::SocketAddr,
     path::{Path, PathBuf},
     sync::Arc,
@@ -14,6 +14,7 @@ const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
 
 mod asm_cleanup;
+mod env;
 mod gist;
 mod metrics;
 mod sandbox;
@@ -23,7 +24,10 @@ fn main() {
     // Dotenv may be unable to load environment variables, but that's ok in production
     let _ = dotenv::dotenv();
     openssl_probe::init_ssl_cert_env_vars();
-    env_logger::init();
+
+    // Enable warn-level logging by default. env_logger's default is error only.
+    let env_logger_config = env_logger::Env::default().default_filter_or("warn");
+    env_logger::Builder::from_env(env_logger_config).init();
 
     let config = Config::from_env();
     server_axum::serve(config);
@@ -32,7 +36,7 @@ fn main() {
 struct Config {
     address: String,
     cors_enabled: bool,
-    gh_token: String,
+    gh_token: Option<String>,
     metrics_token: Option<String>,
     port: u16,
     root: PathBuf,
@@ -51,8 +55,11 @@ impl Config {
             .and_then(|p| p.parse().ok())
             .unwrap_or(DEFAULT_PORT);
 
-        let gh_token =
-            env::var("PLAYGROUND_GITHUB_TOKEN").expect("Must specify PLAYGROUND_GITHUB_TOKEN");
+        let gh_token = env::var(PLAYGROUND_GITHUB_TOKEN).ok();
+        if gh_token.is_none() {
+            log::warn!("Environment variable {} is not set, so reading and writing GitHub gists will not work", PLAYGROUND_GITHUB_TOKEN);
+        }
+
         let metrics_token = env::var("PLAYGROUND_METRICS_TOKEN").ok();
 
         let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
@@ -94,11 +101,18 @@ impl Config {
 }
 
 #[derive(Debug, Clone)]
-struct GhToken(Arc<String>);
+struct GhToken(Option<Arc<String>>);
 
 impl GhToken {
-    fn new(token: impl Into<String>) -> Self {
-        GhToken(Arc::new(token.into()))
+    fn new(token: &Option<String>) -> Self {
+        GhToken(token.clone().map(Arc::new))
+    }
+
+    fn must_get(&self) -> Result<String> {
+        self.0
+            .as_ref()
+            .map(|s| String::clone(s))
+            .context(NoGithubTokenSnafu)
     }
 }
 
@@ -135,6 +149,8 @@ pub enum Error {
     GistCreation { source: octocrab::Error },
     #[snafu(display("Gist loading failed: {}", source))]
     GistLoading { source: octocrab::Error },
+    #[snafu(display("{PLAYGROUND_GITHUB_TOKEN} not set up for reading/writing gists"))]
+    NoGithubToken,
     #[snafu(display("Unable to serialize response: {}", source))]
     Serialization { source: serde_json::Error },
     #[snafu(display("The value {:?} is not a valid target", value))]
