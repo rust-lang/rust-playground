@@ -16,6 +16,8 @@ struct TomlManifest {
     profile: Profiles,
     #[serde(serialize_with = "toml::ser::tables_last")]
     dependencies: BTreeMap<String, DependencySpec>,
+    #[serde(serialize_with = "toml::ser::tables_last")]
+    build_dependencies: BTreeMap<String, DependencySpec>,
 }
 
 /// Header of Cargo.toml file.
@@ -84,7 +86,8 @@ fn main() {
                 build_override: BuildOverride { codegen_units: 1 },
             },
         },
-        dependencies,
+        dependencies: dependencies.clone(),
+        build_dependencies: dependencies,
     };
 
     // Write manifest file.
