@@ -6,15 +6,15 @@ disk in this directory.
 In production, these should be set according to your deployment method
 of choice.
 
-| Key                        | Required   | Default Value     | Description                                                                                                                 |
-| -------------------------- | ---------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `PLAYGROUND_UI_ROOT`       | **Yes**    |                   | The path to the HTML, CSS, and Javascript files; for local testing probably you'll use: `PLAYGROUND_UI_ROOT=frontend/build` |
-| `PLAYGROUND_GITHUB_TOKEN`  | No         |                   | The [GitHub API token][gist] to read and write Gists                                                                        |
-| `PLAYGROUND_UI_ADDRESS`    | No         | 127.0.0.1         | The address to listen on                                                                                                    |
-| `PLAYGROUND_UI_PORT`       | No         | 5000              | The port to listen on                                                                                                       |
-| `PLAYGROUND_METRICS_TOKEN` | No         |                   | If set, will require authentication for the metrics endpoint                                                                |
-| `PLAYGROUND_CORS_ENABLED`  | No         |                   | If set, will enable CORS support                                                                                            |
-| `TMPDIR`                   | No         | system-provided   | Where compilation artifacts will be saved. Must be accessible to Docker                                                     |
+| Key                        | Required | Default Value     | Description                                                                           |
+| -------------------------- | -------- | ----------------- | ------------------------------------------------------------------------------------- |
+| `PLAYGROUND_UI_ROOT`       | No       |                   | The path to the HTML, CSS, and Javascript files (the directory containing index.html) |
+| `PLAYGROUND_GITHUB_TOKEN`  | No       |                   | The [GitHub API token][gist] to read and write Gists                                  |
+| `PLAYGROUND_UI_ADDRESS`    | No       | 127.0.0.1         | The address to listen on                                                              |
+| `PLAYGROUND_UI_PORT`       | No       | 5000              | The port to listen on                                                                 |
+| `PLAYGROUND_METRICS_TOKEN` | No       |                   | If set, will require authentication for the metrics endpoint                          |
+| `PLAYGROUND_CORS_ENABLED`  | No       |                   | If set, will enable CORS support                                                      |
+| `TMPDIR`                   | No       | system-provided   | Where compilation artifacts will be saved. Must be accessible to Docker               |
 
 [dotenv]: https://crates.io/crates/dotenv
 [gist]: https://developer.github.com/v3/gists/#authentication
