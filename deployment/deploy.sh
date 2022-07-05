@@ -27,7 +27,7 @@ fi
 image_name="$DOCKER_REGISTRY/playground:$DEPLOYMENT_ID"
 config_file=$DEPLOYMENT_ID.Dockerrun.aws.json
 
-cat Dockerrun.aws.json.template | sed "s/\$image_name/$image_name" > $config_file
+cat Dockerrun.aws.json.template | sed "s/\$image_name/$image_name/" > $config_file
 
 aws s3 mv $config_file $S3_BUCKET/$config_file
 
