@@ -31,7 +31,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.57",
+    "version": "1.0.58",
     "id": "anyhow"
   },
   {
@@ -80,6 +80,11 @@
     "id": "base64"
   },
   {
+    "name": "bit_field",
+    "version": "0.10.1",
+    "id": "bit_field"
+  },
+  {
     "name": "bit-set",
     "version": "0.5.2",
     "id": "bit_set"
@@ -88,11 +93,6 @@
     "name": "bit-vec",
     "version": "0.6.3",
     "id": "bit_vec"
-  },
-  {
-    "name": "bit_field",
-    "version": "0.10.1",
-    "id": "bit_field"
   },
   {
     "name": "bitflags",
@@ -111,8 +111,13 @@
   },
   {
     "name": "bytemuck",
-    "version": "1.9.1",
+    "version": "1.10.0",
     "id": "bytemuck"
+  },
+  {
+    "name": "bytemuck_derive",
+    "version": "1.1.0",
+    "id": "bytemuck_derive"
   },
   {
     "name": "byteorder",
@@ -123,6 +128,11 @@
     "name": "bytes",
     "version": "1.1.0",
     "id": "bytes"
+  },
+  {
+    "name": "bytes",
+    "version": "0.4.12",
+    "id": "bytes_0_4_12"
   },
   {
     "name": "cc",
@@ -141,18 +151,33 @@
   },
   {
     "name": "clap",
-    "version": "3.1.18",
+    "version": "3.2.8",
     "id": "clap"
   },
   {
+    "name": "clap_derive",
+    "version": "3.2.7",
+    "id": "clap_derive"
+  },
+  {
     "name": "clap_lex",
-    "version": "0.2.0",
+    "version": "0.2.4",
     "id": "clap_lex"
   },
   {
     "name": "color_quant",
     "version": "1.1.0",
     "id": "color_quant"
+  },
+  {
+    "name": "cookie",
+    "version": "0.16.0",
+    "id": "cookie"
+  },
+  {
+    "name": "cookie_store",
+    "version": "0.16.1",
+    "id": "cookie_store"
   },
   {
     "name": "cpufeatures",
@@ -171,7 +196,7 @@
   },
   {
     "name": "crossbeam-channel",
-    "version": "0.5.4",
+    "version": "0.5.5",
     "id": "crossbeam_channel"
   },
   {
@@ -181,7 +206,7 @@
   },
   {
     "name": "crossbeam-epoch",
-    "version": "0.9.8",
+    "version": "0.9.9",
     "id": "crossbeam_epoch"
   },
   {
@@ -191,12 +216,12 @@
   },
   {
     "name": "crossbeam-utils",
-    "version": "0.8.8",
+    "version": "0.8.10",
     "id": "crossbeam_utils"
   },
   {
     "name": "crypto-common",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "id": "crypto_common"
   },
   {
@@ -215,6 +240,11 @@
     "id": "data_encoding"
   },
   {
+    "name": "new_debug_unreachable",
+    "version": "1.0.4",
+    "id": "debug_unreachable"
+  },
+  {
     "name": "deflate",
     "version": "1.0.0",
     "id": "deflate"
@@ -231,7 +261,7 @@
   },
   {
     "name": "either",
-    "version": "1.6.1",
+    "version": "1.7.0",
     "id": "either"
   },
   {
@@ -271,12 +301,12 @@
   },
   {
     "name": "filetime",
-    "version": "0.2.16",
+    "version": "0.2.17",
     "id": "filetime"
   },
   {
     "name": "fixedbitset",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "id": "fixedbitset"
   },
   {
@@ -318,6 +348,11 @@
     "name": "futures",
     "version": "0.3.21",
     "id": "futures"
+  },
+  {
+    "name": "futures",
+    "version": "0.1.31",
+    "id": "futures_0_1_31"
   },
   {
     "name": "futures-channel",
@@ -366,7 +401,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "id": "getrandom"
   },
   {
@@ -376,7 +411,7 @@
   },
   {
     "name": "gif",
-    "version": "0.11.3",
+    "version": "0.11.4",
     "id": "gif"
   },
   {
@@ -476,13 +511,18 @@
   },
   {
     "name": "indexmap",
-    "version": "1.8.2",
+    "version": "1.9.1",
     "id": "indexmap"
   },
   {
     "name": "inflate",
     "version": "0.4.5",
     "id": "inflate"
+  },
+  {
+    "name": "iovec",
+    "version": "0.1.4",
+    "id": "iovec"
   },
   {
     "name": "ipnet",
@@ -536,7 +576,7 @@
   },
   {
     "name": "linked-hash-map",
-    "version": "0.5.4",
+    "version": "0.5.6",
     "id": "linked_hash_map"
   },
   {
@@ -550,14 +590,14 @@
     "id": "log"
   },
   {
-    "name": "log-mdc",
-    "version": "0.1.0",
-    "id": "log_mdc"
-  },
-  {
     "name": "log4rs",
     "version": "1.1.1",
     "id": "log4rs"
+  },
+  {
+    "name": "log-mdc",
+    "version": "0.1.0",
+    "id": "log_mdc"
   },
   {
     "name": "mac",
@@ -585,8 +625,8 @@
     "id": "matrixmultiply"
   },
   {
-    "name": "md-5",
-    "version": "0.10.1",
+    "name": "md5",
+    "version": "0.7.0",
     "id": "md5"
   },
   {
@@ -610,13 +650,18 @@
     "id": "mime"
   },
   {
+    "name": "mime_guess",
+    "version": "2.0.4",
+    "id": "mime_guess"
+  },
+  {
     "name": "miniz_oxide",
     "version": "0.5.3",
     "id": "miniz_oxide"
   },
   {
     "name": "mio",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "id": "mio"
   },
   {
@@ -645,11 +690,6 @@
     "id": "ndarray"
   },
   {
-    "name": "new_debug_unreachable",
-    "version": "1.0.4",
-    "id": "debug_unreachable"
-  },
-  {
     "name": "num",
     "version": "0.4.0",
     "id": "num"
@@ -661,8 +701,13 @@
   },
   {
     "name": "num-complex",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "id": "num_complex"
+  },
+  {
+    "name": "num_cpus",
+    "version": "1.13.1",
+    "id": "num_cpus"
   },
   {
     "name": "num-integer",
@@ -676,23 +721,18 @@
   },
   {
     "name": "num-rational",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "id": "num_rational"
-  },
-  {
-    "name": "num-traits",
-    "version": "0.2.15",
-    "id": "num_traits"
-  },
-  {
-    "name": "num_cpus",
-    "version": "1.13.1",
-    "id": "num_cpus"
   },
   {
     "name": "num_threads",
     "version": "0.1.6",
     "id": "num_threads"
+  },
+  {
+    "name": "num-traits",
+    "version": "0.2.15",
+    "id": "num_traits"
   },
   {
     "name": "object",
@@ -701,7 +741,7 @@
   },
   {
     "name": "once_cell",
-    "version": "1.12.0",
+    "version": "1.13.0",
     "id": "once_cell"
   },
   {
@@ -806,12 +846,12 @@
   },
   {
     "name": "pin-project",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "id": "pin_project"
   },
   {
     "name": "pin-project-internal",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "id": "pin_project_internal"
   },
   {
@@ -860,18 +900,38 @@
     "id": "precomputed_hash"
   },
   {
+    "name": "proc-macro2",
+    "version": "1.0.40",
+    "id": "proc_macro2"
+  },
+  {
+    "name": "proc-macro-error",
+    "version": "1.0.4",
+    "id": "proc_macro_error"
+  },
+  {
+    "name": "proc-macro-error-attr",
+    "version": "1.0.4",
+    "id": "proc_macro_error_attr"
+  },
+  {
     "name": "proc-macro-hack",
     "version": "0.5.19",
     "id": "proc_macro_hack"
   },
   {
-    "name": "proc-macro2",
-    "version": "1.0.39",
-    "id": "proc_macro2"
+    "name": "psl-types",
+    "version": "2.0.10",
+    "id": "psl_types"
+  },
+  {
+    "name": "publicsuffix",
+    "version": "2.1.1",
+    "id": "publicsuffix"
   },
   {
     "name": "quote",
-    "version": "1.0.18",
+    "version": "1.0.20",
     "id": "quote"
   },
   {
@@ -931,7 +991,7 @@
   },
   {
     "name": "regex",
-    "version": "1.5.6",
+    "version": "1.6.0",
     "id": "regex"
   },
   {
@@ -941,7 +1001,7 @@
   },
   {
     "name": "regex-syntax",
-    "version": "0.6.26",
+    "version": "0.6.27",
     "id": "regex_syntax"
   },
   {
@@ -951,7 +1011,7 @@
   },
   {
     "name": "reqwest",
-    "version": "0.11.10",
+    "version": "0.11.11",
     "id": "reqwest"
   },
   {
@@ -1006,7 +1066,7 @@
   },
   {
     "name": "semver",
-    "version": "1.0.10",
+    "version": "1.0.12",
     "id": "semver"
   },
   {
@@ -1016,22 +1076,17 @@
   },
   {
     "name": "serde",
-    "version": "1.0.137",
+    "version": "1.0.138",
     "id": "serde"
   },
   {
-    "name": "serde-value",
-    "version": "0.7.0",
-    "id": "serde_value"
-  },
-  {
     "name": "serde_derive",
-    "version": "1.0.137",
+    "version": "1.0.138",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.81",
+    "version": "1.0.82",
     "id": "serde_json"
   },
   {
@@ -1040,14 +1095,34 @@
     "id": "serde_urlencoded"
   },
   {
+    "name": "serde-value",
+    "version": "0.7.0",
+    "id": "serde_value"
+  },
+  {
     "name": "serde_yaml",
     "version": "0.8.24",
     "id": "serde_yaml"
   },
   {
+    "name": "sha1",
+    "version": "0.6.1",
+    "id": "sha1"
+  },
+  {
+    "name": "sha1_smol",
+    "version": "1.0.0",
+    "id": "sha1_smol"
+  },
+  {
     "name": "sha2",
     "version": "0.10.2",
     "id": "sha2"
+  },
+  {
+    "name": "signal-hook-registry",
+    "version": "1.4.0",
+    "id": "signal_hook_registry"
   },
   {
     "name": "simba",
@@ -1066,7 +1141,7 @@
   },
   {
     "name": "smallvec",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "id": "smallvec"
   },
   {
@@ -1116,7 +1191,7 @@
   },
   {
     "name": "syn",
-    "version": "1.0.96",
+    "version": "1.0.98",
     "id": "syn"
   },
   {
@@ -1138,6 +1213,11 @@
     "name": "termcolor",
     "version": "1.1.3",
     "id": "termcolor"
+  },
+  {
+    "name": "terminal_size",
+    "version": "0.1.17",
+    "id": "terminal_size"
   },
   {
     "name": "textwrap",
@@ -1176,13 +1256,18 @@
   },
   {
     "name": "time",
-    "version": "0.3.9",
+    "version": "0.3.11",
     "id": "time"
   },
   {
     "name": "time",
     "version": "0.1.44",
     "id": "time_0_1_44"
+  },
+  {
+    "name": "time-macros",
+    "version": "0.2.4",
+    "id": "time_macros"
   },
   {
     "name": "tinyvec",
@@ -1198,6 +1283,16 @@
     "name": "tokio",
     "version": "1.19.2",
     "id": "tokio"
+  },
+  {
+    "name": "tokio-io",
+    "version": "0.1.13",
+    "id": "tokio_io"
+  },
+  {
+    "name": "tokio-macros",
+    "version": "1.8.0",
+    "id": "tokio_macros"
   },
   {
     "name": "tokio-native-tls",
@@ -1221,7 +1316,7 @@
   },
   {
     "name": "tower-service",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "id": "tower_service"
   },
   {
@@ -1231,7 +1326,7 @@
   },
   {
     "name": "tracing-core",
-    "version": "0.1.27",
+    "version": "0.1.28",
     "id": "tracing_core"
   },
   {
@@ -1256,8 +1351,13 @@
   },
   {
     "name": "ucd-trie",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "id": "ucd_trie"
+  },
+  {
+    "name": "unicase",
+    "version": "2.6.0",
+    "id": "unicase"
   },
   {
     "name": "unicode-bidi",
@@ -1266,7 +1366,7 @@
   },
   {
     "name": "unicode-ident",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "unicode_ident"
   },
   {
@@ -1276,7 +1376,7 @@
   },
   {
     "name": "unicode-normalization",
-    "version": "0.1.19",
+    "version": "0.1.21",
     "id": "unicode_normalization"
   },
   {
@@ -1313,6 +1413,11 @@
     "name": "utf-8",
     "version": "0.7.6",
     "id": "utf8"
+  },
+  {
+    "name": "uuid",
+    "version": "0.8.2",
+    "id": "uuid"
   },
   {
     "name": "vcpkg",
