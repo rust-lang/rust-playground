@@ -96,12 +96,15 @@ basic HTML/CSS/JS changes, directly open in your browser the built
 
 ### Build and run the server
 
-Configure your `.env` file as described in the [ui README](./ui/README.md).
-
 ```
 cd ui
 cargo run
 ```
+
+There are some optional configuration parameters described in the
+[ui README](./ui/README.md) which you may set in a `.env` file. The server will
+run with no configuration, but in order to load and save gists a GitHub token
+must be configured.
 
 ### Build or download the containers
 ```

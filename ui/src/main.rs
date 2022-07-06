@@ -1,6 +1,6 @@
 #![deny(rust_2018_idioms)]
 
-use crate::env::PLAYGROUND_GITHUB_TOKEN;
+use crate::env::{PLAYGROUND_GITHUB_TOKEN, PLAYGROUND_UI_ROOT};
 use serde::{Deserialize, Serialize};
 use snafu::prelude::*;
 use std::{
@@ -25,8 +25,8 @@ fn main() {
     let _ = dotenv::dotenv();
     openssl_probe::init_ssl_cert_env_vars();
 
-    // Enable warn-level logging by default. env_logger's default is error only.
-    let env_logger_config = env_logger::Env::default().default_filter_or("warn");
+    // Enable info-level logging by default. env_logger's default is error only.
+    let env_logger_config = env_logger::Env::default().default_filter_or("info");
     env_logger::Builder::from_env(env_logger_config).init();
 
     let config = Config::from_env();
@@ -44,9 +44,36 @@ struct Config {
 
 impl Config {
     fn from_env() -> Self {
-        let root: PathBuf = env::var_os("PLAYGROUND_UI_ROOT")
-            .expect("Must specify PLAYGROUND_UI_ROOT")
-            .into();
+        let root = if let Some(root) = env::var_os(PLAYGROUND_UI_ROOT) {
+            // Ensure it appears as an absolute path in logs to help user orient
+            // themselves about what directory the PLAYGROUND_UI_ROOT
+            // configuration is interpreted relative to.
+            let mut root = PathBuf::from(root);
+            if !root.is_absolute() {
+                if let Ok(current_dir) = env::current_dir() {
+                    root = current_dir.join(root);
+                }
+            }
+            root
+        } else {
+            // Note this is `env!` (compile time) while the above is
+            // `env::var_os` (run time). We know where the ui is expected to be
+            // relative to the source code that the server was compiled from.
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("frontend")
+                .join("build")
+        };
+
+        let index_html = root.join("index.html");
+        if index_html.exists() {
+            log::info!("Serving playground frontend from {}", root.display());
+        } else {
+            log::error!(
+                "Playground ui does not exist at {}\n\
+                Playground will not work until `yarn run build` has been run or {PLAYGROUND_UI_ROOT} has been fixed",
+                index_html.display(),
+            );
+        }
 
         let address =
             env::var("PLAYGROUND_UI_ADDRESS").unwrap_or_else(|_| DEFAULT_ADDRESS.to_string());
