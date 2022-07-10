@@ -16,6 +16,8 @@ struct TomlManifest {
     profile: Profiles,
     #[serde(serialize_with = "toml::ser::tables_last")]
     dependencies: BTreeMap<String, DependencySpec>,
+    #[serde(serialize_with = "toml::ser::tables_last")]
+    build_dependencies: BTreeMap<String, DependencySpec>,
 }
 
 /// Header of Cargo.toml file.
@@ -27,12 +29,21 @@ struct TomlPackage {
     resolver: String,
 }
 
+/// Profile used for build dependencies (build scripts, proc macros, and their
+/// dependencies).
+#[derive(Serialize)]
+#[serde(rename_all = "kebab-case")]
+struct BuildOverride {
+    codegen_units: u32,
+}
+
 /// A profile section in a Cargo.toml file
 #[derive(Serialize)]
 #[serde(rename_all = "kebab-case")]
 struct Profile {
     codegen_units: u32,
     incremental: bool,
+    build_override: BuildOverride,
 }
 
 /// Available profile types
@@ -67,13 +78,16 @@ fn main() {
             dev: Profile {
                 codegen_units: 1,
                 incremental: false,
+                build_override: BuildOverride { codegen_units: 1 },
             },
             release: Profile {
                 codegen_units: 1,
                 incremental: false,
+                build_override: BuildOverride { codegen_units: 1 },
             },
         },
-        dependencies,
+        dependencies: dependencies.clone(),
+        build_dependencies: dependencies,
     };
 
     // Write manifest file.
