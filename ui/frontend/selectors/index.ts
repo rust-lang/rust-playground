@@ -21,7 +21,7 @@ const autoPrimaryActionSelector = createSelector(
   hasTestsSelector,
   hasMainFunctionSelector,
   (crateType, hasTests, hasMainFunction) => {
-    if (crateType) {
+    if (crateType && crateType !== 'proc-macro') {
       if (crateType === 'bin') {
         return PrimaryActionCore.Execute;
       } else {
@@ -43,9 +43,19 @@ export const runAsTest = createSelector(
   autoPrimaryActionSelector,
   primaryAction => primaryAction === PrimaryActionCore.Test,
 );
+
 export const getCrateType = createSelector(
+  crateTypeSelector,
   autoPrimaryActionSelector,
-  primaryAction => primaryAction === PrimaryActionCore.Execute ? 'bin' : 'lib',
+  (crateType, primaryAction) => {
+    if (crateType) {
+      return crateType;
+    } else if (primaryAction === PrimaryActionCore.Execute) {
+      return 'bin';
+    } else {
+      return 'lib';
+    }
+  },
 );
 
 const rawPrimaryActionSelector = (state: State) => state.configuration.primaryAction;
