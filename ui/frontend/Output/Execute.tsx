@@ -13,12 +13,13 @@ import styles from './Execute.module.css';
 const Execute: React.FC = () => {
   const details = useSelector((state: State) => state.output.execute);
   const isAutoBuild = useSelector(selectors.isAutoBuildSelector);
+  const isTest = useSelector(selectors.isTestPrimaryAction)
 
   const dispatch = useDispatch();
   const addMainFunction = useCallback(() => dispatch(actions.addMainFunction()), [dispatch]);
 
   return (
-    <SimplePane {...details} kind="execute">
+    <SimplePane highlightStdOut={isTest} {...details} kind="execute">
       {isAutoBuild && <Warning addMainFunction={addMainFunction} />}
     </SimplePane>
 

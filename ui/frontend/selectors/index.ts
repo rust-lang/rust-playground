@@ -60,6 +60,11 @@ export const getCrateType = createSelector(
 
 const rawPrimaryActionSelector = (state: State) => state.configuration.primaryAction;
 
+export const isTestPrimaryAction = createSelector(
+  rawPrimaryActionSelector,
+  (primaryAction) => (primaryAction === PrimaryActionCore.Test),
+)
+
 export const isAutoBuildSelector = createSelector(
   rawPrimaryActionSelector,
   autoPrimaryActionSelector,
