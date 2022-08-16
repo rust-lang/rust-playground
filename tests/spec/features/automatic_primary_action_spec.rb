@@ -28,7 +28,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     click_on("Build")
 
     within(:output, :stderr) do
-      expect(page).to have_content 'function is never used: `main`'
+      expect(page).to have_content 'function `main` is never used'
     end
   end
 
@@ -75,7 +75,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     click_on("Build")
 
     within(:output, :stderr) do
-      expect(page).to have_content 'function is never used: `main`'
+      expect(page).to have_content 'function `main` is never used'
     end
   end
 
@@ -134,7 +134,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     click_on("Build")
 
     within(:output, :stderr) do
-      expect(page).to have_content 'function is never used: `arbitrary_code`'
+      expect(page).to have_content 'function `arbitrary_code` is never used'
     end
   end
 
