@@ -30,7 +30,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     scenario "choosing to build the code" do
       in_build_menu { click_on(build_button: "Build") }
       within(:output, :stderr) do
-        expect(page).to have_content 'function is never used: `main`'
+        expect(page).to have_content 'function `main` is never used'
       end
     end
 
