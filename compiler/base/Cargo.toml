@@ -47,7 +47,7 @@ version = "=0.12.1"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.61"
+version = "=1.0.62"
 features = ["std"]
 
 [dependencies.approx]
@@ -125,12 +125,12 @@ features = ["lazy_static", "regex-automata", "serde", "serde1", "serde1-nostd", 
 
 [dependencies.bytemuck]
 package = "bytemuck"
-version = "=1.12.0"
+version = "=1.12.1"
 features = ["bytemuck_derive", "derive", "extern_crate_alloc", "extern_crate_std", "min_const_generics", "wasm_simd", "zeroable_maybe_uninit"]
 
 [dependencies.bytemuck_derive]
 package = "bytemuck_derive"
-version = "=1.2.0"
+version = "=1.2.1"
 
 [dependencies.byteorder]
 package = "byteorder"
@@ -187,7 +187,7 @@ version = "=0.16.1"
 
 [dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.2.2"
+version = "=0.2.4"
 
 [dependencies.crc32fast]
 package = "crc32fast"
@@ -262,7 +262,7 @@ features = ["alloc", "block-buffer", "core-api", "mac", "std", "subtle"]
 
 [dependencies.either]
 package = "either"
-version = "=1.7.0"
+version = "=1.8.0"
 features = ["use_std"]
 
 [dependencies.encoding_rs]
@@ -282,7 +282,7 @@ features = ["backtrace", "example_generated"]
 
 [dependencies.exr]
 package = "exr"
-version = "=1.4.2"
+version = "=1.5.0"
 
 [dependencies.fallible_iterator]
 package = "fallible-iterator"
@@ -420,7 +420,7 @@ version = "=0.3.0"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.3.13"
+version = "=0.3.14"
 
 [dependencies.half]
 package = "half"
@@ -479,7 +479,7 @@ version = "=0.5.0"
 
 [dependencies.iana_time_zone]
 package = "iana-time-zone"
-version = "=0.1.45"
+version = "=0.1.46"
 features = ["fallback"]
 
 [dependencies.idna]
@@ -495,10 +495,6 @@ features = ["bmp", "dds", "dxt", "exr", "farbfeld", "gif", "hdr", "ico", "jpeg",
 package = "indexmap"
 version = "=1.9.1"
 features = ["std"]
-
-[dependencies.inflate]
-package = "inflate"
-version = "=0.4.5"
 
 [dependencies.iovec]
 package = "iovec"
@@ -538,7 +534,7 @@ version = "=0.5.2"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.131"
+version = "=0.2.132"
 features = ["std"]
 
 [dependencies.libm]
@@ -620,7 +616,18 @@ package = "mime_guess"
 version = "=2.0.4"
 default-features = false
 
+[dependencies.minimal_lexical]
+package = "minimal-lexical"
+version = "=0.2.1"
+features = ["std"]
+default-features = false
+
 [dependencies.miniz_oxide]
+package = "miniz_oxide"
+version = "=0.6.1"
+features = ["with-alloc"]
+
+[dependencies.miniz_oxide_0_5_3]
 package = "miniz_oxide"
 version = "=0.5.3"
 
@@ -651,6 +658,11 @@ version = "=0.2.10"
 package = "ndarray"
 version = "=0.15.6"
 features = ["std"]
+
+[dependencies.nom]
+package = "nom"
+version = "=7.1.1"
+features = ["alloc", "std"]
 
 [dependencies.num]
 package = "num"
@@ -759,7 +771,7 @@ version = "=2.1.0"
 
 [dependencies.pest]
 package = "pest"
-version = "=2.2.1"
+version = "=2.3.0"
 features = ["std", "thiserror"]
 
 [dependencies.petgraph]
@@ -769,7 +781,7 @@ features = ["graphmap", "matrix_graph", "stable_graph"]
 
 [dependencies.phf]
 package = "phf"
-version = "=0.10.1"
+version = "=0.11.1"
 features = ["std"]
 
 [dependencies.phf_0_8_0]
@@ -790,6 +802,12 @@ package = "phf_generator"
 version = "=0.8.0"
 
 [dependencies.phf_shared]
+package = "phf_shared"
+version = "=0.11.1"
+features = ["std"]
+default-features = false
+
+[dependencies.phf_shared_0_10_0]
 package = "phf_shared"
 version = "=0.10.0"
 features = ["std"]
@@ -825,7 +843,7 @@ version = "=0.17.5"
 
 [dependencies.postgres]
 package = "postgres"
-version = "=0.19.3"
+version = "=0.19.4"
 
 [dependencies.postgres_protocol]
 package = "postgres-protocol"
@@ -833,7 +851,7 @@ version = "=0.6.4"
 
 [dependencies.postgres_types]
 package = "postgres-types"
-version = "=0.2.3"
+version = "=0.2.4"
 
 [dependencies.ppv_lite86]
 package = "ppv-lite86"
@@ -1007,16 +1025,16 @@ version = "=0.10.2"
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.143"
+version = "=1.0.144"
 features = ["derive", "rc", "serde_derive", "std"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.143"
+version = "=1.0.144"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.83"
+version = "=1.0.85"
 features = ["raw_value", "std"]
 
 [dependencies.serde_urlencoded]
@@ -1070,7 +1088,7 @@ version = "=0.3.1"
 
 [dependencies.socket2]
 package = "socket2"
-version = "=0.4.4"
+version = "=0.4.6"
 features = ["all"]
 
 [dependencies.spin]
@@ -1161,7 +1179,7 @@ version = "=0.7.3"
 
 [dependencies.time]
 package = "time"
-version = "=0.3.13"
+version = "=0.3.14"
 features = ["alloc", "formatting", "itoa", "macros", "parsing", "std", "time-macros"]
 
 [dependencies.time_0_1_44]
@@ -1200,7 +1218,7 @@ version = "=0.3.0"
 
 [dependencies.tokio_postgres]
 package = "tokio-postgres"
-version = "=0.7.6"
+version = "=0.7.7"
 features = ["runtime"]
 
 [dependencies.tokio_util]
@@ -1384,7 +1402,7 @@ version = "=0.12.1"
 
 [build_dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.61"
+version = "=1.0.62"
 features = ["std"]
 
 [build_dependencies.approx]
@@ -1462,12 +1480,12 @@ features = ["lazy_static", "regex-automata", "serde", "serde1", "serde1-nostd", 
 
 [build_dependencies.bytemuck]
 package = "bytemuck"
-version = "=1.12.0"
+version = "=1.12.1"
 features = ["bytemuck_derive", "derive", "extern_crate_alloc", "extern_crate_std", "min_const_generics", "wasm_simd", "zeroable_maybe_uninit"]
 
 [build_dependencies.bytemuck_derive]
 package = "bytemuck_derive"
-version = "=1.2.0"
+version = "=1.2.1"
 
 [build_dependencies.byteorder]
 package = "byteorder"
@@ -1524,7 +1542,7 @@ version = "=0.16.1"
 
 [build_dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.2.2"
+version = "=0.2.4"
 
 [build_dependencies.crc32fast]
 package = "crc32fast"
@@ -1599,7 +1617,7 @@ features = ["alloc", "block-buffer", "core-api", "mac", "std", "subtle"]
 
 [build_dependencies.either]
 package = "either"
-version = "=1.7.0"
+version = "=1.8.0"
 features = ["use_std"]
 
 [build_dependencies.encoding_rs]
@@ -1619,7 +1637,7 @@ features = ["backtrace", "example_generated"]
 
 [build_dependencies.exr]
 package = "exr"
-version = "=1.4.2"
+version = "=1.5.0"
 
 [build_dependencies.fallible_iterator]
 package = "fallible-iterator"
@@ -1757,7 +1775,7 @@ version = "=0.3.0"
 
 [build_dependencies.h2]
 package = "h2"
-version = "=0.3.13"
+version = "=0.3.14"
 
 [build_dependencies.half]
 package = "half"
@@ -1816,7 +1834,7 @@ version = "=0.5.0"
 
 [build_dependencies.iana_time_zone]
 package = "iana-time-zone"
-version = "=0.1.45"
+version = "=0.1.46"
 features = ["fallback"]
 
 [build_dependencies.idna]
@@ -1832,10 +1850,6 @@ features = ["bmp", "dds", "dxt", "exr", "farbfeld", "gif", "hdr", "ico", "jpeg",
 package = "indexmap"
 version = "=1.9.1"
 features = ["std"]
-
-[build_dependencies.inflate]
-package = "inflate"
-version = "=0.4.5"
 
 [build_dependencies.iovec]
 package = "iovec"
@@ -1875,7 +1889,7 @@ version = "=0.5.2"
 
 [build_dependencies.libc]
 package = "libc"
-version = "=0.2.131"
+version = "=0.2.132"
 features = ["std"]
 
 [build_dependencies.libm]
@@ -1957,7 +1971,18 @@ package = "mime_guess"
 version = "=2.0.4"
 default-features = false
 
+[build_dependencies.minimal_lexical]
+package = "minimal-lexical"
+version = "=0.2.1"
+features = ["std"]
+default-features = false
+
 [build_dependencies.miniz_oxide]
+package = "miniz_oxide"
+version = "=0.6.1"
+features = ["with-alloc"]
+
+[build_dependencies.miniz_oxide_0_5_3]
 package = "miniz_oxide"
 version = "=0.5.3"
 
@@ -1988,6 +2013,11 @@ version = "=0.2.10"
 package = "ndarray"
 version = "=0.15.6"
 features = ["std"]
+
+[build_dependencies.nom]
+package = "nom"
+version = "=7.1.1"
+features = ["alloc", "std"]
 
 [build_dependencies.num]
 package = "num"
@@ -2096,7 +2126,7 @@ version = "=2.1.0"
 
 [build_dependencies.pest]
 package = "pest"
-version = "=2.2.1"
+version = "=2.3.0"
 features = ["std", "thiserror"]
 
 [build_dependencies.petgraph]
@@ -2106,7 +2136,7 @@ features = ["graphmap", "matrix_graph", "stable_graph"]
 
 [build_dependencies.phf]
 package = "phf"
-version = "=0.10.1"
+version = "=0.11.1"
 features = ["std"]
 
 [build_dependencies.phf_0_8_0]
@@ -2127,6 +2157,12 @@ package = "phf_generator"
 version = "=0.8.0"
 
 [build_dependencies.phf_shared]
+package = "phf_shared"
+version = "=0.11.1"
+features = ["std"]
+default-features = false
+
+[build_dependencies.phf_shared_0_10_0]
 package = "phf_shared"
 version = "=0.10.0"
 features = ["std"]
@@ -2162,7 +2198,7 @@ version = "=0.17.5"
 
 [build_dependencies.postgres]
 package = "postgres"
-version = "=0.19.3"
+version = "=0.19.4"
 
 [build_dependencies.postgres_protocol]
 package = "postgres-protocol"
@@ -2170,7 +2206,7 @@ version = "=0.6.4"
 
 [build_dependencies.postgres_types]
 package = "postgres-types"
-version = "=0.2.3"
+version = "=0.2.4"
 
 [build_dependencies.ppv_lite86]
 package = "ppv-lite86"
@@ -2344,16 +2380,16 @@ version = "=0.10.2"
 
 [build_dependencies.serde]
 package = "serde"
-version = "=1.0.143"
+version = "=1.0.144"
 features = ["derive", "rc", "serde_derive", "std"]
 
 [build_dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.143"
+version = "=1.0.144"
 
 [build_dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.83"
+version = "=1.0.85"
 features = ["raw_value", "std"]
 
 [build_dependencies.serde_urlencoded]
@@ -2407,7 +2443,7 @@ version = "=0.3.1"
 
 [build_dependencies.socket2]
 package = "socket2"
-version = "=0.4.4"
+version = "=0.4.6"
 features = ["all"]
 
 [build_dependencies.spin]
@@ -2498,7 +2534,7 @@ version = "=0.7.3"
 
 [build_dependencies.time]
 package = "time"
-version = "=0.3.13"
+version = "=0.3.14"
 features = ["alloc", "formatting", "itoa", "macros", "parsing", "std", "time-macros"]
 
 [build_dependencies.time_0_1_44]
@@ -2537,7 +2573,7 @@ version = "=0.3.0"
 
 [build_dependencies.tokio_postgres]
 package = "tokio-postgres"
-version = "=0.7.6"
+version = "=0.7.7"
 features = ["runtime"]
 
 [build_dependencies.tokio_util]

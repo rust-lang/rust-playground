@@ -31,7 +31,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.61",
+    "version": "1.0.62",
     "id": "anyhow"
   },
   {
@@ -116,12 +116,12 @@
   },
   {
     "name": "bytemuck",
-    "version": "1.12.0",
+    "version": "1.12.1",
     "id": "bytemuck"
   },
   {
     "name": "bytemuck_derive",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "id": "bytemuck_derive"
   },
   {
@@ -186,7 +186,7 @@
   },
   {
     "name": "cpufeatures",
-    "version": "0.2.2",
+    "version": "0.2.4",
     "id": "cpufeatures"
   },
   {
@@ -266,7 +266,7 @@
   },
   {
     "name": "either",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "id": "either"
   },
   {
@@ -286,7 +286,7 @@
   },
   {
     "name": "exr",
-    "version": "1.4.2",
+    "version": "1.5.0",
     "id": "exr"
   },
   {
@@ -431,7 +431,7 @@
   },
   {
     "name": "h2",
-    "version": "0.3.13",
+    "version": "0.3.14",
     "id": "h2"
   },
   {
@@ -501,7 +501,7 @@
   },
   {
     "name": "iana-time-zone",
-    "version": "0.1.45",
+    "version": "0.1.46",
     "id": "iana_time_zone"
   },
   {
@@ -518,11 +518,6 @@
     "name": "indexmap",
     "version": "1.9.1",
     "id": "indexmap"
-  },
-  {
-    "name": "inflate",
-    "version": "0.4.5",
-    "id": "inflate"
   },
   {
     "name": "iovec",
@@ -566,7 +561,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.131",
+    "version": "0.2.132",
     "id": "libc"
   },
   {
@@ -660,9 +655,19 @@
     "id": "mime_guess"
   },
   {
+    "name": "minimal-lexical",
+    "version": "0.2.1",
+    "id": "minimal_lexical"
+  },
+  {
+    "name": "miniz_oxide",
+    "version": "0.6.1",
+    "id": "miniz_oxide"
+  },
+  {
     "name": "miniz_oxide",
     "version": "0.5.3",
-    "id": "miniz_oxide"
+    "id": "miniz_oxide_0_5_3"
   },
   {
     "name": "mio",
@@ -693,6 +698,11 @@
     "name": "ndarray",
     "version": "0.15.6",
     "id": "ndarray"
+  },
+  {
+    "name": "nom",
+    "version": "7.1.1",
+    "id": "nom"
   },
   {
     "name": "num",
@@ -806,7 +816,7 @@
   },
   {
     "name": "pest",
-    "version": "2.2.1",
+    "version": "2.3.0",
     "id": "pest"
   },
   {
@@ -816,7 +826,7 @@
   },
   {
     "name": "phf",
-    "version": "0.10.1",
+    "version": "0.11.1",
     "id": "phf"
   },
   {
@@ -841,8 +851,13 @@
   },
   {
     "name": "phf_shared",
-    "version": "0.10.0",
+    "version": "0.11.1",
     "id": "phf_shared"
+  },
+  {
+    "name": "phf_shared",
+    "version": "0.10.0",
+    "id": "phf_shared_0_10_0"
   },
   {
     "name": "phf_shared",
@@ -881,7 +896,7 @@
   },
   {
     "name": "postgres",
-    "version": "0.19.3",
+    "version": "0.19.4",
     "id": "postgres"
   },
   {
@@ -891,7 +906,7 @@
   },
   {
     "name": "postgres-types",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "id": "postgres_types"
   },
   {
@@ -1081,17 +1096,17 @@
   },
   {
     "name": "serde",
-    "version": "1.0.143",
+    "version": "1.0.144",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.143",
+    "version": "1.0.144",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.83",
+    "version": "1.0.85",
     "id": "serde_json"
   },
   {
@@ -1151,7 +1166,7 @@
   },
   {
     "name": "socket2",
-    "version": "0.4.4",
+    "version": "0.4.6",
     "id": "socket2"
   },
   {
@@ -1256,7 +1271,7 @@
   },
   {
     "name": "time",
-    "version": "0.3.13",
+    "version": "0.3.14",
     "id": "time"
   },
   {
@@ -1301,7 +1316,7 @@
   },
   {
     "name": "tokio-postgres",
-    "version": "0.7.6",
+    "version": "0.7.7",
     "id": "tokio_postgres"
   },
   {
