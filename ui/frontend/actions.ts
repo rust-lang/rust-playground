@@ -218,18 +218,30 @@ async function fetchJson(url, args) {
     response = await fetch(url, { ...args, headers });
   } catch (networkError) {
     // e.g. server unreachable
-    throw ({
-      error: `Network error: ${networkError.toString()}`,
-    });
+    if (networkError instanceof Error) {
+      throw ({
+        error: `Network error: ${networkError.toString()}`,
+      });
+    } else {
+      throw ({
+        error: 'Unknown error while fetching JSON',
+      });
+    }
   }
 
   let body;
   try {
     body = await response.json();
   } catch (convertError) {
-    throw ({
-      error: `Response was not JSON: ${convertError.toString()}`,
-    });
+    if (convertError instanceof Error) {
+      throw ({
+        error: `Response was not JSON: ${convertError.toString()}`,
+      });
+    } else {
+      throw ({
+        error: 'Unknown error while converting JSON',
+      });
+    }
   }
 
   if (response.ok) {
@@ -753,14 +765,14 @@ function parseEdition(s: string): Edition | null {
 export function indexPageLoad({
   code,
   gist,
-  version = 'stable',
-  mode: modeString = 'debug',
+  version,
+  mode: modeString,
   edition: editionString,
 }): ThunkAction {
   return function(dispatch) {
-    const channel = parseChannel(version);
-    const mode = parseMode(modeString);
-    let edition = parseEdition(editionString);
+    const channel = parseChannel(version) || Channel.Stable;
+    const mode = parseMode(modeString) || Mode.Debug;
+    let maybeEdition = parseEdition(editionString);
 
     dispatch(navigateToIndex());
 
@@ -768,10 +780,12 @@ export function indexPageLoad({
       // We need to ensure that any links that predate the existence
       // of editions will *forever* pick 2015. However, if we aren't
       // loading code, then allow the edition to remain the default.
-      if (!edition) {
-        edition = Edition.Rust2015;
+      if (!maybeEdition) {
+        maybeEdition = Edition.Rust2015;
       }
     }
+
+    const edition = maybeEdition || Edition.Rust2021;
 
     if (code) {
       dispatch(editCode(code));
@@ -779,17 +793,9 @@ export function indexPageLoad({
       dispatch(performGistLoad({ id: gist, channel, mode, edition }));
     }
 
-    if (channel) {
-      dispatch(changeChannel(channel));
-    }
-
-    if (mode) {
-      dispatch(changeMode(mode));
-    }
-
-    if (edition) {
-      dispatch(changeEdition(edition));
-    }
+    dispatch(changeChannel(channel));
+    dispatch(changeMode(mode));
+    dispatch(changeEdition(edition));
   };
 }
 
