@@ -1739,9 +1739,9 @@
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
 ace-builds@^1.4.4:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.5.1.tgz#7ed9fe277acdc14e6522aa866b0980ac196d797e"
-  integrity sha512-2G313uyM7lfqZgCs6xCW4QPeuX2GZKaCyRqKhTC2mBeZqC7TjkTXguKRyLzsAIMLJfj3koq98RXCBoemoZVAnQ==
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.10.0.tgz#241e036411e99ee771f0bb7b16fdc63a866c2381"
+  integrity sha512-7BChLsIOOeWiAX6rzddLbOz6pBMLe9uPK0FNPhklZ8XGzbv0ydvP2yE7tZ/1irma/82KDZ6EVH16AYbDxwNA/Q==
 
 acorn-import-assertions@^1.7.6:
   version "1.8.0"

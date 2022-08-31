@@ -192,11 +192,13 @@ const AceEditor: React.FC<AceEditorProps> = props => {
   );
 
   useEditorProp(editor, onEditCodeDebounced, useCallback((editor, onEditCode) => {
-    const listener = editor.on('change', _delta => {
+    const listener = () => {
       if (!doingSetProp.current) {
         onEditCode(editor.getValue());
       }
-    });
+    };
+
+    editor.on('change', listener);
 
     return () => {
       editor.off('change', listener);
@@ -236,7 +238,6 @@ const AceEditor: React.FC<AceEditorProps> = props => {
 
   useEditorProp(editor, keybindingProps, useCallback((editor, { keybinding, ace }) => {
     const handler = keybinding === 'ace' ? null : `ace/keyboard/${keybinding}`;
-    // @ts-ignore https://github.com/ajaxorg/ace/issues/4801
     editor.setOption('keyboardHandler', handler);
 
     if (keybinding === 'vim') {
