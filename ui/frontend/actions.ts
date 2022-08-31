@@ -60,6 +60,7 @@ const createAction = <T extends string, P extends {}>(type: T, props?: P) => (
 );
 
 export enum ActionType {
+  InitializeApplication = 'INITIALIZE_APPLICATION',
   SetPage = 'SET_PAGE',
   ChangeEditor = 'CHANGE_EDITOR',
   ChangeKeybinding = 'CHANGE_KEYBINDING',
@@ -126,6 +127,8 @@ export enum ActionType {
   BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
   SplitRatioChanged = 'SPLIT_RATIO_CHANGED',
 }
+
+export const initializeApplication = () => createAction(ActionType.InitializeApplication);
 
 const setPage = (page: Page) =>
   createAction(ActionType.SetPage, { page });
@@ -811,6 +814,7 @@ export function showExample(code): ThunkAction {
 }
 
 export type Action =
+  | ReturnType<typeof initializeApplication>
   | ReturnType<typeof setPage>
   | ReturnType<typeof changePairCharacters>
   | ReturnType<typeof changeAssemblyFlavor>
