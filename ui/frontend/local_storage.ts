@@ -3,7 +3,7 @@
 // playground.
 
 import State from './state';
-import storage from './storage';
+import {removeVersion, initializeStorage, PartialState} from './storage';
 import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, PairCharacters, ProcessAssembly } from './types';
 
 const CURRENT_VERSION = 2;
@@ -90,7 +90,7 @@ function migrateV2(state: V2Configuration): CurrentConfiguration {
   return state;
 }
 
-function migrate(state: V1Configuration | V2Configuration): CurrentConfiguration {
+function migrate(state: V1Configuration | V2Configuration): CurrentConfiguration | undefined {
   switch (state.version) {
     case 1: return migrateV1(state);
     case 2: return migrateV2(state);
@@ -98,7 +98,7 @@ function migrate(state: V1Configuration | V2Configuration): CurrentConfiguration
   }
 }
 
-export function deserialize(savedState: string) {
+export function deserialize(savedState: string): PartialState {
   if (!savedState) { return undefined; }
 
   const parsedState = JSON.parse(savedState);
@@ -107,11 +107,10 @@ export function deserialize(savedState: string) {
   const result = migrate(parsedState);
   if (!result) { return undefined; }
 
-  delete result.version;
-  return result;
+  return removeVersion(result);
 }
 
-export default storage({
+export default initializeStorage({
   storageFactory: () => localStorage,
   serialize,
   deserialize,

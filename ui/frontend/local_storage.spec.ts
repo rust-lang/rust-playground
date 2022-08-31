@@ -25,9 +25,9 @@ describe('restoring saved state', () => {
       notifications: { seenRustSurvey2018: true },
     });
 
-    expect(parsed.configuration.orientation).toEqual('vertical');
-    expect(parsed.code).toEqual('not default code');
-    expect(parsed.notifications.seenRustSurvey2018).toBe(true);
+    expect(parsed?.configuration?.orientation).toEqual('vertical');
+    expect(parsed?.code).toEqual('not default code');
+    expect(parsed?.notifications?.seenRustSurvey2018).toBe(true);
   });
 
   test('data is migrated', () => {
@@ -35,9 +35,9 @@ describe('restoring saved state', () => {
       configuration: { editor: 'advanced', theme: 'xcode', keybinding: 'vi', pairCharacters: 'disabled' },
     });
 
-    expect(parsed.configuration.editor).toEqual('ace');
-    expect(parsed.configuration.ace.theme).toEqual('xcode');
-    expect(parsed.configuration.ace.keybinding).toEqual('vi');
-    expect(parsed.configuration.ace.pairCharacters).toEqual('disabled');
+    expect(parsed?.configuration?.editor).toEqual('ace');
+    expect(parsed?.configuration?.ace?.theme).toEqual('xcode');
+    expect(parsed?.configuration?.ace?.keybinding).toEqual('vi');
+    expect(parsed?.configuration?.ace?.pairCharacters).toEqual('disabled');
   });
 });
