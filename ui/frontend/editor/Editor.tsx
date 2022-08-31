@@ -52,7 +52,7 @@ class CodeByteOffsets {
 }
 
 class SimpleEditor extends React.PureComponent<CommonEditorProps> {
-  private _editor: HTMLTextAreaElement;
+  private _editor: HTMLTextAreaElement | undefined = undefined;
 
   private onChange = e => this.props.onEditCode(e.target.value);
   private trackEditor = component => this._editor = component;
@@ -99,7 +99,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
   private setSelection(oldSelection: Selection, newSelection: Selection) {
     const editor = this._editor;
 
-    if (!newSelection || !editor) { return; }
+    if (!newSelection || !newSelection.start || !newSelection.end || !editor) { return; }
     if (newSelection === oldSelection) { return; }
 
     const offsets = new CodeByteOffsets(this.props.code);
