@@ -33,7 +33,9 @@ const PopButton: React.FC<NewPopProps> = ({ Button, Menu }) => {
       return;
     }
 
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!(event.target instanceof Node)) { return; }
+
       if (referenceElement && referenceElement.contains(event.target)) {
         // They are clicking on the button, so let that go ahead and close us.
         return;
