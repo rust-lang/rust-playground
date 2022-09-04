@@ -30,6 +30,7 @@ import {
   ProcessAssembly,
   Position,
   makePosition,
+  Version,
 } from './types';
 
 const routes = {
@@ -688,7 +689,11 @@ export function performCratesLoad(): ThunkAction {
 const requestVersionsLoad = () =>
   createAction(ActionType.RequestVersionsLoad);
 
-const receiveVersionsLoadSuccess = ({ stable, beta, nightly, rustfmt, clippy, miri }) =>
+const receiveVersionsLoadSuccess = ({
+  stable, beta, nightly, rustfmt, clippy, miri,
+}: {
+  stable: Version, beta: Version, nightly: Version, rustfmt: Version, clippy: Version, miri: Version,
+}) =>
   createAction(ActionType.VersionsLoadSucceeded, { stable, beta, nightly, rustfmt, clippy, miri });
 
 export function performVersionsLoad(): ThunkAction {

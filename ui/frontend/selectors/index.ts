@@ -3,7 +3,16 @@ import { createSelector } from 'reselect';
 import * as url from 'url';
 
 import { State } from '../reducers';
-import { Backtrace, Channel, Edition, Orientation, PrimaryActionAuto, PrimaryActionCore, AceResizeKey } from '../types';
+import {
+  AceResizeKey,
+  Backtrace,
+  Channel,
+  Edition,
+  Orientation,
+  PrimaryActionAuto,
+  PrimaryActionCore,
+  Version,
+} from '../types';
 
 const codeSelector = (state: State) => state.code;
 
@@ -89,27 +98,27 @@ const LABELS: { [index in PrimaryActionCore]: string } = {
 
 export const getExecutionLabel = createSelector(primaryActionSelector, primaryAction => LABELS[primaryAction]);
 
-const getStable = (state: State) => state.versions && state.versions.stable;
-const getBeta = (state: State) => state.versions && state.versions.beta;
-const getNightly = (state: State) => state.versions && state.versions.nightly;
-const getRustfmt = (state: State) => state.versions && state.versions.rustfmt;
-const getClippy = (state: State) => state.versions && state.versions.clippy;
-const getMiri = (state: State) => state.versions && state.versions.miri;
+const getStable = (state: State) => state.versions?.stable;
+const getBeta = (state: State) => state.versions?.beta;
+const getNightly = (state: State) => state.versions?.nightly;
+const getRustfmt = (state: State) => state.versions?.rustfmt;
+const getClippy = (state: State) => state.versions?.clippy;
+const getMiri = (state: State) => state.versions?.miri;
 
-const versionNumber = v => v ? v.version : '';
-export const stableVersionText = createSelector([getStable], versionNumber);
-export const betaVersionText = createSelector([getBeta], versionNumber);
-export const nightlyVersionText = createSelector([getNightly], versionNumber);
-export const clippyVersionText = createSelector([getClippy], versionNumber);
-export const rustfmtVersionText = createSelector([getRustfmt], versionNumber);
-export const miriVersionText = createSelector([getMiri], versionNumber);
+const versionNumber = (v: Version | undefined) => v ? v.version : '';
+export const stableVersionText = createSelector(getStable, versionNumber);
+export const betaVersionText = createSelector(getBeta, versionNumber);
+export const nightlyVersionText = createSelector(getNightly, versionNumber);
+export const clippyVersionText = createSelector(getClippy, versionNumber);
+export const rustfmtVersionText = createSelector(getRustfmt, versionNumber);
+export const miriVersionText = createSelector(getMiri, versionNumber);
 
-const versionDetails = v => v ? `${v.date} ${v.hash.slice(0, 20)}` : '';
-export const betaVersionDetailsText = createSelector([getBeta], versionDetails);
-export const nightlyVersionDetailsText = createSelector([getNightly], versionDetails);
-export const clippyVersionDetailsText = createSelector([getClippy], versionDetails);
-export const rustfmtVersionDetailsText = createSelector([getRustfmt], versionDetails);
-export const miriVersionDetailsText = createSelector([getMiri], versionDetails);
+const versionDetails = (v: Version | undefined) => v ? `${v.date} ${v.hash.slice(0, 20)}` : '';
+export const betaVersionDetailsText = createSelector(getBeta, versionDetails);
+export const nightlyVersionDetailsText = createSelector(getNightly, versionDetails);
+export const clippyVersionDetailsText = createSelector(getClippy, versionDetails);
+export const rustfmtVersionDetailsText = createSelector(getRustfmt, versionDetails);
+export const miriVersionDetailsText = createSelector(getMiri, versionDetails);
 
 const editionSelector = (state: State) => state.configuration.edition;
 
