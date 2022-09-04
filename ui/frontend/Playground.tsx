@@ -50,8 +50,8 @@ const ResizableArea: React.FC = () => {
   // Reset styles left on the grid from split-grid when we change orientation or focus.
   useEffect(() => {
     if (grid.current) {
-      grid.current.style['grid-template-columns'] = null;
-      grid.current.style['grid-template-rows'] = null;
+      grid.current.style.removeProperty('grid-template-columns');
+      grid.current.style.removeProperty('grid-template-rows');
     }
 
     resizeComplete();
