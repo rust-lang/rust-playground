@@ -1,5 +1,14 @@
 import Prism from 'prismjs';
-import { makePosition } from './types';
+import { Channel, makePosition, Position } from './types';
+
+interface ConfigureRustErrorsArgs {
+  enableFeatureGate: (feature: string) => void;
+  getChannel: () => Channel;
+  gotoPosition: (line: string | number, column: string | number) => void;
+  selectText: (start: Position, end: Position) => void;
+  addImport: (code: string) => void;
+  reExecuteWithBacktrace: () => void;
+}
 
 export function configureRustErrors({
   enableFeatureGate,
@@ -8,7 +17,7 @@ export function configureRustErrors({
   selectText,
   addImport,
   reExecuteWithBacktrace,
-}) {
+}: ConfigureRustErrorsArgs) {
   Prism.languages.rust_errors = {
     'warning': {
       pattern: /^warning(\[E\d+\])?:.*$/m,
@@ -89,8 +98,10 @@ export function configureRustErrors({
       }
       env.tag = 'a';
       env.attributes.href = '#';
-      env.attributes['data-line'] = line;
-      env.attributes['data-col'] = col;
+      if (line && col) {
+        env.attributes['data-line'] = line;
+        env.attributes['data-col'] = col;
+      }
     }
     if (env.type === 'import-suggestion') {
       env.tag = 'a';
@@ -142,7 +153,9 @@ export function configureRustErrors({
         const { line, col } = link.dataset;
         link.onclick = e => {
           e.preventDefault();
-          gotoPosition(line, col);
+          if (line && col) {
+            gotoPosition(line, col);
+          }
         };
       }
     });
@@ -163,8 +176,10 @@ export function configureRustErrors({
       if (link instanceof HTMLAnchorElement) {
         link.onclick = e => {
           e.preventDefault();
-          enableFeatureGate(link.dataset.featureGate);
-          gotoPosition(1, 1);
+          if (link.dataset.featureGate) {
+            enableFeatureGate(link.dataset.featureGate);
+            gotoPosition(1, 1);
+          }
         };
       }
     });
