@@ -29,7 +29,7 @@ interface CopiedState {
 }
 
 class Copied extends React.PureComponent<CopiedProps, CopiedState> {
-  public constructor(props) {
+  public constructor(props: CopiedProps) {
     super(props);
     this.state = { copied: false };
   }
