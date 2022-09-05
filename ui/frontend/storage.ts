@@ -26,7 +26,7 @@ export function removeVersion<T extends { version: unknown }>(data: T): Omit<T, 
 }
 
 export class InMemoryStorage {
-  private data = {};
+  private data: { [s: string]: string } = {};
 
   public getItem(name: string): string {
     return this.data[name];
