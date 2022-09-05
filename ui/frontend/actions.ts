@@ -1,7 +1,6 @@
-
 import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
-import url from 'url';
+import url, { UrlObject } from 'url';
 
 import {
   clippyRequestSelector,
@@ -31,6 +30,7 @@ import {
   Position,
   makePosition,
   Version,
+  Crate,
 } from './types';
 
 const routes = {
@@ -187,16 +187,29 @@ export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
 export const changeFocus = (focus?: Focus) =>
   createAction(ActionType.ChangeFocus, { focus });
 
+interface ExecuteResponseBody {
+  stdout: string;
+  stderr: string;
+}
+
+interface ExecuteSuccess extends ExecuteResponseBody {
+  isAutoBuild: boolean;
+}
+
 const requestExecute = () =>
   createAction(ActionType.ExecuteRequest);
 
-const receiveExecuteSuccess = ({ stdout, stderr, isAutoBuild }) =>
+const receiveExecuteSuccess = ({ stdout, stderr, isAutoBuild }: ExecuteSuccess) =>
   createAction(ActionType.ExecuteSucceeded, { stdout, stderr, isAutoBuild });
 
-const receiveExecuteFailure = ({ error, isAutoBuild }) =>
+const receiveExecuteFailure = ({
+  error, isAutoBuild,
+}: {
+  error?: string, isAutoBuild: boolean,
+}) =>
   createAction(ActionType.ExecuteFailed, { error, isAutoBuild });
 
-function jsonGet(urlObj) {
+function jsonGet(urlObj: string | UrlObject) {
   const urlStr = url.format(urlObj);
 
   return fetchJson(urlStr, {
@@ -204,7 +217,7 @@ function jsonGet(urlObj) {
   });
 }
 
-function jsonPost(urlObj, body) {
+function jsonPost<T>(urlObj: UrlObject, body: Record<string, any>): Promise<T> {
   const urlStr = url.format(urlObj);
 
   return fetchJson(urlStr, {
@@ -213,9 +226,9 @@ function jsonPost(urlObj, body) {
   });
 }
 
-async function fetchJson(url, args) {
-  const { headers = {} } = args;
-  headers['Content-Type'] = 'application/json';
+async function fetchJson(url: string, args: RequestInit) {
+  const headers = new Headers(args.headers);
+  headers.set('Content-Type', 'application/json');
 
   let response;
   try {
@@ -267,7 +280,7 @@ interface ExecuteRequestBody {
   backtrace: boolean;
 }
 
-const performCommonExecute = (crateType, tests): ThunkAction => (dispatch, getState) => {
+const performCommonExecute = (crateType: string, tests: boolean): ThunkAction => (dispatch, getState) => {
   dispatch(requestExecute());
 
   const state = getState();
@@ -277,7 +290,7 @@ const performCommonExecute = (crateType, tests): ThunkAction => (dispatch, getSt
 
   const body: ExecuteRequestBody = { channel, mode, edition, crateType, tests, code, backtrace };
 
-  return jsonPost(routes.execute, body)
+  return jsonPost<ExecuteResponseBody>(routes.execute, body)
     .then(json => dispatch(receiveExecuteSuccess({ ...json, isAutoBuild })))
     .catch(json => dispatch(receiveExecuteFailure({ ...json, isAutoBuild })));
 };
@@ -303,7 +316,25 @@ interface CompileRequestBody extends ExecuteRequestBody {
   processAssembly: string;
 }
 
-function performCompileShow(target, { request, success, failure }): ThunkAction {
+type CompileResponseBody = CompileSuccess;
+
+interface CompileSuccess {
+  code: string;
+  stdout: string;
+  stderr: string;
+}
+
+interface CompileFailure {
+  error: string;
+}
+
+function performCompileShow(
+  target: string,
+  { request, success, failure }: {
+    request: () => Action,
+    success: (body: CompileResponseBody) => Action,
+    failure: (f: CompileFailure) => Action,
+  }): ThunkAction {
   // TODO: Check a cache
   return function(dispatch, getState) {
     dispatch(request());
@@ -334,7 +365,7 @@ function performCompileShow(target, { request, success, failure }): ThunkAction 
       backtrace,
     };
 
-    return jsonPost(routes.compile, body)
+    return jsonPost<CompileResponseBody>(routes.compile, body)
       .then(json => dispatch(success(json)))
       .catch(json => dispatch(failure(json)));
   };
@@ -343,10 +374,10 @@ function performCompileShow(target, { request, success, failure }): ThunkAction 
 const requestCompileAssembly = () =>
   createAction(ActionType.CompileAssemblyRequest);
 
-const receiveCompileAssemblySuccess = ({ code, stdout, stderr }) =>
+const receiveCompileAssemblySuccess = ({ code, stdout, stderr }: CompileSuccess) =>
   createAction(ActionType.CompileAssemblySucceeded, { code, stdout, stderr });
 
-const receiveCompileAssemblyFailure = ({ error }) =>
+const receiveCompileAssemblyFailure = ({ error }: CompileFailure) =>
   createAction(ActionType.CompileAssemblyFailed, { error });
 
 const performCompileToAssemblyOnly = () =>
@@ -359,10 +390,10 @@ const performCompileToAssemblyOnly = () =>
 const requestCompileLlvmIr = () =>
   createAction(ActionType.CompileLlvmIrRequest);
 
-const receiveCompileLlvmIrSuccess = ({ code, stdout, stderr }) =>
+const receiveCompileLlvmIrSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
   createAction(ActionType.CompileLlvmIrSucceeded, { code, stdout, stderr });
 
-const receiveCompileLlvmIrFailure = ({ error }) =>
+const receiveCompileLlvmIrFailure = ({ error }: CompileFailure) =>
   createAction(ActionType.CompileLlvmIrFailed, { error });
 
 const performCompileToLLVMOnly = () =>
@@ -375,10 +406,10 @@ const performCompileToLLVMOnly = () =>
 const requestCompileHir = () =>
   createAction(ActionType.CompileHirRequest);
 
-const receiveCompileHirSuccess = ({ code, stdout, stderr }) =>
+const receiveCompileHirSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
   createAction(ActionType.CompileHirSucceeded, { code, stdout, stderr });
 
-const receiveCompileHirFailure = ({ error }) =>
+const receiveCompileHirFailure = ({ error }: CompileFailure) =>
   createAction(ActionType.CompileHirFailed, { error });
 
 const performCompileToHirOnly = () =>
@@ -396,10 +427,10 @@ const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
 const requestCompileMir = () =>
   createAction(ActionType.CompileMirRequest);
 
-const receiveCompileMirSuccess = ({ code, stdout, stderr }) =>
+const receiveCompileMirSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
   createAction(ActionType.CompileMirSucceeded, { code, stdout, stderr });
 
-const receiveCompileMirFailure = ({ error }) =>
+const receiveCompileMirFailure = ({ error }: CompileFailure) =>
   createAction(ActionType.CompileMirFailed, { error });
 
 const performCompileToMirOnly = () =>
@@ -412,10 +443,10 @@ const performCompileToMirOnly = () =>
 const requestCompileWasm = () =>
   createAction(ActionType.CompileWasmRequest);
 
-const receiveCompileWasmSuccess = ({ code, stdout, stderr }) =>
+const receiveCompileWasmSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
   createAction(ActionType.CompileWasmSucceeded, { code, stdout, stderr });
 
-const receiveCompileWasmFailure = ({ error }) =>
+const receiveCompileWasmFailure = ({ error }: CompileFailure) =>
   createAction(ActionType.CompileWasmFailed, { error });
 
 const performCompileToWasm = () =>
@@ -497,10 +528,10 @@ interface FormatRequestBody {
 }
 
 interface FormatResponseBody {
+  success: boolean;
   code: string;
   stdout: string;
   stderr: string;
-  error: string;
 }
 
 const receiveFormatSuccess = (body: FormatResponseBody) =>
@@ -516,7 +547,7 @@ export function performFormat(): ThunkAction {
 
     const body: FormatRequestBody = formatRequestSelector(getState());
 
-    return jsonPost(routes.format, body)
+    return jsonPost<FormatResponseBody>(routes.format, body)
       .then(json => {
         if (json.success) {
           dispatch(receiveFormatSuccess(json));
@@ -528,6 +559,11 @@ export function performFormat(): ThunkAction {
   };
 }
 
+interface GeneralSuccess {
+  stdout: string;
+  stderr: string;
+}
+
 const requestClippy = () =>
   createAction(ActionType.RequestClippy);
 
@@ -537,10 +573,18 @@ interface ClippyRequestBody {
   crateType: string;
 }
 
-const receiveClippySuccess = ({ stdout, stderr }) =>
+interface ClippyResponseBody {
+  success: boolean;
+  stdout: string;
+  stderr: string;
+}
+
+type ClippySuccess = GeneralSuccess;
+
+const receiveClippySuccess = ({ stdout, stderr }: ClippySuccess) =>
   createAction(ActionType.ClippySucceeded, { stdout, stderr });
 
-const receiveClippyFailure = ({ error }) =>
+const receiveClippyFailure = ({ error }: CompileFailure) =>
   createAction(ActionType.ClippyFailed, { error });
 
 export function performClippy(): ThunkAction {
@@ -550,7 +594,7 @@ export function performClippy(): ThunkAction {
 
     const body: ClippyRequestBody = clippyRequestSelector(getState());
 
-    return jsonPost(routes.clippy, body)
+    return jsonPost<ClippyResponseBody>(routes.clippy, body)
       .then(json => dispatch(receiveClippySuccess(json)))
       .catch(json => dispatch(receiveClippyFailure(json)));
   };
@@ -564,10 +608,18 @@ interface MiriRequestBody {
   edition: string;
 }
 
-const receiveMiriSuccess = ({ stdout, stderr }) =>
+interface MiriResponseBody {
+  success: boolean;
+  stdout: string;
+  stderr: string;
+}
+
+type MiriSuccess = GeneralSuccess;
+
+const receiveMiriSuccess = ({ stdout, stderr }: MiriSuccess) =>
   createAction(ActionType.MiriSucceeded, { stdout, stderr });
 
-const receiveMiriFailure = ({ error }) =>
+const receiveMiriFailure = ({ error }: CompileFailure) =>
   createAction(ActionType.MiriFailed, { error });
 
 export function performMiri(): ThunkAction {
@@ -580,7 +632,7 @@ export function performMiri(): ThunkAction {
     } } = getState();
     const body: MiriRequestBody = { code, edition };
 
-    return jsonPost(routes.miri, body)
+    return jsonPost<MiriResponseBody>(routes.miri, body)
       .then(json => dispatch(receiveMiriSuccess(json)))
       .catch(json => dispatch(receiveMiriFailure(json)));
   };
@@ -594,10 +646,18 @@ interface MacroExpansionRequestBody {
   edition: string;
 }
 
-const receiveMacroExpansionSuccess = ({ stdout, stderr }) =>
+interface MacroExpansionResponseBody {
+  success: boolean;
+  stdout: string;
+  stderr: string;
+}
+
+type MacroExpansionSuccess = GeneralSuccess;
+
+const receiveMacroExpansionSuccess = ({ stdout, stderr }: MacroExpansionSuccess) =>
   createAction(ActionType.MacroExpansionSucceeded, { stdout, stderr });
 
-const receiveMacroExpansionFailure = ({ error }) =>
+const receiveMacroExpansionFailure = ({ error }: CompileFailure) =>
   createAction(ActionType.MacroExpansionFailed, { error });
 
 export function performMacroExpansion(): ThunkAction {
@@ -610,7 +670,7 @@ export function performMacroExpansion(): ThunkAction {
     } } = getState();
     const body: MacroExpansionRequestBody = { code, edition };
 
-    return jsonPost(routes.macroExpansion, body)
+    return jsonPost<MacroExpansionResponseBody>(routes.macroExpansion, body)
       .then(json => dispatch(receiveMacroExpansionSuccess(json)))
       .catch(json => dispatch(receiveMacroExpansionFailure(json)));
   };
@@ -655,16 +715,33 @@ const requestGistSave = () =>
 const receiveGistSaveSuccess = (props: GistSuccessProps) =>
   createAction(ActionType.GistSaveSucceeded, props);
 
-const receiveGistSaveFailure = ({ error }) => // eslint-disable-line no-unused-vars
+const receiveGistSaveFailure = ({ error }: CompileFailure) => // eslint-disable-line no-unused-vars
   createAction(ActionType.GistSaveFailed, { error });
+
+interface GistResponseBody {
+  id: string;
+  url: string;
+  code: string;
+}
 
 export function performGistSave(): ThunkAction {
   return function(dispatch, getState) {
     dispatch(requestGistSave());
 
-    const { code, configuration: { channel, mode, edition }, output: { execute: { stdout, stderr } } } = getState();
+    const {
+      code,
+      configuration: {
+        channel, mode, edition,
+      },
+      output: {
+        execute: {
+          stdout = '',
+          stderr = '',
+        },
+      },
+    } = getState();
 
-    return jsonPost(routes.meta.gist, { code })
+    return jsonPost<GistResponseBody>(routes.meta.gist, { code })
       .then(json => dispatch(receiveGistSaveSuccess({ ...json, code, stdout, stderr, channel, mode, edition })));
     // TODO: Failure case
   };
@@ -673,7 +750,7 @@ export function performGistSave(): ThunkAction {
 const requestCratesLoad = () =>
   createAction(ActionType.RequestCratesLoad);
 
-const receiveCratesLoadSuccess = ({ crates }) =>
+const receiveCratesLoadSuccess = ({ crates }: { crates: Crate[] }) =>
   createAction(ActionType.CratesLoadSucceeded, { crates });
 
 export function performCratesLoad(): ThunkAction {
@@ -733,7 +810,7 @@ export const browserWidthChanged = (isSmall: boolean) =>
 export const splitRatioChanged = () =>
   createAction(ActionType.SplitRatioChanged);
 
-function parseChannel(s: string): Channel | null {
+function parseChannel(s?: string): Channel | null {
   switch (s) {
     case 'stable':
       return Channel.Stable;
@@ -746,7 +823,7 @@ function parseChannel(s: string): Channel | null {
   }
 }
 
-function parseMode(s: string): Mode | null {
+function parseMode(s?: string): Mode | null {
   switch (s) {
     case 'debug':
       return Mode.Debug;
@@ -757,7 +834,7 @@ function parseMode(s: string): Mode | null {
   }
 }
 
-function parseEdition(s: string): Edition | null {
+function parseEdition(s?: string): Edition | null {
   switch (s) {
     case '2015':
       return Edition.Rust2015;
@@ -776,7 +853,7 @@ export function indexPageLoad({
   version,
   mode: modeString,
   edition: editionString,
-}): ThunkAction {
+}: { code?: string, gist?: string, version?: string, mode?: string, edition?: string }): ThunkAction {
   return function(dispatch) {
     const channel = parseChannel(version) || Channel.Stable;
     const mode = parseMode(modeString) || Mode.Debug;
@@ -811,7 +888,7 @@ export function helpPageLoad() {
   return navigateToHelp();
 }
 
-export function showExample(code): ThunkAction {
+export function showExample(code: string): ThunkAction {
   return function(dispatch) {
     dispatch(navigateToIndex());
     dispatch(editCode(code));

@@ -9,7 +9,6 @@ interface State {
   requestsInProgress: number;
   stdout?: string;
   stderr?: string;
-  error?: string;
 }
 
 export default function format(state = DEFAULT, action: Action): State {
@@ -19,8 +18,8 @@ export default function format(state = DEFAULT, action: Action): State {
     case ActionType.FormatSucceeded:
       return finish(state);
     case ActionType.FormatFailed: {
-      const { stdout = '', stderr = '', error = '' } = action;
-      return finish(state, { stdout, stderr, error });
+      const { stdout = '', stderr = '' } = action;
+      return finish(state, { stdout, stderr });
     }
     default:
       return state;
