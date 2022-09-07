@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
+import { ThunkAction as ReduxThunkAction } from '@reduxjs/toolkit';
 import { z } from 'zod';
 
 import {

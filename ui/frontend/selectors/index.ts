@@ -1,5 +1,5 @@
 import { source } from 'common-tags';
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 
 import { State } from '../reducers';
 import {

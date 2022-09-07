@@ -1,7 +1,6 @@
 import { isEqual } from 'lodash-es';
-import { createStore, Reducer, Store, Action, PreloadedState } from 'redux';
+import { configureStore, CombinedState, ThunkAction, Reducer, Store, Action, PreloadedState } from '@reduxjs/toolkit';
 import { BrowserHistory, Location, Path } from 'history';
-import { ThunkAction } from 'redux-thunk';
 
 export type PlainOrThunk<St, A extends Action<any>> = A | ThunkAction<void, St, {}, A>;
 
@@ -68,9 +67,15 @@ export function createRouter<St, SubSt, A extends Action<any>>({
   return {
     provisionalLocation: (makeAction: () => A) => {
       const state = store.getState();
-      // This is a hack -- we know that our fully-constructed state is
-      // valid as a "preloaded" state for a brand new store!
-      const tempStore = createStore(reducer, state as PreloadedState<St>);
+
+      const tempStore = configureStore({
+        reducer,
+        // This is a hack -- we know that our fully-constructed state is
+        // valid as a "preloaded" state for a brand new store!
+        preloadedState: state as PreloadedState<CombinedState<St>>,
+        devTools: false,
+      });
+
       const action = makeAction();
       tempStore.dispatch(action);
       const maybeState = tempStore.getState();
