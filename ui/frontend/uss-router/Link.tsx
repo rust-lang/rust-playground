@@ -19,11 +19,13 @@ const Link: React.FC<LinkProps> = (props) => {
   const realOnClick = useCallback(e => {
     if (onClick) {
       onClick();
-    } else {
+    } else if (action) {
       dispatch(action());
     }
     e.preventDefault();
   }, [action, dispatch, onClick]);
+
+  if (!router) { return null; }
 
   const location = router.provisionalLocation(action);
   const href = location.pathname;

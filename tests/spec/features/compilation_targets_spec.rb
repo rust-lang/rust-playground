@@ -42,7 +42,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     end
   end
 
-  context "when AT&T syntax is selected" do
+  context "when AT&T syntax is selected", :assembly do
     before do
       in_config_menu { choose("AT&T") }
     end
@@ -59,7 +59,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     end
   end
 
-  context "when Intel syntax is selected" do
+  context "when Intel syntax is selected", :assembly do
     before do
       in_config_menu { choose("Intel") }
     end

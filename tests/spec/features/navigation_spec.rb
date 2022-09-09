@@ -44,7 +44,7 @@ RSpec.feature "Navigating between pages", type: :feature, js: true do
     expect(page).to be_at_url('/')
   end
 
-  scenario "Navigating to help changes the URL" do
+  scenario "Navigating to help changes the URL", :flaky do
     visit '/'
     expect(page).to have_content('RUN')
 

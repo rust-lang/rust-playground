@@ -3,7 +3,7 @@
 // when we reopen a closed tab.
 
 import { State } from './reducers';
-import storage from './storage';
+import {removeVersion, initializeStorage, PartialState} from './storage';
 
 const CURRENT_VERSION = 1;
 
@@ -17,20 +17,22 @@ export function serialize(state: State): string {
   });
 }
 
-export function deserialize(savedState: string): Partial<State> {
+export function deserialize(savedState: string): PartialState {
   if (!savedState) { return undefined; }
+
   const parsedState = JSON.parse(savedState);
   if (!parsedState) { return undefined; }
+
   if (parsedState.version !== CURRENT_VERSION) { return undefined; }
 
   // This assumes that the keys we serialize with match the keys in the
   // live state. If that's no longer true, an additional renaming step
   // needs to be added.
-  delete parsedState.version;
-  return parsedState;
+
+  return removeVersion(parsedState);
 }
 
-export default storage({
+export default initializeStorage({
   storageFactory: () => sessionStorage,
   serialize,
   deserialize,

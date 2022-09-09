@@ -1,17 +1,32 @@
-import { merge } from 'lodash';
-import { StoreEnhancer, StoreEnhancerStoreCreator } from 'redux';
 import { DeepPartial } from 'ts-essentials';
+
+import State from './state';
 
 type SimpleStorage = Pick<Storage, 'getItem' | 'setItem'>;
 
-interface Config<S> {
-  storageFactory: () => SimpleStorage;
-  serialize: (state: S) => string;
-  deserialize: (state: string) => DeepPartial<S>;
+export type PartialState = DeepPartial<State> | undefined;
+
+type StorageFactory = () => SimpleStorage;
+
+interface Config {
+  storageFactory: StorageFactory;
+  serialize: (state: State) => string;
+  deserialize: (state: string) => PartialState;
+}
+
+interface InitializedStorage {
+  initialState: PartialState;
+  saveChanges: (state: State) => void;
+}
+
+export function removeVersion<T extends { version: unknown }>(data: T): Omit<T, 'version'> {
+  const munged: Record<string, unknown> = {...data};
+  delete munged.version;
+  return munged as Omit<T, 'version'>
 }
 
 export class InMemoryStorage {
-  private data = {};
+  private data: { [s: string]: string } = {};
 
   public getItem(name: string): string {
     return this.data[name];
@@ -22,37 +37,36 @@ export class InMemoryStorage {
   }
 }
 
-const key = 'redux';
+const KEY = 'redux';
 
-const storage = <St>(config: Config<St>): StoreEnhancer =>
-  (createStore: StoreEnhancerStoreCreator<{}, St>) =>
-    (reducer, preloadedState) => {
-      const { storageFactory, serialize, deserialize } = config;
+export function initializeStorage(config: Config) {
+  return (): InitializedStorage => {
+    const { storageFactory, serialize, deserialize } = config;
 
-      let storage: SimpleStorage;
+    const storage = validateStorage(storageFactory);
+    const serializedState = storage.getItem(KEY);
+    const initialState = serializedState ? deserialize(serializedState) : undefined;
 
-      try {
-        // Attempt to use the storage to see if security settings are preventing it.
-        storage = storageFactory();
-        const current = storage.getItem(key);
-        storage.setItem(key, current);
-      } catch (e) {
-        console.warn('Unable to store configuration, falling back to non-persistent in-memory storage');
-        storage = new InMemoryStorage();
-      }
-
-      const serializedState = storage.getItem(key);
-      const persistedState = deserialize(serializedState);
-      const mergedPreloadedState = merge(preloadedState, persistedState);
-      const theStore = createStore(reducer, mergedPreloadedState);
-
-      theStore.subscribe(() => {
-        const state = theStore.getState();
-        const serializedState = serialize(state);
-        storage.setItem(key, serializedState);
-      });
-
-      return theStore;
+    const saveChanges = (state: State) => {
+      const serializedState = serialize(state);
+      storage.setItem(KEY, serializedState);
     };
 
-export default storage;
+    return { initialState, saveChanges }
+  }
+}
+
+// Attempt to use the storage to see if security settings are
+// preventing it. Falls back to dummy in-memory storage if needed.
+function validateStorage(storageFactory: StorageFactory): SimpleStorage {
+  try {
+    const storage = storageFactory();
+    const current = storage.getItem(KEY);
+    storage.setItem(KEY, current || '');
+    return storage;
+
+  } catch (e) {
+    console.warn('Unable to store configuration, falling back to non-persistent in-memory storage');
+    return new InMemoryStorage();
+  }
+}

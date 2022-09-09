@@ -1,10 +1,10 @@
+import { editCode } from '../actions';
 import reducer from '../reducers';
 
 import { hasMainFunctionSelector } from './index';
 
-const buildState = code => {
-  const state = reducer(undefined, { type: '__test_init' });
-  state.code = code;
+const buildState = (code: string) => {
+  const state = reducer(undefined, editCode(code));
   return state;
 };
 

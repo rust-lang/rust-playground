@@ -1,18 +1,17 @@
 import React, { createContext } from 'react';
 
-export const Context = createContext(undefined);
+import { RouterObject } from '.';
+
+export const Context = createContext<RouterObject | undefined>(undefined);
 
 interface RouterProps {
-  router: boolean;
+  router: RouterObject;
 }
 
-const Router: React.FC<RouterProps> = (props) => {
-
-  return (
-    <Context.Provider value={props.router}>
-      {props.children}
-    </Context.Provider>
-  );
-};
+const Router: React.FC<RouterProps> = ({router, children}) => (
+  <Context.Provider value={router}>
+    {children}
+  </Context.Provider>
+);
 
 export default Router;

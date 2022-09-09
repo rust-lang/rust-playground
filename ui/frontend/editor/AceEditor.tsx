@@ -12,6 +12,18 @@ type AceModule = import('ace-builds').Ace.Editor;
 type AceCompleter = import('ace-builds').Ace.Completer;
 type AceCompletion = import('ace-builds').Ace.Completion;
 
+interface CodeMirrorEditor {
+  ace: AceModule;
+}
+
+interface VimKeybindings {
+  CodeMirror: {
+    Vim: {
+      defineEx: (cmd: string, key: string, cb: (cm: CodeMirrorEditor) => void) => void;
+    };
+  };
+}
+
 const displayExternCrateAutocomplete = (editor: AceModule, autocompleteOnUse: boolean) => {
   const { session } = editor;
   const pos = editor.getCursorPosition();
@@ -192,11 +204,13 @@ const AceEditor: React.FC<AceEditorProps> = props => {
   );
 
   useEditorProp(editor, onEditCodeDebounced, useCallback((editor, onEditCode) => {
-    const listener = editor.on('change', _delta => {
+    const listener = () => {
       if (!doingSetProp.current) {
         onEditCode(editor.getValue());
       }
-    });
+    };
+
+    editor.on('change', listener);
 
     return () => {
       editor.off('change', listener);
@@ -236,12 +250,11 @@ const AceEditor: React.FC<AceEditorProps> = props => {
 
   useEditorProp(editor, keybindingProps, useCallback((editor, { keybinding, ace }) => {
     const handler = keybinding === 'ace' ? null : `ace/keyboard/${keybinding}`;
-    // @ts-ignore https://github.com/ajaxorg/ace/issues/4801
     editor.setOption('keyboardHandler', handler);
 
     if (keybinding === 'vim') {
-      const { CodeMirror: { Vim } } = ace.require('ace/keyboard/vim');
-      Vim.defineEx('write', 'w', (cm, _input) => {
+      const { CodeMirror: { Vim } }: VimKeybindings = ace.require('ace/keyboard/vim');
+      Vim.defineEx('write', 'w', (cm) => {
         cm.ace.execCommand('executeCode');
       });
     }
@@ -332,7 +345,7 @@ interface AceEditorAsyncProps {
 }
 
 class AceEditorAsync extends React.Component<AceEditorAsyncProps, AceEditorAsyncState> {
-  public constructor(props) {
+  public constructor(props: AceEditorAsyncProps) {
     super(props);
     this.state = {
       modeState: LoadState.Unloaded,
@@ -358,7 +371,7 @@ class AceEditorAsync extends React.Component<AceEditorAsyncProps, AceEditorAsync
     this.load();
   }
 
-  public componentDidUpdate(_prevProps, _prevState) {
+  public componentDidUpdate() {
     if (this.isLoadNeeded()) {
       this.load();
     }

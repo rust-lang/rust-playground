@@ -44,13 +44,15 @@ const ResizableArea: React.FC = () => {
   const dispatch = useDispatch();
   const resizeComplete = useCallback(() => dispatch(actions.splitRatioChanged()), [dispatch]);
 
-  const grid = useRef(null);
+  const grid = useRef<HTMLDivElement | null>(null);
   const dragHandle = useRef(null);
 
   // Reset styles left on the grid from split-grid when we change orientation or focus.
   useEffect(() => {
-    grid.current.style['grid-template-columns'] = null;
-    grid.current.style['grid-template-rows'] = null;
+    if (grid.current) {
+      grid.current.style.removeProperty('grid-template-columns');
+      grid.current.style.removeProperty('grid-template-rows');
+    }
 
     resizeComplete();
   }, [orientation, isFocused, resizeComplete])

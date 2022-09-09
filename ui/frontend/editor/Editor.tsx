@@ -52,11 +52,11 @@ class CodeByteOffsets {
 }
 
 class SimpleEditor extends React.PureComponent<CommonEditorProps> {
-  private _editor: HTMLTextAreaElement;
+  private _editor: HTMLTextAreaElement | null = null;
 
-  private onChange = e => this.props.onEditCode(e.target.value);
-  private trackEditor = component => this._editor = component;
-  private onKeyDown = e => {
+  private onChange: React.ChangeEventHandler<HTMLTextAreaElement> = e => this.props.onEditCode(e.target.value);
+  private trackEditor: React.RefCallback<HTMLTextAreaElement> = component => this._editor = component;
+  private onKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = e => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       this.props.execute();
     }
@@ -78,7 +78,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
     );
   }
 
-  public componentDidUpdate(prevProps, _prevState) {
+  public componentDidUpdate(prevProps: CommonEditorProps) {
     this.gotoPosition(prevProps.position, this.props.position);
     this.setSelection(prevProps.selection, this.props.selection);
   }
@@ -99,7 +99,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
   private setSelection(oldSelection: Selection, newSelection: Selection) {
     const editor = this._editor;
 
-    if (!newSelection || !editor) { return; }
+    if (!newSelection || !newSelection.start || !newSelection.end || !editor) { return; }
     if (newSelection === oldSelection) { return; }
 
     const offsets = new CodeByteOffsets(this.props.code);

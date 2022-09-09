@@ -1,18 +1,29 @@
 import React from 'react';
 
-import { createBrowserHistory as createHistory } from 'history';
-import { createRouter } from './uss-router';
+import { createBrowserHistory as createHistory, Path, Location } from 'history';
+import { createRouter, PlainOrThunk } from './uss-router';
 import UssRouter from './uss-router/Router';
 
 import qs from 'qs';
 import Route from 'route-parser';
 
 import * as actions from './actions';
+import State from './state';
+import { Channel, Edition, Mode, Page } from './types';
 
 const homeRoute = new Route('/');
 const helpRoute = new Route('/help');
 
-const stateSelector = ({ page, configuration: { channel, mode, edition } }) => ({
+interface Substate {
+  page: Page;
+  configuration: {
+    channel: Channel;
+    mode: Mode;
+    edition: Edition;
+  }
+}
+
+const stateSelector = ({ page, configuration: { channel, mode, edition } }: State): Substate => ({
   page,
   configuration: {
     channel,
@@ -21,7 +32,7 @@ const stateSelector = ({ page, configuration: { channel, mode, edition } }) => (
   },
 });
 
-const stateToLocation = ({ page, configuration }) => {
+const stateToLocation = ({ page, configuration }: Substate): Partial<Path> => {
   switch (page) {
     case 'help': {
       return {
@@ -42,7 +53,7 @@ const stateToLocation = ({ page, configuration }) => {
   }
 };
 
-const locationToAction = location => {
+const locationToAction = (location: Location): PlainOrThunk<State, actions.Action> | null => {
   const matchedHelp = helpRoute.match(location.pathname);
 
   if (matchedHelp) {
@@ -61,7 +72,7 @@ const locationToAction = location => {
 export default class Router extends React.Component<RouterProps> {
   private router: any;
 
-  public constructor(props) {
+  public constructor(props: RouterProps) {
     super(props);
 
     const history = createHistory();
