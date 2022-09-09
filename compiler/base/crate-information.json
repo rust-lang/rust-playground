@@ -10,18 +10,13 @@
     "id": "adler"
   },
   {
-    "name": "adler32",
-    "version": "1.2.0",
-    "id": "adler32"
-  },
-  {
     "name": "ahash",
     "version": "0.7.6",
     "id": "ahash"
   },
   {
     "name": "aho-corasick",
-    "version": "0.7.18",
+    "version": "0.7.19",
     "id": "aho_corasick"
   },
   {
@@ -31,7 +26,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.62",
+    "version": "1.0.64",
     "id": "anyhow"
   },
   {
@@ -106,7 +101,7 @@
   },
   {
     "name": "block-buffer",
-    "version": "0.10.2",
+    "version": "0.10.3",
     "id": "block_buffer"
   },
   {
@@ -156,12 +151,12 @@
   },
   {
     "name": "clap",
-    "version": "3.2.17",
+    "version": "3.2.20",
     "id": "clap"
   },
   {
     "name": "clap_derive",
-    "version": "3.2.17",
+    "version": "3.2.18",
     "id": "clap_derive"
   },
   {
@@ -186,7 +181,7 @@
   },
   {
     "name": "cpufeatures",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "id": "cpufeatures"
   },
   {
@@ -248,11 +243,6 @@
     "name": "new_debug_unreachable",
     "version": "1.0.4",
     "id": "debug_unreachable"
-  },
-  {
-    "name": "deflate",
-    "version": "1.0.0",
-    "id": "deflate"
   },
   {
     "name": "derivative",
@@ -351,7 +341,7 @@
   },
   {
     "name": "futures",
-    "version": "0.3.23",
+    "version": "0.3.24",
     "id": "futures"
   },
   {
@@ -361,42 +351,42 @@
   },
   {
     "name": "futures-channel",
-    "version": "0.3.23",
+    "version": "0.3.24",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.3.23",
+    "version": "0.3.24",
     "id": "futures_core"
   },
   {
     "name": "futures-executor",
-    "version": "0.3.23",
+    "version": "0.3.24",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.3.23",
+    "version": "0.3.24",
     "id": "futures_io"
   },
   {
     "name": "futures-macro",
-    "version": "0.3.23",
+    "version": "0.3.24",
     "id": "futures_macro"
   },
   {
     "name": "futures-sink",
-    "version": "0.3.23",
+    "version": "0.3.24",
     "id": "futures_sink"
   },
   {
     "name": "futures-task",
-    "version": "0.3.23",
+    "version": "0.3.24",
     "id": "futures_task"
   },
   {
     "name": "futures-util",
-    "version": "0.3.23",
+    "version": "0.3.24",
     "id": "futures_util"
   },
   {
@@ -476,7 +466,7 @@
   },
   {
     "name": "httparse",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "id": "httparse"
   },
   {
@@ -501,7 +491,7 @@
   },
   {
     "name": "iana-time-zone",
-    "version": "0.1.46",
+    "version": "0.1.47",
     "id": "iana_time_zone"
   },
   {
@@ -581,7 +571,7 @@
   },
   {
     "name": "lock_api",
-    "version": "0.4.7",
+    "version": "0.4.8",
     "id": "lock_api"
   },
   {
@@ -626,7 +616,7 @@
   },
   {
     "name": "md-5",
-    "version": "0.10.1",
+    "version": "0.10.4",
     "id": "md5"
   },
   {
@@ -661,13 +651,13 @@
   },
   {
     "name": "miniz_oxide",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "id": "miniz_oxide"
   },
   {
     "name": "miniz_oxide",
-    "version": "0.5.3",
-    "id": "miniz_oxide_0_5_3"
+    "version": "0.5.4",
+    "id": "miniz_oxide_0_5_4"
   },
   {
     "name": "mio",
@@ -756,7 +746,7 @@
   },
   {
     "name": "once_cell",
-    "version": "1.13.1",
+    "version": "1.14.0",
     "id": "once_cell"
   },
   {
@@ -806,7 +796,7 @@
   },
   {
     "name": "paste",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "id": "paste"
   },
   {
@@ -891,7 +881,7 @@
   },
   {
     "name": "png",
-    "version": "0.17.5",
+    "version": "0.17.6",
     "id": "png"
   },
   {
@@ -1131,7 +1121,7 @@
   },
   {
     "name": "sha2",
-    "version": "0.10.2",
+    "version": "0.10.5",
     "id": "sha2"
   },
   {
@@ -1166,7 +1156,7 @@
   },
   {
     "name": "socket2",
-    "version": "0.4.6",
+    "version": "0.4.7",
     "id": "socket2"
   },
   {
@@ -1241,12 +1231,12 @@
   },
   {
     "name": "thiserror",
-    "version": "1.0.32",
+    "version": "1.0.34",
     "id": "thiserror"
   },
   {
     "name": "thiserror-impl",
-    "version": "1.0.32",
+    "version": "1.0.34",
     "id": "thiserror_impl"
   },
   {
@@ -1296,7 +1286,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.20.1",
+    "version": "1.21.0",
     "id": "tokio"
   },
   {
@@ -1366,7 +1356,7 @@
   },
   {
     "name": "ucd-trie",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "id": "ucd_trie"
   },
   {
