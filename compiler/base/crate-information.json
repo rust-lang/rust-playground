@@ -26,7 +26,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.64",
+    "version": "1.0.65",
     "id": "anyhow"
   },
   {
@@ -151,7 +151,7 @@
   },
   {
     "name": "clap",
-    "version": "3.2.20",
+    "version": "3.2.21",
     "id": "clap"
   },
   {
@@ -331,7 +331,7 @@
   },
   {
     "name": "form_urlencoded",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "id": "form_urlencoded"
   },
   {
@@ -491,13 +491,18 @@
   },
   {
     "name": "iana-time-zone",
-    "version": "0.1.47",
+    "version": "0.1.48",
     "id": "iana_time_zone"
   },
   {
     "name": "idna",
-    "version": "0.2.3",
+    "version": "0.3.0",
     "id": "idna"
+  },
+  {
+    "name": "idna",
+    "version": "0.2.3",
+    "id": "idna_0_2_3"
   },
   {
     "name": "image",
@@ -521,7 +526,7 @@
   },
   {
     "name": "itertools",
-    "version": "0.10.3",
+    "version": "0.10.4",
     "id": "itertools"
   },
   {
@@ -801,12 +806,12 @@
   },
   {
     "name": "percent-encoding",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "id": "percent_encoding"
   },
   {
     "name": "pest",
-    "version": "2.3.0",
+    "version": "2.3.1",
     "id": "pest"
   },
   {
@@ -966,7 +971,7 @@
   },
   {
     "name": "rand_core",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "id": "rand_core"
   },
   {
@@ -1076,7 +1081,7 @@
   },
   {
     "name": "semver",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "id": "semver"
   },
   {
@@ -1231,12 +1236,12 @@
   },
   {
     "name": "thiserror",
-    "version": "1.0.34",
+    "version": "1.0.35",
     "id": "thiserror"
   },
   {
     "name": "thiserror-impl",
-    "version": "1.0.34",
+    "version": "1.0.35",
     "id": "thiserror_impl"
   },
   {
@@ -1286,7 +1291,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.21.0",
+    "version": "1.21.1",
     "id": "tokio"
   },
   {
@@ -1311,7 +1316,7 @@
   },
   {
     "name": "tokio-util",
-    "version": "0.7.3",
+    "version": "0.7.4",
     "id": "tokio_util"
   },
   {
@@ -1371,7 +1376,7 @@
   },
   {
     "name": "unicode-ident",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "id": "unicode_ident"
   },
   {
@@ -1386,17 +1391,17 @@
   },
   {
     "name": "unicode-segmentation",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "id": "unicode_segmentation"
   },
   {
     "name": "unicode-width",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "id": "unicode_width"
   },
   {
     "name": "unicode-xid",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "id": "unicode_xid"
   },
   {
@@ -1411,7 +1416,7 @@
   },
   {
     "name": "url",
-    "version": "2.2.2",
+    "version": "2.3.1",
     "id": "url"
   },
   {

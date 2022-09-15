@@ -42,7 +42,7 @@ version = "=0.12.1"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.64"
+version = "=1.0.65"
 features = ["std"]
 
 [dependencies.approx]
@@ -156,7 +156,7 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [dependencies.clap]
 package = "clap"
-version = "=3.2.20"
+version = "=3.2.21"
 features = ["atty", "cargo", "clap_derive", "color", "derive", "env", "once_cell", "regex", "std", "strsim", "suggestions", "termcolor", "terminal_size", "unicase", "unicode", "unstable-doc", "unstable-grouped", "unstable-replace", "wrap_help", "yaml", "yaml-rust"]
 
 [dependencies.clap_derive]
@@ -322,7 +322,7 @@ version = "=0.1.1"
 
 [dependencies.form_urlencoded]
 package = "form_urlencoded"
-version = "=1.0.1"
+version = "=1.1.0"
 
 [dependencies.futf]
 package = "futf"
@@ -470,10 +470,14 @@ version = "=0.5.0"
 
 [dependencies.iana_time_zone]
 package = "iana-time-zone"
-version = "=0.1.47"
+version = "=0.1.48"
 features = ["fallback"]
 
 [dependencies.idna]
+package = "idna"
+version = "=0.3.0"
+
+[dependencies.idna_0_2_3]
 package = "idna"
 version = "=0.2.3"
 
@@ -497,7 +501,7 @@ version = "=2.5.0"
 
 [dependencies.itertools]
 package = "itertools"
-version = "=0.10.3"
+version = "=0.10.4"
 features = ["use_alloc", "use_std"]
 
 [dependencies.itoa]
@@ -758,11 +762,12 @@ version = "=1.0.9"
 
 [dependencies.percent_encoding]
 package = "percent-encoding"
-version = "=2.1.0"
+version = "=2.2.0"
+features = ["alloc"]
 
 [dependencies.pest]
 package = "pest"
-version = "=2.3.0"
+version = "=2.3.1"
 features = ["std", "thiserror"]
 
 [dependencies.petgraph]
@@ -908,7 +913,7 @@ default-features = false
 
 [dependencies.rand_core]
 package = "rand_core"
-version = "=0.6.3"
+version = "=0.6.4"
 features = ["alloc", "getrandom", "serde", "serde1", "std"]
 
 [dependencies.rand_core_0_5_1]
@@ -1007,7 +1012,7 @@ version = "=0.5.0"
 
 [dependencies.semver]
 package = "semver"
-version = "=1.0.13"
+version = "=1.0.14"
 features = ["std"]
 
 [dependencies.semver_parser]
@@ -1146,11 +1151,11 @@ features = ["smawk", "terminal_size", "unicode-linebreak", "unicode-width"]
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.34"
+version = "=1.0.35"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.34"
+version = "=1.0.35"
 
 [dependencies.thread_id]
 package = "thread-id"
@@ -1192,8 +1197,8 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.21.0"
-features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "sync", "test-util", "time", "tokio-macros", "winapi"]
+version = "=1.21.1"
+features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "winapi"]
 
 [dependencies.tokio_io]
 package = "tokio-io"
@@ -1214,7 +1219,7 @@ features = ["runtime"]
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.3"
+version = "=0.7.4"
 features = ["codec", "tracing"]
 
 [dependencies.toml]
@@ -1270,7 +1275,7 @@ features = ["hardcoded-data", "std"]
 
 [dependencies.unicode_ident]
 package = "unicode-ident"
-version = "=1.0.3"
+version = "=1.0.4"
 
 [dependencies.unicode_linebreak]
 package = "unicode-linebreak"
@@ -1283,15 +1288,15 @@ features = ["std"]
 
 [dependencies.unicode_segmentation]
 package = "unicode-segmentation"
-version = "=1.9.0"
+version = "=1.10.0"
 
 [dependencies.unicode_width]
 package = "unicode-width"
-version = "=0.1.9"
+version = "=0.1.10"
 
 [dependencies.unicode_xid]
 package = "unicode-xid"
-version = "=0.2.3"
+version = "=0.2.4"
 
 [dependencies.unsafe_any]
 package = "unsafe-any"
@@ -1303,7 +1308,7 @@ version = "=0.7.1"
 
 [dependencies.url]
 package = "url"
-version = "=2.2.2"
+version = "=2.3.1"
 
 [dependencies.utf8]
 package = "utf-8"
@@ -1388,7 +1393,7 @@ version = "=0.12.1"
 
 [build_dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.64"
+version = "=1.0.65"
 features = ["std"]
 
 [build_dependencies.approx]
@@ -1502,7 +1507,7 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [build_dependencies.clap]
 package = "clap"
-version = "=3.2.20"
+version = "=3.2.21"
 features = ["atty", "cargo", "clap_derive", "color", "derive", "env", "once_cell", "regex", "std", "strsim", "suggestions", "termcolor", "terminal_size", "unicase", "unicode", "unstable-doc", "unstable-grouped", "unstable-replace", "wrap_help", "yaml", "yaml-rust"]
 
 [build_dependencies.clap_derive]
@@ -1668,7 +1673,7 @@ version = "=0.1.1"
 
 [build_dependencies.form_urlencoded]
 package = "form_urlencoded"
-version = "=1.0.1"
+version = "=1.1.0"
 
 [build_dependencies.futf]
 package = "futf"
@@ -1816,10 +1821,14 @@ version = "=0.5.0"
 
 [build_dependencies.iana_time_zone]
 package = "iana-time-zone"
-version = "=0.1.47"
+version = "=0.1.48"
 features = ["fallback"]
 
 [build_dependencies.idna]
+package = "idna"
+version = "=0.3.0"
+
+[build_dependencies.idna_0_2_3]
 package = "idna"
 version = "=0.2.3"
 
@@ -1843,7 +1852,7 @@ version = "=2.5.0"
 
 [build_dependencies.itertools]
 package = "itertools"
-version = "=0.10.3"
+version = "=0.10.4"
 features = ["use_alloc", "use_std"]
 
 [build_dependencies.itoa]
@@ -2104,11 +2113,12 @@ version = "=1.0.9"
 
 [build_dependencies.percent_encoding]
 package = "percent-encoding"
-version = "=2.1.0"
+version = "=2.2.0"
+features = ["alloc"]
 
 [build_dependencies.pest]
 package = "pest"
-version = "=2.3.0"
+version = "=2.3.1"
 features = ["std", "thiserror"]
 
 [build_dependencies.petgraph]
@@ -2254,7 +2264,7 @@ default-features = false
 
 [build_dependencies.rand_core]
 package = "rand_core"
-version = "=0.6.3"
+version = "=0.6.4"
 features = ["alloc", "getrandom", "serde", "serde1", "std"]
 
 [build_dependencies.rand_core_0_5_1]
@@ -2353,7 +2363,7 @@ version = "=0.5.0"
 
 [build_dependencies.semver]
 package = "semver"
-version = "=1.0.13"
+version = "=1.0.14"
 features = ["std"]
 
 [build_dependencies.semver_parser]
@@ -2492,11 +2502,11 @@ features = ["smawk", "terminal_size", "unicode-linebreak", "unicode-width"]
 
 [build_dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.34"
+version = "=1.0.35"
 
 [build_dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.34"
+version = "=1.0.35"
 
 [build_dependencies.thread_id]
 package = "thread-id"
@@ -2538,8 +2548,8 @@ version = "=0.1.0"
 
 [build_dependencies.tokio]
 package = "tokio"
-version = "=1.21.0"
-features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "sync", "test-util", "time", "tokio-macros", "winapi"]
+version = "=1.21.1"
+features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "winapi"]
 
 [build_dependencies.tokio_io]
 package = "tokio-io"
@@ -2560,7 +2570,7 @@ features = ["runtime"]
 
 [build_dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.3"
+version = "=0.7.4"
 features = ["codec", "tracing"]
 
 [build_dependencies.toml]
@@ -2616,7 +2626,7 @@ features = ["hardcoded-data", "std"]
 
 [build_dependencies.unicode_ident]
 package = "unicode-ident"
-version = "=1.0.3"
+version = "=1.0.4"
 
 [build_dependencies.unicode_linebreak]
 package = "unicode-linebreak"
@@ -2629,15 +2639,15 @@ features = ["std"]
 
 [build_dependencies.unicode_segmentation]
 package = "unicode-segmentation"
-version = "=1.9.0"
+version = "=1.10.0"
 
 [build_dependencies.unicode_width]
 package = "unicode-width"
-version = "=0.1.9"
+version = "=0.1.10"
 
 [build_dependencies.unicode_xid]
 package = "unicode-xid"
-version = "=0.2.3"
+version = "=0.2.4"
 
 [build_dependencies.unsafe_any]
 package = "unsafe-any"
@@ -2649,7 +2659,7 @@ version = "=0.7.1"
 
 [build_dependencies.url]
 package = "url"
-version = "=2.2.2"
+version = "=2.3.1"
 
 [build_dependencies.utf8]
 package = "utf-8"
