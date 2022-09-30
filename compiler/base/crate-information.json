@@ -151,17 +151,17 @@
   },
   {
     "name": "clap",
-    "version": "3.2.21",
+    "version": "4.0.6",
     "id": "clap"
   },
   {
     "name": "clap_derive",
-    "version": "3.2.18",
+    "version": "4.0.6",
     "id": "clap_derive"
   },
   {
     "name": "clap_lex",
-    "version": "0.2.4",
+    "version": "0.3.0",
     "id": "clap_lex"
   },
   {
@@ -171,7 +171,7 @@
   },
   {
     "name": "cookie",
-    "version": "0.16.0",
+    "version": "0.16.1",
     "id": "cookie"
   },
   {
@@ -206,7 +206,7 @@
   },
   {
     "name": "crossbeam-epoch",
-    "version": "0.9.10",
+    "version": "0.9.11",
     "id": "crossbeam_epoch"
   },
   {
@@ -216,7 +216,7 @@
   },
   {
     "name": "crossbeam-utils",
-    "version": "0.8.11",
+    "version": "0.8.12",
     "id": "crossbeam_utils"
   },
   {
@@ -251,7 +251,7 @@
   },
   {
     "name": "digest",
-    "version": "0.10.3",
+    "version": "0.10.5",
     "id": "digest"
   },
   {
@@ -266,7 +266,7 @@
   },
   {
     "name": "env_logger",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "id": "env_logger"
   },
   {
@@ -276,7 +276,7 @@
   },
   {
     "name": "exr",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "id": "exr"
   },
   {
@@ -436,7 +436,7 @@
   },
   {
     "name": "hashlink",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "id": "hashlink"
   },
   {
@@ -491,7 +491,7 @@
   },
   {
     "name": "iana-time-zone",
-    "version": "0.1.48",
+    "version": "0.1.50",
     "id": "iana_time_zone"
   },
   {
@@ -506,13 +506,18 @@
   },
   {
     "name": "image",
-    "version": "0.24.3",
+    "version": "0.24.4",
     "id": "image"
   },
   {
     "name": "indexmap",
     "version": "1.9.1",
     "id": "indexmap"
+  },
+  {
+    "name": "io-lifetimes",
+    "version": "0.7.3",
+    "id": "io_lifetimes"
   },
   {
     "name": "iovec",
@@ -526,7 +531,7 @@
   },
   {
     "name": "itertools",
-    "version": "0.10.4",
+    "version": "0.10.5",
     "id": "itertools"
   },
   {
@@ -556,7 +561,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.132",
+    "version": "0.2.134",
     "id": "libc"
   },
   {
@@ -575,8 +580,13 @@
     "id": "linked_hash_map"
   },
   {
+    "name": "linux-raw-sys",
+    "version": "0.0.46",
+    "id": "linux_raw_sys"
+  },
+  {
     "name": "lock_api",
-    "version": "0.4.8",
+    "version": "0.4.9",
     "id": "lock_api"
   },
   {
@@ -621,7 +631,7 @@
   },
   {
     "name": "md-5",
-    "version": "0.10.4",
+    "version": "0.10.5",
     "id": "md5"
   },
   {
@@ -751,7 +761,7 @@
   },
   {
     "name": "once_cell",
-    "version": "1.14.0",
+    "version": "1.15.0",
     "id": "once_cell"
   },
   {
@@ -761,7 +771,7 @@
   },
   {
     "name": "openssl",
-    "version": "0.10.41",
+    "version": "0.10.42",
     "id": "openssl"
   },
   {
@@ -776,7 +786,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.75",
+    "version": "0.9.76",
     "id": "openssl_sys"
   },
   {
@@ -808,11 +818,6 @@
     "name": "percent-encoding",
     "version": "2.2.0",
     "id": "percent_encoding"
-  },
-  {
-    "name": "pest",
-    "version": "2.3.1",
-    "id": "pest"
   },
   {
     "name": "petgraph",
@@ -916,7 +921,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.43",
+    "version": "1.0.46",
     "id": "proc_macro2"
   },
   {
@@ -1026,7 +1031,7 @@
   },
   {
     "name": "reqwest",
-    "version": "0.11.11",
+    "version": "0.11.12",
     "id": "reqwest"
   },
   {
@@ -1048,6 +1053,11 @@
     "name": "rustc_version",
     "version": "0.4.0",
     "id": "rustc_version"
+  },
+  {
+    "name": "rustix",
+    "version": "0.35.11",
+    "id": "rustix"
   },
   {
     "name": "ryu",
@@ -1085,18 +1095,13 @@
     "id": "semver"
   },
   {
-    "name": "semver-parser",
-    "version": "0.10.2",
-    "id": "semver_parser"
-  },
-  {
     "name": "serde",
-    "version": "1.0.144",
+    "version": "1.0.145",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.144",
+    "version": "1.0.145",
     "id": "serde_derive"
   },
   {
@@ -1126,7 +1131,7 @@
   },
   {
     "name": "sha2",
-    "version": "0.10.5",
+    "version": "0.10.6",
     "id": "sha2"
   },
   {
@@ -1201,7 +1206,7 @@
   },
   {
     "name": "syn",
-    "version": "1.0.99",
+    "version": "1.0.101",
     "id": "syn"
   },
   {
@@ -1226,22 +1231,22 @@
   },
   {
     "name": "terminal_size",
-    "version": "0.1.17",
+    "version": "0.2.1",
     "id": "terminal_size"
   },
   {
     "name": "textwrap",
-    "version": "0.15.0",
+    "version": "0.15.1",
     "id": "textwrap"
   },
   {
     "name": "thiserror",
-    "version": "1.0.35",
+    "version": "1.0.37",
     "id": "thiserror"
   },
   {
     "name": "thiserror-impl",
-    "version": "1.0.35",
+    "version": "1.0.37",
     "id": "thiserror_impl"
   },
   {
@@ -1291,7 +1296,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.21.1",
+    "version": "1.21.2",
     "id": "tokio"
   },
   {
@@ -1360,11 +1365,6 @@
     "id": "typenum"
   },
   {
-    "name": "ucd-trie",
-    "version": "0.1.5",
-    "id": "ucd_trie"
-  },
-  {
     "name": "unicase",
     "version": "2.6.0",
     "id": "unicase"
@@ -1381,12 +1381,12 @@
   },
   {
     "name": "unicode-linebreak",
-    "version": "0.1.2",
+    "version": "0.1.4",
     "id": "unicode_linebreak"
   },
   {
     "name": "unicode-normalization",
-    "version": "0.1.21",
+    "version": "0.1.22",
     "id": "unicode_normalization"
   },
   {
@@ -1433,11 +1433,6 @@
     "name": "vcpkg",
     "version": "0.2.15",
     "id": "vcpkg"
-  },
-  {
-    "name": "vec_map",
-    "version": "0.8.2",
-    "id": "vec_map"
   },
   {
     "name": "version_check",

@@ -156,16 +156,16 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [dependencies.clap]
 package = "clap"
-version = "=3.2.21"
-features = ["atty", "cargo", "clap_derive", "color", "derive", "env", "once_cell", "regex", "std", "strsim", "suggestions", "termcolor", "terminal_size", "unicase", "unicode", "unstable-doc", "unstable-grouped", "unstable-replace", "wrap_help", "yaml", "yaml-rust"]
+version = "=4.0.6"
+features = ["cargo", "clap_derive", "color", "derive", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-grouped", "unstable-replace", "usage", "wrap_help"]
 
 [dependencies.clap_derive]
 package = "clap_derive"
-version = "=3.2.18"
+version = "=4.0.6"
 
 [dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.2.4"
+version = "=0.3.0"
 
 [dependencies.color_quant]
 package = "color_quant"
@@ -173,7 +173,7 @@ version = "=1.1.0"
 
 [dependencies.cookie]
 package = "cookie"
-version = "=0.16.0"
+version = "=0.16.1"
 features = ["percent-encode", "percent-encoding"]
 
 [dependencies.cookie_store]
@@ -206,8 +206,8 @@ features = ["crossbeam-epoch", "crossbeam-utils", "std"]
 
 [dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.10"
-features = ["alloc", "once_cell", "std"]
+version = "=0.9.11"
+features = ["alloc", "std"]
 
 [dependencies.crossbeam_queue]
 package = "crossbeam-queue"
@@ -217,8 +217,8 @@ default-features = false
 
 [dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.11"
-features = ["once_cell", "std"]
+version = "=0.8.12"
+features = ["std"]
 
 [dependencies.crypto_common]
 package = "crypto-common"
@@ -248,7 +248,7 @@ version = "=2.2.0"
 
 [dependencies.digest]
 package = "digest"
-version = "=0.10.3"
+version = "=0.10.5"
 features = ["alloc", "block-buffer", "core-api", "mac", "std", "subtle"]
 
 [dependencies.either]
@@ -263,7 +263,7 @@ features = ["alloc"]
 
 [dependencies.env_logger]
 package = "env_logger"
-version = "=0.9.0"
+version = "=0.9.1"
 features = ["atty", "humantime", "regex", "termcolor"]
 
 [dependencies.error_chain]
@@ -273,7 +273,7 @@ features = ["backtrace", "example_generated"]
 
 [dependencies.exr]
 package = "exr"
-version = "=1.5.0"
+version = "=1.5.1"
 
 [dependencies.fallible_iterator]
 package = "fallible-iterator"
@@ -358,7 +358,6 @@ default-features = false
 package = "futures-io"
 version = "=0.3.24"
 features = ["std"]
-default-features = false
 
 [dependencies.futures_macro]
 package = "futures-macro"
@@ -424,7 +423,7 @@ features = ["ahash", "inline-more", "raw"]
 
 [dependencies.hashlink]
 package = "hashlink"
-version = "=0.8.0"
+version = "=0.8.1"
 
 [dependencies.heck]
 package = "heck"
@@ -470,7 +469,7 @@ version = "=0.5.0"
 
 [dependencies.iana_time_zone]
 package = "iana-time-zone"
-version = "=0.1.48"
+version = "=0.1.50"
 features = ["fallback"]
 
 [dependencies.idna]
@@ -483,13 +482,18 @@ version = "=0.2.3"
 
 [dependencies.image]
 package = "image"
-version = "=0.24.3"
+version = "=0.24.4"
 features = ["bmp", "dds", "dxt", "exr", "farbfeld", "gif", "hdr", "ico", "jpeg", "jpeg_rayon", "openexr", "png", "pnm", "scoped_threadpool", "tga", "tiff", "webp"]
 
 [dependencies.indexmap]
 package = "indexmap"
 version = "=1.9.1"
 features = ["std"]
+
+[dependencies.io_lifetimes]
+package = "io-lifetimes"
+version = "=0.7.3"
+default-features = false
 
 [dependencies.iovec]
 package = "iovec"
@@ -501,7 +505,7 @@ version = "=2.5.0"
 
 [dependencies.itertools]
 package = "itertools"
-version = "=0.10.4"
+version = "=0.10.5"
 features = ["use_alloc", "use_std"]
 
 [dependencies.itoa]
@@ -529,8 +533,8 @@ version = "=0.5.2"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.132"
-features = ["std"]
+version = "=0.2.134"
+features = ["extra_traits", "std"]
 
 [dependencies.libm]
 package = "libm"
@@ -545,9 +549,15 @@ features = ["bundled", "bundled_bindings", "cc", "min_sqlite_version_3_6_23", "m
 package = "linked-hash-map"
 version = "=0.5.6"
 
+[dependencies.linux_raw_sys]
+package = "linux-raw-sys"
+version = "=0.0.46"
+features = ["errno", "general", "ioctl", "no_std"]
+default-features = false
+
 [dependencies.lock_api]
 package = "lock_api"
-version = "=0.4.8"
+version = "=0.4.9"
 
 [dependencies.log]
 package = "log"
@@ -586,7 +596,7 @@ features = ["cgemm", "std"]
 
 [dependencies.md5]
 package = "md-5"
-version = "=0.10.4"
+version = "=0.10.5"
 features = ["std"]
 
 [dependencies.memchr]
@@ -714,7 +724,7 @@ default-features = false
 
 [dependencies.once_cell]
 package = "once_cell"
-version = "=1.14.0"
+version = "=1.15.0"
 features = ["alloc", "race", "std"]
 
 [dependencies.opaque_debug]
@@ -723,7 +733,7 @@ version = "=0.3.0"
 
 [dependencies.openssl]
 package = "openssl"
-version = "=0.10.41"
+version = "=0.10.42"
 
 [dependencies.openssl_macros]
 package = "openssl-macros"
@@ -735,7 +745,7 @@ version = "=0.1.5"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.75"
+version = "=0.9.76"
 
 [dependencies.ordered_float]
 package = "ordered-float"
@@ -764,11 +774,6 @@ version = "=1.0.9"
 package = "percent-encoding"
 version = "=2.2.0"
 features = ["alloc"]
-
-[dependencies.pest]
-package = "pest"
-version = "=2.3.1"
-features = ["std", "thiserror"]
 
 [dependencies.petgraph]
 package = "petgraph"
@@ -860,7 +865,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.43"
+version = "=1.0.46"
 features = ["proc-macro", "span-locations"]
 
 [dependencies.proc_macro_error]
@@ -963,7 +968,7 @@ version = "=0.5.3"
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.11.11"
+version = "=0.11.12"
 features = ["__tls", "blocking", "cookie_crate", "cookie_store", "cookies", "default-tls", "hyper-tls", "json", "mime_guess", "multipart", "native-tls-crate", "proc-macro-hack", "serde_json", "tokio-native-tls"]
 
 [dependencies.ring]
@@ -983,6 +988,11 @@ version = "=0.1.21"
 [dependencies.rustc_version]
 package = "rustc_version"
 version = "=0.4.0"
+
+[dependencies.rustix]
+package = "rustix"
+version = "=0.35.11"
+features = ["io-lifetimes", "libc", "std", "termios", "use-libc-auxv"]
 
 [dependencies.ryu]
 package = "ryu"
@@ -1015,18 +1025,14 @@ package = "semver"
 version = "=1.0.14"
 features = ["std"]
 
-[dependencies.semver_parser]
-package = "semver-parser"
-version = "=0.10.2"
-
 [dependencies.serde]
 package = "serde"
-version = "=1.0.144"
+version = "=1.0.145"
 features = ["derive", "rc", "serde_derive", "std"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.144"
+version = "=1.0.145"
 
 [dependencies.serde_json]
 package = "serde_json"
@@ -1051,7 +1057,7 @@ version = "=1.0.0"
 
 [dependencies.sha2]
 package = "sha2"
-version = "=0.10.5"
+version = "=0.10.6"
 features = ["std"]
 
 [dependencies.signal_hook_registry]
@@ -1120,7 +1126,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.99"
+version = "=1.0.101"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"]
 
 [dependencies.tar]
@@ -1142,20 +1148,20 @@ version = "=1.1.3"
 
 [dependencies.terminal_size]
 package = "terminal_size"
-version = "=0.1.17"
+version = "=0.2.1"
 
 [dependencies.textwrap]
 package = "textwrap"
-version = "=0.15.0"
-features = ["smawk", "terminal_size", "unicode-linebreak", "unicode-width"]
+version = "=0.15.1"
+features = ["smawk", "unicode-linebreak", "unicode-width"]
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.35"
+version = "=1.0.37"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.35"
+version = "=1.0.37"
 
 [dependencies.thread_id]
 package = "thread-id"
@@ -1197,8 +1203,8 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.21.1"
-features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "winapi"]
+version = "=1.21.2"
+features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "winapi"]
 
 [dependencies.tokio_io]
 package = "tokio-io"
@@ -1258,12 +1264,6 @@ version = "=0.3.3"
 package = "typenum"
 version = "=1.15.0"
 
-[dependencies.ucd_trie]
-package = "ucd-trie"
-version = "=0.1.5"
-features = ["std"]
-default-features = false
-
 [dependencies.unicase]
 package = "unicase"
 version = "=2.6.0"
@@ -1279,11 +1279,11 @@ version = "=1.0.4"
 
 [dependencies.unicode_linebreak]
 package = "unicode-linebreak"
-version = "=0.1.2"
+version = "=0.1.4"
 
 [dependencies.unicode_normalization]
 package = "unicode-normalization"
-version = "=0.1.21"
+version = "=0.1.22"
 features = ["std"]
 
 [dependencies.unicode_segmentation]
@@ -1322,10 +1322,6 @@ features = ["md5", "private_atomic", "private_getrandom", "private_md-5", "priva
 [dependencies.vcpkg]
 package = "vcpkg"
 version = "=0.2.15"
-
-[dependencies.vec_map]
-package = "vec_map"
-version = "=0.8.2"
 
 [dependencies.version_check]
 package = "version_check"
@@ -1507,16 +1503,16 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [build_dependencies.clap]
 package = "clap"
-version = "=3.2.21"
-features = ["atty", "cargo", "clap_derive", "color", "derive", "env", "once_cell", "regex", "std", "strsim", "suggestions", "termcolor", "terminal_size", "unicase", "unicode", "unstable-doc", "unstable-grouped", "unstable-replace", "wrap_help", "yaml", "yaml-rust"]
+version = "=4.0.6"
+features = ["cargo", "clap_derive", "color", "derive", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-grouped", "unstable-replace", "usage", "wrap_help"]
 
 [build_dependencies.clap_derive]
 package = "clap_derive"
-version = "=3.2.18"
+version = "=4.0.6"
 
 [build_dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.2.4"
+version = "=0.3.0"
 
 [build_dependencies.color_quant]
 package = "color_quant"
@@ -1524,7 +1520,7 @@ version = "=1.1.0"
 
 [build_dependencies.cookie]
 package = "cookie"
-version = "=0.16.0"
+version = "=0.16.1"
 features = ["percent-encode", "percent-encoding"]
 
 [build_dependencies.cookie_store]
@@ -1557,8 +1553,8 @@ features = ["crossbeam-epoch", "crossbeam-utils", "std"]
 
 [build_dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.10"
-features = ["alloc", "once_cell", "std"]
+version = "=0.9.11"
+features = ["alloc", "std"]
 
 [build_dependencies.crossbeam_queue]
 package = "crossbeam-queue"
@@ -1568,8 +1564,8 @@ default-features = false
 
 [build_dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.11"
-features = ["once_cell", "std"]
+version = "=0.8.12"
+features = ["std"]
 
 [build_dependencies.crypto_common]
 package = "crypto-common"
@@ -1599,7 +1595,7 @@ version = "=2.2.0"
 
 [build_dependencies.digest]
 package = "digest"
-version = "=0.10.3"
+version = "=0.10.5"
 features = ["alloc", "block-buffer", "core-api", "mac", "std", "subtle"]
 
 [build_dependencies.either]
@@ -1614,7 +1610,7 @@ features = ["alloc"]
 
 [build_dependencies.env_logger]
 package = "env_logger"
-version = "=0.9.0"
+version = "=0.9.1"
 features = ["atty", "humantime", "regex", "termcolor"]
 
 [build_dependencies.error_chain]
@@ -1624,7 +1620,7 @@ features = ["backtrace", "example_generated"]
 
 [build_dependencies.exr]
 package = "exr"
-version = "=1.5.0"
+version = "=1.5.1"
 
 [build_dependencies.fallible_iterator]
 package = "fallible-iterator"
@@ -1709,7 +1705,6 @@ default-features = false
 package = "futures-io"
 version = "=0.3.24"
 features = ["std"]
-default-features = false
 
 [build_dependencies.futures_macro]
 package = "futures-macro"
@@ -1775,7 +1770,7 @@ features = ["ahash", "inline-more", "raw"]
 
 [build_dependencies.hashlink]
 package = "hashlink"
-version = "=0.8.0"
+version = "=0.8.1"
 
 [build_dependencies.heck]
 package = "heck"
@@ -1821,7 +1816,7 @@ version = "=0.5.0"
 
 [build_dependencies.iana_time_zone]
 package = "iana-time-zone"
-version = "=0.1.48"
+version = "=0.1.50"
 features = ["fallback"]
 
 [build_dependencies.idna]
@@ -1834,13 +1829,18 @@ version = "=0.2.3"
 
 [build_dependencies.image]
 package = "image"
-version = "=0.24.3"
+version = "=0.24.4"
 features = ["bmp", "dds", "dxt", "exr", "farbfeld", "gif", "hdr", "ico", "jpeg", "jpeg_rayon", "openexr", "png", "pnm", "scoped_threadpool", "tga", "tiff", "webp"]
 
 [build_dependencies.indexmap]
 package = "indexmap"
 version = "=1.9.1"
 features = ["std"]
+
+[build_dependencies.io_lifetimes]
+package = "io-lifetimes"
+version = "=0.7.3"
+default-features = false
 
 [build_dependencies.iovec]
 package = "iovec"
@@ -1852,7 +1852,7 @@ version = "=2.5.0"
 
 [build_dependencies.itertools]
 package = "itertools"
-version = "=0.10.4"
+version = "=0.10.5"
 features = ["use_alloc", "use_std"]
 
 [build_dependencies.itoa]
@@ -1880,8 +1880,8 @@ version = "=0.5.2"
 
 [build_dependencies.libc]
 package = "libc"
-version = "=0.2.132"
-features = ["std"]
+version = "=0.2.134"
+features = ["extra_traits", "std"]
 
 [build_dependencies.libm]
 package = "libm"
@@ -1896,9 +1896,15 @@ features = ["bundled", "bundled_bindings", "cc", "min_sqlite_version_3_6_23", "m
 package = "linked-hash-map"
 version = "=0.5.6"
 
+[build_dependencies.linux_raw_sys]
+package = "linux-raw-sys"
+version = "=0.0.46"
+features = ["errno", "general", "ioctl", "no_std"]
+default-features = false
+
 [build_dependencies.lock_api]
 package = "lock_api"
-version = "=0.4.8"
+version = "=0.4.9"
 
 [build_dependencies.log]
 package = "log"
@@ -1937,7 +1943,7 @@ features = ["cgemm", "std"]
 
 [build_dependencies.md5]
 package = "md-5"
-version = "=0.10.4"
+version = "=0.10.5"
 features = ["std"]
 
 [build_dependencies.memchr]
@@ -2065,7 +2071,7 @@ default-features = false
 
 [build_dependencies.once_cell]
 package = "once_cell"
-version = "=1.14.0"
+version = "=1.15.0"
 features = ["alloc", "race", "std"]
 
 [build_dependencies.opaque_debug]
@@ -2074,7 +2080,7 @@ version = "=0.3.0"
 
 [build_dependencies.openssl]
 package = "openssl"
-version = "=0.10.41"
+version = "=0.10.42"
 
 [build_dependencies.openssl_macros]
 package = "openssl-macros"
@@ -2086,7 +2092,7 @@ version = "=0.1.5"
 
 [build_dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.75"
+version = "=0.9.76"
 
 [build_dependencies.ordered_float]
 package = "ordered-float"
@@ -2115,11 +2121,6 @@ version = "=1.0.9"
 package = "percent-encoding"
 version = "=2.2.0"
 features = ["alloc"]
-
-[build_dependencies.pest]
-package = "pest"
-version = "=2.3.1"
-features = ["std", "thiserror"]
 
 [build_dependencies.petgraph]
 package = "petgraph"
@@ -2211,7 +2212,7 @@ version = "=0.1.1"
 
 [build_dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.43"
+version = "=1.0.46"
 features = ["proc-macro", "span-locations"]
 
 [build_dependencies.proc_macro_error]
@@ -2314,7 +2315,7 @@ version = "=0.5.3"
 
 [build_dependencies.reqwest]
 package = "reqwest"
-version = "=0.11.11"
+version = "=0.11.12"
 features = ["__tls", "blocking", "cookie_crate", "cookie_store", "cookies", "default-tls", "hyper-tls", "json", "mime_guess", "multipart", "native-tls-crate", "proc-macro-hack", "serde_json", "tokio-native-tls"]
 
 [build_dependencies.ring]
@@ -2334,6 +2335,11 @@ version = "=0.1.21"
 [build_dependencies.rustc_version]
 package = "rustc_version"
 version = "=0.4.0"
+
+[build_dependencies.rustix]
+package = "rustix"
+version = "=0.35.11"
+features = ["io-lifetimes", "libc", "std", "termios", "use-libc-auxv"]
 
 [build_dependencies.ryu]
 package = "ryu"
@@ -2366,18 +2372,14 @@ package = "semver"
 version = "=1.0.14"
 features = ["std"]
 
-[build_dependencies.semver_parser]
-package = "semver-parser"
-version = "=0.10.2"
-
 [build_dependencies.serde]
 package = "serde"
-version = "=1.0.144"
+version = "=1.0.145"
 features = ["derive", "rc", "serde_derive", "std"]
 
 [build_dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.144"
+version = "=1.0.145"
 
 [build_dependencies.serde_json]
 package = "serde_json"
@@ -2402,7 +2404,7 @@ version = "=1.0.0"
 
 [build_dependencies.sha2]
 package = "sha2"
-version = "=0.10.5"
+version = "=0.10.6"
 features = ["std"]
 
 [build_dependencies.signal_hook_registry]
@@ -2471,7 +2473,7 @@ default-features = false
 
 [build_dependencies.syn]
 package = "syn"
-version = "=1.0.99"
+version = "=1.0.101"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"]
 
 [build_dependencies.tar]
@@ -2493,20 +2495,20 @@ version = "=1.1.3"
 
 [build_dependencies.terminal_size]
 package = "terminal_size"
-version = "=0.1.17"
+version = "=0.2.1"
 
 [build_dependencies.textwrap]
 package = "textwrap"
-version = "=0.15.0"
-features = ["smawk", "terminal_size", "unicode-linebreak", "unicode-width"]
+version = "=0.15.1"
+features = ["smawk", "unicode-linebreak", "unicode-width"]
 
 [build_dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.35"
+version = "=1.0.37"
 
 [build_dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.35"
+version = "=1.0.37"
 
 [build_dependencies.thread_id]
 package = "thread-id"
@@ -2548,8 +2550,8 @@ version = "=0.1.0"
 
 [build_dependencies.tokio]
 package = "tokio"
-version = "=1.21.1"
-features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "winapi"]
+version = "=1.21.2"
+features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "winapi"]
 
 [build_dependencies.tokio_io]
 package = "tokio-io"
@@ -2609,12 +2611,6 @@ version = "=0.3.3"
 package = "typenum"
 version = "=1.15.0"
 
-[build_dependencies.ucd_trie]
-package = "ucd-trie"
-version = "=0.1.5"
-features = ["std"]
-default-features = false
-
 [build_dependencies.unicase]
 package = "unicase"
 version = "=2.6.0"
@@ -2630,11 +2626,11 @@ version = "=1.0.4"
 
 [build_dependencies.unicode_linebreak]
 package = "unicode-linebreak"
-version = "=0.1.2"
+version = "=0.1.4"
 
 [build_dependencies.unicode_normalization]
 package = "unicode-normalization"
-version = "=0.1.21"
+version = "=0.1.22"
 features = ["std"]
 
 [build_dependencies.unicode_segmentation]
@@ -2673,10 +2669,6 @@ features = ["md5", "private_atomic", "private_getrandom", "private_md-5", "priva
 [build_dependencies.vcpkg]
 package = "vcpkg"
 version = "=0.2.15"
-
-[build_dependencies.vec_map]
-package = "vec_map"
-version = "=0.8.2"
 
 [build_dependencies.version_check]
 package = "version_check"
