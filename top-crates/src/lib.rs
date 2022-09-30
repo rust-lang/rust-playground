@@ -7,7 +7,7 @@ use cargo::{
         registry::PackageRegistry,
         resolver::{self, features::RequestedFeatures, ResolveOpts, VersionPreferences},
         source::SourceMap,
-        Dependency, Package, PackageId, Source, SourceId, Summary, Target,
+        Dependency, Package, PackageId, QueryKind, Source, SourceId, Summary, Target,
     },
     sources::RegistrySource,
     util::{interning::InternedString, Config, VersionExt},
@@ -302,7 +302,7 @@ fn populate_initial_direct_dependencies(
         let dep = Dependency::parse(name, version, global.crates_io)
             .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
-        let matches = match global.source.query_vec(&dep) {
+        let matches = match global.source.query_vec(&dep, QueryKind::Exact) {
             Poll::Ready(Ok(v)) => v,
             Poll::Ready(Err(e)) => panic!("Unable to query registry for {}: {}", name, e),
             Poll::Pending => panic!("Registry not ready to query"),
