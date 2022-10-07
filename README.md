@@ -33,7 +33,7 @@ It has a number of features, including:
 
 ## Architecture
 
-A [React][react] frontend communicates with an [Iron][iron]
+A [React][react] frontend communicates with an [Axum][axum]
 backend. [Docker][docker] containers are used to provide the various
 compilers and tools as well as to help isolate them.
 
@@ -43,7 +43,7 @@ feel free to ask a question and we might even be able to point out
 some useful resources.
 
 [react]: https://reactjs.org/
-[iron]: https://github.com/iron/iron
+[axum]: https://github.com/tokio-rs/axum
 [docker]: https://www.docker.com/
 
 ## Resource Limits
