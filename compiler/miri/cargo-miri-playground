@@ -2,6 +2,6 @@
 
 set -eu
 
-export MIRI_SYSROOT=~/.cache/miri/HOST
+export MIRI_SYSROOT=~/.cache/miri
 export MIRIFLAGS="-Zmiri-disable-isolation"
 exec cargo miri run
