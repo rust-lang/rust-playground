@@ -27,15 +27,15 @@ jobs:
       IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v2
       with:
         driver-opts: image=moby/buildkit:v0.9.1
     - name: Login to GitHub Container Registry
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: "${{ env.GH_CONTAINER_REGISTRY_USERNAME }}"
@@ -43,7 +43,7 @@ jobs:
     - name: Build and push 'toolchain' container
       env:
         TAG_PREFIX: "${{ env.IMAGE_NAME }}:toolchain"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -59,7 +59,7 @@ jobs:
     - name: Build and push 'bare-sources' container
       env:
         TAG_PREFIX: "${{ env.IMAGE_NAME }}:bare-sources"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -75,7 +75,7 @@ jobs:
     - name: Build and push 'munge' container
       env:
         TAG_PREFIX: "${{ env.IMAGE_NAME }}:munge"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -91,7 +91,7 @@ jobs:
     - name: Build and push 'sources' container
       env:
         TAG_PREFIX: "${{ env.IMAGE_NAME }}:sources"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -105,7 +105,7 @@ jobs:
           ${{ env.TAG_PREFIX }}--latest
         cache-to: type=inline
     - name: Build and push container
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -132,21 +132,21 @@ jobs:
       IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-tool-${{ matrix.tool }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v2
       with:
         driver-opts: image=moby/buildkit:v0.9.1
     - name: Login to GitHub Container Registry
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: "${{ env.GH_CONTAINER_REGISTRY_USERNAME }}"
         password: "${{ secrets.GH_CONTAINER_REGISTRY_TOKEN }}"
     - name: Build and push container
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/${{ matrix.tool }}/
         file: compiler/${{ matrix.tool }}/Dockerfile
@@ -164,7 +164,7 @@ jobs:
     if: 'github.event_name == ''push'' || contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
     - name: Install Rust
@@ -175,7 +175,7 @@ jobs:
         override: true
         components: rustfmt
     - name: Cache Cargo intermediate products
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |-
           ~/.cargo/registry
@@ -209,7 +209,7 @@ jobs:
     - name: Restore permissions
       run: sudo chown -R runner:docker ~/.cargo/ ui/target
     - name: Save backend artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: backend
         path: |
@@ -221,20 +221,20 @@ jobs:
     if: 'github.event_name == ''push'' || contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
     - name: Cache yarn intermediate products
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: "${{ steps.yarn-cache-dir-path.outputs.dir }}"
         key: "${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}"
         restore-keys: "${{ runner.os }}-yarn-"
     - name: Configure node
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: 16.13
     - name: Install dependencies
@@ -248,7 +248,7 @@ jobs:
     - name: Build frontend
       run: yarn --cwd ui/frontend/ run build:production
     - name: Save frontend artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: frontend
         path: ui/frontend/build
@@ -266,7 +266,7 @@ jobs:
         working-directory: tests
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
     - name: Configure Ruby
@@ -274,7 +274,7 @@ jobs:
       with:
         ruby-version: 3.0.2
     - name: Cache bundler intermediate products
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: tests/vendor/bundle
         key: "${{ runner.os }}-gems-${{ hashFiles('tests/**/Gemfile.lock') }}"
@@ -299,12 +299,12 @@ jobs:
           docker tag ghcr.io/integer32llc/rust-playground-ci-tool-$t:${{ github.run_id }} $t
         done
     - name: Download backend
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: backend
         path: tests/server/
     - name: Download frontend
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: frontend
         path: tests/server/build/
@@ -321,7 +321,7 @@ jobs:
         bundle exec rspec
     - name: Preserve screenshots
       if: "${{ failure() }}"
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: test-failures
         path: tests/test-failures
@@ -336,13 +336,13 @@ jobs:
       id-token: write
     steps:
     - name: Login to GitHub Container Registry
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: "${{ env.GH_CONTAINER_REGISTRY_USERNAME }}"
         password: "${{ secrets.GH_CONTAINER_REGISTRY_TOKEN }}"
     - name: Login to Docker Hub
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         username: "${{ env.DOCKER_HUB_USERNAME }}"
         password: "${{ secrets.DOCKER_HUB_TOKEN }}"
@@ -371,12 +371,12 @@ jobs:
           docker push shepmaster/$t
         done
     - name: Download backend
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: backend
         path: server/
     - name: Download frontend
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: frontend
         path: server/build/

@@ -7,26 +7,26 @@ components:
 
   - checkout: &checkout
       name: "Checkout code"
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
   # This should only be used when we know that the code being tested
   # doesn't make use of our secrets or elevated GitHub token.
   - checkout_pr: &checkout_pr
       name: "Checkout code"
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
   - docker_buildx: &docker_buildx
       name: "Set up Docker Buildx"
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v2
       with:
         driver-opts: >-
           image=moby/buildkit:v0.9.1
 
   - login_ghcr: &login_ghcr
       name: "Login to GitHub Container Registry"
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: ${{ env.GH_CONTAINER_REGISTRY_USERNAME }}
@@ -34,7 +34,7 @@ components:
 
   - login_docker_hub: &login_docker_hub
       name: "Login to Docker Hub"
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         username: ${{ env.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_TOKEN }}
@@ -54,7 +54,7 @@ components:
       name: "Build and push 'toolchain' container"
       env:
         TAG_PREFIX: ${{ env.IMAGE_NAME }}:toolchain
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -74,7 +74,7 @@ components:
       name: "Build and push 'bare-sources' container"
       env:
         TAG_PREFIX: ${{ env.IMAGE_NAME }}:bare-sources
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -94,7 +94,7 @@ components:
       name: "Build and push 'munge' container"
       env:
         TAG_PREFIX: ${{ env.IMAGE_NAME }}:munge
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -114,7 +114,7 @@ components:
       name: "Build and push 'sources' container"
       env:
         TAG_PREFIX: ${{ env.IMAGE_NAME }}:sources
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -132,7 +132,7 @@ components:
 
   - build_compiler_containers_final: &build_compiler_containers_final
       name: "Build and push container"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -161,7 +161,7 @@ components:
 
   - build_tool_containers_final: &build_tool_containers_final
       name: "Build and push container"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/${{ matrix.tool }}/
         file: compiler/${{ matrix.tool }}/Dockerfile
@@ -271,7 +271,7 @@ workflows:
               components: rustfmt
 
           - name: "Cache Cargo intermediate products"
-            uses: actions/cache@v2
+            uses: actions/cache@v3
             with:
               path: |-
                 ~/.cargo/registry
@@ -320,7 +320,7 @@ workflows:
               sudo chown -R runner:docker ~/.cargo/ ui/target
 
           - name: "Save backend artifact"
-            uses: actions/upload-artifact@v2
+            uses: actions/upload-artifact@v3
             with:
               name: backend
               path: |
@@ -340,7 +340,7 @@ workflows:
             run: echo "::set-output name=dir::$(yarn cache dir)"
 
           - name: "Cache yarn intermediate products"
-            uses: actions/cache@v2
+            uses: actions/cache@v3
             with:
               path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
               key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -348,7 +348,7 @@ workflows:
                 ${{ runner.os }}-yarn-
 
           - name: "Configure node"
-            uses: actions/setup-node@v1
+            uses: actions/setup-node@v3
             with:
               node-version: 16.13
 
@@ -373,7 +373,7 @@ workflows:
               yarn --cwd ui/frontend/ run build:production
 
           - name: "Save frontend artifact"
-            uses: actions/upload-artifact@v2
+            uses: actions/upload-artifact@v3
             with:
               name: frontend
               path: ui/frontend/build
@@ -401,7 +401,7 @@ workflows:
               ruby-version: '3.0.2'
 
           - name: "Cache bundler intermediate products"
-            uses: actions/cache@v2
+            uses: actions/cache@v3
             with:
               path: tests/vendor/bundle
               key: ${{ runner.os }}-gems-${{ hashFiles('tests/**/Gemfile.lock') }}
@@ -418,13 +418,13 @@ workflows:
           - *rename_all_containers
 
           - name: "Download backend"
-            uses: actions/download-artifact@v2
+            uses: actions/download-artifact@v3
             with:
               name: backend
               path: tests/server/
 
           - name: "Download frontend"
-            uses: actions/download-artifact@v2
+            uses: actions/download-artifact@v3
             with:
               name: frontend
               path: tests/server/build/
@@ -445,7 +445,7 @@ workflows:
 
           - name: "Preserve screenshots"
             if: ${{ failure() }}
-            uses: actions/upload-artifact@v2
+            uses: actions/upload-artifact@v3
             with:
               name: test-failures
               path: tests/test-failures
@@ -464,7 +464,7 @@ workflows:
           - *login_ghcr
 
           - name: "Login to Docker Hub"
-            uses: docker/login-action@v1
+            uses: docker/login-action@v2
             with:
               username: ${{ env.DOCKER_HUB_USERNAME }}
               password: ${{ secrets.DOCKER_HUB_TOKEN }}
@@ -484,13 +484,13 @@ workflows:
               done
 
           - name: "Download backend"
-            uses: actions/download-artifact@v2
+            uses: actions/download-artifact@v3
             with:
               name: backend
               path: server/
 
           - name: "Download frontend"
-            uses: actions/download-artifact@v2
+            uses: actions/download-artifact@v3
             with:
               name: frontend
               path: server/build/

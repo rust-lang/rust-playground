@@ -25,26 +25,26 @@ jobs:
     continue-on-error: true
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v2
       with:
         driver-opts: image=moby/buildkit:v0.9.1
     - name: Login to GitHub Container Registry
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: "${{ env.GH_CONTAINER_REGISTRY_USERNAME }}"
         password: "${{ secrets.GH_CONTAINER_REGISTRY_TOKEN }}"
     - name: Login to Docker Hub
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         username: "${{ env.DOCKER_HUB_USERNAME }}"
         password: "${{ secrets.DOCKER_HUB_TOKEN }}"
     - name: Build and push 'toolchain' container
       env:
         TAG_PREFIX: "${{ env.IMAGE_NAME }}:toolchain"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -60,7 +60,7 @@ jobs:
     - name: Build and push 'bare-sources' container
       env:
         TAG_PREFIX: "${{ env.IMAGE_NAME }}:bare-sources"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -76,7 +76,7 @@ jobs:
     - name: Build and push 'munge' container
       env:
         TAG_PREFIX: "${{ env.IMAGE_NAME }}:munge"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -92,7 +92,7 @@ jobs:
     - name: Build and push 'sources' container
       env:
         TAG_PREFIX: "${{ env.IMAGE_NAME }}:sources"
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -106,7 +106,7 @@ jobs:
           ${{ env.TAG_PREFIX }}--latest
         cache-to: type=inline
     - name: Build and push container
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -144,24 +144,24 @@ jobs:
     continue-on-error: true
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v2
       with:
         driver-opts: image=moby/buildkit:v0.9.1
     - name: Login to GitHub Container Registry
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: "${{ env.GH_CONTAINER_REGISTRY_USERNAME }}"
         password: "${{ secrets.GH_CONTAINER_REGISTRY_TOKEN }}"
     - name: Login to Docker Hub
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         username: "${{ env.DOCKER_HUB_USERNAME }}"
         password: "${{ secrets.DOCKER_HUB_TOKEN }}"
     - name: Build and push container
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v3
       with:
         context: compiler/${{ matrix.tool }}/
         file: compiler/${{ matrix.tool }}/Dockerfile
