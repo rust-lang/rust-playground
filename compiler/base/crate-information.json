@@ -26,7 +26,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.65",
+    "version": "1.0.66",
     "id": "anyhow"
   },
   {
@@ -51,7 +51,7 @@
   },
   {
     "name": "async-trait",
-    "version": "0.1.57",
+    "version": "0.1.58",
     "id": "async_trait"
   },
   {
@@ -76,7 +76,7 @@
   },
   {
     "name": "base64",
-    "version": "0.13.0",
+    "version": "0.13.1",
     "id": "base64"
   },
   {
@@ -151,12 +151,12 @@
   },
   {
     "name": "clap",
-    "version": "4.0.6",
+    "version": "4.0.18",
     "id": "clap"
   },
   {
     "name": "clap_derive",
-    "version": "4.0.6",
+    "version": "4.0.18",
     "id": "clap_derive"
   },
   {
@@ -250,6 +250,11 @@
     "id": "derivative"
   },
   {
+    "name": "destructure_traitobject",
+    "version": "0.2.0",
+    "id": "destructure_traitobject"
+  },
+  {
     "name": "digest",
     "version": "0.10.5",
     "id": "digest"
@@ -276,7 +281,7 @@
   },
   {
     "name": "exr",
-    "version": "1.5.1",
+    "version": "1.5.2",
     "id": "exr"
   },
   {
@@ -296,7 +301,7 @@
   },
   {
     "name": "filetime",
-    "version": "0.2.17",
+    "version": "0.2.18",
     "id": "filetime"
   },
   {
@@ -341,7 +346,7 @@
   },
   {
     "name": "futures",
-    "version": "0.3.24",
+    "version": "0.3.25",
     "id": "futures"
   },
   {
@@ -351,42 +356,42 @@
   },
   {
     "name": "futures-channel",
-    "version": "0.3.24",
+    "version": "0.3.25",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.3.24",
+    "version": "0.3.25",
     "id": "futures_core"
   },
   {
     "name": "futures-executor",
-    "version": "0.3.24",
+    "version": "0.3.25",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.3.24",
+    "version": "0.3.25",
     "id": "futures_io"
   },
   {
     "name": "futures-macro",
-    "version": "0.3.24",
+    "version": "0.3.25",
     "id": "futures_macro"
   },
   {
     "name": "futures-sink",
-    "version": "0.3.24",
+    "version": "0.3.25",
     "id": "futures_sink"
   },
   {
     "name": "futures-task",
-    "version": "0.3.24",
+    "version": "0.3.25",
     "id": "futures_task"
   },
   {
     "name": "futures-util",
-    "version": "0.3.24",
+    "version": "0.3.25",
     "id": "futures_util"
   },
   {
@@ -396,7 +401,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "id": "getrandom"
   },
   {
@@ -421,12 +426,12 @@
   },
   {
     "name": "h2",
-    "version": "0.3.14",
+    "version": "0.3.15",
     "id": "h2"
   },
   {
     "name": "half",
-    "version": "1.8.2",
+    "version": "2.1.0",
     "id": "half"
   },
   {
@@ -491,7 +496,7 @@
   },
   {
     "name": "iana-time-zone",
-    "version": "0.1.50",
+    "version": "0.1.51",
     "id": "iana_time_zone"
   },
   {
@@ -516,7 +521,7 @@
   },
   {
     "name": "io-lifetimes",
-    "version": "0.7.3",
+    "version": "0.7.4",
     "id": "io_lifetimes"
   },
   {
@@ -536,7 +541,7 @@
   },
   {
     "name": "itoa",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "id": "itoa"
   },
   {
@@ -561,7 +566,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.134",
+    "version": "0.2.136",
     "id": "libc"
   },
   {
@@ -596,7 +601,7 @@
   },
   {
     "name": "log4rs",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "id": "log4rs"
   },
   {
@@ -646,8 +651,13 @@
   },
   {
     "name": "memoffset",
-    "version": "0.6.5",
+    "version": "0.7.1",
     "id": "memoffset"
+  },
+  {
+    "name": "memoffset",
+    "version": "0.6.5",
+    "id": "memoffset_0_6_5"
   },
   {
     "name": "mime",
@@ -681,7 +691,7 @@
   },
   {
     "name": "nalgebra",
-    "version": "0.31.1",
+    "version": "0.31.2",
     "id": "nalgebra"
   },
   {
@@ -786,7 +796,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.76",
+    "version": "0.9.77",
     "id": "openssl_sys"
   },
   {
@@ -806,7 +816,7 @@
   },
   {
     "name": "parking_lot_core",
-    "version": "0.9.3",
+    "version": "0.9.4",
     "id": "parking_lot_core"
   },
   {
@@ -921,7 +931,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.46",
+    "version": "1.0.47",
     "id": "proc_macro2"
   },
   {
@@ -946,7 +956,7 @@
   },
   {
     "name": "publicsuffix",
-    "version": "2.2.2",
+    "version": "2.2.3",
     "id": "publicsuffix"
   },
   {
@@ -1056,7 +1066,7 @@
   },
   {
     "name": "rustix",
-    "version": "0.35.11",
+    "version": "0.35.12",
     "id": "rustix"
   },
   {
@@ -1096,17 +1106,17 @@
   },
   {
     "name": "serde",
-    "version": "1.0.145",
+    "version": "1.0.147",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.145",
+    "version": "1.0.147",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.85",
+    "version": "1.0.87",
     "id": "serde_json"
   },
   {
@@ -1156,7 +1166,7 @@
   },
   {
     "name": "smallvec",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "id": "smallvec"
   },
   {
@@ -1206,7 +1216,7 @@
   },
   {
     "name": "syn",
-    "version": "1.0.101",
+    "version": "1.0.103",
     "id": "syn"
   },
   {
@@ -1236,7 +1246,7 @@
   },
   {
     "name": "textwrap",
-    "version": "0.15.1",
+    "version": "0.16.0",
     "id": "textwrap"
   },
   {
@@ -1271,7 +1281,7 @@
   },
   {
     "name": "time",
-    "version": "0.3.14",
+    "version": "0.3.16",
     "id": "time"
   },
   {
@@ -1280,8 +1290,13 @@
     "id": "time_0_1_44"
   },
   {
+    "name": "time-core",
+    "version": "0.1.0",
+    "id": "time_core"
+  },
+  {
     "name": "time-macros",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "id": "time_macros"
   },
   {
@@ -1336,18 +1351,13 @@
   },
   {
     "name": "tracing",
-    "version": "0.1.36",
+    "version": "0.1.37",
     "id": "tracing"
   },
   {
     "name": "tracing-core",
-    "version": "0.1.29",
+    "version": "0.1.30",
     "id": "tracing_core"
-  },
-  {
-    "name": "traitobject",
-    "version": "0.1.0",
-    "id": "traitobject"
   },
   {
     "name": "try-lock",
@@ -1355,9 +1365,9 @@
     "id": "try_lock"
   },
   {
-    "name": "typemap",
-    "version": "0.3.3",
-    "id": "typemap"
+    "name": "typemap-ors",
+    "version": "1.0.0",
+    "id": "typemap_ors"
   },
   {
     "name": "typenum",
@@ -1376,7 +1386,7 @@
   },
   {
     "name": "unicode-ident",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "id": "unicode_ident"
   },
   {
@@ -1405,9 +1415,9 @@
     "id": "unicode_xid"
   },
   {
-    "name": "unsafe-any",
-    "version": "0.4.2",
-    "id": "unsafe_any"
+    "name": "unsafe-any-ors",
+    "version": "1.0.0",
+    "id": "unsafe_any_ors"
   },
   {
     "name": "untrusted",
@@ -1426,7 +1436,7 @@
   },
   {
     "name": "uuid",
-    "version": "1.1.2",
+    "version": "1.2.1",
     "id": "uuid"
   },
   {
@@ -1456,7 +1466,7 @@
   },
   {
     "name": "wide",
-    "version": "0.7.4",
+    "version": "0.7.5",
     "id": "wide"
   },
   {
