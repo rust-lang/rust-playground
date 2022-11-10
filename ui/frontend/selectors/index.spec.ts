@@ -55,4 +55,12 @@ describe('checking for a main function', () => {
   test('a function with the substring main does not count', () => {
     expect(doMainFunctionSelector('fn mainly()')).toBe(false);
   });
+
+  test('a main function after other items on the same line', () => {
+    expect(doMainFunctionSelector('use std; fn main(){ println!("Hello, world!"); }')).toBe(true);
+  });
+
+  test('a main function with a block comment in the argument list', () => {
+    expect(doMainFunctionSelector('fn main(/* comment */) {')).toBe(true);
+  });
 });
