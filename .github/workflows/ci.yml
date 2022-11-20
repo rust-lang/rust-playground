@@ -194,17 +194,24 @@ jobs:
         args: "--manifest-path top-crates/Cargo.toml --check"
     - name: Build backend
       run: |-
-        mkdir -p ui/target; docker run --rm -v $PWD/ui:/ui -v ~/.cargo/git:/home/rust/.cargo/git -v ~/.cargo/registry:/home/rust/.cargo/registry --workdir /ui ekidd/rust-musl-builder:stable bash -c $'
-          sudo chown -R rust:rust /home/rust/.cargo /ui/target;
+        mkdir -p ui/target; docker run --rm -v $PWD/ui:/ui -v ~/.cargo/git:/root/.cargo/git -v ~/.cargo/registry:/root/.cargo/registry --workdir /ui rust:alpine sh -c '
+          apk add musl-dev openssl-dev openssl-libs-static
+
+          # Adding -C relocation-model=static due to
+          # https://github.com/rust-lang/rust/issues/95926
+
+          # Adding this to find the statically-built version
+          export OPENSSL_NO_PKG_CONFIG=1 OPENSSL_STATIC=1 OPENSSL_DIR=/usr/
 
           # Unit tests
-          cargo test --locked --target=x86_64-unknown-linux-musl --no-run;
-          test_bin=$(find target/x86_64-unknown-linux-musl/debug/deps/ -type f -perm -a=x);
+          cargo rustc --tests --locked -- -C relocation-model=static;
+
+          test_bin=$(find target/debug/deps/ -name "ui*" -type f -perm -a=x);
           mv "${test_bin}" target/unit_tests;
 
           # Primary binary
-          cargo build --locked --target=x86_64-unknown-linux-musl --release;
-          mv target/x86_64-unknown-linux-musl/release/ui target/ui;
+          cargo rustc --locked --release -- -C relocation-model=static;
+          mv target/release/ui target/ui;
         '
     - name: Restore permissions
       run: sudo chown -R runner:docker ~/.cargo/ ui/target
