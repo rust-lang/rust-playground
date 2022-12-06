@@ -120,7 +120,7 @@ export enum Focus {
 }
 
 export enum Notification {
-  MonacoEditorAvailable = 'monaco-editor-available',
+  RustSurvey2022 = 'rust-survey-2022',
 }
 
 export type AceResizeKey = [Focus | undefined, number];

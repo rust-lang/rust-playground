@@ -70,7 +70,7 @@ version = "=1.0.0"
 
 [dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.58"
+version = "=0.1.59"
 
 [dependencies.atomic]
 package = "atomic"
@@ -161,7 +161,7 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [dependencies.clap]
 package = "clap"
-version = "=4.0.26"
+version = "=4.0.29"
 features = ["cargo", "color", "derive", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-grouped", "unstable-replace", "usage", "wrap_help"]
 
 [dependencies.clap_derive]
@@ -240,7 +240,7 @@ version = "=0.1.10"
 
 [dependencies.data_encoding]
 package = "data-encoding"
-version = "=2.3.2"
+version = "=2.3.3"
 features = ["alloc", "std"]
 
 [dependencies.debug_unreachable]
@@ -272,8 +272,8 @@ features = ["alloc"]
 
 [dependencies.env_logger]
 package = "env_logger"
-version = "=0.9.3"
-features = ["atty", "humantime", "regex", "termcolor"]
+version = "=0.10.0"
+features = ["auto-color", "color", "humantime", "regex"]
 
 [dependencies.error_chain]
 package = "error-chain"
@@ -308,7 +308,7 @@ default-features = false
 
 [dependencies.flate2]
 package = "flate2"
-version = "=1.0.24"
+version = "=1.0.25"
 features = ["miniz_oxide", "rust_backend"]
 
 [dependencies.flume]
@@ -507,8 +507,8 @@ features = ["std"]
 
 [dependencies.io_lifetimes]
 package = "io-lifetimes"
-version = "=0.7.5"
-default-features = false
+version = "=1.0.3"
+features = ["close", "libc", "windows-sys"]
 
 [dependencies.iovec]
 package = "iovec"
@@ -517,6 +517,10 @@ version = "=0.1.4"
 [dependencies.ipnet]
 package = "ipnet"
 version = "=2.5.1"
+
+[dependencies.is_terminal]
+package = "is-terminal"
+version = "=0.4.1"
 
 [dependencies.itertools]
 package = "itertools"
@@ -548,7 +552,7 @@ version = "=0.5.2"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.137"
+version = "=0.2.138"
 features = ["extra_traits", "std"]
 
 [dependencies.libm]
@@ -566,7 +570,7 @@ version = "=0.5.6"
 
 [dependencies.linux_raw_sys]
 package = "linux-raw-sys"
-version = "=0.0.46"
+version = "=0.1.3"
 features = ["errno", "general", "ioctl", "no_std"]
 default-features = false
 
@@ -745,7 +749,7 @@ version = "=0.3.0"
 
 [dependencies.openssl]
 package = "openssl"
-version = "=0.10.42"
+version = "=0.10.43"
 
 [dependencies.openssl_macros]
 package = "openssl-macros"
@@ -757,7 +761,7 @@ version = "=0.1.5"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.77"
+version = "=0.9.78"
 
 [dependencies.ordered_float]
 package = "ordered-float"
@@ -776,7 +780,7 @@ version = "=0.12.1"
 
 [dependencies.parking_lot_core]
 package = "parking_lot_core"
-version = "=0.9.4"
+version = "=0.9.5"
 
 [dependencies.paste]
 package = "paste"
@@ -1003,7 +1007,7 @@ version = "=0.4.0"
 
 [dependencies.rustix]
 package = "rustix"
-version = "=0.35.13"
+version = "=0.36.5"
 features = ["io-lifetimes", "libc", "std", "termios", "use-libc-auxv"]
 
 [dependencies.ryu]
@@ -1039,12 +1043,12 @@ features = ["std"]
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.147"
+version = "=1.0.149"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.147"
+version = "=1.0.149"
 
 [dependencies.serde_json]
 package = "serde_json"
@@ -1138,7 +1142,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.103"
+version = "=1.0.105"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"]
 
 [dependencies.tar]
@@ -1160,7 +1164,7 @@ version = "=1.1.3"
 
 [dependencies.terminal_size]
 package = "terminal_size"
-version = "=0.2.2"
+version = "=0.2.3"
 
 [dependencies.textwrap]
 package = "textwrap"
@@ -1196,9 +1200,9 @@ package = "time"
 version = "=0.3.17"
 features = ["alloc", "formatting", "macros", "parsing", "std"]
 
-[dependencies.time_0_1_44]
+[dependencies.time_0_1_45]
 package = "time"
-version = "=0.1.44"
+version = "=0.1.45"
 
 [dependencies.time_core]
 package = "time-core"
@@ -1220,8 +1224,8 @@ version = "=0.1.0"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.22.0"
-features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "winapi"]
+version = "=1.23.0"
+features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "windows-sys"]
 
 [dependencies.tokio_io]
 package = "tokio-io"
@@ -1229,7 +1233,7 @@ version = "=0.1.13"
 
 [dependencies.tokio_macros]
 package = "tokio-macros"
-version = "=1.8.0"
+version = "=1.8.2"
 
 [dependencies.tokio_native_tls]
 package = "tokio-native-tls"
@@ -1278,7 +1282,7 @@ version = "=1.0.0"
 
 [dependencies.typenum]
 package = "typenum"
-version = "=1.15.0"
+version = "=1.16.0"
 
 [dependencies.unicase]
 package = "unicase"
@@ -1365,7 +1369,7 @@ default-features = false
 [dependencies.winapi]
 package = "winapi"
 version = "=0.3.9"
-features = ["accctrl", "aclapi", "activation", "basetsd", "combaseapi", "consoleapi", "errhandlingapi", "fileapi", "handleapi", "impl-debug", "impl-default", "memoryapi", "minwinbase", "minwindef", "namedpipeapi", "ntdef", "ntsecapi", "objbase", "processenv", "processthreadsapi", "profileapi", "roapi", "std", "sysinfoapi", "threadpoollegacyapiset", "timezoneapi", "winbase", "wincon", "winerror", "winnt", "winreg", "winstring", "ws2ipdef", "ws2tcpip", "wtypesbase"]
+features = ["activation", "basetsd", "combaseapi", "consoleapi", "errhandlingapi", "fileapi", "handleapi", "impl-debug", "impl-default", "memoryapi", "minwinbase", "minwindef", "ntdef", "ntsecapi", "objbase", "processenv", "processthreadsapi", "profileapi", "roapi", "std", "sysinfoapi", "timezoneapi", "winbase", "wincon", "winerror", "winnt", "winreg", "winstring", "ws2ipdef", "ws2tcpip", "wtypesbase"]
 
 [dependencies.xattr]
 package = "xattr"
@@ -1433,7 +1437,7 @@ version = "=1.0.0"
 
 [build_dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.58"
+version = "=0.1.59"
 
 [build_dependencies.atomic]
 package = "atomic"
@@ -1524,7 +1528,7 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [build_dependencies.clap]
 package = "clap"
-version = "=4.0.26"
+version = "=4.0.29"
 features = ["cargo", "color", "derive", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-grouped", "unstable-replace", "usage", "wrap_help"]
 
 [build_dependencies.clap_derive]
@@ -1603,7 +1607,7 @@ version = "=0.1.10"
 
 [build_dependencies.data_encoding]
 package = "data-encoding"
-version = "=2.3.2"
+version = "=2.3.3"
 features = ["alloc", "std"]
 
 [build_dependencies.debug_unreachable]
@@ -1635,8 +1639,8 @@ features = ["alloc"]
 
 [build_dependencies.env_logger]
 package = "env_logger"
-version = "=0.9.3"
-features = ["atty", "humantime", "regex", "termcolor"]
+version = "=0.10.0"
+features = ["auto-color", "color", "humantime", "regex"]
 
 [build_dependencies.error_chain]
 package = "error-chain"
@@ -1671,7 +1675,7 @@ default-features = false
 
 [build_dependencies.flate2]
 package = "flate2"
-version = "=1.0.24"
+version = "=1.0.25"
 features = ["miniz_oxide", "rust_backend"]
 
 [build_dependencies.flume]
@@ -1870,8 +1874,8 @@ features = ["std"]
 
 [build_dependencies.io_lifetimes]
 package = "io-lifetimes"
-version = "=0.7.5"
-default-features = false
+version = "=1.0.3"
+features = ["close", "libc", "windows-sys"]
 
 [build_dependencies.iovec]
 package = "iovec"
@@ -1880,6 +1884,10 @@ version = "=0.1.4"
 [build_dependencies.ipnet]
 package = "ipnet"
 version = "=2.5.1"
+
+[build_dependencies.is_terminal]
+package = "is-terminal"
+version = "=0.4.1"
 
 [build_dependencies.itertools]
 package = "itertools"
@@ -1911,7 +1919,7 @@ version = "=0.5.2"
 
 [build_dependencies.libc]
 package = "libc"
-version = "=0.2.137"
+version = "=0.2.138"
 features = ["extra_traits", "std"]
 
 [build_dependencies.libm]
@@ -1929,7 +1937,7 @@ version = "=0.5.6"
 
 [build_dependencies.linux_raw_sys]
 package = "linux-raw-sys"
-version = "=0.0.46"
+version = "=0.1.3"
 features = ["errno", "general", "ioctl", "no_std"]
 default-features = false
 
@@ -2108,7 +2116,7 @@ version = "=0.3.0"
 
 [build_dependencies.openssl]
 package = "openssl"
-version = "=0.10.42"
+version = "=0.10.43"
 
 [build_dependencies.openssl_macros]
 package = "openssl-macros"
@@ -2120,7 +2128,7 @@ version = "=0.1.5"
 
 [build_dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.77"
+version = "=0.9.78"
 
 [build_dependencies.ordered_float]
 package = "ordered-float"
@@ -2139,7 +2147,7 @@ version = "=0.12.1"
 
 [build_dependencies.parking_lot_core]
 package = "parking_lot_core"
-version = "=0.9.4"
+version = "=0.9.5"
 
 [build_dependencies.paste]
 package = "paste"
@@ -2366,7 +2374,7 @@ version = "=0.4.0"
 
 [build_dependencies.rustix]
 package = "rustix"
-version = "=0.35.13"
+version = "=0.36.5"
 features = ["io-lifetimes", "libc", "std", "termios", "use-libc-auxv"]
 
 [build_dependencies.ryu]
@@ -2402,12 +2410,12 @@ features = ["std"]
 
 [build_dependencies.serde]
 package = "serde"
-version = "=1.0.147"
+version = "=1.0.149"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [build_dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.147"
+version = "=1.0.149"
 
 [build_dependencies.serde_json]
 package = "serde_json"
@@ -2501,7 +2509,7 @@ default-features = false
 
 [build_dependencies.syn]
 package = "syn"
-version = "=1.0.103"
+version = "=1.0.105"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"]
 
 [build_dependencies.tar]
@@ -2523,7 +2531,7 @@ version = "=1.1.3"
 
 [build_dependencies.terminal_size]
 package = "terminal_size"
-version = "=0.2.2"
+version = "=0.2.3"
 
 [build_dependencies.textwrap]
 package = "textwrap"
@@ -2559,9 +2567,9 @@ package = "time"
 version = "=0.3.17"
 features = ["alloc", "formatting", "macros", "parsing", "std"]
 
-[build_dependencies.time_0_1_44]
+[build_dependencies.time_0_1_45]
 package = "time"
-version = "=0.1.44"
+version = "=0.1.45"
 
 [build_dependencies.time_core]
 package = "time-core"
@@ -2583,8 +2591,8 @@ version = "=0.1.0"
 
 [build_dependencies.tokio]
 package = "tokio"
-version = "=1.22.0"
-features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "winapi"]
+version = "=1.23.0"
+features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "windows-sys"]
 
 [build_dependencies.tokio_io]
 package = "tokio-io"
@@ -2592,7 +2600,7 @@ version = "=0.1.13"
 
 [build_dependencies.tokio_macros]
 package = "tokio-macros"
-version = "=1.8.0"
+version = "=1.8.2"
 
 [build_dependencies.tokio_native_tls]
 package = "tokio-native-tls"
@@ -2641,7 +2649,7 @@ version = "=1.0.0"
 
 [build_dependencies.typenum]
 package = "typenum"
-version = "=1.15.0"
+version = "=1.16.0"
 
 [build_dependencies.unicase]
 package = "unicase"
@@ -2728,7 +2736,7 @@ default-features = false
 [build_dependencies.winapi]
 package = "winapi"
 version = "=0.3.9"
-features = ["accctrl", "aclapi", "activation", "basetsd", "combaseapi", "consoleapi", "errhandlingapi", "fileapi", "handleapi", "impl-debug", "impl-default", "memoryapi", "minwinbase", "minwindef", "namedpipeapi", "ntdef", "ntsecapi", "objbase", "processenv", "processthreadsapi", "profileapi", "roapi", "std", "sysinfoapi", "threadpoollegacyapiset", "timezoneapi", "winbase", "wincon", "winerror", "winnt", "winreg", "winstring", "ws2ipdef", "ws2tcpip", "wtypesbase"]
+features = ["activation", "basetsd", "combaseapi", "consoleapi", "errhandlingapi", "fileapi", "handleapi", "impl-debug", "impl-default", "memoryapi", "minwinbase", "minwindef", "ntdef", "ntsecapi", "objbase", "processenv", "processthreadsapi", "profileapi", "roapi", "std", "sysinfoapi", "timezoneapi", "winbase", "wincon", "winerror", "winnt", "winreg", "winstring", "ws2ipdef", "ws2tcpip", "wtypesbase"]
 
 [build_dependencies.xattr]
 package = "xattr"

@@ -7,7 +7,8 @@ interface State {
   seenRustSurvey2020: boolean; // expired
   seenRust2021IsDefault: boolean; // expired
   seenRustSurvey2021: boolean; // expired
-  seenMonacoEditorAvailable: boolean;
+  seenMonacoEditorAvailable: boolean; // expired
+  seenRustSurvey2022: boolean;
 }
 
 const DEFAULT: State = {
@@ -16,15 +17,16 @@ const DEFAULT: State = {
   seenRustSurvey2020: true,
   seenRust2021IsDefault: true,
   seenRustSurvey2021: true,
-  seenMonacoEditorAvailable: false,
+  seenMonacoEditorAvailable: true,
+  seenRustSurvey2022: false,
 };
 
 export default function notifications(state = DEFAULT, action: Action): State {
   switch (action.type) {
     case ActionType.NotificationSeen: {
       switch (action.notification) {
-        case Notification.MonacoEditorAvailable: {
-          return { ...state, seenMonacoEditorAvailable: true };
+        case Notification.RustSurvey2022: {
+          return { ...state, seenRustSurvey2022: true };
         }
       }
     }
