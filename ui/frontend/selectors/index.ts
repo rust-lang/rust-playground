@@ -271,15 +271,15 @@ const notificationsSelector = (state: State) => state.notifications;
 
 const NOW = new Date();
 
-const MONACO_EDITOR_AVAILABLE_END = new Date('2022-02-15T00:00:00Z');
-const MONACO_EDITOR_AVAILABLE_OPEN = NOW <= MONACO_EDITOR_AVAILABLE_END;
-export const showMonacoEditorAvailableSelector = createSelector(
+const RUST_SURVEY_2022_END = new Date('2022-12-19T00:00:00Z');
+const RUST_SURVEY_2022_OPEN = NOW <= RUST_SURVEY_2022_END;
+export const showRustSurvey2022Selector = createSelector(
   notificationsSelector,
-  notifications => MONACO_EDITOR_AVAILABLE_OPEN && !notifications.seenMonacoEditorAvailable,
+  notifications => RUST_SURVEY_2022_OPEN && !notifications.seenRustSurvey2022,
 );
 
 export const anyNotificationsToShowSelector = createSelector(
-  showMonacoEditorAvailableSelector,
+  showRustSurvey2022Selector,
   (...allNotifications) => allNotifications.some(n => n),
 );
 

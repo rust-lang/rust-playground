@@ -9,29 +9,31 @@ import * as selectors from './selectors';
 
 import styles from './Notifications.module.css';
 
-const MONACO_EDITOR_URL = 'https://microsoft.github.io/monaco-editor/';
+const SURVEY_URL = 'https://blog.rust-lang.org/2022/12/05/survey-launch.html';
 
 const Notifications: React.FC = () => {
   return (
     <Portal>
       <div className={styles.container}>
-        <MonacoEditorAvailableNotification />
+        <RustSurvey2022Notification />
       </div>
     </Portal>
   );
 };
 
-const MonacoEditorAvailableNotification: React.FC = () => {
-  const monacoEditorAvailable = useSelector(selectors.showMonacoEditorAvailableSelector);
+const RustSurvey2022Notification: React.SFC = () => {
+  const showRustSurvey2022 = useSelector(selectors.showRustSurvey2022Selector);
 
   const dispatch = useDispatch();
-  const seenMonacoEditorAvailable = useCallback(() => dispatch(actions.seenMonacoEditorAvailable()), [dispatch]);
+  const seenRustSurvey2021 = useCallback(() => dispatch(actions.seenRustSurvey2022()), [dispatch]);
 
-  return monacoEditorAvailable ? (
-    <Notification onClose={seenMonacoEditorAvailable}>
-      The <a href={MONACO_EDITOR_URL}>Monaco Editor</a>, the code editor
-      that powers VS Code, is now available in the playground. Choose
-      your preferred editor from the Config menu.
+  return showRustSurvey2022 ? (
+    <Notification onClose={seenRustSurvey2021}>
+      Please help us take a look at who the Rust community is
+      composed of, how the Rust project is doing, and how we can
+      improve the Rust programming experience by completing the <a
+        href={SURVEY_URL}>2022 State of Rust Survey</a>. Whether or
+      not you use Rust today, we want to know your opinions.
     </Notification>
   ) : null;
 };
