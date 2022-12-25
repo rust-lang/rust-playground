@@ -1,18 +1,10 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-export const useKeyDown = (keys: string[], callback: Function, node = null) => {
+export const useKeyDown = (
+  shortcutMap: Map<string[], Function>,
+  node = document
+) => {
   const [currentShortcutKeys, setCurrentShortcutKeys] = useState<string[]>([]);
-
-  const callbackRef = useRef(callback);
-  useLayoutEffect(() => {
-    callbackRef.current = callback;
-  });
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -21,17 +13,19 @@ export const useKeyDown = (keys: string[], callback: Function, node = null) => {
         return;
       }
       const newShortcutKeys = currentShortcutKeys.concat([event.key]);
-      // Note: this implementation cares about order of keys pressed
-      if (
-        keys.length === newShortcutKeys.length &&
-        keys.every((val, i) => newShortcutKeys[i] === val)
-      ) {
-        callbackRef.current(event);
+      for (const [keys, cb] of shortcutMap.entries()) {
+        // Note: this implementation cares about order of keys pressed
+        if (
+          keys.length === newShortcutKeys.length &&
+          keys.every((val, i) => newShortcutKeys[i] === val)
+        ) {
+          cb(event);
+        }
       }
       setCurrentShortcutKeys(newShortcutKeys);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [keys]
+    [shortcutMap]
   );
 
   const handleKeyUp = (event: KeyboardEvent) => {
@@ -45,11 +39,11 @@ export const useKeyDown = (keys: string[], callback: Function, node = null) => {
   };
 
   useEffect(() => {
-    // target is either the provided node or the whole document
-    const targetNode = node ?? document;
-    targetNode.addEventListener('keydown', handleKeyDown);
-    targetNode.addEventListener('keyup', handleKeyUp);
-    return () =>
-      targetNode && targetNode.removeEventListener('keydown', handleKeyDown);
+    node.addEventListener('keydown', handleKeyDown);
+    node.addEventListener('keyup', handleKeyUp);
+    return () => {
+      node.removeEventListener('keydown', handleKeyDown);
+      node.removeEventListener('keydown', handleKeyUp);
+    };
   }, [handleKeyDown, node]);
 };

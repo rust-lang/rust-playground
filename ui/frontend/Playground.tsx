@@ -112,10 +112,13 @@ const Playground: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useKeyDown(['Control', 'Alt', 'f'], handleRustFmt);
-  useKeyDown(['Control', 'Alt', 'c'], handleClippy);
-  useKeyDown(['Control', 'Alt', 'm'], handleMiri);
-  useKeyDown(['Control', 'Alt', 'e'], handleMacroExpansion);
+  const shortcutMap = new Map([
+    [['Control', 'Alt', 'f'], handleRustFmt],
+    [['Control', 'Alt', 'c'], handleClippy],
+    [['Control', 'Alt', 'm'], handleMiri],
+    [['Control', 'Alt', 'x'], handleMacroExpansion],
+  ]);
+  useKeyDown(shortcutMap);
 
   return (
     <>
