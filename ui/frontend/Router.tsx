@@ -20,19 +20,29 @@ interface Substate {
     channel: Channel;
     mode: Mode;
     edition: Edition;
+  };
+  output: {
+    gist: {
+      id?: string;
+    }
   }
 }
 
-const stateSelector = ({ page, configuration: { channel, mode, edition } }: State): Substate => ({
+const stateSelector = ({ page, configuration: { channel, mode, edition}, output }: State): Substate => ({
   page,
   configuration: {
     channel,
     mode,
     edition,
   },
+  output: {
+    gist: {
+      id: output.gist.id,
+    },
+  },
 });
 
-const stateToLocation = ({ page, configuration }: Substate): Partial<Path> => {
+const stateToLocation = ({ page, configuration, output }: Substate): Partial<Path> => {
   switch (page) {
     case 'help': {
       return {
@@ -45,6 +55,7 @@ const stateToLocation = ({ page, configuration }: Substate): Partial<Path> => {
         version: configuration.channel,
         mode: configuration.mode,
         edition: configuration.edition,
+        gist: output.gist.id,
       };
       return {
         pathname: `/?${qs.stringify(query)}`,
