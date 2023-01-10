@@ -39,7 +39,7 @@ export const grammar: languages.IMonarchLanguage = {
     'as', 'break', 'const', 'crate', 'enum', 'extern', 'false', 'fn', 'impl', 'in',
     'let', 'mod', 'move', 'mut', 'pub', 'ref', 'return', 'self', 'Self', 'static',
     'struct', 'super', 'trait', 'true', 'type', 'unsafe', 'use', 'where',
-    'macro_rules',
+    'macro_rules', 'async', 'await',
   ],
 
   controlFlowKeywords: [
@@ -80,6 +80,7 @@ export const grammar: languages.IMonarchLanguage = {
           '@keywords': {
             cases: {
               'fn': { token: 'keyword', next: '@func_decl' },
+              'const': { token: 'keyword', next: '@const_decl' },
               '@default': 'keyword',
             },
           },
@@ -157,7 +158,12 @@ export const grammar: languages.IMonarchLanguage = {
 
     func_decl: [
       [
-        /[a-z_$][\w$]*/, 'support.function', '@pop',
+        /[a-zA-Z_$][\w$]*/, 'support.function', '@pop',
+      ],
+    ],
+    const_decl: [
+      [
+        /[a-zA-Z_$][\w$]*/, 'variable.constant', '@pop',
       ],
     ],
   },

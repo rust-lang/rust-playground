@@ -4,6 +4,22 @@ import MenuItem from './MenuItem';
 
 import styles from './ConfigElement.module.css';
 
+interface ButtonProps extends ConfigElementProps {
+  id: string;
+  label: string;
+  onClick: () => any;
+}
+
+export const Button: React.SFC<ButtonProps> =
+  ({ label, onClick, ...rest }) => (
+    <ConfigElement {...rest}>
+      <div className={styles.toggle}>
+        <button onClick={onClick}>{label}</button>
+      </div>
+    </ConfigElement>
+  );
+
+
 interface EitherProps extends ConfigElementProps {
   id: string;
   a: string;
