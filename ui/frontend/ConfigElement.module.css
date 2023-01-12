@@ -42,9 +42,9 @@
     text-transform: uppercase;
 
     & ~ label {
+      border-radius: 0 var(--header-border-radius) var(--header-border-radius) 0;
       border-right-width: 1px;
       border-left: $border;
-      border-radius: 0 var(--header-border-radius) var(--header-border-radius) 0;
     }
 
     &:hover {

@@ -29,12 +29,12 @@ $vertical-border-color: #cacaca;
 }
 
 .content {
+  border-radius: var(--header-border-radius);
   border-right: 1px solid $vertical-border-color;
   border-bottom: 1px solid var(--header-accent-border);
   border-left: 1px solid $vertical-border-color;
   margin: $arrow-size;
   background: $bg-color;
-  border-radius: var(--header-border-radius);
   box-shadow: 0 1px 4px -2px rgb(0 0 0 / 60%), inset 0 1px 0 white;
   color: $fg-color;
 }
