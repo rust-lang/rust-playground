@@ -74,7 +74,7 @@
     "postcss": "^8.2.7",
     "postcss-loader": "^7.0.0",
     "postcss-nesting": "^10.1.1",
-    "postcss-simple-vars": "^6.0.3",
+    "postcss-simple-vars": "^7.0.1",
     "prettier": "^2.2.1",
     "stylelint": "^14.2.0",
     "stylelint-config-css-modules": "^4.0.0",
