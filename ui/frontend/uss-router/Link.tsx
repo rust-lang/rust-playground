@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useCallback, MouseEventHandler } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Context } from './Router';
@@ -16,7 +16,7 @@ const Link: React.FC<LinkProps> = (props) => {
   const router = useContext(Context);
   const { action, onClick, children, ...anchorProps } = props;
 
-  const realOnClick = useCallback(e => {
+  const realOnClick: MouseEventHandler<HTMLAnchorElement> = useCallback((e) => {
     if (onClick) {
       onClick();
     } else if (action) {

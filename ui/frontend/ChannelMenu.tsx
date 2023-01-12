@@ -24,7 +24,7 @@ const ChannelMenu: React.FC<ChannelMenuProps> = props => {
   const nightlyVersionDetails = useSelector(selectors.nightlyVersionDetailsText);
 
   const dispatch = useDispatch();
-  const changeChannel = useCallback((channel) => {
+  const changeChannel = useCallback((channel: Channel) => {
     dispatch(actions.changeChannel(channel));
     props.close();
   }, [dispatch, props]);

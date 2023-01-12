@@ -200,7 +200,7 @@ const AceEditor: React.FC<AceEditorProps> = props => {
   const previouslyNotified = useRef<string[]>([]);
   const onEditCodeDebounced = useRafDebouncedFunction(
     props.onEditCode,
-    useCallback(code => previouslyNotified.current.push(code), [previouslyNotified]),
+    useCallback((code: string) => previouslyNotified.current.push(code), [previouslyNotified]),
   );
 
   useEditorProp(editor, onEditCodeDebounced, useCallback((editor, onEditCode) => {

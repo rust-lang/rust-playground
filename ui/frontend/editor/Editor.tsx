@@ -125,7 +125,7 @@ const Editor: React.FC = () => {
 
   const dispatch = useAppDispatch();
   const execute = useCallback(() => dispatch(actions.performPrimaryAction()), [dispatch]);
-  const onEditCode = useCallback((c) => dispatch(actions.editCode(c)), [dispatch]);
+  const onEditCode = useCallback((c: string) => dispatch(actions.editCode(c)), [dispatch]);
 
   const SelectedEditor = editorMap[editor];
 
