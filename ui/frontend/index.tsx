@@ -5,7 +5,7 @@ import 'normalize.css/normalize.css';
 import './index.module.css';
 
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 
 import {
@@ -51,11 +51,14 @@ window.rustPlayground = {
   },
 };
 
-ReactDOM.render(
-  <Provider store={store}>
-    <Router store={store} reducer={playgroundApp}>
-      <PageSwitcher />
-    </Router>
-  </Provider>,
-  document.getElementById('playground'),
-);
+const container = document.getElementById('playground');
+if (container) {
+  const root = createRoot(container);
+  root.render(
+    <Provider store={store}>
+      <Router store={store} reducer={playgroundApp}>
+        <PageSwitcher />
+      </Router>
+    </Provider>,
+  );
+}
