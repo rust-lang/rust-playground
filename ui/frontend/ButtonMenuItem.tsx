@@ -7,6 +7,7 @@ import styles from './ButtonMenuItem.module.css';
 type Button = JSX.IntrinsicElements['button'];
 
 interface ButtonMenuItemProps extends Button {
+  children: React.ReactNode;
   name: string;
 }
 

@@ -330,12 +330,13 @@ const LinkableSection: React.FC<LinkableSectionProps> = ({
 );
 
 interface LinkableSectionProps {
+  children: React.ReactNode;
   id: string;
   header: string;
   level: React.ElementType;
 }
 
-const Code: React.FC = ({ children }) => (
+const Code: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => (
   <code className={styles.code}>{children}</code>
 );
 

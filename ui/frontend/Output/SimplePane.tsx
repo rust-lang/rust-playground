@@ -6,6 +6,7 @@ import Section from './Section';
 import OutputPrism from './OutputPrism';
 
 interface HighlightErrorsProps {
+  children: React.ReactNode;
   label: string;
 }
 
@@ -19,6 +20,7 @@ const HighlightErrors: React.FC<HighlightErrorsProps> = ({ label, children }) =>
 );
 
 export interface SimplePaneProps extends ReallySimplePaneProps {
+  children?: React.ReactNode;
   kind: string;
 }
 

@@ -5,6 +5,7 @@ import { RouterObject } from '.';
 export const Context = createContext<RouterObject | undefined>(undefined);
 
 interface RouterProps {
+  children: React.ReactNode;
   router: RouterObject;
 }
 

@@ -17,15 +17,11 @@ import {
   ProcessAssembly,
 } from './types';
 
-interface ConfigMenuProps {
-  close: () => void;
-}
-
 const MONACO_THEMES = [
   'vs', 'vs-dark', 'vscode-dark-plus',
 ];
 
-const ConfigMenu: React.FC<ConfigMenuProps> = () => {
+const ConfigMenu: React.FC = () => {
   const keybinding = useSelector((state: State) => state.configuration.ace.keybinding);
   const aceTheme = useSelector((state: State) => state.configuration.ace.theme);
   const monacoTheme = useSelector((state: State) => state.configuration.monaco.theme);

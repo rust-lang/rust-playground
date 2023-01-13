@@ -63,7 +63,7 @@ const ChannelMenu: React.FC<ChannelMenuProps> = props => {
   );
 };
 
-const Desc: React.FC<{}> = ({ children }) => (
+const Desc: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => (
   <p className={styles.description}>{children}</p>
 );
 

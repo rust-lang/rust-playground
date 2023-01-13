@@ -57,6 +57,7 @@ const Header: React.FC = () => (
 );
 
 interface HeaderSetProps {
+  children: React.ReactNode;
   id: string;
 }
 

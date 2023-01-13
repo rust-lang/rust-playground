@@ -4,6 +4,7 @@ import { PrismCode } from 'react-prism';
 import styles from './OutputPrism.module.css';
 
 interface OutputPrismProps {
+  children: React.ReactNode;
   languageCode: 'language-rust_mir' | 'language-rust_errors';
 }
 

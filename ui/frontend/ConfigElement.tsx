@@ -51,6 +51,7 @@ export const Select = <T extends string,>({ value, onChange, children, ...rest }
 );
 
 interface ConfigElementProps {
+  children?: React.ReactNode;
   name: string;
   isNotDefault?: boolean;
   aside?: JSX.Element,

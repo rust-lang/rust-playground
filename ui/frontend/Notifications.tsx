@@ -39,6 +39,7 @@ const RustSurvey2022Notification: React.FC = () => {
 };
 
 interface NotificationProps {
+  children: React.ReactNode;
   onClose: () => void;
 }
 
