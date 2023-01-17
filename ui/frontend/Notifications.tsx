@@ -21,7 +21,7 @@ const Notifications: React.FC = () => {
   );
 };
 
-const RustSurvey2022Notification: React.SFC = () => {
+const RustSurvey2022Notification: React.FC = () => {
   const showRustSurvey2022 = useSelector(selectors.showRustSurvey2022Selector);
 
   const dispatch = useDispatch();
@@ -39,6 +39,7 @@ const RustSurvey2022Notification: React.SFC = () => {
 };
 
 interface NotificationProps {
+  children: React.ReactNode;
   onClose: () => void;
 }
 

@@ -5,6 +5,7 @@ import Header from './Header';
 import styles from './Section.module.css';
 
 interface SectionProps {
+  children: React.ReactNode;
   kind: string;
   label: string;
 }

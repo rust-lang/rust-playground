@@ -16,8 +16,8 @@ const AdvancedOptionsMenu: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const changeEdition = useCallback((e) => dispatch(actions.changeEdition(e)), [dispatch]);
-  const changeBacktrace = useCallback((b) => dispatch(actions.changeBacktrace(b)), [dispatch]);
+  const changeEdition = useCallback((e: Edition) => dispatch(actions.changeEdition(e)), [dispatch]);
+  const changeBacktrace = useCallback((b: Backtrace) => dispatch(actions.changeBacktrace(b)), [dispatch]);
 
   return (
     <MenuGroup title="Advanced options">

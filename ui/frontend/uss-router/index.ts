@@ -30,31 +30,28 @@ export function createRouter<St, SubSt, A extends Action<any>>({
   stateToLocation,
   locationToAction,
 }: CreateRouterArg<St, SubSt, A>): RouterObject {
-  let doingUpdateFromBrowser = false; // Avoid immediately PUSHing the state again
   let interestingPrevState: SubSt;
 
   // Watch changes to the Redux state
   store.subscribe(() => {
-    if (doingUpdateFromBrowser) { return; }
-
     const nextState = store.getState();
+
+    // It's only worth checking if our state subset has changed.
     const interestingNextState = stateSelector(nextState);
+    if (isEqual(interestingNextState, interestingPrevState)) { return; }
+    interestingPrevState = interestingNextState;
 
-    if (!isEqual(interestingNextState, interestingPrevState)) {
-      const nextLocation = stateToLocation(nextState);
-
-      history.push(nextLocation);
-
-      interestingPrevState = interestingNextState;
-    }
+    // If our next location matches where we already are, leave the
+    // history stack as-is.
+    const nextLocation = stateToLocation(nextState);
+    if (pathsEqualEnough(history, history.location, nextLocation)) { return; }
+    history.push(nextLocation);
   });
 
   const dispatchBrowserLocationChange = (nextLocation: Location) => {
     const action = locationToAction(nextLocation);
     if (action) {
-      doingUpdateFromBrowser = true;
       store.dispatch(action);
-      doingUpdateFromBrowser = false;
     }
   };
 
@@ -68,10 +65,6 @@ export function createRouter<St, SubSt, A extends Action<any>>({
   // Load initial browser state
   dispatchBrowserLocationChange(history.location);
 
-  // Now that we've set up any initial state, we keep it so we can
-  // tell when the location needs to change.
-  interestingPrevState = stateSelector(store.getState());
-
   return {
     provisionalLocation: (makeAction: () => A) => {
       const state = store.getState();
@@ -84,4 +77,11 @@ export function createRouter<St, SubSt, A extends Action<any>>({
       return stateToLocation(maybeState);
     },
   };
+}
+
+function pathsEqualEnough(history: BrowserHistory, a: Partial<Path>, b: Partial<Path>): boolean {
+  const aHref = history.createHref(a);
+  const bHref = history.createHref(b);
+
+  return aHref === bHref;
 }

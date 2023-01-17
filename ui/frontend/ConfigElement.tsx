@@ -4,18 +4,18 @@ import MenuItem from './MenuItem';
 
 import styles from './ConfigElement.module.css';
 
-interface EitherProps extends ConfigElementProps {
+interface EitherProps<T extends string> extends ConfigElementProps {
   id: string;
   a: string;
   b: string;
   aLabel?: string;
   bLabel?: string;
-  value: string;
-  onChange: (_: string) => any;
+  value: T;
+  onChange: (_: T) => any;
 }
 
-export const Either: React.FC<EitherProps> =
-  ({ id, a, b, aLabel = a, bLabel = b, value, onChange, ...rest }) => (
+export const Either =
+  <T extends string,>({ id, a, b, aLabel = a, bLabel = b, value, onChange, ...rest }: EitherProps<T>) => (
     <ConfigElement {...rest}>
       <div className={styles.toggle}>
         <input id={`${id}-a`}
@@ -23,33 +23,35 @@ export const Either: React.FC<EitherProps> =
           value={a}
           type="radio"
           checked={value === a}
-          onChange={() => onChange(a)} />
+          onChange={() => onChange(a as T)} />
         <label htmlFor={`${id}-a`}>{aLabel}</label>
         <input id={`${id}-b`}
           name={id}
           value={b}
           type="radio"
           checked={value === b}
-          onChange={() => onChange(b)} />
+          onChange={() => onChange(b as T)} />
         <label htmlFor={`${id}-b`}>{bLabel}</label>
       </div>
     </ConfigElement>
   );
 
-interface SelectProps extends ConfigElementProps {
-  value: string;
-  onChange: (_: string) => any;
+interface SelectProps<T extends string> extends ConfigElementProps {
+  children: React.ReactNode;
+  value: T;
+  onChange: (_: T) => any;
 }
 
-export const Select: React.FC<SelectProps> = ({ value, onChange, children, ...rest }) => (
+export const Select = <T extends string,>({ value, onChange, children, ...rest }: SelectProps<T>) => (
   <ConfigElement {...rest}>
-    <select className={styles.select} value={value} onChange={e => onChange(e.target.value)}>
+    <select className={styles.select} value={value} onChange={e => onChange(e.target.value as T)}>
       {children}
     </select>
   </ConfigElement>
 );
 
 interface ConfigElementProps {
+  children?: React.ReactNode;
   name: string;
   isNotDefault?: boolean;
   aside?: JSX.Element,

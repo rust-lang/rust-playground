@@ -17,15 +17,11 @@ import {
   ProcessAssembly,
 } from './types';
 
-interface ConfigMenuProps {
-  close: () => void;
-}
-
 const MONACO_THEMES = [
   'vs', 'vs-dark', 'vscode-dark-plus',
 ];
 
-const ConfigMenu: React.FC<ConfigMenuProps> = () => {
+const ConfigMenu: React.FC = () => {
   const keybinding = useSelector((state: State) => state.configuration.ace.keybinding);
   const aceTheme = useSelector((state: State) => state.configuration.ace.theme);
   const monacoTheme = useSelector((state: State) => state.configuration.monaco.theme);
@@ -37,15 +33,19 @@ const ConfigMenu: React.FC<ConfigMenuProps> = () => {
   const processAssembly = useSelector((state: State) => state.configuration.processAssembly);
 
   const dispatch = useDispatch();
-  const changeAceTheme = useCallback((t) => dispatch(actions.changeAceTheme(t)), [dispatch]);
-  const changeMonacoTheme = useCallback((t) => dispatch(actions.changeMonacoTheme(t)), [dispatch]);
-  const changeKeybinding = useCallback((k) => dispatch(actions.changeKeybinding(k)), [dispatch]);
-  const changeOrientation = useCallback((o) => dispatch(actions.changeOrientation(o)), [dispatch]);
-  const changeEditorStyle = useCallback((e) => dispatch(actions.changeEditor(e)), [dispatch]);
-  const changeAssemblyFlavor = useCallback((a) => dispatch(actions.changeAssemblyFlavor(a)), [dispatch]);
-  const changePairCharacters = useCallback((p) => dispatch(actions.changePairCharacters(p)), [dispatch]);
-  const changeProcessAssembly = useCallback((p) => dispatch(actions.changeProcessAssembly(p)), [dispatch]);
-  const changeDemangleAssembly = useCallback((d) => dispatch(actions.changeDemangleAssembly(d)), [dispatch]);
+  const changeAceTheme = useCallback((t: string) => dispatch(actions.changeAceTheme(t)), [dispatch]);
+  const changeMonacoTheme = useCallback((t: string) => dispatch(actions.changeMonacoTheme(t)), [dispatch]);
+  const changeKeybinding = useCallback((k: string) => dispatch(actions.changeKeybinding(k)), [dispatch]);
+  const changeOrientation = useCallback((o: Orientation) => dispatch(actions.changeOrientation(o)), [dispatch]);
+  const changeEditorStyle = useCallback((e: Editor) => dispatch(actions.changeEditor(e)), [dispatch]);
+  const changeAssemblyFlavor =
+    useCallback((a: AssemblyFlavor) => dispatch(actions.changeAssemblyFlavor(a)), [dispatch]);
+  const changePairCharacters =
+    useCallback((p: PairCharacters) => dispatch(actions.changePairCharacters(p)), [dispatch]);
+  const changeProcessAssembly =
+    useCallback((p: ProcessAssembly) => dispatch(actions.changeProcessAssembly(p)), [dispatch]);
+  const changeDemangleAssembly =
+    useCallback((d: DemangleAssembly) => dispatch(actions.changeDemangleAssembly(d)), [dispatch]);
 
   return (
     <Fragment>

@@ -91,6 +91,7 @@ export default class Router extends React.Component<RouterProps> {
 }
 
 interface RouterProps {
+  children: React.ReactNode;
   store: any;
   reducer: any;
 }

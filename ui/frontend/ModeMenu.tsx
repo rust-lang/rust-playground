@@ -15,7 +15,7 @@ interface ModeMenuProps {
 const ModeMenu: React.FC<ModeMenuProps> = props => {
   const mode = useSelector((state: State) => state.configuration.mode);
   const dispatch = useDispatch();
-  const changeMode = useCallback((mode) => {
+  const changeMode = useCallback((mode: Mode) => {
     dispatch(actions.changeMode(mode));
     props.close();
   }, [dispatch, props]

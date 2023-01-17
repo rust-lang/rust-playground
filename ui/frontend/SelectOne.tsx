@@ -3,6 +3,7 @@ import React from 'react';
 import SelectableMenuItem from './SelectableMenuItem';
 
 interface SelectOneProps<T> {
+  children: React.ReactNode;
   name: string;
   currentValue: T;
   thisValue: T;

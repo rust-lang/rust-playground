@@ -5,6 +5,7 @@ import { ExpandableIcon } from './Icon';
 import styles from './HeaderButton.module.css';
 
 interface HeaderButtonProps {
+  children?: React.ReactNode;
   bold?: boolean;
   icon?: React.ReactNode;
   rightIcon?: React.ReactNode;

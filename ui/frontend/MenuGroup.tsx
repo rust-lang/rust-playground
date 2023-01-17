@@ -3,6 +3,7 @@ import React from 'react';
 import styles from './MenuGroup.module.css';
 
 interface MenuGroupProps {
+  children: React.ReactNode;
   title: string;
 }
 
