@@ -1,24 +1,10 @@
 require 'spec_helper'
 require 'support/editor'
+require 'support/matchers/be_at_url'
 require 'support/playground_actions'
 
 RSpec.feature "Navigating between pages", type: :feature, js: true do
   include PlaygroundActions
-
-  RSpec::Matchers.define :be_at_url do |path, query = {}|
-    match do |page|
-      uri = URI::parse(page.current_url)
-      expect(uri.path).to eql(path)
-
-      query = query.map { |k, v| [k.to_s, Array(v).map(&:to_s)] }.to_h
-      query_hash = CGI::parse(uri.query || '')
-      expect(query_hash).to include(query)
-    end
-
-    failure_message do |page|
-      "expected that #{page.current_url} would be #{path} with the query parameters #{query}"
-    end
-  end
 
   # This is kind of a test of the router library too, so if that ever
   # gets extracted, a chunk of these tests can be removed.
