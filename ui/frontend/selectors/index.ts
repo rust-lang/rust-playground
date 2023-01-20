@@ -205,6 +205,11 @@ export const permalinkSelector = createSelector(
   },
 );
 
+export const textChangedSinceShareSelector = createSelector(
+  codeSelector, gistSelector,
+  (code, gist) => code !== gist.code
+)
+
 const codeBlock = (code: string, language = '') =>
   '```' + language + `\n${code}\n` + '```';
 

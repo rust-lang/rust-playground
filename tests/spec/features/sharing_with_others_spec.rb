@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'support/editor'
+require 'support/matchers/be_at_url'
 require 'support/playground_actions'
 
 RSpec.feature "Sharing the code with others", type: :feature, js: true do
@@ -22,6 +23,10 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
     perma_link = find_link("Permalink to the playground")[:href]
     direct_link = find_link("Direct link to the gist")[:href]
     urlo_link = find_link("Open a new thread in the Rust user forum")[:href]
+
+    # Have we automatically added the gist to our URL?
+    gist_id = Addressable::URI.parse(perma_link).query_values['gist']
+    expect(page).to be_at_url('/', gist: gist_id)
 
     # Navigate away so we can tell that we go back to the same page
     visit 'about:blank'
