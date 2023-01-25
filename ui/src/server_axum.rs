@@ -2,7 +2,7 @@ use crate::{
     gist,
     metrics::{
         track_metric_async, track_metric_force_endpoint_async, track_metric_no_request_async,
-        Endpoint, GenerateLabels, SuccessDetails,
+        Endpoint, GenerateLabels, SuccessDetails, DURATION_WS, LIVE_WS,
     },
     sandbox::{self, Channel, Sandbox},
     CachingSnafu, ClippyRequest, ClippyResponse, CompilationSnafu, CompileRequest, CompileResponse,
@@ -15,7 +15,11 @@ use crate::{
 };
 use async_trait::async_trait;
 use axum::{
-    extract::{self, Extension, Path, TypedHeader},
+    extract::{
+        self,
+        ws::{WebSocket, WebSocketUpgrade},
+        Extension, Path, TypedHeader,
+    },
     handler::Handler,
     headers::{authorization::Bearer, Authorization, CacheControl, ETag, IfNoneMatch},
     http::{header, uri::PathAndQuery, HeaderValue, Method, Request, StatusCode, Uri},
@@ -78,6 +82,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/meta/gist", post(meta_gist_create))
         .route("/meta/gist/:id", get(meta_gist_get))
         .route("/metrics", get(metrics))
+        .route("/websocket", get(websocket))
         .layer(Extension(Arc::new(SandboxCache::default())))
         .layer(Extension(config.github_token()));
 
@@ -384,6 +389,19 @@ async fn metrics(_: MetricsAuthorization) -> Result<Vec<u8>, StatusCode> {
         .encode(&metric_families, &mut buffer)
         .map(|_| buffer)
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+}
+
+async fn websocket(ws: WebSocketUpgrade) -> impl IntoResponse {
+    ws.on_upgrade(handle_socket)
+}
+
+async fn handle_socket(mut socket: WebSocket) {
+    LIVE_WS.inc();
+    let start = Instant::now();
+    while let Some(Ok(_msg)) = socket.recv().await {}
+    LIVE_WS.dec();
+    let elapsed = start.elapsed();
+    DURATION_WS.observe(elapsed.as_secs_f64());
 }
 
 #[derive(Debug)]

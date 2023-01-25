@@ -25,6 +25,9 @@ import playgroundApp from './reducers';
 import Router from './Router';
 import configureStore from './configureStore';
 
+const wsUri = '/websocket';
+const socket = new WebSocket(wsUri);
+
 const store = configureStore(window);
 
 const z = (evt: MediaQueryList | MediaQueryListEvent) => { store.dispatch(browserWidthChanged(evt.matches)); };
@@ -49,6 +52,9 @@ window.rustPlayground = {
   setCode: code => {
     store.dispatch(editCode(code));
   },
+  // Temporarily storing this as a global to prevent it from being
+  // garbage collected (at least by Safari).
+  webSocket: socket,
 };
 
 const container = document.getElementById('playground');
