@@ -26,8 +26,9 @@ import Router from './Router';
 import configureStore from './configureStore';
 import openWebSocket from './websocket';
 
-// Might be null;
-const socket = openWebSocket(window.location);
+const params = new URLSearchParams(window.location.search);
+// openWebSocket() may return null.
+const socket = params.has('websocket') ? openWebSocket(window.location) : null;
 
 const store = configureStore(window);
 
