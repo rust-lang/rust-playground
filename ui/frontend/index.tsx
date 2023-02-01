@@ -24,6 +24,11 @@ import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
 import Router from './Router';
 import configureStore from './configureStore';
+import openWebSocket from './websocket';
+
+const params = new URLSearchParams(window.location.search);
+// openWebSocket() may return null.
+const socket = params.has('websocket') ? openWebSocket(window.location) : null;
 
 const store = configureStore(window);
 
@@ -49,6 +54,9 @@ window.rustPlayground = {
   setCode: code => {
     store.dispatch(editCode(code));
   },
+  // Temporarily storing this as a global to prevent it from being
+  // garbage collected (at least by Safari).
+  webSocket: socket,
 };
 
 const container = document.getElementById('playground');

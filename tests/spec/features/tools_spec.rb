@@ -61,7 +61,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
 
     within(:output, :stdout) do
       # First-party
-      expect(page).to have_content('core::fmt::Arguments::new_v1')
+      expect(page).to have_content('::std::io::_print')
 
       # Third-party procedural macro
       expect(page).to have_content('block_on(body)')
