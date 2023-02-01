@@ -2,7 +2,7 @@ use crate::{
     gist,
     metrics::{
         track_metric_async, track_metric_force_endpoint_async, track_metric_no_request_async,
-        Endpoint, GenerateLabels, SuccessDetails, DURATION_WS, LIVE_WS,
+        Endpoint, GenerateLabels, SuccessDetails, DURATION_WS, LIVE_WS, UNAVAILABLE_WS,
     },
     sandbox::{self, Channel, Sandbox},
     CachingSnafu, ClippyRequest, ClippyResponse, CompilationSnafu, CompileRequest, CompileResponse,
@@ -83,6 +83,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/meta/gist/:id", get(meta_gist_get))
         .route("/metrics", get(metrics))
         .route("/websocket", get(websocket))
+        .route("/nowebsocket", post(nowebsocket))
         .layer(Extension(Arc::new(SandboxCache::default())))
         .layer(Extension(config.github_token()));
 
@@ -402,6 +403,10 @@ async fn handle_socket(mut socket: WebSocket) {
     LIVE_WS.dec();
     let elapsed = start.elapsed();
     DURATION_WS.observe(elapsed.as_secs_f64());
+}
+
+async fn nowebsocket() {
+    UNAVAILABLE_WS.inc();
 }
 
 #[derive(Debug)]

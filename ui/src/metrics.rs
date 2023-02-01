@@ -1,8 +1,8 @@
 use futures::future::BoxFuture;
 use lazy_static::lazy_static;
 use prometheus::{
-    self, register_histogram, register_histogram_vec, register_int_gauge, Histogram, HistogramVec,
-    IntGauge,
+    self, register_histogram, register_histogram_vec, register_int_counter, register_int_gauge,
+    Histogram, HistogramVec, IntCounter, IntGauge,
 };
 use regex::Regex;
 use std::{future::Future, time::Instant};
@@ -26,6 +26,11 @@ lazy_static! {
         "websocket_duration_seconds",
         "WebSocket connection length",
         vec![15.0, 60.0, 300.0, 600.0, 1800.0, 3600.0, 7200.0]
+    )
+    .unwrap();
+    pub(crate) static ref UNAVAILABLE_WS: IntCounter = register_int_counter!(
+        "websocket_unavailability_count",
+        "Number of failed WebSocket connections"
     )
     .unwrap();
 }

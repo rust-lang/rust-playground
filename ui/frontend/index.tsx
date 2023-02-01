@@ -24,9 +24,10 @@ import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
 import Router from './Router';
 import configureStore from './configureStore';
+import openWebSocket from './websocket';
 
-const wsUri = '/websocket';
-const socket = new WebSocket(wsUri);
+// Might be null;
+const socket = openWebSocket(window.location);
 
 const store = configureStore(window);
 
