@@ -69,7 +69,7 @@ export function configureRustErrors({
       if (errorMatch) {
         const [errorCode] = errorMatch;
         env.tag = 'a';
-        env.attributes.href = `https://doc.rust-lang.org/${getChannel()}/error-index.html#${errorCode}`;
+        env.attributes.href = `https://doc.rust-lang.org/${getChannel()}/error_codes/${errorCode}.html`;
         env.attributes.target = '_blank';
       }
     }
