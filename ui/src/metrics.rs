@@ -18,18 +18,18 @@ lazy_static! {
     )
     .unwrap();
     pub(crate) static ref LIVE_WS: IntGauge = register_int_gauge!(
-        "active_websocket_connections_count",
+        "playground_active_websocket_connections_count",
         "Number of active WebSocket connections"
     )
     .unwrap();
     pub(crate) static ref DURATION_WS: Histogram = register_histogram!(
-        "websocket_duration_seconds",
+        "playground_websocket_duration_seconds",
         "WebSocket connection length",
         vec![15.0, 60.0, 300.0, 600.0, 1800.0, 3600.0, 7200.0]
     )
     .unwrap();
     pub(crate) static ref UNAVAILABLE_WS: IntCounter = register_int_counter!(
-        "websocket_unavailability_count",
+        "playground_websocket_unavailability_count",
         "Number of failed WebSocket connections"
     )
     .unwrap();
