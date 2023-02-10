@@ -30,7 +30,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
 
   scenario "error codes link to the error page" do
     within(:output, :stderr) do
-      expect(page).to have_link('E0107', href: /error-index.html#E0107/)
+      expect(page).to have_link('E0107', href: %r{/error_codes/E0107.html})
     end
   end
 
