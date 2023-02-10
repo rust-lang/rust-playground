@@ -12,7 +12,7 @@ fork-bomb-prevention = []
 async-trait = "0.1.52"
 axum = { version = "0.5", features = ["headers", "ws"] }
 dotenv = "0.15.0"
-env_logger = "0.9.0"
+env_logger = "0.10.0"
 futures = "0.3.21"
 lazy_static = "1.0.0"
 log = "0.4.0"
