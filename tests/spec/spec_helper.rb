@@ -40,17 +40,14 @@ Capybara.register_driver :firefox do |app|
   capture_js_log = ENV.fetch('CAPTURE_JS_LOG', 'false').casecmp?('true')
   Selenium::WebDriver.logger.level = :debug if capture_js_log
 
-  options = {}
-  options[:log_level] = :trace if capture_js_log
-
-  browser_options = ::Selenium::WebDriver::Firefox::Options.new(**options)
-  browser_options.headless! if ENV.fetch('HEADLESS', 'true').casecmp?('true')
+  browser_options = ::Selenium::WebDriver::Firefox::Options.new
+  browser_options.add_argument('-headless') if ENV.fetch('HEADLESS', 'true').casecmp?('true')
   browser_options.add_preference('devtools.console.stdout.content', true) if capture_js_log
 
   Capybara::Selenium::Driver.new(
     app,
     browser: :firefox,
-    capabilities: browser_options,
+    options: browser_options,
     clear_local_storage: true,
     clear_session_storage: true,
   )

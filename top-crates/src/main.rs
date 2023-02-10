@@ -4,8 +4,7 @@ use rust_playground_top_crates::*;
 use serde::Serialize;
 use std::{
     collections::BTreeMap,
-    fs::File,
-    io::{Read, Write},
+    fs::{self, File},
     path::{Path, PathBuf},
 };
 
@@ -14,9 +13,7 @@ use std::{
 struct TomlManifest {
     package: TomlPackage,
     profile: Profiles,
-    #[serde(serialize_with = "toml::ser::tables_last")]
     dependencies: BTreeMap<String, DependencySpec>,
-    #[serde(serialize_with = "toml::ser::tables_last")]
     build_dependencies: BTreeMap<String, DependencySpec>,
 }
 
@@ -54,15 +51,11 @@ struct Profiles {
 }
 
 fn main() {
-    let mut f =
-        File::open("crate-modifications.toml").expect("unable to open crate modifications file");
-
-    let mut d = Vec::new();
-    f.read_to_end(&mut d)
+    let d = fs::read_to_string("crate-modifications.toml")
         .expect("unable to read crate modifications file");
 
     let modifications: Modifications =
-        toml::from_slice(&d).expect("unable to parse crate modifications file");
+        toml::from_str(&d).expect("unable to parse crate modifications file");
 
     let (dependencies, infos) = rust_playground_top_crates::generate_info(&modifications);
 
@@ -109,7 +102,6 @@ fn main() {
 }
 
 fn write_manifest(manifest: TomlManifest, path: impl AsRef<Path>) {
-    let mut f = File::create(path).expect("Unable to create Cargo.toml");
-    let content = toml::to_vec(&manifest).expect("Couldn't serialize TOML");
-    f.write_all(&content).expect("Couldn't write Cargo.toml");
+    let content = toml::to_string(&manifest).expect("Couldn't serialize TOML");
+    fs::write(path, content).expect("Couldn't write Cargo.toml");
 }

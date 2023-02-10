@@ -13,7 +13,7 @@ $vertical-border-color: #cacaca;
   top: 0;
   font-size: 12px;
 
-  button:enabled {
+  & button:enabled {
     cursor: pointer;
   }
 }
