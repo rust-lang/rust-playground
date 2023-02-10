@@ -36,15 +36,15 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
 
   scenario "using a type that hasn't been imported offers importing it" do
     editor.set <<~EOF
-      fn example(_: HashMap) {}
+      fn example(_: NonZeroU128) {}
     EOF
     click_on("Build")
 
     within(:output, :stderr) do
-      click_on("use std::collections::HashMap;")
+      click_on("use core::num::NonZeroU128;")
     end
 
-    expect(editor).to have_line 'use std::collections::HashMap;'
+    expect(editor).to have_line 'use core::num::NonZeroU128;'
   end
 
   scenario "triggering a panic offers enabling backtraces" do
