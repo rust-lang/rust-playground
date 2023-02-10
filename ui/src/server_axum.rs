@@ -22,7 +22,9 @@ use axum::{
     },
     handler::Handler,
     headers::{authorization::Bearer, Authorization, CacheControl, ETag, IfNoneMatch},
-    http::{header, uri::PathAndQuery, HeaderValue, Method, Request, StatusCode, Uri},
+    http::{
+        header, request::Parts, uri::PathAndQuery, HeaderValue, Method, Request, StatusCode, Uri,
+    },
     middleware,
     response::IntoResponse,
     routing::{get, get_service, post, MethodRouter},
@@ -62,8 +64,8 @@ pub(crate) async fn serve(config: Config) {
     let rewrite_help_as_index = middleware::from_fn(rewrite_help_as_index);
 
     let mut app = Router::new()
-        .fallback(root_files)
-        .nest("/assets", asset_files)
+        .fallback_service(root_files)
+        .nest_service("/assets", asset_files)
         .layer(rewrite_help_as_index)
         .route("/evaluate.json", post(evaluate))
         .route("/compile", post(compile))
@@ -80,6 +82,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/meta/version/clippy", get_or_post(meta_version_clippy))
         .route("/meta/version/miri", get_or_post(meta_version_miri))
         .route("/meta/gist", post(meta_gist_create))
+        .route("/meta/gist/", post(meta_gist_create)) // compatibility with lax frontend code
         .route("/meta/gist/:id", get(meta_gist_get))
         .route("/metrics", get(metrics))
         .route("/websocket", get(websocket))
@@ -111,7 +114,7 @@ pub(crate) async fn serve(config: Config) {
         .unwrap();
 }
 
-fn get_or_post<T: 'static>(handler: impl Handler<T> + Copy) -> MethodRouter {
+fn get_or_post<T: 'static>(handler: impl Handler<T, ()> + Copy) -> MethodRouter {
     get(handler).post(handler)
 }
 
@@ -419,16 +422,16 @@ impl MetricsAuthorization {
 }
 
 #[async_trait]
-impl<B> extract::FromRequest<B> for MetricsAuthorization
+impl<S> extract::FromRequestParts<S> for MetricsAuthorization
 where
-    B: Send,
+    S: Send + Sync,
 {
     type Rejection = MetricsAuthorizationRejection;
 
-    async fn from_request(req: &mut extract::RequestParts<B>) -> Result<Self, Self::Rejection> {
-        match Extension::<MetricsToken>::from_request(req).await {
+    async fn from_request_parts(req: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        match Extension::<MetricsToken>::from_request_parts(req, state).await {
             Ok(Extension(expected)) => {
-                match TypedHeader::<Authorization<Bearer>>::from_request(req).await {
+                match TypedHeader::<Authorization<Bearer>>::from_request_parts(req, state).await {
                     Ok(TypedHeader(Authorization(actual))) => {
                         if actual.token() == *expected.0 {
                             Ok(Self)
@@ -635,17 +638,18 @@ impl IntoResponse for Error {
 struct Json<T>(T);
 
 #[async_trait]
-impl<T, B> extract::FromRequest<B> for Json<T>
+impl<T, S, B> extract::FromRequest<S, B> for Json<T>
 where
     T: serde::de::DeserializeOwned,
-    B: axum::body::HttpBody + Send,
+    S: Send + Sync,
+    B: axum::body::HttpBody + Send + 'static,
     B::Data: Send,
     B::Error: Into<axum::BoxError>,
 {
     type Rejection = axum::response::Response;
 
-    async fn from_request(req: &mut extract::RequestParts<B>) -> Result<Self, Self::Rejection> {
-        match axum::Json::<T>::from_request(req).await {
+    async fn from_request(req: Request<B>, state: &S) -> Result<Self, Self::Rejection> {
+        match axum::Json::<T>::from_request(req, state).await {
             Ok(v) => Ok(Self(v.0)),
             Err(e) => {
                 let error = format!("Unable to deserialize request: {e}");
