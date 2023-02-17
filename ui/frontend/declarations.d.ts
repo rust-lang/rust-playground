@@ -21,6 +21,5 @@ interface Window {
   rustPlayground: {
     setCode(code: string): void;
     disableSyncChangesToStorage(): void;
-    webSocket: WebSocket | null;
   };
 }

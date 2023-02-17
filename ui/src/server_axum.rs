@@ -2,7 +2,7 @@ use crate::{
     gist,
     metrics::{
         track_metric_async, track_metric_force_endpoint_async, track_metric_no_request_async,
-        Endpoint, GenerateLabels, SuccessDetails, DURATION_WS, LIVE_WS, UNAVAILABLE_WS,
+        Endpoint, GenerateLabels, SuccessDetails, UNAVAILABLE_WS,
     },
     sandbox::{self, Channel, Sandbox},
     CachingSnafu, ClippyRequest, ClippyResponse, CompilationSnafu, CompileRequest, CompileResponse,
@@ -15,11 +15,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use axum::{
-    extract::{
-        self,
-        ws::{WebSocket, WebSocketUpgrade},
-        Extension, Path, TypedHeader,
-    },
+    extract::{self, ws::WebSocketUpgrade, Extension, Path, TypedHeader},
     handler::Handler,
     headers::{authorization::Bearer, Authorization, CacheControl, ETag, IfNoneMatch},
     http::{
@@ -56,6 +52,8 @@ const SANDBOX_CACHE_TIME_TO_LIVE: Duration = TEN_MINUTES;
 
 const MAX_AGE_ONE_DAY: HeaderValue = HeaderValue::from_static("public, max-age=86400");
 const MAX_AGE_ONE_YEAR: HeaderValue = HeaderValue::from_static("public, max-age=31536000");
+
+mod websocket;
 
 #[tokio::main]
 pub(crate) async fn serve(config: Config) {
@@ -396,16 +394,7 @@ async fn metrics(_: MetricsAuthorization) -> Result<Vec<u8>, StatusCode> {
 }
 
 async fn websocket(ws: WebSocketUpgrade) -> impl IntoResponse {
-    ws.on_upgrade(handle_socket)
-}
-
-async fn handle_socket(mut socket: WebSocket) {
-    LIVE_WS.inc();
-    let start = Instant::now();
-    while let Some(Ok(_msg)) = socket.recv().await {}
-    LIVE_WS.dec();
-    let elapsed = start.elapsed();
-    DURATION_WS.observe(elapsed.as_secs_f64());
+    ws.on_upgrade(websocket::handle)
 }
 
 async fn nowebsocket() {

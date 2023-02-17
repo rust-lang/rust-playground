@@ -8,9 +8,11 @@ import { Action, initializeApplication } from './actions';
 import initializeLocalStorage from './local_storage';
 import initializeSessionStorage from './session_storage';
 import playgroundApp, { State } from './reducers';
+import { websocketMiddleware } from './websocketMiddleware';
 
 export default function configureStore(window: Window) {
   const baseUrl = url.resolve(window.location.href, '/');
+  const websocket = websocketMiddleware(window);
 
   const initialGlobalState = {
     globalConfiguration: {
@@ -29,7 +31,7 @@ export default function configureStore(window: Window) {
     sessionStorage.initialState,
   );
 
-  const middlewares = applyMiddleware<ThunkDispatch<State, {}, Action>, {}>(thunk);
+  const middlewares = applyMiddleware<ThunkDispatch<State, {}, Action>, {}>(thunk, websocket);
   const composeEnhancers: typeof compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
   const enhancers = composeEnhancers(middlewares);
   const store = createStore(playgroundApp, initialState, enhancers);

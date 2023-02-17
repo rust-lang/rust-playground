@@ -178,6 +178,8 @@ pub enum Error {
     GistLoading { source: octocrab::Error },
     #[snafu(display("{PLAYGROUND_GITHUB_TOKEN} not set up for reading/writing gists"))]
     NoGithubToken,
+    #[snafu(display("Unable to deserialize request: {}", source))]
+    Deserialization { source: serde_json::Error },
     #[snafu(display("Unable to serialize response: {}", source))]
     Serialization { source: serde_json::Error },
     #[snafu(display("The value {:?} is not a valid target", value))]

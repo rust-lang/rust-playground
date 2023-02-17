@@ -19,18 +19,20 @@ import {
   performVersionsLoad,
   reExecuteWithBacktrace,
   browserWidthChanged,
+  websocketFeatureFlagEnabled,
 } from './actions';
 import { configureRustErrors } from './highlighting';
 import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
 import Router from './Router';
 import configureStore from './configureStore';
-import openWebSocket from './websocket';
-
-// openWebSocket() may return null.
-const socket = openWebSocket(window.location);
 
 const store = configureStore(window);
+
+const params = new URLSearchParams(window.location.search);
+if (params.has('websocket')) {
+  store.dispatch(websocketFeatureFlagEnabled());
+}
 
 const z = (evt: MediaQueryList | MediaQueryListEvent) => { store.dispatch(browserWidthChanged(evt.matches)); };
 
@@ -57,9 +59,6 @@ window.rustPlayground = {
   disableSyncChangesToStorage: () => {
     store.dispatch(disableSyncChangesToStorage());
   },
-  // Temporarily storing this as a global to prevent it from being
-  // garbage collected (at least by Safari).
-  webSocket: socket,
 };
 
 const container = document.getElementById('playground');

@@ -334,3 +334,12 @@ export const offerCrateAutocompleteOnUse = createSelector(
   editionSelector,
   (edition) => edition !== Edition.Rust2015,
 );
+
+const websocket = (state: State) => state.websocket;
+
+export const websocketFeatureFlagEnabled = createSelector(websocket, (ws) => ws.featureFlagEnabled);
+
+export const useWebsocketSelector = createSelector(
+  websocket,
+  (ws) => ws.connected && ws.featureFlagEnabled,
+);
