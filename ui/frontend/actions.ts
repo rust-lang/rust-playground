@@ -138,6 +138,12 @@ export enum ActionType {
   WSExecuteResponse = 'WS_EXECUTE_RESPONSE',
 }
 
+export const WebSocketError = z.object({
+  type: z.literal(ActionType.WebSocketError),
+  error: z.string(),
+});
+export type WebSocketError = z.infer<typeof WebSocketError>;
+
 const ExecuteExtra = z.object({
   isAutoBuild: z.boolean(),
 });
@@ -851,7 +857,7 @@ export const browserWidthChanged = (isSmall: boolean) =>
 export const splitRatioChanged = () =>
   createAction(ActionType.SplitRatioChanged);
 
-export const websocketError = () => createAction(ActionType.WebSocketError);
+export const websocketError = (error: string): WebSocketError => createAction(ActionType.WebSocketError, { error });
 export const websocketConnected = () => createAction(ActionType.WebSocketConnected);
 export const websocketDisconnected = () => createAction(ActionType.WebSocketDisconnected);
 export const websocketFeatureFlagEnabled = () => createAction(ActionType.WebSocketFeatureFlagEnabled);

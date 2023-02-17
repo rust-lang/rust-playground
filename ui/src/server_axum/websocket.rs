@@ -65,8 +65,16 @@ impl TryFrom<WSExecuteRequest> for (sandbox::ExecuteRequest, serde_json::Value) 
 #[derive(Debug, serde::Serialize)]
 #[serde(tag = "type")]
 enum WSMessageResponse {
+    #[serde(rename = "WEBSOCKET_ERROR")]
+    Error(WSError),
     #[serde(rename = "WS_EXECUTE_RESPONSE")]
     WSExecuteResponse(WSExecuteResponse),
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct WSError {
+    error: String,
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -115,13 +123,14 @@ pub async fn handle(mut socket: WebSocket) {
                         // unknown message type
                         continue;
                     }
-                    Some(Err(_)) => panic!("Error: {:?}", request),
+                    Some(Err(e)) => super::record_websocket_error(e.to_string()),
                 }
             },
             resp = rx.recv() => {
                 let resp = resp.expect("The rx should never close as we have a tx");
-                let resp = resp.expect("An error occurred and should be reported back to the frontend");
-                let resp = serde_json::to_string(&resp).expect("An error occurred and should be reported back to the frontend");
+                let resp = resp.unwrap_or_else(|e| WSMessageResponse::Error(WSError { error: e.to_string() }));
+                const LAST_CHANCE_ERROR: &str = r#"{ "type": "WEBSOCKET_ERROR", "error": "Unable to serialize JSON" }"#;
+                let resp = serde_json::to_string(&resp).unwrap_or_else(|_| LAST_CHANCE_ERROR.into());
                 let resp = Message::Text(resp);
 
                 if let Err(_) = socket.send(resp).await {

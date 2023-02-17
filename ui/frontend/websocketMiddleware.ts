@@ -1,20 +1,28 @@
 import { Middleware } from 'redux';
 import { z } from 'zod';
 
-import { ActionType, websocketError, websocketConnected, websocketDisconnected, WSExecuteResponse } from './actions';
+import {
+  ActionType,
+  WSExecuteResponse,
+  WebSocketError,
+  websocketConnected,
+  websocketDisconnected,
+  websocketError,
+} from './actions';
 
-const WSMessageResponse = z.discriminatedUnion('type', [WSExecuteResponse]);
+const WSMessageResponse = z.discriminatedUnion('type', [WebSocketError, WSExecuteResponse]);
 
-const reportWebSocketError = async () => {
+const reportWebSocketError = async (error: string) => {
   try {
     await fetch('/nowebsocket', {
       method: 'post',
       headers: {
-        'Content-Length': '0',
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ error }),
     });
   } catch (reportError) {
-    console.log('Unable to report WebSocket error', reportError);
+    console.log('Unable to report WebSocket error', error, reportError);
   }
 }
 
@@ -26,7 +34,8 @@ const openWebSocket = (currentLocation: Location) => {
   } catch (e) {
     // WebSocket URL error or WebSocket is not supported by browser.
     // Assume it's the second case since URL error is easy to notice.
-    reportWebSocketError()
+    const detail = (e instanceof Error) ? e.toString() : 'An unknown error occurred';
+    reportWebSocketError(`Could not create the WebSocket: ${detail}`)
 
     return null;
   }
@@ -45,8 +54,11 @@ export const websocketMiddleware = (window: Window): Middleware => store => {
     });
 
     socket.addEventListener('error', () => {
-      store.dispatch(websocketError());
-      reportWebSocketError();
+      // We cannot get detailed information about the failure
+      // https://stackoverflow.com/a/31003057/155423
+      const error = 'Generic WebSocket Error';
+      store.dispatch(websocketError(error));
+      reportWebSocketError(error);
     });
 
     // TODO: reconnect on error? (if ever connected? if < n failures?)

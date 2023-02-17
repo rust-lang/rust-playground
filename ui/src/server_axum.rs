@@ -85,6 +85,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/metrics", get(metrics))
         .route("/websocket", get(websocket))
         .route("/nowebsocket", post(nowebsocket))
+        .route("/whynowebsocket", get(whynowebsocket))
         .layer(Extension(Arc::new(SandboxCache::default())))
         .layer(Extension(config.github_token()));
 
@@ -397,8 +398,32 @@ async fn websocket(ws: WebSocketUpgrade) -> impl IntoResponse {
     ws.on_upgrade(websocket::handle)
 }
 
-async fn nowebsocket() {
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct NoWebSocketRequest {
+    #[serde(default)]
+    error: String,
+}
+
+async fn nowebsocket(Json(req): Json<NoWebSocketRequest>) {
+    record_websocket_error(req.error);
     UNAVAILABLE_WS.inc();
+}
+
+lazy_static::lazy_static! {
+    static ref WS_ERRORS: std::sync::Mutex<std::collections::HashMap<String, usize>> = Default::default();
+}
+
+fn record_websocket_error(error: String) {
+    *WS_ERRORS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .entry(error)
+        .or_default() += 1;
+}
+
+async fn whynowebsocket() -> String {
+    format!("{:#?}", WS_ERRORS.lock().unwrap_or_else(|e| e.into_inner()))
 }
 
 #[derive(Debug)]
