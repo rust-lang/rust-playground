@@ -343,3 +343,17 @@ export const useWebsocketSelector = createSelector(
   websocket,
   (ws) => ws.connected && ws.featureFlagEnabled,
 );
+
+export type WebSocketStatus =
+  { state: 'disconnected' } |
+  { state: 'connected' } |
+  { state: 'error', error: string };
+
+export const websocketStatusSelector = createSelector(
+  websocket,
+  (ws): WebSocketStatus => {
+    if (ws.error) { return { state: 'error', error: ws.error }; }
+    if (ws.connected) { return { state: 'connected' }; }
+    return { state: 'disconnected' };
+  }
+);
