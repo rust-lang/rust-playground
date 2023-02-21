@@ -202,6 +202,8 @@ pub enum Error {
     RequestMissing,
     #[snafu(display("The cache has been poisoned"))]
     CachePoisoned,
+    #[snafu(display("The WebSocket worker panicked: {}", text))]
+    WebSocketTaskPanic { text: String },
 }
 
 type Result<T, E = Error> = ::std::result::Result<T, E>;
