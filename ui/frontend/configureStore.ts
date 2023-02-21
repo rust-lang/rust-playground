@@ -36,8 +36,18 @@ export default function configureStore(window: Window) {
 
   store.subscribe(() => {
     const state = store.getState();
-    localStorage.saveChanges(state);
-    sessionStorage.saveChanges(state);
+
+    // Some automated tests run fast enough that the following interleaving is possible:
+    //
+    // 1. RSpec test finishes, local/session storage cleared
+    // 2. WebSocket connects, the state updates, and the local/session storage is saved
+    // 3. Subsequent RSpec test starts and local/session storage has been preserved
+    //
+    // We allow the tests to stop saving to sidestep that.
+    if (state.globalConfiguration.syncChangesToStorage) {
+      localStorage.saveChanges(state);
+      sessionStorage.saveChanges(state);
+    }
   })
 
   return store;

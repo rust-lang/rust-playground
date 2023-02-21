@@ -10,6 +10,7 @@ import { Provider } from 'react-redux';
 
 import {
   editCode,
+  disableSyncChangesToStorage,
   enableFeatureGate,
   gotoPosition,
   selectText,
@@ -52,6 +53,9 @@ store.dispatch(performVersionsLoad());
 window.rustPlayground = {
   setCode: code => {
     store.dispatch(editCode(code));
+  },
+  disableSyncChangesToStorage: () => {
+    store.dispatch(disableSyncChangesToStorage());
   },
   // Temporarily storing this as a global to prevent it from being
   // garbage collected (at least by Safari).

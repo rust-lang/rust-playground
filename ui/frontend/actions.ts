@@ -62,6 +62,7 @@ const createAction = <T extends string, P extends {}>(type: T, props?: P) => (
 
 export enum ActionType {
   InitializeApplication = 'INITIALIZE_APPLICATION',
+  DisableSyncChangesToStorage = 'DISABLE_SYNC_CHANGES_TO_STORAGE',
   SetPage = 'SET_PAGE',
   ChangeEditor = 'CHANGE_EDITOR',
   ChangeKeybinding = 'CHANGE_KEYBINDING',
@@ -130,6 +131,8 @@ export enum ActionType {
 }
 
 export const initializeApplication = () => createAction(ActionType.InitializeApplication);
+
+export const disableSyncChangesToStorage = () => createAction(ActionType.DisableSyncChangesToStorage);
 
 const setPage = (page: Page) =>
   createAction(ActionType.SetPage, { page });
@@ -897,6 +900,7 @@ export function showExample(code: string): ThunkAction {
 
 export type Action =
   | ReturnType<typeof initializeApplication>
+  | ReturnType<typeof disableSyncChangesToStorage>
   | ReturnType<typeof setPage>
   | ReturnType<typeof changePairCharacters>
   | ReturnType<typeof changeAssemblyFlavor>
