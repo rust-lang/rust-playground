@@ -125,11 +125,6 @@ version = "=1.3.2"
 package = "block-buffer"
 version = "=0.10.3"
 
-[dependencies.bstr]
-package = "bstr"
-version = "=0.2.17"
-features = ["lazy_static", "regex-automata", "serde", "serde1", "serde1-nostd", "std", "unicode"]
-
 [dependencies.bytemuck]
 package = "bytemuck"
 version = "=1.13.0"
@@ -168,7 +163,7 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [dependencies.clap]
 package = "clap"
-version = "=4.1.4"
+version = "=4.1.6"
 features = ["cargo", "color", "derive", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-replace", "usage", "wrap_help"]
 
 [dependencies.clap_derive]
@@ -177,7 +172,7 @@ version = "=4.1.0"
 
 [dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.3.1"
+version = "=0.3.2"
 
 [dependencies.color_quant]
 package = "color_quant"
@@ -239,7 +234,7 @@ features = ["std"]
 
 [dependencies.csv]
 package = "csv"
-version = "=1.1.6"
+version = "=1.2.0"
 
 [dependencies.csv_core]
 package = "csv-core"
@@ -302,7 +297,7 @@ version = "=0.1.9"
 
 [dependencies.fastrand]
 package = "fastrand"
-version = "=1.8.0"
+version = "=1.9.0"
 
 [dependencies.filetime]
 package = "filetime"
@@ -411,7 +406,7 @@ features = ["raii_no_panic", "std"]
 
 [dependencies.gimli]
 package = "gimli"
-version = "=0.27.1"
+version = "=0.27.2"
 features = ["read", "read-core"]
 default-features = false
 
@@ -456,7 +451,7 @@ version = "=0.26.0"
 
 [dependencies.http]
 package = "http"
-version = "=0.2.8"
+version = "=0.2.9"
 
 [dependencies.http_body]
 package = "http-body"
@@ -522,7 +517,7 @@ version = "=2.7.1"
 
 [dependencies.is_terminal]
 package = "is-terminal"
-version = "=0.4.3"
+version = "=0.4.4"
 
 [dependencies.itertools]
 package = "itertools"
@@ -532,11 +527,6 @@ features = ["use_alloc", "use_std"]
 [dependencies.itoa]
 package = "itoa"
 version = "=1.0.5"
-
-[dependencies.itoa_0_4_8]
-package = "itoa"
-version = "=0.4.8"
-features = ["std"]
 
 [dependencies.jpeg_decoder]
 package = "jpeg-decoder"
@@ -664,7 +654,7 @@ features = ["with-alloc"]
 
 [dependencies.mio]
 package = "mio"
-version = "=0.8.5"
+version = "=0.8.6"
 features = ["net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
@@ -693,11 +683,6 @@ features = ["std"]
 [dependencies.nom]
 package = "nom"
 version = "=7.1.3"
-features = ["alloc", "std"]
-
-[dependencies.nom8]
-package = "nom8"
-version = "=0.2.0"
 features = ["alloc", "std"]
 
 [dependencies.num]
@@ -751,7 +736,7 @@ default-features = false
 
 [dependencies.once_cell]
 package = "once_cell"
-version = "=1.17.0"
+version = "=1.17.1"
 features = ["alloc", "race", "std", "unstable"]
 
 [dependencies.opaque_debug]
@@ -946,11 +931,6 @@ package = "regex"
 version = "=1.7.1"
 features = ["aho-corasick", "memchr", "perf", "perf-cache", "perf-dfa", "perf-inline", "perf-literal", "std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
-[dependencies.regex_automata]
-package = "regex-automata"
-version = "=0.1.10"
-default-features = false
-
 [dependencies.regex_syntax]
 package = "regex-syntax"
 version = "=0.6.28"
@@ -1061,7 +1041,7 @@ features = ["std"]
 
 [dependencies.signal_hook_registry]
 package = "signal-hook-registry"
-version = "=1.4.0"
+version = "=1.4.1"
 
 [dependencies.simba]
 package = "simba"
@@ -1081,7 +1061,7 @@ features = ["std"]
 
 [dependencies.slab]
 package = "slab"
-version = "=0.4.7"
+version = "=0.4.8"
 features = ["std"]
 
 [dependencies.smallvec]
@@ -1130,7 +1110,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=1.0.107"
+version = "=1.0.109"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"]
 
 [dependencies.tar]
@@ -1152,7 +1132,7 @@ version = "=1.2.0"
 
 [dependencies.terminal_size]
 package = "terminal_size"
-version = "=0.2.3"
+version = "=0.2.5"
 
 [dependencies.textwrap]
 package = "textwrap"
@@ -1173,7 +1153,7 @@ version = "=4.0.0"
 
 [dependencies.thread_local]
 package = "thread_local"
-version = "=1.1.4"
+version = "=1.1.7"
 
 [dependencies.threadpool]
 package = "threadpool"
@@ -1185,7 +1165,7 @@ version = "=0.8.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.3.17"
+version = "=0.3.19"
 features = ["alloc", "formatting", "macros", "parsing", "std"]
 
 [dependencies.time_0_1_45]
@@ -1198,7 +1178,7 @@ version = "=0.1.0"
 
 [dependencies.time_macros]
 package = "time-macros"
-version = "=0.2.6"
+version = "=0.2.7"
 features = ["formatting", "parsing"]
 
 [dependencies.tinyvec]
@@ -1234,7 +1214,7 @@ features = ["runtime"]
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.6"
+version = "=0.7.7"
 features = ["codec", "tracing"]
 
 [dependencies.toml]
@@ -1249,7 +1229,7 @@ features = ["serde"]
 
 [dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.19.3"
+version = "=0.19.4"
 features = ["serde"]
 
 [dependencies.tower_service]
@@ -1360,7 +1340,7 @@ features = ["alloc", "std"]
 
 [dependencies.wide]
 package = "wide"
-version = "=0.7.6"
+version = "=0.7.7"
 features = ["std"]
 default-features = false
 
@@ -1368,6 +1348,11 @@ default-features = false
 package = "winapi"
 version = "=0.3.9"
 features = ["activation", "basetsd", "combaseapi", "consoleapi", "errhandlingapi", "fileapi", "handleapi", "impl-debug", "impl-default", "memoryapi", "minwinbase", "minwindef", "ntdef", "ntsecapi", "objbase", "processenv", "processthreadsapi", "profileapi", "roapi", "std", "sysinfoapi", "timezoneapi", "winbase", "wincon", "winerror", "winnt", "winreg", "winstring", "ws2ipdef", "ws2tcpip", "wtypesbase"]
+
+[dependencies.winnow]
+package = "winnow"
+version = "=0.3.1"
+features = ["alloc", "std"]
 
 [dependencies.xattr]
 package = "xattr"
@@ -1384,7 +1369,7 @@ version = "=0.4.5"
 
 [dependencies.zune_inflate]
 package = "zune-inflate"
-version = "=0.2.42"
+version = "=0.2.50"
 features = ["simd-adler32", "zlib"]
 default-features = false
 
@@ -1495,11 +1480,6 @@ version = "=1.3.2"
 package = "block-buffer"
 version = "=0.10.3"
 
-[build_dependencies.bstr]
-package = "bstr"
-version = "=0.2.17"
-features = ["lazy_static", "regex-automata", "serde", "serde1", "serde1-nostd", "std", "unicode"]
-
 [build_dependencies.bytemuck]
 package = "bytemuck"
 version = "=1.13.0"
@@ -1538,7 +1518,7 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [build_dependencies.clap]
 package = "clap"
-version = "=4.1.4"
+version = "=4.1.6"
 features = ["cargo", "color", "derive", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-replace", "usage", "wrap_help"]
 
 [build_dependencies.clap_derive]
@@ -1547,7 +1527,7 @@ version = "=4.1.0"
 
 [build_dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.3.1"
+version = "=0.3.2"
 
 [build_dependencies.color_quant]
 package = "color_quant"
@@ -1609,7 +1589,7 @@ features = ["std"]
 
 [build_dependencies.csv]
 package = "csv"
-version = "=1.1.6"
+version = "=1.2.0"
 
 [build_dependencies.csv_core]
 package = "csv-core"
@@ -1672,7 +1652,7 @@ version = "=0.1.9"
 
 [build_dependencies.fastrand]
 package = "fastrand"
-version = "=1.8.0"
+version = "=1.9.0"
 
 [build_dependencies.filetime]
 package = "filetime"
@@ -1781,7 +1761,7 @@ features = ["raii_no_panic", "std"]
 
 [build_dependencies.gimli]
 package = "gimli"
-version = "=0.27.1"
+version = "=0.27.2"
 features = ["read", "read-core"]
 default-features = false
 
@@ -1826,7 +1806,7 @@ version = "=0.26.0"
 
 [build_dependencies.http]
 package = "http"
-version = "=0.2.8"
+version = "=0.2.9"
 
 [build_dependencies.http_body]
 package = "http-body"
@@ -1892,7 +1872,7 @@ version = "=2.7.1"
 
 [build_dependencies.is_terminal]
 package = "is-terminal"
-version = "=0.4.3"
+version = "=0.4.4"
 
 [build_dependencies.itertools]
 package = "itertools"
@@ -1902,11 +1882,6 @@ features = ["use_alloc", "use_std"]
 [build_dependencies.itoa]
 package = "itoa"
 version = "=1.0.5"
-
-[build_dependencies.itoa_0_4_8]
-package = "itoa"
-version = "=0.4.8"
-features = ["std"]
 
 [build_dependencies.jpeg_decoder]
 package = "jpeg-decoder"
@@ -2034,7 +2009,7 @@ features = ["with-alloc"]
 
 [build_dependencies.mio]
 package = "mio"
-version = "=0.8.5"
+version = "=0.8.6"
 features = ["net", "os-ext", "os-poll"]
 
 [build_dependencies.nalgebra]
@@ -2063,11 +2038,6 @@ features = ["std"]
 [build_dependencies.nom]
 package = "nom"
 version = "=7.1.3"
-features = ["alloc", "std"]
-
-[build_dependencies.nom8]
-package = "nom8"
-version = "=0.2.0"
 features = ["alloc", "std"]
 
 [build_dependencies.num]
@@ -2121,7 +2091,7 @@ default-features = false
 
 [build_dependencies.once_cell]
 package = "once_cell"
-version = "=1.17.0"
+version = "=1.17.1"
 features = ["alloc", "race", "std", "unstable"]
 
 [build_dependencies.opaque_debug]
@@ -2316,11 +2286,6 @@ package = "regex"
 version = "=1.7.1"
 features = ["aho-corasick", "memchr", "perf", "perf-cache", "perf-dfa", "perf-inline", "perf-literal", "std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
-[build_dependencies.regex_automata]
-package = "regex-automata"
-version = "=0.1.10"
-default-features = false
-
 [build_dependencies.regex_syntax]
 package = "regex-syntax"
 version = "=0.6.28"
@@ -2431,7 +2396,7 @@ features = ["std"]
 
 [build_dependencies.signal_hook_registry]
 package = "signal-hook-registry"
-version = "=1.4.0"
+version = "=1.4.1"
 
 [build_dependencies.simba]
 package = "simba"
@@ -2451,7 +2416,7 @@ features = ["std"]
 
 [build_dependencies.slab]
 package = "slab"
-version = "=0.4.7"
+version = "=0.4.8"
 features = ["std"]
 
 [build_dependencies.smallvec]
@@ -2500,7 +2465,7 @@ default-features = false
 
 [build_dependencies.syn]
 package = "syn"
-version = "=1.0.107"
+version = "=1.0.109"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"]
 
 [build_dependencies.tar]
@@ -2522,7 +2487,7 @@ version = "=1.2.0"
 
 [build_dependencies.terminal_size]
 package = "terminal_size"
-version = "=0.2.3"
+version = "=0.2.5"
 
 [build_dependencies.textwrap]
 package = "textwrap"
@@ -2543,7 +2508,7 @@ version = "=4.0.0"
 
 [build_dependencies.thread_local]
 package = "thread_local"
-version = "=1.1.4"
+version = "=1.1.7"
 
 [build_dependencies.threadpool]
 package = "threadpool"
@@ -2555,7 +2520,7 @@ version = "=0.8.1"
 
 [build_dependencies.time]
 package = "time"
-version = "=0.3.17"
+version = "=0.3.19"
 features = ["alloc", "formatting", "macros", "parsing", "std"]
 
 [build_dependencies.time_0_1_45]
@@ -2568,7 +2533,7 @@ version = "=0.1.0"
 
 [build_dependencies.time_macros]
 package = "time-macros"
-version = "=0.2.6"
+version = "=0.2.7"
 features = ["formatting", "parsing"]
 
 [build_dependencies.tinyvec]
@@ -2604,7 +2569,7 @@ features = ["runtime"]
 
 [build_dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.6"
+version = "=0.7.7"
 features = ["codec", "tracing"]
 
 [build_dependencies.toml]
@@ -2619,7 +2584,7 @@ features = ["serde"]
 
 [build_dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.19.3"
+version = "=0.19.4"
 features = ["serde"]
 
 [build_dependencies.tower_service]
@@ -2730,7 +2695,7 @@ features = ["alloc", "std"]
 
 [build_dependencies.wide]
 package = "wide"
-version = "=0.7.6"
+version = "=0.7.7"
 features = ["std"]
 default-features = false
 
@@ -2738,6 +2703,11 @@ default-features = false
 package = "winapi"
 version = "=0.3.9"
 features = ["activation", "basetsd", "combaseapi", "consoleapi", "errhandlingapi", "fileapi", "handleapi", "impl-debug", "impl-default", "memoryapi", "minwinbase", "minwindef", "ntdef", "ntsecapi", "objbase", "processenv", "processthreadsapi", "profileapi", "roapi", "std", "sysinfoapi", "timezoneapi", "winbase", "wincon", "winerror", "winnt", "winreg", "winstring", "ws2ipdef", "ws2tcpip", "wtypesbase"]
+
+[build_dependencies.winnow]
+package = "winnow"
+version = "=0.3.1"
+features = ["alloc", "std"]
 
 [build_dependencies.xattr]
 package = "xattr"
@@ -2754,6 +2724,6 @@ version = "=0.4.5"
 
 [build_dependencies.zune_inflate]
 package = "zune-inflate"
-version = "=0.2.42"
+version = "=0.2.50"
 features = ["simd-adler32", "zlib"]
 default-features = false
