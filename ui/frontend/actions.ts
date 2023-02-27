@@ -7,7 +7,6 @@ import {
   clippyRequestSelector,
   formatRequestSelector,
   getCrateType,
-  isAutoBuildSelector,
   runAsTest,
   useWebsocketSelector,
 } from './selectors';
@@ -145,7 +144,7 @@ export const WebSocketError = z.object({
 export type WebSocketError = z.infer<typeof WebSocketError>;
 
 const ExecuteExtra = z.object({
-  isAutoBuild: z.boolean(),
+  sequenceNumber: z.number(),
 });
 type ExecuteExtra = z.infer<typeof ExecuteExtra>;
 
@@ -223,22 +222,14 @@ interface ExecuteResponseBody {
   stderr: string;
 }
 
-interface ExecuteSuccess extends ExecuteResponseBody {
-  isAutoBuild: boolean;
-}
-
 const requestExecute = () =>
   createAction(ActionType.ExecuteRequest);
 
-const receiveExecuteSuccess = ({ stdout, stderr, isAutoBuild }: ExecuteSuccess) =>
-  createAction(ActionType.ExecuteSucceeded, { stdout, stderr, isAutoBuild });
+const receiveExecuteSuccess = ({ stdout, stderr }: ExecuteResponseBody) =>
+  createAction(ActionType.ExecuteSucceeded, { stdout, stderr });
 
-const receiveExecuteFailure = ({
-  error, isAutoBuild,
-}: {
-  error?: string, isAutoBuild: boolean,
-}) =>
-  createAction(ActionType.ExecuteFailed, { error, isAutoBuild });
+const receiveExecuteFailure = ({ error }: { error?: string }) =>
+  createAction(ActionType.ExecuteFailed, { error });
 
 function jsonGet(urlObj: string | UrlObject) {
   const urlStr = url.format(urlObj);
@@ -315,19 +306,17 @@ const performCommonExecute = (crateType: string, tests: boolean): ThunkAction =>
   const state = getState();
   const { code, configuration: { channel, mode, edition } } = state;
   const backtrace = state.configuration.backtrace === Backtrace.Enabled;
-  const isAutoBuild = isAutoBuildSelector(state);
-
 
   if (useWebsocketSelector(state)) {
-    return dispatch(wsExecuteRequest(channel, mode, edition, crateType, tests, code, backtrace, { isAutoBuild }));
+    return dispatch(wsExecuteRequest(channel, mode, edition, crateType, tests, code, backtrace));
   } else {
     dispatch(requestExecute());
 
     const body: ExecuteRequestBody = { channel, mode, edition, crateType, tests, code, backtrace };
 
     return jsonPost<ExecuteResponseBody>(routes.execute, body)
-      .then(json => dispatch(receiveExecuteSuccess({ ...json, isAutoBuild })))
-      .catch(json => dispatch(receiveExecuteFailure({ ...json, isAutoBuild })));
+      .then(json => dispatch(receiveExecuteSuccess(json)))
+      .catch(json => dispatch(receiveExecuteFailure(json)));
   }
 };
 
@@ -509,6 +498,12 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
 };
 
+let sequenceNumber = 0;
+const nextSequenceNumber = () => sequenceNumber++;
+const makeExtra = (): ExecuteExtra => ({
+  sequenceNumber: nextSequenceNumber(),
+});
+
 const wsExecuteRequest = (
   channel: Channel,
   mode: Mode,
@@ -516,9 +511,18 @@ const wsExecuteRequest = (
   crateType: string,
   tests: boolean,
   code: string,
-  backtrace: boolean,
-  extra: ExecuteExtra,
-) => createAction(ActionType.WSExecuteRequest, { channel, mode, edition, crateType, tests, code, backtrace, extra });
+  backtrace: boolean
+) =>
+  createAction(ActionType.WSExecuteRequest, {
+    channel,
+    mode,
+    edition,
+    crateType,
+    tests,
+    code,
+    backtrace,
+    extra: makeExtra(),
+  });
 
 export const performPrimaryAction = (): ThunkAction => (dispatch, getState) => {
   const state = getState();
