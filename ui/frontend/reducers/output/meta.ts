@@ -38,6 +38,7 @@ export default function meta(state = DEFAULT, action: Action) {
       return { ...state, focus: Focus.Asm };
 
     case ActionType.ExecuteRequest:
+    case ActionType.WSExecuteRequest:
       return { ...state, focus: Focus.Execute };
 
     case ActionType.RequestFormat:

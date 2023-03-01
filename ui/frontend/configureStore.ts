@@ -8,9 +8,11 @@ import { Action, initializeApplication } from './actions';
 import initializeLocalStorage from './local_storage';
 import initializeSessionStorage from './session_storage';
 import playgroundApp, { State } from './reducers';
+import { websocketMiddleware } from './websocketMiddleware';
 
 export default function configureStore(window: Window) {
   const baseUrl = url.resolve(window.location.href, '/');
+  const websocket = websocketMiddleware(window);
 
   const initialGlobalState = {
     globalConfiguration: {
@@ -29,15 +31,25 @@ export default function configureStore(window: Window) {
     sessionStorage.initialState,
   );
 
-  const middlewares = applyMiddleware<ThunkDispatch<State, {}, Action>, {}>(thunk);
+  const middlewares = applyMiddleware<ThunkDispatch<State, {}, Action>, {}>(thunk, websocket);
   const composeEnhancers: typeof compose = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
   const enhancers = composeEnhancers(middlewares);
   const store = createStore(playgroundApp, initialState, enhancers);
 
   store.subscribe(() => {
     const state = store.getState();
-    localStorage.saveChanges(state);
-    sessionStorage.saveChanges(state);
+
+    // Some automated tests run fast enough that the following interleaving is possible:
+    //
+    // 1. RSpec test finishes, local/session storage cleared
+    // 2. WebSocket connects, the state updates, and the local/session storage is saved
+    // 3. Subsequent RSpec test starts and local/session storage has been preserved
+    //
+    // We allow the tests to stop saving to sidestep that.
+    if (state.globalConfiguration.syncChangesToStorage) {
+      localStorage.saveChanges(state);
+      sessionStorage.saveChanges(state);
+    }
   })
 
   return store;

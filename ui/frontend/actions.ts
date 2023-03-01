@@ -1,13 +1,14 @@
 import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import url, { UrlObject } from 'url';
+import { z } from 'zod';
 
 import {
   clippyRequestSelector,
   formatRequestSelector,
   getCrateType,
-  isAutoBuildSelector,
   runAsTest,
+  useWebsocketSelector,
 } from './selectors';
 import State from './state';
 import {
@@ -62,6 +63,7 @@ const createAction = <T extends string, P extends {}>(type: T, props?: P) => (
 
 export enum ActionType {
   InitializeApplication = 'INITIALIZE_APPLICATION',
+  DisableSyncChangesToStorage = 'DISABLE_SYNC_CHANGES_TO_STORAGE',
   SetPage = 'SET_PAGE',
   ChangeEditor = 'CHANGE_EDITOR',
   ChangeKeybinding = 'CHANGE_KEYBINDING',
@@ -127,9 +129,37 @@ export enum ActionType {
   NotificationSeen = 'NOTIFICATION_SEEN',
   BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
   SplitRatioChanged = 'SPLIT_RATIO_CHANGED',
+  WebSocketError = 'WEBSOCKET_ERROR',
+  WebSocketConnected = 'WEBSOCKET_CONNECTED',
+  WebSocketDisconnected = 'WEBSOCKET_DISCONNECTED',
+  WebSocketFeatureFlagEnabled = 'WEBSOCKET_FEATURE_FLAG_ENABLED',
+  WSExecuteRequest = 'WS_EXECUTE_REQUEST',
+  WSExecuteResponse = 'WS_EXECUTE_RESPONSE',
 }
 
+export const WebSocketError = z.object({
+  type: z.literal(ActionType.WebSocketError),
+  error: z.string(),
+});
+export type WebSocketError = z.infer<typeof WebSocketError>;
+
+const ExecuteExtra = z.object({
+  sequenceNumber: z.number(),
+});
+type ExecuteExtra = z.infer<typeof ExecuteExtra>;
+
+export const WSExecuteResponse = z.object({
+  type: z.literal(ActionType.WSExecuteResponse),
+  success: z.boolean(),
+  stdout: z.string(),
+  stderr: z.string(),
+  extra: ExecuteExtra,
+});
+export type WSExecuteResponse = z.infer<typeof WSExecuteResponse>;
+
 export const initializeApplication = () => createAction(ActionType.InitializeApplication);
+
+export const disableSyncChangesToStorage = () => createAction(ActionType.DisableSyncChangesToStorage);
 
 const setPage = (page: Page) =>
   createAction(ActionType.SetPage, { page });
@@ -192,22 +222,14 @@ interface ExecuteResponseBody {
   stderr: string;
 }
 
-interface ExecuteSuccess extends ExecuteResponseBody {
-  isAutoBuild: boolean;
-}
-
 const requestExecute = () =>
   createAction(ActionType.ExecuteRequest);
 
-const receiveExecuteSuccess = ({ stdout, stderr, isAutoBuild }: ExecuteSuccess) =>
-  createAction(ActionType.ExecuteSucceeded, { stdout, stderr, isAutoBuild });
+const receiveExecuteSuccess = ({ stdout, stderr }: ExecuteResponseBody) =>
+  createAction(ActionType.ExecuteSucceeded, { stdout, stderr });
 
-const receiveExecuteFailure = ({
-  error, isAutoBuild,
-}: {
-  error?: string, isAutoBuild: boolean,
-}) =>
-  createAction(ActionType.ExecuteFailed, { error, isAutoBuild });
+const receiveExecuteFailure = ({ error }: { error?: string }) =>
+  createAction(ActionType.ExecuteFailed, { error });
 
 function jsonGet(urlObj: string | UrlObject) {
   const urlStr = url.format(urlObj);
@@ -281,18 +303,21 @@ interface ExecuteRequestBody {
 }
 
 const performCommonExecute = (crateType: string, tests: boolean): ThunkAction => (dispatch, getState) => {
-  dispatch(requestExecute());
-
   const state = getState();
   const { code, configuration: { channel, mode, edition } } = state;
   const backtrace = state.configuration.backtrace === Backtrace.Enabled;
-  const isAutoBuild = isAutoBuildSelector(state);
 
-  const body: ExecuteRequestBody = { channel, mode, edition, crateType, tests, code, backtrace };
+  if (useWebsocketSelector(state)) {
+    return dispatch(wsExecuteRequest(channel, mode, edition, crateType, tests, code, backtrace));
+  } else {
+    dispatch(requestExecute());
 
-  return jsonPost<ExecuteResponseBody>(routes.execute, body)
-    .then(json => dispatch(receiveExecuteSuccess({ ...json, isAutoBuild })))
-    .catch(json => dispatch(receiveExecuteFailure({ ...json, isAutoBuild })));
+    const body: ExecuteRequestBody = { channel, mode, edition, crateType, tests, code, backtrace };
+
+    return jsonPost<ExecuteResponseBody>(routes.execute, body)
+      .then(json => dispatch(receiveExecuteSuccess(json)))
+      .catch(json => dispatch(receiveExecuteFailure(json)));
+  }
 };
 
 function performAutoOnly(): ThunkAction {
@@ -472,6 +497,32 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Mir]: performCompileToMirOnly,
   [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
 };
+
+let sequenceNumber = 0;
+const nextSequenceNumber = () => sequenceNumber++;
+const makeExtra = (): ExecuteExtra => ({
+  sequenceNumber: nextSequenceNumber(),
+});
+
+const wsExecuteRequest = (
+  channel: Channel,
+  mode: Mode,
+  edition: Edition,
+  crateType: string,
+  tests: boolean,
+  code: string,
+  backtrace: boolean
+) =>
+  createAction(ActionType.WSExecuteRequest, {
+    channel,
+    mode,
+    edition,
+    crateType,
+    tests,
+    code,
+    backtrace,
+    extra: makeExtra(),
+  });
 
 export const performPrimaryAction = (): ThunkAction => (dispatch, getState) => {
   const state = getState();
@@ -810,6 +861,11 @@ export const browserWidthChanged = (isSmall: boolean) =>
 export const splitRatioChanged = () =>
   createAction(ActionType.SplitRatioChanged);
 
+export const websocketError = (error: string): WebSocketError => createAction(ActionType.WebSocketError, { error });
+export const websocketConnected = () => createAction(ActionType.WebSocketConnected);
+export const websocketDisconnected = () => createAction(ActionType.WebSocketDisconnected);
+export const websocketFeatureFlagEnabled = () => createAction(ActionType.WebSocketFeatureFlagEnabled);
+
 function parseChannel(s?: string): Channel | null {
   switch (s) {
     case 'stable':
@@ -897,6 +953,7 @@ export function showExample(code: string): ThunkAction {
 
 export type Action =
   | ReturnType<typeof initializeApplication>
+  | ReturnType<typeof disableSyncChangesToStorage>
   | ReturnType<typeof setPage>
   | ReturnType<typeof changePairCharacters>
   | ReturnType<typeof changeAssemblyFlavor>
@@ -962,4 +1019,10 @@ export type Action =
   | ReturnType<typeof notificationSeen>
   | ReturnType<typeof browserWidthChanged>
   | ReturnType<typeof splitRatioChanged>
+  | ReturnType<typeof websocketError>
+  | ReturnType<typeof websocketConnected>
+  | ReturnType<typeof websocketDisconnected>
+  | ReturnType<typeof websocketFeatureFlagEnabled>
+  | ReturnType<typeof wsExecuteRequest>
+  | WSExecuteResponse
   ;

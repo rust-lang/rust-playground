@@ -79,3 +79,15 @@ Capybara.add_selector(:output) do
     "[data-test-id = '#{id_s}']"
   end
 end
+
+RSpec.configure do |config|
+  config.after(:example, :js) do
+    page.execute_script <<~JS
+      (() => {
+        if (window.rustPlayground) {
+           window.rustPlayground.disableSyncChangesToStorage();
+        }
+      })()
+    JS
+  end
+end

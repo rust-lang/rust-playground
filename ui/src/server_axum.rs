@@ -2,7 +2,7 @@ use crate::{
     gist,
     metrics::{
         track_metric_async, track_metric_force_endpoint_async, track_metric_no_request_async,
-        Endpoint, GenerateLabels, SuccessDetails, DURATION_WS, LIVE_WS, UNAVAILABLE_WS,
+        Endpoint, GenerateLabels, SuccessDetails, UNAVAILABLE_WS,
     },
     sandbox::{self, Channel, Sandbox},
     CachingSnafu, ClippyRequest, ClippyResponse, CompilationSnafu, CompileRequest, CompileResponse,
@@ -15,11 +15,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use axum::{
-    extract::{
-        self,
-        ws::{WebSocket, WebSocketUpgrade},
-        Extension, Path, TypedHeader,
-    },
+    extract::{self, ws::WebSocketUpgrade, Extension, Path, TypedHeader},
     handler::Handler,
     headers::{authorization::Bearer, Authorization, CacheControl, ETag, IfNoneMatch},
     http::{
@@ -57,6 +53,8 @@ const SANDBOX_CACHE_TIME_TO_LIVE: Duration = TEN_MINUTES;
 const MAX_AGE_ONE_DAY: HeaderValue = HeaderValue::from_static("public, max-age=86400");
 const MAX_AGE_ONE_YEAR: HeaderValue = HeaderValue::from_static("public, max-age=31536000");
 
+mod websocket;
+
 #[tokio::main]
 pub(crate) async fn serve(config: Config) {
     let root_files = static_file_service(config.root_path(), MAX_AGE_ONE_DAY);
@@ -87,6 +85,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/metrics", get(metrics))
         .route("/websocket", get(websocket))
         .route("/nowebsocket", post(nowebsocket))
+        .route("/whynowebsocket", get(whynowebsocket))
         .layer(Extension(Arc::new(SandboxCache::default())))
         .layer(Extension(config.github_token()));
 
@@ -396,20 +395,35 @@ async fn metrics(_: MetricsAuthorization) -> Result<Vec<u8>, StatusCode> {
 }
 
 async fn websocket(ws: WebSocketUpgrade) -> impl IntoResponse {
-    ws.on_upgrade(handle_socket)
+    ws.on_upgrade(websocket::handle)
 }
 
-async fn handle_socket(mut socket: WebSocket) {
-    LIVE_WS.inc();
-    let start = Instant::now();
-    while let Some(Ok(_msg)) = socket.recv().await {}
-    LIVE_WS.dec();
-    let elapsed = start.elapsed();
-    DURATION_WS.observe(elapsed.as_secs_f64());
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct NoWebSocketRequest {
+    #[serde(default)]
+    error: String,
 }
 
-async fn nowebsocket() {
+async fn nowebsocket(Json(req): Json<NoWebSocketRequest>) {
+    record_websocket_error(req.error);
     UNAVAILABLE_WS.inc();
+}
+
+lazy_static::lazy_static! {
+    static ref WS_ERRORS: std::sync::Mutex<std::collections::HashMap<String, usize>> = Default::default();
+}
+
+fn record_websocket_error(error: String) {
+    *WS_ERRORS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .entry(error)
+        .or_default() += 1;
+}
+
+async fn whynowebsocket() -> String {
+    format!("{:#?}", WS_ERRORS.lock().unwrap_or_else(|e| e.into_inner()))
 }
 
 #[derive(Debug)]

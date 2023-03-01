@@ -20,6 +20,6 @@ interface Window {
   __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
   rustPlayground: {
     setCode(code: string): void;
-    webSocket: WebSocket | null;
+    disableSyncChangesToStorage(): void;
   };
 }

@@ -87,12 +87,40 @@ const ResizableArea: React.FC = () => {
   );
 };
 
+
+const WebSocketStatus: React.FC = () => {
+  const enabled = useSelector(selectors.websocketFeatureFlagEnabled);
+  const status = useSelector(selectors.websocketStatusSelector);
+
+  if (!enabled) { return null; }
+
+  const style: React.CSSProperties = {
+    position: 'absolute',
+    left: '1em',
+    bottom: '1em',
+    zIndex: '1',
+  };
+
+  switch (status.state) {
+    case 'connected':
+      style.color = 'green';
+      return <div style={style}>⬤</div>;
+    case 'disconnected':
+      style.color = 'grey';
+      return <div style={style}>⬤</div>;
+    case 'error':
+      style.color = 'red';
+      return <div style={style} title={status.error}>⬤</div>;
+  }
+}
+
 const Playground: React.FC = () => {
   const showNotifications = useSelector(selectors.anyNotificationsToShowSelector);
 
   return (
     <>
       <div className={styles.container}>
+        <WebSocketStatus />
         <Header />
         <ResizableArea />
       </div>
