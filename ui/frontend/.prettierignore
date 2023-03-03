@@ -11,3 +11,4 @@ node_modules
 
 # Slowly migrate files that we've touched
 !.eslintrc.js
+!websocketMiddleware.ts
