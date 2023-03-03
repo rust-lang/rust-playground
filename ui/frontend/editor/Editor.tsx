@@ -8,6 +8,7 @@ import AceEditor from './AceEditor';
 import SimpleEditor from './SimpleEditor';
 import MonacoEditor from './MonacoEditor';
 import { Editor as EditorType } from '../types';
+import { codeSelector, positionSelector, selectionSelector } from '../selectors';
 import { State } from '../reducers';
 
 import styles from './Editor.module.css';
@@ -19,10 +20,10 @@ const editorMap = {
 };
 
 const Editor: React.FC = () => {
-  const code = useSelector((state: State) => state.code);
+  const code = useSelector(codeSelector);
   const editor = useSelector((state: State) => state.configuration.editor);
-  const position = useSelector((state: State) => state.position);
-  const selection = useSelector((state: State) => state.selection);
+  const position = useSelector(positionSelector);
+  const selection = useSelector(selectionSelector);
   const crates = useSelector((state: State) => state.crates);
 
   const dispatch = useAppDispatch();

@@ -3,6 +3,7 @@ import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
 import { z } from 'zod';
 
 import {
+  codeSelector,
   clippyRequestSelector,
   formatRequestSelector,
   getCrateType,
@@ -303,7 +304,8 @@ interface ExecuteRequestBody {
 
 const performCommonExecute = (crateType: string, tests: boolean): ThunkAction => (dispatch, getState) => {
   const state = getState();
-  const { code, configuration: { channel, mode, edition } } = state;
+  const code = codeSelector(state);
+  const { configuration: { channel, mode, edition } } = state;
   const backtrace = state.configuration.backtrace === Backtrace.Enabled;
 
   if (useWebsocketSelector(state)) {
@@ -364,7 +366,8 @@ function performCompileShow(
     dispatch(request());
 
     const state = getState();
-    const { code, configuration: {
+    const code = codeSelector(state);
+    const { configuration: {
       channel,
       mode,
       edition,
@@ -677,9 +680,11 @@ export function performMiri(): ThunkAction {
   return function(dispatch, getState) {
     dispatch(requestMiri());
 
-    const { code, configuration: {
+    const state = getState();
+    const code = codeSelector(state);
+    const { configuration: {
       edition,
-    } } = getState();
+    } } = state;
     const body: MiriRequestBody = { code, edition };
 
     return jsonPost<MiriResponseBody>(routes.miri, body)
@@ -715,9 +720,11 @@ export function performMacroExpansion(): ThunkAction {
   return function(dispatch, getState) {
     dispatch(requestMacroExpansion());
 
-    const { code, configuration: {
+    const state = getState();
+    const code = codeSelector(state);
+    const { configuration: {
       edition,
-    } } = getState();
+    } } = state;
     const body: MacroExpansionRequestBody = { code, edition };
 
     return jsonPost<MacroExpansionResponseBody>(routes.macroExpansion, body)
@@ -783,8 +790,9 @@ export function performGistSave(): ThunkAction {
   return function(dispatch, getState) {
     dispatch(requestGistSave());
 
+    const state = getState();
+    const code = codeSelector(state);
     const {
-      code,
       configuration: {
         channel, mode, edition,
       },
@@ -794,7 +802,7 @@ export function performGistSave(): ThunkAction {
           stderr = '',
         },
       },
-    } = getState();
+    } = state;
 
     return jsonPost<GistResponseBody>(routes.meta.gistSave, { code })
       .then(json => dispatch(receiveGistSaveSuccess({ ...json, code, stdout, stderr, channel, mode, edition })));

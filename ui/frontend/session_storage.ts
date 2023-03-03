@@ -4,16 +4,19 @@
 
 import { State } from './reducers';
 import {removeVersion, initializeStorage, PartialState} from './storage';
+import { codeSelector } from './selectors';
 
 const CURRENT_VERSION = 1;
 
 export function serialize(state: State): string {
+  const code = codeSelector(state);
+
   return JSON.stringify({
     version: CURRENT_VERSION,
     configuration: {
       primaryAction: state.configuration.primaryAction,
     },
-    code: state.code,
+    code,
   });
 }
 
