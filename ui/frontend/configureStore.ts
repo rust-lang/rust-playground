@@ -2,7 +2,6 @@ import { merge } from 'lodash';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { useDispatch } from 'react-redux';
 import thunk, { ThunkDispatch } from 'redux-thunk';
-import * as url from 'url';
 
 import { Action, initializeApplication } from './actions';
 import initializeLocalStorage from './local_storage';
@@ -11,7 +10,7 @@ import playgroundApp, { State } from './reducers';
 import { websocketMiddleware } from './websocketMiddleware';
 
 export default function configureStore(window: Window) {
-  const baseUrl = url.resolve(window.location.href, '/');
+  const baseUrl = new URL('/', window.location.href).href;
   const websocket = websocketMiddleware(window);
 
   const initialGlobalState = {

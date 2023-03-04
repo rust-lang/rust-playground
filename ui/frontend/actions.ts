@@ -1,6 +1,5 @@
 import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
-import url, { UrlObject } from 'url';
 import { z } from 'zod';
 
 import {
@@ -9,6 +8,7 @@ import {
   getCrateType,
   runAsTest,
   useWebsocketSelector,
+  baseUrlSelector,
 } from './selectors';
 import State from './state';
 import {
@@ -35,14 +35,14 @@ import {
 } from './types';
 
 const routes = {
-  compile: { pathname: '/compile' },
-  execute: { pathname: '/execute' },
-  format: { pathname: '/format' },
-  clippy: { pathname: '/clippy' },
-  miri: { pathname: '/miri' },
-  macroExpansion: { pathname: '/macro-expansion' },
+  compile: '/compile',
+  execute: '/execute',
+  format: '/format',
+  clippy: '/clippy',
+  miri: '/miri',
+  macroExpansion: '/macro-expansion',
   meta: {
-    crates: { pathname: '/meta/crates' },
+    crates: '/meta/crates',
     version: {
       stable: '/meta/version/stable',
       beta: '/meta/version/beta',
@@ -51,7 +51,8 @@ const routes = {
       clippy: '/meta/version/clippy',
       miri: '/meta/version/miri',
     },
-    gist: { pathname: '/meta/gist/' },
+    gistSave: '/meta/gist',
+    gistLoad: '/meta/gist/id',
   },
 };
 
@@ -231,24 +232,22 @@ const receiveExecuteSuccess = ({ stdout, stderr }: ExecuteResponseBody) =>
 const receiveExecuteFailure = ({ error }: { error?: string }) =>
   createAction(ActionType.ExecuteFailed, { error });
 
-function jsonGet(urlObj: string | UrlObject) {
-  const urlStr = url.format(urlObj);
+type FetchArg = Parameters<typeof fetch>[0];
 
-  return fetchJson(urlStr, {
+function jsonGet(url: FetchArg) {
+  return fetchJson(url, {
     method: 'get',
   });
 }
 
-function jsonPost<T>(urlObj: UrlObject, body: Record<string, any>): Promise<T> {
-  const urlStr = url.format(urlObj);
-
-  return fetchJson(urlStr, {
+function jsonPost<T>(url: FetchArg, body: Record<string, any>): Promise<T> {
+  return fetchJson(url, {
     method: 'post',
     body: JSON.stringify(body),
   });
 }
 
-async function fetchJson(url: string, args: RequestInit) {
+async function fetchJson(url: FetchArg, args: RequestInit) {
   const headers = new Headers(args.headers);
   headers.set('Content-Type', 'application/json');
 
@@ -751,9 +750,14 @@ type PerformGistLoadProps =
   Pick<GistSuccessProps, Exclude<keyof GistSuccessProps, 'url' | 'code' | 'stdout' | 'stderr'>>;
 
 export function performGistLoad({ id, channel, mode, edition }: PerformGistLoadProps): ThunkAction {
-  return function(dispatch, _getState) {
+  return function(dispatch, getState) {
     dispatch(requestGistLoad());
-    const u = url.resolve(routes.meta.gist.pathname, id);
+
+    const state = getState();
+    const baseUrl = baseUrlSelector(state);
+    const gistUrl = new URL(routes.meta.gistLoad, baseUrl);
+    const u = new URL(id, gistUrl);
+
     jsonGet(u)
       .then(gist => dispatch(receiveGistLoadSuccess({ channel, mode, edition, ...gist })));
     // TODO: Failure case
@@ -792,7 +796,7 @@ export function performGistSave(): ThunkAction {
       },
     } = getState();
 
-    return jsonPost<GistResponseBody>(routes.meta.gist, { code })
+    return jsonPost<GistResponseBody>(routes.meta.gistSave, { code })
       .then(json => dispatch(receiveGistSaveSuccess({ ...json, code, stdout, stderr, channel, mode, edition })));
     // TODO: Failure case
   };

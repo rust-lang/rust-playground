@@ -44,7 +44,7 @@ RSpec.feature "Sharing the code with others", type: :feature, js: true do
 
     # Need to be logged in to URLO for this link to work
     expect(urlo_link).to match(%r{https://users.rust-lang.org/new-topic})
-    expect(urlo_link).to match(%{automated%20test})
+    expect(urlo_link).to include('automated+test')
   end
 
   def editor
