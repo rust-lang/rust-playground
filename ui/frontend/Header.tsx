@@ -15,6 +15,7 @@ import ToolsMenu from './ToolsMenu';
 import * as actions from './actions';
 import * as selectors from './selectors';
 import { useAppDispatch } from './configureStore';
+import { performGistSave } from './reducers/output/gist';
 
 import styles from './Header.module.css';
 
@@ -132,7 +133,7 @@ const AdvancedOptionsMenuButton: React.FC = () => {
 
 const ShareButton: React.FC = () => {
   const dispatch = useAppDispatch();
-  const gistSave = useCallback(() => dispatch(actions.performGistSave()), [dispatch]);
+  const gistSave = useCallback(() => dispatch(performGistSave()), [dispatch]);
 
   return (
     <SegmentedButton title="Create shareable links to this code" onClick={gistSave}>

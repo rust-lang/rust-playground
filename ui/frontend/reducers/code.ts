@@ -1,4 +1,5 @@
 import { Action, ActionType } from '../actions';
+import { performGistLoad } from './output/gist'
 
 const DEFAULT: State = `fn main() {
     println!("Hello, world!");
@@ -8,11 +9,6 @@ export type State = string;
 
 export default function code(state = DEFAULT, action: Action): State {
   switch (action.type) {
-    case ActionType.RequestGistLoad:
-      return '';
-    case ActionType.GistLoadSucceeded:
-      return action.code;
-
     case ActionType.EditCode:
       return action.code;
 
@@ -28,7 +24,14 @@ export default function code(state = DEFAULT, action: Action): State {
     case ActionType.FormatSucceeded:
       return action.code;
 
-    default:
-      return state;
+    default: {
+      if (performGistLoad.pending.match(action)) {
+        return '';
+      } else if (performGistLoad.fulfilled.match(action)) {
+        return action.payload.code;
+      } else {
+        return state;
+      }
+    }
   }
 }

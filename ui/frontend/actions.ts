@@ -9,7 +9,6 @@ import {
   getCrateType,
   runAsTest,
   useWebsocketSelector,
-  baseUrlSelector,
 } from './selectors';
 import State from './state';
 import {
@@ -35,7 +34,9 @@ import {
   Crate,
 } from './types';
 
-const routes = {
+import { performGistLoad } from './reducers/output/gist';
+
+export const routes = {
   compile: '/compile',
   execute: '/execute',
   format: '/format',
@@ -118,12 +119,6 @@ export enum ActionType {
   RequestMacroExpansion = 'REQUEST_MACRO_EXPANSION',
   MacroExpansionSucceeded = 'MACRO_EXPANSION_SUCCEEDED',
   MacroExpansionFailed = 'MACRO_EXPANSION_FAILED',
-  RequestGistLoad = 'REQUEST_GIST_LOAD',
-  GistLoadSucceeded = 'GIST_LOAD_SUCCEEDED',
-  GistLoadFailed = 'GIST_LOAD_FAILED',
-  RequestGistSave = 'REQUEST_GIST_SAVE',
-  GistSaveSucceeded = 'GIST_SAVE_SUCCEEDED',
-  GistSaveFailed = 'GIST_SAVE_FAILED',
   RequestCratesLoad = 'REQUEST_CRATES_LOAD',
   CratesLoadSucceeded = 'CRATES_LOAD_SUCCEEDED',
   RequestVersionsLoad = 'REQUEST_VERSIONS_LOAD',
@@ -235,13 +230,13 @@ const receiveExecuteFailure = ({ error }: { error?: string }) =>
 
 type FetchArg = Parameters<typeof fetch>[0];
 
-function jsonGet(url: FetchArg) {
+export function jsonGet(url: FetchArg) {
   return fetchJson(url, {
     method: 'get',
   });
 }
 
-function jsonPost<T>(url: FetchArg, body: Record<string, any>): Promise<T> {
+export function jsonPost<T>(url: FetchArg, body: Record<string, any>): Promise<T> {
   return fetchJson(url, {
     method: 'post',
     body: JSON.stringify(body),
@@ -733,83 +728,6 @@ export function performMacroExpansion(): ThunkAction {
   };
 }
 
-interface GistSuccessProps {
-  id: string;
-  url: string;
-  code: string;
-  stdout: string;
-  stderr: string;
-  channel: Channel;
-  mode: Mode;
-  edition: Edition;
-}
-
-const requestGistLoad = () =>
-  createAction(ActionType.RequestGistLoad);
-
-const receiveGistLoadSuccess = (props: GistSuccessProps) =>
-  createAction(ActionType.GistLoadSucceeded, props);
-
-const receiveGistLoadFailure = () => // eslint-disable-line no-unused-vars
-  createAction(ActionType.GistLoadFailed);
-
-type PerformGistLoadProps =
-  Pick<GistSuccessProps, Exclude<keyof GistSuccessProps, 'url' | 'code' | 'stdout' | 'stderr'>>;
-
-export function performGistLoad({ id, channel, mode, edition }: PerformGistLoadProps): ThunkAction {
-  return function(dispatch, getState) {
-    dispatch(requestGistLoad());
-
-    const state = getState();
-    const baseUrl = baseUrlSelector(state);
-    const gistUrl = new URL(routes.meta.gistLoad, baseUrl);
-    const u = new URL(id, gistUrl);
-
-    jsonGet(u)
-      .then(gist => dispatch(receiveGistLoadSuccess({ channel, mode, edition, ...gist })));
-    // TODO: Failure case
-  };
-}
-
-const requestGistSave = () =>
-  createAction(ActionType.RequestGistSave);
-
-const receiveGistSaveSuccess = (props: GistSuccessProps) =>
-  createAction(ActionType.GistSaveSucceeded, props);
-
-const receiveGistSaveFailure = ({ error }: CompileFailure) => // eslint-disable-line no-unused-vars
-  createAction(ActionType.GistSaveFailed, { error });
-
-interface GistResponseBody {
-  id: string;
-  url: string;
-  code: string;
-}
-
-export function performGistSave(): ThunkAction {
-  return function(dispatch, getState) {
-    dispatch(requestGistSave());
-
-    const state = getState();
-    const code = codeSelector(state);
-    const {
-      configuration: {
-        channel, mode, edition,
-      },
-      output: {
-        execute: {
-          stdout = '',
-          stderr = '',
-        },
-      },
-    } = state;
-
-    return jsonPost<GistResponseBody>(routes.meta.gistSave, { code })
-      .then(json => dispatch(receiveGistSaveSuccess({ ...json, code, stdout, stderr, channel, mode, edition })));
-    // TODO: Failure case
-  };
-}
-
 const requestCratesLoad = () =>
   createAction(ActionType.RequestCratesLoad);
 
@@ -1018,12 +936,6 @@ export type Action =
   | ReturnType<typeof requestMacroExpansion>
   | ReturnType<typeof receiveMacroExpansionSuccess>
   | ReturnType<typeof receiveMacroExpansionFailure>
-  | ReturnType<typeof requestGistLoad>
-  | ReturnType<typeof receiveGistLoadSuccess>
-  | ReturnType<typeof receiveGistLoadFailure>
-  | ReturnType<typeof requestGistSave>
-  | ReturnType<typeof receiveGistSaveSuccess>
-  | ReturnType<typeof receiveGistSaveFailure>
   | ReturnType<typeof requestCratesLoad>
   | ReturnType<typeof receiveCratesLoadSuccess>
   | ReturnType<typeof requestVersionsLoad>

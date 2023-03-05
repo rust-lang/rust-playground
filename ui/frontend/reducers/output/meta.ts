@@ -1,5 +1,6 @@
 import { Action, ActionType } from '../../actions';
 import { Focus } from '../../types';
+import { performGistLoad, performGistSave } from './gist';
 
 const DEFAULT: State = {
 };
@@ -46,11 +47,12 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.FormatSucceeded:
       return { ...state, focus: undefined };
 
-    case ActionType.RequestGistLoad:
-    case ActionType.RequestGistSave:
-      return { ...state, focus: Focus.Gist };
-
-    default:
-      return state;
+    default: {
+      if (performGistLoad.pending.match(action) || performGistSave.pending.match(action)) {
+        return { ...state, focus: Focus.Gist };
+      } else {
+        return state;
+      }
+    }
   }
 }
