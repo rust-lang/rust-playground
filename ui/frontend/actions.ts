@@ -5,7 +5,6 @@ import { z } from 'zod';
 import {
   codeSelector,
   clippyRequestSelector,
-  formatRequestSelector,
   getCrateType,
   runAsTest,
   useWebsocketSelector,
@@ -107,9 +106,6 @@ export enum ActionType {
   EnableFeatureGate = 'ENABLE_FEATURE_GATE',
   GotoPosition = 'GOTO_POSITION',
   SelectText = 'SELECT_TEXT',
-  RequestFormat = 'REQUEST_FORMAT',
-  FormatSucceeded = 'FORMAT_SUCCEEDED',
-  FormatFailed = 'FORMAT_FAILED',
   RequestClippy = 'REQUEST_CLIPPY',
   ClippySucceeded = 'CLIPPY_SUCCEEDED',
   ClippyFailed = 'CLIPPY_FAILED',
@@ -284,6 +280,21 @@ async function fetchJson(url: FetchArg, args: RequestInit) {
   } else {
     // HTTP 4xx, 5xx (e.g. malformed JSON request)
     throw body;
+  }
+}
+
+// We made some strange decisions with how the `fetchJson` function
+// communicates errors, so we untwist those here to fit better with
+// redux-toolkit's ideas.
+export const adaptFetchError = async <R>(cb: () => Promise<R>): Promise<R> => {
+  try {
+    return await cb();
+  } catch (e) {
+    if (e && typeof e === 'object' && 'error' in e && typeof e.error === 'string') {
+      throw new Error(e.error);
+    } else {
+      throw new Error('An unknown error occurred');
+    }
   }
 }
 
@@ -566,46 +577,6 @@ export const gotoPosition = (line: string | number, column: string | number) =>
 
 export const selectText = (start: Position, end: Position) =>
   createAction(ActionType.SelectText, { start, end });
-
-const requestFormat = () =>
-  createAction(ActionType.RequestFormat);
-
-interface FormatRequestBody {
-  code: string;
-  edition: string;
-}
-
-interface FormatResponseBody {
-  success: boolean;
-  code: string;
-  stdout: string;
-  stderr: string;
-}
-
-const receiveFormatSuccess = (body: FormatResponseBody) =>
-  createAction(ActionType.FormatSucceeded, body);
-
-const receiveFormatFailure = (body: FormatResponseBody) =>
-  createAction(ActionType.FormatFailed, body);
-
-export function performFormat(): ThunkAction {
-  // TODO: Check a cache
-  return function(dispatch, getState) {
-    dispatch(requestFormat());
-
-    const body: FormatRequestBody = formatRequestSelector(getState());
-
-    return jsonPost<FormatResponseBody>(routes.format, body)
-      .then(json => {
-        if (json.success) {
-          dispatch(receiveFormatSuccess(json));
-        } else {
-          dispatch(receiveFormatFailure(json));
-        }
-      })
-      .catch(json => dispatch(receiveFormatFailure(json)));
-  };
-}
 
 interface GeneralSuccess {
   stdout: string;
@@ -924,9 +895,6 @@ export type Action =
   | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof gotoPosition>
   | ReturnType<typeof selectText>
-  | ReturnType<typeof requestFormat>
-  | ReturnType<typeof receiveFormatSuccess>
-  | ReturnType<typeof receiveFormatFailure>
   | ReturnType<typeof requestClippy>
   | ReturnType<typeof receiveClippySuccess>
   | ReturnType<typeof receiveClippyFailure>

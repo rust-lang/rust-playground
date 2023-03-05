@@ -65,6 +65,7 @@ module.exports = {
         'PopButton.tsx',
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',
+        'reducers/output/format.ts',
         'reducers/output/gist.ts',
         'websocketMiddleware.ts',
       ],
