@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import { merge } from 'lodash-es';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { useDispatch } from 'react-redux';
 import thunk, { ThunkDispatch } from 'redux-thunk';
