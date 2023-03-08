@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import { createStore, Reducer, Store, Action, PreloadedState } from 'redux';
 import { BrowserHistory, Location, Path } from 'history';
 import { ThunkAction } from 'redux-thunk';

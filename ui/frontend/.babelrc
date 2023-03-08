@@ -10,7 +10,6 @@
     }],
   ],
   "plugins": [
-    "lodash",
     "@babel/proposal-class-properties",
     "@babel/proposal-object-rest-spread",
     "@babel/syntax-dynamic-import"

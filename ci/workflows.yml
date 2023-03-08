@@ -503,7 +503,7 @@ workflows:
               path: server/build/
 
           - name: "Configure AWS credentials (i32)"
-            uses: aws-actions/configure-aws-credentials@v1
+            uses: aws-actions/configure-aws-credentials@v2
             with:
               aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
               aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -518,7 +518,7 @@ workflows:
               aws s3 sync server/build/ s3://playground-artifacts-i32/build
 
           - name: "Configure AWS credentials (rust-lang)"
-            uses: aws-actions/configure-aws-credentials@v1
+            uses: aws-actions/configure-aws-credentials@v2
             with:
               role-skip-session-tagging: true
               role-to-assume: arn:aws:iam::890664054962:role/upload-playground-artifacts

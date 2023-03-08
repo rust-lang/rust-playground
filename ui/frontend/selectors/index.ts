@@ -1,6 +1,5 @@
 import { source } from 'common-tags';
 import { createSelector } from 'reselect';
-import * as url from 'url';
 
 import { State } from '../reducers';
 import {
@@ -175,7 +174,7 @@ export const getSomethingToShow = createSelector(
   a => a.some(hasProperties),
 );
 
-const baseUrlSelector = (state: State) =>
+export const baseUrlSelector = (state: State) =>
   state.globalConfiguration.baseUrl;
 
 const gistSelector = (state: State) =>
@@ -184,11 +183,13 @@ const gistSelector = (state: State) =>
 // Selects url.query of build configs.
 const urlQuerySelector = createSelector(
   gistSelector,
-  gist => ({
-    version: gist.channel,
-    mode: gist.mode,
-    edition: gist.edition,
-  }),
+  gist => {
+    const res = new URLSearchParams();
+    if (gist.channel) { res.set('version', gist.channel) }
+    if (gist.mode) { res.set('mode', gist.mode) }
+    if (gist.edition) { res.set('edition', gist.edition) }
+    return res;
+  },
 );
 
 export const showGistLoaderSelector = createSelector(
@@ -198,10 +199,12 @@ export const showGistLoaderSelector = createSelector(
 
 export const permalinkSelector = createSelector(
   baseUrlSelector, urlQuerySelector, gistSelector,
-  (baseUrl, query, gist) => {
-    const u = url.parse(baseUrl, true);
-    u.query = { ...query, gist: gist.id };
-    return url.format(u);
+  (baseUrl, originalQuery, gist) => {
+    const u = new URL(baseUrl);
+    const query = new URLSearchParams(originalQuery);
+    if (gist.id) { query.set('gist', gist.id) }
+    u.search = query.toString();
+    return u.href;
   },
 );
 
@@ -257,18 +260,20 @@ const snippetSelector = createSelector(
 export const urloUrlSelector = createSelector(
   snippetSelector,
   snippet => {
-    const newUsersPostUrl = url.parse('https://users.rust-lang.org/new-topic', true);
-    newUsersPostUrl.query = { body: snippet };
-    return url.format(newUsersPostUrl);
+    const newUsersPostUrl = new URL('https://users.rust-lang.org/new-topic');
+    newUsersPostUrl.searchParams.set('body', snippet);
+    return newUsersPostUrl.href;
   },
 );
 
 export const codeUrlSelector = createSelector(
   baseUrlSelector, urlQuerySelector, gistSelector,
-  (baseUrl, query, gist) => {
-    const u = url.parse(baseUrl, true);
-    u.query = { ...query, code: gist.code };
-    return url.format(u);
+  (baseUrl, originalQuery, gist) => {
+    const u = new URL(baseUrl);
+    const query = new URLSearchParams(originalQuery);
+    if (gist.code) { query.set('code', gist.code) }
+    u.search = new URLSearchParams(query).toString();
+    return u.href;
   },
 );
 

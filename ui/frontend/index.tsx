@@ -34,11 +34,12 @@ if (params.has('websocket')) {
   store.dispatch(websocketFeatureFlagEnabled());
 }
 
-const z = (evt: MediaQueryList | MediaQueryListEvent) => { store.dispatch(browserWidthChanged(evt.matches)); };
-
+const whenBrowserWidthChanged = (evt: MediaQueryList | MediaQueryListEvent) =>
+  store.dispatch(browserWidthChanged(evt.matches));
 const maxWidthMediaQuery = window.matchMedia('(max-width: 1600px)');
-z(maxWidthMediaQuery);
-maxWidthMediaQuery.addListener(z);
+
+whenBrowserWidthChanged(maxWidthMediaQuery);
+maxWidthMediaQuery.addEventListener('change', whenBrowserWidthChanged);
 
 configureRustErrors({
   enableFeatureGate: featureGate => store.dispatch(enableFeatureGate(featureGate)),

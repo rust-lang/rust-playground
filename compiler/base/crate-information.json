@@ -56,7 +56,7 @@
   },
   {
     "name": "async-trait",
-    "version": "0.1.64",
+    "version": "0.1.66",
     "id": "async_trait"
   },
   {
@@ -91,7 +91,7 @@
   },
   {
     "name": "bit_field",
-    "version": "0.10.1",
+    "version": "0.10.2",
     "id": "bit_field"
   },
   {
@@ -116,7 +116,7 @@
   },
   {
     "name": "bytemuck",
-    "version": "1.13.0",
+    "version": "1.13.1",
     "id": "bytemuck"
   },
   {
@@ -156,12 +156,12 @@
   },
   {
     "name": "clap",
-    "version": "4.1.6",
+    "version": "4.1.8",
     "id": "clap"
   },
   {
     "name": "clap_derive",
-    "version": "4.1.0",
+    "version": "4.1.8",
     "id": "clap_derive"
   },
   {
@@ -201,17 +201,17 @@
   },
   {
     "name": "crossbeam-channel",
-    "version": "0.5.6",
+    "version": "0.5.7",
     "id": "crossbeam_channel"
   },
   {
     "name": "crossbeam-deque",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "id": "crossbeam_deque"
   },
   {
     "name": "crossbeam-epoch",
-    "version": "0.9.13",
+    "version": "0.9.14",
     "id": "crossbeam_epoch"
   },
   {
@@ -221,7 +221,7 @@
   },
   {
     "name": "crossbeam-utils",
-    "version": "0.8.14",
+    "version": "0.8.15",
     "id": "crossbeam_utils"
   },
   {
@@ -231,7 +231,7 @@
   },
   {
     "name": "csv",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "id": "csv"
   },
   {
@@ -426,7 +426,7 @@
   },
   {
     "name": "h2",
-    "version": "0.3.15",
+    "version": "0.3.16",
     "id": "h2"
   },
   {
@@ -526,7 +526,7 @@
   },
   {
     "name": "io-lifetimes",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "id": "io_lifetimes"
   },
   {
@@ -551,7 +551,7 @@
   },
   {
     "name": "itoa",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "id": "itoa"
   },
   {
@@ -660,11 +660,6 @@
     "id": "memoffset"
   },
   {
-    "name": "memoffset",
-    "version": "0.7.1",
-    "id": "memoffset_0_7_1"
-  },
-  {
     "name": "mime",
     "version": "0.3.16",
     "id": "mime"
@@ -696,7 +691,7 @@
   },
   {
     "name": "nalgebra",
-    "version": "0.32.1",
+    "version": "0.32.2",
     "id": "nalgebra"
   },
   {
@@ -821,7 +816,7 @@
   },
   {
     "name": "paste",
-    "version": "1.0.11",
+    "version": "1.0.12",
     "id": "paste"
   },
   {
@@ -976,12 +971,12 @@
   },
   {
     "name": "rayon",
-    "version": "1.6.1",
+    "version": "1.7.0",
     "id": "rayon"
   },
   {
     "name": "rayon-core",
-    "version": "1.10.2",
+    "version": "1.11.0",
     "id": "rayon_core"
   },
   {
@@ -993,11 +988,6 @@
     "name": "regex-syntax",
     "version": "0.6.28",
     "id": "regex_syntax"
-  },
-  {
-    "name": "remove_dir_all",
-    "version": "0.5.3",
-    "id": "remove_dir_all"
   },
   {
     "name": "reqwest",
@@ -1026,12 +1016,12 @@
   },
   {
     "name": "rustix",
-    "version": "0.36.8",
+    "version": "0.36.9",
     "id": "rustix"
   },
   {
     "name": "ryu",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "id": "ryu"
   },
   {
@@ -1066,17 +1056,17 @@
   },
   {
     "name": "serde",
-    "version": "1.0.152",
+    "version": "1.0.153",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.152",
+    "version": "1.0.153",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.93",
+    "version": "1.0.94",
     "id": "serde_json"
   },
   {
@@ -1146,8 +1136,13 @@
   },
   {
     "name": "socket2",
-    "version": "0.4.7",
+    "version": "0.5.1",
     "id": "socket2"
+  },
+  {
+    "name": "socket2",
+    "version": "0.4.9",
+    "id": "socket2_0_4_9"
   },
   {
     "name": "spin",
@@ -1161,7 +1156,7 @@
   },
   {
     "name": "string_cache",
-    "version": "0.8.4",
+    "version": "0.8.7",
     "id": "string_cache"
   },
   {
@@ -1196,7 +1191,7 @@
   },
   {
     "name": "tempfile",
-    "version": "3.3.0",
+    "version": "3.4.0",
     "id": "tempfile"
   },
   {
@@ -1221,12 +1216,12 @@
   },
   {
     "name": "thiserror",
-    "version": "1.0.38",
+    "version": "1.0.39",
     "id": "thiserror"
   },
   {
     "name": "thiserror-impl",
-    "version": "1.0.38",
+    "version": "1.0.39",
     "id": "thiserror_impl"
   },
   {
@@ -1251,7 +1246,7 @@
   },
   {
     "name": "time",
-    "version": "0.3.19",
+    "version": "0.3.20",
     "id": "time"
   },
   {
@@ -1266,7 +1261,7 @@
   },
   {
     "name": "time-macros",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "id": "time_macros"
   },
   {
@@ -1281,7 +1276,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.25.0",
+    "version": "1.26.0",
     "id": "tokio"
   },
   {
@@ -1371,7 +1366,7 @@
   },
   {
     "name": "unicode-ident",
-    "version": "1.0.6",
+    "version": "1.0.8",
     "id": "unicode_ident"
   },
   {
@@ -1451,7 +1446,7 @@
   },
   {
     "name": "wide",
-    "version": "0.7.7",
+    "version": "0.7.8",
     "id": "wide"
   },
   {
@@ -1461,7 +1456,7 @@
   },
   {
     "name": "winnow",
-    "version": "0.3.1",
+    "version": "0.3.5",
     "id": "winnow"
   },
   {
@@ -1481,7 +1476,7 @@
   },
   {
     "name": "zune-inflate",
-    "version": "0.2.50",
+    "version": "0.2.51",
     "id": "zune_inflate"
   }
 ]
