@@ -12,10 +12,8 @@ fork-bomb-prevention = []
 async-trait = "0.1.52"
 axum = { version = "0.6", features = ["headers", "ws"] }
 dotenv = "0.15.0"
-env_logger = "0.10.0"
 futures = "0.3.21"
 lazy_static = "1.0.0"
-log = "0.4.0"
 octocrab = "0.18"
 openssl-probe = "0.1.2"
 petgraph = "0.6.0"
@@ -30,3 +28,5 @@ strum = { version = "0.24.0", features = ["derive"] }
 tempfile = "3"
 tokio = { version = "1.9", features = ["macros", "time", "process", "rt-multi-thread"] }
 tower-http = { version = "0.3", features = ["cors", "fs", "set-header", "trace"] }
+tracing = "0.1.37"
+tracing-subscriber = "0.3.16"

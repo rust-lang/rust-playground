@@ -12,6 +12,7 @@ use std::{
 };
 use tempfile::TempDir;
 use tokio::{fs, process::Command, time};
+use tracing::debug;
 
 const DOCKER_PROCESS_TIMEOUT_SOFT: Duration = Duration::from_secs(10);
 const DOCKER_PROCESS_TIMEOUT_HARD: Duration = Duration::from_secs(12);
@@ -495,7 +496,7 @@ impl Sandbox {
             .await
             .context(UnableToSetSourcePermissionsSnafu)?;
 
-        log::debug!(
+        debug!(
             "Wrote {} bytes of source to {}",
             code.len(),
             self.input_file.display()
@@ -518,7 +519,7 @@ impl Sandbox {
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
-        log::debug!("Compilation command is {:?}", cmd);
+        debug!("Compilation command is {:?}", cmd);
 
         cmd
     }
@@ -537,7 +538,7 @@ impl Sandbox {
 
         cmd.arg(&channel.container_name()).args(&execution_cmd);
 
-        log::debug!("Execution command is {:?}", cmd);
+        debug!("Execution command is {:?}", cmd);
 
         cmd
     }
@@ -551,7 +552,7 @@ impl Sandbox {
 
         cmd.arg("rustfmt").args(&["cargo", "fmt"]);
 
-        log::debug!("Formatting command is {:?}", cmd);
+        debug!("Formatting command is {:?}", cmd);
 
         cmd
     }
@@ -564,7 +565,7 @@ impl Sandbox {
 
         cmd.arg("clippy").args(&["cargo", "clippy"]);
 
-        log::debug!("Clippy command is {:?}", cmd);
+        debug!("Clippy command is {:?}", cmd);
 
         cmd
     }
@@ -575,7 +576,7 @@ impl Sandbox {
 
         cmd.arg("miri").args(&["cargo", "miri-playground"]);
 
-        log::debug!("Miri command is {:?}", cmd);
+        debug!("Miri command is {:?}", cmd);
 
         cmd
     }
@@ -591,7 +592,7 @@ impl Sandbox {
             "-Zunpretty=expanded",
         ]);
 
-        log::debug!("Macro expansion command is {:?}", cmd);
+        debug!("Macro expansion command is {:?}", cmd);
 
         cmd
     }
