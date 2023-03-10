@@ -1,16 +1,15 @@
-import { Middleware } from '@reduxjs/toolkit';
+import { AnyAction, Middleware } from '@reduxjs/toolkit';
 import { z } from 'zod';
 
 import {
-  ActionType,
-  WSExecuteResponse,
   WebSocketError,
   websocketConnected,
   websocketDisconnected,
   websocketError,
 } from './actions';
+import { wsExecuteResponseSchema } from './reducers/output/execute';
 
-const WSMessageResponse = z.discriminatedUnion('type', [WebSocketError, WSExecuteResponse]);
+const WSMessageResponse = z.discriminatedUnion('type', [WebSocketError, wsExecuteResponseSchema]);
 
 const reportWebSocketError = async (error: string) => {
   try {
@@ -136,4 +135,4 @@ export const websocketMiddleware =
     };
   };
 
-const sendActionOnWebsocket = (action: any): boolean => action.type === ActionType.WSExecuteRequest;
+const sendActionOnWebsocket = (action: AnyAction): boolean => action?.meta?.websocket;

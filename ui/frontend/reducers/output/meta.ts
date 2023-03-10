@@ -2,6 +2,7 @@ import { Action, ActionType } from '../../actions';
 import { Focus } from '../../types';
 import { performGistLoad, performGistSave } from './gist';
 import { performFormat } from './format';
+import { performExecute, wsExecuteRequest } from './execute';
 
 const DEFAULT: State = {
 };
@@ -39,8 +40,8 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.CompileAssemblyRequest:
       return { ...state, focus: Focus.Asm };
 
-    case ActionType.ExecuteRequest:
-    case ActionType.WSExecuteRequest:
+    case performExecute.pending.type:
+    case wsExecuteRequest.type:
       return { ...state, focus: Focus.Execute };
 
     default: {

@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { ThunkAction as ReduxThunkAction } from '@reduxjs/toolkit';
+import { ThunkAction as ReduxThunkAction, AnyAction } from '@reduxjs/toolkit';
 import { z } from 'zod';
 
 import {
@@ -7,7 +7,6 @@ import {
   clippyRequestSelector,
   getCrateType,
   runAsTest,
-  useWebsocketSelector,
 } from './selectors';
 import State from './state';
 import {
@@ -33,6 +32,7 @@ import {
   Crate,
 } from './types';
 
+import { ExecuteRequestBody, performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
 import { performGistLoad } from './reducers/output/gist';
 
 export const routes = {
@@ -58,6 +58,7 @@ export const routes = {
 };
 
 export type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, Action>;
+export type SimpleThunkAction<T = void> = ReduxThunkAction<T, State, {}, AnyAction>;
 
 const createAction = <T extends string, P extends {}>(type: T, props?: P) => (
   Object.assign({ type }, props)
@@ -82,9 +83,6 @@ export enum ActionType {
   ChangeEdition = 'CHANGE_EDITION',
   ChangeBacktrace = 'CHANGE_BACKTRACE',
   ChangeFocus = 'CHANGE_FOCUS',
-  ExecuteRequest = 'EXECUTE_REQUEST',
-  ExecuteSucceeded = 'EXECUTE_SUCCEEDED',
-  ExecuteFailed = 'EXECUTE_FAILED',
   CompileAssemblyRequest = 'COMPILE_ASSEMBLY_REQUEST',
   CompileAssemblySucceeded = 'COMPILE_ASSEMBLY_SUCCEEDED',
   CompileAssemblyFailed = 'COMPILE_ASSEMBLY_FAILED',
@@ -126,8 +124,6 @@ export enum ActionType {
   WebSocketConnected = 'WEBSOCKET_CONNECTED',
   WebSocketDisconnected = 'WEBSOCKET_DISCONNECTED',
   WebSocketFeatureFlagEnabled = 'WEBSOCKET_FEATURE_FLAG_ENABLED',
-  WSExecuteRequest = 'WS_EXECUTE_REQUEST',
-  WSExecuteResponse = 'WS_EXECUTE_RESPONSE',
 }
 
 export const WebSocketError = z.object({
@@ -135,20 +131,6 @@ export const WebSocketError = z.object({
   error: z.string(),
 });
 export type WebSocketError = z.infer<typeof WebSocketError>;
-
-const ExecuteExtra = z.object({
-  sequenceNumber: z.number(),
-});
-type ExecuteExtra = z.infer<typeof ExecuteExtra>;
-
-export const WSExecuteResponse = z.object({
-  type: z.literal(ActionType.WSExecuteResponse),
-  success: z.boolean(),
-  stdout: z.string(),
-  stderr: z.string(),
-  extra: ExecuteExtra,
-});
-export type WSExecuteResponse = z.infer<typeof WSExecuteResponse>;
 
 export const initializeApplication = () => createAction(ActionType.InitializeApplication);
 
@@ -209,20 +191,6 @@ export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
 
 export const changeFocus = (focus?: Focus) =>
   createAction(ActionType.ChangeFocus, { focus });
-
-interface ExecuteResponseBody {
-  stdout: string;
-  stderr: string;
-}
-
-const requestExecute = () =>
-  createAction(ActionType.ExecuteRequest);
-
-const receiveExecuteSuccess = ({ stdout, stderr }: ExecuteResponseBody) =>
-  createAction(ActionType.ExecuteSucceeded, { stdout, stderr });
-
-const receiveExecuteFailure = ({ error }: { error?: string }) =>
-  createAction(ActionType.ExecuteFailed, { error });
 
 type FetchArg = Parameters<typeof fetch>[0];
 
@@ -297,35 +265,6 @@ export const adaptFetchError = async <R>(cb: () => Promise<R>): Promise<R> => {
     }
   }
 }
-
-interface ExecuteRequestBody {
-  channel: string;
-  mode: string;
-  crateType: string;
-  tests: boolean;
-  code: string;
-  edition: string;
-  backtrace: boolean;
-}
-
-const performCommonExecute = (crateType: string, tests: boolean): ThunkAction => (dispatch, getState) => {
-  const state = getState();
-  const code = codeSelector(state);
-  const { configuration: { channel, mode, edition } } = state;
-  const backtrace = state.configuration.backtrace === Backtrace.Enabled;
-
-  if (useWebsocketSelector(state)) {
-    return dispatch(wsExecuteRequest(channel, mode, edition, crateType, tests, code, backtrace));
-  } else {
-    dispatch(requestExecute());
-
-    const body: ExecuteRequestBody = { channel, mode, edition, crateType, tests, code, backtrace };
-
-    return jsonPost<ExecuteResponseBody>(routes.execute, body)
-      .then(json => dispatch(receiveExecuteSuccess(json)))
-      .catch(json => dispatch(receiveExecuteFailure(json)));
-  }
-};
 
 function performAutoOnly(): ThunkAction {
   return function(dispatch, getState) {
@@ -505,32 +444,6 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Mir]: performCompileToMirOnly,
   [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
 };
-
-let sequenceNumber = 0;
-const nextSequenceNumber = () => sequenceNumber++;
-const makeExtra = (): ExecuteExtra => ({
-  sequenceNumber: nextSequenceNumber(),
-});
-
-const wsExecuteRequest = (
-  channel: Channel,
-  mode: Mode,
-  edition: Edition,
-  crateType: string,
-  tests: boolean,
-  code: string,
-  backtrace: boolean
-) =>
-  createAction(ActionType.WSExecuteRequest, {
-    channel,
-    mode,
-    edition,
-    crateType,
-    tests,
-    code,
-    backtrace,
-    extra: makeExtra(),
-  });
 
 export const performPrimaryAction = (): ThunkAction => (dispatch, getState) => {
   const state = getState();
@@ -871,9 +784,6 @@ export type Action =
   | ReturnType<typeof changeProcessAssembly>
   | ReturnType<typeof changeAceTheme>
   | ReturnType<typeof changeMonacoTheme>
-  | ReturnType<typeof requestExecute>
-  | ReturnType<typeof receiveExecuteSuccess>
-  | ReturnType<typeof receiveExecuteFailure>
   | ReturnType<typeof requestCompileAssembly>
   | ReturnType<typeof receiveCompileAssemblySuccess>
   | ReturnType<typeof receiveCompileAssemblyFailure>
@@ -916,5 +826,4 @@ export type Action =
   | ReturnType<typeof websocketDisconnected>
   | ReturnType<typeof websocketFeatureFlagEnabled>
   | ReturnType<typeof wsExecuteRequest>
-  | WSExecuteResponse
   ;
