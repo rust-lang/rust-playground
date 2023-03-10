@@ -1,15 +1,18 @@
 import { AnyAction, Middleware } from '@reduxjs/toolkit';
 import { z } from 'zod';
 
+import { wsExecuteResponseSchema } from './reducers/output/execute';
 import {
-  WebSocketError,
   websocketConnected,
   websocketDisconnected,
   websocketError,
-} from './actions';
-import { wsExecuteResponseSchema } from './reducers/output/execute';
+  websocketErrorSchema,
+} from './reducers/websocket';
 
-const WSMessageResponse = z.discriminatedUnion('type', [WebSocketError, wsExecuteResponseSchema]);
+const WSMessageResponse = z.discriminatedUnion('type', [
+  websocketErrorSchema,
+  wsExecuteResponseSchema,
+]);
 
 const reportWebSocketError = async (error: string) => {
   try {
@@ -93,7 +96,7 @@ export const websocketMiddleware =
           // We cannot get detailed information about the failure
           // https://stackoverflow.com/a/31003057/155423
           const error = 'Generic WebSocket Error';
-          store.dispatch(websocketError(error));
+          store.dispatch(websocketError({ error }));
           reportWebSocketError(error);
         });
 

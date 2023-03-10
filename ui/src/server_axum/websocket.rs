@@ -63,8 +63,8 @@ impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
 #[derive(Debug, serde::Serialize)]
 #[serde(tag = "type")]
 enum MessageResponse {
-    #[serde(rename = "WEBSOCKET_ERROR")]
-    Error(WSError),
+    #[serde(rename = "websocket/error")]
+    Error { payload: WSError, meta: Meta },
 
     #[serde(rename = "output/execute/wsExecuteResponse")]
     ExecuteResponse {
@@ -174,7 +174,12 @@ pub async fn handle(mut socket: WebSocket) {
 
 fn error_to_response(error: Error) -> MessageResponse {
     let error = error.to_string();
-    MessageResponse::Error(WSError { error })
+    // TODO: thread through the Meta from the originating request
+    let meta = serde_json::json!({ "sequenceNumber": -1 });
+    MessageResponse::Error {
+        payload: WSError { error },
+        meta,
+    }
 }
 
 fn response_to_message(response: MessageResponse) -> Message {

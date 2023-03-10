@@ -1,4 +1,7 @@
-import { Action, ActionType } from '../actions';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import z from 'zod';
+
+import { createWebsocketResponseSchema } from '../websocketActions';
 
 export type State = {
   connected: boolean;
@@ -6,26 +9,49 @@ export type State = {
   featureFlagEnabled: boolean;
 };
 
-const DEFAULT: State = {
+const initialState: State = {
   connected: false,
   featureFlagEnabled: false,
 };
 
-export default function websocket(state = DEFAULT, action: Action): State {
-  switch (action.type) {
-    case ActionType.WebSocketConnected:
-      return { ...state, connected: true, error: undefined };
+const websocketErrorPayloadSchema = z.object({
+  error: z.string(),
+});
+type websocketErrorPayload = z.infer<typeof websocketErrorPayloadSchema>;
 
-    case ActionType.WebSocketDisconnected:
-      return { ...state, connected: false };
+const slice = createSlice({
+  name: 'websocket',
+  initialState,
+  reducers: {
+    connected: (state) => {
+      state.connected = true;
+      delete state.error;
+    },
 
-    case ActionType.WebSocketError:
-      return { ...state, error: action.error };
+    disconnected: (state) => {
+      state.connected = false;
+    },
 
-    case ActionType.WebSocketFeatureFlagEnabled:
-      return { ...state, featureFlagEnabled: true };
+    error: (state, action: PayloadAction<websocketErrorPayload>) => {
+      state.error = action.payload.error;
+    },
 
-    default:
-      return state;
-  }
-}
+    featureFlagEnabled: (state) => {
+      state.featureFlagEnabled = true;
+    },
+  },
+});
+
+export const {
+  connected: websocketConnected,
+  disconnected: websocketDisconnected,
+  error: websocketError,
+  featureFlagEnabled: websocketFeatureFlagEnabled,
+} = slice.actions;
+
+export const websocketErrorSchema = createWebsocketResponseSchema(
+  websocketError,
+  websocketErrorPayloadSchema,
+);
+
+export default slice.reducer;

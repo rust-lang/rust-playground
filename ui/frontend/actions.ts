@@ -1,6 +1,5 @@
 import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction, AnyAction } from '@reduxjs/toolkit';
-import { z } from 'zod';
 
 import {
   codeSelector,
@@ -120,17 +119,7 @@ export enum ActionType {
   NotificationSeen = 'NOTIFICATION_SEEN',
   BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
   SplitRatioChanged = 'SPLIT_RATIO_CHANGED',
-  WebSocketError = 'WEBSOCKET_ERROR',
-  WebSocketConnected = 'WEBSOCKET_CONNECTED',
-  WebSocketDisconnected = 'WEBSOCKET_DISCONNECTED',
-  WebSocketFeatureFlagEnabled = 'WEBSOCKET_FEATURE_FLAG_ENABLED',
 }
-
-export const WebSocketError = z.object({
-  type: z.literal(ActionType.WebSocketError),
-  error: z.string(),
-});
-export type WebSocketError = z.infer<typeof WebSocketError>;
 
 export const initializeApplication = () => createAction(ActionType.InitializeApplication);
 
@@ -675,11 +664,6 @@ export const browserWidthChanged = (isSmall: boolean) =>
 export const splitRatioChanged = () =>
   createAction(ActionType.SplitRatioChanged);
 
-export const websocketError = (error: string): WebSocketError => createAction(ActionType.WebSocketError, { error });
-export const websocketConnected = () => createAction(ActionType.WebSocketConnected);
-export const websocketDisconnected = () => createAction(ActionType.WebSocketDisconnected);
-export const websocketFeatureFlagEnabled = () => createAction(ActionType.WebSocketFeatureFlagEnabled);
-
 function parseChannel(s?: string): Channel | null {
   switch (s) {
     case 'stable':
@@ -821,9 +805,5 @@ export type Action =
   | ReturnType<typeof notificationSeen>
   | ReturnType<typeof browserWidthChanged>
   | ReturnType<typeof splitRatioChanged>
-  | ReturnType<typeof websocketError>
-  | ReturnType<typeof websocketConnected>
-  | ReturnType<typeof websocketDisconnected>
-  | ReturnType<typeof websocketFeatureFlagEnabled>
   | ReturnType<typeof wsExecuteRequest>
   ;
