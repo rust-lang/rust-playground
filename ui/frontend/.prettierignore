@@ -8,3 +8,6 @@ node_modules
 *.ts
 *.tsx
 *.scss
+
+# Slowly migrate files that we've touched
+!.eslintrc.js
