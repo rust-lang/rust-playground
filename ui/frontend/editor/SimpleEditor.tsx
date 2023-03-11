@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash-es';
 import React from 'react';
 
 import { CommonEditorProps, Position, Selection } from '../types';
@@ -85,7 +86,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
     if (!newPosition || !editor) {
       return;
     }
-    if (newPosition === oldPosition) {
+    if (isEqual(newPosition, oldPosition)) {
       return;
     }
 
@@ -102,7 +103,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
     if (!newSelection || !newSelection.start || !newSelection.end || !editor) {
       return;
     }
-    if (newSelection === oldSelection) {
+    if (isEqual(newSelection, oldSelection)) {
       return;
     }
 
