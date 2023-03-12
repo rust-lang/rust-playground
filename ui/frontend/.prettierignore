@@ -11,5 +11,6 @@ node_modules
 
 # Slowly migrate files that we've touched
 !.eslintrc.js
+!editor/AceEditor.tsx
 !editor/SimpleEditor.tsx
 !websocketMiddleware.ts

@@ -60,7 +60,12 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['.eslintrc.js', 'editor/SimpleEditor.tsx', 'websocketMiddleware.ts'],
+      files: [
+        '.eslintrc.js',
+        'editor/AceEditor.tsx',
+        'editor/SimpleEditor.tsx',
+        'websocketMiddleware.ts',
+      ],
       extends: ['prettier'],
     },
   ],

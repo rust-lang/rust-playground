@@ -29,6 +29,7 @@
     "reselect": "^4.0.0",
     "route-parser": "^0.0.5",
     "split-grid": "^1.0.9",
+    "suspend-react": "^0.0.9",
     "zod": "^3.20.3"
   },
   "devDependencies": {
