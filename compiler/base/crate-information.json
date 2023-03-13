@@ -106,12 +106,17 @@
   },
   {
     "name": "bitflags",
-    "version": "1.3.2",
+    "version": "2.0.0",
     "id": "bitflags"
   },
   {
+    "name": "bitflags",
+    "version": "1.3.2",
+    "id": "bitflags_1_3_2"
+  },
+  {
     "name": "block-buffer",
-    "version": "0.10.3",
+    "version": "0.10.4",
     "id": "block_buffer"
   },
   {
@@ -151,7 +156,7 @@
   },
   {
     "name": "chrono",
-    "version": "0.4.23",
+    "version": "0.4.24",
     "id": "chrono"
   },
   {
@@ -286,7 +291,7 @@
   },
   {
     "name": "exr",
-    "version": "1.5.3",
+    "version": "1.6.3",
     "id": "exr"
   },
   {
@@ -351,7 +356,7 @@
   },
   {
     "name": "futures",
-    "version": "0.3.26",
+    "version": "0.3.27",
     "id": "futures"
   },
   {
@@ -361,42 +366,42 @@
   },
   {
     "name": "futures-channel",
-    "version": "0.3.26",
+    "version": "0.3.27",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.3.26",
+    "version": "0.3.27",
     "id": "futures_core"
   },
   {
     "name": "futures-executor",
-    "version": "0.3.26",
+    "version": "0.3.27",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.3.26",
+    "version": "0.3.27",
     "id": "futures_io"
   },
   {
     "name": "futures-macro",
-    "version": "0.3.26",
+    "version": "0.3.27",
     "id": "futures_macro"
   },
   {
     "name": "futures-sink",
-    "version": "0.3.26",
+    "version": "0.3.27",
     "id": "futures_sink"
   },
   {
     "name": "futures-task",
-    "version": "0.3.26",
+    "version": "0.3.27",
     "id": "futures_task"
   },
   {
     "name": "futures-util",
-    "version": "0.3.26",
+    "version": "0.3.27",
     "id": "futures_util"
   },
   {
@@ -491,7 +496,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.14.24",
+    "version": "0.14.25",
     "id": "hyper"
   },
   {
@@ -571,7 +576,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.139",
+    "version": "0.2.140",
     "id": "libc"
   },
   {
@@ -916,7 +921,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.51",
+    "version": "1.0.52",
     "id": "proc_macro2"
   },
   {
@@ -941,7 +946,7 @@
   },
   {
     "name": "quote",
-    "version": "1.0.23",
+    "version": "1.0.26",
     "id": "quote"
   },
   {
@@ -1051,17 +1056,17 @@
   },
   {
     "name": "semver",
-    "version": "1.0.16",
+    "version": "1.0.17",
     "id": "semver"
   },
   {
     "name": "serde",
-    "version": "1.0.153",
+    "version": "1.0.155",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.153",
+    "version": "1.0.155",
     "id": "serde_derive"
   },
   {
@@ -1146,7 +1151,7 @@
   },
   {
     "name": "spin",
-    "version": "0.9.5",
+    "version": "0.9.6",
     "id": "spin"
   },
   {
@@ -1306,7 +1311,7 @@
   },
   {
     "name": "toml",
-    "version": "0.7.2",
+    "version": "0.7.3",
     "id": "toml"
   },
   {
@@ -1316,7 +1321,7 @@
   },
   {
     "name": "toml_edit",
-    "version": "0.19.4",
+    "version": "0.19.6",
     "id": "toml_edit"
   },
   {
@@ -1361,7 +1366,7 @@
   },
   {
     "name": "unicode-bidi",
-    "version": "0.3.10",
+    "version": "0.3.11",
     "id": "unicode_bidi"
   },
   {
