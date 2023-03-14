@@ -5,6 +5,7 @@
 import State from './state';
 import {removeVersion, initializeStorage, PartialState} from './storage';
 import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, PairCharacters, ProcessAssembly } from './types';
+import { codeSelector } from './selectors';
 
 const CURRENT_VERSION = 2;
 
@@ -48,6 +49,7 @@ interface V1Configuration {
 type CurrentConfiguration = V2Configuration;
 
 export function serialize(state: State): string {
+  const code = codeSelector(state);
   const conf: CurrentConfiguration = {
     version: CURRENT_VERSION,
     configuration: {
@@ -65,7 +67,7 @@ export function serialize(state: State): string {
       demangleAssembly: state.configuration.demangleAssembly,
       processAssembly: state.configuration.processAssembly,
     },
-    code: state.code,
+    code,
     notifications: state.notifications,
   };
   return JSON.stringify(conf);

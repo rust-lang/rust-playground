@@ -29,6 +29,7 @@
     "reselect": "^4.0.0",
     "route-parser": "^0.0.5",
     "split-grid": "^1.0.9",
+    "suspend-react": "^0.0.9",
     "zod": "^3.20.3"
   },
   "devDependencies": {
@@ -38,6 +39,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/common-tags": "^1.8.1",
     "@types/isomorphic-fetch": "^0.0.36",
     "@types/jest": "^29.2.5",
@@ -58,6 +60,7 @@
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.0.0",
     "eslint": "^8.6.0",
+    "eslint-config-prettier": "^8.7.0",
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-react-hooks": "^4.0.0",
     "glob": "^8.0.3",

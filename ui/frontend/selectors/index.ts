@@ -13,7 +13,9 @@ import {
   Version,
 } from '../types';
 
-const codeSelector = (state: State) => state.code;
+export const codeSelector = (state: State) => state.code;
+export const positionSelector = (state: State) => state.position;
+export const selectionSelector = (state: State) => state.selection;
 
 const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
 export const hasTestsSelector = createSelector(codeSelector, code => !!code.match(HAS_TESTS_RE));

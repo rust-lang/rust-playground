@@ -24,7 +24,7 @@ const reportWebSocketError = async (error: string) => {
   } catch (reportError) {
     console.log('Unable to report WebSocket error', error, reportError);
   }
-}
+};
 
 const openWebSocket = (currentLocation: Location) => {
   try {
@@ -34,55 +34,86 @@ const openWebSocket = (currentLocation: Location) => {
   } catch (e) {
     // WebSocket URL error or WebSocket is not supported by browser.
     // Assume it's the second case since URL error is easy to notice.
-    const detail = (e instanceof Error) ? e.toString() : 'An unknown error occurred';
-    reportWebSocketError(`Could not create the WebSocket: ${detail}`)
+    const detail = e instanceof Error ? e.toString() : 'An unknown error occurred';
+    reportWebSocketError(`Could not create the WebSocket: ${detail}`);
 
     return null;
   }
-}
+};
 
-export const websocketMiddleware = (window: Window): Middleware => store => {
-  const socket = openWebSocket(window.location);
+// https://exponentialbackoffcalculator.com
+const backoffMs = (n: number) => Math.min(100 * Math.pow(2, n), 10000);
 
-  if (socket) {
-    socket.addEventListener('open', () => {
-      store.dispatch(websocketConnected());
-    });
+export const websocketMiddleware =
+  (window: Window): Middleware =>
+  (store) => {
+    let socket: WebSocket | null = null;
+    let wasConnected = false;
+    let reconnectAttempt = 0;
 
-    socket.addEventListener('close', () => {
-      store.dispatch(websocketDisconnected());
-    });
+    const connect = () => {
+      socket = openWebSocket(window.location);
 
-    socket.addEventListener('error', () => {
-      // We cannot get detailed information about the failure
-      // https://stackoverflow.com/a/31003057/155423
-      const error = 'Generic WebSocket Error';
-      store.dispatch(websocketError(error));
-      reportWebSocketError(error);
-    });
+      if (socket) {
+        socket.addEventListener('open', () => {
+          store.dispatch(websocketConnected());
 
-    // TODO: reconnect on error? (if ever connected? if < n failures?)
+          wasConnected = true;
+        });
 
-    socket.addEventListener('message', (event) => {
-      try {
-        const rawMessage = JSON.parse(event.data);
-        const message = WSMessageResponse.parse(rawMessage);
-        store.dispatch(message);
-      } catch (e) {
-        console.log('Unable to parse WebSocket message', event.data, e);
+        socket.addEventListener('close', (event) => {
+          store.dispatch(websocketDisconnected());
+
+          // Reconnect if we've previously connected
+          if (wasConnected && !event.wasClean) {
+            wasConnected = false;
+            reconnectAttempt = 0;
+            reconnect();
+          }
+        });
+
+        socket.addEventListener('error', () => {
+          // We cannot get detailed information about the failure
+          // https://stackoverflow.com/a/31003057/155423
+          const error = 'Generic WebSocket Error';
+          store.dispatch(websocketError(error));
+          reportWebSocketError(error);
+        });
+
+        socket.addEventListener('message', (event) => {
+          try {
+            const rawMessage = JSON.parse(event.data);
+            const message = WSMessageResponse.parse(rawMessage);
+            store.dispatch(message);
+          } catch (e) {
+            console.log('Unable to parse WebSocket message', event.data, e);
+          }
+        });
       }
-    });
-  }
+    };
 
-  return next => action => {
-    if (socket && socket.readyState == socket.OPEN && sendActionOnWebsocket(action)) {
-      const message = JSON.stringify(action);
-      socket.send(message);
-    }
+    const reconnect = () => {
+      if (socket && socket.readyState == socket.OPEN) {
+        return;
+      }
 
-    next(action);
+      connect();
+
+      const delay = backoffMs(reconnectAttempt);
+      reconnectAttempt += 1;
+      setTimeout(reconnect, delay);
+    };
+
+    connect();
+
+    return (next) => (action) => {
+      if (socket && socket.readyState == socket.OPEN && sendActionOnWebsocket(action)) {
+        const message = JSON.stringify(action);
+        socket.send(message);
+      }
+
+      next(action);
+    };
   };
-}
 
-const sendActionOnWebsocket = (action: any): boolean =>
-  action.type === ActionType.WSExecuteRequest;
+const sendActionOnWebsocket = (action: any): boolean => action.type === ActionType.WSExecuteRequest;

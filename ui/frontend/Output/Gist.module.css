@@ -13,8 +13,7 @@ $copied-duration: 1s ease-in-out;
 
 .text {
   opacity: 0;
-  transition: visibility $copied-duration, opacity $copied-duration,
-    color $copied-duration;
+  transition: visibility $copied-duration, opacity $copied-duration, color $copied-duration;
   visibility: hidden;
 }
 

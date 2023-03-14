@@ -9,6 +9,7 @@ use std::{
     path::{Path, PathBuf},
     sync::Arc,
 };
+use tracing::{error, info, warn};
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
@@ -25,9 +26,8 @@ fn main() {
     let _ = dotenv::dotenv();
     openssl_probe::init_ssl_cert_env_vars();
 
-    // Enable info-level logging by default. env_logger's default is error only.
-    let env_logger_config = env_logger::Env::default().default_filter_or("info");
-    env_logger::Builder::from_env(env_logger_config).init();
+    // Info-level logging is enabled by default.
+    tracing_subscriber::fmt::init();
 
     let config = Config::from_env();
     server_axum::serve(config);
@@ -66,9 +66,9 @@ impl Config {
 
         let index_html = root.join("index.html");
         if index_html.exists() {
-            log::info!("Serving playground frontend from {}", root.display());
+            info!("Serving playground frontend from {}", root.display());
         } else {
-            log::error!(
+            error!(
                 "Playground ui does not exist at {}\n\
                 Playground will not work until `yarn run build` has been run or {PLAYGROUND_UI_ROOT} has been fixed",
                 index_html.display(),
@@ -84,7 +84,7 @@ impl Config {
 
         let gh_token = env::var(PLAYGROUND_GITHUB_TOKEN).ok();
         if gh_token.is_none() {
-            log::warn!("Environment variable {} is not set, so reading and writing GitHub gists will not work", PLAYGROUND_GITHUB_TOKEN);
+            warn!("Environment variable {} is not set, so reading and writing GitHub gists will not work", PLAYGROUND_GITHUB_TOKEN);
         }
 
         let metrics_token = env::var("PLAYGROUND_METRICS_TOKEN").ok();
