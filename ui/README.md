@@ -42,4 +42,4 @@ mkdir tmp
 TMPDIR=$PWD/tmp cargo run
 ```
 
-(Note: This was reported at [#480](https://github.com/integer32llc/rust-playground/issues/480))
+(Note: This was reported at [#480](https://github.com/rust-lang/rust-playground/issues/480))

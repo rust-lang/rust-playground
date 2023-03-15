@@ -13,12 +13,12 @@ const CLIPPY_URL = 'https://github.com/Manishearth/rust-clippy';
 const MIRI_URL = 'https://github.com/rust-lang/miri';
 const CRATES_IO_URL = 'https://crates.io/';
 const RUST_COOKBOOK_URL = 'https://rust-lang-nursery.github.io/rust-cookbook/';
-const CRATES_URL = 'https://github.com/integer32llc/rust-playground/blob/master/compiler/base/Cargo.toml';
+const CRATES_URL = 'https://github.com/rust-lang/rust-playground/blob/main/compiler/base/Cargo.toml';
 const GIST_URL = 'https://gist.github.com/';
 const I32_URL = 'http://integer32.com/';
 const LOCALSTORAGE_URL = 'https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API';
 const ORIGINAL_PLAYGROUND_URL = 'https://github.com/rust-lang/rust-playpen';
-const REPO_URL = 'https://github.com/integer32llc/rust-playground';
+const REPO_URL = 'https://github.com/rust-lang/rust-playground';
 const RUSTFMT_URL = 'https://github.com/rust-lang-nursery/rustfmt';
 const SHEPMASTER_URL = 'https://github.com/shepmaster/';
 

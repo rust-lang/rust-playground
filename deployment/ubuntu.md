@@ -56,7 +56,7 @@ Reboot the instance at this point.
 
 #### Get the code
 ```
-git clone https://github.com/integer32llc/rust-playground.git
+git clone https://github.com/rust-lang/rust-playground.git
 cd rust-playground
 ```
 
