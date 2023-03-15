@@ -122,12 +122,7 @@ fn static_file_service(root: impl AsRef<path::Path>, max_age: HeaderValue) -> Me
 
     let with_caching = SetResponseHeader::if_not_present(files, header::CACHE_CONTROL, max_age);
 
-    get_service(with_caching).handle_error(|e| async move {
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Unhandled internal error: {}", e),
-        )
-    })
+    get_service(with_caching)
 }
 
 async fn rewrite_help_as_index<B>(
