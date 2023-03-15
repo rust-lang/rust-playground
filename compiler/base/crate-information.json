@@ -781,7 +781,7 @@
   },
   {
     "name": "openssl",
-    "version": "0.10.45",
+    "version": "0.10.46",
     "id": "openssl"
   },
   {
@@ -796,7 +796,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.80",
+    "version": "0.9.81",
     "id": "openssl_sys"
   },
   {
@@ -1061,12 +1061,12 @@
   },
   {
     "name": "serde",
-    "version": "1.0.155",
+    "version": "1.0.156",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.155",
+    "version": "1.0.156",
     "id": "serde_derive"
   },
   {
@@ -1116,7 +1116,7 @@
   },
   {
     "name": "simd-adler32",
-    "version": "0.3.4",
+    "version": "0.3.5",
     "id": "simd_adler32"
   },
   {
@@ -1321,7 +1321,7 @@
   },
   {
     "name": "toml_edit",
-    "version": "0.19.6",
+    "version": "0.19.7",
     "id": "toml_edit"
   },
   {
@@ -1461,7 +1461,7 @@
   },
   {
     "name": "winnow",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "id": "winnow"
   },
   {

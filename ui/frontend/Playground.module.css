@@ -1,8 +1,8 @@
 .container {
   display: flex;
-  height: 100vh;
   flex-direction: column;
   padding-bottom: 1em;
+  height: 100vh;
 }
 
 .-resizeableArea {
@@ -32,8 +32,8 @@
 
 .-gutter {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 .splitRowsGutter {
@@ -42,8 +42,8 @@
 }
 
 .splitRowsGutterHandle {
-  pointer-events: none;
   transform: rotate(90deg);
+  pointer-events: none;
 }
 
 .splitColumnsGutter {

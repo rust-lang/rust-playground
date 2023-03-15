@@ -745,7 +745,7 @@ version = "=0.3.0"
 
 [dependencies.openssl]
 package = "openssl"
-version = "=0.10.45"
+version = "=0.10.46"
 
 [dependencies.openssl_macros]
 package = "openssl-macros"
@@ -757,7 +757,7 @@ version = "=0.1.5"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.80"
+version = "=0.9.81"
 
 [dependencies.ordered_float]
 package = "ordered-float"
@@ -997,12 +997,12 @@ features = ["std"]
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.155"
+version = "=1.0.156"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.155"
+version = "=1.0.156"
 
 [dependencies.serde_json]
 package = "serde_json"
@@ -1047,7 +1047,7 @@ default-features = false
 
 [dependencies.simd_adler32]
 package = "simd-adler32"
-version = "=0.3.4"
+version = "=0.3.5"
 features = ["const-generics", "std"]
 
 [dependencies.siphasher]
@@ -1230,7 +1230,7 @@ features = ["serde"]
 
 [dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.19.6"
+version = "=0.19.7"
 features = ["serde"]
 
 [dependencies.tower_service]
@@ -1352,7 +1352,7 @@ features = ["activation", "basetsd", "combaseapi", "consoleapi", "errhandlingapi
 
 [dependencies.winnow]
 package = "winnow"
-version = "=0.3.5"
+version = "=0.3.6"
 features = ["alloc", "std"]
 
 [dependencies.xattr]
@@ -2101,7 +2101,7 @@ version = "=0.3.0"
 
 [build_dependencies.openssl]
 package = "openssl"
-version = "=0.10.45"
+version = "=0.10.46"
 
 [build_dependencies.openssl_macros]
 package = "openssl-macros"
@@ -2113,7 +2113,7 @@ version = "=0.1.5"
 
 [build_dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.80"
+version = "=0.9.81"
 
 [build_dependencies.ordered_float]
 package = "ordered-float"
@@ -2353,12 +2353,12 @@ features = ["std"]
 
 [build_dependencies.serde]
 package = "serde"
-version = "=1.0.155"
+version = "=1.0.156"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [build_dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.155"
+version = "=1.0.156"
 
 [build_dependencies.serde_json]
 package = "serde_json"
@@ -2403,7 +2403,7 @@ default-features = false
 
 [build_dependencies.simd_adler32]
 package = "simd-adler32"
-version = "=0.3.4"
+version = "=0.3.5"
 features = ["const-generics", "std"]
 
 [build_dependencies.siphasher]
@@ -2586,7 +2586,7 @@ features = ["serde"]
 
 [build_dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.19.6"
+version = "=0.19.7"
 features = ["serde"]
 
 [build_dependencies.tower_service]
@@ -2708,7 +2708,7 @@ features = ["activation", "basetsd", "combaseapi", "consoleapi", "errhandlingapi
 
 [build_dependencies.winnow]
 package = "winnow"
-version = "=0.3.5"
+version = "=0.3.6"
 features = ["alloc", "std"]
 
 [build_dependencies.xattr]

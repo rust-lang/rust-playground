@@ -32,8 +32,8 @@ html {
 }
 
 body {
-  padding: 0 1em;
   background-color: #e1e1db;
+  padding: 0 1em;
   font-family: var(--primary-font);
 }
 

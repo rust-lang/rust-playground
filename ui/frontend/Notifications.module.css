@@ -3,15 +3,15 @@ $space: 0.25em;
 
 .container {
   position: absolute;
-  z-index: 10;
   right: $buffer;
   bottom: $buffer;
   left: $buffer;
-  max-width: 50em;
-  border: 2px solid #428bca;
+  z-index: 10;
   margin-right: auto;
   margin-left: auto;
+  border: 2px solid #428bca;
   background: white;
+  max-width: 50em;
 }
 
 .notification {
@@ -24,7 +24,7 @@ $space: 0.25em;
 
 .close {
   composes: -buttonReset from './shared.module.css';
-  padding: $space;
-  background: #e1e1db;
   cursor: pointer;
+  background: #e1e1db;
+  padding: $space;
 }

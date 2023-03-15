@@ -4,13 +4,12 @@ $arrow-size: 10px;
 $vertical-border-color: #cacaca;
 
 .container {
-  z-index: 10;
-
   /* Prevents the popper from shifting when adding it to the DOM
    * triggers showing the scrollbars.
    * https://github.com/FezVrasta/popper.js/issues/457#issuecomment-367692177
    */
   top: 0;
+  z-index: 10;
   font-size: 12px;
 
   & button:enabled {
@@ -23,18 +22,18 @@ $vertical-border-color: #cacaca;
 }
 
 .container[data-popper-placement^='bottom'] .arrow {
+  margin-top: 0;
   border-top-width: 0;
   border-bottom-color: $bg-color;
-  margin-top: 0;
 }
 
 .content {
-  border-radius: var(--header-border-radius);
+  margin: $arrow-size;
+  box-shadow: 0 1px 4px -2px rgb(0 0 0 / 60%), inset 0 1px 0 white;
   border-right: 1px solid $vertical-border-color;
   border-bottom: 1px solid var(--header-accent-border);
   border-left: 1px solid $vertical-border-color;
-  margin: $arrow-size;
+  border-radius: var(--header-border-radius);
   background: $bg-color;
-  box-shadow: 0 1px 4px -2px rgb(0 0 0 / 60%), inset 0 1px 0 white;
   color: $fg-color;
 }
