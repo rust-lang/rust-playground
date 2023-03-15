@@ -26,9 +26,9 @@
 }
 
 .checkmark {
-  margin-right: 0.5em;
   opacity: 0;
   transition: opacity 0.15s ease-in-out;
+  margin-right: 0.5em;
 }
 
 .selected .checkmark,
@@ -37,6 +37,6 @@
 }
 
 .container:hover .checkmark {
-  color: var(--header-tint);
   opacity: 0.5;
+  color: var(--header-tint);
 }

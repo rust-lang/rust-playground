@@ -1,9 +1,10 @@
 .-bodyMonospace {
+  font-size: 0.9em;
+
   /* http://code.stephenmorley.org/html-and-css/fixing-browsers-broken-monospace-font-handling/
    * ACE uses Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
    */
   font-family: 'Source Code Pro', monospace;
-  font-size: 0.9em;
 }
 
 .-autoSize {
@@ -14,10 +15,10 @@
 }
 
 .-buttonReset {
-  padding: 0;
   border: none;
   background: inherit;
   background-color: transparent; /* IE 11 */
+  padding: 0;
   font: inherit;
   line-height: inherit;
   text-align: inherit;
@@ -25,20 +26,20 @@
 
 .-buttonAsLink {
   composes: -buttonReset;
-  color: #00e;
   cursor: pointer;
-  text-decoration: underline;
+  color: #00e;
   user-select: text;
+  text-decoration: underline;
 }
 
 .-menuItemTitle {
-  font-size: 13px;
   font-weight: 600;
+  font-size: 13px;
 }
 
 .-menuItemFullButton {
   composes: -buttonReset;
-  width: 100%;
   transition: color var(--header-transition);
+  width: 100%;
   user-select: text;
 }

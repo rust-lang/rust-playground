@@ -1,8 +1,8 @@
 .container {
   display: flex;
-  height: 3em;
   align-items: center;
   padding: 0 1.25em;
+  height: 3em;
   font-weight: 600;
   text-decoration: none;
   text-transform: uppercase;

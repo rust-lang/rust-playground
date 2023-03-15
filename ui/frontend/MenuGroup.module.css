@@ -1,6 +1,6 @@
 .container {
-  width: 27em;
   padding: 0.75em 1em 0;
+  width: 27em;
   line-height: normal;
 
   &:last-child {
@@ -9,11 +9,11 @@
 }
 
 .title {
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--header-main-border);
   margin: 0;
-  font-size: 11px;
+  border-bottom: 1px solid var(--header-main-border);
+  padding-bottom: 10px;
   font-weight: 700;
+  font-size: 11px;
   text-transform: uppercase;
 }
 

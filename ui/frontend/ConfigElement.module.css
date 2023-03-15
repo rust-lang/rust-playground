@@ -29,22 +29,22 @@
     $border: 1px solid #bbb;
 
     flex: 1;
-    padding: 0 1em;
+    cursor: pointer;
     border: $border;
     border-right-width: 0;
-    border-bottom-left-radius: var(--header-border-radius);
     border-top-left-radius: var(--header-border-radius);
+    border-bottom-left-radius: var(--header-border-radius);
+    padding: 0 1em;
     color: #777;
-    cursor: pointer;
-    font-size: 11px;
     font-weight: 600;
+    font-size: 11px;
     text-align: center;
     text-transform: uppercase;
 
     & ~ label {
-      border-radius: 0 var(--header-border-radius) var(--header-border-radius) 0;
-      border-right-width: 1px;
       border-left: $border;
+      border-right-width: 1px;
+      border-radius: 0 var(--header-border-radius) var(--header-border-radius) 0;
     }
 
     &:hover {

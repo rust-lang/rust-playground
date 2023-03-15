@@ -3,9 +3,9 @@ $background-tab: #fcfcfc; /* desaturate($current-tab, 100%); */
 
 .container {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  flex-direction: column;
 }
 
 .tabs {
@@ -14,10 +14,10 @@ $background-tab: #fcfcfc; /* desaturate($current-tab, 100%); */
 
 .tab {
   flex: 1 1 auto;
+  cursor: pointer;
   border: var(--border);
   border-right: none;
   background-color: $background-tab;
-  cursor: pointer;
   line-height: 1.5em;
 
   &:last-of-type {
@@ -27,9 +27,9 @@ $background-tab: #fcfcfc; /* desaturate($current-tab, 100%); */
 
 .tabSelected {
   composes: tab;
+  cursor: default;
   border-bottom: none;
   background-color: $current-tab;
-  cursor: default;
 
   &:focus {
     outline: none;
@@ -42,10 +42,10 @@ $background-tab: #fcfcfc; /* desaturate($current-tab, 100%); */
 }
 
 .body {
-  overflow: scroll;
-  height: 100%;
-  padding: 0.5em;
   border: var(--border);
   border-top: none;
   background-color: $current-tab;
+  padding: 0.5em;
+  height: 100%;
+  overflow: scroll;
 }

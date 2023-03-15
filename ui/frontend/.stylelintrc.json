@@ -1,9 +1,7 @@
 {
   "extends": [
     "stylelint-config-standard",
-    "stylelint-config-css-modules",
-    "stylelint-config-idiomatic-order",
-    "stylelint-config-prettier"
+    "stylelint-config-css-modules"
   ],
   "rules": {
     "selector-class-pattern": [

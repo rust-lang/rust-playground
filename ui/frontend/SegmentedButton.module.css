@@ -4,8 +4,8 @@ $bg-dark: #f9f9f9;
 .container {
   display: flex;
   align-items: center;
-  border-radius: var(--header-border-radius);
   box-shadow: 0 2px 4px -2px rgb(0 0 0 / 40%), inset 0 1px 0 white;
+  border-radius: var(--header-border-radius);
 }
 
 .button {
@@ -16,13 +16,13 @@ $bg-dark: #f9f9f9;
   color: #444;
 
   &:first-child {
-    border-bottom-left-radius: var(--header-border-radius);
     border-top-left-radius: var(--header-border-radius);
+    border-bottom-left-radius: var(--header-border-radius);
   }
 
   &:last-child {
-    border-bottom-right-radius: var(--header-border-radius);
     border-top-right-radius: var(--header-border-radius);
+    border-bottom-right-radius: var(--header-border-radius);
   }
 
   &:not(:first-child) {
@@ -39,10 +39,10 @@ $bg-dark: #f9f9f9;
   }
 
   &:active {
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 20%);
     border-top-color: #bababa;
     border-bottom-color: #d6d6d6;
     background: linear-gradient($bg-dark, #ededed);
-    box-shadow: inset 0 1px 1px rgb(0 0 0 / 20%);
   }
 }
 
