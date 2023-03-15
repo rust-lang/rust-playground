@@ -42,4 +42,4 @@ majority of implementation work.
 
 [all time downloads]: https://crates.io/crates?sort=downloads
 [Rust cookbook]: https://rust-lang-nursery.github.io/rust-cookbook/
-[alternate algorithms]: https://github.com/integer32llc/rust-playground/issues/101
+[alternate algorithms]: https://github.com/rust-lang/rust-playground/issues/101

@@ -6,7 +6,7 @@ edition = "2018"
 
 description = "Calculates what crates should be included in the playground"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/integer32llc/rust-playground"
+repository = "https://github.com/rust-lang/rust-playground"
 
 [dependencies]
 cargo = "0.68.0"
