@@ -52,7 +52,6 @@ export const websocketMiddleware =
   (window: Window): Middleware =>
   (store) => {
     let socket: WebSocket | null = null;
-    let wasConnected = false;
     let reconnectAttempt = 0;
 
     let timeout: number | null = null;
@@ -77,17 +76,14 @@ export const websocketMiddleware =
 
         socket.addEventListener('open', () => {
           store.dispatch(websocketConnected());
-
-          wasConnected = true;
+          reconnectAttempt = 0;
         });
 
         socket.addEventListener('close', (event) => {
           store.dispatch(websocketDisconnected());
 
           // Reconnect if we've previously connected
-          if (wasConnected && !event.wasClean) {
-            wasConnected = false;
-            reconnectAttempt = 0;
+          if (!event.wasClean) {
             reconnect();
           }
         });
@@ -114,15 +110,10 @@ export const websocketMiddleware =
     };
 
     const reconnect = () => {
-      if (socket && socket.readyState == socket.OPEN) {
-        return;
-      }
-
-      connect();
-
       const delay = backoffMs(reconnectAttempt);
       reconnectAttempt += 1;
-      setTimeout(reconnect, delay);
+
+      window.setTimeout(connect, delay);
     };
 
     connect();
