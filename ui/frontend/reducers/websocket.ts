@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import z from 'zod';
 
-import { createWebsocketResponseSchema } from '../websocketActions';
+import { createWebsocketResponseSchema, makeWebSocketMeta } from '../websocketActions';
 
 export type State = {
   connected: boolean;
@@ -14,6 +14,11 @@ const initialState: State = {
   featureFlagEnabled: false,
 };
 
+const websocketConnectedPayloadSchema = z.object({
+  iAcceptThisIsAnUnsupportedApi: z.boolean(),
+});
+type websocketConnectedPayload = z.infer<typeof websocketConnectedPayloadSchema>;
+
 const websocketErrorPayloadSchema = z.object({
   error: z.string(),
 });
@@ -23,9 +28,18 @@ const slice = createSlice({
   name: 'websocket',
   initialState,
   reducers: {
-    connected: (state) => {
-      state.connected = true;
-      delete state.error;
+    connected: {
+      reducer: (state, _action: PayloadAction<websocketConnectedPayload>) => {
+        state.connected = true;
+        delete state.error;
+      },
+
+      prepare: () => ({
+        payload: {
+          iAcceptThisIsAnUnsupportedApi: true,
+        },
+        meta: makeWebSocketMeta(),
+      }),
     },
 
     disconnected: (state) => {
@@ -48,6 +62,11 @@ export const {
   error: websocketError,
   featureFlagEnabled: websocketFeatureFlagEnabled,
 } = slice.actions;
+
+export const websocketConnectedSchema = createWebsocketResponseSchema(
+  websocketConnected,
+  websocketConnectedPayloadSchema,
+);
 
 export const websocketErrorSchema = createWebsocketResponseSchema(
   websocketError,

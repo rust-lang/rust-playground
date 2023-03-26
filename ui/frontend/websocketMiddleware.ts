@@ -4,12 +4,14 @@ import { z } from 'zod';
 import { wsExecuteResponseSchema } from './reducers/output/execute';
 import {
   websocketConnected,
+  websocketConnectedSchema,
   websocketDisconnected,
   websocketError,
   websocketErrorSchema,
 } from './reducers/websocket';
 
 const WSMessageResponse = z.discriminatedUnion('type', [
+  websocketConnectedSchema,
   websocketErrorSchema,
   wsExecuteResponseSchema,
 ]);
@@ -52,6 +54,7 @@ export const websocketMiddleware =
   (window: Window): Middleware =>
   (store) => {
     let socket: WebSocket | null = null;
+    let wasConnected = false;
     let reconnectAttempt = 0;
 
     let timeout: number | null = null;
@@ -75,15 +78,16 @@ export const websocketMiddleware =
         resetTimeout();
 
         socket.addEventListener('open', () => {
-          store.dispatch(websocketConnected());
-          reconnectAttempt = 0;
+          if (socket) {
+            socket.send(JSON.stringify(websocketConnected()));
+          }
         });
 
         socket.addEventListener('close', (event) => {
           store.dispatch(websocketDisconnected());
 
           // Reconnect if we've previously connected
-          if (!event.wasClean) {
+          if (wasConnected && !event.wasClean) {
             reconnect();
           }
         });
@@ -100,6 +104,12 @@ export const websocketMiddleware =
           try {
             const rawMessage = JSON.parse(event.data);
             const message = WSMessageResponse.parse(rawMessage);
+
+            if (websocketConnected.match(message)) {
+              wasConnected = true;
+              reconnectAttempt = 0;
+            }
+
             store.dispatch(message);
             resetTimeout();
           } catch (e) {

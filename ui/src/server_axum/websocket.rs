@@ -17,6 +17,23 @@ type Meta = serde_json::Value;
 
 #[derive(serde::Deserialize)]
 #[serde(tag = "type")]
+enum HandshakeMessage {
+    #[serde(rename = "websocket/connected")]
+    Connected {
+        payload: Connected,
+        #[allow(unused)]
+        meta: Meta,
+    },
+}
+
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Connected {
+    i_accept_this_is_an_unsupported_api: bool,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(tag = "type")]
 enum WSMessageRequest {
     #[serde(rename = "output/execute/wsExecuteRequest")]
     ExecuteRequest { payload: ExecuteRequest, meta: Meta },
@@ -107,6 +124,10 @@ pub async fn handle(mut socket: WebSocket) {
     LIVE_WS.inc();
     let start = Instant::now();
 
+    if !connect_handshake(&mut socket).await {
+        return;
+    }
+
     let (tx, mut rx) = mpsc::channel(3);
     let mut tasks = JoinSet::new();
 
@@ -170,6 +191,15 @@ pub async fn handle(mut socket: WebSocket) {
     LIVE_WS.dec();
     let elapsed = start.elapsed();
     DURATION_WS.observe(elapsed.as_secs_f64());
+}
+
+async fn connect_handshake(socket: &mut WebSocket) -> bool {
+    let Some(Ok(Message::Text(txt))) = socket.recv().await else { return false };
+    let Ok(HandshakeMessage::Connected { payload, .. }) = serde_json::from_str::<HandshakeMessage>(&txt) else { return false };
+    if !payload.i_accept_this_is_an_unsupported_api {
+        return false;
+    }
+    socket.send(Message::Text(txt)).await.is_ok()
 }
 
 fn error_to_response(error: Error) -> MessageResponse {
