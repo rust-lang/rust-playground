@@ -1,75 +1,74 @@
-import React, { useCallback, useState, useEffect } from 'react';
-import { usePopper } from 'react-popper';
-import { Portal } from 'react-portal';
+import {
+  FloatingArrow,
+  FloatingFocusManager,
+  arrow,
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useRole,
+} from '@floating-ui/react';
+import React, { useCallback, useRef, useState } from 'react';
 
 import styles from './PopButton.module.css';
 
 interface NewPopProps {
-  Button: React.ComponentType<{
-    toggle: () => void;
-  } & React.RefAttributes<HTMLButtonElement>>;
+  Button: React.ComponentType<
+    {
+      toggle: () => void;
+    } & React.RefAttributes<HTMLButtonElement>
+  >;
   Menu: React.ComponentType<{ close: () => void }>;
 }
 
 const PopButton: React.FC<NewPopProps> = ({ Button, Menu }) => {
-  const [isOpen, setOpen] = useState(false);
-  const toggle = useCallback(() => setOpen(v => !v), []);
-  const close = useCallback(() => setOpen(false), []);
+  const [isOpen, setIsOpen] = useState(false);
+  const toggle = useCallback(() => setIsOpen((v) => !v), []);
+  const close = useCallback(() => setIsOpen(false), []);
 
-  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
-  const [arrowElement, setArrowElement] = useState<HTMLElement | null>(null);
+  const arrowRef = useRef(null);
 
-  const { styles: popperStyles, attributes: popperAttributes } = usePopper(referenceElement, popperElement, {
-    modifiers: [
-      { name: 'arrow', options: { element: arrowElement } },
-      // Issue #303
-      { name: 'computeStyles', options: { gpuAcceleration: false } },
-    ],
+  const { x, y, refs, strategy, context } = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
+    middleware: [offset(10), flip(), shift(), arrow({ element: arrowRef })],
+    whileElementsMounted: autoUpdate,
   });
 
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+  const click = useClick(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
 
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!(event.target instanceof Node)) { return; }
-
-      if (referenceElement && referenceElement.contains(event.target)) {
-        // They are clicking on the button, so let that go ahead and close us.
-        return;
-      }
-
-      if (popperElement && !popperElement.contains(event.target)) {
-        close();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, referenceElement, popperElement, close]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
   return (
     <>
-      <Button ref={setReferenceElement} toggle={toggle} />
+      <Button toggle={toggle} ref={refs.setReference} {...getReferenceProps()} />
 
-      {isOpen && <Portal>
-        <div
-          ref={setPopperElement}
-          className={styles.container}
-          style={popperStyles.popper}
-          {...popperAttributes.popper}>
+      {isOpen && (
+        <FloatingFocusManager context={context}>
           <div
-            ref={setArrowElement}
-            className={styles.arrow}
-            style={popperStyles.arrow}
-            {...popperAttributes.arrow} />
-          <div className={styles.content}>
-            <Menu close={close} />
+            ref={refs.setFloating}
+            className={styles.container}
+            style={{
+              position: strategy,
+              top: y ?? 0,
+              left: x ?? 0,
+              width: 'max-content',
+            }}
+            {...getFloatingProps()}
+          >
+            <FloatingArrow ref={arrowRef} context={context} height={10} width={20} fill="white" />
+            <div className={styles.content}>
+              <Menu close={close} />
+            </div>
           </div>
-        </div>
-      </Portal>}
+        </FloatingFocusManager>
+      )}
     </>
   );
 };

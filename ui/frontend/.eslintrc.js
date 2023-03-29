@@ -62,6 +62,7 @@ module.exports = {
     {
       files: [
         '.eslintrc.js',
+        'PopButton.tsx',
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',
         'websocketMiddleware.ts',
