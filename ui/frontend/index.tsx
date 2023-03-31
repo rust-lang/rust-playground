@@ -19,11 +19,11 @@ import {
   performVersionsLoad,
   reExecuteWithBacktrace,
   browserWidthChanged,
-  websocketFeatureFlagEnabled,
 } from './actions';
 import { configureRustErrors } from './highlighting';
 import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
+import { websocketFeatureFlagEnabled } from './reducers/websocket';
 import Router from './Router';
 import configureStore from './configureStore';
 

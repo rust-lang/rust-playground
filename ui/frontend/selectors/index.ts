@@ -1,5 +1,5 @@
 import { source } from 'common-tags';
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 
 import { State } from '../reducers';
 import {
@@ -363,4 +363,19 @@ export const websocketStatusSelector = createSelector(
     if (ws.connected) { return { state: 'connected' }; }
     return { state: 'disconnected' };
   }
+);
+
+export const executeRequestPayloadSelector = createSelector(
+  codeSelector,
+  (state: State) => state.configuration,
+  (_state: State, { crateType, tests }: { crateType: string, tests: boolean }) => ({ crateType, tests }),
+  (code, configuration, { crateType, tests }) => ({
+    channel: configuration.channel,
+    mode: configuration.mode,
+    edition: configuration.edition,
+    crateType,
+    tests,
+    code,
+    backtrace: configuration.backtrace === Backtrace.Enabled,
+  }),
 );

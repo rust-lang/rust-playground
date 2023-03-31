@@ -1,5 +1,8 @@
 import { Action, ActionType } from '../../actions';
 import { Focus } from '../../types';
+import { performGistLoad, performGistSave } from './gist';
+import { performFormat } from './format';
+import { performExecute, wsExecuteRequest } from './execute';
 
 const DEFAULT: State = {
 };
@@ -37,20 +40,20 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.CompileAssemblyRequest:
       return { ...state, focus: Focus.Asm };
 
-    case ActionType.ExecuteRequest:
-    case ActionType.WSExecuteRequest:
+    case performExecute.pending.type:
+    case wsExecuteRequest.type:
       return { ...state, focus: Focus.Execute };
 
-    case ActionType.RequestFormat:
-      return { ...state, focus: Focus.Format };
-    case ActionType.FormatSucceeded:
-      return { ...state, focus: undefined };
-
-    case ActionType.RequestGistLoad:
-    case ActionType.RequestGistSave:
-      return { ...state, focus: Focus.Gist };
-
-    default:
-      return state;
+    default: {
+      if (performGistLoad.pending.match(action) || performGistSave.pending.match(action)) {
+        return { ...state, focus: Focus.Gist };
+      } else if (performFormat.pending.match(action)) {
+        return { ...state, focus: Focus.Format };
+      } else if (performFormat.fulfilled.match(action)) {
+        return { ...state, focus: undefined };
+      } else {
+        return state;
+      }
+    }
   }
 }

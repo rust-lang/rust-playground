@@ -8,6 +8,7 @@ import MenuAside from './MenuAside';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import { useAppDispatch } from './configureStore';
+import { performFormat } from './reducers/output/format';
 
 interface ToolsMenuProps {
   close: () => void;
@@ -33,7 +34,7 @@ const ToolsMenu: React.FC<ToolsMenuProps> = props => {
     props.close();
   }, [dispatch, props]);
   const format = useCallback(() => {
-    dispatch(actions.performFormat());
+    dispatch(performFormat());
     props.close();
   }, [dispatch, props]);
   const expandMacros = useCallback(() => {

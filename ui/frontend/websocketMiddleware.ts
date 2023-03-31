@@ -1,16 +1,18 @@
-import { Middleware } from 'redux';
+import { AnyAction, Middleware } from '@reduxjs/toolkit';
 import { z } from 'zod';
 
+import { wsExecuteResponseSchema } from './reducers/output/execute';
 import {
-  ActionType,
-  WSExecuteResponse,
-  WebSocketError,
   websocketConnected,
   websocketDisconnected,
   websocketError,
-} from './actions';
+  websocketErrorSchema,
+} from './reducers/websocket';
 
-const WSMessageResponse = z.discriminatedUnion('type', [WebSocketError, WSExecuteResponse]);
+const WSMessageResponse = z.discriminatedUnion('type', [
+  websocketErrorSchema,
+  wsExecuteResponseSchema,
+]);
 
 const reportWebSocketError = async (error: string) => {
   try {
@@ -94,7 +96,7 @@ export const websocketMiddleware =
           // We cannot get detailed information about the failure
           // https://stackoverflow.com/a/31003057/155423
           const error = 'Generic WebSocket Error';
-          store.dispatch(websocketError(error));
+          store.dispatch(websocketError({ error }));
           reportWebSocketError(error);
         });
 
@@ -136,4 +138,4 @@ export const websocketMiddleware =
     };
   };
 
-const sendActionOnWebsocket = (action: any): boolean => action.type === ActionType.WSExecuteRequest;
+const sendActionOnWebsocket = (action: AnyAction): boolean => action?.meta?.websocket;

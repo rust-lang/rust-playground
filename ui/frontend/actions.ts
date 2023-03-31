@@ -1,15 +1,11 @@
 import fetch from 'isomorphic-fetch';
-import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
-import { z } from 'zod';
+import { ThunkAction as ReduxThunkAction, AnyAction } from '@reduxjs/toolkit';
 
 import {
   codeSelector,
   clippyRequestSelector,
-  formatRequestSelector,
   getCrateType,
   runAsTest,
-  useWebsocketSelector,
-  baseUrlSelector,
 } from './selectors';
 import State from './state';
 import {
@@ -35,7 +31,10 @@ import {
   Crate,
 } from './types';
 
-const routes = {
+import { ExecuteRequestBody, performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
+import { performGistLoad } from './reducers/output/gist';
+
+export const routes = {
   compile: '/compile',
   execute: '/execute',
   format: '/format',
@@ -58,6 +57,7 @@ const routes = {
 };
 
 export type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, Action>;
+export type SimpleThunkAction<T = void> = ReduxThunkAction<T, State, {}, AnyAction>;
 
 const createAction = <T extends string, P extends {}>(type: T, props?: P) => (
   Object.assign({ type }, props)
@@ -82,9 +82,6 @@ export enum ActionType {
   ChangeEdition = 'CHANGE_EDITION',
   ChangeBacktrace = 'CHANGE_BACKTRACE',
   ChangeFocus = 'CHANGE_FOCUS',
-  ExecuteRequest = 'EXECUTE_REQUEST',
-  ExecuteSucceeded = 'EXECUTE_SUCCEEDED',
-  ExecuteFailed = 'EXECUTE_FAILED',
   CompileAssemblyRequest = 'COMPILE_ASSEMBLY_REQUEST',
   CompileAssemblySucceeded = 'COMPILE_ASSEMBLY_SUCCEEDED',
   CompileAssemblyFailed = 'COMPILE_ASSEMBLY_FAILED',
@@ -106,9 +103,6 @@ export enum ActionType {
   EnableFeatureGate = 'ENABLE_FEATURE_GATE',
   GotoPosition = 'GOTO_POSITION',
   SelectText = 'SELECT_TEXT',
-  RequestFormat = 'REQUEST_FORMAT',
-  FormatSucceeded = 'FORMAT_SUCCEEDED',
-  FormatFailed = 'FORMAT_FAILED',
   RequestClippy = 'REQUEST_CLIPPY',
   ClippySucceeded = 'CLIPPY_SUCCEEDED',
   ClippyFailed = 'CLIPPY_FAILED',
@@ -118,12 +112,6 @@ export enum ActionType {
   RequestMacroExpansion = 'REQUEST_MACRO_EXPANSION',
   MacroExpansionSucceeded = 'MACRO_EXPANSION_SUCCEEDED',
   MacroExpansionFailed = 'MACRO_EXPANSION_FAILED',
-  RequestGistLoad = 'REQUEST_GIST_LOAD',
-  GistLoadSucceeded = 'GIST_LOAD_SUCCEEDED',
-  GistLoadFailed = 'GIST_LOAD_FAILED',
-  RequestGistSave = 'REQUEST_GIST_SAVE',
-  GistSaveSucceeded = 'GIST_SAVE_SUCCEEDED',
-  GistSaveFailed = 'GIST_SAVE_FAILED',
   RequestCratesLoad = 'REQUEST_CRATES_LOAD',
   CratesLoadSucceeded = 'CRATES_LOAD_SUCCEEDED',
   RequestVersionsLoad = 'REQUEST_VERSIONS_LOAD',
@@ -131,33 +119,7 @@ export enum ActionType {
   NotificationSeen = 'NOTIFICATION_SEEN',
   BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
   SplitRatioChanged = 'SPLIT_RATIO_CHANGED',
-  WebSocketError = 'WEBSOCKET_ERROR',
-  WebSocketConnected = 'WEBSOCKET_CONNECTED',
-  WebSocketDisconnected = 'WEBSOCKET_DISCONNECTED',
-  WebSocketFeatureFlagEnabled = 'WEBSOCKET_FEATURE_FLAG_ENABLED',
-  WSExecuteRequest = 'WS_EXECUTE_REQUEST',
-  WSExecuteResponse = 'WS_EXECUTE_RESPONSE',
 }
-
-export const WebSocketError = z.object({
-  type: z.literal(ActionType.WebSocketError),
-  error: z.string(),
-});
-export type WebSocketError = z.infer<typeof WebSocketError>;
-
-const ExecuteExtra = z.object({
-  sequenceNumber: z.number(),
-});
-type ExecuteExtra = z.infer<typeof ExecuteExtra>;
-
-export const WSExecuteResponse = z.object({
-  type: z.literal(ActionType.WSExecuteResponse),
-  success: z.boolean(),
-  stdout: z.string(),
-  stderr: z.string(),
-  extra: ExecuteExtra,
-});
-export type WSExecuteResponse = z.infer<typeof WSExecuteResponse>;
 
 export const initializeApplication = () => createAction(ActionType.InitializeApplication);
 
@@ -219,29 +181,15 @@ export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
 export const changeFocus = (focus?: Focus) =>
   createAction(ActionType.ChangeFocus, { focus });
 
-interface ExecuteResponseBody {
-  stdout: string;
-  stderr: string;
-}
-
-const requestExecute = () =>
-  createAction(ActionType.ExecuteRequest);
-
-const receiveExecuteSuccess = ({ stdout, stderr }: ExecuteResponseBody) =>
-  createAction(ActionType.ExecuteSucceeded, { stdout, stderr });
-
-const receiveExecuteFailure = ({ error }: { error?: string }) =>
-  createAction(ActionType.ExecuteFailed, { error });
-
 type FetchArg = Parameters<typeof fetch>[0];
 
-function jsonGet(url: FetchArg) {
+export function jsonGet(url: FetchArg) {
   return fetchJson(url, {
     method: 'get',
   });
 }
 
-function jsonPost<T>(url: FetchArg, body: Record<string, any>): Promise<T> {
+export function jsonPost<T>(url: FetchArg, body: Record<string, any>): Promise<T> {
   return fetchJson(url, {
     method: 'post',
     body: JSON.stringify(body),
@@ -292,34 +240,20 @@ async function fetchJson(url: FetchArg, args: RequestInit) {
   }
 }
 
-interface ExecuteRequestBody {
-  channel: string;
-  mode: string;
-  crateType: string;
-  tests: boolean;
-  code: string;
-  edition: string;
-  backtrace: boolean;
-}
-
-const performCommonExecute = (crateType: string, tests: boolean): ThunkAction => (dispatch, getState) => {
-  const state = getState();
-  const code = codeSelector(state);
-  const { configuration: { channel, mode, edition } } = state;
-  const backtrace = state.configuration.backtrace === Backtrace.Enabled;
-
-  if (useWebsocketSelector(state)) {
-    return dispatch(wsExecuteRequest(channel, mode, edition, crateType, tests, code, backtrace));
-  } else {
-    dispatch(requestExecute());
-
-    const body: ExecuteRequestBody = { channel, mode, edition, crateType, tests, code, backtrace };
-
-    return jsonPost<ExecuteResponseBody>(routes.execute, body)
-      .then(json => dispatch(receiveExecuteSuccess(json)))
-      .catch(json => dispatch(receiveExecuteFailure(json)));
+// We made some strange decisions with how the `fetchJson` function
+// communicates errors, so we untwist those here to fit better with
+// redux-toolkit's ideas.
+export const adaptFetchError = async <R>(cb: () => Promise<R>): Promise<R> => {
+  try {
+    return await cb();
+  } catch (e) {
+    if (e && typeof e === 'object' && 'error' in e && typeof e.error === 'string') {
+      throw new Error(e.error);
+    } else {
+      throw new Error('An unknown error occurred');
+    }
   }
-};
+}
 
 function performAutoOnly(): ThunkAction {
   return function(dispatch, getState) {
@@ -500,32 +434,6 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
 };
 
-let sequenceNumber = 0;
-const nextSequenceNumber = () => sequenceNumber++;
-const makeExtra = (): ExecuteExtra => ({
-  sequenceNumber: nextSequenceNumber(),
-});
-
-const wsExecuteRequest = (
-  channel: Channel,
-  mode: Mode,
-  edition: Edition,
-  crateType: string,
-  tests: boolean,
-  code: string,
-  backtrace: boolean
-) =>
-  createAction(ActionType.WSExecuteRequest, {
-    channel,
-    mode,
-    edition,
-    crateType,
-    tests,
-    code,
-    backtrace,
-    extra: makeExtra(),
-  });
-
 export const performPrimaryAction = (): ThunkAction => (dispatch, getState) => {
   const state = getState();
   const primaryAction = PRIMARY_ACTIONS[state.configuration.primaryAction];
@@ -571,46 +479,6 @@ export const gotoPosition = (line: string | number, column: string | number) =>
 
 export const selectText = (start: Position, end: Position) =>
   createAction(ActionType.SelectText, { start, end });
-
-const requestFormat = () =>
-  createAction(ActionType.RequestFormat);
-
-interface FormatRequestBody {
-  code: string;
-  edition: string;
-}
-
-interface FormatResponseBody {
-  success: boolean;
-  code: string;
-  stdout: string;
-  stderr: string;
-}
-
-const receiveFormatSuccess = (body: FormatResponseBody) =>
-  createAction(ActionType.FormatSucceeded, body);
-
-const receiveFormatFailure = (body: FormatResponseBody) =>
-  createAction(ActionType.FormatFailed, body);
-
-export function performFormat(): ThunkAction {
-  // TODO: Check a cache
-  return function(dispatch, getState) {
-    dispatch(requestFormat());
-
-    const body: FormatRequestBody = formatRequestSelector(getState());
-
-    return jsonPost<FormatResponseBody>(routes.format, body)
-      .then(json => {
-        if (json.success) {
-          dispatch(receiveFormatSuccess(json));
-        } else {
-          dispatch(receiveFormatFailure(json));
-        }
-      })
-      .catch(json => dispatch(receiveFormatFailure(json)));
-  };
-}
 
 interface GeneralSuccess {
   stdout: string;
@@ -733,83 +601,6 @@ export function performMacroExpansion(): ThunkAction {
   };
 }
 
-interface GistSuccessProps {
-  id: string;
-  url: string;
-  code: string;
-  stdout: string;
-  stderr: string;
-  channel: Channel;
-  mode: Mode;
-  edition: Edition;
-}
-
-const requestGistLoad = () =>
-  createAction(ActionType.RequestGistLoad);
-
-const receiveGistLoadSuccess = (props: GistSuccessProps) =>
-  createAction(ActionType.GistLoadSucceeded, props);
-
-const receiveGistLoadFailure = () => // eslint-disable-line no-unused-vars
-  createAction(ActionType.GistLoadFailed);
-
-type PerformGistLoadProps =
-  Pick<GistSuccessProps, Exclude<keyof GistSuccessProps, 'url' | 'code' | 'stdout' | 'stderr'>>;
-
-export function performGistLoad({ id, channel, mode, edition }: PerformGistLoadProps): ThunkAction {
-  return function(dispatch, getState) {
-    dispatch(requestGistLoad());
-
-    const state = getState();
-    const baseUrl = baseUrlSelector(state);
-    const gistUrl = new URL(routes.meta.gistLoad, baseUrl);
-    const u = new URL(id, gistUrl);
-
-    jsonGet(u)
-      .then(gist => dispatch(receiveGistLoadSuccess({ channel, mode, edition, ...gist })));
-    // TODO: Failure case
-  };
-}
-
-const requestGistSave = () =>
-  createAction(ActionType.RequestGistSave);
-
-const receiveGistSaveSuccess = (props: GistSuccessProps) =>
-  createAction(ActionType.GistSaveSucceeded, props);
-
-const receiveGistSaveFailure = ({ error }: CompileFailure) => // eslint-disable-line no-unused-vars
-  createAction(ActionType.GistSaveFailed, { error });
-
-interface GistResponseBody {
-  id: string;
-  url: string;
-  code: string;
-}
-
-export function performGistSave(): ThunkAction {
-  return function(dispatch, getState) {
-    dispatch(requestGistSave());
-
-    const state = getState();
-    const code = codeSelector(state);
-    const {
-      configuration: {
-        channel, mode, edition,
-      },
-      output: {
-        execute: {
-          stdout = '',
-          stderr = '',
-        },
-      },
-    } = state;
-
-    return jsonPost<GistResponseBody>(routes.meta.gistSave, { code })
-      .then(json => dispatch(receiveGistSaveSuccess({ ...json, code, stdout, stderr, channel, mode, edition })));
-    // TODO: Failure case
-  };
-}
-
 const requestCratesLoad = () =>
   createAction(ActionType.RequestCratesLoad);
 
@@ -872,11 +663,6 @@ export const browserWidthChanged = (isSmall: boolean) =>
 
 export const splitRatioChanged = () =>
   createAction(ActionType.SplitRatioChanged);
-
-export const websocketError = (error: string): WebSocketError => createAction(ActionType.WebSocketError, { error });
-export const websocketConnected = () => createAction(ActionType.WebSocketConnected);
-export const websocketDisconnected = () => createAction(ActionType.WebSocketDisconnected);
-export const websocketFeatureFlagEnabled = () => createAction(ActionType.WebSocketFeatureFlagEnabled);
 
 function parseChannel(s?: string): Channel | null {
   switch (s) {
@@ -982,9 +768,6 @@ export type Action =
   | ReturnType<typeof changeProcessAssembly>
   | ReturnType<typeof changeAceTheme>
   | ReturnType<typeof changeMonacoTheme>
-  | ReturnType<typeof requestExecute>
-  | ReturnType<typeof receiveExecuteSuccess>
-  | ReturnType<typeof receiveExecuteFailure>
   | ReturnType<typeof requestCompileAssembly>
   | ReturnType<typeof receiveCompileAssemblySuccess>
   | ReturnType<typeof receiveCompileAssemblyFailure>
@@ -1006,9 +789,6 @@ export type Action =
   | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof gotoPosition>
   | ReturnType<typeof selectText>
-  | ReturnType<typeof requestFormat>
-  | ReturnType<typeof receiveFormatSuccess>
-  | ReturnType<typeof receiveFormatFailure>
   | ReturnType<typeof requestClippy>
   | ReturnType<typeof receiveClippySuccess>
   | ReturnType<typeof receiveClippyFailure>
@@ -1018,12 +798,6 @@ export type Action =
   | ReturnType<typeof requestMacroExpansion>
   | ReturnType<typeof receiveMacroExpansionSuccess>
   | ReturnType<typeof receiveMacroExpansionFailure>
-  | ReturnType<typeof requestGistLoad>
-  | ReturnType<typeof receiveGistLoadSuccess>
-  | ReturnType<typeof receiveGistLoadFailure>
-  | ReturnType<typeof requestGistSave>
-  | ReturnType<typeof receiveGistSaveSuccess>
-  | ReturnType<typeof receiveGistSaveFailure>
   | ReturnType<typeof requestCratesLoad>
   | ReturnType<typeof receiveCratesLoadSuccess>
   | ReturnType<typeof requestVersionsLoad>
@@ -1031,10 +805,5 @@ export type Action =
   | ReturnType<typeof notificationSeen>
   | ReturnType<typeof browserWidthChanged>
   | ReturnType<typeof splitRatioChanged>
-  | ReturnType<typeof websocketError>
-  | ReturnType<typeof websocketConnected>
-  | ReturnType<typeof websocketDisconnected>
-  | ReturnType<typeof websocketFeatureFlagEnabled>
   | ReturnType<typeof wsExecuteRequest>
-  | WSExecuteResponse
   ;

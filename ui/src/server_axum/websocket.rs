@@ -13,16 +13,18 @@ use std::{
 };
 use tokio::{sync::mpsc, task::JoinSet};
 
+type Meta = serde_json::Value;
+
 #[derive(serde::Deserialize)]
 #[serde(tag = "type")]
 enum WSMessageRequest {
-    #[serde(rename = "WS_EXECUTE_REQUEST")]
-    WSExecuteRequest(WSExecuteRequest),
+    #[serde(rename = "output/execute/wsExecuteRequest")]
+    ExecuteRequest { payload: ExecuteRequest, meta: Meta },
 }
 
 #[derive(serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct WSExecuteRequest {
+struct ExecuteRequest {
     channel: String,
     mode: String,
     edition: String,
@@ -30,14 +32,13 @@ struct WSExecuteRequest {
     tests: bool,
     code: String,
     backtrace: bool,
-    extra: serde_json::Value,
 }
 
-impl TryFrom<WSExecuteRequest> for (sandbox::ExecuteRequest, serde_json::Value) {
+impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
     type Error = Error;
 
-    fn try_from(value: WSExecuteRequest) -> Result<Self, Self::Error> {
-        let WSExecuteRequest {
+    fn try_from(value: ExecuteRequest) -> Result<Self, Self::Error> {
+        let ExecuteRequest {
             channel,
             mode,
             edition,
@@ -45,10 +46,9 @@ impl TryFrom<WSExecuteRequest> for (sandbox::ExecuteRequest, serde_json::Value) 
             tests,
             code,
             backtrace,
-            extra,
         } = value;
 
-        let req = sandbox::ExecuteRequest {
+        Ok(sandbox::ExecuteRequest {
             channel: parse_channel(&channel)?,
             mode: parse_mode(&mode)?,
             edition: parse_edition(&edition)?,
@@ -56,19 +56,21 @@ impl TryFrom<WSExecuteRequest> for (sandbox::ExecuteRequest, serde_json::Value) 
             tests,
             backtrace,
             code,
-        };
-
-        Ok((req, extra))
+        })
     }
 }
 
 #[derive(Debug, serde::Serialize)]
 #[serde(tag = "type")]
-enum WSMessageResponse {
-    #[serde(rename = "WEBSOCKET_ERROR")]
-    Error(WSError),
-    #[serde(rename = "WS_EXECUTE_RESPONSE")]
-    WSExecuteResponse(WSExecuteResponse),
+enum MessageResponse {
+    #[serde(rename = "websocket/error")]
+    Error { payload: WSError, meta: Meta },
+
+    #[serde(rename = "output/execute/wsExecuteResponse")]
+    ExecuteResponse {
+        payload: ExecuteResponse,
+        meta: Meta,
+    },
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -79,27 +81,24 @@ struct WSError {
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-struct WSExecuteResponse {
+struct ExecuteResponse {
     success: bool,
     stdout: String,
     stderr: String,
-    extra: serde_json::Value,
 }
 
-impl From<(sandbox::ExecuteResponse, serde_json::Value)> for WSExecuteResponse {
-    fn from(value: (sandbox::ExecuteResponse, serde_json::Value)) -> Self {
+impl From<sandbox::ExecuteResponse> for ExecuteResponse {
+    fn from(value: sandbox::ExecuteResponse) -> Self {
         let sandbox::ExecuteResponse {
             success,
             stdout,
             stderr,
-        } = value.0;
-        let extra = value.1;
+        } = value;
 
-        WSExecuteResponse {
+        ExecuteResponse {
             success,
             stdout,
             stderr,
-            extra,
         }
     }
 }
@@ -173,12 +172,17 @@ pub async fn handle(mut socket: WebSocket) {
     DURATION_WS.observe(elapsed.as_secs_f64());
 }
 
-fn error_to_response(error: Error) -> WSMessageResponse {
+fn error_to_response(error: Error) -> MessageResponse {
     let error = error.to_string();
-    WSMessageResponse::Error(WSError { error })
+    // TODO: thread through the Meta from the originating request
+    let meta = serde_json::json!({ "sequenceNumber": -1 });
+    MessageResponse::Error {
+        payload: WSError { error },
+        meta,
+    }
 }
 
-fn response_to_message(response: WSMessageResponse) -> Message {
+fn response_to_message(response: MessageResponse) -> Message {
     const LAST_CHANCE_ERROR: &str =
         r#"{ "type": "WEBSOCKET_ERROR", "error": "Unable to serialize JSON" }"#;
     let resp = serde_json::to_string(&response).unwrap_or_else(|_| LAST_CHANCE_ERROR.into());
@@ -187,7 +191,7 @@ fn response_to_message(response: WSMessageResponse) -> Message {
 
 async fn handle_msg(
     txt: String,
-    tx: &mpsc::Sender<Result<WSMessageResponse>>,
+    tx: &mpsc::Sender<Result<MessageResponse>>,
     tasks: &mut JoinSet<Result<()>>,
 ) {
     use WSMessageRequest::*;
@@ -195,10 +199,11 @@ async fn handle_msg(
     let msg = serde_json::from_str(&txt).context(crate::DeserializationSnafu);
 
     match msg {
-        Ok(WSExecuteRequest(req)) => {
+        Ok(ExecuteRequest { payload, meta }) => {
             let tx = tx.clone();
             tasks.spawn(async move {
-                let resp = handle_execute(req).await;
+                let resp = handle_execute(payload).await;
+                let resp = resp.map(|payload| MessageResponse::ExecuteResponse { payload, meta });
                 tx.send(resp).await.ok(/* We don't care if the channel is closed */);
                 Ok(())
             });
@@ -210,10 +215,10 @@ async fn handle_msg(
     }
 }
 
-async fn handle_execute(req: WSExecuteRequest) -> Result<WSMessageResponse> {
+async fn handle_execute(req: ExecuteRequest) -> Result<ExecuteResponse> {
     let sb = Sandbox::new().await.context(SandboxCreationSnafu)?;
 
-    let (req, extra) = req.try_into()?;
+    let req = req.try_into()?;
     let resp = sb.execute(&req).await.context(ExecutionSnafu)?;
-    Ok(WSMessageResponse::WSExecuteResponse((resp, extra).into()))
+    Ok(resp.into())
 }
