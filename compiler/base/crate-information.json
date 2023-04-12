@@ -116,7 +116,7 @@
   },
   {
     "name": "bitflags",
-    "version": "2.0.2",
+    "version": "2.1.0",
     "id": "bitflags"
   },
   {
@@ -171,12 +171,12 @@
   },
   {
     "name": "clap",
-    "version": "4.2.0",
+    "version": "4.2.1",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.2.0",
+    "version": "4.2.1",
     "id": "clap_builder"
   },
   {
@@ -231,7 +231,7 @@
   },
   {
     "name": "crossbeam-channel",
-    "version": "0.5.7",
+    "version": "0.5.8",
     "id": "crossbeam_channel"
   },
   {
@@ -335,8 +335,13 @@
     "id": "fastrand"
   },
   {
+    "name": "fdeflate",
+    "version": "0.3.0",
+    "id": "fdeflate"
+  },
+  {
     "name": "filetime",
-    "version": "0.2.20",
+    "version": "0.2.21",
     "id": "filetime"
   },
   {
@@ -381,7 +386,7 @@
   },
   {
     "name": "futures",
-    "version": "0.3.27",
+    "version": "0.3.28",
     "id": "futures"
   },
   {
@@ -391,42 +396,42 @@
   },
   {
     "name": "futures-channel",
-    "version": "0.3.27",
+    "version": "0.3.28",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.3.27",
+    "version": "0.3.28",
     "id": "futures_core"
   },
   {
     "name": "futures-executor",
-    "version": "0.3.27",
+    "version": "0.3.28",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.3.27",
+    "version": "0.3.28",
     "id": "futures_io"
   },
   {
     "name": "futures-macro",
-    "version": "0.3.27",
+    "version": "0.3.28",
     "id": "futures_macro"
   },
   {
     "name": "futures-sink",
-    "version": "0.3.27",
+    "version": "0.3.28",
     "id": "futures_sink"
   },
   {
     "name": "futures-task",
-    "version": "0.3.27",
+    "version": "0.3.28",
     "id": "futures_task"
   },
   {
     "name": "futures-util",
-    "version": "0.3.27",
+    "version": "0.3.28",
     "id": "futures_util"
   },
   {
@@ -436,7 +441,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.2.8",
+    "version": "0.2.9",
     "id": "getrandom"
   },
   {
@@ -531,7 +536,7 @@
   },
   {
     "name": "iana-time-zone",
-    "version": "0.1.54",
+    "version": "0.1.56",
     "id": "iana_time_zone"
   },
   {
@@ -556,7 +561,7 @@
   },
   {
     "name": "io-lifetimes",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "id": "io_lifetimes"
   },
   {
@@ -571,7 +576,7 @@
   },
   {
     "name": "is-terminal",
-    "version": "0.4.6",
+    "version": "0.4.7",
     "id": "is_terminal"
   },
   {
@@ -601,7 +606,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.140",
+    "version": "0.2.141",
     "id": "libc"
   },
   {
@@ -621,13 +626,8 @@
   },
   {
     "name": "linux-raw-sys",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "id": "linux_raw_sys"
-  },
-  {
-    "name": "linux-raw-sys",
-    "version": "0.1.4",
-    "id": "linux_raw_sys_0_1_4"
   },
   {
     "name": "lock_api",
@@ -806,12 +806,12 @@
   },
   {
     "name": "openssl",
-    "version": "0.10.48",
+    "version": "0.10.50",
     "id": "openssl"
   },
   {
     "name": "openssl-macros",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "id": "openssl_macros"
   },
   {
@@ -821,7 +821,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.83",
+    "version": "0.9.85",
     "id": "openssl_sys"
   },
   {
@@ -911,7 +911,7 @@
   },
   {
     "name": "png",
-    "version": "0.17.7",
+    "version": "0.17.8",
     "id": "png"
   },
   {
@@ -941,7 +941,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.54",
+    "version": "1.0.56",
     "id": "proc_macro2"
   },
   {
@@ -1036,13 +1036,8 @@
   },
   {
     "name": "rustix",
-    "version": "0.37.4",
+    "version": "0.37.11",
     "id": "rustix"
-  },
-  {
-    "name": "rustix",
-    "version": "0.36.11",
-    "id": "rustix_0_36_11"
   },
   {
     "name": "ryu",
@@ -1076,12 +1071,12 @@
   },
   {
     "name": "serde",
-    "version": "1.0.159",
+    "version": "1.0.160",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.159",
+    "version": "1.0.160",
     "id": "serde_derive"
   },
   {
@@ -1126,7 +1121,7 @@
   },
   {
     "name": "simba",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "id": "simba"
   },
   {
@@ -1156,7 +1151,7 @@
   },
   {
     "name": "socket2",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "id": "socket2"
   },
   {
@@ -1166,7 +1161,7 @@
   },
   {
     "name": "spin",
-    "version": "0.9.7",
+    "version": "0.9.8",
     "id": "spin"
   },
   {
@@ -1201,7 +1196,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.11",
+    "version": "2.0.14",
     "id": "syn"
   },
   {
@@ -1231,7 +1226,7 @@
   },
   {
     "name": "terminal_size",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "id": "terminal_size"
   },
   {
@@ -1446,7 +1441,7 @@
   },
   {
     "name": "uuid",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "id": "uuid"
   },
   {
