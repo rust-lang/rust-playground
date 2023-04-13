@@ -31,18 +31,23 @@
   },
   {
     "name": "anstream",
-    "version": "0.2.6",
+    "version": "0.3.0",
     "id": "anstream"
   },
   {
     "name": "anstyle",
-    "version": "0.3.5",
+    "version": "1.0.0",
     "id": "anstyle"
   },
   {
     "name": "anstyle-parse",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "id": "anstyle_parse"
+  },
+  {
+    "name": "anstyle-query",
+    "version": "1.0.0",
+    "id": "anstyle_query"
   },
   {
     "name": "anyhow",
@@ -171,12 +176,12 @@
   },
   {
     "name": "clap",
-    "version": "4.2.1",
+    "version": "4.2.2",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.2.1",
+    "version": "4.2.2",
     "id": "clap_builder"
   },
   {
@@ -195,14 +200,9 @@
     "id": "color_quant"
   },
   {
-    "name": "concolor-override",
+    "name": "colorchoice",
     "version": "1.0.0",
-    "id": "concolor_override"
-  },
-  {
-    "name": "concolor-query",
-    "version": "0.3.3",
-    "id": "concolor_query"
+    "id": "colorchoice"
   },
   {
     "name": "cookie",
@@ -461,7 +461,7 @@
   },
   {
     "name": "h2",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "id": "h2"
   },
   {
@@ -1081,7 +1081,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.95",
+    "version": "1.0.96",
     "id": "serde_json"
   },
   {
@@ -1196,7 +1196,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.14",
+    "version": "2.0.15",
     "id": "syn"
   },
   {
