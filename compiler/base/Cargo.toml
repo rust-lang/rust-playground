@@ -40,6 +40,11 @@ default-features = false
 
 [dependencies.aho_corasick]
 package = "aho-corasick"
+version = "=1.0.0"
+features = ["perf-literal", "std"]
+
+[dependencies.aho_corasick_0_7_20]
+package = "aho-corasick"
 version = "=0.7.20"
 features = ["std"]
 
@@ -181,13 +186,13 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [dependencies.clap]
 package = "clap"
-version = "=4.2.2"
+version = "=4.2.3"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.2.2"
-features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
+version = "=4.2.3"
+features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-styles", "usage", "wrap_help"]
 default-features = false
 
 [dependencies.clap_derive]
@@ -448,7 +453,7 @@ version = "=0.3.1"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.3.17"
+version = "=0.3.18"
 
 [dependencies.half]
 package = "half"
@@ -504,7 +509,7 @@ version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=0.14.25"
+version = "=0.14.26"
 features = ["client", "full", "h2", "http1", "http2", "runtime", "server", "socket2", "stream", "tcp"]
 
 [dependencies.hyper_tls]
@@ -594,7 +599,7 @@ version = "=0.5.6"
 
 [dependencies.linux_raw_sys]
 package = "linux-raw-sys"
-version = "=0.3.1"
+version = "=0.3.2"
 features = ["errno", "general", "ioctl", "no_std"]
 default-features = false
 
@@ -967,7 +972,7 @@ features = ["array", "backup", "blob", "bundled", "bundled-full", "chrono", "col
 
 [dependencies.rustc_demangle]
 package = "rustc-demangle"
-version = "=0.1.22"
+version = "=0.1.23"
 
 [dependencies.rustc_version]
 package = "rustc_version"
@@ -975,7 +980,7 @@ version = "=0.4.0"
 
 [dependencies.rustix]
 package = "rustix"
-version = "=0.37.11"
+version = "=0.37.12"
 features = ["fs", "io-lifetimes", "libc", "std", "termios", "use-libc-auxv"]
 
 [dependencies.ryu]
@@ -1415,6 +1420,11 @@ default-features = false
 
 [build_dependencies.aho_corasick]
 package = "aho-corasick"
+version = "=1.0.0"
+features = ["perf-literal", "std"]
+
+[build_dependencies.aho_corasick_0_7_20]
+package = "aho-corasick"
 version = "=0.7.20"
 features = ["std"]
 
@@ -1556,13 +1566,13 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [build_dependencies.clap]
 package = "clap"
-version = "=4.2.2"
+version = "=4.2.3"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build_dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.2.2"
-features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
+version = "=4.2.3"
+features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-styles", "usage", "wrap_help"]
 default-features = false
 
 [build_dependencies.clap_derive]
@@ -1823,7 +1833,7 @@ version = "=0.3.1"
 
 [build_dependencies.h2]
 package = "h2"
-version = "=0.3.17"
+version = "=0.3.18"
 
 [build_dependencies.half]
 package = "half"
@@ -1879,7 +1889,7 @@ version = "=2.1.0"
 
 [build_dependencies.hyper]
 package = "hyper"
-version = "=0.14.25"
+version = "=0.14.26"
 features = ["client", "full", "h2", "http1", "http2", "runtime", "server", "socket2", "stream", "tcp"]
 
 [build_dependencies.hyper_tls]
@@ -1969,7 +1979,7 @@ version = "=0.5.6"
 
 [build_dependencies.linux_raw_sys]
 package = "linux-raw-sys"
-version = "=0.3.1"
+version = "=0.3.2"
 features = ["errno", "general", "ioctl", "no_std"]
 default-features = false
 
@@ -2342,7 +2352,7 @@ features = ["array", "backup", "blob", "bundled", "bundled-full", "chrono", "col
 
 [build_dependencies.rustc_demangle]
 package = "rustc-demangle"
-version = "=0.1.22"
+version = "=0.1.23"
 
 [build_dependencies.rustc_version]
 package = "rustc_version"
@@ -2350,7 +2360,7 @@ version = "=0.4.0"
 
 [build_dependencies.rustix]
 package = "rustix"
-version = "=0.37.11"
+version = "=0.37.12"
 features = ["fs", "io-lifetimes", "libc", "std", "termios", "use-libc-auxv"]
 
 [build_dependencies.ryu]
