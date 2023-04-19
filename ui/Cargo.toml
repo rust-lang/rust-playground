@@ -14,7 +14,7 @@ axum = { version = "0.6", features = ["headers", "ws"] }
 dotenv = "0.15.0"
 futures = "0.3.21"
 lazy_static = "1.0.0"
-octocrab = "0.19"
+octocrab = "0.20"
 openssl-probe = "0.1.2"
 petgraph = "0.6.0"
 prometheus = "0.13.0"

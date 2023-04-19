@@ -14,7 +14,7 @@ impl From<octocrab::models::gists::Gist> for Gist {
         let mut files: Vec<_> = other
             .files
             .into_iter()
-            .map(|(name, file)| (name, file.content))
+            .map(|(name, file)| (name, file.content.unwrap_or_default()))
             .collect();
 
         files.sort_by(|(name1, _), (name2, _)| name1.cmp(name2));
