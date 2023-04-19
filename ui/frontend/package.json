@@ -4,7 +4,7 @@
   "description": "UI for the Rust playground",
   "main": "index.js",
   "dependencies": {
-    "@floating-ui/react": "^0.22.2",
+    "@floating-ui/react": "^0.23.0",
     "@reduxjs/toolkit": "^1.8.5",
     "ace-builds": "^1.4.4",
     "common-tags": "^1.8.0",
