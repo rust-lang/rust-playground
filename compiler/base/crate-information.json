@@ -21,8 +21,13 @@
   },
   {
     "name": "aho-corasick",
-    "version": "0.7.20",
+    "version": "1.0.0",
     "id": "aho_corasick"
+  },
+  {
+    "name": "aho-corasick",
+    "version": "0.7.20",
+    "id": "aho_corasick_0_7_20"
   },
   {
     "name": "ansi_term",
@@ -176,12 +181,12 @@
   },
   {
     "name": "clap",
-    "version": "4.2.2",
+    "version": "4.2.3",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.2.2",
+    "version": "4.2.3",
     "id": "clap_builder"
   },
   {
@@ -461,7 +466,7 @@
   },
   {
     "name": "h2",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "id": "h2"
   },
   {
@@ -526,7 +531,7 @@
   },
   {
     "name": "hyper",
-    "version": "0.14.25",
+    "version": "0.14.26",
     "id": "hyper"
   },
   {
@@ -626,7 +631,7 @@
   },
   {
     "name": "linux-raw-sys",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "id": "linux_raw_sys"
   },
   {
@@ -1026,7 +1031,7 @@
   },
   {
     "name": "rustc-demangle",
-    "version": "0.1.22",
+    "version": "0.1.23",
     "id": "rustc_demangle"
   },
   {
@@ -1036,7 +1041,7 @@
   },
   {
     "name": "rustix",
-    "version": "0.37.11",
+    "version": "0.37.12",
     "id": "rustix"
   },
   {
