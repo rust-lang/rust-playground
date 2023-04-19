@@ -6,18 +6,18 @@ const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-const glob = require('glob');
+const { globSync } = require('glob');
 const basename = require('basename');
 
 const thisPackage = require('./package.json');
 const devDependencies = Object.keys(thisPackage.devDependencies);
 
 const allKeybindingNames =
-      glob.sync('./node_modules/ace-builds/src-noconflict/keybinding-*.js')
+      globSync('./node_modules/ace-builds/src-noconflict/keybinding-*.js')
       .map(basename)
       .map(n => n.replace(/^keybinding-/, ''));
 const allThemeNames =
-      glob.sync('./node_modules/ace-builds/src-noconflict/theme-*.js')
+      globSync('./node_modules/ace-builds/src-noconflict/theme-*.js')
       .map(basename)
       .map(n => n.replace(/^theme-/, ''));
 
