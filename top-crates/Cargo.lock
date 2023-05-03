@@ -173,9 +173,9 @@ checksum = "38fcc2979eff34a4b84e1cf9a1e3da42a7d44b3b690a40cdcb23e3d556cfb2e5"
 
 [[package]]
 name = "cargo"
-version = "0.69.1"
+version = "0.70.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ecf1ab9246253733b30352b5194b4c3a7038a1c7729e1a18b3ba00e479c4d54"
+checksum = "798a2174afcd5e45e75aa8b82a84dc6ab086a7abe4b4ae7991ada37a9fff6dbb"
 dependencies = [
  "anyhow",
  "base64 0.13.1",
@@ -214,7 +214,6 @@ dependencies = [
  "os_info",
  "pasetors",
  "pathdiff",
- "percent-encoding",
  "rustc-workspace-hack",
  "rustfix",
  "semver",
@@ -229,12 +228,13 @@ dependencies = [
  "tempfile",
  "termcolor",
  "time",
- "toml_edit 0.15.0",
+ "toml",
+ "toml_edit",
  "unicode-width",
  "unicode-xid",
  "url",
  "walkdir",
- "winapi",
+ "windows-sys 0.45.0",
 ]
 
 [[package]]
@@ -318,16 +318,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
 
 [[package]]
-name = "combine"
-version = "4.6.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35ed6e9d84f0b51a7f52daf1c7d71dd136fd7a3f41a8462b8cdb8c78d920fad4"
-dependencies = [
- "bytes",
- "memchr",
-]
-
-[[package]]
 name = "commoncrypto"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -378,9 +368,9 @@ dependencies = [
 
 [[package]]
 name = "crates-io"
-version = "0.35.1"
+version = "0.36.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2dfb6077da60207264ab2eb0e3734f02e0a0c50c347b32c728e42c6fbbf7e2e"
+checksum = "1ab9973744e6d1f35e47df29ad99f9bb6a8270e8feaea79c5a5f1febb4c99f1b"
 dependencies = [
  "anyhow",
  "curl",
@@ -1087,15 +1077,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "445dde2150c55e483f3d8416706b97ec8e8237c307e5b7b4b8dd15e6af2a0730"
 dependencies = [
  "wasm-bindgen",
-]
-
-[[package]]
-name = "kstring"
-version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec3066350882a1cd6d950d055997f379ac37fd39f81cd4d8ed186032eb3c5747"
-dependencies = [
- "static_assertions",
 ]
 
 [[package]]
@@ -1831,12 +1812,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "static_assertions"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
-
-[[package]]
 name = "strip-ansi-escapes"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2011,17 +1986,8 @@ checksum = "b403acf6f2bb0859c93c7f0d967cb4a75a7ac552100f9322faf64dc047669b21"
 dependencies = [
  "serde",
  "serde_spanned",
- "toml_datetime 0.6.1",
- "toml_edit 0.19.8",
-]
-
-[[package]]
-name = "toml_datetime"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4553f467ac8e3d374bc9a177a26801e5d0f9b211aa1673fb137a403afd1c9cf5"
-dependencies = [
- "serde",
+ "toml_datetime",
+ "toml_edit",
 ]
 
 [[package]]
@@ -2035,20 +2001,6 @@ dependencies = [
 
 [[package]]
 name = "toml_edit"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1541ba70885967e662f69d31ab3aeca7b1aaecfcd58679590b893e9239c3646"
-dependencies = [
- "combine",
- "indexmap",
- "itertools",
- "kstring",
- "serde",
- "toml_datetime 0.5.1",
-]
-
-[[package]]
-name = "toml_edit"
 version = "0.19.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "239410c8609e8125456927e6707163a3b1fdb40561e4b803bc041f466ccfdc13"
@@ -2056,7 +2008,7 @@ dependencies = [
  "indexmap",
  "serde",
  "serde_spanned",
- "toml_datetime 0.6.1",
+ "toml_datetime",
  "winnow",
 ]
 
