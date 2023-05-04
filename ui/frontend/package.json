@@ -4,7 +4,7 @@
   "description": "UI for the Rust playground",
   "main": "index.js",
   "dependencies": {
-    "@floating-ui/react": "^0.23.0",
+    "@floating-ui/react": "^0.24.0",
     "@reduxjs/toolkit": "^1.8.5",
     "ace-builds": "^1.4.4",
     "common-tags": "^1.8.0",
@@ -83,6 +83,10 @@
     "typescript-plugin-css-modules": "^5.0.0",
     "webpack": "^5.24.3",
     "webpack-cli": "^5.0.1"
+  },
+  "resolutions": {
+    "//": "https://github.com/isaacs/jackspeak/issues/5",
+    "jackspeak": "2.0.3"
   },
   "engines": {
     "node": "^18.14"

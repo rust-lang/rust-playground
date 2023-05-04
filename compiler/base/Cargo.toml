@@ -10,6 +10,7 @@ incremental = false
 
 [profile.dev.build-override]
 codegen-units = 1
+debug = true
 
 [profile.release]
 codegen-units = 1
@@ -17,6 +18,7 @@ incremental = false
 
 [profile.release.build-override]
 codegen-units = 1
+debug = false
 
 [dependencies.addr2line]
 package = "addr2line"
@@ -40,13 +42,8 @@ default-features = false
 
 [dependencies.aho_corasick]
 package = "aho-corasick"
-version = "=1.0.0"
+version = "=1.0.1"
 features = ["perf-literal", "std"]
-
-[dependencies.aho_corasick_0_7_20]
-package = "aho-corasick"
-version = "=0.7.20"
-features = ["std"]
 
 [dependencies.ansi_term]
 package = "ansi_term"
@@ -54,7 +51,7 @@ version = "=0.12.1"
 
 [dependencies.anstream]
 package = "anstream"
-version = "=0.3.0"
+version = "=0.3.2"
 features = ["auto", "wincon"]
 
 [dependencies.anstyle]
@@ -73,7 +70,7 @@ version = "=1.0.0"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.70"
+version = "=1.0.71"
 features = ["std"]
 
 [dependencies.approx]
@@ -138,7 +135,7 @@ default-features = false
 
 [dependencies.bitflags]
 package = "bitflags"
-version = "=2.1.0"
+version = "=2.2.1"
 
 [dependencies.bitflags_1_3_2]
 package = "bitflags"
@@ -186,12 +183,12 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [dependencies.clap]
 package = "clap"
-version = "=4.2.3"
+version = "=4.2.7"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.2.3"
+version = "=4.2.7"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-styles", "usage", "wrap_help"]
 default-features = false
 
@@ -222,7 +219,7 @@ version = "=0.16.1"
 
 [dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.2.6"
+version = "=0.2.7"
 
 [dependencies.crc32fast]
 package = "crc32fast"
@@ -347,7 +344,7 @@ default-features = false
 
 [dependencies.flate2]
 package = "flate2"
-version = "=1.0.25"
+version = "=1.0.26"
 features = ["miniz_oxide", "rust_backend"]
 
 [dependencies.flume]
@@ -581,7 +578,7 @@ version = "=0.5.2"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.141"
+version = "=0.2.142"
 features = ["extra_traits", "std"]
 
 [dependencies.libm]
@@ -599,7 +596,7 @@ version = "=0.5.6"
 
 [dependencies.linux_raw_sys]
 package = "linux-raw-sys"
-version = "=0.3.2"
+version = "=0.3.7"
 features = ["errno", "general", "ioctl", "no_std"]
 default-features = false
 
@@ -639,7 +636,7 @@ version = "=0.1.10"
 
 [dependencies.matrixmultiply]
 package = "matrixmultiply"
-version = "=0.3.2"
+version = "=0.3.7"
 features = ["cgemm", "std"]
 
 [dependencies.md5]
@@ -774,7 +771,7 @@ features = ["alloc", "race", "std", "unstable"]
 
 [dependencies.openssl]
 package = "openssl"
-version = "=0.10.50"
+version = "=0.10.52"
 
 [dependencies.openssl_macros]
 package = "openssl-macros"
@@ -786,7 +783,7 @@ version = "=0.1.5"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.85"
+version = "=0.9.87"
 
 [dependencies.ordered_float]
 package = "ordered-float"
@@ -862,7 +859,7 @@ version = "=0.1.0"
 
 [dependencies.pkg_config]
 package = "pkg-config"
-version = "=0.3.26"
+version = "=0.3.27"
 
 [dependencies.png]
 package = "png"
@@ -947,17 +944,17 @@ version = "=1.11.0"
 
 [dependencies.regex]
 package = "regex"
-version = "=1.7.3"
+version = "=1.8.1"
 features = ["aho-corasick", "memchr", "perf", "perf-cache", "perf-dfa", "perf-inline", "perf-literal", "std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
 [dependencies.regex_syntax]
 package = "regex-syntax"
-version = "=0.6.29"
-features = ["unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
+version = "=0.7.1"
+features = ["std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.11.16"
+version = "=0.11.17"
 features = ["__tls", "blocking", "cookie_crate", "cookie_store", "cookies", "default-tls", "hyper-tls", "json", "mime_guess", "multipart", "native-tls-crate", "serde_json", "tokio-native-tls"]
 
 [dependencies.ring]
@@ -980,7 +977,7 @@ version = "=0.4.0"
 
 [dependencies.rustix]
 package = "rustix"
-version = "=0.37.12"
+version = "=0.37.19"
 features = ["fs", "io-lifetimes", "libc", "std", "termios", "use-libc-auxv"]
 
 [dependencies.ryu]
@@ -1213,7 +1210,7 @@ version = "=0.1.1"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.27.0"
+version = "=1.28.0"
 features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "windows-sys"]
 
 [dependencies.tokio_io]
@@ -1222,7 +1219,7 @@ version = "=0.1.13"
 
 [dependencies.tokio_macros]
 package = "tokio-macros"
-version = "=2.0.0"
+version = "=2.1.0"
 
 [dependencies.tokio_native_tls]
 package = "tokio-native-tls"
@@ -1235,7 +1232,7 @@ features = ["runtime"]
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.7"
+version = "=0.7.8"
 features = ["codec", "tracing"]
 
 [dependencies.toml]
@@ -1264,7 +1261,7 @@ features = ["attributes", "std", "tracing-attributes"]
 
 [dependencies.tracing_attributes]
 package = "tracing-attributes"
-version = "=0.1.23"
+version = "=0.1.24"
 
 [dependencies.tracing_core]
 package = "tracing-core"
@@ -1339,7 +1336,7 @@ version = "=0.2.1"
 
 [dependencies.uuid]
 package = "uuid"
-version = "=1.3.1"
+version = "=1.3.2"
 features = ["atomic", "getrandom", "md-5", "md5", "rng", "serde", "sha1", "sha1_smol", "std", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [dependencies.vcpkg]
@@ -1376,7 +1373,7 @@ features = ["basetsd", "consoleapi", "errhandlingapi", "fileapi", "handleapi", "
 
 [dependencies.winnow]
 package = "winnow"
-version = "=0.4.1"
+version = "=0.4.6"
 features = ["alloc", "std"]
 
 [dependencies.xattr]
@@ -1394,7 +1391,7 @@ version = "=0.4.5"
 
 [dependencies.zune_inflate]
 package = "zune-inflate"
-version = "=0.2.53"
+version = "=0.2.54"
 features = ["simd-adler32", "zlib"]
 default-features = false
 
@@ -1420,13 +1417,8 @@ default-features = false
 
 [build_dependencies.aho_corasick]
 package = "aho-corasick"
-version = "=1.0.0"
+version = "=1.0.1"
 features = ["perf-literal", "std"]
-
-[build_dependencies.aho_corasick_0_7_20]
-package = "aho-corasick"
-version = "=0.7.20"
-features = ["std"]
 
 [build_dependencies.ansi_term]
 package = "ansi_term"
@@ -1434,7 +1426,7 @@ version = "=0.12.1"
 
 [build_dependencies.anstream]
 package = "anstream"
-version = "=0.3.0"
+version = "=0.3.2"
 features = ["auto", "wincon"]
 
 [build_dependencies.anstyle]
@@ -1453,7 +1445,7 @@ version = "=1.0.0"
 
 [build_dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.70"
+version = "=1.0.71"
 features = ["std"]
 
 [build_dependencies.approx]
@@ -1518,7 +1510,7 @@ default-features = false
 
 [build_dependencies.bitflags]
 package = "bitflags"
-version = "=2.1.0"
+version = "=2.2.1"
 
 [build_dependencies.bitflags_1_3_2]
 package = "bitflags"
@@ -1566,12 +1558,12 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [build_dependencies.clap]
 package = "clap"
-version = "=4.2.3"
+version = "=4.2.7"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build_dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.2.3"
+version = "=4.2.7"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-styles", "usage", "wrap_help"]
 default-features = false
 
@@ -1602,7 +1594,7 @@ version = "=0.16.1"
 
 [build_dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.2.6"
+version = "=0.2.7"
 
 [build_dependencies.crc32fast]
 package = "crc32fast"
@@ -1727,7 +1719,7 @@ default-features = false
 
 [build_dependencies.flate2]
 package = "flate2"
-version = "=1.0.25"
+version = "=1.0.26"
 features = ["miniz_oxide", "rust_backend"]
 
 [build_dependencies.flume]
@@ -1961,7 +1953,7 @@ version = "=0.5.2"
 
 [build_dependencies.libc]
 package = "libc"
-version = "=0.2.141"
+version = "=0.2.142"
 features = ["extra_traits", "std"]
 
 [build_dependencies.libm]
@@ -1979,7 +1971,7 @@ version = "=0.5.6"
 
 [build_dependencies.linux_raw_sys]
 package = "linux-raw-sys"
-version = "=0.3.2"
+version = "=0.3.7"
 features = ["errno", "general", "ioctl", "no_std"]
 default-features = false
 
@@ -2019,7 +2011,7 @@ version = "=0.1.10"
 
 [build_dependencies.matrixmultiply]
 package = "matrixmultiply"
-version = "=0.3.2"
+version = "=0.3.7"
 features = ["cgemm", "std"]
 
 [build_dependencies.md5]
@@ -2154,7 +2146,7 @@ features = ["alloc", "race", "std", "unstable"]
 
 [build_dependencies.openssl]
 package = "openssl"
-version = "=0.10.50"
+version = "=0.10.52"
 
 [build_dependencies.openssl_macros]
 package = "openssl-macros"
@@ -2166,7 +2158,7 @@ version = "=0.1.5"
 
 [build_dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.85"
+version = "=0.9.87"
 
 [build_dependencies.ordered_float]
 package = "ordered-float"
@@ -2242,7 +2234,7 @@ version = "=0.1.0"
 
 [build_dependencies.pkg_config]
 package = "pkg-config"
-version = "=0.3.26"
+version = "=0.3.27"
 
 [build_dependencies.png]
 package = "png"
@@ -2327,17 +2319,17 @@ version = "=1.11.0"
 
 [build_dependencies.regex]
 package = "regex"
-version = "=1.7.3"
+version = "=1.8.1"
 features = ["aho-corasick", "memchr", "perf", "perf-cache", "perf-dfa", "perf-inline", "perf-literal", "std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
 [build_dependencies.regex_syntax]
 package = "regex-syntax"
-version = "=0.6.29"
-features = ["unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
+version = "=0.7.1"
+features = ["std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
 [build_dependencies.reqwest]
 package = "reqwest"
-version = "=0.11.16"
+version = "=0.11.17"
 features = ["__tls", "blocking", "cookie_crate", "cookie_store", "cookies", "default-tls", "hyper-tls", "json", "mime_guess", "multipart", "native-tls-crate", "serde_json", "tokio-native-tls"]
 
 [build_dependencies.ring]
@@ -2360,7 +2352,7 @@ version = "=0.4.0"
 
 [build_dependencies.rustix]
 package = "rustix"
-version = "=0.37.12"
+version = "=0.37.19"
 features = ["fs", "io-lifetimes", "libc", "std", "termios", "use-libc-auxv"]
 
 [build_dependencies.ryu]
@@ -2593,7 +2585,7 @@ version = "=0.1.1"
 
 [build_dependencies.tokio]
 package = "tokio"
-version = "=1.27.0"
+version = "=1.28.0"
 features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "windows-sys"]
 
 [build_dependencies.tokio_io]
@@ -2602,7 +2594,7 @@ version = "=0.1.13"
 
 [build_dependencies.tokio_macros]
 package = "tokio-macros"
-version = "=2.0.0"
+version = "=2.1.0"
 
 [build_dependencies.tokio_native_tls]
 package = "tokio-native-tls"
@@ -2615,7 +2607,7 @@ features = ["runtime"]
 
 [build_dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.7"
+version = "=0.7.8"
 features = ["codec", "tracing"]
 
 [build_dependencies.toml]
@@ -2644,7 +2636,7 @@ features = ["attributes", "std", "tracing-attributes"]
 
 [build_dependencies.tracing_attributes]
 package = "tracing-attributes"
-version = "=0.1.23"
+version = "=0.1.24"
 
 [build_dependencies.tracing_core]
 package = "tracing-core"
@@ -2719,7 +2711,7 @@ version = "=0.2.1"
 
 [build_dependencies.uuid]
 package = "uuid"
-version = "=1.3.1"
+version = "=1.3.2"
 features = ["atomic", "getrandom", "md-5", "md5", "rng", "serde", "sha1", "sha1_smol", "std", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [build_dependencies.vcpkg]
@@ -2756,7 +2748,7 @@ features = ["basetsd", "consoleapi", "errhandlingapi", "fileapi", "handleapi", "
 
 [build_dependencies.winnow]
 package = "winnow"
-version = "=0.4.1"
+version = "=0.4.6"
 features = ["alloc", "std"]
 
 [build_dependencies.xattr]
@@ -2774,6 +2766,6 @@ version = "=0.4.5"
 
 [build_dependencies.zune_inflate]
 package = "zune-inflate"
-version = "=0.2.53"
+version = "=0.2.54"
 features = ["simd-adler32", "zlib"]
 default-features = false

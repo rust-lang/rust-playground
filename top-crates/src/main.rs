@@ -32,6 +32,7 @@ struct TomlPackage {
 #[serde(rename_all = "kebab-case")]
 struct BuildOverride {
     codegen_units: u32,
+    debug: bool,
 }
 
 /// A profile section in a Cargo.toml file
@@ -71,12 +72,18 @@ fn main() {
             dev: Profile {
                 codegen_units: 1,
                 incremental: false,
-                build_override: BuildOverride { codegen_units: 1 },
+                build_override: BuildOverride {
+                    codegen_units: 1,
+                    debug: true,
+                },
             },
             release: Profile {
                 codegen_units: 1,
                 incremental: false,
-                build_override: BuildOverride { codegen_units: 1 },
+                build_override: BuildOverride {
+                    codegen_units: 1,
+                    debug: false,
+                },
             },
         },
         dependencies: dependencies.clone(),
