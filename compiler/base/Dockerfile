@@ -20,6 +20,13 @@ RUN apt-get update && apt-get install -y \
 
 RUN useradd -m playground -d /playground
 RUN usermod -p '!!' root # Disable all passwords for root
+
+# Attach the security note
+ADD --chown=playground attach_notice.sh security_notice.txt /playground/
+RUN /playground/attach_notice.sh /playground/security_notice.txt /etc/passwd && \
+    /playground/attach_notice.sh /playground/security_notice.txt /etc/shadow && \
+    rm -f /playground/attach_notice.sh
+
 USER playground
 ENV USER=playground
 ENV PATH=/playground/.cargo/bin:$PATH
