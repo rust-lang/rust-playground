@@ -288,6 +288,7 @@ workflows:
                 docker
                 run
                 --rm
+                -v $PWD/compiler/base/modify-cargo-toml:/compiler/base/modify-cargo-toml
                 -v $PWD/ui:/ui
                 -v ~/.cargo/git:/root/.cargo/git
                 -v ~/.cargo/registry:/root/.cargo/registry
