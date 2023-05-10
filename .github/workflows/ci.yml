@@ -185,7 +185,7 @@ jobs:
       run: cargo fmt --manifest-path top-crates/Cargo.toml --check
     - name: Build backend
       run: |-
-        mkdir -p ui/target; docker run --rm -v $PWD/compiler/base/modify-cargo-toml:/compiler/base/modify-cargo-toml -v $PWD/ui:/ui -v ~/.cargo/git:/root/.cargo/git -v ~/.cargo/registry:/root/.cargo/registry --workdir /ui rust:alpine sh -c '
+        mkdir -p ui/target; docker run --rm -v $PWD/compiler/base/asm-cleanup:/compiler/base/asm-cleanup -v $PWD/compiler/base/modify-cargo-toml:/compiler/base/modify-cargo-toml -v $PWD/ui:/ui -v ~/.cargo/git:/root/.cargo/git -v ~/.cargo/registry:/root/.cargo/registry --workdir /ui rust:alpine sh -c '
           apk add musl-dev openssl-dev openssl-libs-static
 
           # Adding -C relocation-model=static due to

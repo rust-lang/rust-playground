@@ -48,6 +48,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bddcadddf5e9015d310179a59bb28c4d4b9920ad0f11e8e14dbadf654890c9a6"
 
 [[package]]
+name = "asm-cleanup"
+version = "0.1.0"
+dependencies = [
+ "lazy_static",
+ "petgraph",
+ "regex",
+ "rustc-demangle",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.68"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1695,6 +1705,7 @@ checksum = "497961ef93d974e23eb6f433eb5fe1b7930b659f06d12dec6fc44a8f554c0bba"
 name = "ui"
 version = "0.1.0"
 dependencies = [
+ "asm-cleanup",
  "async-trait",
  "axum",
  "dotenv",
@@ -1702,10 +1713,8 @@ dependencies = [
  "lazy_static",
  "octocrab",
  "openssl-probe",
- "petgraph",
  "prometheus",
  "regex",
- "rustc-demangle",
  "serde",
  "serde_derive",
  "serde_json",

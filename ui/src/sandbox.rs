@@ -314,11 +314,11 @@ impl Sandbox {
 
         if let CompileTarget::Assembly(_, demangle, process) = req.target {
             if demangle == DemangleAssembly::Demangle {
-                code = crate::asm_cleanup::demangle_asm(&code);
+                code = asm_cleanup::demangle_asm(&code);
             }
 
             if process == ProcessAssembly::Filter {
-                code = crate::asm_cleanup::filter_asm(&code);
+                code = asm_cleanup::filter_asm(&code);
             }
         } else if CompileTarget::Hir == req.target {
             // TODO: Run rustfmt on the generated HIR.

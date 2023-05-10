@@ -9,6 +9,7 @@ default = ['fork-bomb-prevention']
 fork-bomb-prevention = []
 
 [dependencies]
+asm-cleanup = { path = "../compiler/base/asm-cleanup" }
 async-trait = "0.1.52"
 axum = { version = "0.6", features = ["headers", "ws"] }
 dotenv = "0.15.0"
@@ -16,10 +17,8 @@ futures = "0.3.21"
 lazy_static = "1.0.0"
 octocrab = "0.25"
 openssl-probe = "0.1.2"
-petgraph = "0.6.0"
 prometheus = "0.13.0"
 regex = "1.0.0"
-rustc-demangle = "0.1.5"
 serde = { version = "1.0", features = ["rc"] }
 serde_derive = "1.0"
 serde_json = "1.0"

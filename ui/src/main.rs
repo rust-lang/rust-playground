@@ -14,7 +14,6 @@ use tracing::{error, info, warn};
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
 
-mod asm_cleanup;
 mod env;
 mod gist;
 mod metrics;
