@@ -4,29 +4,49 @@ import { z } from 'zod';
 import { wsExecuteResponseSchema } from './reducers/output/execute';
 import {
   websocketConnected,
+  websocketConnectedSchema,
   websocketDisconnected,
   websocketError,
   websocketErrorSchema,
 } from './reducers/websocket';
 
 const WSMessageResponse = z.discriminatedUnion('type', [
+  websocketConnectedSchema,
   websocketErrorSchema,
   wsExecuteResponseSchema,
 ]);
 
-const reportWebSocketError = async (error: string) => {
-  try {
-    await fetch('/nowebsocket', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ error }),
-    });
-  } catch (reportError) {
-    console.log('Unable to report WebSocket error', error, reportError);
-  }
-};
+const reportWebSocketError = (() => {
+  let lastReport: string | undefined;
+  let lastReportTime = 0;
+
+  return async (error: string) => {
+    // Don't worry about reporting the same thing again.
+    if (lastReport === error) {
+      return;
+    }
+    lastReport = error;
+
+    // Don't worry about spamming the server with reports.
+    const now = Date.now();
+    if (now - lastReportTime < 1000) {
+      return;
+    }
+    lastReportTime = now;
+
+    try {
+      await fetch('/nowebsocket', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ error }),
+      });
+    } catch (reportError) {
+      console.log('Unable to report WebSocket error', error, reportError);
+    }
+  };
+})();
 
 const openWebSocket = (currentLocation: Location) => {
   try {
@@ -76,9 +96,9 @@ export const websocketMiddleware =
         resetTimeout();
 
         socket.addEventListener('open', () => {
-          store.dispatch(websocketConnected());
-
-          wasConnected = true;
+          if (socket) {
+            socket.send(JSON.stringify(websocketConnected()));
+          }
         });
 
         socket.addEventListener('close', (event) => {
@@ -86,8 +106,6 @@ export const websocketMiddleware =
 
           // Reconnect if we've previously connected
           if (wasConnected && !event.wasClean) {
-            wasConnected = false;
-            reconnectAttempt = 0;
             reconnect();
           }
         });
@@ -104,6 +122,12 @@ export const websocketMiddleware =
           try {
             const rawMessage = JSON.parse(event.data);
             const message = WSMessageResponse.parse(rawMessage);
+
+            if (websocketConnected.match(message)) {
+              wasConnected = true;
+              reconnectAttempt = 0;
+            }
+
             store.dispatch(message);
             resetTimeout();
           } catch (e) {
@@ -114,15 +138,10 @@ export const websocketMiddleware =
     };
 
     const reconnect = () => {
-      if (socket && socket.readyState == socket.OPEN) {
-        return;
-      }
-
-      connect();
-
       const delay = backoffMs(reconnectAttempt);
       reconnectAttempt += 1;
-      setTimeout(reconnect, delay);
+
+      window.setTimeout(connect, delay);
     };
 
     connect();
