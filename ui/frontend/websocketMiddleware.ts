@@ -16,19 +16,37 @@ const WSMessageResponse = z.discriminatedUnion('type', [
   wsExecuteResponseSchema,
 ]);
 
-const reportWebSocketError = async (error: string) => {
-  try {
-    await fetch('/nowebsocket', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ error }),
-    });
-  } catch (reportError) {
-    console.log('Unable to report WebSocket error', error, reportError);
-  }
-};
+const reportWebSocketError = (() => {
+  let lastReport: string | undefined;
+  let lastReportTime = 0;
+
+  return async (error: string) => {
+    // Don't worry about reporting the same thing again.
+    if (lastReport === error) {
+      return;
+    }
+    lastReport = error;
+
+    // Don't worry about spamming the server with reports.
+    const now = Date.now();
+    if (now - lastReportTime < 1000) {
+      return;
+    }
+    lastReportTime = now;
+
+    try {
+      await fetch('/nowebsocket', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ error }),
+      });
+    } catch (reportError) {
+      console.log('Unable to report WebSocket error', error, reportError);
+    }
+  };
+})();
 
 const openWebSocket = (currentLocation: Location) => {
   try {
