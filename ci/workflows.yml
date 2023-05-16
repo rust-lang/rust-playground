@@ -263,11 +263,8 @@ workflows:
           - *checkout_pr
 
           - name: "Install Rust"
-            uses: actions-rs/toolchain@v1
+            uses: dtolnay/rust-toolchain@stable
             with:
-              profile: minimal
-              toolchain: stable
-              override: true
               components: rustfmt
 
           - name: "Cache Cargo intermediate products"
@@ -280,16 +277,10 @@ workflows:
               key: ${{ runner.os }}-cargo-${{ hashFiles('ui/**/Cargo.lock') }}-2
 
           - name: "Format server"
-            uses: actions-rs/cargo@v1
-            with:
-              command: fmt
-              args: --manifest-path ui/Cargo.toml --all --check
+            run: cargo fmt --manifest-path ui/Cargo.toml --all --check
 
           - name: "Format top-crates"
-            uses: actions-rs/cargo@v1
-            with:
-              command: fmt
-              args: --manifest-path top-crates/Cargo.toml --check
+            run: cargo fmt --manifest-path top-crates/Cargo.toml --check
 
           - name: "Build backend"
             run: >-
