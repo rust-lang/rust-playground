@@ -1,6 +1,5 @@
 use crate::{
-    metrics::{DURATION_WS, LIVE_WS},
-    parse_channel, parse_crate_type, parse_edition, parse_mode,
+    metrics, parse_channel, parse_crate_type, parse_edition, parse_mode,
     sandbox::{self, Sandbox},
     Error, ExecutionSnafu, Result, SandboxCreationSnafu, WebSocketTaskPanicSnafu,
 };
@@ -120,10 +119,18 @@ impl From<sandbox::ExecuteResponse> for ExecuteResponse {
     }
 }
 
-pub async fn handle(mut socket: WebSocket) {
-    LIVE_WS.inc();
+pub async fn handle(socket: WebSocket) {
+    metrics::LIVE_WS.inc();
     let start = Instant::now();
 
+    handle_core(socket).await;
+
+    metrics::LIVE_WS.dec();
+    let elapsed = start.elapsed();
+    metrics::DURATION_WS.observe(elapsed.as_secs_f64());
+}
+
+async fn handle_core(mut socket: WebSocket) {
     if !connect_handshake(&mut socket).await {
         return;
     }
@@ -187,10 +194,6 @@ pub async fn handle(mut socket: WebSocket) {
 
     drop((tx, rx, socket));
     tasks.shutdown().await;
-
-    LIVE_WS.dec();
-    let elapsed = start.elapsed();
-    DURATION_WS.observe(elapsed.as_secs_f64());
 }
 
 async fn connect_handshake(socket: &mut WebSocket) -> bool {
