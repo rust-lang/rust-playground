@@ -39,7 +39,7 @@ export function configureRustErrors({
     },
     'error-location': /-->\s+(\/playground\/)?src\/.*\n/,
     'import-suggestion-outer': {
-      pattern: /\|\s+use\s+([^;]+);/,
+      pattern: /\+\s+use\s+([^;]+);/,
       inside: {
         'import-suggestion': /use\s+.*/,
       },
