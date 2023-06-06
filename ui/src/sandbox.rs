@@ -1402,7 +1402,7 @@ mod test {
         let sb = Sandbox::new().await.expect("Unable to create sandbox");
         let resp = sb.compile(&req).await.expect("Unable to compile code");
 
-        assert!(resp.code.contains("core::fmt::Arguments::new_v1"));
+        assert!(resp.code.contains("core::fmt::Arguments::new_const"));
         assert!(resp.code.contains("std::io::stdio::_print@GOTPCREL"));
     }
 

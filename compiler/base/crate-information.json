@@ -21,7 +21,7 @@
   },
   {
     "name": "aho-corasick",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "id": "aho_corasick"
   },
   {
@@ -81,7 +81,7 @@
   },
   {
     "name": "atomic",
-    "version": "0.5.1",
+    "version": "0.5.3",
     "id": "atomic"
   },
   {
@@ -101,7 +101,7 @@
   },
   {
     "name": "base64",
-    "version": "0.21.0",
+    "version": "0.21.2",
     "id": "base64"
   },
   {
@@ -121,7 +121,7 @@
   },
   {
     "name": "bitflags",
-    "version": "2.2.1",
+    "version": "2.3.1",
     "id": "bitflags"
   },
   {
@@ -171,27 +171,27 @@
   },
   {
     "name": "chrono",
-    "version": "0.4.24",
+    "version": "0.4.26",
     "id": "chrono"
   },
   {
     "name": "clap",
-    "version": "4.2.7",
+    "version": "4.3.1",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.2.7",
+    "version": "4.3.1",
     "id": "clap_builder"
   },
   {
     "name": "clap_derive",
-    "version": "4.2.0",
+    "version": "4.3.1",
     "id": "clap_derive"
   },
   {
     "name": "clap_lex",
-    "version": "0.4.1",
+    "version": "0.5.0",
     "id": "clap_lex"
   },
   {
@@ -261,7 +261,7 @@
   },
   {
     "name": "csv",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "id": "csv"
   },
   {
@@ -271,7 +271,7 @@
   },
   {
     "name": "data-encoding",
-    "version": "2.3.3",
+    "version": "2.4.0",
     "id": "data_encoding"
   },
   {
@@ -291,7 +291,7 @@
   },
   {
     "name": "digest",
-    "version": "0.10.6",
+    "version": "0.10.7",
     "id": "digest"
   },
   {
@@ -316,7 +316,7 @@
   },
   {
     "name": "exr",
-    "version": "1.6.3",
+    "version": "1.6.4",
     "id": "exr"
   },
   {
@@ -376,7 +376,7 @@
   },
   {
     "name": "form_urlencoded",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "id": "form_urlencoded"
   },
   {
@@ -461,7 +461,7 @@
   },
   {
     "name": "h2",
-    "version": "0.3.18",
+    "version": "0.3.19",
     "id": "h2"
   },
   {
@@ -481,7 +481,7 @@
   },
   {
     "name": "hashlink",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "id": "hashlink"
   },
   {
@@ -541,13 +541,18 @@
   },
   {
     "name": "idna",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "id": "idna"
   },
   {
     "name": "idna",
     "version": "0.2.3",
     "id": "idna_0_2_3"
+  },
+  {
+    "name": "idna",
+    "version": "0.3.0",
+    "id": "idna_0_3_0"
   },
   {
     "name": "image",
@@ -561,7 +566,7 @@
   },
   {
     "name": "io-lifetimes",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "id": "io_lifetimes"
   },
   {
@@ -606,12 +611,12 @@
   },
   {
     "name": "libc",
-    "version": "0.2.142",
+    "version": "0.2.145",
     "id": "libc"
   },
   {
     "name": "libm",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "id": "libm"
   },
   {
@@ -626,7 +631,7 @@
   },
   {
     "name": "linux-raw-sys",
-    "version": "0.3.7",
+    "version": "0.3.8",
     "id": "linux_raw_sys"
   },
   {
@@ -636,7 +641,7 @@
   },
   {
     "name": "log",
-    "version": "0.4.17",
+    "version": "0.4.18",
     "id": "log"
   },
   {
@@ -691,8 +696,13 @@
   },
   {
     "name": "memoffset",
-    "version": "0.8.0",
+    "version": "0.9.0",
     "id": "memoffset"
+  },
+  {
+    "name": "memoffset",
+    "version": "0.8.0",
+    "id": "memoffset_0_8_0"
   },
   {
     "name": "mime",
@@ -721,7 +731,7 @@
   },
   {
     "name": "mio",
-    "version": "0.8.6",
+    "version": "0.8.8",
     "id": "mio"
   },
   {
@@ -801,12 +811,12 @@
   },
   {
     "name": "once_cell",
-    "version": "1.17.1",
+    "version": "1.18.0",
     "id": "once_cell"
   },
   {
     "name": "openssl",
-    "version": "0.10.52",
+    "version": "0.10.54",
     "id": "openssl"
   },
   {
@@ -821,7 +831,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.87",
+    "version": "0.9.88",
     "id": "openssl_sys"
   },
   {
@@ -846,7 +856,7 @@
   },
   {
     "name": "percent-encoding",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "id": "percent_encoding"
   },
   {
@@ -886,12 +896,12 @@
   },
   {
     "name": "pin-project",
-    "version": "1.0.12",
+    "version": "1.1.0",
     "id": "pin_project"
   },
   {
     "name": "pin-project-internal",
-    "version": "1.0.12",
+    "version": "1.1.0",
     "id": "pin_project_internal"
   },
   {
@@ -941,7 +951,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.56",
+    "version": "1.0.59",
     "id": "proc_macro2"
   },
   {
@@ -961,7 +971,7 @@
   },
   {
     "name": "quote",
-    "version": "1.0.26",
+    "version": "1.0.28",
     "id": "quote"
   },
   {
@@ -1001,17 +1011,17 @@
   },
   {
     "name": "regex",
-    "version": "1.8.1",
+    "version": "1.8.4",
     "id": "regex"
   },
   {
     "name": "regex-syntax",
-    "version": "0.7.1",
+    "version": "0.7.2",
     "id": "regex_syntax"
   },
   {
     "name": "reqwest",
-    "version": "0.11.17",
+    "version": "0.11.18",
     "id": "reqwest"
   },
   {
@@ -1071,12 +1081,12 @@
   },
   {
     "name": "serde",
-    "version": "1.0.160",
+    "version": "1.0.163",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.160",
+    "version": "1.0.163",
     "id": "serde_derive"
   },
   {
@@ -1086,7 +1096,7 @@
   },
   {
     "name": "serde_spanned",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "id": "serde_spanned"
   },
   {
@@ -1151,7 +1161,7 @@
   },
   {
     "name": "socket2",
-    "version": "0.5.2",
+    "version": "0.5.3",
     "id": "socket2"
   },
   {
@@ -1191,12 +1201,12 @@
   },
   {
     "name": "subtle",
-    "version": "2.4.1",
+    "version": "2.5.0",
     "id": "subtle"
   },
   {
     "name": "syn",
-    "version": "2.0.15",
+    "version": "2.0.18",
     "id": "syn"
   },
   {
@@ -1246,7 +1256,7 @@
   },
   {
     "name": "thread-id",
-    "version": "4.0.0",
+    "version": "4.1.0",
     "id": "thread_id"
   },
   {
@@ -1266,7 +1276,7 @@
   },
   {
     "name": "time",
-    "version": "0.3.20",
+    "version": "0.3.21",
     "id": "time"
   },
   {
@@ -1276,12 +1286,12 @@
   },
   {
     "name": "time-core",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "id": "time_core"
   },
   {
     "name": "time-macros",
-    "version": "0.2.8",
+    "version": "0.2.9",
     "id": "time_macros"
   },
   {
@@ -1296,7 +1306,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.28.0",
+    "version": "1.28.2",
     "id": "tokio"
   },
   {
@@ -1326,17 +1336,17 @@
   },
   {
     "name": "toml",
-    "version": "0.7.3",
+    "version": "0.7.4",
     "id": "toml"
   },
   {
     "name": "toml_datetime",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "id": "toml_datetime"
   },
   {
     "name": "toml_edit",
-    "version": "0.19.8",
+    "version": "0.19.10",
     "id": "toml_edit"
   },
   {
@@ -1356,7 +1366,7 @@
   },
   {
     "name": "tracing-core",
-    "version": "0.1.30",
+    "version": "0.1.31",
     "id": "tracing_core"
   },
   {
@@ -1386,7 +1396,7 @@
   },
   {
     "name": "unicode-ident",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "id": "unicode_ident"
   },
   {
@@ -1426,7 +1436,7 @@
   },
   {
     "name": "url",
-    "version": "2.3.1",
+    "version": "2.4.0",
     "id": "url"
   },
   {
@@ -1441,7 +1451,7 @@
   },
   {
     "name": "uuid",
-    "version": "1.3.2",
+    "version": "1.3.3",
     "id": "uuid"
   },
   {
@@ -1471,7 +1481,7 @@
   },
   {
     "name": "wide",
-    "version": "0.7.8",
+    "version": "0.7.9",
     "id": "wide"
   },
   {
