@@ -45,6 +45,12 @@ package = "aho-corasick"
 version = "=1.0.2"
 features = ["perf-literal", "std"]
 
+[dependencies.allocator_api2]
+package = "allocator-api2"
+version = "=0.2.14"
+features = ["alloc"]
+default-features = false
+
 [dependencies.ansi_term]
 package = "ansi_term"
 version = "=0.12.1"
@@ -183,7 +189,7 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [dependencies.clap]
 package = "clap"
-version = "=4.3.1"
+version = "=4.3.2"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
@@ -194,7 +200,7 @@ default-features = false
 
 [dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.3.1"
+version = "=4.3.2"
 
 [dependencies.clap_lex]
 package = "clap_lex"
@@ -431,7 +437,7 @@ features = ["more_lengths"]
 
 [dependencies.getrandom]
 package = "getrandom"
-version = "=0.2.9"
+version = "=0.2.10"
 features = ["js", "js-sys", "rdrand", "std", "wasm-bindgen"]
 
 [dependencies.gif]
@@ -460,13 +466,18 @@ features = ["alloc", "std"]
 
 [dependencies.hashbrown]
 package = "hashbrown"
-version = "=0.13.2"
-features = ["ahash", "inline-more"]
+version = "=0.14.0"
+features = ["ahash", "allocator-api2", "inline-more"]
 
 [dependencies.hashbrown_0_12_3]
 package = "hashbrown"
 version = "=0.12.3"
 features = ["ahash", "inline-more", "raw"]
+
+[dependencies.hashbrown_0_13_2]
+package = "hashbrown"
+version = "=0.13.2"
+features = ["ahash", "inline-more"]
 
 [dependencies.hashlink]
 package = "hashlink"
@@ -584,7 +595,7 @@ version = "=0.5.2"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.145"
+version = "=0.2.146"
 features = ["extra_traits", "std"]
 
 [dependencies.libm]
@@ -608,7 +619,8 @@ default-features = false
 
 [dependencies.lock_api]
 package = "lock_api"
-version = "=0.4.9"
+version = "=0.4.10"
+features = ["atomic_usize"]
 
 [dependencies.log]
 package = "log"
@@ -770,7 +782,7 @@ features = ["i128", "libm", "std"]
 
 [dependencies.object]
 package = "object"
-version = "=0.30.3"
+version = "=0.30.4"
 features = ["archive", "coff", "elf", "macho", "pe", "read_core", "unaligned"]
 default-features = false
 
@@ -806,7 +818,7 @@ version = "=0.12.1"
 
 [dependencies.parking_lot_core]
 package = "parking_lot_core"
-version = "=0.9.7"
+version = "=0.9.8"
 
 [dependencies.paste]
 package = "paste"
@@ -996,7 +1008,7 @@ version = "=1.0.13"
 
 [dependencies.safe_arch]
 package = "safe_arch"
-version = "=0.6.0"
+version = "=0.7.0"
 features = ["bytemuck"]
 
 [dependencies.same_file]
@@ -1373,7 +1385,7 @@ features = ["alloc", "std"]
 
 [dependencies.wide]
 package = "wide"
-version = "=0.7.9"
+version = "=0.7.10"
 features = ["std"]
 default-features = false
 
@@ -1430,6 +1442,12 @@ default-features = false
 package = "aho-corasick"
 version = "=1.0.2"
 features = ["perf-literal", "std"]
+
+[build_dependencies.allocator_api2]
+package = "allocator-api2"
+version = "=0.2.14"
+features = ["alloc"]
+default-features = false
 
 [build_dependencies.ansi_term]
 package = "ansi_term"
@@ -1569,7 +1587,7 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [build_dependencies.clap]
 package = "clap"
-version = "=4.3.1"
+version = "=4.3.2"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build_dependencies.clap_builder]
@@ -1580,7 +1598,7 @@ default-features = false
 
 [build_dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.3.1"
+version = "=4.3.2"
 
 [build_dependencies.clap_lex]
 package = "clap_lex"
@@ -1817,7 +1835,7 @@ features = ["more_lengths"]
 
 [build_dependencies.getrandom]
 package = "getrandom"
-version = "=0.2.9"
+version = "=0.2.10"
 features = ["js", "js-sys", "rdrand", "std", "wasm-bindgen"]
 
 [build_dependencies.gif]
@@ -1846,13 +1864,18 @@ features = ["alloc", "std"]
 
 [build_dependencies.hashbrown]
 package = "hashbrown"
-version = "=0.13.2"
-features = ["ahash", "inline-more"]
+version = "=0.14.0"
+features = ["ahash", "allocator-api2", "inline-more"]
 
 [build_dependencies.hashbrown_0_12_3]
 package = "hashbrown"
 version = "=0.12.3"
 features = ["ahash", "inline-more", "raw"]
+
+[build_dependencies.hashbrown_0_13_2]
+package = "hashbrown"
+version = "=0.13.2"
+features = ["ahash", "inline-more"]
 
 [build_dependencies.hashlink]
 package = "hashlink"
@@ -1970,7 +1993,7 @@ version = "=0.5.2"
 
 [build_dependencies.libc]
 package = "libc"
-version = "=0.2.145"
+version = "=0.2.146"
 features = ["extra_traits", "std"]
 
 [build_dependencies.libm]
@@ -1994,7 +2017,8 @@ default-features = false
 
 [build_dependencies.lock_api]
 package = "lock_api"
-version = "=0.4.9"
+version = "=0.4.10"
+features = ["atomic_usize"]
 
 [build_dependencies.log]
 package = "log"
@@ -2156,7 +2180,7 @@ features = ["i128", "libm", "std"]
 
 [build_dependencies.object]
 package = "object"
-version = "=0.30.3"
+version = "=0.30.4"
 features = ["archive", "coff", "elf", "macho", "pe", "read_core", "unaligned"]
 default-features = false
 
@@ -2192,7 +2216,7 @@ version = "=0.12.1"
 
 [build_dependencies.parking_lot_core]
 package = "parking_lot_core"
-version = "=0.9.7"
+version = "=0.9.8"
 
 [build_dependencies.paste]
 package = "paste"
@@ -2382,7 +2406,7 @@ version = "=1.0.13"
 
 [build_dependencies.safe_arch]
 package = "safe_arch"
-version = "=0.6.0"
+version = "=0.7.0"
 features = ["bytemuck"]
 
 [build_dependencies.same_file]
@@ -2759,7 +2783,7 @@ features = ["alloc", "std"]
 
 [build_dependencies.wide]
 package = "wide"
-version = "=0.7.9"
+version = "=0.7.10"
 features = ["std"]
 default-features = false
 

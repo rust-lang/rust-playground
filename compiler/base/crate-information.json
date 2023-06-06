@@ -25,6 +25,11 @@
     "id": "aho_corasick"
   },
   {
+    "name": "allocator-api2",
+    "version": "0.2.14",
+    "id": "allocator_api2"
+  },
+  {
     "name": "ansi_term",
     "version": "0.12.1",
     "id": "ansi_term"
@@ -176,7 +181,7 @@
   },
   {
     "name": "clap",
-    "version": "4.3.1",
+    "version": "4.3.2",
     "id": "clap"
   },
   {
@@ -186,7 +191,7 @@
   },
   {
     "name": "clap_derive",
-    "version": "4.3.1",
+    "version": "4.3.2",
     "id": "clap_derive"
   },
   {
@@ -441,7 +446,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.2.9",
+    "version": "0.2.10",
     "id": "getrandom"
   },
   {
@@ -471,13 +476,18 @@
   },
   {
     "name": "hashbrown",
-    "version": "0.13.2",
+    "version": "0.14.0",
     "id": "hashbrown"
   },
   {
     "name": "hashbrown",
     "version": "0.12.3",
     "id": "hashbrown_0_12_3"
+  },
+  {
+    "name": "hashbrown",
+    "version": "0.13.2",
+    "id": "hashbrown_0_13_2"
   },
   {
     "name": "hashlink",
@@ -611,7 +621,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.145",
+    "version": "0.2.146",
     "id": "libc"
   },
   {
@@ -636,7 +646,7 @@
   },
   {
     "name": "lock_api",
-    "version": "0.4.9",
+    "version": "0.4.10",
     "id": "lock_api"
   },
   {
@@ -806,7 +816,7 @@
   },
   {
     "name": "object",
-    "version": "0.30.3",
+    "version": "0.30.4",
     "id": "object"
   },
   {
@@ -846,7 +856,7 @@
   },
   {
     "name": "parking_lot_core",
-    "version": "0.9.7",
+    "version": "0.9.8",
     "id": "parking_lot_core"
   },
   {
@@ -1056,7 +1066,7 @@
   },
   {
     "name": "safe_arch",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "id": "safe_arch"
   },
   {
@@ -1481,7 +1491,7 @@
   },
   {
     "name": "wide",
-    "version": "0.7.9",
+    "version": "0.7.10",
     "id": "wide"
   },
   {
