@@ -346,6 +346,12 @@ where
     }
 }
 
+impl Coordinator<DockerBackend> {
+    pub async fn new_docker() -> Result<Self, Error> {
+        Self::new(DockerBackend(())).await
+    }
+}
+
 #[derive(Debug)]
 struct Container {
     task: JoinHandle<Result<()>>,
@@ -819,6 +825,63 @@ where
     }
 }
 
+macro_rules! docker_command {
+    ($($arg:expr),* $(,)?) => ({
+        let mut cmd = Command::new("docker");
+        $( cmd.arg($arg); )*
+        cmd
+    });
+}
+
+#[cfg(target_arch = "x86_64")]
+const DOCKER_ARCH: &str = "linux/amd64";
+
+#[cfg(target_arch = "aarch64")]
+const DOCKER_ARCH: &str = "linux/arm64";
+
+fn basic_secure_docker_command() -> Command {
+    docker_command!(
+        "run",
+        "--platform",
+        DOCKER_ARCH,
+        "--cap-drop=ALL",
+        "--net",
+        "none",
+        "--memory",
+        "512m",
+        "--memory-swap",
+        "640m",
+        "--pids-limit",
+        "512",
+    )
+}
+
+pub struct DockerBackend(());
+
+impl Backend for DockerBackend {
+    fn prepare_worker_command(&self, channel: Channel) -> Command {
+        let mut command = basic_secure_docker_command();
+        command
+            .arg("-i")
+            .args(["-a", "stdin", "-a", "stdout", "-a", "stderr"])
+            .arg("--rm")
+            .arg(channel.to_container_name())
+            .arg("worker")
+            .arg("/playground");
+        command
+    }
+}
+
+impl Channel {
+    fn to_container_name(self) -> &'static str {
+        match self {
+            Channel::Stable => "rust-stable",
+            Channel::Beta => "rust-beta",
+            Channel::Nightly => "rust-nightly",
+        }
+    }
+}
+
 pub type Result<T, E = Error> = ::std::result::Result<T, E>;
 
 #[derive(Debug, Snafu)]
@@ -988,6 +1051,7 @@ mod tests {
 
     async fn new_coordinator() -> Result<Coordinator<impl Backend>> {
         Coordinator::new(TestBackend::new()).await
+        //Coordinator::new_docker().await
     }
 
     fn new_compile_request() -> CompileRequest {
@@ -1201,6 +1265,29 @@ mod tests {
 
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.code, "@llvm.umul.with.overflow.i8(i8, i8)");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn test_compile_wasm() -> Result<()> {
+        // cargo-wasm only exists inside the container
+        let coordinator = Coordinator::new_docker().await?;
+
+        let response = coordinator
+            .compile(new_compile_wasm_request())
+            .with_timeout()
+            .await
+            .unwrap();
+
+        assert!(response.success, "stderr: {}", response.stderr);
+        assert_contains!(
+            response.code,
+            r#"(func $inc (export "inc") (type $t0) (param $p0 i32) (result i32)"#
+        );
 
         coordinator.shutdown().await?;
 

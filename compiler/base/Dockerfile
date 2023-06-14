@@ -61,11 +61,41 @@ FROM bare-sources as munge
 ADD --chown=playground modify-cargo-toml /playground/modify-cargo-toml
 RUN cargo build --release --manifest-path=/playground/modify-cargo-toml/Cargo.toml
 
+# Set up cargo-chef for faster builds
+
+FROM bare-sources as chef-available
+
+RUN cargo install cargo-chef
+
+WORKDIR /orchestrator
+
+# Prepare the orchestrator's dependencies
+
+FROM chef-available as prepare-orchestrator
+
+COPY --chown=playground asm-cleanup /asm-cleanup
+COPY --chown=playground modify-cargo-toml /modify-cargo-toml
+COPY --chown=playground orchestrator /orchestrator
+RUN cargo chef prepare
+
+# Build the orchestrator
+
+FROM chef-available as build-orchestrator
+
+COPY --chown=playground asm-cleanup /asm-cleanup
+COPY --chown=playground modify-cargo-toml /modify-cargo-toml
+COPY --chown=playground --from=prepare-orchestrator /orchestrator/recipe.json /orchestrator/recipe.json
+RUN cargo chef cook --release
+
+COPY --chown=playground orchestrator /orchestrator
+RUN cargo install --path .
+
 # Compiler and sources
 
 FROM bare-sources as sources
 
 COPY --from=munge /playground/modify-cargo-toml/target/release/modify-cargo-toml /playground/.cargo/bin
+COPY --from=build-orchestrator /playground/.cargo/bin/worker /playground/.cargo/bin/worker
 
 # Compiler and pre-compiled crates
 
