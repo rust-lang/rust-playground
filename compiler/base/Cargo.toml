@@ -47,7 +47,7 @@ features = ["perf-literal", "std"]
 
 [dependencies.allocator_api2]
 package = "allocator-api2"
-version = "=0.2.14"
+version = "=0.2.15"
 features = ["alloc"]
 default-features = false
 
@@ -90,7 +90,7 @@ version = "=1.6.0"
 
 [dependencies.arrayvec]
 package = "arrayvec"
-version = "=0.7.2"
+version = "=0.7.3"
 features = ["std"]
 
 [dependencies.async_recursion]
@@ -141,7 +141,7 @@ default-features = false
 
 [dependencies.bitflags]
 package = "bitflags"
-version = "=2.3.1"
+version = "=2.3.2"
 
 [dependencies.bitflags_1_3_2]
 package = "bitflags"
@@ -189,12 +189,12 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [dependencies.clap]
 package = "clap"
-version = "=4.3.2"
+version = "=4.3.4"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.3.1"
+version = "=4.3.4"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-styles", "usage", "wrap_help"]
 default-features = false
 
@@ -249,7 +249,7 @@ features = ["crossbeam-epoch", "crossbeam-utils", "std"]
 
 [dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.14"
+version = "=0.9.15"
 features = ["alloc", "std"]
 
 [dependencies.crossbeam_queue]
@@ -260,7 +260,7 @@ default-features = false
 
 [dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.15"
+version = "=0.8.16"
 features = ["std"]
 
 [dependencies.crypto_common]
@@ -447,7 +447,7 @@ features = ["color_quant", "raii_no_panic", "std"]
 
 [dependencies.gimli]
 package = "gimli"
-version = "=0.27.2"
+version = "=0.27.3"
 features = ["read", "read-core"]
 default-features = false
 
@@ -474,14 +474,9 @@ package = "hashbrown"
 version = "=0.12.3"
 features = ["ahash", "inline-more", "raw"]
 
-[dependencies.hashbrown_0_13_2]
-package = "hashbrown"
-version = "=0.13.2"
-features = ["ahash", "inline-more"]
-
 [dependencies.hashlink]
 package = "hashlink"
-version = "=0.8.2"
+version = "=0.8.3"
 
 [dependencies.heck]
 package = "heck"
@@ -527,7 +522,7 @@ version = "=0.5.0"
 
 [dependencies.iana_time_zone]
 package = "iana-time-zone"
-version = "=0.1.56"
+version = "=0.1.57"
 features = ["fallback"]
 
 [dependencies.idna]
@@ -624,7 +619,7 @@ features = ["atomic_usize"]
 
 [dependencies.log]
 package = "log"
-version = "=0.4.18"
+version = "=0.4.19"
 features = ["serde", "std"]
 
 [dependencies.log4rs]
@@ -674,10 +669,6 @@ version = "=0.7.0"
 [dependencies.memoffset]
 package = "memoffset"
 version = "=0.9.0"
-
-[dependencies.memoffset_0_8_0]
-package = "memoffset"
-version = "=0.8.0"
 
 [dependencies.mime]
 package = "mime"
@@ -885,7 +876,7 @@ version = "=0.3.27"
 
 [dependencies.png]
 package = "png"
-version = "=0.17.8"
+version = "=0.17.9"
 
 [dependencies.postgres]
 package = "postgres"
@@ -910,7 +901,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.59"
+version = "=1.0.60"
 features = ["proc-macro", "span-locations"]
 
 [dependencies.psl_types]
@@ -999,7 +990,7 @@ version = "=0.4.0"
 
 [dependencies.rustix]
 package = "rustix"
-version = "=0.37.19"
+version = "=0.37.20"
 features = ["fs", "io-lifetimes", "libc", "std", "termios", "use-libc-auxv"]
 
 [dependencies.ryu]
@@ -1031,12 +1022,12 @@ features = ["std"]
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.163"
+version = "=1.0.164"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.163"
+version = "=1.0.164"
 
 [dependencies.serde_json]
 package = "serde_json"
@@ -1066,7 +1057,7 @@ version = "=1.0.0"
 
 [dependencies.sha2]
 package = "sha2"
-version = "=0.10.6"
+version = "=0.10.7"
 features = ["std"]
 
 [dependencies.signal_hook_registry]
@@ -1160,7 +1151,7 @@ features = ["xattr"]
 
 [dependencies.tempfile]
 package = "tempfile"
-version = "=3.5.0"
+version = "=3.6.0"
 
 [dependencies.tendril]
 package = "tendril"
@@ -1205,7 +1196,7 @@ version = "=0.8.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.3.21"
+version = "=0.3.22"
 features = ["alloc", "formatting", "macros", "parsing", "std"]
 
 [dependencies.time_0_1_45]
@@ -1359,7 +1350,7 @@ version = "=0.2.1"
 
 [dependencies.uuid]
 package = "uuid"
-version = "=1.3.3"
+version = "=1.3.4"
 features = ["atomic", "getrandom", "md-5", "md5", "rng", "serde", "sha1", "sha1_smol", "std", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [dependencies.vcpkg]
@@ -1376,7 +1367,7 @@ version = "=2.3.3"
 
 [dependencies.want]
 package = "want"
-version = "=0.3.0"
+version = "=0.3.1"
 
 [dependencies.weezl]
 package = "weezl"
@@ -1396,7 +1387,7 @@ features = ["basetsd", "consoleapi", "errhandlingapi", "fileapi", "handleapi", "
 
 [dependencies.winnow]
 package = "winnow"
-version = "=0.4.6"
+version = "=0.4.7"
 features = ["alloc", "std"]
 
 [dependencies.xattr]
@@ -1445,7 +1436,7 @@ features = ["perf-literal", "std"]
 
 [build_dependencies.allocator_api2]
 package = "allocator-api2"
-version = "=0.2.14"
+version = "=0.2.15"
 features = ["alloc"]
 default-features = false
 
@@ -1488,7 +1479,7 @@ version = "=1.6.0"
 
 [build_dependencies.arrayvec]
 package = "arrayvec"
-version = "=0.7.2"
+version = "=0.7.3"
 features = ["std"]
 
 [build_dependencies.async_recursion]
@@ -1539,7 +1530,7 @@ default-features = false
 
 [build_dependencies.bitflags]
 package = "bitflags"
-version = "=2.3.1"
+version = "=2.3.2"
 
 [build_dependencies.bitflags_1_3_2]
 package = "bitflags"
@@ -1587,12 +1578,12 @@ features = ["clock", "iana-time-zone", "js-sys", "oldtime", "serde", "std", "tim
 
 [build_dependencies.clap]
 package = "clap"
-version = "=4.3.2"
+version = "=4.3.4"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build_dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.3.1"
+version = "=4.3.4"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-styles", "usage", "wrap_help"]
 default-features = false
 
@@ -1647,7 +1638,7 @@ features = ["crossbeam-epoch", "crossbeam-utils", "std"]
 
 [build_dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.14"
+version = "=0.9.15"
 features = ["alloc", "std"]
 
 [build_dependencies.crossbeam_queue]
@@ -1658,7 +1649,7 @@ default-features = false
 
 [build_dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.15"
+version = "=0.8.16"
 features = ["std"]
 
 [build_dependencies.crypto_common]
@@ -1845,7 +1836,7 @@ features = ["color_quant", "raii_no_panic", "std"]
 
 [build_dependencies.gimli]
 package = "gimli"
-version = "=0.27.2"
+version = "=0.27.3"
 features = ["read", "read-core"]
 default-features = false
 
@@ -1872,14 +1863,9 @@ package = "hashbrown"
 version = "=0.12.3"
 features = ["ahash", "inline-more", "raw"]
 
-[build_dependencies.hashbrown_0_13_2]
-package = "hashbrown"
-version = "=0.13.2"
-features = ["ahash", "inline-more"]
-
 [build_dependencies.hashlink]
 package = "hashlink"
-version = "=0.8.2"
+version = "=0.8.3"
 
 [build_dependencies.heck]
 package = "heck"
@@ -1925,7 +1911,7 @@ version = "=0.5.0"
 
 [build_dependencies.iana_time_zone]
 package = "iana-time-zone"
-version = "=0.1.56"
+version = "=0.1.57"
 features = ["fallback"]
 
 [build_dependencies.idna]
@@ -2022,7 +2008,7 @@ features = ["atomic_usize"]
 
 [build_dependencies.log]
 package = "log"
-version = "=0.4.18"
+version = "=0.4.19"
 features = ["serde", "std"]
 
 [build_dependencies.log4rs]
@@ -2072,10 +2058,6 @@ version = "=0.7.0"
 [build_dependencies.memoffset]
 package = "memoffset"
 version = "=0.9.0"
-
-[build_dependencies.memoffset_0_8_0]
-package = "memoffset"
-version = "=0.8.0"
 
 [build_dependencies.mime]
 package = "mime"
@@ -2283,7 +2265,7 @@ version = "=0.3.27"
 
 [build_dependencies.png]
 package = "png"
-version = "=0.17.8"
+version = "=0.17.9"
 
 [build_dependencies.postgres]
 package = "postgres"
@@ -2308,7 +2290,7 @@ version = "=0.1.1"
 
 [build_dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.59"
+version = "=1.0.60"
 features = ["proc-macro", "span-locations"]
 
 [build_dependencies.psl_types]
@@ -2397,7 +2379,7 @@ version = "=0.4.0"
 
 [build_dependencies.rustix]
 package = "rustix"
-version = "=0.37.19"
+version = "=0.37.20"
 features = ["fs", "io-lifetimes", "libc", "std", "termios", "use-libc-auxv"]
 
 [build_dependencies.ryu]
@@ -2429,12 +2411,12 @@ features = ["std"]
 
 [build_dependencies.serde]
 package = "serde"
-version = "=1.0.163"
+version = "=1.0.164"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [build_dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.163"
+version = "=1.0.164"
 
 [build_dependencies.serde_json]
 package = "serde_json"
@@ -2464,7 +2446,7 @@ version = "=1.0.0"
 
 [build_dependencies.sha2]
 package = "sha2"
-version = "=0.10.6"
+version = "=0.10.7"
 features = ["std"]
 
 [build_dependencies.signal_hook_registry]
@@ -2558,7 +2540,7 @@ features = ["xattr"]
 
 [build_dependencies.tempfile]
 package = "tempfile"
-version = "=3.5.0"
+version = "=3.6.0"
 
 [build_dependencies.tendril]
 package = "tendril"
@@ -2603,7 +2585,7 @@ version = "=0.8.1"
 
 [build_dependencies.time]
 package = "time"
-version = "=0.3.21"
+version = "=0.3.22"
 features = ["alloc", "formatting", "macros", "parsing", "std"]
 
 [build_dependencies.time_0_1_45]
@@ -2757,7 +2739,7 @@ version = "=0.2.1"
 
 [build_dependencies.uuid]
 package = "uuid"
-version = "=1.3.3"
+version = "=1.3.4"
 features = ["atomic", "getrandom", "md-5", "md5", "rng", "serde", "sha1", "sha1_smol", "std", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [build_dependencies.vcpkg]
@@ -2774,7 +2756,7 @@ version = "=2.3.3"
 
 [build_dependencies.want]
 package = "want"
-version = "=0.3.0"
+version = "=0.3.1"
 
 [build_dependencies.weezl]
 package = "weezl"
@@ -2794,7 +2776,7 @@ features = ["basetsd", "consoleapi", "errhandlingapi", "fileapi", "handleapi", "
 
 [build_dependencies.winnow]
 package = "winnow"
-version = "=0.4.6"
+version = "=0.4.7"
 features = ["alloc", "std"]
 
 [build_dependencies.xattr]
