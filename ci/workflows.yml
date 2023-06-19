@@ -22,7 +22,7 @@ components:
       uses: docker/setup-buildx-action@v2
       with:
         driver-opts: >-
-          image=moby/buildkit:v0.9.1
+          image=moby/buildkit:v0.11.6
 
   - login_ghcr: &login_ghcr
       name: "Login to GitHub Container Registry"
