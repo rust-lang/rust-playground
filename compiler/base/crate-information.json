@@ -71,7 +71,7 @@
   },
   {
     "name": "arrayvec",
-    "version": "0.7.3",
+    "version": "0.7.4",
     "id": "arrayvec"
   },
   {
@@ -216,12 +216,12 @@
   },
   {
     "name": "cookie_store",
-    "version": "0.16.1",
+    "version": "0.16.2",
     "id": "cookie_store"
   },
   {
     "name": "cpufeatures",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "id": "cpufeatures"
   },
   {
@@ -1091,7 +1091,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.96",
+    "version": "1.0.97",
     "id": "serde_json"
   },
   {
@@ -1361,7 +1361,7 @@
   },
   {
     "name": "tracing-attributes",
-    "version": "0.1.24",
+    "version": "0.1.25",
     "id": "tracing_attributes"
   },
   {
