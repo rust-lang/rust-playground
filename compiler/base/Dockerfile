@@ -1,3 +1,5 @@
+#syntax=docker/dockerfile:1.5
+
 FROM ubuntu:20.04 as toolchain
 
 ARG channel

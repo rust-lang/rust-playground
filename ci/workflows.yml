@@ -22,7 +22,7 @@ components:
       uses: docker/setup-buildx-action@v2
       with:
         driver-opts: >-
-          image=moby/buildkit:v0.9.1
+          image=moby/buildkit:v0.11.6
 
   - login_ghcr: &login_ghcr
       name: "Login to GitHub Container Registry"
@@ -54,7 +54,7 @@ components:
       name: "Build and push 'toolchain' container"
       env:
         TAG_PREFIX: ${{ env.IMAGE_NAME }}:toolchain
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v4
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -74,7 +74,7 @@ components:
       name: "Build and push 'bare-sources' container"
       env:
         TAG_PREFIX: ${{ env.IMAGE_NAME }}:bare-sources
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v4
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -94,7 +94,7 @@ components:
       name: "Build and push 'munge' container"
       env:
         TAG_PREFIX: ${{ env.IMAGE_NAME }}:munge
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v4
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -114,7 +114,7 @@ components:
       name: "Build and push 'sources' container"
       env:
         TAG_PREFIX: ${{ env.IMAGE_NAME }}:sources
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v4
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -132,7 +132,7 @@ components:
 
   - build_compiler_containers_final: &build_compiler_containers_final
       name: "Build and push container"
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v4
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -161,7 +161,7 @@ components:
 
   - build_tool_containers_final: &build_tool_containers_final
       name: "Build and push container"
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v4
       with:
         context: compiler/${{ matrix.tool }}/
         file: compiler/${{ matrix.tool }}/Dockerfile

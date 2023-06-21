@@ -90,7 +90,7 @@ version = "=1.6.0"
 
 [dependencies.arrayvec]
 package = "arrayvec"
-version = "=0.7.3"
+version = "=0.7.4"
 features = ["std"]
 
 [dependencies.async_recursion]
@@ -221,11 +221,11 @@ features = ["percent-encode", "percent-encoding"]
 
 [dependencies.cookie_store]
 package = "cookie_store"
-version = "=0.16.1"
+version = "=0.16.2"
 
 [dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.2.7"
+version = "=0.2.8"
 
 [dependencies.crc32fast]
 package = "crc32fast"
@@ -1031,7 +1031,7 @@ version = "=1.0.164"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.96"
+version = "=1.0.97"
 features = ["raw_value", "std"]
 
 [dependencies.serde_spanned]
@@ -1274,7 +1274,7 @@ features = ["attributes", "std", "tracing-attributes"]
 
 [dependencies.tracing_attributes]
 package = "tracing-attributes"
-version = "=0.1.24"
+version = "=0.1.25"
 
 [dependencies.tracing_core]
 package = "tracing-core"
@@ -1479,7 +1479,7 @@ version = "=1.6.0"
 
 [build_dependencies.arrayvec]
 package = "arrayvec"
-version = "=0.7.3"
+version = "=0.7.4"
 features = ["std"]
 
 [build_dependencies.async_recursion]
@@ -1610,11 +1610,11 @@ features = ["percent-encode", "percent-encoding"]
 
 [build_dependencies.cookie_store]
 package = "cookie_store"
-version = "=0.16.1"
+version = "=0.16.2"
 
 [build_dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.2.7"
+version = "=0.2.8"
 
 [build_dependencies.crc32fast]
 package = "crc32fast"
@@ -2420,7 +2420,7 @@ version = "=1.0.164"
 
 [build_dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.96"
+version = "=1.0.97"
 features = ["raw_value", "std"]
 
 [build_dependencies.serde_spanned]
@@ -2663,7 +2663,7 @@ features = ["attributes", "std", "tracing-attributes"]
 
 [build_dependencies.tracing_attributes]
 package = "tracing-attributes"
-version = "=0.1.24"
+version = "=0.1.25"
 
 [build_dependencies.tracing_core]
 package = "tracing-core"
