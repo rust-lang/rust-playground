@@ -41,4 +41,9 @@ for wasm in $(find target/ -name '*wasm' -not -path '*/deps/*'); do
     # wasm2wat spits out an error that we don't care about, so hide it
     # https://github.com/WebAssembly/wabt/issues/842
     # https://stackoverflow.com/a/15936384/155423
+
+    # The streaming playground expects the file to be without the
+    # extension while the original playground expects it to be with
+    # the extension. Support both for now.
+    cp "${output}.wat" "${output}"
 done

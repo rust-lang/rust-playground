@@ -14,7 +14,6 @@ use tracing::{error, info, warn};
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
 
-mod asm_cleanup;
 mod env;
 mod gist;
 mod metrics;
@@ -38,6 +37,7 @@ struct Config {
     cors_enabled: bool,
     gh_token: Option<String>,
     metrics_token: Option<String>,
+    orchestrator_enabled: bool,
     port: u16,
     root: PathBuf,
 }
@@ -91,11 +91,14 @@ impl Config {
 
         let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
 
+        let orchestrator_enabled = env::var_os("PLAYGROUND_ORCHESTRATOR_ENABLED").is_some();
+
         Self {
             address,
             cors_enabled,
             gh_token,
             metrics_token,
+            orchestrator_enabled,
             port,
             root,
         }
@@ -111,6 +114,10 @@ impl Config {
 
     fn use_cors(&self) -> bool {
         self.cors_enabled
+    }
+
+    fn use_orchestrator(&self) -> bool {
+        self.orchestrator_enabled
     }
 
     fn metrics_token(&self) -> Option<MetricsToken> {
@@ -204,6 +211,24 @@ pub enum Error {
     CachePoisoned,
     #[snafu(display("The WebSocket worker panicked: {}", text))]
     WebSocketTaskPanic { text: String },
+
+    #[snafu(display("Unable to create the coordinator"))]
+    CreateCoordinator {
+        source: orchestrator::coordinator::Error,
+    },
+
+    #[snafu(display("Unable to shutdown the coordinator"))]
+    ShutdownCoordinator {
+        source: orchestrator::coordinator::Error,
+    },
+
+    #[snafu(display("Unable to convert the compile request"))]
+    Compile {
+        source: orchestrator::coordinator::CompileError,
+    },
+
+    #[snafu(display("The operation timed out"))]
+    Timeout { source: tokio::time::error::Elapsed },
 }
 
 type Result<T, E = Error> = ::std::result::Result<T, E>;

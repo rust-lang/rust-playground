@@ -14,7 +14,7 @@ use tempfile::TempDir;
 use tokio::{fs, process::Command, time};
 use tracing::debug;
 
-const DOCKER_PROCESS_TIMEOUT_SOFT: Duration = Duration::from_secs(10);
+pub(crate) const DOCKER_PROCESS_TIMEOUT_SOFT: Duration = Duration::from_secs(10);
 const DOCKER_PROCESS_TIMEOUT_HARD: Duration = Duration::from_secs(12);
 
 #[derive(Debug, Deserialize)]
@@ -314,11 +314,11 @@ impl Sandbox {
 
         if let CompileTarget::Assembly(_, demangle, process) = req.target {
             if demangle == DemangleAssembly::Demangle {
-                code = crate::asm_cleanup::demangle_asm(&code);
+                code = asm_cleanup::demangle_asm(&code);
             }
 
             if process == ProcessAssembly::Filter {
-                code = crate::asm_cleanup::filter_asm(&code);
+                code = asm_cleanup::filter_asm(&code);
             }
         } else if CompileTarget::Hir == req.target {
             // TODO: Run rustfmt on the generated HIR.
@@ -1053,6 +1053,102 @@ pub struct MacroExpansionResponse {
     pub success: bool,
     pub stdout: String,
     pub stderr: String,
+}
+
+mod sandbox_orchestrator_integration_impls {
+    use orchestrator::coordinator;
+
+    impl From<coordinator::CompileTarget> for super::CompileTarget {
+        fn from(value: coordinator::CompileTarget) -> Self {
+            match value {
+                coordinator::CompileTarget::Assembly(a, b, c) => {
+                    super::CompileTarget::Assembly(a.into(), b.into(), c.into())
+                }
+                coordinator::CompileTarget::Hir => super::CompileTarget::Hir,
+                coordinator::CompileTarget::LlvmIr => super::CompileTarget::LlvmIr,
+                coordinator::CompileTarget::Mir => super::CompileTarget::Mir,
+                coordinator::CompileTarget::Wasm => super::CompileTarget::Wasm,
+            }
+        }
+    }
+
+    impl From<coordinator::Mode> for super::Mode {
+        fn from(value: coordinator::Mode) -> Self {
+            match value {
+                coordinator::Mode::Debug => super::Mode::Debug,
+                coordinator::Mode::Release => super::Mode::Release,
+            }
+        }
+    }
+
+    impl From<coordinator::Edition> for super::Edition {
+        fn from(value: coordinator::Edition) -> Self {
+            match value {
+                coordinator::Edition::Rust2015 => super::Edition::Rust2015,
+                coordinator::Edition::Rust2018 => super::Edition::Rust2018,
+                coordinator::Edition::Rust2021 => super::Edition::Rust2021,
+            }
+        }
+    }
+
+    impl From<coordinator::Channel> for super::Channel {
+        fn from(value: coordinator::Channel) -> Self {
+            match value {
+                coordinator::Channel::Stable => super::Channel::Stable,
+                coordinator::Channel::Beta => super::Channel::Beta,
+                coordinator::Channel::Nightly => super::Channel::Nightly,
+            }
+        }
+    }
+
+    impl From<coordinator::AssemblyFlavor> for super::AssemblyFlavor {
+        fn from(value: coordinator::AssemblyFlavor) -> Self {
+            match value {
+                coordinator::AssemblyFlavor::Att => super::AssemblyFlavor::Att,
+                coordinator::AssemblyFlavor::Intel => super::AssemblyFlavor::Intel,
+            }
+        }
+    }
+
+    impl From<coordinator::CrateType> for super::CrateType {
+        fn from(value: coordinator::CrateType) -> Self {
+            match value {
+                coordinator::CrateType::Binary => super::CrateType::Binary,
+                coordinator::CrateType::Library(a) => super::CrateType::Library(a.into()),
+            }
+        }
+    }
+
+    impl From<coordinator::DemangleAssembly> for super::DemangleAssembly {
+        fn from(value: coordinator::DemangleAssembly) -> Self {
+            match value {
+                coordinator::DemangleAssembly::Demangle => super::DemangleAssembly::Demangle,
+                coordinator::DemangleAssembly::Mangle => super::DemangleAssembly::Mangle,
+            }
+        }
+    }
+
+    impl From<coordinator::ProcessAssembly> for super::ProcessAssembly {
+        fn from(value: coordinator::ProcessAssembly) -> Self {
+            match value {
+                coordinator::ProcessAssembly::Filter => super::ProcessAssembly::Filter,
+                coordinator::ProcessAssembly::Raw => super::ProcessAssembly::Raw,
+            }
+        }
+    }
+
+    impl From<coordinator::LibraryType> for super::LibraryType {
+        fn from(value: coordinator::LibraryType) -> Self {
+            match value {
+                coordinator::LibraryType::Lib => super::LibraryType::Lib,
+                coordinator::LibraryType::Dylib => super::LibraryType::Dylib,
+                coordinator::LibraryType::Rlib => super::LibraryType::Rlib,
+                coordinator::LibraryType::Staticlib => super::LibraryType::Staticlib,
+                coordinator::LibraryType::Cdylib => super::LibraryType::Cdylib,
+                coordinator::LibraryType::ProcMacro => super::LibraryType::ProcMacro,
+            }
+        }
+    }
 }
 
 #[cfg(test)]

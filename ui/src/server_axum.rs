@@ -1,17 +1,19 @@
 use crate::{
     gist,
     metrics::{
-        track_metric_async, track_metric_force_endpoint_async, track_metric_no_request_async,
-        Endpoint, GenerateLabels, SuccessDetails, UNAVAILABLE_WS,
+        record_metric, track_metric_async, track_metric_force_endpoint_async,
+        track_metric_no_request_async, Endpoint, GenerateLabels, HasLabelsCore, Outcome,
+        SuccessDetails, UNAVAILABLE_WS,
     },
-    sandbox::{self, Channel, Sandbox},
+    sandbox::{self, Channel, Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
     CachingSnafu, ClippyRequest, ClippyResponse, CompilationSnafu, CompileRequest, CompileResponse,
-    Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluationSnafu, ExecuteRequest,
-    ExecuteResponse, ExecutionSnafu, ExpansionSnafu, FormatRequest, FormatResponse,
-    FormattingSnafu, GhToken, GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu, LintingSnafu,
-    MacroExpansionRequest, MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest,
-    MetaGistResponse, MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result,
-    SandboxCreationSnafu,
+    CompileSnafu, Config, CreateCoordinatorSnafu, Error, ErrorJson, EvaluateRequest,
+    EvaluateResponse, EvaluationSnafu, ExecuteRequest, ExecuteResponse, ExecutionSnafu,
+    ExpansionSnafu, FormatRequest, FormatResponse, FormattingSnafu, GhToken, GistCreationSnafu,
+    GistLoadingSnafu, InterpretingSnafu, LintingSnafu, MacroExpansionRequest,
+    MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse,
+    MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result, SandboxCreationSnafu,
+    ShutdownCoordinatorSnafu, TimeoutSnafu,
 };
 use async_trait::async_trait;
 use axum::{
@@ -27,6 +29,7 @@ use axum::{
     Router,
 };
 use futures::{future::BoxFuture, FutureExt};
+use orchestrator::coordinator::{self, DockerBackend};
 use snafu::{prelude::*, IntoError};
 use std::{
     convert::{TryFrom, TryInto},
@@ -54,6 +57,9 @@ const MAX_AGE_ONE_DAY: HeaderValue = HeaderValue::from_static("public, max-age=8
 const MAX_AGE_ONE_YEAR: HeaderValue = HeaderValue::from_static("public, max-age=31536000");
 
 mod websocket;
+
+#[derive(Debug, Copy, Clone)]
+struct OrchestratorEnabled(bool);
 
 #[tokio::main]
 pub(crate) async fn serve(config: Config) {
@@ -87,7 +93,8 @@ pub(crate) async fn serve(config: Config) {
         .route("/nowebsocket", post(nowebsocket))
         .route("/whynowebsocket", get(whynowebsocket))
         .layer(Extension(Arc::new(SandboxCache::default())))
-        .layer(Extension(config.github_token()));
+        .layer(Extension(config.github_token()))
+        .layer(Extension(OrchestratorEnabled(config.use_orchestrator())));
 
     if let Some(token) = config.metrics_token() {
         app = app.layer(Extension(token))
@@ -152,14 +159,23 @@ async fn evaluate(Json(req): Json<EvaluateRequest>) -> Result<Json<EvaluateRespo
     .map(Json)
 }
 
-async fn compile(Json(req): Json<CompileRequest>) -> Result<Json<CompileResponse>> {
-    with_sandbox(
-        req,
-        |sb, req| async move { sb.compile(req).await }.boxed(),
-        CompilationSnafu,
-    )
-    .await
-    .map(Json)
+async fn compile(
+    Extension(use_orchestrator): Extension<OrchestratorEnabled>,
+    Json(req): Json<CompileRequest>,
+) -> Result<Json<CompileResponse>> {
+    if use_orchestrator.0 {
+        with_coordinator(req, |c, req| c.compile(req).context(CompileSnafu).boxed())
+            .await
+            .map(Json)
+    } else {
+        with_sandbox(
+            req,
+            |sb, req| async move { sb.compile(req).await }.boxed(),
+            CompilationSnafu,
+        )
+        .await
+        .map(Json)
+    }
 }
 
 async fn execute(Json(req): Json<ExecuteRequest>) -> Result<Json<ExecuteResponse>> {
@@ -249,6 +265,82 @@ where
         .await
         .map(Into::into)
         .context(ctx)
+}
+
+pub(crate) trait HasEndpoint {
+    const ENDPOINT: Endpoint;
+}
+
+impl HasEndpoint for CompileRequest {
+    const ENDPOINT: Endpoint = Endpoint::Compile;
+}
+
+trait IsSuccess {
+    fn is_success(&self) -> bool;
+}
+
+impl IsSuccess for coordinator::CompileResponseWithOutput {
+    fn is_success(&self) -> bool {
+        self.success
+    }
+}
+
+async fn with_coordinator<WebReq, WebResp, Req, Resp, F>(req: WebReq, f: F) -> Result<WebResp>
+where
+    WebReq: TryInto<Req, Error = Error>,
+    WebReq: HasEndpoint,
+    Req: HasLabelsCore,
+    Resp: Into<WebResp>,
+    Resp: IsSuccess,
+    for<'f> F:
+        FnOnce(&'f coordinator::Coordinator<DockerBackend>, Req) -> BoxFuture<'f, Result<Resp>>,
+{
+    let coordinator = orchestrator::coordinator::Coordinator::new_docker()
+        .await
+        .context(CreateCoordinatorSnafu)?;
+
+    let job = async {
+        let req = req.try_into()?;
+
+        let labels_core = req.labels_core();
+
+        let start = Instant::now();
+
+        let job = f(&coordinator, req);
+        let resp = tokio::time::timeout(DOCKER_PROCESS_TIMEOUT_SOFT, job).await;
+
+        let elapsed = start.elapsed();
+
+        let outcome = match &resp {
+            Ok(Ok(v)) => {
+                if v.is_success() {
+                    Outcome::Success
+                } else {
+                    Outcome::ErrorUserCode
+                }
+            }
+            Ok(Err(_)) => Outcome::ErrorServer,
+            Err(_) => Outcome::ErrorTimeoutSoft,
+        };
+
+        // Note that any early return before this point won't be
+        // reported in the metrics!
+
+        record_metric(WebReq::ENDPOINT, labels_core, outcome, elapsed);
+
+        let resp = resp.context(TimeoutSnafu)?;
+
+        resp.map(Into::into)
+    };
+
+    let resp = job.await;
+
+    coordinator
+        .shutdown()
+        .await
+        .context(ShutdownCoordinatorSnafu)?;
+
+    resp
 }
 
 async fn meta_crates(
@@ -674,5 +766,164 @@ where
 {
     fn into_response(self) -> axum::response::Response {
         axum::Json(self.0).into_response()
+    }
+}
+
+mod api_orchestrator_integration_impls {
+    use orchestrator::coordinator::*;
+    use std::convert::TryFrom;
+
+    use super::{Error, Result};
+
+    impl TryFrom<crate::CompileRequest> for CompileRequest {
+        type Error = Error;
+
+        fn try_from(other: crate::CompileRequest) -> Result<Self> {
+            let crate::CompileRequest {
+                target,
+                assembly_flavor,
+                demangle_assembly,
+                process_assembly,
+                channel,
+                mode,
+                edition,
+                crate_type,
+                tests,
+                backtrace,
+                code,
+            } = other;
+
+            Ok(Self {
+                target: parse_target(
+                    &target,
+                    assembly_flavor.as_deref(),
+                    demangle_assembly.as_deref(),
+                    process_assembly.as_deref(),
+                )?,
+                channel: parse_channel(&channel)?,
+                crate_type: parse_crate_type(&crate_type)?,
+                mode: parse_mode(&mode)?,
+                edition: parse_edition(&edition)?,
+                tests,
+                backtrace,
+                code,
+            })
+        }
+    }
+
+    impl From<CompileResponseWithOutput> for crate::CompileResponse {
+        fn from(other: CompileResponseWithOutput) -> Self {
+            let CompileResponseWithOutput {
+                success,
+                code,
+                stdout,
+                stderr,
+            } = other;
+
+            Self {
+                success,
+                code,
+                stdout,
+                stderr,
+            }
+        }
+    }
+
+    fn parse_target(
+        target: &str,
+        assembly_flavor: Option<&str>,
+        demangle_assembly: Option<&str>,
+        process_assembly: Option<&str>,
+    ) -> Result<CompileTarget> {
+        Ok(match target {
+            "asm" => {
+                let assembly_flavor = match assembly_flavor {
+                    Some(f) => parse_assembly_flavor(f)?,
+                    None => AssemblyFlavor::Att,
+                };
+
+                let demangle = match demangle_assembly {
+                    Some(f) => parse_demangle_assembly(f)?,
+                    None => DemangleAssembly::Demangle,
+                };
+
+                let process_assembly = match process_assembly {
+                    Some(f) => parse_process_assembly(f)?,
+                    None => ProcessAssembly::Filter,
+                };
+
+                CompileTarget::Assembly(assembly_flavor, demangle, process_assembly)
+            }
+            "llvm-ir" => CompileTarget::LlvmIr,
+            "mir" => CompileTarget::Mir,
+            "hir" => CompileTarget::Hir,
+            "wasm" => CompileTarget::Wasm,
+            value => crate::InvalidTargetSnafu { value }.fail()?,
+        })
+    }
+
+    fn parse_assembly_flavor(s: &str) -> Result<AssemblyFlavor> {
+        Ok(match s {
+            "att" => AssemblyFlavor::Att,
+            "intel" => AssemblyFlavor::Intel,
+            value => crate::InvalidAssemblyFlavorSnafu { value }.fail()?,
+        })
+    }
+
+    fn parse_demangle_assembly(s: &str) -> Result<DemangleAssembly> {
+        Ok(match s {
+            "demangle" => DemangleAssembly::Demangle,
+            "mangle" => DemangleAssembly::Mangle,
+            value => crate::InvalidDemangleAssemblySnafu { value }.fail()?,
+        })
+    }
+
+    fn parse_process_assembly(s: &str) -> Result<ProcessAssembly> {
+        Ok(match s {
+            "filter" => ProcessAssembly::Filter,
+            "raw" => ProcessAssembly::Raw,
+            value => crate::InvalidProcessAssemblySnafu { value }.fail()?,
+        })
+    }
+
+    fn parse_channel(s: &str) -> Result<Channel> {
+        Ok(match s {
+            "stable" => Channel::Stable,
+            "beta" => Channel::Beta,
+            "nightly" => Channel::Nightly,
+            value => crate::InvalidChannelSnafu { value }.fail()?,
+        })
+    }
+
+    fn parse_crate_type(s: &str) -> Result<CrateType> {
+        use {CrateType::*, LibraryType::*};
+
+        Ok(match s {
+            "bin" => Binary,
+            "lib" => Library(Lib),
+            "dylib" => Library(Dylib),
+            "rlib" => Library(Rlib),
+            "staticlib" => Library(Staticlib),
+            "cdylib" => Library(Cdylib),
+            "proc-macro" => Library(ProcMacro),
+            value => crate::InvalidCrateTypeSnafu { value }.fail()?,
+        })
+    }
+
+    fn parse_mode(s: &str) -> Result<Mode> {
+        Ok(match s {
+            "debug" => Mode::Debug,
+            "release" => Mode::Release,
+            value => crate::InvalidModeSnafu { value }.fail()?,
+        })
+    }
+
+    fn parse_edition(s: &str) -> Result<Edition> {
+        Ok(match s {
+            "2015" => Edition::Rust2015,
+            "2018" => Edition::Rust2018,
+            "2021" => Edition::Rust2021,
+            value => crate::InvalidEditionSnafu { value }.fail()?,
+        })
     }
 }

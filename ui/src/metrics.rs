@@ -1,11 +1,15 @@
 use futures::future::BoxFuture;
 use lazy_static::lazy_static;
+use orchestrator::coordinator;
 use prometheus::{
     self, register_histogram, register_histogram_vec, register_int_counter, register_int_gauge,
     Histogram, HistogramVec, IntCounter, IntGauge,
 };
 use regex::Regex;
-use std::{future::Future, time::Instant};
+use std::{
+    future::Future,
+    time::{Duration, Instant},
+};
 
 use crate::sandbox::{self, Channel, CompileTarget, CrateType, Edition, Mode};
 
@@ -60,6 +64,16 @@ pub(crate) enum Outcome {
     ErrorTimeoutSoft,
     ErrorTimeoutHard,
     ErrorUserCode,
+}
+
+pub(crate) struct LabelsCore {
+    target: Option<CompileTarget>,
+    channel: Option<Channel>,
+    mode: Option<Mode>,
+    edition: Option<Option<Edition>>,
+    crate_type: Option<CrateType>,
+    tests: Option<bool>,
+    backtrace: Option<bool>,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -131,6 +145,29 @@ impl Labels {
             tests,
             backtrace,
         ]
+    }
+
+    pub(crate) fn complete(endpoint: Endpoint, labels_core: LabelsCore, outcome: Outcome) -> Self {
+        let LabelsCore {
+            target,
+            channel,
+            mode,
+            edition,
+            crate_type,
+            tests,
+            backtrace,
+        } = labels_core;
+        Self {
+            endpoint,
+            outcome,
+            target,
+            channel,
+            mode,
+            edition,
+            crate_type,
+            tests,
+            backtrace,
+        }
     }
 }
 
@@ -406,11 +443,8 @@ where
     let outcome = SuccessDetails::for_sandbox_result(&response);
     let mut labels = request.generate_labels(outcome);
     f(&mut labels);
-    let values = &labels.as_values();
 
-    let histogram = REQUESTS.with_label_values(values);
-
-    histogram.observe(elapsed.as_secs_f64());
+    record_metric_complete(labels, elapsed);
 
     response
 }
@@ -443,10 +477,53 @@ where
         tests: None,
         backtrace: None,
     };
-    let values = &labels.as_values();
-    let histogram = REQUESTS.with_label_values(values);
 
-    histogram.observe(elapsed.as_secs_f64());
+    record_metric_complete(labels, elapsed);
 
     response
+}
+
+pub(crate) trait HasLabelsCore {
+    fn labels_core(&self) -> LabelsCore;
+}
+
+impl HasLabelsCore for coordinator::CompileRequest {
+    fn labels_core(&self) -> LabelsCore {
+        let Self {
+            target,
+            channel,
+            crate_type,
+            mode,
+            edition,
+            tests,
+            backtrace,
+            code: _,
+        } = *self;
+
+        LabelsCore {
+            target: Some(target.into()),
+            channel: Some(channel.into()),
+            mode: Some(mode.into()),
+            edition: Some(Some(edition.into())),
+            crate_type: Some(crate_type.into()),
+            tests: Some(tests),
+            backtrace: Some(backtrace),
+        }
+    }
+}
+
+pub(crate) fn record_metric(
+    endpoint: Endpoint,
+    labels_core: LabelsCore,
+    outcome: Outcome,
+    elapsed: Duration,
+) {
+    let labels = Labels::complete(endpoint, labels_core, outcome);
+    record_metric_complete(labels, elapsed)
+}
+
+fn record_metric_complete(labels: Labels, elapsed: Duration) {
+    let values = &labels.as_values();
+    let histogram = REQUESTS.with_label_values(values);
+    histogram.observe(elapsed.as_secs_f64());
 }
