@@ -1,7 +1,8 @@
+use futures::{future::BoxFuture, FutureExt};
 use snafu::prelude::*;
 use std::{
     collections::HashMap,
-    mem,
+    fmt, mem,
     process::Stdio,
     sync::{
         atomic::{AtomicU64, Ordering},
@@ -416,8 +417,6 @@ impl Container {
         &self,
         request: CompileRequest,
     ) -> Result<CompileResponseWithOutput, CompileError> {
-        use compile_error::*;
-
         let ActiveCompilation {
             task,
             stdout_rx,
@@ -429,7 +428,7 @@ impl Container {
 
         let (result, stdout, stderr) = join!(task, stdout, stderr);
 
-        let CompileResponse { success, code } = result.context(CompilationTaskPanickedSnafu)??;
+        let CompileResponse { success, code } = result?;
         Ok(CompileResponseWithOutput {
             success,
             code,
@@ -460,6 +459,52 @@ impl Container {
         write_main.context(CouldNotWriteCodeSnafu)?;
         modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
 
+        let SpawnCargo {
+            task,
+            stdout_rx,
+            stderr_rx,
+        } = self
+            .spawn_cargo_task(execute_cargo)
+            .await
+            .context(CouldNotStartCargoSnafu)?;
+
+        let commander = self.commander.clone();
+        let task = async move {
+            let success = task
+                .await
+                .context(CargoTaskPanickedSnafu)?
+                .context(CargoFailedSnafu)?;
+
+            let code = if success {
+                let file: ReadFileResponse = commander
+                    .one(read_output)
+                    .await
+                    .context(CouldNotReadCodeSnafu)?;
+                String::from_utf8(file.0).context(CodeNotUtf8Snafu)?
+            } else {
+                String::new()
+            };
+
+            // TODO: This is synchronous...
+            let code = request.postprocess_result(code);
+
+            Ok(CompileResponse { success, code })
+        }
+        .boxed();
+
+        Ok(ActiveCompilation {
+            task,
+            stdout_rx,
+            stderr_rx,
+        })
+    }
+
+    async fn spawn_cargo_task(
+        &self,
+        execute_cargo: ExecuteCommandRequest,
+    ) -> Result<SpawnCargo, SpawnCargoError> {
+        use spawn_cargo_error::*;
+
         let (stdout_tx, stdout_rx) = mpsc::channel(8);
         let (stderr_tx, stderr_rx) = mpsc::channel(8);
 
@@ -467,18 +512,14 @@ impl Container {
             .commander
             .many(execute_cargo)
             .await
-            .context(CouldNotStartCompilerSnafu)?;
+            .context(CouldNotStartCargoSnafu)?;
 
         let task = tokio::spawn({
-            let commander = self.commander.clone();
             async move {
-                let mut success = false;
-
                 while let Some(container_msg) = from_worker_rx.recv().await {
                     match container_msg {
                         WorkerMessage::ExecuteCommand(resp) => {
-                            success = resp.success;
-                            break;
+                            return Ok(resp.success);
                         }
                         WorkerMessage::StdoutPacket(packet) => {
                             stdout_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
@@ -490,24 +531,11 @@ impl Container {
                     }
                 }
 
-                let code = if success {
-                    let file: ReadFileResponse = commander
-                        .one(read_output)
-                        .await
-                        .context(CouldNotReadCodeSnafu)?;
-                    String::from_utf8(file.0).context(CodeNotUtf8Snafu)?
-                } else {
-                    String::new()
-                };
-
-                // TODO: This is synchronous...
-                let code = request.postprocess_result(code);
-
-                Ok(CompileResponse { success, code })
+                UnexpectedEndOfMessagesSnafu.fail()
             }
         });
 
-        Ok(ActiveCompilation {
+        Ok(SpawnCargo {
             task,
             stdout_rx,
             stderr_rx,
@@ -526,36 +554,64 @@ impl Container {
     }
 }
 
-#[derive(Debug)]
 pub struct ActiveCompilation {
-    pub task: JoinHandle<Result<CompileResponse, CompileError>>,
+    pub task: BoxFuture<'static, Result<CompileResponse, CompileError>>,
     pub stdout_rx: mpsc::Receiver<String>,
     pub stderr_rx: mpsc::Receiver<String>,
+}
+
+impl fmt::Debug for ActiveCompilation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ActiveCompilation")
+            .field("task", &"<future>")
+            .field("stdout_rx", &self.stdout_rx)
+            .field("stderr_rx", &self.stderr_rx)
+            .finish()
+    }
 }
 
 #[derive(Debug, Snafu)]
 #[snafu(module)]
 pub enum CompileError {
-    #[snafu(display("The compilation task panicked"))]
-    CompilationTaskPanicked { source: tokio::task::JoinError },
-
     #[snafu(display("Could not modify Cargo.toml"))]
     CouldNotModifyCargoToml { source: ModifyCargoTomlError },
 
     #[snafu(display("Could not write source code"))]
     CouldNotWriteCode { source: CommanderError },
 
-    #[snafu(display("Could not start compiler"))]
-    CouldNotStartCompiler { source: CommanderError },
+    #[snafu(display("Could not start Cargo task"))]
+    CouldNotStartCargo { source: SpawnCargoError },
 
-    #[snafu(display("Received an unexpected message"))]
-    UnexpectedMessage,
+    #[snafu(display("The Cargo task panicked"))]
+    CargoTaskPanicked { source: tokio::task::JoinError },
+
+    #[snafu(display("Cargo task failed"))]
+    CargoFailed { source: SpawnCargoError },
 
     #[snafu(display("Could not read the compilation output"))]
     CouldNotReadCode { source: CommanderError },
 
     #[snafu(display("The compilation output was not UTF-8"))]
     CodeNotUtf8 { source: std::string::FromUtf8Error },
+}
+
+struct SpawnCargo {
+    task: JoinHandle<Result<bool, SpawnCargoError>>,
+    stdout_rx: mpsc::Receiver<String>,
+    stderr_rx: mpsc::Receiver<String>,
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum SpawnCargoError {
+    #[snafu(display("Could not start Cargo"))]
+    CouldNotStartCargo { source: CommanderError },
+
+    #[snafu(display("Received an unexpected message"))]
+    UnexpectedMessage,
+
+    #[snafu(display("There are no more messages"))]
+    UnexpectedEndOfMessages,
 }
 
 #[derive(Debug, Clone)]
@@ -1199,7 +1255,7 @@ mod tests {
         let (complete, _stdout, stderr) =
             async { join!(task, stdout, stderr) }.with_timeout().await;
 
-        let response = complete.unwrap().unwrap();
+        let response = complete.unwrap();
 
         assert!(response.success, "stderr: {}", stderr);
         assert_contains!(stderr, "Compiling");
