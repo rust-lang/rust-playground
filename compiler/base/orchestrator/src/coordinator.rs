@@ -223,21 +223,6 @@ impl CompileRequest {
         }
     }
 
-    pub(crate) fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
-        cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
-
-        if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
-            cargo_toml = modify_cargo_toml::set_crate_type(cargo_toml, crate_type);
-        }
-
-        if CompileTarget::Wasm == self.target {
-            cargo_toml = modify_cargo_toml::remove_dependencies(cargo_toml);
-            cargo_toml = modify_cargo_toml::set_release_lto(cargo_toml, true);
-        }
-
-        cargo_toml
-    }
-
     pub(crate) fn postprocess_result(&self, mut code: String) -> String {
         if let CompileTarget::Assembly(_, demangle, process) = self.target {
             if demangle == DemangleAssembly::Demangle {
@@ -250,6 +235,23 @@ impl CompileRequest {
         }
 
         code
+    }
+}
+
+impl CargoTomlModifier for CompileRequest {
+    fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
+        cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
+
+        if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
+            cargo_toml = modify_cargo_toml::set_crate_type(cargo_toml, crate_type);
+        }
+
+        if CompileTarget::Wasm == self.target {
+            cargo_toml = modify_cargo_toml::remove_dependencies(cargo_toml);
+            cargo_toml = modify_cargo_toml::set_release_lto(cargo_toml, true);
+        }
+
+        cargo_toml
     }
 }
 
@@ -563,6 +565,10 @@ struct Commander {
     id: Arc<AtomicU64>,
 }
 
+trait CargoTomlModifier {
+    fn modify_cargo_toml(&self, cargo_toml: toml::Value) -> toml::Value;
+}
+
 #[derive(Debug)]
 struct ModifyCargoToml {
     commander: Commander,
@@ -580,7 +586,10 @@ impl ModifyCargoToml {
         })
     }
 
-    async fn modify_for(&self, request: &CompileRequest) -> Result<(), ModifyCargoTomlError> {
+    async fn modify_for(
+        &self,
+        request: &impl CargoTomlModifier,
+    ) -> Result<(), ModifyCargoTomlError> {
         let cargo_toml = self.cargo_toml.clone();
         let cargo_toml = request.modify_cargo_toml(cargo_toml);
         Self::write(&self.commander, cargo_toml).await
