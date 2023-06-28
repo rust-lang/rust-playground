@@ -152,6 +152,66 @@ pub enum LibraryType {
 }
 
 #[derive(Debug, Clone)]
+pub struct ExecuteRequest {
+    pub channel: Channel,
+    pub mode: Mode,
+    pub edition: Edition,
+    pub crate_type: CrateType,
+    pub tests: bool,
+    pub backtrace: bool,
+    pub code: String,
+}
+
+impl ExecuteRequest {
+    pub(crate) fn write_main_request(&self) -> WriteFileRequest {
+        write_primary_file_request(self.crate_type, &self.code)
+    }
+
+    fn execute_cargo_request(&self) -> ExecuteCommandRequest {
+        let mut args = vec![];
+
+        let cmd = match (self.tests, self.crate_type.is_binary()) {
+            (true, _) => "test",
+            (_, true) => "run",
+            (_, _) => "build",
+        };
+        args.push(cmd);
+
+        if let Mode::Release = self.mode {
+            args.push("--release");
+        }
+
+        let mut envs = HashMap::new();
+        if self.backtrace {
+            envs.insert("RUST_BACKTRACE".to_owned(), "1".to_owned());
+        }
+
+        ExecuteCommandRequest {
+            cmd: "cargo".to_owned(),
+            args: args.into_iter().map(|s| s.to_owned()).collect(),
+            envs,
+            cwd: None,
+        }
+    }
+}
+
+impl CargoTomlModifier for ExecuteRequest {
+    fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
+        cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
+
+        if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
+            cargo_toml = modify_cargo_toml::set_crate_type(cargo_toml, crate_type);
+        }
+        cargo_toml
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ExecuteResponse {
+    pub success: bool,
+}
+
+#[derive(Debug, Clone)]
 pub struct CompileRequest {
     pub target: CompileTarget,
     pub channel: Channel,
@@ -345,6 +405,22 @@ where
         })
     }
 
+    pub async fn execute(
+        &self,
+        request: ExecuteRequest,
+    ) -> Result<WithOutput<ExecuteResponse>, ExecuteError> {
+        self.select_channel(request.channel).execute(request).await
+    }
+
+    pub async fn begin_execute(
+        &self,
+        request: ExecuteRequest,
+    ) -> Result<ActiveExecution, ExecuteError> {
+        self.select_channel(request.channel)
+            .begin_execute(request)
+            .await
+    }
+
     pub async fn compile(
         &self,
         request: CompileRequest,
@@ -444,6 +520,61 @@ impl Container {
             task,
             modify_cargo_toml,
             commander,
+        })
+    }
+
+    async fn execute(
+        &self,
+        request: ExecuteRequest,
+    ) -> Result<WithOutput<ExecuteResponse>, ExecuteError> {
+        let ActiveExecution {
+            task,
+            stdout_rx,
+            stderr_rx,
+        } = self.begin_execute(request).await?;
+
+        WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
+    }
+
+    async fn begin_execute(
+        &self,
+        request: ExecuteRequest,
+    ) -> Result<ActiveExecution, ExecuteError> {
+        use execute_error::*;
+
+        let write_main = request.write_main_request();
+        let execute_cargo = request.execute_cargo_request();
+
+        let write_main = self.commander.one(write_main);
+        let modify_cargo_toml = self.modify_cargo_toml.modify_for(&request);
+
+        let (write_main, modify_cargo_toml) = join!(write_main, modify_cargo_toml);
+
+        write_main.context(CouldNotWriteCodeSnafu)?;
+        modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
+
+        let SpawnCargo {
+            task,
+            stdout_rx,
+            stderr_rx,
+        } = self
+            .spawn_cargo_task(execute_cargo)
+            .await
+            .context(CouldNotStartCargoSnafu)?;
+
+        let task = async move {
+            let success = task
+                .await
+                .context(CargoTaskPanickedSnafu)?
+                .context(CargoFailedSnafu)?;
+            Ok(ExecuteResponse { success })
+        }
+        .boxed();
+
+        Ok(ActiveExecution {
+            task,
+            stdout_rx,
+            stderr_rx,
         })
     }
 
@@ -575,6 +706,41 @@ impl Container {
         drop(modify_cargo_toml);
         task.await.context(ContainerTaskPanickedSnafu)?
     }
+}
+
+pub struct ActiveExecution {
+    pub task: BoxFuture<'static, Result<ExecuteResponse, ExecuteError>>,
+    pub stdout_rx: mpsc::Receiver<String>,
+    pub stderr_rx: mpsc::Receiver<String>,
+}
+
+impl fmt::Debug for ActiveExecution {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ActiveExecution")
+            .field("task", &"<future>")
+            .field("stdout_rx", &self.stdout_rx)
+            .field("stderr_rx", &self.stderr_rx)
+            .finish()
+    }
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum ExecuteError {
+    #[snafu(display("Could not modify Cargo.toml"))]
+    CouldNotModifyCargoToml { source: ModifyCargoTomlError },
+
+    #[snafu(display("Could not write source code"))]
+    CouldNotWriteCode { source: CommanderError },
+
+    #[snafu(display("Could not start Cargo task"))]
+    CouldNotStartCargo { source: SpawnCargoError },
+
+    #[snafu(display("The Cargo task panicked"))]
+    CargoTaskPanicked { source: tokio::task::JoinError },
+
+    #[snafu(display("Cargo task failed"))]
+    CargoFailed { source: SpawnCargoError },
 }
 
 pub struct ActiveCompilation {
@@ -1098,7 +1264,7 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
 #[cfg(test)]
 mod tests {
     use assertables::*;
-    use futures::{Future, FutureExt};
+    use futures::{future::try_join_all, Future, FutureExt};
     use std::{sync::Once, time::Duration};
     use tempdir::TempDir;
     use tokio::join;
@@ -1156,6 +1322,213 @@ mod tests {
     async fn new_coordinator() -> Result<Coordinator<impl Backend>> {
         Coordinator::new(TestBackend::new()).await
         //Coordinator::new_docker().await
+    }
+
+    fn new_execute_request() -> ExecuteRequest {
+        ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            edition: Edition::Rust2021,
+            crate_type: CrateType::Binary,
+            tests: false,
+            backtrace: false,
+            code: r#"fn main() { println!("Hello, coordinator!"); }"#.into(),
+        }
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn test_execute_response() -> Result<()> {
+        let coordinator = new_coordinator().await?;
+
+        let response = coordinator
+            .execute(new_execute_request())
+            .with_timeout()
+            .await
+            .unwrap();
+
+        assert!(response.success, "stderr: {}", response.stderr);
+        assert_contains!(response.stderr, "Compiling");
+        assert_contains!(response.stderr, "Finished");
+        assert_contains!(response.stderr, "Running");
+        assert_contains!(response.stdout, "Hello, coordinator!");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn test_execute_mode() -> Result<()> {
+        let params = [
+            (Mode::Debug, "[unoptimized + debuginfo]"),
+            (Mode::Release, "[optimized]"),
+        ];
+
+        let tests = params.into_iter().map(|(mode, expected)| async move {
+            let coordinator = new_coordinator().await?;
+
+            let request = ExecuteRequest {
+                mode,
+                ..new_execute_request()
+            };
+            let response = coordinator.execute(request).await.unwrap();
+
+            assert!(response.success, "({mode:?}) stderr: {}", response.stderr);
+            assert_contains!(response.stderr, expected);
+
+            coordinator.shutdown().await?;
+
+            Ok(())
+        });
+
+        try_join_all(tests).with_timeout().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn test_execute_edition() -> Result<()> {
+        let params = [
+            (r#"fn x() { let dyn = true; }"#, [true, false, false]),
+            (r#"fn x() { u16::try_from(1u8); }"#, [false, false, true]),
+        ];
+
+        let tests = params.into_iter().flat_map(|(code, works_in)| {
+            Edition::ALL.into_iter().zip(works_in).map(
+                move |(edition, expected_to_work)| async move {
+                    let coordinator = new_coordinator().await?;
+
+                    let request = ExecuteRequest {
+                        code: code.into(),
+                        edition,
+                        crate_type: CrateType::Library(LibraryType::Lib),
+                        ..new_execute_request()
+                    };
+                    let response = coordinator.execute(request).await.unwrap();
+
+                    assert_eq!(
+                        response.success, expected_to_work,
+                        "({edition:?}), stderr: {}",
+                        response.stderr,
+                    );
+
+                    coordinator.shutdown().await?;
+
+                    Ok(())
+                },
+            )
+        });
+
+        try_join_all(tests).with_timeout().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn test_execute_crate_type() -> Result<()> {
+        let params = [
+            (CrateType::Binary, "Running `target"),
+            (
+                CrateType::Library(LibraryType::Cdylib),
+                "function `main` is never used",
+            ),
+        ];
+
+        let tests = params.into_iter().map(|(crate_type, expected)| async move {
+            let coordinator = new_coordinator().await?;
+
+            let request = ExecuteRequest {
+                crate_type,
+                ..new_execute_request()
+            };
+            let response = coordinator.execute(request).await.unwrap();
+
+            assert!(
+                response.success,
+                "({crate_type:?}), stderr: {}",
+                response.stderr,
+            );
+            assert_contains!(response.stderr, expected);
+
+            coordinator.shutdown().await?;
+
+            Ok(())
+        });
+
+        try_join_all(tests).with_timeout().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn test_execute_tests() -> Result<()> {
+        let code = r#"fn main() {} #[test] fn test() {}"#;
+
+        let params = [(false, "Running `"), (true, "Running unittests")];
+
+        let tests = params.into_iter().map(|(tests, expected)| async move {
+            let coordinator = new_coordinator().await?;
+
+            let request = ExecuteRequest {
+                code: code.into(),
+                tests,
+                ..new_execute_request()
+            };
+            let response = coordinator.execute(request).await.unwrap();
+
+            assert!(response.success, "({tests:?}), stderr: {}", response.stderr,);
+            assert_contains!(response.stderr, expected);
+
+            coordinator.shutdown().await?;
+
+            Ok(())
+        });
+
+        try_join_all(tests).with_timeout().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn test_execute_backtrace() -> Result<()> {
+        let code = r#"fn main() { panic!("Disco"); }"#;
+
+        let params = [
+            (false, "note: run with `RUST_BACKTRACE=1`"),
+            (true, "stack backtrace:"),
+        ];
+
+        let tests = params.into_iter().map(|(backtrace, expected)| async move {
+            let coordinator = new_coordinator().await?;
+
+            let request = ExecuteRequest {
+                code: code.into(),
+                backtrace,
+                ..new_execute_request()
+            };
+            let response = coordinator.execute(request).await.unwrap();
+
+            assert!(
+                !response.success,
+                "({backtrace:?}), stderr: {}",
+                response.stderr,
+            );
+            assert_contains!(response.stderr, expected);
+
+            coordinator.shutdown().await?;
+
+            Ok(())
+        });
+
+        try_join_all(tests).with_timeout().await?;
+
+        Ok(())
     }
 
     fn new_compile_request() -> CompileRequest {
