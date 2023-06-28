@@ -153,6 +153,7 @@ pub struct CompileRequest {
     pub crate_type: CrateType,
     pub mode: Mode,
     pub edition: Edition,
+    // TODO: Remove `tests` and `backtrace` -- don't make sense for compiling.
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
