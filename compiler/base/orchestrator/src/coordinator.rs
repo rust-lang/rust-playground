@@ -1,8 +1,8 @@
-use futures::{future::BoxFuture, FutureExt};
+use futures::{future::BoxFuture, Future, FutureExt};
 use snafu::prelude::*;
 use std::{
     collections::HashMap,
-    fmt, mem,
+    fmt, mem, ops,
     process::Stdio,
     sync::{
         atomic::{AtomicU64, Ordering},
@@ -248,17 +248,47 @@ impl CargoTomlModifier for CompileRequest {
 }
 
 #[derive(Debug, Clone)]
-pub struct CompileResponseWithOutput {
+pub struct CompileResponse {
     pub success: bool,
     pub code: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct WithOutput<T> {
+    pub response: T,
     pub stdout: String,
     pub stderr: String,
 }
 
-#[derive(Debug, Clone)]
-pub struct CompileResponse {
-    pub success: bool,
-    pub code: String,
+impl<T> WithOutput<T> {
+    async fn try_absorb<F, E>(
+        task: F,
+        stdout_rx: mpsc::Receiver<String>,
+        stderr_rx: mpsc::Receiver<String>,
+    ) -> Result<WithOutput<T>, E>
+    where
+        F: Future<Output = Result<T, E>>,
+    {
+        let stdout = ReceiverStream::new(stdout_rx).collect();
+        let stderr = ReceiverStream::new(stderr_rx).collect();
+
+        let (result, stdout, stderr) = join!(task, stdout, stderr);
+        let response = result?;
+
+        Ok(WithOutput {
+            response,
+            stdout,
+            stderr,
+        })
+    }
+}
+
+impl<T> ops::Deref for WithOutput<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.response
+    }
 }
 
 fn write_primary_file_request(crate_type: CrateType, code: &str) -> WriteFileRequest {
@@ -318,7 +348,7 @@ where
     pub async fn compile(
         &self,
         request: CompileRequest,
-    ) -> Result<CompileResponseWithOutput, CompileError> {
+    ) -> Result<WithOutput<CompileResponse>, CompileError> {
         self.select_channel(request.channel).compile(request).await
     }
 
@@ -420,25 +450,14 @@ impl Container {
     async fn compile(
         &self,
         request: CompileRequest,
-    ) -> Result<CompileResponseWithOutput, CompileError> {
+    ) -> Result<WithOutput<CompileResponse>, CompileError> {
         let ActiveCompilation {
             task,
             stdout_rx,
             stderr_rx,
         } = self.begin_compile(request).await?;
 
-        let stdout = ReceiverStream::new(stdout_rx).collect();
-        let stderr = ReceiverStream::new(stderr_rx).collect();
-
-        let (result, stdout, stderr) = join!(task, stdout, stderr);
-
-        let CompileResponse { success, code } = result?;
-        Ok(CompileResponseWithOutput {
-            success,
-            code,
-            stdout,
-            stderr,
-        })
+        WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
     }
 
     async fn begin_compile(
