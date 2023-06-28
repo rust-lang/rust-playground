@@ -864,6 +864,7 @@ impl Backend for DockerBackend {
         command
             .arg("-i")
             .args(["-a", "stdin", "-a", "stdout", "-a", "stderr"])
+            .args(["-e", "PLAYGROUND_ORCHESTRATOR=1"])
             .arg("--rm")
             .arg(channel.to_container_name())
             .arg("worker")
