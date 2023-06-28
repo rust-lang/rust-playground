@@ -166,16 +166,7 @@ pub struct CompileRequest {
 
 impl CompileRequest {
     pub(crate) fn write_main_request(&self) -> WriteFileRequest {
-        let path = if self.crate_type.is_binary() {
-            "src/main.rs"
-        } else {
-            "src/lib.rs"
-        };
-
-        WriteFileRequest {
-            path: path.to_owned(),
-            content: self.code.clone().into(),
-        }
+        write_primary_file_request(self.crate_type, &self.code)
     }
 
     pub(crate) fn execute_cargo_request(&self, output_path: &str) -> ExecuteCommandRequest {
@@ -268,6 +259,19 @@ pub struct CompileResponseWithOutput {
 pub struct CompileResponse {
     pub success: bool,
     pub code: String,
+}
+
+fn write_primary_file_request(crate_type: CrateType, code: &str) -> WriteFileRequest {
+    let path = if crate_type.is_binary() {
+        "src/main.rs"
+    } else {
+        "src/lib.rs"
+    };
+
+    WriteFileRequest {
+        path: path.to_owned(),
+        content: code.clone().into(),
+    }
 }
 
 #[derive(Debug)]
