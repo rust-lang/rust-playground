@@ -113,6 +113,10 @@ pub enum CrateType {
 }
 
 impl CrateType {
+    pub(crate) fn is_binary(self) -> bool {
+        self == CrateType::Binary
+    }
+
     pub(crate) fn to_cargo_toml_key(self) -> &'static str {
         use {CrateType::*, LibraryType::*};
 
@@ -161,9 +165,10 @@ pub struct CompileRequest {
 
 impl CompileRequest {
     pub(crate) fn write_main_request(&self) -> WriteFileRequest {
-        let path = match self.crate_type {
-            CrateType::Binary => "src/main.rs",
-            CrateType::Library(_) => "src/lib.rs",
+        let path = if self.crate_type.is_binary() {
+            "src/main.rs"
+        } else {
+            "src/lib.rs"
         };
 
         WriteFileRequest {
