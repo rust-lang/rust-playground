@@ -20,6 +20,7 @@ use tokio::{
 };
 use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tokio_util::{io::SyncIoBridge, sync::CancellationToken};
+use tracing::{instrument, trace, trace_span, warn, Instrument};
 
 use crate::{
     bincode_input_closed,
@@ -536,6 +537,7 @@ impl Container {
         WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
     }
 
+    #[instrument(skip_all)]
     async fn begin_execute(
         &self,
         request: ExecuteRequest,
@@ -591,6 +593,7 @@ impl Container {
         WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
     }
 
+    #[instrument(skip_all)]
     async fn begin_compile(
         &self,
         request: CompileRequest,
@@ -671,6 +674,8 @@ impl Container {
         let task = tokio::spawn({
             async move {
                 while let Some(container_msg) = from_worker_rx.recv().await {
+                    trace!("processing {container_msg:?}");
+
                     match container_msg {
                         WorkerMessage::ExecuteCommand(resp) => {
                             return Ok(resp.success);
@@ -687,6 +692,7 @@ impl Container {
 
                 UnexpectedEndOfMessagesSnafu.fail()
             }
+            .instrument(trace_span!("cargo task").or_current())
         });
 
         Ok(SpawnCargo {
@@ -899,6 +905,7 @@ pub enum ModifyCargoTomlError {
 impl Commander {
     const GC_PERIOD: Duration = Duration::from_secs(30);
 
+    #[instrument(skip_all)]
     async fn demultiplex(
         mut command_rx: mpsc::Receiver<(oneshot::Sender<()>, DemultiplexCommand)>,
         mut from_worker_rx: mpsc::Receiver<Multiplexed<WorkerMessage>>,
@@ -918,11 +925,13 @@ impl Commander {
 
                     match command {
                         DemultiplexCommand::Listen(job_id, waiter) => {
+                            trace!("adding listener for {job_id:?}");
                             let old = waiting.insert(job_id, waiter);
                             ensure!(old.is_none(), DuplicateDemultiplexerClientSnafu { job_id });
                         }
 
                         DemultiplexCommand::ListenOnce(job_id, waiter) => {
+                            trace!("adding listener for {job_id:?}");
                             let old = waiting_once.insert(job_id, waiter);
                             ensure!(old.is_none(), DuplicateDemultiplexerClientSnafu { job_id });
                         }
@@ -935,16 +944,18 @@ impl Commander {
                     let Some(Multiplexed(job_id, msg)) = msg else { break };
 
                     if let Some(waiter) = waiting_once.remove(&job_id) {
+                        trace!("notifying listener for {job_id:?}");
                         waiter.send(msg).ok(/* Don't care about it */);
                         continue;
                     }
 
                     if let Some(waiter) = waiting.get(&job_id) {
+                        trace!("notifying listener for {job_id:?}");
                         waiter.send(msg).await.ok(/* Don't care about it */);
                         continue;
                     }
 
-                    // Should we log messages that didn't have a receiver?
+                    warn!("no listener for {job_id:?}");
                 }
 
                 // Find any channels where the receivers have been
