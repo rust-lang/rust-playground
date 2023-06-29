@@ -553,7 +553,7 @@ pub enum CompileError {
 #[derive(Debug, Clone)]
 struct Commander {
     to_worker_tx: mpsc::Sender<Multiplexed<CoordinatorMessage>>,
-    to_demultiplexer_tx: mpsc::Sender<DemultiplexCommand>,
+    to_demultiplexer_tx: mpsc::Sender<(oneshot::Sender<()>, DemultiplexCommand)>,
     id: Arc<AtomicU64>,
 }
 
@@ -640,7 +640,7 @@ impl Commander {
     const GC_PERIOD: Duration = Duration::from_secs(30);
 
     async fn demultiplex(
-        mut command_rx: mpsc::Receiver<DemultiplexCommand>,
+        mut command_rx: mpsc::Receiver<(oneshot::Sender<()>, DemultiplexCommand)>,
         mut from_worker_rx: mpsc::Receiver<Multiplexed<WorkerMessage>>,
     ) -> Result<(), CommanderError> {
         use commander_error::*;
@@ -654,7 +654,7 @@ impl Commander {
         loop {
             select! {
                 command = command_rx.recv() => {
-                    let Some(command) = command else { break };
+                    let Some((ack_tx, command)) = command else { break };
 
                     match command {
                         DemultiplexCommand::Listen(job_id, waiter) => {
@@ -667,6 +667,8 @@ impl Commander {
                             ensure!(old.is_none(), DuplicateDemultiplexerClientSnafu { job_id });
                         }
                     }
+
+                    ack_tx.send(()).ok(/* Don't care about it */);
                 },
 
                 msg = from_worker_rx.recv() => {
@@ -714,11 +716,15 @@ impl Commander {
     ) -> Result<(), CommanderError> {
         use commander_error::*;
 
+        let (ack_tx, ack_rx) = oneshot::channel();
+
         self.to_demultiplexer_tx
-            .send(command)
+            .send((ack_tx, command))
             .await
             .drop_error_details()
-            .context(UnableToSendToDemultiplexerSnafu)
+            .context(UnableToSendToDemultiplexerSnafu)?;
+
+        ack_rx.await.context(DemultiplexerDidNotRespondSnafu)
     }
 
     async fn send_to_worker(
@@ -782,6 +788,9 @@ pub enum CommanderError {
 
     #[snafu(display("Could not send a message to the demultiplexer"))]
     UnableToSendToDemultiplexer { source: mpsc::error::SendError<()> },
+
+    #[snafu(display("Could not send a message to the demultiplexer"))]
+    DemultiplexerDidNotRespond { source: oneshot::error::RecvError },
 
     #[snafu(display("Did not receive a response from the demultiplexer"))]
     UnableToReceiveFromDemultiplexer { source: oneshot::error::RecvError },
