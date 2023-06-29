@@ -10,6 +10,7 @@ use std::{
     sync::Arc,
 };
 use tracing::{error, info, warn};
+use tracing_subscriber::EnvFilter;
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
@@ -26,7 +27,9 @@ fn main() {
     openssl_probe::init_ssl_cert_env_vars();
 
     // Info-level logging is enabled by default.
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt()
+        .with_env_filter(EnvFilter::from_default_env())
+        .init();
 
     let config = Config::from_env();
     server_axum::serve(config);
