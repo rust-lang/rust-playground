@@ -19,6 +19,7 @@ const allKeybindingNames =
 const allThemeNames =
       globSync('./node_modules/ace-builds/src-noconflict/theme-*.js')
       .map(basename)
+      .filter(n => !n.endsWith('-css'))
       .map(n => n.replace(/^theme-/, ''));
 
 // There's a builtin/default keybinding that we call `ace`.
