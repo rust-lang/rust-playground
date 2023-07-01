@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import Split from 'split-grid';
 
 import Editor from './editor/Editor';
@@ -8,7 +8,6 @@ import Notifications from './Notifications';
 import Output from './Output';
 import * as selectors from './selectors';
 import { Orientation } from './types';
-import * as actions from './actions';
 
 import styles from './Playground.module.css';
 
@@ -41,9 +40,6 @@ const ResizableArea: React.FC = () => {
   const isFocused = useSelector(selectors.isOutputFocused);
   const orientation = useSelector(selectors.orientation);
 
-  const dispatch = useDispatch();
-  const resizeComplete = useCallback(() => dispatch(actions.splitRatioChanged()), [dispatch]);
-
   const grid = useRef<HTMLDivElement | null>(null);
   const dragHandle = useRef(null);
 
@@ -53,9 +49,7 @@ const ResizableArea: React.FC = () => {
       grid.current.style.removeProperty('grid-template-columns');
       grid.current.style.removeProperty('grid-template-rows');
     }
-
-    resizeComplete();
-  }, [orientation, isFocused, resizeComplete])
+  }, [orientation, isFocused])
 
   useEffect(() => {
     const split = Split({
@@ -64,11 +58,10 @@ const ResizableArea: React.FC = () => {
         track: 1,
         element: dragHandle.current,
       }],
-      onDragEnd: resizeComplete,
     });
 
     return () => split.destroy();
-  }, [orientation, isFocused, somethingToShow, resizeComplete])
+  }, [orientation, isFocused, somethingToShow])
 
   const gridStyles = isFocused ? FOCUSED_GRID_STYLE : UNFOCUSED_GRID_STYLE;
   const gridStyle = gridStyles[orientation];

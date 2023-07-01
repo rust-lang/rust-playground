@@ -5,7 +5,6 @@ import { suspend } from 'suspend-react';
 import {
   aceKeybinding,
   acePairCharacters,
-  aceResizeKey,
   aceTheme,
   offerCrateAutocompleteOnUse,
 } from '../selectors';
@@ -41,7 +40,6 @@ const AceEditorLazy = React.lazy(() => import('./AceEditorCore'));
 //
 // Themes and keybindings can be changed at runtime.
 const AceEditorAsync: React.FC<CommonEditorProps> = (props) => {
-  const resizeKey = useSelector(aceResizeKey);
   const autocompleteOnUse = useSelector(offerCrateAutocompleteOnUse);
   const keybinding = useSelector(aceKeybinding);
   const pairCharacters = useSelector(acePairCharacters);
@@ -55,7 +53,6 @@ const AceEditorAsync: React.FC<CommonEditorProps> = (props) => {
         autocompleteOnUse={autocompleteOnUse}
         keybinding={keybinding}
         pairCharacters={pairCharacters}
-        resizeKey={resizeKey}
         theme={theme}
       />
     </Suspense>

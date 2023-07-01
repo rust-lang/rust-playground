@@ -6,7 +6,7 @@ import 'ace-builds/src-noconflict/ext-searchbox';
 import 'ace-builds/src-noconflict/mode-rust';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { AceResizeKey, Crate, PairCharacters, Position, Selection } from '../types';
+import { Crate, PairCharacters, Position, Selection } from '../types';
 
 import styles from './Editor.module.css';
 
@@ -89,7 +89,6 @@ interface AceEditorProps {
   selection: Selection;
   theme: string;
   crates: Crate[];
-  resizeKey?: AceResizeKey;
   pairCharacters: PairCharacters;
 }
 
@@ -294,20 +293,6 @@ const AceEditor: React.FC<AceEditorProps> = props => {
       editor.renderer.scrollCursorIntoView(start);
       editor.focus();
     }
-  }, []));
-
-  // There's a tricky bug with Ace:
-  //
-  // 1. Open the page
-  // 2. Fill up the page with text but do not cause scrolling
-  // 3. Run the code (causing the pane to cover some of the text)
-  // 4. Try to scroll
-  //
-  // Ace doesn't know that we changed the visible area and so
-  // doesn't recalculate. We track factors that lead to this case to
-  // force such a recalculation.
-  useEditorProp(editor, props.resizeKey, useCallback((editor, _resizeKey) => {
-    editor.resize();
   }, []));
 
   return (
