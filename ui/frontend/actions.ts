@@ -244,8 +244,10 @@ async function fetchJson(url: FetchArg, args: RequestInit) {
 // communicates errors, so we untwist those here to fit better with
 // redux-toolkit's ideas.
 export const adaptFetchError = async <R>(cb: () => Promise<R>): Promise<R> => {
+  let result;
+
   try {
-    return await cb();
+    result = await cb();
   } catch (e) {
     if (e && typeof e === 'object' && 'error' in e && typeof e.error === 'string') {
       throw new Error(e.error);
@@ -253,6 +255,12 @@ export const adaptFetchError = async <R>(cb: () => Promise<R>): Promise<R> => {
       throw new Error('An unknown error occurred');
     }
   }
+
+  if (result && typeof result === 'object' && 'error' in result && typeof result.error === 'string') {
+    throw new Error(result.error);
+  }
+
+  return result;
 }
 
 function performAutoOnly(): ThunkAction {
