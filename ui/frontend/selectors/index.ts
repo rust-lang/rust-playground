@@ -337,6 +337,11 @@ export const aceResizeKey = createSelector(
   (focus, ratioGeneration): AceResizeKey => [focus, ratioGeneration],
 )
 
+const aceConfig = (s: State) => s.configuration.ace;
+export const aceKeybinding = createSelector(aceConfig, c => c.keybinding);
+export const acePairCharacters = createSelector(aceConfig, c => c.pairCharacters);
+export const aceTheme = createSelector(aceConfig, c => c.theme);
+
 export const offerCrateAutocompleteOnUse = createSelector(
   editionSelector,
   (edition) => edition !== Edition.Rust2015,

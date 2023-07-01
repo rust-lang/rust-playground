@@ -279,7 +279,7 @@ trait IsSuccess {
     fn is_success(&self) -> bool;
 }
 
-impl IsSuccess for coordinator::CompileResponseWithOutput {
+impl IsSuccess for coordinator::WithOutput<coordinator::CompileResponse> {
     fn is_success(&self) -> bool {
         self.success
     }
@@ -811,14 +811,14 @@ mod api_orchestrator_integration_impls {
         }
     }
 
-    impl From<CompileResponseWithOutput> for crate::CompileResponse {
-        fn from(other: CompileResponseWithOutput) -> Self {
-            let CompileResponseWithOutput {
-                success,
-                code,
+    impl From<WithOutput<CompileResponse>> for crate::CompileResponse {
+        fn from(other: WithOutput<CompileResponse>) -> Self {
+            let WithOutput {
+                response,
                 stdout,
                 stderr,
             } = other;
+            let CompileResponse { success, code } = response;
 
             Self {
                 success,

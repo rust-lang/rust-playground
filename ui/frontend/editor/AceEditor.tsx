@@ -2,8 +2,13 @@ import React, { Suspense } from 'react';
 import { useSelector } from 'react-redux';
 import { suspend } from 'suspend-react';
 
-import { aceResizeKey, offerCrateAutocompleteOnUse } from '../selectors';
-import State from '../state';
+import {
+  aceKeybinding,
+  acePairCharacters,
+  aceResizeKey,
+  aceTheme,
+  offerCrateAutocompleteOnUse,
+} from '../selectors';
 import { CommonEditorProps } from '../types';
 
 const AceEditorDependencies: React.FC<{
@@ -38,11 +43,9 @@ const AceEditorLazy = React.lazy(() => import('./AceEditorCore'));
 const AceEditorAsync: React.FC<CommonEditorProps> = (props) => {
   const resizeKey = useSelector(aceResizeKey);
   const autocompleteOnUse = useSelector(offerCrateAutocompleteOnUse);
-  const { keybinding, pairCharacters, theme } = useSelector((s: State) => ({
-    keybinding: s.configuration.ace.keybinding,
-    pairCharacters: s.configuration.ace.pairCharacters,
-    theme: s.configuration.ace.theme,
-  }));
+  const keybinding = useSelector(aceKeybinding);
+  const pairCharacters = useSelector(acePairCharacters);
+  const theme = useSelector(aceTheme);
 
   return (
     <Suspense fallback={'Loading the ACE editor...'}>

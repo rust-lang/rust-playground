@@ -1,7 +1,8 @@
+use futures::{future::BoxFuture, Future, FutureExt};
 use snafu::prelude::*;
 use std::{
     collections::HashMap,
-    mem,
+    fmt, mem, ops,
     process::Stdio,
     sync::{
         atomic::{AtomicU64, Ordering},
@@ -113,6 +114,10 @@ pub enum CrateType {
 }
 
 impl CrateType {
+    pub(crate) fn is_binary(self) -> bool {
+        self == CrateType::Binary
+    }
+
     pub(crate) fn to_cargo_toml_key(self) -> &'static str {
         use {CrateType::*, LibraryType::*};
 
@@ -153,6 +158,7 @@ pub struct CompileRequest {
     pub crate_type: CrateType,
     pub mode: Mode,
     pub edition: Edition,
+    // TODO: Remove `tests` and `backtrace` -- don't make sense for compiling.
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
@@ -160,15 +166,7 @@ pub struct CompileRequest {
 
 impl CompileRequest {
     pub(crate) fn write_main_request(&self) -> WriteFileRequest {
-        let path = match self.crate_type {
-            CrateType::Binary => "src/main.rs",
-            CrateType::Library(_) => "src/lib.rs",
-        };
-
-        WriteFileRequest {
-            path: path.to_owned(),
-            content: self.code.clone().into(),
-        }
+        write_primary_file_request(self.crate_type, &self.code)
     }
 
     pub(crate) fn execute_cargo_request(&self, output_path: &str) -> ExecuteCommandRequest {
@@ -217,21 +215,6 @@ impl CompileRequest {
         }
     }
 
-    pub(crate) fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
-        cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
-
-        if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
-            cargo_toml = modify_cargo_toml::set_crate_type(cargo_toml, crate_type);
-        }
-
-        if CompileTarget::Wasm == self.target {
-            cargo_toml = modify_cargo_toml::remove_dependencies(cargo_toml);
-            cargo_toml = modify_cargo_toml::set_release_lto(cargo_toml, true);
-        }
-
-        cargo_toml
-    }
-
     pub(crate) fn postprocess_result(&self, mut code: String) -> String {
         if let CompileTarget::Assembly(_, demangle, process) = self.target {
             if demangle == DemangleAssembly::Demangle {
@@ -247,18 +230,78 @@ impl CompileRequest {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct CompileResponseWithOutput {
-    pub success: bool,
-    pub code: String,
-    pub stdout: String,
-    pub stderr: String,
+impl CargoTomlModifier for CompileRequest {
+    fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
+        cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
+
+        if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
+            cargo_toml = modify_cargo_toml::set_crate_type(cargo_toml, crate_type);
+        }
+
+        if CompileTarget::Wasm == self.target {
+            cargo_toml = modify_cargo_toml::remove_dependencies(cargo_toml);
+            cargo_toml = modify_cargo_toml::set_release_lto(cargo_toml, true);
+        }
+
+        cargo_toml
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct CompileResponse {
     pub success: bool,
     pub code: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct WithOutput<T> {
+    pub response: T,
+    pub stdout: String,
+    pub stderr: String,
+}
+
+impl<T> WithOutput<T> {
+    async fn try_absorb<F, E>(
+        task: F,
+        stdout_rx: mpsc::Receiver<String>,
+        stderr_rx: mpsc::Receiver<String>,
+    ) -> Result<WithOutput<T>, E>
+    where
+        F: Future<Output = Result<T, E>>,
+    {
+        let stdout = ReceiverStream::new(stdout_rx).collect();
+        let stderr = ReceiverStream::new(stderr_rx).collect();
+
+        let (result, stdout, stderr) = join!(task, stdout, stderr);
+        let response = result?;
+
+        Ok(WithOutput {
+            response,
+            stdout,
+            stderr,
+        })
+    }
+}
+
+impl<T> ops::Deref for WithOutput<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.response
+    }
+}
+
+fn write_primary_file_request(crate_type: CrateType, code: &str) -> WriteFileRequest {
+    let path = if crate_type.is_binary() {
+        "src/main.rs"
+    } else {
+        "src/lib.rs"
+    };
+
+    WriteFileRequest {
+        path: path.to_owned(),
+        content: code.clone().into(),
+    }
 }
 
 #[derive(Debug)]
@@ -305,7 +348,7 @@ where
     pub async fn compile(
         &self,
         request: CompileRequest,
-    ) -> Result<CompileResponseWithOutput, CompileError> {
+    ) -> Result<WithOutput<CompileResponse>, CompileError> {
         self.select_channel(request.channel).compile(request).await
     }
 
@@ -407,27 +450,14 @@ impl Container {
     async fn compile(
         &self,
         request: CompileRequest,
-    ) -> Result<CompileResponseWithOutput, CompileError> {
-        use compile_error::*;
-
+    ) -> Result<WithOutput<CompileResponse>, CompileError> {
         let ActiveCompilation {
             task,
             stdout_rx,
             stderr_rx,
         } = self.begin_compile(request).await?;
 
-        let stdout = ReceiverStream::new(stdout_rx).collect();
-        let stderr = ReceiverStream::new(stderr_rx).collect();
-
-        let (result, stdout, stderr) = join!(task, stdout, stderr);
-
-        let CompileResponse { success, code } = result.context(CompilationTaskPanickedSnafu)??;
-        Ok(CompileResponseWithOutput {
-            success,
-            code,
-            stdout,
-            stderr,
-        })
+        WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
     }
 
     async fn begin_compile(
@@ -452,6 +482,52 @@ impl Container {
         write_main.context(CouldNotWriteCodeSnafu)?;
         modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
 
+        let SpawnCargo {
+            task,
+            stdout_rx,
+            stderr_rx,
+        } = self
+            .spawn_cargo_task(execute_cargo)
+            .await
+            .context(CouldNotStartCargoSnafu)?;
+
+        let commander = self.commander.clone();
+        let task = async move {
+            let success = task
+                .await
+                .context(CargoTaskPanickedSnafu)?
+                .context(CargoFailedSnafu)?;
+
+            let code = if success {
+                let file: ReadFileResponse = commander
+                    .one(read_output)
+                    .await
+                    .context(CouldNotReadCodeSnafu)?;
+                String::from_utf8(file.0).context(CodeNotUtf8Snafu)?
+            } else {
+                String::new()
+            };
+
+            // TODO: This is synchronous...
+            let code = request.postprocess_result(code);
+
+            Ok(CompileResponse { success, code })
+        }
+        .boxed();
+
+        Ok(ActiveCompilation {
+            task,
+            stdout_rx,
+            stderr_rx,
+        })
+    }
+
+    async fn spawn_cargo_task(
+        &self,
+        execute_cargo: ExecuteCommandRequest,
+    ) -> Result<SpawnCargo, SpawnCargoError> {
+        use spawn_cargo_error::*;
+
         let (stdout_tx, stdout_rx) = mpsc::channel(8);
         let (stderr_tx, stderr_rx) = mpsc::channel(8);
 
@@ -459,18 +535,14 @@ impl Container {
             .commander
             .many(execute_cargo)
             .await
-            .context(CouldNotStartCompilerSnafu)?;
+            .context(CouldNotStartCargoSnafu)?;
 
         let task = tokio::spawn({
-            let commander = self.commander.clone();
             async move {
-                let mut success = false;
-
                 while let Some(container_msg) = from_worker_rx.recv().await {
                     match container_msg {
                         WorkerMessage::ExecuteCommand(resp) => {
-                            success = resp.success;
-                            break;
+                            return Ok(resp.success);
                         }
                         WorkerMessage::StdoutPacket(packet) => {
                             stdout_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
@@ -482,24 +554,11 @@ impl Container {
                     }
                 }
 
-                let code = if success {
-                    let file: ReadFileResponse = commander
-                        .one(read_output)
-                        .await
-                        .context(CouldNotReadCodeSnafu)?;
-                    String::from_utf8(file.0).context(CodeNotUtf8Snafu)?
-                } else {
-                    String::new()
-                };
-
-                // TODO: This is synchronous...
-                let code = request.postprocess_result(code);
-
-                Ok(CompileResponse { success, code })
+                UnexpectedEndOfMessagesSnafu.fail()
             }
         });
 
-        Ok(ActiveCompilation {
+        Ok(SpawnCargo {
             task,
             stdout_rx,
             stderr_rx,
@@ -518,30 +577,39 @@ impl Container {
     }
 }
 
-#[derive(Debug)]
 pub struct ActiveCompilation {
-    pub task: JoinHandle<Result<CompileResponse, CompileError>>,
+    pub task: BoxFuture<'static, Result<CompileResponse, CompileError>>,
     pub stdout_rx: mpsc::Receiver<String>,
     pub stderr_rx: mpsc::Receiver<String>,
+}
+
+impl fmt::Debug for ActiveCompilation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ActiveCompilation")
+            .field("task", &"<future>")
+            .field("stdout_rx", &self.stdout_rx)
+            .field("stderr_rx", &self.stderr_rx)
+            .finish()
+    }
 }
 
 #[derive(Debug, Snafu)]
 #[snafu(module)]
 pub enum CompileError {
-    #[snafu(display("The compilation task panicked"))]
-    CompilationTaskPanicked { source: tokio::task::JoinError },
-
     #[snafu(display("Could not modify Cargo.toml"))]
     CouldNotModifyCargoToml { source: ModifyCargoTomlError },
 
     #[snafu(display("Could not write source code"))]
     CouldNotWriteCode { source: CommanderError },
 
-    #[snafu(display("Could not start compiler"))]
-    CouldNotStartCompiler { source: CommanderError },
+    #[snafu(display("Could not start Cargo task"))]
+    CouldNotStartCargo { source: SpawnCargoError },
 
-    #[snafu(display("Received an unexpected message"))]
-    UnexpectedMessage,
+    #[snafu(display("The Cargo task panicked"))]
+    CargoTaskPanicked { source: tokio::task::JoinError },
+
+    #[snafu(display("Cargo task failed"))]
+    CargoFailed { source: SpawnCargoError },
 
     #[snafu(display("Could not read the compilation output"))]
     CouldNotReadCode { source: CommanderError },
@@ -550,11 +618,34 @@ pub enum CompileError {
     CodeNotUtf8 { source: std::string::FromUtf8Error },
 }
 
+struct SpawnCargo {
+    task: JoinHandle<Result<bool, SpawnCargoError>>,
+    stdout_rx: mpsc::Receiver<String>,
+    stderr_rx: mpsc::Receiver<String>,
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum SpawnCargoError {
+    #[snafu(display("Could not start Cargo"))]
+    CouldNotStartCargo { source: CommanderError },
+
+    #[snafu(display("Received an unexpected message"))]
+    UnexpectedMessage,
+
+    #[snafu(display("There are no more messages"))]
+    UnexpectedEndOfMessages,
+}
+
 #[derive(Debug, Clone)]
 struct Commander {
     to_worker_tx: mpsc::Sender<Multiplexed<CoordinatorMessage>>,
-    to_demultiplexer_tx: mpsc::Sender<DemultiplexCommand>,
+    to_demultiplexer_tx: mpsc::Sender<(oneshot::Sender<()>, DemultiplexCommand)>,
     id: Arc<AtomicU64>,
+}
+
+trait CargoTomlModifier {
+    fn modify_cargo_toml(&self, cargo_toml: toml::Value) -> toml::Value;
 }
 
 #[derive(Debug)]
@@ -574,7 +665,10 @@ impl ModifyCargoToml {
         })
     }
 
-    async fn modify_for(&self, request: &CompileRequest) -> Result<(), ModifyCargoTomlError> {
+    async fn modify_for(
+        &self,
+        request: &impl CargoTomlModifier,
+    ) -> Result<(), ModifyCargoTomlError> {
         let cargo_toml = self.cargo_toml.clone();
         let cargo_toml = request.modify_cargo_toml(cargo_toml);
         Self::write(&self.commander, cargo_toml).await
@@ -640,7 +734,7 @@ impl Commander {
     const GC_PERIOD: Duration = Duration::from_secs(30);
 
     async fn demultiplex(
-        mut command_rx: mpsc::Receiver<DemultiplexCommand>,
+        mut command_rx: mpsc::Receiver<(oneshot::Sender<()>, DemultiplexCommand)>,
         mut from_worker_rx: mpsc::Receiver<Multiplexed<WorkerMessage>>,
     ) -> Result<(), CommanderError> {
         use commander_error::*;
@@ -654,7 +748,7 @@ impl Commander {
         loop {
             select! {
                 command = command_rx.recv() => {
-                    let Some(command) = command else { break };
+                    let Some((ack_tx, command)) = command else { break };
 
                     match command {
                         DemultiplexCommand::Listen(job_id, waiter) => {
@@ -667,6 +761,8 @@ impl Commander {
                             ensure!(old.is_none(), DuplicateDemultiplexerClientSnafu { job_id });
                         }
                     }
+
+                    ack_tx.send(()).ok(/* Don't care about it */);
                 },
 
                 msg = from_worker_rx.recv() => {
@@ -714,11 +810,15 @@ impl Commander {
     ) -> Result<(), CommanderError> {
         use commander_error::*;
 
+        let (ack_tx, ack_rx) = oneshot::channel();
+
         self.to_demultiplexer_tx
-            .send(command)
+            .send((ack_tx, command))
             .await
             .drop_error_details()
-            .context(UnableToSendToDemultiplexerSnafu)
+            .context(UnableToSendToDemultiplexerSnafu)?;
+
+        ack_rx.await.context(DemultiplexerDidNotRespondSnafu)
     }
 
     async fn send_to_worker(
@@ -782,6 +882,9 @@ pub enum CommanderError {
 
     #[snafu(display("Could not send a message to the demultiplexer"))]
     UnableToSendToDemultiplexer { source: mpsc::error::SendError<()> },
+
+    #[snafu(display("Could not send a message to the demultiplexer"))]
+    DemultiplexerDidNotRespond { source: oneshot::error::RecvError },
 
     #[snafu(display("Did not receive a response from the demultiplexer"))]
     UnableToReceiveFromDemultiplexer { source: oneshot::error::RecvError },
@@ -864,6 +967,7 @@ impl Backend for DockerBackend {
         command
             .arg("-i")
             .args(["-a", "stdin", "-a", "stdout", "-a", "stderr"])
+            .args(["-e", "PLAYGROUND_ORCHESTRATOR=1"])
             .arg("--rm")
             .arg(channel.to_container_name())
             .arg("worker")
@@ -1174,7 +1278,7 @@ mod tests {
         let (complete, _stdout, stderr) =
             async { join!(task, stdout, stderr) }.with_timeout().await;
 
-        let response = complete.unwrap().unwrap();
+        let response = complete.unwrap();
 
         assert!(response.success, "stderr: {}", stderr);
         assert_contains!(stderr, "Compiling");
