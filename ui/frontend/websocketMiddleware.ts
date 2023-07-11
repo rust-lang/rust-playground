@@ -1,7 +1,12 @@
 import { AnyAction, Middleware } from '@reduxjs/toolkit';
 import { z } from 'zod';
 
-import { wsExecuteResponseSchema } from './reducers/output/execute';
+import {
+  wsExecuteBeginSchema,
+  wsExecuteEndSchema,
+  wsExecuteStderrSchema,
+  wsExecuteStdoutSchema,
+} from './reducers/output/execute';
 import {
   websocketConnected,
   websocketConnectedSchema,
@@ -13,7 +18,10 @@ import {
 const WSMessageResponse = z.discriminatedUnion('type', [
   websocketConnectedSchema,
   websocketErrorSchema,
-  wsExecuteResponseSchema,
+  wsExecuteBeginSchema,
+  wsExecuteEndSchema,
+  wsExecuteStderrSchema,
+  wsExecuteStdoutSchema,
 ]);
 
 const reportWebSocketError = (() => {

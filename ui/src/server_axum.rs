@@ -57,6 +57,8 @@ const MAX_AGE_ONE_DAY: HeaderValue = HeaderValue::from_static("public, max-age=8
 const MAX_AGE_ONE_YEAR: HeaderValue = HeaderValue::from_static("public, max-age=31536000");
 
 mod websocket;
+pub use websocket::CoordinatorManagerError as WebsocketCoordinatorManagerError;
+pub use websocket::ExecuteError as WebsocketExecuteError;
 
 #[derive(Debug, Copy, Clone)]
 struct OrchestratorEnabled(bool);
@@ -948,7 +950,7 @@ mod api_orchestrator_integration_impls {
         })
     }
 
-    fn parse_channel(s: &str) -> Result<Channel> {
+    pub(crate) fn parse_channel(s: &str) -> Result<Channel> {
         Ok(match s {
             "stable" => Channel::Stable,
             "beta" => Channel::Beta,
@@ -957,7 +959,7 @@ mod api_orchestrator_integration_impls {
         })
     }
 
-    fn parse_crate_type(s: &str) -> Result<CrateType> {
+    pub(crate) fn parse_crate_type(s: &str) -> Result<CrateType> {
         use {CrateType::*, LibraryType::*};
 
         Ok(match s {
@@ -972,7 +974,7 @@ mod api_orchestrator_integration_impls {
         })
     }
 
-    fn parse_mode(s: &str) -> Result<Mode> {
+    pub(crate) fn parse_mode(s: &str) -> Result<Mode> {
         Ok(match s {
             "debug" => Mode::Debug,
             "release" => Mode::Release,
@@ -980,7 +982,7 @@ mod api_orchestrator_integration_impls {
         })
     }
 
-    fn parse_edition(s: &str) -> Result<Edition> {
+    pub(crate) fn parse_edition(s: &str) -> Result<Edition> {
         Ok(match s {
             "2015" => Edition::Rust2015,
             "2018" => Edition::Rust2018,

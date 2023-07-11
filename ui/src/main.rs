@@ -237,6 +237,21 @@ pub enum Error {
 
     #[snafu(display("The operation timed out"))]
     Timeout { source: tokio::time::error::Elapsed },
+
+    #[snafu(display("Unable to spawn a coordinator task"))]
+    StreamingCoordinatorSpawn {
+        source: server_axum::WebsocketCoordinatorManagerError,
+    },
+
+    #[snafu(display("Unable to idle the coordinator"))]
+    StreamingCoordinatorIdle {
+        source: server_axum::WebsocketCoordinatorManagerError,
+    },
+
+    #[snafu(display("Unable to perform a streaming execute"))]
+    StreamingExecute {
+        source: server_axum::WebsocketExecuteError,
+    },
 }
 
 type Result<T, E = Error> = ::std::result::Result<T, E>;
