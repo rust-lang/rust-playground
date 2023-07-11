@@ -282,6 +282,9 @@ workflows:
           - name: "Format top-crates"
             run: cargo fmt --manifest-path top-crates/Cargo.toml --check
 
+          - name: "Format orchestrator"
+            run: cargo fmt --manifest-path compiler/base/orchestrator/Cargo.toml --check
+
           - name: "Build backend"
             run: >-
                 mkdir -p ui/target;
