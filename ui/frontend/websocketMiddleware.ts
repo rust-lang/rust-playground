@@ -1,6 +1,7 @@
 import { AnyAction, Middleware } from '@reduxjs/toolkit';
 import { z } from 'zod';
 
+import { wsFeatureFlagsSchema } from './reducers/featureFlags';
 import {
   wsExecuteBeginSchema,
   wsExecuteEndSchema,
@@ -22,6 +23,7 @@ const WSMessageResponse = z.discriminatedUnion('type', [
   wsExecuteEndSchema,
   wsExecuteStderrSchema,
   wsExecuteStdoutSchema,
+  wsFeatureFlagsSchema,
 ]);
 
 const reportWebSocketError = (() => {

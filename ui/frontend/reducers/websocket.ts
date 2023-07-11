@@ -6,12 +6,10 @@ import { createWebsocketResponseSchema, makeWebSocketMeta } from '../websocketAc
 export type State = {
   connected: boolean;
   error?: string;
-  featureFlagEnabled: boolean;
 };
 
 const initialState: State = {
   connected: false,
-  featureFlagEnabled: false,
 };
 
 const websocketConnectedPayloadSchema = z.object({
@@ -49,10 +47,6 @@ const slice = createSlice({
     error: (state, action: PayloadAction<websocketErrorPayload>) => {
       state.error = action.payload.error;
     },
-
-    featureFlagEnabled: (state) => {
-      state.featureFlagEnabled = true;
-    },
   },
 });
 
@@ -60,7 +54,6 @@ export const {
   connected: websocketConnected,
   disconnected: websocketDisconnected,
   error: websocketError,
-  featureFlagEnabled: websocketFeatureFlagEnabled,
 } = slice.actions;
 
 export const websocketConnectedSchema = createWebsocketResponseSchema(

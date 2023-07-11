@@ -35,12 +35,18 @@ fn main() {
     server_axum::serve(config);
 }
 
+#[derive(Copy, Clone)]
+pub(crate) struct FeatureFlags {
+    execute_via_websocket_threshold: Option<f64>,
+}
+
 struct Config {
     address: String,
     cors_enabled: bool,
     gh_token: Option<String>,
     metrics_token: Option<String>,
     orchestrator_enabled: bool,
+    feature_flags: FeatureFlags,
     port: u16,
     root: PathBuf,
 }
@@ -96,12 +102,22 @@ impl Config {
 
         let orchestrator_enabled = env::var_os("PLAYGROUND_ORCHESTRATOR_ENABLED").is_some();
 
+        let execute_via_websocket_threshold =
+            env::var("PLAYGROUND_EXECUTE_VIA_WEBSOCKET_THRESHOLD")
+                .ok()
+                .and_then(|v| v.parse().ok());
+
+        let feature_flags = FeatureFlags {
+            execute_via_websocket_threshold,
+        };
+
         Self {
             address,
             cors_enabled,
             gh_token,
             metrics_token,
             orchestrator_enabled,
+            feature_flags,
             port,
             root,
         }

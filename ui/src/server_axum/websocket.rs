@@ -94,6 +94,9 @@ enum MessageResponse {
     #[serde(rename = "websocket/error")]
     Error { payload: WSError, meta: Meta },
 
+    #[serde(rename = "featureFlags")]
+    FeatureFlags { payload: FeatureFlags, meta: Meta },
+
     #[serde(rename = "output/execute/wsExecuteBegin")]
     ExecuteBegin { meta: Meta },
 
@@ -118,15 +121,29 @@ struct WSError {
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
+pub(crate) struct FeatureFlags {
+    execute_via_websocket_threshold: Option<f64>,
+}
+
+impl From<crate::FeatureFlags> for FeatureFlags {
+    fn from(value: crate::FeatureFlags) -> Self {
+        Self {
+            execute_via_websocket_threshold: value.execute_via_websocket_threshold,
+        }
+    }
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 struct ExecuteResponse {
     success: bool,
 }
 
-pub async fn handle(socket: WebSocket) {
+pub(crate) async fn handle(socket: WebSocket, feature_flags: FeatureFlags) {
     metrics::LIVE_WS.inc();
     let start = Instant::now();
 
-    handle_core(socket).await;
+    handle_core(socket, feature_flags).await;
 
     metrics::LIVE_WS.dec();
     let elapsed = start.elapsed();
@@ -254,12 +271,21 @@ pub enum CoordinatorManagerError {
 
 type CoordinatorManagerResult<T, E = CoordinatorManagerError> = std::result::Result<T, E>;
 
-async fn handle_core(mut socket: WebSocket) {
+async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
     if !connect_handshake(&mut socket).await {
         return;
     }
 
     let (tx, mut rx) = mpsc::channel(3);
+
+    let ff = MessageResponse::FeatureFlags {
+        payload: feature_flags,
+        meta: create_server_meta(),
+    };
+
+    if tx.send(Ok(ff)).await.is_err() {
+        return;
+    }
 
     let mut manager = CoordinatorManager::new();
 
@@ -340,14 +366,17 @@ async fn connect_handshake(socket: &mut WebSocket) -> bool {
     socket.send(Message::Text(txt)).await.is_ok()
 }
 
+fn create_server_meta() -> Meta {
+    Arc::new(serde_json::json!({ "sequenceNumber": -1 }))
+}
+
 fn error_to_response(error: Error) -> MessageResponse {
     let error = error.to_string();
+    let payload = WSError { error };
     // TODO: thread through the Meta from the originating request
-    let meta = Arc::new(serde_json::json!({ "sequenceNumber": -1 }));
-    MessageResponse::Error {
-        payload: WSError { error },
-        meta,
-    }
+    let meta = create_server_meta();
+
+    MessageResponse::Error { payload, meta }
 }
 
 fn response_to_message(response: MessageResponse) -> Message {

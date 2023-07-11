@@ -23,8 +23,8 @@ import { configureRustErrors } from './highlighting';
 import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
 import { clientSetIdentifiers } from './reducers/client';
+import { featureFlagsForceDisableAll, featureFlagsForceEnableAll } from './reducers/featureFlags';
 import { disableSyncChangesToStorage } from './reducers/globalConfiguration';
-import { websocketFeatureFlagEnabled } from './reducers/websocket';
 import Router from './Router';
 import configureStore from './configureStore';
 
@@ -43,8 +43,13 @@ if (store.getState().client.id === '') {
 }
 
 const params = new URLSearchParams(window.location.search);
-if (params.has('websocket')) {
-  store.dispatch(websocketFeatureFlagEnabled());
+if (params.has('features')) {
+  const selection = params.get('features');
+  if (selection === 'false') {
+    store.dispatch(featureFlagsForceDisableAll());
+  } else {
+    store.dispatch(featureFlagsForceEnableAll());
+  }
 }
 
 const whenBrowserWidthChanged = (evt: MediaQueryList | MediaQueryListEvent) =>

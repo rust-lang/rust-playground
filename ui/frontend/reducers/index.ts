@@ -5,6 +5,7 @@ import client from './client';
 import code from './code';
 import configuration from './configuration';
 import crates from './crates';
+import featureFlags from './featureFlags';
 import globalConfiguration from './globalConfiguration';
 import notifications from './notifications';
 import output from './output';
@@ -20,6 +21,7 @@ const playgroundApp = combineReducers({
   code,
   configuration,
   crates,
+  featureFlags,
   globalConfiguration,
   notifications,
   output,
