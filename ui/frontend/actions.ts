@@ -118,7 +118,6 @@ export enum ActionType {
   VersionsLoadSucceeded = 'VERSIONS_LOAD_SUCCEEDED',
   NotificationSeen = 'NOTIFICATION_SEEN',
   BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
-  SplitRatioChanged = 'SPLIT_RATIO_CHANGED',
 }
 
 export const initializeApplication = () => createAction(ActionType.InitializeApplication);
@@ -669,9 +668,6 @@ export const seenRustSurvey2022 = () => notificationSeen(Notification.RustSurvey
 export const browserWidthChanged = (isSmall: boolean) =>
   createAction(ActionType.BrowserWidthChanged, { isSmall });
 
-export const splitRatioChanged = () =>
-  createAction(ActionType.SplitRatioChanged);
-
 function parseChannel(s?: string): Channel | null {
   switch (s) {
     case 'stable':
@@ -812,6 +808,5 @@ export type Action =
   | ReturnType<typeof receiveVersionsLoadSuccess>
   | ReturnType<typeof notificationSeen>
   | ReturnType<typeof browserWidthChanged>
-  | ReturnType<typeof splitRatioChanged>
   | ReturnType<typeof wsExecuteRequest>
   ;

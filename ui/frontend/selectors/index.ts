@@ -3,7 +3,6 @@ import { createSelector } from '@reduxjs/toolkit';
 
 import { State } from '../reducers';
 import {
-  AceResizeKey,
   Backtrace,
   Channel,
   Edition,
@@ -327,14 +326,6 @@ export const orientation = createSelector(
       return orientation;
     }
   }
-)
-
-const ratioGeneration = (state: State) => state.browser.ratioGeneration;
-
-export const aceResizeKey = createSelector(
-  focus,
-  ratioGeneration,
-  (focus, ratioGeneration): AceResizeKey => [focus, ratioGeneration],
 )
 
 const aceConfig = (s: State) => s.configuration.ace;
