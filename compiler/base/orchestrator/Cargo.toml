@@ -17,6 +17,7 @@ tokio = { version = "1.28", default-features = false, features = ["fs", "io-std"
 tokio-stream = { version = "0.1.14", default-features = false }
 tokio-util = { version = "0.7.8", default-features = false, features = ["io", "io-util"] }
 toml = { version = "0.7.3", default-features = false, features = ["parse", "display"] }
+tracing = { version = "0.1.37", default-features = false, features = ["attributes"] }
 
 [dev-dependencies]
 assertables = "7.0.1"

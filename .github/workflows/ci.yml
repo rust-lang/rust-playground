@@ -183,6 +183,8 @@ jobs:
       run: cargo fmt --manifest-path ui/Cargo.toml --all --check
     - name: Format top-crates
       run: cargo fmt --manifest-path top-crates/Cargo.toml --check
+    - name: Format orchestrator
+      run: cargo fmt --manifest-path compiler/base/orchestrator/Cargo.toml --check
     - name: Build backend
       run: |-
         mkdir -p ui/target; docker run --rm -v $PWD/compiler/base/asm-cleanup:/compiler/base/asm-cleanup -v $PWD/compiler/base/orchestrator:/compiler/base/orchestrator -v $PWD/compiler/base/modify-cargo-toml:/compiler/base/modify-cargo-toml -v $PWD/ui:/ui -v ~/.cargo/git:/root/.cargo/git -v ~/.cargo/registry:/root/.cargo/registry --workdir /ui rust:alpine sh -c '

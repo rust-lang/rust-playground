@@ -512,6 +512,30 @@ impl HasLabelsCore for coordinator::CompileRequest {
     }
 }
 
+impl HasLabelsCore for coordinator::ExecuteRequest {
+    fn labels_core(&self) -> LabelsCore {
+        let Self {
+            channel,
+            crate_type,
+            mode,
+            edition,
+            tests,
+            backtrace,
+            code: _,
+        } = *self;
+
+        LabelsCore {
+            target: None,
+            channel: Some(channel.into()),
+            mode: Some(mode.into()),
+            edition: Some(Some(edition.into())),
+            crate_type: Some(crate_type.into()),
+            tests: Some(tests),
+            backtrace: Some(backtrace),
+        }
+    }
+}
+
 pub(crate) fn record_metric(
     endpoint: Endpoint,
     labels_core: LabelsCore,

@@ -8,9 +8,9 @@ use crate::{
     sandbox::{self, Channel, Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
     CachingSnafu, ClippyRequest, ClippyResponse, CompilationSnafu, CompileRequest, CompileResponse,
     CompileSnafu, Config, CreateCoordinatorSnafu, Error, ErrorJson, EvaluateRequest,
-    EvaluateResponse, EvaluationSnafu, ExecuteRequest, ExecuteResponse, ExecutionSnafu,
-    ExpansionSnafu, FormatRequest, FormatResponse, FormattingSnafu, GhToken, GistCreationSnafu,
-    GistLoadingSnafu, InterpretingSnafu, LintingSnafu, MacroExpansionRequest,
+    EvaluateResponse, EvaluationSnafu, ExecuteRequest, ExecuteResponse, ExecuteSnafu,
+    ExecutionSnafu, ExpansionSnafu, FormatRequest, FormatResponse, FormattingSnafu, GhToken,
+    GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu, LintingSnafu, MacroExpansionRequest,
     MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse,
     MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result, SandboxCreationSnafu,
     ShutdownCoordinatorSnafu, TimeoutSnafu,
@@ -178,14 +178,23 @@ async fn compile(
     }
 }
 
-async fn execute(Json(req): Json<ExecuteRequest>) -> Result<Json<ExecuteResponse>> {
-    with_sandbox(
-        req,
-        |sb, req| async move { sb.execute(req).await }.boxed(),
-        ExecutionSnafu,
-    )
-    .await
-    .map(Json)
+async fn execute(
+    Extension(use_orchestrator): Extension<OrchestratorEnabled>,
+    Json(req): Json<ExecuteRequest>,
+) -> Result<Json<ExecuteResponse>> {
+    if use_orchestrator.0 {
+        with_coordinator(req, |c, req| c.execute(req).context(ExecuteSnafu).boxed())
+            .await
+            .map(Json)
+    } else {
+        with_sandbox(
+            req,
+            |sb, req| async move { sb.execute(req).await }.boxed(),
+            ExecutionSnafu,
+        )
+        .await
+        .map(Json)
+    }
 }
 
 async fn format(Json(req): Json<FormatRequest>) -> Result<Json<FormatResponse>> {
@@ -275,11 +284,21 @@ impl HasEndpoint for CompileRequest {
     const ENDPOINT: Endpoint = Endpoint::Compile;
 }
 
+impl HasEndpoint for ExecuteRequest {
+    const ENDPOINT: Endpoint = Endpoint::Execute;
+}
+
 trait IsSuccess {
     fn is_success(&self) -> bool;
 }
 
 impl IsSuccess for coordinator::WithOutput<coordinator::CompileResponse> {
+    fn is_success(&self) -> bool {
+        self.success
+    }
+}
+
+impl IsSuccess for coordinator::WithOutput<coordinator::ExecuteResponse> {
     fn is_success(&self) -> bool {
         self.success
     }
@@ -823,6 +842,49 @@ mod api_orchestrator_integration_impls {
             Self {
                 success,
                 code,
+                stdout,
+                stderr,
+            }
+        }
+    }
+
+    impl TryFrom<crate::ExecuteRequest> for ExecuteRequest {
+        type Error = Error;
+
+        fn try_from(other: crate::ExecuteRequest) -> Result<Self> {
+            let crate::ExecuteRequest {
+                channel,
+                mode,
+                edition,
+                crate_type,
+                tests,
+                backtrace,
+                code,
+            } = other;
+
+            Ok(Self {
+                channel: parse_channel(&channel)?,
+                crate_type: parse_crate_type(&crate_type)?,
+                mode: parse_mode(&mode)?,
+                edition: parse_edition(&edition)?,
+                tests,
+                backtrace,
+                code,
+            })
+        }
+    }
+
+    impl From<WithOutput<ExecuteResponse>> for crate::ExecuteResponse {
+        fn from(other: WithOutput<ExecuteResponse>) -> Self {
+            let WithOutput {
+                response,
+                stdout,
+                stderr,
+            } = other;
+            let ExecuteResponse { success } = response;
+
+            Self {
+                success,
                 stdout,
                 stderr,
             }

@@ -230,6 +230,11 @@ pub enum Error {
         source: orchestrator::coordinator::CompileError,
     },
 
+    #[snafu(display("Unable to convert the execute request"))]
+    Execute {
+        source: orchestrator::coordinator::ExecuteError,
+    },
+
     #[snafu(display("The operation timed out"))]
     Timeout { source: tokio::time::error::Elapsed },
 }
