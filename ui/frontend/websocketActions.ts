@@ -32,6 +32,17 @@ export const createWebsocketResponseSchema = <P extends z.ZodTypeAny, T extends 
     }),
   });
 
+export const createWebsocketResponse = <T extends string, P extends z.ZodTypeAny>(
+  type: T,
+  payloadSchema: P,
+) => {
+  type Payload = z.infer<typeof payloadSchema>;
+  const action = createWebsocketResponseAction<Payload>(type);
+  const schema = createWebsocketResponseSchema(action, payloadSchema);
+
+  return { action, schema };
+};
+
 const nextSequenceNumber = (() => {
   let sequenceNumber = 0;
   return () => sequenceNumber++;

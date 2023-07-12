@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { Draft, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
 import { SimpleThunkAction, adaptFetchError, jsonPost, routes } from '../../actions';
@@ -6,8 +6,7 @@ import { executeRequestPayloadSelector, useWebsocketSelector } from '../../selec
 import { Channel, Edition, Mode } from '../../types';
 import {
   WsPayloadAction,
-  createWebsocketResponseAction,
-  createWebsocketResponseSchema,
+  createWebsocketResponse,
   makeWebSocketMeta,
 } from '../../websocketActions';
 
@@ -23,13 +22,6 @@ interface State {
   error?: string;
 }
 
-const wsExecuteResponsePayloadSchema = z.object({
-  success: z.boolean(),
-  stdout: z.string(),
-  stderr: z.string(),
-});
-type wsExecuteResponsePayload = z.infer<typeof wsExecuteResponsePayloadSchema>;
-
 type wsExecuteRequestPayload = {
   channel: Channel;
   mode: Mode;
@@ -40,8 +32,26 @@ type wsExecuteRequestPayload = {
   backtrace: boolean;
 };
 
-const wsExecuteResponse = createWebsocketResponseAction<wsExecuteResponsePayload>(
-  'output/execute/wsExecuteResponse',
+const { action: wsExecuteBegin, schema: wsExecuteBeginSchema } = createWebsocketResponse(
+  'output/execute/wsExecuteBegin',
+  z.undefined(),
+);
+
+const { action: wsExecuteStdout, schema: wsExecuteStdoutSchema } = createWebsocketResponse(
+  'output/execute/wsExecuteStdout',
+  z.string(),
+);
+
+const { action: wsExecuteStderr, schema: wsExecuteStderrSchema } = createWebsocketResponse(
+  'output/execute/wsExecuteStderr',
+  z.string(),
+);
+
+const { action: wsExecuteEnd, schema: wsExecuteEndSchema } = createWebsocketResponse(
+  'output/execute/wsExecuteEnd',
+  z.object({
+    success: z.boolean(),
+  }),
 );
 
 const sliceName = 'output/execute';
@@ -66,6 +76,19 @@ export const performExecute = createAsyncThunk(sliceName, async (payload: Execut
   adaptFetchError(() => jsonPost<ExecuteResponseBody>(routes.execute, payload)),
 );
 
+const sequenceNumberMatches =
+  <P>(whenMatch: (state: Draft<State>, payload: P) => void) =>
+  (state: Draft<State>, action: WsPayloadAction<P>) => {
+    const {
+      payload,
+      meta: { sequenceNumber },
+    } = action;
+
+    if (sequenceNumber === state.sequenceNumber) {
+      whenMatch(state, payload);
+    }
+  };
+
 const slice = createSlice({
   name: 'output/execute',
   initialState,
@@ -75,7 +98,6 @@ const slice = createSlice({
         const { sequenceNumber } = action.meta;
         if (sequenceNumber >= (state.sequenceNumber ?? 0)) {
           state.sequenceNumber = sequenceNumber;
-          state.requestsInProgress = 1; // Only tracking one request
         }
       },
 
@@ -102,17 +124,32 @@ const slice = createSlice({
         }
         state.requestsInProgress -= 1;
       })
-      .addCase(wsExecuteResponse, (state, action) => {
-        const {
-          payload: { stdout, stderr },
-          meta: { sequenceNumber },
-        } = action;
-
-        if (sequenceNumber >= (state.sequenceNumber ?? 0)) {
-          Object.assign(state, { stdout, stderr });
+      .addCase(
+        wsExecuteBegin,
+        sequenceNumberMatches((state) => {
+          state.requestsInProgress = 1; // Only tracking one request
+          state.stdout = '';
+          state.stderr = '';
+        }),
+      )
+      .addCase(
+        wsExecuteStdout,
+        sequenceNumberMatches((state, payload) => {
+          state.stdout += payload;
+        }),
+      )
+      .addCase(
+        wsExecuteStderr,
+        sequenceNumberMatches((state, payload) => {
+          state.stderr += payload;
+        }),
+      )
+      .addCase(
+        wsExecuteEnd,
+        sequenceNumberMatches((state) => {
           state.requestsInProgress = 0; // Only tracking one request
-        }
-      });
+        }),
+      );
   },
 });
 
@@ -132,9 +169,6 @@ export const performCommonExecute =
     }
   };
 
-export const wsExecuteResponseSchema = createWebsocketResponseSchema(
-  wsExecuteResponse,
-  wsExecuteResponsePayloadSchema,
-);
+export { wsExecuteBeginSchema, wsExecuteStdoutSchema, wsExecuteStderrSchema, wsExecuteEndSchema };
 
 export default slice.reducer;
