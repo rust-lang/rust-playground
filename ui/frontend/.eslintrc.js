@@ -66,6 +66,7 @@ module.exports = {
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',
         'reducers/client.ts',
+        'reducers/globalConfiguration.ts',
         'reducers/output/execute.ts',
         'reducers/output/format.ts',
         'reducers/output/gist.ts',

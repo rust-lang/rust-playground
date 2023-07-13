@@ -10,7 +10,6 @@ import { Provider } from 'react-redux';
 
 import {
   editCode,
-  disableSyncChangesToStorage,
   enableFeatureGate,
   gotoPosition,
   selectText,
@@ -24,6 +23,7 @@ import { configureRustErrors } from './highlighting';
 import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
 import { clientSetIdentifiers } from './reducers/client';
+import { disableSyncChangesToStorage } from './reducers/globalConfiguration';
 import { websocketFeatureFlagEnabled } from './reducers/websocket';
 import Router from './Router';
 import configureStore from './configureStore';

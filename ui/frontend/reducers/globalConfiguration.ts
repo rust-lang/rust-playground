@@ -1,21 +1,25 @@
-import { Action, ActionType } from '../actions';
+import { createSlice } from '@reduxjs/toolkit';
 
-export interface State {
+interface State {
   baseUrl: string;
   syncChangesToStorage: boolean;
 }
 
-const DEFAULT: State = {
+const initialState: State = {
   baseUrl: '',
   syncChangesToStorage: true,
 };
 
-export default function globalConfiguration(state = DEFAULT, action: Action): State {
-  switch (action.type) {
-    case ActionType.DisableSyncChangesToStorage: {
-      return { ...state, syncChangesToStorage: false };
-    }
-    default:
-      return state;
-  }
-}
+const slice = createSlice({
+  name: 'globalConfiguration',
+  initialState,
+  reducers: {
+    disableSyncChangesToStorage: (state) => {
+      state.syncChangesToStorage = false;
+    },
+  },
+});
+
+export const { disableSyncChangesToStorage } = slice.actions;
+
+export default slice.reducer;
