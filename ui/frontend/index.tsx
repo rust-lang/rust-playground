@@ -23,11 +23,24 @@ import {
 import { configureRustErrors } from './highlighting';
 import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
+import { clientSetIdentifiers } from './reducers/client';
 import { websocketFeatureFlagEnabled } from './reducers/websocket';
 import Router from './Router';
 import configureStore from './configureStore';
 
 const store = configureStore(window);
+
+if (store.getState().client.id === '') {
+  const { crypto } = window;
+
+  const id = crypto.randomUUID();
+
+  const rawValue = new Uint32Array(1);
+  crypto.getRandomValues(rawValue);
+  const featureFlagThreshold = rawValue[0] / 0xFFFF_FFFF;
+
+  store.dispatch(clientSetIdentifiers({ id, featureFlagThreshold }));
+}
 
 const params = new URLSearchParams(window.location.search);
 if (params.has('websocket')) {

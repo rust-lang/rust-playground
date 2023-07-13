@@ -1,6 +1,7 @@
 import { combineReducers } from '@reduxjs/toolkit';
 
 import browser from './browser';
+import client from './client';
 import code from './code';
 import configuration from './configuration';
 import crates from './crates';
@@ -15,6 +16,7 @@ import websocket from './websocket';
 
 const playgroundApp = combineReducers({
   browser,
+  client,
   code,
   configuration,
   crates,

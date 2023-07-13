@@ -11,6 +11,10 @@ const CURRENT_VERSION = 2;
 
 interface V2Configuration {
   version: 2;
+  client: {
+    id: string;
+    featureFlagThreshold: number;
+  },
   configuration: {
     editor: Editor;
     ace: {
@@ -52,6 +56,10 @@ export function serialize(state: State): string {
   const code = codeSelector(state);
   const conf: CurrentConfiguration = {
     version: CURRENT_VERSION,
+    client: {
+      id: state.client.id,
+      featureFlagThreshold: state.client.featureFlagThreshold,
+    },
     configuration: {
       editor: state.configuration.editor,
       ace: {
@@ -77,6 +85,10 @@ function migrateV1(state: V1Configuration): CurrentConfiguration {
   const { editor, theme, keybinding, pairCharacters, ...configuration } = state.configuration;
   const step: V2Configuration = {
     ...state,
+    client: {
+      id: '',
+      featureFlagThreshold: 0,
+    },
     configuration: {
       ...configuration,
       ace: { theme, keybinding, pairCharacters },
