@@ -338,14 +338,20 @@ export const offerCrateAutocompleteOnUse = createSelector(
   (edition) => edition !== Edition.Rust2015,
 );
 
+const client = (state: State) => state.client;
+const featureFlags = (state: State) => state.featureFlags;
 const websocket = (state: State) => state.websocket;
 
-export const websocketFeatureFlagEnabled = createSelector(websocket, (ws) => ws.featureFlagEnabled);
+const clientFeatureFlagThreshold = createSelector(client, (c) => c.featureFlagThreshold);
 
-export const useWebsocketSelector = createSelector(
-  websocket,
-  (ws) => ws.connected && ws.featureFlagEnabled,
-);
+const showGemThreshold = createSelector(featureFlags, ff => ff.showGemThreshold);
+const executeViaWebsocketThreshold = createSelector(featureFlags, ff => ff.executeViaWebsocketThreshold);
+
+const createFeatureFlagSelector = (ff: (state: State) => number) =>
+  createSelector(clientFeatureFlagThreshold, ff, (c, ff) => c <= ff);
+
+export const showGemSelector = createFeatureFlagSelector(showGemThreshold);
+export const executeViaWebsocketSelector = createFeatureFlagSelector(executeViaWebsocketThreshold);
 
 export type WebSocketStatus =
   { state: 'disconnected' } |

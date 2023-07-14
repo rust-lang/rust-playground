@@ -6,7 +6,7 @@ RSpec.feature "Streaming interaction using WebSockets", type: :feature, js: true
   include PlaygroundActions
 
   before do
-    visit '/?websocket=1'
+    visit '/?features=true'
     editor.set(slow_output_code)
   end
 

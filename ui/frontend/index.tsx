@@ -10,7 +10,6 @@ import { Provider } from 'react-redux';
 
 import {
   editCode,
-  disableSyncChangesToStorage,
   enableFeatureGate,
   gotoPosition,
   selectText,
@@ -23,15 +22,34 @@ import {
 import { configureRustErrors } from './highlighting';
 import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
-import { websocketFeatureFlagEnabled } from './reducers/websocket';
+import { clientSetIdentifiers } from './reducers/client';
+import { featureFlagsForceDisableAll, featureFlagsForceEnableAll } from './reducers/featureFlags';
+import { disableSyncChangesToStorage } from './reducers/globalConfiguration';
 import Router from './Router';
 import configureStore from './configureStore';
 
 const store = configureStore(window);
 
+if (store.getState().client.id === '') {
+  const { crypto } = window;
+
+  const id = crypto.randomUUID();
+
+  const rawValue = new Uint32Array(1);
+  crypto.getRandomValues(rawValue);
+  const featureFlagThreshold = rawValue[0] / 0xFFFF_FFFF;
+
+  store.dispatch(clientSetIdentifiers({ id, featureFlagThreshold }));
+}
+
 const params = new URLSearchParams(window.location.search);
-if (params.has('websocket')) {
-  store.dispatch(websocketFeatureFlagEnabled());
+if (params.has('features')) {
+  const selection = params.get('features');
+  if (selection === 'false') {
+    store.dispatch(featureFlagsForceDisableAll());
+  } else {
+    store.dispatch(featureFlagsForceEnableAll());
+  }
 }
 
 const whenBrowserWidthChanged = (evt: MediaQueryList | MediaQueryListEvent) =>

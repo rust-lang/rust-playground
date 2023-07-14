@@ -2,8 +2,9 @@ use futures::future::BoxFuture;
 use lazy_static::lazy_static;
 use orchestrator::coordinator;
 use prometheus::{
-    self, register_histogram, register_histogram_vec, register_int_counter, register_int_gauge,
-    Histogram, HistogramVec, IntCounter, IntGauge,
+    self, register_histogram, register_histogram_vec, register_int_counter,
+    register_int_counter_vec, register_int_gauge, Histogram, HistogramVec, IntCounter,
+    IntCounterVec, IntGauge,
 };
 use regex::Regex;
 use std::{
@@ -35,6 +36,17 @@ lazy_static! {
     pub(crate) static ref UNAVAILABLE_WS: IntCounter = register_int_counter!(
         "playground_websocket_unavailability_count",
         "Number of failed WebSocket connections"
+    )
+    .unwrap();
+    pub(crate) static ref WS_INCOMING: IntCounter = register_int_counter!(
+        "playground_websocket_incoming_messages_count",
+        "Number of WebSocket messages received"
+    )
+    .unwrap();
+    pub(crate) static ref WS_OUTGOING: IntCounterVec = register_int_counter_vec!(
+        "playground_websocket_outgoing_messages_count",
+        "Number of WebSocket messages sent",
+        &["success"],
     )
     .unwrap();
 }

@@ -82,7 +82,7 @@ const ResizableArea: React.FC = () => {
 
 
 const WebSocketStatus: React.FC = () => {
-  const enabled = useSelector(selectors.websocketFeatureFlagEnabled);
+  const enabled = useSelector(selectors.showGemSelector);
   const status = useSelector(selectors.websocketStatusSelector);
 
   if (!enabled) { return null; }

@@ -96,6 +96,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/whynowebsocket", get(whynowebsocket))
         .layer(Extension(Arc::new(SandboxCache::default())))
         .layer(Extension(config.github_token()))
+        .layer(Extension(config.feature_flags))
         .layer(Extension(OrchestratorEnabled(config.use_orchestrator())));
 
     if let Some(token) = config.metrics_token() {
@@ -502,8 +503,11 @@ async fn metrics(_: MetricsAuthorization) -> Result<Vec<u8>, StatusCode> {
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
 
-async fn websocket(ws: WebSocketUpgrade) -> impl IntoResponse {
-    ws.on_upgrade(websocket::handle)
+async fn websocket(
+    ws: WebSocketUpgrade,
+    Extension(feature_flags): Extension<crate::FeatureFlags>,
+) -> impl IntoResponse {
+    ws.on_upgrade(move |s| websocket::handle(s, feature_flags.into()))
 }
 
 #[derive(Debug, serde::Deserialize)]

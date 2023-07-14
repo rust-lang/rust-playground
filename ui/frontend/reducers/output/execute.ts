@@ -2,7 +2,7 @@ import { Draft, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
 import { SimpleThunkAction, adaptFetchError, jsonPost, routes } from '../../actions';
-import { executeRequestPayloadSelector, useWebsocketSelector } from '../../selectors';
+import { executeRequestPayloadSelector, executeViaWebsocketSelector } from '../../selectors';
 import { Channel, Edition, Mode } from '../../types';
 import {
   WsPayloadAction,
@@ -160,7 +160,7 @@ export const performCommonExecute =
   (dispatch, getState) => {
     const state = getState();
     const body = executeRequestPayloadSelector(state, { crateType, tests });
-    const useWebSocket = useWebsocketSelector(state);
+    const useWebSocket = executeViaWebsocketSelector(state);
 
     if (useWebSocket) {
       dispatch(wsExecuteRequest(body));
