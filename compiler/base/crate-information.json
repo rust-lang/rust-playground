@@ -1,7 +1,7 @@
 [
   {
     "name": "addr2line",
-    "version": "0.19.0",
+    "version": "0.20.0",
     "id": "addr2line"
   },
   {
@@ -26,7 +26,7 @@
   },
   {
     "name": "allocator-api2",
-    "version": "0.2.15",
+    "version": "0.2.16",
     "id": "allocator_api2"
   },
   {
@@ -70,18 +70,13 @@
     "id": "arc_swap"
   },
   {
-    "name": "arrayvec",
-    "version": "0.7.4",
-    "id": "arrayvec"
-  },
-  {
     "name": "async-recursion",
     "version": "1.0.4",
     "id": "async_recursion"
   },
   {
     "name": "async-trait",
-    "version": "0.1.68",
+    "version": "0.1.71",
     "id": "async_trait"
   },
   {
@@ -101,7 +96,7 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.67",
+    "version": "0.3.68",
     "id": "backtrace"
   },
   {
@@ -181,12 +176,12 @@
   },
   {
     "name": "clap",
-    "version": "4.3.8",
+    "version": "4.3.11",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.3.8",
+    "version": "4.3.11",
     "id": "clap_builder"
   },
   {
@@ -221,7 +216,7 @@
   },
   {
     "name": "cpufeatures",
-    "version": "0.2.8",
+    "version": "0.2.9",
     "id": "cpufeatures"
   },
   {
@@ -316,7 +311,7 @@
   },
   {
     "name": "equivalent",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "equivalent"
   },
   {
@@ -326,7 +321,7 @@
   },
   {
     "name": "exr",
-    "version": "1.6.4",
+    "version": "1.7.0",
     "id": "exr"
   },
   {
@@ -476,7 +471,7 @@
   },
   {
     "name": "half",
-    "version": "2.3.1",
+    "version": "2.2.1",
     "id": "half"
   },
   {
@@ -596,7 +591,7 @@
   },
   {
     "name": "is-terminal",
-    "version": "0.4.7",
+    "version": "0.4.9",
     "id": "is_terminal"
   },
   {
@@ -606,7 +601,7 @@
   },
   {
     "name": "itoa",
-    "version": "1.0.6",
+    "version": "1.0.8",
     "id": "itoa"
   },
   {
@@ -646,8 +641,13 @@
   },
   {
     "name": "linux-raw-sys",
-    "version": "0.3.8",
+    "version": "0.4.3",
     "id": "linux_raw_sys"
+  },
+  {
+    "name": "linux-raw-sys",
+    "version": "0.3.8",
+    "id": "linux_raw_sys_0_3_8"
   },
   {
     "name": "lock_api",
@@ -735,23 +735,18 @@
     "id": "miniz_oxide"
   },
   {
-    "name": "miniz_oxide",
-    "version": "0.6.2",
-    "id": "miniz_oxide_0_6_2"
-  },
-  {
     "name": "mio",
     "version": "0.8.8",
     "id": "mio"
   },
   {
     "name": "nalgebra",
-    "version": "0.32.2",
+    "version": "0.32.3",
     "id": "nalgebra"
   },
   {
     "name": "nalgebra-macros",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "id": "nalgebra_macros"
   },
   {
@@ -776,7 +771,7 @@
   },
   {
     "name": "num",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "id": "num"
   },
   {
@@ -791,7 +786,7 @@
   },
   {
     "name": "num_cpus",
-    "version": "1.15.0",
+    "version": "1.16.0",
     "id": "num_cpus"
   },
   {
@@ -816,7 +811,7 @@
   },
   {
     "name": "object",
-    "version": "0.30.4",
+    "version": "0.31.1",
     "id": "object"
   },
   {
@@ -861,7 +856,7 @@
   },
   {
     "name": "paste",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "id": "paste"
   },
   {
@@ -916,17 +911,17 @@
   },
   {
     "name": "pin-project",
-    "version": "1.1.0",
+    "version": "1.1.2",
     "id": "pin_project"
   },
   {
     "name": "pin-project-internal",
-    "version": "1.1.0",
+    "version": "1.1.2",
     "id": "pin_project_internal"
   },
   {
     "name": "pin-project-lite",
-    "version": "0.2.9",
+    "version": "0.2.10",
     "id": "pin_project_lite"
   },
   {
@@ -971,7 +966,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.63",
+    "version": "1.0.64",
     "id": "proc_macro2"
   },
   {
@@ -991,7 +986,7 @@
   },
   {
     "name": "quote",
-    "version": "1.0.28",
+    "version": "1.0.29",
     "id": "quote"
   },
   {
@@ -1031,12 +1026,17 @@
   },
   {
     "name": "regex",
-    "version": "1.8.4",
+    "version": "1.9.1",
     "id": "regex"
   },
   {
+    "name": "regex-automata",
+    "version": "0.3.3",
+    "id": "regex_automata"
+  },
+  {
     "name": "regex-syntax",
-    "version": "0.7.2",
+    "version": "0.7.4",
     "id": "regex_syntax"
   },
   {
@@ -1066,12 +1066,17 @@
   },
   {
     "name": "rustix",
-    "version": "0.37.20",
+    "version": "0.38.4",
     "id": "rustix"
   },
   {
+    "name": "rustix",
+    "version": "0.37.23",
+    "id": "rustix_0_37_23"
+  },
+  {
     "name": "ryu",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "id": "ryu"
   },
   {
@@ -1101,17 +1106,17 @@
   },
   {
     "name": "serde",
-    "version": "1.0.164",
+    "version": "1.0.171",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.164",
+    "version": "1.0.171",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.99",
+    "version": "1.0.102",
     "id": "serde_json"
   },
   {
@@ -1171,7 +1176,7 @@
   },
   {
     "name": "smallvec",
-    "version": "1.10.0",
+    "version": "1.11.0",
     "id": "smallvec"
   },
   {
@@ -1226,7 +1231,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.22",
+    "version": "2.0.25",
     "id": "syn"
   },
   {
@@ -1236,7 +1241,7 @@
   },
   {
     "name": "tar",
-    "version": "0.4.38",
+    "version": "0.4.39",
     "id": "tar"
   },
   {
@@ -1266,12 +1271,12 @@
   },
   {
     "name": "thiserror",
-    "version": "1.0.40",
+    "version": "1.0.43",
     "id": "thiserror"
   },
   {
     "name": "thiserror-impl",
-    "version": "1.0.40",
+    "version": "1.0.43",
     "id": "thiserror_impl"
   },
   {
@@ -1296,7 +1301,7 @@
   },
   {
     "name": "time",
-    "version": "0.3.22",
+    "version": "0.3.23",
     "id": "time"
   },
   {
@@ -1311,7 +1316,7 @@
   },
   {
     "name": "time-macros",
-    "version": "0.2.9",
+    "version": "0.2.10",
     "id": "time_macros"
   },
   {
@@ -1326,7 +1331,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.29.0",
+    "version": "1.29.1",
     "id": "tokio"
   },
   {
@@ -1356,7 +1361,7 @@
   },
   {
     "name": "toml",
-    "version": "0.7.5",
+    "version": "0.7.6",
     "id": "toml"
   },
   {
@@ -1366,7 +1371,7 @@
   },
   {
     "name": "toml_edit",
-    "version": "0.19.11",
+    "version": "0.19.13",
     "id": "toml_edit"
   },
   {
@@ -1416,7 +1421,7 @@
   },
   {
     "name": "unicode-ident",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "id": "unicode_ident"
   },
   {
@@ -1501,7 +1506,7 @@
   },
   {
     "name": "wide",
-    "version": "0.7.10",
+    "version": "0.7.11",
     "id": "wide"
   },
   {
@@ -1511,7 +1516,7 @@
   },
   {
     "name": "winnow",
-    "version": "0.4.7",
+    "version": "0.5.0",
     "id": "winnow"
   },
   {
