@@ -24,7 +24,7 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
 
   scenario "github see-issues are links" do
     within(:output, :stderr) do
-      expect(page).to have_link('see issue #23416 <https://github.com/rust-lang/rust/issues/23416>', href: 'https://github.com/rust-lang/rust/issues/23416')
+      expect(page).to have_link('see issue #31844 <https://github.com/rust-lang/rust/issues/31844>', href: 'https://github.com/rust-lang/rust/issues/31844')
     end
   end
 
@@ -42,9 +42,10 @@ RSpec.feature "Highlighting the output", type: :feature, js: true do
     <<~EOF
     fn main() {
         drop::<u8, u8>(1);
-
-        42: u64;
     }
+
+    trait X { fn foo(&self); }
+    impl X for () { default fn foo(&self) {} }
     EOF
   end
 end
