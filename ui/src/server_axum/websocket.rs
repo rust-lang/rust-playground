@@ -292,6 +292,8 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
     loop {
         tokio::select! {
             request = socket.recv() => {
+                metrics::WS_INCOMING.inc();
+
                 match request {
                     None => {
                         // browser disconnected
@@ -308,6 +310,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
 
             resp = rx.recv() => {
                 let resp = resp.expect("The rx should never close as we have a tx");
+                let success = resp.is_ok();
                 let resp = resp.unwrap_or_else(error_to_response);
                 let resp = response_to_message(resp);
 
@@ -315,6 +318,9 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
                     // We can't send a response
                     break;
                 }
+
+                let success = if success { "true" } else { "false" };
+                metrics::WS_OUTGOING.with_label_values(&[success]).inc();
             },
 
             // We don't care if there are no running tasks
