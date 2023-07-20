@@ -39,7 +39,7 @@ use std::{
 };
 use tokio::{
     fs,
-    io::{AsyncBufReadExt, AsyncRead, AsyncWriteExt, BufReader},
+    io::{AsyncRead, AsyncReadExt, AsyncWriteExt},
     process::{Child, ChildStderr, ChildStdin, ChildStdout, Command},
     select,
     sync::mpsc,
@@ -570,6 +570,195 @@ pub enum StdioError {
     CopyStderr { source: CopyChildOutputError },
 }
 
+struct Utf8BufReader<R> {
+    reader: R,
+    buffer: Box<[u8]>,
+    n_incomplete: usize,
+}
+
+impl<R> Utf8BufReader<R>
+where
+    R: AsyncRead + Unpin,
+{
+    const DEFAULT_CAPACITY: usize = 32 * 1024;
+
+    fn new(reader: R) -> Self {
+        Self {
+            reader,
+            buffer: vec![0; Self::DEFAULT_CAPACITY].into(),
+            n_incomplete: 0,
+        }
+    }
+
+    async fn next(&mut self) -> Result<Option<String>, Utf8BufReaderError> {
+        use std::str;
+        use utf8_buf_reader_error::*;
+
+        loop {
+            let after_incomplete_bytes = &mut self.buffer[self.n_incomplete..];
+            let n_read = self
+                .reader
+                .read(after_incomplete_bytes)
+                .await
+                .context(ReaderSnafu)?;
+            let n_valid = self.n_incomplete + n_read;
+
+            if n_read == 0 && self.n_incomplete == 0 {
+                return Ok(None);
+            }
+
+            let valid_utf_8_bytes = match str::from_utf8(&self.buffer[..n_valid]) {
+                Ok(s) => s.len(),
+                Err(e) => e.valid_up_to(),
+            };
+
+            // We can't parse any UTF-8
+            if valid_utf_8_bytes == 0 {
+                // We aren't going to get any more input
+                ensure!(n_read != 0, RanOutOfInputSnafu);
+
+                // This should be enough bytes to get one UTF-8 character.
+                ensure!(n_valid < 4, InvalidUtf8Snafu)
+            }
+
+            // Safety: We just calculated the number of valid UTF-8 bytes
+            // and the buffer hasn't changed since then.
+            let s = unsafe {
+                let utf8_bytes = self.buffer.get_unchecked(..valid_utf_8_bytes);
+                str::from_utf8_unchecked(utf8_bytes)
+            };
+            let s = s.to_owned();
+
+            // Move any trailing incomplete bytes
+            self.buffer.copy_within(valid_utf_8_bytes..n_valid, 0);
+
+            self.n_incomplete = n_valid - valid_utf_8_bytes;
+            assert!(
+                self.n_incomplete < 4,
+                "Should never have 4 or more incomplete bytes, had {}",
+                self.n_incomplete,
+            );
+
+            if !s.is_empty() {
+                return Ok(Some(s));
+            }
+        }
+    }
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum Utf8BufReaderError {
+    Reader {
+        source: std::io::Error,
+    },
+
+    #[snafu(display("Insufficient data to complete a UTF-8 character"))]
+    RanOutOfInput,
+
+    #[snafu(display("Found non-UTF-8 data"))]
+    InvalidUtf8,
+}
+
+#[cfg(test)]
+mod test {
+    use std::{
+        collections::VecDeque,
+        io,
+        pin::Pin,
+        task::{Context, Poll},
+    };
+
+    use assert_matches::assert_matches;
+
+    use super::*;
+
+    struct FixedAsyncRead(VecDeque<io::Result<Vec<u8>>>);
+
+    impl FixedAsyncRead {
+        fn is_empty(&self) -> bool {
+            self.0.is_empty()
+        }
+
+        fn success_exact(i: impl IntoIterator<Item = impl Into<Vec<u8>>>) -> Self {
+            Self(
+                i.into_iter()
+                    .map(Into::into)
+                    .chain(Some(vec![]))
+                    .map(Ok)
+                    .collect(),
+            )
+        }
+    }
+
+    impl AsyncRead for FixedAsyncRead {
+        fn poll_read(
+            self: Pin<&mut Self>,
+            _cx: &mut Context<'_>,
+            buf: &mut tokio::io::ReadBuf<'_>,
+        ) -> Poll<io::Result<()>> {
+            let this = Pin::get_mut(self);
+            let next_result = this.0.pop_front().expect("FixedAsyncRead ran out of input");
+
+            if let Ok(v) = &next_result {
+                buf.put_slice(&v);
+            }
+
+            Poll::Ready(next_result.map(drop))
+        }
+    }
+
+    #[tokio::test]
+    async fn small_reads() {
+        let bytes: [u8; 4] = "🙂".as_bytes().try_into().unwrap();
+
+        let reader = FixedAsyncRead::success_exact(bytes.map(|b| [b]));
+        let mut buffer = Utf8BufReader::new(reader);
+
+        assert_eq!(buffer.next().await.unwrap().as_deref(), Some("🙂"));
+        assert_eq!(buffer.next().await.unwrap().as_deref(), None);
+        assert!(buffer.reader.is_empty());
+    }
+
+    #[tokio::test]
+    async fn incomplete_utf8() {
+        let bytes: [u8; 4] = "🙂".as_bytes().try_into().unwrap();
+
+        let partial_string = &bytes[..3];
+        let reader = FixedAsyncRead::success_exact([partial_string]);
+        let mut buffer = Utf8BufReader::new(reader);
+
+        assert_matches!(buffer.next().await, Err(Utf8BufReaderError::RanOutOfInput));
+        assert!(buffer.reader.is_empty());
+    }
+
+    #[tokio::test]
+    async fn invalid_utf8() {
+        let mut bytes: [u8; 4] = "🙂".as_bytes().try_into().unwrap();
+        bytes[0] = 0xFF;
+
+        let reader = FixedAsyncRead::success_exact([bytes]);
+        let mut buffer = Utf8BufReader::new(reader);
+
+        assert_matches!(buffer.next().await, Err(Utf8BufReaderError::InvalidUtf8));
+        assert!(!buffer.reader.is_empty());
+    }
+
+    #[tokio::test]
+    async fn split_across_responses() {
+        let bytes: [u8; 12] = "🙂🙂🙂".as_bytes().try_into().unwrap();
+
+        let (head, tail) = bytes.split_at(6);
+        let reader = FixedAsyncRead::success_exact([head, tail]);
+        let mut buffer = Utf8BufReader::new(reader);
+
+        assert_eq!(buffer.next().await.unwrap().as_deref(), Some("🙂"));
+        assert_eq!(buffer.next().await.unwrap().as_deref(), Some("🙂🙂"));
+        assert_eq!(buffer.next().await.unwrap().as_deref(), None);
+        assert!(buffer.reader.is_empty());
+    }
+}
+
 async fn copy_child_output(
     output: impl AsyncRead + Unpin,
     coordinator_tx: MultiplexingSender,
@@ -577,21 +766,9 @@ async fn copy_child_output(
 ) -> Result<(), CopyChildOutputError> {
     use copy_child_output_error::*;
 
-    let mut buf = BufReader::new(output);
+    let mut buf = Utf8BufReader::new(output);
 
-    loop {
-        // Must be valid UTF-8.
-        let mut buffer = String::new();
-
-        let n = buf
-            .read_line(&mut buffer)
-            .await
-            .context(UnableToReadSnafu)?;
-
-        if n == 0 {
-            break;
-        }
-
+    while let Some(buffer) = buf.next().await.context(UnableToReadSnafu)? {
         coordinator_tx
             .send_ok(xform(buffer))
             .await
@@ -605,7 +782,7 @@ async fn copy_child_output(
 #[snafu(module)]
 pub enum CopyChildOutputError {
     #[snafu(display("Failed to read child output"))]
-    UnableToRead { source: std::io::Error },
+    UnableToRead { source: Utf8BufReaderError },
 
     #[snafu(display("Failed to send output packet"))]
     UnableToSend { source: MultiplexingSenderError },
