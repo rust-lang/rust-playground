@@ -36,6 +36,7 @@ import { ExecuteRequestBody, performCommonExecute, wsExecuteRequest } from './re
 import { performGistLoad } from './reducers/output/gist';
 import { performCompileToHirOnly } from './reducers/output/hir';
 import { performCompileToLlvmIrOnly } from './reducers/output/llvmIr';
+import { performCompileToMirOnly } from './reducers/output/mir';
 
 export const routes = {
   compile: '/compile',
@@ -87,9 +88,6 @@ export enum ActionType {
   CompileAssemblyRequest = 'COMPILE_ASSEMBLY_REQUEST',
   CompileAssemblySucceeded = 'COMPILE_ASSEMBLY_SUCCEEDED',
   CompileAssemblyFailed = 'COMPILE_ASSEMBLY_FAILED',
-  CompileMirRequest = 'COMPILE_MIR_REQUEST',
-  CompileMirSucceeded = 'COMPILE_MIR_SUCCEEDED',
-  CompileMirFailed = 'COMPILE_MIR_FAILED',
   CompileWasmRequest = 'COMPILE_WASM_REQUEST',
   CompileWasmSucceeded = 'COMPILE_WASM_SUCCEEDED',
   CompileWasmFailed = 'COMPILE_WASM_FAILED',
@@ -329,22 +327,6 @@ const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
   dispatch(changeChannel(Channel.Nightly));
   dispatch(performCompileToHirOnly());
 };
-
-const requestCompileMir = () =>
-  createAction(ActionType.CompileMirRequest);
-
-const receiveCompileMirSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
-  createAction(ActionType.CompileMirSucceeded, { code, stdout, stderr });
-
-const receiveCompileMirFailure = ({ error }: CompileFailure) =>
-  createAction(ActionType.CompileMirFailed, { error });
-
-const performCompileToMirOnly = () =>
-  performCompileShow('mir', {
-    request: requestCompileMir,
-    success: receiveCompileMirSuccess,
-    failure: receiveCompileMirFailure,
-  });
 
 const requestCompileWasm = () =>
   createAction(ActionType.CompileWasmRequest);
@@ -712,9 +694,6 @@ export type Action =
   | ReturnType<typeof requestCompileAssembly>
   | ReturnType<typeof receiveCompileAssemblySuccess>
   | ReturnType<typeof receiveCompileAssemblyFailure>
-  | ReturnType<typeof requestCompileMir>
-  | ReturnType<typeof receiveCompileMirSuccess>
-  | ReturnType<typeof receiveCompileMirFailure>
   | ReturnType<typeof requestCompileWasm>
   | ReturnType<typeof receiveCompileWasmSuccess>
   | ReturnType<typeof receiveCompileWasmFailure>
