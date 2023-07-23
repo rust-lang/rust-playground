@@ -6,6 +6,7 @@ import {
   clippyRequestSelector,
   getCrateType,
   runAsTest,
+  compileRequestPayloadSelector,
 } from './selectors';
 import State from './state';
 import {
@@ -304,31 +305,7 @@ function performCompileShow(
     dispatch(request());
 
     const state = getState();
-    const code = codeSelector(state);
-    const { configuration: {
-      channel,
-      mode,
-      edition,
-      assemblyFlavor,
-      demangleAssembly,
-      processAssembly,
-    } } = state;
-    const crateType = getCrateType(state);
-    const tests = runAsTest(state);
-    const backtrace = state.configuration.backtrace === Backtrace.Enabled;
-    const body: CompileRequestBody = {
-      channel,
-      mode,
-      edition,
-      crateType,
-      tests,
-      code,
-      target,
-      assemblyFlavor,
-      demangleAssembly,
-      processAssembly,
-      backtrace,
-    };
+    const body: CompileRequestBody = compileRequestPayloadSelector(state, { target });
 
     return jsonPost<CompileResponseBody>(routes.compile, body)
       .then(json => dispatch(success(json)))
