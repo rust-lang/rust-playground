@@ -1,7 +1,8 @@
-import { Action, ActionType } from '../../actions';
-import { finish, start } from './sharedStateManagement';
+import { createSlice } from '@reduxjs/toolkit';
 
-const DEFAULT: State = {
+import { makeCompileActions } from '../../compileActions';
+
+const initialState: State = {
   requestsInProgress: 0,
 };
 
@@ -13,17 +14,30 @@ interface State {
   error?: string;
 }
 
-export default function hir(state = DEFAULT, action: Action) {
-  switch (action.type) {
-    case ActionType.CompileHirRequest:
-      return start(DEFAULT, state);
-    case ActionType.CompileHirSucceeded: {
-      const { code = '', stdout = '', stderr = '' } = action;
-      return finish(state, { code, stdout, stderr });
-    }
-    case ActionType.CompileHirFailed:
-      return finish(state, { error: action.error });
-    default:
-      return state;
-  }
-}
+const sliceName = 'output/hir';
+
+export const { action: performCompileHir, performCompile: performCompileToHirOnly } =
+  makeCompileActions({ sliceName, target: 'hir' });
+
+const slice = createSlice({
+  name: 'output/hir',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(performCompileHir.pending, (state) => {
+        state.requestsInProgress += 1;
+      })
+      .addCase(performCompileHir.fulfilled, (state, action) => {
+        const { code, stdout, stderr } = action.payload;
+        Object.assign(state, { code, stdout, stderr });
+        state.requestsInProgress -= 1;
+      })
+      .addCase(performCompileHir.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.requestsInProgress -= 1;
+      });
+  },
+});
+
+export default slice.reducer;

@@ -12,6 +12,7 @@ node_modules
 # Slowly migrate files that we've touched
 !.eslintrc.js
 !PopButton.tsx
+!compileActions.ts
 !editor/AceEditor.tsx
 !editor/SimpleEditor.tsx
 !reducers/client.ts
@@ -20,6 +21,7 @@ node_modules
 !reducers/output/execute.ts
 !reducers/output/format.ts
 !reducers/output/gist.ts
+!reducers/output/hir.ts
 !reducers/websocket.ts
 !websocketActions.ts
 !websocketMiddleware.ts

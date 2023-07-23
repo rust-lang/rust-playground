@@ -63,6 +63,7 @@ module.exports = {
       files: [
         '.eslintrc.js',
         'PopButton.tsx',
+        'compileActions.ts',
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',
         'reducers/client.ts',
@@ -71,6 +72,7 @@ module.exports = {
         'reducers/output/execute.ts',
         'reducers/output/format.ts',
         'reducers/output/gist.ts',
+        'reducers/output/hir.ts',
         'reducers/websocket.ts',
         'websocketActions.ts',
         'websocketMiddleware.ts',

@@ -3,6 +3,7 @@ import { Focus } from '../../types';
 import { performGistLoad, performGistSave } from './gist';
 import { performFormat } from './format';
 import { performExecute, wsExecuteRequest } from './execute';
+import { performCompileHir } from './hir';
 
 const DEFAULT: State = {
 };
@@ -31,9 +32,6 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.CompileMirRequest:
       return { ...state, focus: Focus.Mir };
 
-    case ActionType.CompileHirRequest:
-      return { ...state, focus: Focus.Hir };
-
     case ActionType.CompileWasmRequest:
       return { ...state, focus: Focus.Wasm };
 
@@ -43,6 +41,9 @@ export default function meta(state = DEFAULT, action: Action) {
     case performExecute.pending.type:
     case wsExecuteRequest.type:
       return { ...state, focus: Focus.Execute };
+
+    case performCompileHir.pending.type:
+      return { ...state, focus: Focus.Hir };
 
     default: {
       if (performGistLoad.pending.match(action) || performGistSave.pending.match(action)) {

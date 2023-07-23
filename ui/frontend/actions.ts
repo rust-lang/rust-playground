@@ -34,6 +34,7 @@ import {
 
 import { ExecuteRequestBody, performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
 import { performGistLoad } from './reducers/output/gist';
+import { performCompileToHirOnly } from './reducers/output/hir';
 
 export const routes = {
   compile: '/compile',
@@ -88,9 +89,6 @@ export enum ActionType {
   CompileLlvmIrRequest = 'COMPILE_LLVM_IR_REQUEST',
   CompileLlvmIrSucceeded = 'COMPILE_LLVM_IR_SUCCEEDED',
   CompileLlvmIrFailed = 'COMPILE_LLVM_IR_FAILED',
-  CompileHirRequest = 'COMPILE_HIR_REQUEST',
-  CompileHirSucceeded = 'COMPILE_HIR_SUCCEEDED',
-  CompileHirFailed = 'COMPILE_HIR_FAILED',
   CompileMirRequest = 'COMPILE_MIR_REQUEST',
   CompileMirSucceeded = 'COMPILE_MIR_SUCCEEDED',
   CompileMirFailed = 'COMPILE_MIR_FAILED',
@@ -343,22 +341,6 @@ const performCompileToLLVMOnly = () =>
     request: requestCompileLlvmIr,
     success: receiveCompileLlvmIrSuccess,
     failure: receiveCompileLlvmIrFailure,
-  });
-
-const requestCompileHir = () =>
-  createAction(ActionType.CompileHirRequest);
-
-const receiveCompileHirSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
-  createAction(ActionType.CompileHirSucceeded, { code, stdout, stderr });
-
-const receiveCompileHirFailure = ({ error }: CompileFailure) =>
-  createAction(ActionType.CompileHirFailed, { error });
-
-const performCompileToHirOnly = () =>
-  performCompileShow('hir', {
-    request: requestCompileHir,
-    success: receiveCompileHirSuccess,
-    failure: receiveCompileHirFailure,
   });
 
 const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
@@ -754,9 +736,6 @@ export type Action =
   | ReturnType<typeof requestCompileMir>
   | ReturnType<typeof receiveCompileMirSuccess>
   | ReturnType<typeof receiveCompileMirFailure>
-  | ReturnType<typeof requestCompileHir>
-  | ReturnType<typeof receiveCompileHirSuccess>
-  | ReturnType<typeof receiveCompileHirFailure>
   | ReturnType<typeof requestCompileWasm>
   | ReturnType<typeof receiveCompileWasmSuccess>
   | ReturnType<typeof receiveCompileWasmFailure>
