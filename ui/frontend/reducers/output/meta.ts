@@ -6,6 +6,7 @@ import { performExecute, wsExecuteRequest } from './execute';
 import { performCompileHir } from './hir';
 import { performCompileLlvmIr } from './llvmIr';
 import { performCompileMir } from './mir';
+import { performCompileWasm } from './wasm';
 
 const DEFAULT: State = {
 };
@@ -28,9 +29,6 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.RequestMacroExpansion:
       return { ...state, focus: Focus.MacroExpansion };
 
-    case ActionType.CompileWasmRequest:
-      return { ...state, focus: Focus.Wasm };
-
     case ActionType.CompileAssemblyRequest:
       return { ...state, focus: Focus.Asm };
 
@@ -46,6 +44,9 @@ export default function meta(state = DEFAULT, action: Action) {
 
     case performCompileMir.pending.type:
       return { ...state, focus: Focus.Mir };
+
+    case performCompileWasm.pending.type:
+      return { ...state, focus: Focus.Wasm };
 
     default: {
       if (performGistLoad.pending.match(action) || performGistSave.pending.match(action)) {

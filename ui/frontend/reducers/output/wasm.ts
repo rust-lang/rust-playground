@@ -1,7 +1,8 @@
-import { Action, ActionType } from '../../actions';
-import { finish, start } from './sharedStateManagement';
+import { createSlice } from '@reduxjs/toolkit';
 
-const DEFAULT: State = {
+import { makeCompileActions } from '../../compileActions';
+
+const initialState: State = {
   requestsInProgress: 0,
 };
 
@@ -13,17 +14,30 @@ interface State {
   error?: string;
 }
 
-export default function wasm(state = DEFAULT, action: Action) {
-  switch (action.type) {
-    case ActionType.CompileWasmRequest:
-      return start(DEFAULT, state);
-    case ActionType.CompileWasmSucceeded: {
-      const { code = '', stdout = '', stderr = '' } = action;
-      return finish(state, { code, stdout, stderr });
-    }
-    case ActionType.CompileWasmFailed:
-      return finish(state, { error: action.error });
-    default:
-      return state;
-  }
-}
+const sliceName = 'output/wasm';
+
+export const { action: performCompileWasm, performCompile: performCompileToWasmOnly } =
+  makeCompileActions({ sliceName, target: 'wasm' });
+
+const slice = createSlice({
+  name: 'output/wasm',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(performCompileWasm.pending, (state) => {
+        state.requestsInProgress += 1;
+      })
+      .addCase(performCompileWasm.fulfilled, (state, action) => {
+        const { code, stdout, stderr } = action.payload;
+        Object.assign(state, { code, stdout, stderr });
+        state.requestsInProgress -= 1;
+      })
+      .addCase(performCompileWasm.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.requestsInProgress -= 1;
+      });
+  },
+});
+
+export default slice.reducer;

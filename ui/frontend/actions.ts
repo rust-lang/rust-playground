@@ -37,6 +37,7 @@ import { performGistLoad } from './reducers/output/gist';
 import { performCompileToHirOnly } from './reducers/output/hir';
 import { performCompileToLlvmIrOnly } from './reducers/output/llvmIr';
 import { performCompileToMirOnly } from './reducers/output/mir';
+import { performCompileToWasmOnly } from './reducers/output/wasm';
 
 export const routes = {
   compile: '/compile',
@@ -88,9 +89,6 @@ export enum ActionType {
   CompileAssemblyRequest = 'COMPILE_ASSEMBLY_REQUEST',
   CompileAssemblySucceeded = 'COMPILE_ASSEMBLY_SUCCEEDED',
   CompileAssemblyFailed = 'COMPILE_ASSEMBLY_FAILED',
-  CompileWasmRequest = 'COMPILE_WASM_REQUEST',
-  CompileWasmSucceeded = 'COMPILE_WASM_SUCCEEDED',
-  CompileWasmFailed = 'COMPILE_WASM_FAILED',
   EditCode = 'EDIT_CODE',
   AddMainFunction = 'ADD_MAIN_FUNCTION',
   AddImport = 'ADD_IMPORT',
@@ -328,25 +326,9 @@ const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
   dispatch(performCompileToHirOnly());
 };
 
-const requestCompileWasm = () =>
-  createAction(ActionType.CompileWasmRequest);
-
-const receiveCompileWasmSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
-  createAction(ActionType.CompileWasmSucceeded, { code, stdout, stderr });
-
-const receiveCompileWasmFailure = ({ error }: CompileFailure) =>
-  createAction(ActionType.CompileWasmFailed, { error });
-
-const performCompileToWasm = () =>
-  performCompileShow('wasm', {
-    request: requestCompileWasm,
-    success: receiveCompileWasmSuccess,
-    failure: receiveCompileWasmFailure,
-  });
-
 const performCompileToNightlyWasmOnly = (): ThunkAction => dispatch => {
   dispatch(changeChannel(Channel.Nightly));
-  dispatch(performCompileToWasm());
+  dispatch(performCompileToWasmOnly());
 };
 
 const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
@@ -694,9 +676,6 @@ export type Action =
   | ReturnType<typeof requestCompileAssembly>
   | ReturnType<typeof receiveCompileAssemblySuccess>
   | ReturnType<typeof receiveCompileAssemblyFailure>
-  | ReturnType<typeof requestCompileWasm>
-  | ReturnType<typeof receiveCompileWasmSuccess>
-  | ReturnType<typeof receiveCompileWasmFailure>
   | ReturnType<typeof editCode>
   | ReturnType<typeof addMainFunction>
   | ReturnType<typeof addImport>
