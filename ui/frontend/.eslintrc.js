@@ -69,6 +69,7 @@ module.exports = {
         'reducers/client.ts',
         'reducers/featureFlags.ts',
         'reducers/globalConfiguration.ts',
+        'reducers/output/assembly.ts',
         'reducers/output/execute.ts',
         'reducers/output/format.ts',
         'reducers/output/gist.ts',

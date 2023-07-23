@@ -3,6 +3,7 @@ import { Focus } from '../../types';
 import { performGistLoad, performGistSave } from './gist';
 import { performFormat } from './format';
 import { performExecute, wsExecuteRequest } from './execute';
+import { performCompileAssembly } from './assembly';
 import { performCompileHir } from './hir';
 import { performCompileLlvmIr } from './llvmIr';
 import { performCompileMir } from './mir';
@@ -29,12 +30,12 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.RequestMacroExpansion:
       return { ...state, focus: Focus.MacroExpansion };
 
-    case ActionType.CompileAssemblyRequest:
-      return { ...state, focus: Focus.Asm };
-
     case performExecute.pending.type:
     case wsExecuteRequest.type:
       return { ...state, focus: Focus.Execute };
+
+    case performCompileAssembly.pending.type:
+      return { ...state, focus: Focus.Asm };
 
     case performCompileHir.pending.type:
       return { ...state, focus: Focus.Hir };

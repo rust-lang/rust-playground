@@ -6,7 +6,6 @@ import {
   clippyRequestSelector,
   getCrateType,
   runAsTest,
-  compileRequestPayloadSelector,
 } from './selectors';
 import State from './state';
 import {
@@ -32,8 +31,9 @@ import {
   Crate,
 } from './types';
 
-import { ExecuteRequestBody, performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
+import { performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
 import { performGistLoad } from './reducers/output/gist';
+import { performCompileToAssemblyOnly } from './reducers/output/assembly';
 import { performCompileToHirOnly } from './reducers/output/hir';
 import { performCompileToLlvmIrOnly } from './reducers/output/llvmIr';
 import { performCompileToMirOnly } from './reducers/output/mir';
@@ -86,9 +86,6 @@ export enum ActionType {
   ChangeEdition = 'CHANGE_EDITION',
   ChangeBacktrace = 'CHANGE_BACKTRACE',
   ChangeFocus = 'CHANGE_FOCUS',
-  CompileAssemblyRequest = 'COMPILE_ASSEMBLY_REQUEST',
-  CompileAssemblySucceeded = 'COMPILE_ASSEMBLY_SUCCEEDED',
-  CompileAssemblyFailed = 'COMPILE_ASSEMBLY_FAILED',
   EditCode = 'EDIT_CODE',
   AddMainFunction = 'ADD_MAIN_FUNCTION',
   AddImport = 'ADD_IMPORT',
@@ -266,60 +263,9 @@ const performExecuteOnly = (): ThunkAction => performCommonExecute('bin', false)
 const performCompileOnly = (): ThunkAction => performCommonExecute('lib', false);
 const performTestOnly = (): ThunkAction => performCommonExecute('lib', true);
 
-interface CompileRequestBody extends ExecuteRequestBody {
-  target: string;
-  assemblyFlavor: string;
-  demangleAssembly: string;
-  processAssembly: string;
-}
-
-type CompileResponseBody = CompileSuccess;
-
-interface CompileSuccess {
-  code: string;
-  stdout: string;
-  stderr: string;
-}
-
-interface CompileFailure {
+interface GenericApiFailure {
   error: string;
 }
-
-function performCompileShow(
-  target: string,
-  { request, success, failure }: {
-    request: () => Action,
-    success: (body: CompileResponseBody) => Action,
-    failure: (f: CompileFailure) => Action,
-  }): ThunkAction {
-  // TODO: Check a cache
-  return function(dispatch, getState) {
-    dispatch(request());
-
-    const state = getState();
-    const body: CompileRequestBody = compileRequestPayloadSelector(state, { target });
-
-    return jsonPost<CompileResponseBody>(routes.compile, body)
-      .then(json => dispatch(success(json)))
-      .catch(json => dispatch(failure(json)));
-  };
-}
-
-const requestCompileAssembly = () =>
-  createAction(ActionType.CompileAssemblyRequest);
-
-const receiveCompileAssemblySuccess = ({ code, stdout, stderr }: CompileSuccess) =>
-  createAction(ActionType.CompileAssemblySucceeded, { code, stdout, stderr });
-
-const receiveCompileAssemblyFailure = ({ error }: CompileFailure) =>
-  createAction(ActionType.CompileAssemblyFailed, { error });
-
-const performCompileToAssemblyOnly = () =>
-  performCompileShow('asm', {
-    request: requestCompileAssembly,
-    success: receiveCompileAssemblySuccess,
-    failure: receiveCompileAssemblyFailure,
-  });
 
 const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
   dispatch(changeChannel(Channel.Nightly));
@@ -414,7 +360,7 @@ type ClippySuccess = GeneralSuccess;
 const receiveClippySuccess = ({ stdout, stderr }: ClippySuccess) =>
   createAction(ActionType.ClippySucceeded, { stdout, stderr });
 
-const receiveClippyFailure = ({ error }: CompileFailure) =>
+const receiveClippyFailure = ({ error }: GenericApiFailure) =>
   createAction(ActionType.ClippyFailed, { error });
 
 export function performClippy(): ThunkAction {
@@ -449,7 +395,7 @@ type MiriSuccess = GeneralSuccess;
 const receiveMiriSuccess = ({ stdout, stderr }: MiriSuccess) =>
   createAction(ActionType.MiriSucceeded, { stdout, stderr });
 
-const receiveMiriFailure = ({ error }: CompileFailure) =>
+const receiveMiriFailure = ({ error }: GenericApiFailure) =>
   createAction(ActionType.MiriFailed, { error });
 
 export function performMiri(): ThunkAction {
@@ -489,7 +435,7 @@ type MacroExpansionSuccess = GeneralSuccess;
 const receiveMacroExpansionSuccess = ({ stdout, stderr }: MacroExpansionSuccess) =>
   createAction(ActionType.MacroExpansionSucceeded, { stdout, stderr });
 
-const receiveMacroExpansionFailure = ({ error }: CompileFailure) =>
+const receiveMacroExpansionFailure = ({ error }: GenericApiFailure) =>
   createAction(ActionType.MacroExpansionFailed, { error });
 
 export function performMacroExpansion(): ThunkAction {
@@ -673,9 +619,6 @@ export type Action =
   | ReturnType<typeof changeProcessAssembly>
   | ReturnType<typeof changeAceTheme>
   | ReturnType<typeof changeMonacoTheme>
-  | ReturnType<typeof requestCompileAssembly>
-  | ReturnType<typeof receiveCompileAssemblySuccess>
-  | ReturnType<typeof receiveCompileAssemblyFailure>
   | ReturnType<typeof editCode>
   | ReturnType<typeof addMainFunction>
   | ReturnType<typeof addImport>
