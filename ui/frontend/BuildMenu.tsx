@@ -66,7 +66,7 @@ const BuildMenu: React.FC<BuildMenuProps> = props => {
         Build and show the resulting HIR, Rust’s syntax-based intermediate representation.
         {!isHirAvailable && <HirAside />}
       </ButtonMenuItem>
-      <ButtonMenuItem name="WASM" onClick={compileToWasm}>
+      <ButtonMenuItem name="Wasm" onClick={compileToWasm}>
         Build a WebAssembly module for web browsers, in the .WAT textual representation.
       </ButtonMenuItem>
     </MenuGroup>

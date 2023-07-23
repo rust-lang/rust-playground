@@ -93,7 +93,7 @@ const LABELS: { [index in PrimaryActionCore]: string } = {
   [PrimaryActionCore.Hir]: 'Show HIR',
   [PrimaryActionCore.Mir]: 'Show MIR',
   [PrimaryActionCore.Test]: 'Test',
-  [PrimaryActionCore.Wasm]: 'Show WASM',
+  [PrimaryActionCore.Wasm]: 'Show Wasm',
 };
 
 export const getExecutionLabel = createSelector(primaryActionSelector, primaryAction => LABELS[primaryAction]);
