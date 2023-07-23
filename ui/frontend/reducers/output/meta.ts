@@ -4,6 +4,7 @@ import { performGistLoad, performGistSave } from './gist';
 import { performFormat } from './format';
 import { performExecute, wsExecuteRequest } from './execute';
 import { performCompileHir } from './hir';
+import { performCompileLlvmIr } from './llvmIr';
 
 const DEFAULT: State = {
 };
@@ -26,9 +27,6 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.RequestMacroExpansion:
       return { ...state, focus: Focus.MacroExpansion };
 
-    case ActionType.CompileLlvmIrRequest:
-      return { ...state, focus: Focus.LlvmIr };
-
     case ActionType.CompileMirRequest:
       return { ...state, focus: Focus.Mir };
 
@@ -44,6 +42,9 @@ export default function meta(state = DEFAULT, action: Action) {
 
     case performCompileHir.pending.type:
       return { ...state, focus: Focus.Hir };
+
+    case performCompileLlvmIr.pending.type:
+      return { ...state, focus: Focus.LlvmIr };
 
     default: {
       if (performGistLoad.pending.match(action) || performGistSave.pending.match(action)) {

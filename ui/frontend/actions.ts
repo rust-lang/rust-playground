@@ -35,6 +35,7 @@ import {
 import { ExecuteRequestBody, performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
 import { performGistLoad } from './reducers/output/gist';
 import { performCompileToHirOnly } from './reducers/output/hir';
+import { performCompileToLlvmIrOnly } from './reducers/output/llvmIr';
 
 export const routes = {
   compile: '/compile',
@@ -86,9 +87,6 @@ export enum ActionType {
   CompileAssemblyRequest = 'COMPILE_ASSEMBLY_REQUEST',
   CompileAssemblySucceeded = 'COMPILE_ASSEMBLY_SUCCEEDED',
   CompileAssemblyFailed = 'COMPILE_ASSEMBLY_FAILED',
-  CompileLlvmIrRequest = 'COMPILE_LLVM_IR_REQUEST',
-  CompileLlvmIrSucceeded = 'COMPILE_LLVM_IR_SUCCEEDED',
-  CompileLlvmIrFailed = 'COMPILE_LLVM_IR_FAILED',
   CompileMirRequest = 'COMPILE_MIR_REQUEST',
   CompileMirSucceeded = 'COMPILE_MIR_SUCCEEDED',
   CompileMirFailed = 'COMPILE_MIR_FAILED',
@@ -327,22 +325,6 @@ const performCompileToAssemblyOnly = () =>
     failure: receiveCompileAssemblyFailure,
   });
 
-const requestCompileLlvmIr = () =>
-  createAction(ActionType.CompileLlvmIrRequest);
-
-const receiveCompileLlvmIrSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
-  createAction(ActionType.CompileLlvmIrSucceeded, { code, stdout, stderr });
-
-const receiveCompileLlvmIrFailure = ({ error }: CompileFailure) =>
-  createAction(ActionType.CompileLlvmIrFailed, { error });
-
-const performCompileToLLVMOnly = () =>
-  performCompileShow('llvm-ir', {
-    request: requestCompileLlvmIr,
-    success: receiveCompileLlvmIrSuccess,
-    failure: receiveCompileLlvmIrFailure,
-  });
-
 const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
   dispatch(changeChannel(Channel.Nightly));
   dispatch(performCompileToHirOnly());
@@ -391,7 +373,7 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Execute]: performExecuteOnly,
   [PrimaryActionCore.Test]: performTestOnly,
   [PrimaryActionAuto.Auto]: performAutoOnly,
-  [PrimaryActionCore.LlvmIr]: performCompileToLLVMOnly,
+  [PrimaryActionCore.LlvmIr]: performCompileToLlvmIrOnly,
   [PrimaryActionCore.Hir]: performCompileToHirOnly,
   [PrimaryActionCore.Mir]: performCompileToMirOnly,
   [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
@@ -417,7 +399,7 @@ export const performTest =
 export const performCompileToAssembly =
   performAndSwitchPrimaryAction(performCompileToAssemblyOnly, PrimaryActionCore.Asm);
 export const performCompileToLLVM =
-  performAndSwitchPrimaryAction(performCompileToLLVMOnly, PrimaryActionCore.LlvmIr);
+  performAndSwitchPrimaryAction(performCompileToLlvmIrOnly, PrimaryActionCore.LlvmIr);
 export const performCompileToMir =
   performAndSwitchPrimaryAction(performCompileToMirOnly, PrimaryActionCore.Mir);
 export const performCompileToNightlyHir =
@@ -730,9 +712,6 @@ export type Action =
   | ReturnType<typeof requestCompileAssembly>
   | ReturnType<typeof receiveCompileAssemblySuccess>
   | ReturnType<typeof receiveCompileAssemblyFailure>
-  | ReturnType<typeof requestCompileLlvmIr>
-  | ReturnType<typeof receiveCompileLlvmIrSuccess>
-  | ReturnType<typeof receiveCompileLlvmIrFailure>
   | ReturnType<typeof requestCompileMir>
   | ReturnType<typeof receiveCompileMirSuccess>
   | ReturnType<typeof receiveCompileMirFailure>

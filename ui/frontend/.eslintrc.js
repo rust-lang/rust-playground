@@ -73,6 +73,7 @@ module.exports = {
         'reducers/output/format.ts',
         'reducers/output/gist.ts',
         'reducers/output/hir.ts',
+        'reducers/output/llvmIr.ts',
         'reducers/websocket.ts',
         'websocketActions.ts',
         'websocketMiddleware.ts',
