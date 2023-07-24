@@ -1,7 +1,8 @@
-import { Action, ActionType } from '../../actions';
-import { finish, start } from './sharedStateManagement';
+import { createSlice } from '@reduxjs/toolkit';
 
-const DEFAULT: State = {
+import { makeCompileActions } from '../../compileActions';
+
+const initialState: State = {
   requestsInProgress: 0,
 };
 
@@ -13,17 +14,30 @@ interface State {
   error?: string;
 }
 
-export default function assembly(state = DEFAULT, action: Action) {
-  switch (action.type) {
-    case ActionType.CompileAssemblyRequest:
-      return start(DEFAULT, state);
-    case ActionType.CompileAssemblySucceeded: {
-      const { code = '', stdout = '', stderr = '' } = action;
-      return finish(state, { code, stdout, stderr });
-    }
-    case ActionType.CompileAssemblyFailed:
-      return finish(state, { error: action.error });
-    default:
-      return state;
-  }
-}
+const sliceName = 'output/assembly';
+
+export const { action: performCompileAssembly, performCompile: performCompileToAssemblyOnly } =
+  makeCompileActions({ sliceName, target: 'asm' });
+
+const slice = createSlice({
+  name: 'output/assembly',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(performCompileAssembly.pending, (state) => {
+        state.requestsInProgress += 1;
+      })
+      .addCase(performCompileAssembly.fulfilled, (state, action) => {
+        const { code, stdout, stderr } = action.payload;
+        Object.assign(state, { code, stdout, stderr });
+        state.requestsInProgress -= 1;
+      })
+      .addCase(performCompileAssembly.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.requestsInProgress -= 1;
+      });
+  },
+});
+
+export default slice.reducer;

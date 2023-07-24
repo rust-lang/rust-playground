@@ -31,8 +31,13 @@ import {
   Crate,
 } from './types';
 
-import { ExecuteRequestBody, performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
+import { performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
 import { performGistLoad } from './reducers/output/gist';
+import { performCompileToAssemblyOnly } from './reducers/output/assembly';
+import { performCompileToHirOnly } from './reducers/output/hir';
+import { performCompileToLlvmIrOnly } from './reducers/output/llvmIr';
+import { performCompileToMirOnly } from './reducers/output/mir';
+import { performCompileToWasmOnly } from './reducers/output/wasm';
 
 export const routes = {
   compile: '/compile',
@@ -81,21 +86,6 @@ export enum ActionType {
   ChangeEdition = 'CHANGE_EDITION',
   ChangeBacktrace = 'CHANGE_BACKTRACE',
   ChangeFocus = 'CHANGE_FOCUS',
-  CompileAssemblyRequest = 'COMPILE_ASSEMBLY_REQUEST',
-  CompileAssemblySucceeded = 'COMPILE_ASSEMBLY_SUCCEEDED',
-  CompileAssemblyFailed = 'COMPILE_ASSEMBLY_FAILED',
-  CompileLlvmIrRequest = 'COMPILE_LLVM_IR_REQUEST',
-  CompileLlvmIrSucceeded = 'COMPILE_LLVM_IR_SUCCEEDED',
-  CompileLlvmIrFailed = 'COMPILE_LLVM_IR_FAILED',
-  CompileHirRequest = 'COMPILE_HIR_REQUEST',
-  CompileHirSucceeded = 'COMPILE_HIR_SUCCEEDED',
-  CompileHirFailed = 'COMPILE_HIR_FAILED',
-  CompileMirRequest = 'COMPILE_MIR_REQUEST',
-  CompileMirSucceeded = 'COMPILE_MIR_SUCCEEDED',
-  CompileMirFailed = 'COMPILE_MIR_FAILED',
-  CompileWasmRequest = 'COMPILE_WASM_REQUEST',
-  CompileWasmSucceeded = 'COMPILE_WASM_SUCCEEDED',
-  CompileWasmFailed = 'COMPILE_WASM_FAILED',
   EditCode = 'EDIT_CODE',
   AddMainFunction = 'ADD_MAIN_FUNCTION',
   AddImport = 'ADD_IMPORT',
@@ -273,157 +263,18 @@ const performExecuteOnly = (): ThunkAction => performCommonExecute('bin', false)
 const performCompileOnly = (): ThunkAction => performCommonExecute('lib', false);
 const performTestOnly = (): ThunkAction => performCommonExecute('lib', true);
 
-interface CompileRequestBody extends ExecuteRequestBody {
-  target: string;
-  assemblyFlavor: string;
-  demangleAssembly: string;
-  processAssembly: string;
-}
-
-type CompileResponseBody = CompileSuccess;
-
-interface CompileSuccess {
-  code: string;
-  stdout: string;
-  stderr: string;
-}
-
-interface CompileFailure {
+interface GenericApiFailure {
   error: string;
 }
-
-function performCompileShow(
-  target: string,
-  { request, success, failure }: {
-    request: () => Action,
-    success: (body: CompileResponseBody) => Action,
-    failure: (f: CompileFailure) => Action,
-  }): ThunkAction {
-  // TODO: Check a cache
-  return function(dispatch, getState) {
-    dispatch(request());
-
-    const state = getState();
-    const code = codeSelector(state);
-    const { configuration: {
-      channel,
-      mode,
-      edition,
-      assemblyFlavor,
-      demangleAssembly,
-      processAssembly,
-    } } = state;
-    const crateType = getCrateType(state);
-    const tests = runAsTest(state);
-    const backtrace = state.configuration.backtrace === Backtrace.Enabled;
-    const body: CompileRequestBody = {
-      channel,
-      mode,
-      edition,
-      crateType,
-      tests,
-      code,
-      target,
-      assemblyFlavor,
-      demangleAssembly,
-      processAssembly,
-      backtrace,
-    };
-
-    return jsonPost<CompileResponseBody>(routes.compile, body)
-      .then(json => dispatch(success(json)))
-      .catch(json => dispatch(failure(json)));
-  };
-}
-
-const requestCompileAssembly = () =>
-  createAction(ActionType.CompileAssemblyRequest);
-
-const receiveCompileAssemblySuccess = ({ code, stdout, stderr }: CompileSuccess) =>
-  createAction(ActionType.CompileAssemblySucceeded, { code, stdout, stderr });
-
-const receiveCompileAssemblyFailure = ({ error }: CompileFailure) =>
-  createAction(ActionType.CompileAssemblyFailed, { error });
-
-const performCompileToAssemblyOnly = () =>
-  performCompileShow('asm', {
-    request: requestCompileAssembly,
-    success: receiveCompileAssemblySuccess,
-    failure: receiveCompileAssemblyFailure,
-  });
-
-const requestCompileLlvmIr = () =>
-  createAction(ActionType.CompileLlvmIrRequest);
-
-const receiveCompileLlvmIrSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
-  createAction(ActionType.CompileLlvmIrSucceeded, { code, stdout, stderr });
-
-const receiveCompileLlvmIrFailure = ({ error }: CompileFailure) =>
-  createAction(ActionType.CompileLlvmIrFailed, { error });
-
-const performCompileToLLVMOnly = () =>
-  performCompileShow('llvm-ir', {
-    request: requestCompileLlvmIr,
-    success: receiveCompileLlvmIrSuccess,
-    failure: receiveCompileLlvmIrFailure,
-  });
-
-const requestCompileHir = () =>
-  createAction(ActionType.CompileHirRequest);
-
-const receiveCompileHirSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
-  createAction(ActionType.CompileHirSucceeded, { code, stdout, stderr });
-
-const receiveCompileHirFailure = ({ error }: CompileFailure) =>
-  createAction(ActionType.CompileHirFailed, { error });
-
-const performCompileToHirOnly = () =>
-  performCompileShow('hir', {
-    request: requestCompileHir,
-    success: receiveCompileHirSuccess,
-    failure: receiveCompileHirFailure,
-  });
 
 const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
   dispatch(changeChannel(Channel.Nightly));
   dispatch(performCompileToHirOnly());
 };
 
-const requestCompileMir = () =>
-  createAction(ActionType.CompileMirRequest);
-
-const receiveCompileMirSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
-  createAction(ActionType.CompileMirSucceeded, { code, stdout, stderr });
-
-const receiveCompileMirFailure = ({ error }: CompileFailure) =>
-  createAction(ActionType.CompileMirFailed, { error });
-
-const performCompileToMirOnly = () =>
-  performCompileShow('mir', {
-    request: requestCompileMir,
-    success: receiveCompileMirSuccess,
-    failure: receiveCompileMirFailure,
-  });
-
-const requestCompileWasm = () =>
-  createAction(ActionType.CompileWasmRequest);
-
-const receiveCompileWasmSuccess = ({ code, stdout, stderr }: CompileSuccess) =>
-  createAction(ActionType.CompileWasmSucceeded, { code, stdout, stderr });
-
-const receiveCompileWasmFailure = ({ error }: CompileFailure) =>
-  createAction(ActionType.CompileWasmFailed, { error });
-
-const performCompileToWasm = () =>
-  performCompileShow('wasm', {
-    request: requestCompileWasm,
-    success: receiveCompileWasmSuccess,
-    failure: receiveCompileWasmFailure,
-  });
-
 const performCompileToNightlyWasmOnly = (): ThunkAction => dispatch => {
   dispatch(changeChannel(Channel.Nightly));
-  dispatch(performCompileToWasm());
+  dispatch(performCompileToWasmOnly());
 };
 
 const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
@@ -432,7 +283,7 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Execute]: performExecuteOnly,
   [PrimaryActionCore.Test]: performTestOnly,
   [PrimaryActionAuto.Auto]: performAutoOnly,
-  [PrimaryActionCore.LlvmIr]: performCompileToLLVMOnly,
+  [PrimaryActionCore.LlvmIr]: performCompileToLlvmIrOnly,
   [PrimaryActionCore.Hir]: performCompileToHirOnly,
   [PrimaryActionCore.Mir]: performCompileToMirOnly,
   [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
@@ -458,7 +309,7 @@ export const performTest =
 export const performCompileToAssembly =
   performAndSwitchPrimaryAction(performCompileToAssemblyOnly, PrimaryActionCore.Asm);
 export const performCompileToLLVM =
-  performAndSwitchPrimaryAction(performCompileToLLVMOnly, PrimaryActionCore.LlvmIr);
+  performAndSwitchPrimaryAction(performCompileToLlvmIrOnly, PrimaryActionCore.LlvmIr);
 export const performCompileToMir =
   performAndSwitchPrimaryAction(performCompileToMirOnly, PrimaryActionCore.Mir);
 export const performCompileToNightlyHir =
@@ -509,7 +360,7 @@ type ClippySuccess = GeneralSuccess;
 const receiveClippySuccess = ({ stdout, stderr }: ClippySuccess) =>
   createAction(ActionType.ClippySucceeded, { stdout, stderr });
 
-const receiveClippyFailure = ({ error }: CompileFailure) =>
+const receiveClippyFailure = ({ error }: GenericApiFailure) =>
   createAction(ActionType.ClippyFailed, { error });
 
 export function performClippy(): ThunkAction {
@@ -544,7 +395,7 @@ type MiriSuccess = GeneralSuccess;
 const receiveMiriSuccess = ({ stdout, stderr }: MiriSuccess) =>
   createAction(ActionType.MiriSucceeded, { stdout, stderr });
 
-const receiveMiriFailure = ({ error }: CompileFailure) =>
+const receiveMiriFailure = ({ error }: GenericApiFailure) =>
   createAction(ActionType.MiriFailed, { error });
 
 export function performMiri(): ThunkAction {
@@ -584,7 +435,7 @@ type MacroExpansionSuccess = GeneralSuccess;
 const receiveMacroExpansionSuccess = ({ stdout, stderr }: MacroExpansionSuccess) =>
   createAction(ActionType.MacroExpansionSucceeded, { stdout, stderr });
 
-const receiveMacroExpansionFailure = ({ error }: CompileFailure) =>
+const receiveMacroExpansionFailure = ({ error }: GenericApiFailure) =>
   createAction(ActionType.MacroExpansionFailed, { error });
 
 export function performMacroExpansion(): ThunkAction {
@@ -768,21 +619,6 @@ export type Action =
   | ReturnType<typeof changeProcessAssembly>
   | ReturnType<typeof changeAceTheme>
   | ReturnType<typeof changeMonacoTheme>
-  | ReturnType<typeof requestCompileAssembly>
-  | ReturnType<typeof receiveCompileAssemblySuccess>
-  | ReturnType<typeof receiveCompileAssemblyFailure>
-  | ReturnType<typeof requestCompileLlvmIr>
-  | ReturnType<typeof receiveCompileLlvmIrSuccess>
-  | ReturnType<typeof receiveCompileLlvmIrFailure>
-  | ReturnType<typeof requestCompileMir>
-  | ReturnType<typeof receiveCompileMirSuccess>
-  | ReturnType<typeof receiveCompileMirFailure>
-  | ReturnType<typeof requestCompileHir>
-  | ReturnType<typeof receiveCompileHirSuccess>
-  | ReturnType<typeof receiveCompileHirFailure>
-  | ReturnType<typeof requestCompileWasm>
-  | ReturnType<typeof receiveCompileWasmSuccess>
-  | ReturnType<typeof receiveCompileWasmFailure>
   | ReturnType<typeof editCode>
   | ReturnType<typeof addMainFunction>
   | ReturnType<typeof addImport>

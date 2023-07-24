@@ -3,6 +3,11 @@ import { Focus } from '../../types';
 import { performGistLoad, performGistSave } from './gist';
 import { performFormat } from './format';
 import { performExecute, wsExecuteRequest } from './execute';
+import { performCompileAssembly } from './assembly';
+import { performCompileHir } from './hir';
+import { performCompileLlvmIr } from './llvmIr';
+import { performCompileMir } from './mir';
+import { performCompileWasm } from './wasm';
 
 const DEFAULT: State = {
 };
@@ -25,24 +30,24 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.RequestMacroExpansion:
       return { ...state, focus: Focus.MacroExpansion };
 
-    case ActionType.CompileLlvmIrRequest:
-      return { ...state, focus: Focus.LlvmIr };
-
-    case ActionType.CompileMirRequest:
-      return { ...state, focus: Focus.Mir };
-
-    case ActionType.CompileHirRequest:
-      return { ...state, focus: Focus.Hir };
-
-    case ActionType.CompileWasmRequest:
-      return { ...state, focus: Focus.Wasm };
-
-    case ActionType.CompileAssemblyRequest:
-      return { ...state, focus: Focus.Asm };
-
     case performExecute.pending.type:
     case wsExecuteRequest.type:
       return { ...state, focus: Focus.Execute };
+
+    case performCompileAssembly.pending.type:
+      return { ...state, focus: Focus.Asm };
+
+    case performCompileHir.pending.type:
+      return { ...state, focus: Focus.Hir };
+
+    case performCompileLlvmIr.pending.type:
+      return { ...state, focus: Focus.LlvmIr };
+
+    case performCompileMir.pending.type:
+      return { ...state, focus: Focus.Mir };
+
+    case performCompileWasm.pending.type:
+      return { ...state, focus: Focus.Wasm };
 
     default: {
       if (performGistLoad.pending.match(action) || performGistSave.pending.match(action)) {

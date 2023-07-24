@@ -1,7 +1,8 @@
-import { Action, ActionType } from '../../actions';
-import { finish, start } from './sharedStateManagement';
+import { createSlice } from '@reduxjs/toolkit';
 
-const DEFAULT: State = {
+import { makeCompileActions } from '../../compileActions';
+
+const initialState: State = {
   requestsInProgress: 0,
 };
 
@@ -13,17 +14,30 @@ interface State {
   error?: string;
 }
 
-export default function llvmIr(state = DEFAULT, action: Action) {
-  switch (action.type) {
-    case ActionType.CompileLlvmIrRequest:
-      return start(DEFAULT, state);
-    case ActionType.CompileLlvmIrSucceeded: {
-      const { code = '', stdout = '', stderr = '' } = action;
-      return finish(state, { code, stdout, stderr });
-    }
-    case ActionType.CompileLlvmIrFailed:
-      return finish(state, { error: action.error });
-    default:
-      return state;
-  }
-}
+const sliceName = 'output/llvmIr';
+
+export const { action: performCompileLlvmIr, performCompile: performCompileToLlvmIrOnly } =
+  makeCompileActions({ sliceName, target: 'llvm-ir' });
+
+const slice = createSlice({
+  name: 'output/llvmIr',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(performCompileLlvmIr.pending, (state) => {
+        state.requestsInProgress += 1;
+      })
+      .addCase(performCompileLlvmIr.fulfilled, (state, action) => {
+        const { code, stdout, stderr } = action.payload;
+        Object.assign(state, { code, stdout, stderr });
+        state.requestsInProgress -= 1;
+      })
+      .addCase(performCompileLlvmIr.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.requestsInProgress -= 1;
+      });
+  },
+});
+
+export default slice.reducer;
