@@ -20,8 +20,6 @@ function install_wasm_gc() {
     cargo install wasm-gc
 }
 
-if [[ $1 == "nightly" ]]; then
-    (install_wasm_target)
-    (install_wasm2wat)
-    (install_wasm_gc)
-fi
+(install_wasm_target)
+(install_wasm2wat)
+(install_wasm_gc)

@@ -272,11 +272,6 @@ const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
   dispatch(performCompileToHirOnly());
 };
 
-const performCompileToNightlyWasmOnly = (): ThunkAction => dispatch => {
-  dispatch(changeChannel(Channel.Nightly));
-  dispatch(performCompileToWasmOnly());
-};
-
 const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Asm]: performCompileToAssemblyOnly,
   [PrimaryActionCore.Compile]: performCompileOnly,
@@ -286,7 +281,7 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.LlvmIr]: performCompileToLlvmIrOnly,
   [PrimaryActionCore.Hir]: performCompileToHirOnly,
   [PrimaryActionCore.Mir]: performCompileToMirOnly,
-  [PrimaryActionCore.Wasm]: performCompileToNightlyWasmOnly,
+  [PrimaryActionCore.Wasm]: performCompileToWasmOnly,
 };
 
 export const performPrimaryAction = (): ThunkAction => (dispatch, getState) => {
@@ -314,8 +309,8 @@ export const performCompileToMir =
   performAndSwitchPrimaryAction(performCompileToMirOnly, PrimaryActionCore.Mir);
 export const performCompileToNightlyHir =
   performAndSwitchPrimaryAction(performCompileToNightlyHirOnly, PrimaryActionCore.Hir);
-export const performCompileToNightlyWasm =
-  performAndSwitchPrimaryAction(performCompileToNightlyWasmOnly, PrimaryActionCore.Wasm);
+export const performCompileToWasm =
+  performAndSwitchPrimaryAction(performCompileToWasmOnly, PrimaryActionCore.Wasm);
 
 export const editCode = (code: string) =>
   createAction(ActionType.EditCode, { code });

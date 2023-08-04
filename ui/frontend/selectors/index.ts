@@ -93,7 +93,7 @@ const LABELS: { [index in PrimaryActionCore]: string } = {
   [PrimaryActionCore.Hir]: 'Show HIR',
   [PrimaryActionCore.Mir]: 'Show MIR',
   [PrimaryActionCore.Test]: 'Test',
-  [PrimaryActionCore.Wasm]: 'Show WASM',
+  [PrimaryActionCore.Wasm]: 'Show Wasm',
 };
 
 export const getExecutionLabel = createSelector(primaryActionSelector, primaryAction => LABELS[primaryAction]);
@@ -125,7 +125,6 @@ const editionSelector = (state: State) => state.configuration.edition;
 export const isNightlyChannel = (state: State) => (
   state.configuration.channel === Channel.Nightly
 );
-export const isWasmAvailable = isNightlyChannel;
 export const isHirAvailable = isNightlyChannel;
 
 export const getModeLabel = (state: State) => {

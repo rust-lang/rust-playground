@@ -130,7 +130,7 @@ const Output: React.FC = () => {
           onClick={focusHir}
           tabProps={hir} />
         <Tab kind={Focus.Wasm} focus={focus}
-          label="WASM"
+          label="Wasm"
           onClick={focusWasm}
           tabProps={wasm} />
         <Tab kind={Focus.Gist} focus={focus}

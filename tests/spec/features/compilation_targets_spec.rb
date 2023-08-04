@@ -107,7 +107,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   end
 
   scenario "compiling to WebAssembly" do
-    in_build_menu { click_on("WASM") }
+    in_build_menu { click_on("Wasm") }
 
     within(:output, :code) do
       expect(page).to have_content '(module'
