@@ -7,6 +7,7 @@ import './index.module.css';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
+import { v4 } from 'uuid';
 
 import {
   editCode,
@@ -33,7 +34,7 @@ const store = configureStore(window);
 if (store.getState().client.id === '') {
   const { crypto } = window;
 
-  const id = crypto.randomUUID();
+  const id = v4();
 
   const rawValue = new Uint32Array(1);
   crypto.getRandomValues(rawValue);
