@@ -1254,7 +1254,9 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
                 }
             });
 
-            let Some(coordinator_msg) = coordinator_msg else { break };
+            let Some(coordinator_msg) = coordinator_msg else {
+                break;
+            };
 
             bincode::serialize_into(&mut stdin, &coordinator_msg)
                 .context(CoordinatorMessageSerializationSnafu)?;
