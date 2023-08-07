@@ -25,8 +25,9 @@ use tracing::{instrument, trace, trace_span, warn, Instrument};
 use crate::{
     bincode_input_closed,
     message::{
-        CoordinatorMessage, ExecuteCommandRequest, JobId, Multiplexed, OneToOneResponse,
-        ReadFileRequest, ReadFileResponse, SerializedError, WorkerMessage, WriteFileRequest,
+        CoordinatorMessage, DeleteFileRequest, ExecuteCommandRequest, JobId, Multiplexed,
+        OneToOneResponse, ReadFileRequest, ReadFileResponse, SerializedError, WorkerMessage,
+        WriteFileRequest,
     },
     DropErrorDetailsExt,
 };
@@ -115,8 +116,25 @@ pub enum CrateType {
 }
 
 impl CrateType {
+    const MAIN_RS: &str = "src/main.rs";
+    const LIB_RS: &str = "src/lib.rs";
+
     pub(crate) fn is_binary(self) -> bool {
         self == CrateType::Binary
+    }
+
+    pub(crate) fn primary_path(self) -> &'static str {
+        match self {
+            CrateType::Binary => Self::MAIN_RS,
+            CrateType::Library(_) => Self::LIB_RS,
+        }
+    }
+
+    pub(crate) fn other_path(self) -> &'static str {
+        match self {
+            CrateType::Binary => Self::LIB_RS,
+            CrateType::Library(_) => Self::MAIN_RS,
+        }
     }
 
     pub(crate) fn to_cargo_toml_key(self) -> &'static str {
@@ -164,6 +182,10 @@ pub struct ExecuteRequest {
 }
 
 impl ExecuteRequest {
+    pub(crate) fn delete_previous_main_request(&self) -> DeleteFileRequest {
+        delete_previous_primary_file_request(self.crate_type)
+    }
+
     pub(crate) fn write_main_request(&self) -> WriteFileRequest {
         write_primary_file_request(self.crate_type, &self.code)
     }
@@ -226,6 +248,10 @@ pub struct CompileRequest {
 }
 
 impl CompileRequest {
+    pub(crate) fn delete_previous_main_request(&self) -> DeleteFileRequest {
+        delete_previous_primary_file_request(self.crate_type)
+    }
+
     pub(crate) fn write_main_request(&self) -> WriteFileRequest {
         write_primary_file_request(self.crate_type, &self.code)
     }
@@ -353,15 +379,15 @@ impl<T> ops::Deref for WithOutput<T> {
 }
 
 fn write_primary_file_request(crate_type: CrateType, code: &str) -> WriteFileRequest {
-    let path = if crate_type.is_binary() {
-        "src/main.rs"
-    } else {
-        "src/lib.rs"
-    };
-
     WriteFileRequest {
-        path: path.to_owned(),
+        path: crate_type.primary_path().to_owned(),
         content: code.clone().into(),
+    }
+}
+
+fn delete_previous_primary_file_request(crate_type: CrateType) -> DeleteFileRequest {
+    DeleteFileRequest {
+        path: crate_type.other_path().to_owned(),
     }
 }
 
@@ -544,14 +570,18 @@ impl Container {
     ) -> Result<ActiveExecution, ExecuteError> {
         use execute_error::*;
 
+        let delete_previous_main = request.delete_previous_main_request();
         let write_main = request.write_main_request();
         let execute_cargo = request.execute_cargo_request();
 
+        let delete_previous_main = self.commander.one(delete_previous_main);
         let write_main = self.commander.one(write_main);
         let modify_cargo_toml = self.modify_cargo_toml.modify_for(&request);
 
-        let (write_main, modify_cargo_toml) = join!(write_main, modify_cargo_toml);
+        let (delete_previous_main, write_main, modify_cargo_toml) =
+            join!(delete_previous_main, write_main, modify_cargo_toml);
 
+        delete_previous_main.context(CouldNotDeletePreviousCodeSnafu)?;
         write_main.context(CouldNotWriteCodeSnafu)?;
         modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
 
@@ -602,17 +632,21 @@ impl Container {
 
         let output_path: &str = "compilation";
 
+        let delete_previous_main = request.delete_previous_main_request();
         let write_main = request.write_main_request();
         let execute_cargo = request.execute_cargo_request(output_path);
         let read_output = ReadFileRequest {
             path: output_path.to_owned(),
         };
 
+        let delete_previous_main = self.commander.one(delete_previous_main);
         let write_main = self.commander.one(write_main);
         let modify_cargo_toml = self.modify_cargo_toml.modify_for(&request);
 
-        let (write_main, modify_cargo_toml) = join!(write_main, modify_cargo_toml);
+        let (delete_previous_main, write_main, modify_cargo_toml) =
+            join!(delete_previous_main, write_main, modify_cargo_toml);
 
+        delete_previous_main.context(CouldNotDeletePreviousCodeSnafu)?;
         write_main.context(CouldNotWriteCodeSnafu)?;
         modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
 
@@ -736,6 +770,9 @@ pub enum ExecuteError {
     #[snafu(display("Could not modify Cargo.toml"))]
     CouldNotModifyCargoToml { source: ModifyCargoTomlError },
 
+    #[snafu(display("Could not delete previous source code"))]
+    CouldNotDeletePreviousCode { source: CommanderError },
+
     #[snafu(display("Could not write source code"))]
     CouldNotWriteCode { source: CommanderError },
 
@@ -770,6 +807,9 @@ impl fmt::Debug for ActiveCompilation {
 pub enum CompileError {
     #[snafu(display("Could not modify Cargo.toml"))]
     CouldNotModifyCargoToml { source: ModifyCargoTomlError },
+
+    #[snafu(display("Could not delete previous source code"))]
+    CouldNotDeletePreviousCode { source: CommanderError },
 
     #[snafu(display("Could not write source code"))]
     CouldNotWriteCode { source: CommanderError },
@@ -1254,7 +1294,9 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
                 }
             });
 
-            let Some(coordinator_msg) = coordinator_msg else { break };
+            let Some(coordinator_msg) = coordinator_msg else {
+                break;
+            };
 
             bincode::serialize_into(&mut stdin, &coordinator_msg)
                 .context(CoordinatorMessageSerializationSnafu)?;
@@ -1776,6 +1818,57 @@ mod tests {
             response.code,
             r#"(func $inc (export "inc") (type $t0) (param $p0 i32) (result i32)"#
         );
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn test_compile_clears_old_main_rs() -> Result<()> {
+        let coordinator = new_coordinator().await?;
+
+        // Create a main.rs file
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            crate_type: CrateType::Binary,
+            mode: Mode::Debug,
+            edition: Edition::Rust2021,
+            tests: false,
+            backtrace: false,
+            code: "pub fn alpha() {}".into(),
+        };
+
+        let response = coordinator
+            .execute(req.clone())
+            .with_timeout()
+            .await
+            .unwrap();
+        assert!(!response.success, "stderr: {}", response.stderr);
+        assert_contains!(response.stderr, "`main` function not found");
+
+        // Create a lib.rs file
+        let req = CompileRequest {
+            target: CompileTarget::LlvmIr,
+            channel: req.channel,
+            mode: req.mode,
+            edition: req.edition,
+            crate_type: CrateType::Library(LibraryType::Rlib),
+            tests: req.tests,
+            backtrace: req.backtrace,
+            code: "pub fn beta() {}".into(),
+        };
+
+        let response = coordinator
+            .compile(req.clone())
+            .with_timeout()
+            .await
+            .unwrap();
+        assert!(response.success, "stderr: {}", response.stderr);
+
+        assert_not_contains!(response.code, "alpha");
+        assert_contains!(response.code, "beta");
 
         coordinator.shutdown().await?;
 
