@@ -292,9 +292,6 @@ pub enum WriteFileError {
         source: std::io::Error,
         path: PathBuf,
     },
-
-    #[snafu(display("Failed to send worker message to serialization task"))]
-    UnableToSendWorkerMessage { source: mpsc::error::SendError<()> },
 }
 
 async fn handle_read_file(
@@ -320,9 +317,6 @@ pub enum ReadFileError {
         source: std::io::Error,
         path: PathBuf,
     },
-
-    #[snafu(display("Failed to send worker message to serialization task"))]
-    UnableToSendWorkerMessage { source: mpsc::error::SendError<()> },
 }
 
 // Current working directory defaults to project dir unless specified otherwise.
