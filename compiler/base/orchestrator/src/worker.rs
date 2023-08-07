@@ -34,6 +34,7 @@
 use snafu::prelude::*;
 use std::{
     collections::HashMap,
+    io,
     path::{Path, PathBuf},
     process::Stdio,
 };
@@ -49,9 +50,9 @@ use tokio::{
 use crate::{
     bincode_input_closed,
     message::{
-        CoordinatorMessage, ExecuteCommandRequest, ExecuteCommandResponse, JobId, Multiplexed,
-        ReadFileRequest, ReadFileResponse, SerializedError, WorkerMessage, WriteFileRequest,
-        WriteFileResponse,
+        CoordinatorMessage, DeleteFileRequest, DeleteFileResponse, ExecuteCommandRequest,
+        ExecuteCommandResponse, JobId, Multiplexed, ReadFileRequest, ReadFileResponse,
+        SerializedError, WorkerMessage, WriteFileRequest, WriteFileResponse,
     },
     DropErrorDetailsExt,
 };
@@ -151,6 +152,18 @@ async fn handle_coordinator_message(
                         });
                     }
 
+                    CoordinatorMessage::DeleteFile(req) => {
+                        let project_dir = project_dir.clone();
+                        let worker_msg_tx = worker_msg_tx();
+
+                        tasks.spawn(async move {
+                            worker_msg_tx
+                                .send(handle_delete_file(req, project_dir).await)
+                                .await
+                                .context(UnableToSendDeleteFileResponseSnafu)
+                        });
+                    }
+
                     CoordinatorMessage::ReadFile(req) => {
                         let project_dir = project_dir.clone();
                         let worker_msg_tx = worker_msg_tx();
@@ -195,6 +208,9 @@ async fn handle_coordinator_message(
 pub enum HandleCoordinatorMessageError {
     #[snafu(display("Could not send the write command response to the coordinator"))]
     UnableToSendWriteFileResponse { source: MultiplexingSenderError },
+
+    #[snafu(display("Could not send the delete command response to the coordinator"))]
+    UnableToSendDeleteFileResponse { source: MultiplexingSenderError },
 
     #[snafu(display("Could not send the read command response to the coordinator"))]
     UnableToSendReadFileResponse { source: MultiplexingSenderError },
@@ -289,6 +305,34 @@ pub enum WriteFileError {
 
     #[snafu(display("Failed to write file {}", path.display()))]
     UnableToWriteFile {
+        source: std::io::Error,
+        path: PathBuf,
+    },
+}
+
+async fn handle_delete_file(
+    req: DeleteFileRequest,
+    project_dir: PathBuf,
+) -> Result<DeleteFileResponse, DeleteFileError> {
+    use delete_file_error::*;
+
+    let path = parse_working_dir(Some(req.path), project_dir);
+
+    let r = match fs::remove_file(&path).await {
+        Ok(()) => Ok(()),
+        Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(()),
+        Err(e) => Err(e),
+    };
+
+    r.context(UnableToDeleteFileSnafu { path })?;
+    Ok(DeleteFileResponse(()))
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum DeleteFileError {
+    #[snafu(display("Failed to delete file {}", path.display()))]
+    UnableToDeleteFile {
         source: std::io::Error,
         path: PathBuf,
     },

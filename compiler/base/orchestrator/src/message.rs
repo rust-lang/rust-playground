@@ -22,6 +22,7 @@ pub struct Multiplexed<T>(pub JobId, pub T);
 #[derive(Debug, Serialize, Deserialize)]
 pub enum CoordinatorMessage {
     WriteFile(WriteFileRequest),
+    DeleteFile(DeleteFileRequest),
     ReadFile(ReadFileRequest),
     ExecuteCommand(ExecuteCommandRequest),
     StdinPacket(String),
@@ -30,6 +31,7 @@ pub enum CoordinatorMessage {
 impl_narrow_to_broad!(
     CoordinatorMessage,
     WriteFile => WriteFileRequest,
+    DeleteFile => DeleteFileRequest,
     ReadFile => ReadFileRequest,
     ExecuteCommand => ExecuteCommandRequest,
 );
@@ -37,6 +39,7 @@ impl_narrow_to_broad!(
 #[derive(Debug, Serialize, Deserialize)]
 pub enum WorkerMessage {
     WriteFile(WriteFileResponse),
+    DeleteFile(DeleteFileResponse),
     ReadFile(ReadFileResponse),
     ExecuteCommand(ExecuteCommandResponse),
     StdoutPacket(String),
@@ -65,6 +68,7 @@ macro_rules! impl_broad_to_narrow_with_error {
 impl_narrow_to_broad!(
     WorkerMessage,
     WriteFile => WriteFileResponse,
+    DeleteFile => DeleteFileResponse,
     ReadFile => ReadFileResponse,
     ExecuteCommand => ExecuteCommandResponse,
 );
@@ -72,6 +76,7 @@ impl_narrow_to_broad!(
 impl_broad_to_narrow_with_error!(
     WorkerMessage,
     WriteFile => WriteFileResponse,
+    DeleteFile => DeleteFileResponse,
     ReadFile => ReadFileResponse,
     ExecuteCommand => ExecuteCommandResponse,
 );
@@ -84,6 +89,14 @@ pub struct WriteFileRequest {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WriteFileResponse(pub ());
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeleteFileRequest {
+    pub path: Path,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeleteFileResponse(pub ());
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ReadFileRequest {
@@ -121,6 +134,10 @@ pub trait OneToOneResponse {
 
 impl OneToOneResponse for WriteFileRequest {
     type Response = WriteFileResponse;
+}
+
+impl OneToOneResponse for DeleteFileRequest {
+    type Response = DeleteFileResponse;
 }
 
 impl OneToOneResponse for ReadFileRequest {
