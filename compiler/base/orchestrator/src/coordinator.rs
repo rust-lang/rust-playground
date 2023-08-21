@@ -381,7 +381,7 @@ impl<T> ops::Deref for WithOutput<T> {
 fn write_primary_file_request(crate_type: CrateType, code: &str) -> WriteFileRequest {
     WriteFileRequest {
         path: crate_type.primary_path().to_owned(),
-        content: code.clone().into(),
+        content: code.into(),
     }
 }
 
