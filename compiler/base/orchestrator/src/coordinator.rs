@@ -116,8 +116,8 @@ pub enum CrateType {
 }
 
 impl CrateType {
-    const MAIN_RS: &str = "src/main.rs";
-    const LIB_RS: &str = "src/lib.rs";
+    const MAIN_RS: &'static str = "src/main.rs";
+    const LIB_RS: &'static str = "src/lib.rs";
 
     pub(crate) fn is_binary(self) -> bool {
         self == CrateType::Binary
@@ -867,7 +867,7 @@ struct ModifyCargoToml {
 }
 
 impl ModifyCargoToml {
-    const PATH: &str = "Cargo.toml";
+    const PATH: &'static str = "Cargo.toml";
 
     async fn new(commander: Commander) -> Result<Self, ModifyCargoTomlError> {
         let cargo_toml = Self::read(&commander).await?;
