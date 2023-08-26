@@ -216,7 +216,7 @@ impl CoordinatorManager {
 
         let new_abort_handle = self.tasks.spawn(
             async move {
-                let _permit = semaphore.acquire();
+                let _permit = semaphore.acquire().await;
                 handler(coordinator).await
             }
             .in_current_span(),
