@@ -13,7 +13,10 @@ use orchestrator::coordinator::{self, Coordinator, DockerBackend};
 use snafu::prelude::*;
 use std::{
     convert::{TryFrom, TryInto},
-    sync::Arc,
+    sync::{
+        atomic::{AtomicU64, Ordering},
+        Arc,
+    },
     time::{Duration, Instant},
 };
 use tokio::{
@@ -21,7 +24,7 @@ use tokio::{
     task::{AbortHandle, JoinSet},
     time,
 };
-use tracing::error;
+use tracing::{error, instrument, Instrument};
 
 type Meta = Arc<serde_json::Value>;
 
@@ -139,9 +142,15 @@ struct ExecuteResponse {
     success: bool,
 }
 
+#[instrument(skip_all, fields(ws_id))]
 pub(crate) async fn handle(socket: WebSocket, feature_flags: FeatureFlags) {
+    static WEBSOCKET_ID: AtomicU64 = AtomicU64::new(0);
+
     metrics::LIVE_WS.inc();
     let start = Instant::now();
+
+    let id = WEBSOCKET_ID.fetch_add(1, Ordering::SeqCst);
+    tracing::Span::current().record("ws_id", &id);
 
     handle_core(socket, feature_flags).await;
 
@@ -205,10 +214,13 @@ impl CoordinatorManager {
         let coordinator = self.coordinator().await?;
         let semaphore = self.semaphore.clone();
 
-        let new_abort_handle = self.tasks.spawn(async move {
-            let _permit = semaphore.acquire();
-            handler(coordinator).await
-        });
+        let new_abort_handle = self.tasks.spawn(
+            async move {
+                let _permit = semaphore.acquire();
+                handler(coordinator).await
+            }
+            .in_current_span(),
+        );
 
         let kind = Self::KIND_EXECUTE; // TODO: parameterize when we get a second kind
         let old_abort_handle = self.abort_handles[kind].replace(new_abort_handle);
