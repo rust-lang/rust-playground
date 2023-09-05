@@ -530,7 +530,9 @@ fn stream_stdio(
 
     set.spawn(async move {
         loop {
-            let Some(data) = stdin_rx.recv().await else { break };
+            let Some(data) = stdin_rx.recv().await else {
+                break;
+            };
             stdin
                 .write_all(data.as_bytes())
                 .await
