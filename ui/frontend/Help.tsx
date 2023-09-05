@@ -21,9 +21,9 @@ const ORIGINAL_PLAYGROUND_URL = 'https://github.com/rust-lang/rust-playpen';
 const REPO_URL = 'https://github.com/rust-lang/rust-playground';
 const RUSTFMT_URL = 'https://github.com/rust-lang-nursery/rustfmt';
 const SHEPMASTER_URL = 'https://github.com/shepmaster/';
+const RUST_EDITION_2018_URL = 'https://doc.rust-lang.org/edition-guide/rust-2018/index.html';
 
-const CRATE_EXAMPLE = `extern crate rand;
-use rand::Rng;
+const CRATE_EXAMPLE = `use rand::Rng;
 
 fn main() {
     let mut rng = rand::thread_rng();
@@ -115,7 +115,10 @@ const Help: React.FC = () => {
           the <a href={RUST_COOKBOOK_URL}>Rust Cookbook</a>, and all
                                         of their dependencies. To use a crate, add the appropriate
             {' '}
-            <Code>extern crate foo</Code> line to the code.
+            <Code>extern crate foo</Code> line to the code, or, since
+            <a href={RUST_EDITION_2018_URL}>Rust Edition 2018</a>, just
+            {' '}
+            <Code>use</Code> any item from that crate.
           </p>
 
           <Example code={CRATE_EXAMPLE} />
