@@ -181,6 +181,7 @@ struct CoordinatorManager {
 
 impl CoordinatorManager {
     const IDLE_TIMEOUT: Duration = Duration::from_secs(60);
+    const SESSION_TIMEOUT: Duration = Duration::from_secs(45 * 60);
 
     const N_PARALLEL: usize = 2;
 
@@ -300,6 +301,9 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
     }
 
     let mut manager = CoordinatorManager::new();
+    tokio::pin! {
+        let session_timeout = time::sleep(CoordinatorManager::SESSION_TIMEOUT);
+    }
 
     loop {
         tokio::select! {
@@ -366,6 +370,10 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
                     break;
                 }
             },
+
+            _ = &mut session_timeout => {
+                break;
+            }
         }
     }
 
