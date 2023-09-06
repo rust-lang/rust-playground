@@ -12,6 +12,8 @@ RSpec.feature "Highlighting MIR output", type: :feature, js: true do
   end
 
   scenario "error locations are links" do
+    pending "This feature was removed in Rust 1.72, enabling it again is nightly-only"
+
     within(:output, :mir) do
       click_link('src/main.rs:4:14: 4:19', match: :first)
     end
