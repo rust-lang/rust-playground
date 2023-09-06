@@ -27,7 +27,6 @@ RSpec.configure do |config|
 end
 
 require 'capybara/rspec'
-require 'webdrivers'
 require 'capybara-screenshot/rspec'
 
 PROTOCOL = ENV.fetch('PLAYGROUND_UI_PROTOCOL', 'http')

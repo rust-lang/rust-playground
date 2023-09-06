@@ -1,5 +1,6 @@
 # coding: utf-8
 
+require 'json'
 require 'net/http'
 require 'spec_helper'
 require_relative './connection'
