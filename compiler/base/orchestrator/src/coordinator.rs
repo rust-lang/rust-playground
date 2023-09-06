@@ -116,8 +116,8 @@ pub enum CrateType {
 }
 
 impl CrateType {
-    const MAIN_RS: &str = "src/main.rs";
-    const LIB_RS: &str = "src/lib.rs";
+    const MAIN_RS: &'static str = "src/main.rs";
+    const LIB_RS: &'static str = "src/lib.rs";
 
     pub(crate) fn is_binary(self) -> bool {
         self == CrateType::Binary
@@ -381,7 +381,7 @@ impl<T> ops::Deref for WithOutput<T> {
 fn write_primary_file_request(crate_type: CrateType, code: &str) -> WriteFileRequest {
     WriteFileRequest {
         path: crate_type.primary_path().to_owned(),
-        content: code.clone().into(),
+        content: code.into(),
     }
 }
 
@@ -519,19 +519,23 @@ impl Container {
         } = spawn_io_queue(stdin, stdout, token);
 
         let (command_tx, command_rx) = mpsc::channel(8);
-        let demultiplex_task = tokio::spawn(Commander::demultiplex(command_rx, from_worker_rx));
+        let demultiplex_task =
+            tokio::spawn(Commander::demultiplex(command_rx, from_worker_rx).in_current_span());
 
-        let task = tokio::spawn(async move {
-            let (c, d, t) = join!(child.wait(), demultiplex_task, tasks.join_next());
-            c.context(JoinWorkerSnafu)?;
-            d.context(DemultiplexerTaskPanickedSnafu)?
-                .context(DemultiplexerTaskFailedSnafu)?;
-            if let Some(t) = t {
-                t.context(IoQueuePanickedSnafu)??;
+        let task = tokio::spawn(
+            async move {
+                let (c, d, t) = join!(child.wait(), demultiplex_task, tasks.join_next());
+                c.context(JoinWorkerSnafu)?;
+                d.context(DemultiplexerTaskPanickedSnafu)?
+                    .context(DemultiplexerTaskFailedSnafu)?;
+                if let Some(t) = t {
+                    t.context(IoQueuePanickedSnafu)??;
+                }
+
+                Ok(())
             }
-
-            Ok(())
-        });
+            .in_current_span(),
+        );
 
         let commander = Commander {
             to_worker_tx,
@@ -867,7 +871,7 @@ struct ModifyCargoToml {
 }
 
 impl ModifyCargoToml {
-    const PATH: &str = "Cargo.toml";
+    const PATH: &'static str = "Cargo.toml";
 
     async fn new(commander: Commander) -> Result<Self, ModifyCargoTomlError> {
         let cargo_toml = Self::read(&commander).await?;
