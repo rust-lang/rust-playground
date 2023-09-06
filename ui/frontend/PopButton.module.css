@@ -15,7 +15,9 @@ $arrow-width: 20px;
 
 .content {
   margin: 0 $arrow-height $arrow-height $arrow-height;
-  box-shadow: 0 1px 4px -2px rgb(0 0 0 / 60%), inset 0 1px 0 white;
+  box-shadow:
+    0 1px 4px -2px rgb(0 0 0 / 60%),
+    inset 0 1px 0 white;
   border-right: 1px solid $vertical-border-color;
   border-bottom: 1px solid var(--header-accent-border);
   border-left: 1px solid $vertical-border-color;

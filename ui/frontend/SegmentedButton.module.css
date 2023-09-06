@@ -4,7 +4,9 @@ $bg-dark: #f9f9f9;
 .container {
   display: flex;
   align-items: center;
-  box-shadow: 0 2px 4px -2px rgb(0 0 0 / 40%), inset 0 1px 0 white;
+  box-shadow:
+    0 2px 4px -2px rgb(0 0 0 / 40%),
+    inset 0 1px 0 white;
   border-radius: var(--header-border-radius);
 }
 
