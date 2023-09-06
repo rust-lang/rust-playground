@@ -23,7 +23,6 @@
     "react-prism": "^4.0.0",
     "react-redux": "^8.0.2",
     "react-shadow": "^20.0.0",
-    "regenerator-runtime": "^0.13.2",
     "route-parser": "^0.0.5",
     "split-grid": "^1.0.9",
     "suspend-react": "^0.1.3",
