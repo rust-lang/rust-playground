@@ -19,6 +19,9 @@ export default function code(state = DEFAULT, action: Action): State {
     case ActionType.AddImport:
       return action.code + state;
 
+    case ActionType.AddCrateType:
+      return `#![crate_type = "${action.crateType}"]\n${state}`;
+
     case ActionType.EnableFeatureGate:
       return `#![feature(${action.featureGate})]\n${state}`;
 

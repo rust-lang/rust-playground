@@ -6,6 +6,7 @@ import {
   clippyRequestSelector,
   getCrateType,
   runAsTest,
+  wasmLikelyToWork,
 } from './selectors';
 import State from './state';
 import {
@@ -89,6 +90,7 @@ export enum ActionType {
   EditCode = 'EDIT_CODE',
   AddMainFunction = 'ADD_MAIN_FUNCTION',
   AddImport = 'ADD_IMPORT',
+  AddCrateType = 'ADD_CRATE_TYPE',
   EnableFeatureGate = 'ENABLE_FEATURE_GATE',
   GotoPosition = 'GOTO_POSITION',
   SelectText = 'SELECT_TEXT',
@@ -272,6 +274,15 @@ const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
   dispatch(performCompileToHirOnly());
 };
 
+const performCompileToCdylibWasmOnly = (): ThunkAction => (dispatch, getState) => {
+  const state = getState();
+
+  if (!wasmLikelyToWork(state)) {
+    dispatch(addCrateType('cdylib'));
+  }
+  dispatch(performCompileToWasmOnly());
+};
+
 const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Asm]: performCompileToAssemblyOnly,
   [PrimaryActionCore.Compile]: performCompileOnly,
@@ -310,7 +321,7 @@ export const performCompileToMir =
 export const performCompileToNightlyHir =
   performAndSwitchPrimaryAction(performCompileToNightlyHirOnly, PrimaryActionCore.Hir);
 export const performCompileToWasm =
-  performAndSwitchPrimaryAction(performCompileToWasmOnly, PrimaryActionCore.Wasm);
+  performAndSwitchPrimaryAction(performCompileToCdylibWasmOnly, PrimaryActionCore.Wasm);
 
 export const editCode = (code: string) =>
   createAction(ActionType.EditCode, { code });
@@ -320,6 +331,9 @@ export const addMainFunction = () =>
 
 export const addImport = (code: string) =>
   createAction(ActionType.AddImport, { code });
+
+export const addCrateType = (crateType: string) =>
+  createAction(ActionType.AddCrateType, { crateType });
 
 export const enableFeatureGate = (featureGate: string) =>
   createAction(ActionType.EnableFeatureGate, { featureGate });
@@ -617,6 +631,7 @@ export type Action =
   | ReturnType<typeof editCode>
   | ReturnType<typeof addMainFunction>
   | ReturnType<typeof addImport>
+  | ReturnType<typeof addCrateType>
   | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof gotoPosition>
   | ReturnType<typeof selectText>

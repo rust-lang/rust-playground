@@ -107,12 +107,29 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
   end
 
   scenario "compiling to WebAssembly" do
+    editor.set ['#![crate_type = "bin"]', code].join("\n")
+
     in_build_menu { click_on("Wasm") }
 
     within(:output, :code) do
       expect(page).to have_content '(module'
       expect(page).to have_content '(block'
     end
+  end
+
+  scenario "compiling a library to WebAssembly" do
+    editor.set <<~EOF
+      #[no_mangle]
+      pub fn calculator(a: u8) -> u8 { a + 42 }
+    EOF
+
+    in_build_menu { click_on("Wasm") }
+
+    within(:output, :code) do
+      expect(page).to have_content '(func $calculator (export "calculator")'
+    end
+
+    expect(editor).to have_line('#![crate_type = "cdylib"]')
   end
 
   context "when the code doesn't compile" do
