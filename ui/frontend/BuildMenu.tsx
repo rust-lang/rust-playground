@@ -1,13 +1,12 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
-import * as actions from './actions';
-import * as selectors from './selectors';
-import { useAppDispatch } from './configureStore';
-
 import ButtonMenuItem from './ButtonMenuItem';
-import MenuGroup from './MenuGroup';
 import MenuAside from './MenuAside';
+import MenuGroup from './MenuGroup';
+import * as actions from './actions';
+import { useAppDispatch } from './configureStore';
+import * as selectors from './selectors';
 
 import styles from './BuildMenu.module.css';
 
@@ -18,16 +17,13 @@ interface BuildMenuProps {
 const useDispatchAndClose = (action: () => actions.ThunkAction, close: () => void) => {
   const dispatch = useAppDispatch();
 
-  return useCallback(
-    () => {
-      dispatch(action());
-      close();
-    },
-    [action, close, dispatch]
-  );
-}
+  return useCallback(() => {
+    dispatch(action());
+    close();
+  }, [action, close, dispatch]);
+};
 
-const BuildMenu: React.FC<BuildMenuProps> = props => {
+const BuildMenu: React.FC<BuildMenuProps> = (props) => {
   const isHirAvailable = useSelector(selectors.isHirAvailable);
 
   const compile = useDispatchAndClose(actions.performCompile, props.close);
@@ -42,16 +38,16 @@ const BuildMenu: React.FC<BuildMenuProps> = props => {
   return (
     <MenuGroup title="What do you want to do?">
       <ButtonMenuItem name="Run" onClick={execute}>
-        Build and run the code, showing the output.
-        Equivalent to <code className={styles.code}>cargo run</code>.
+        Build and run the code, showing the output. Equivalent to{' '}
+        <code className={styles.code}>cargo run</code>.
       </ButtonMenuItem>
       <ButtonMenuItem name="Build" onClick={compile}>
-        Build the code without running it.
-        Equivalent to <code className={styles.code}>cargo build</code>.
+        Build the code without running it. Equivalent to{' '}
+        <code className={styles.code}>cargo build</code>.
       </ButtonMenuItem>
       <ButtonMenuItem name="Test" onClick={test}>
-        Build the code and run all the tests.
-        Equivalent to <code className={styles.code}>cargo test</code>.
+        Build the code and run all the tests. Equivalent to{' '}
+        <code className={styles.code}>cargo test</code>.
       </ButtonMenuItem>
       <ButtonMenuItem name="ASM" onClick={compileToAssembly}>
         Build and show the resulting assembly code.
@@ -75,8 +71,8 @@ const BuildMenu: React.FC<BuildMenuProps> = props => {
 
 const HirAside: React.FC = () => (
   <MenuAside>
-    Note: HIR currently requires using the Nightly channel, selecting this
-    option will switch to Nightly.
+    Note: HIR currently requires using the Nightly channel, selecting this option will switch to
+    Nightly.
   </MenuAside>
 );
 
