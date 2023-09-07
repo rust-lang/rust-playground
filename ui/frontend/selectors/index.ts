@@ -127,6 +127,15 @@ export const isNightlyChannel = (state: State) => (
 );
 export const isHirAvailable = isNightlyChannel;
 
+export const wasmLikelyToWork = createSelector(
+  crateTypeSelector,
+  getCrateType, (userCrateType, crateType) => {
+    // If the user set it already, assume they know what they are doing
+    if (userCrateType) { return true }
+
+    return crateType === 'cdylib';
+  });
+
 export const getModeLabel = (state: State) => {
   const { configuration: { mode } } = state;
   return `${mode}`;

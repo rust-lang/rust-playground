@@ -25,6 +25,7 @@ const useDispatchAndClose = (action: () => actions.ThunkAction, close: () => voi
 
 const BuildMenu: React.FC<BuildMenuProps> = (props) => {
   const isHirAvailable = useSelector(selectors.isHirAvailable);
+  const wasmLikelyToWork = useSelector(selectors.wasmLikelyToWork);
 
   const compile = useDispatchAndClose(actions.performCompile, props.close);
   const compileToAssembly = useDispatchAndClose(actions.performCompileToAssembly, props.close);
@@ -61,6 +62,7 @@ const BuildMenu: React.FC<BuildMenuProps> = (props) => {
       </ButtonMenuItem>
       <ButtonMenuItem name="Wasm" onClick={compileToWasm}>
         Build a WebAssembly module for web browsers, in the .WAT textual representation.
+        {!wasmLikelyToWork && <WasmAside />}
       </ButtonMenuItem>
     </MenuGroup>
   );
@@ -74,6 +76,14 @@ const HirAside: React.FC = () => (
   <MenuAside>
     Note: HIR currently requires using the Nightly channel, selecting this option will switch to
     Nightly.
+  </MenuAside>
+);
+
+const WasmAside: React.FC = () => (
+  <MenuAside>
+    Note: WebAssembly works best when using the <Code>cdylib</Code> crate type, but the source code
+    does not specify an explicit crate type. Selecting this option will change the code to specify{' '}
+    <Code>cdylib</Code>.
   </MenuAside>
 );
 
