@@ -38,16 +38,13 @@ const BuildMenu: React.FC<BuildMenuProps> = (props) => {
   return (
     <MenuGroup title="What do you want to do?">
       <ButtonMenuItem name="Run" onClick={execute}>
-        Build and run the code, showing the output. Equivalent to{' '}
-        <code className={styles.code}>cargo run</code>.
+        Build and run the code, showing the output. Equivalent to <Code>cargo run</Code>.
       </ButtonMenuItem>
       <ButtonMenuItem name="Build" onClick={compile}>
-        Build the code without running it. Equivalent to{' '}
-        <code className={styles.code}>cargo build</code>.
+        Build the code without running it. Equivalent to <Code>cargo build</Code>.
       </ButtonMenuItem>
       <ButtonMenuItem name="Test" onClick={test}>
-        Build the code and run all the tests. Equivalent to{' '}
-        <code className={styles.code}>cargo test</code>.
+        Build the code and run all the tests. Equivalent to <Code>cargo test</Code>.
       </ButtonMenuItem>
       <ButtonMenuItem name="ASM" onClick={compileToAssembly}>
         Build and show the resulting assembly code.
@@ -68,6 +65,10 @@ const BuildMenu: React.FC<BuildMenuProps> = (props) => {
     </MenuGroup>
   );
 };
+
+const Code: React.FC<{ children: string }> = ({ children }) => (
+  <code className={styles.code}>{children}</code>
+);
 
 const HirAside: React.FC = () => (
   <MenuAside>
