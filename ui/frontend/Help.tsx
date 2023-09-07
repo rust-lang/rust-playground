@@ -116,6 +116,7 @@ const Help: React.FC = () => {
                                         of their dependencies. To use a crate, add the appropriate
             {' '}
             <Code>extern crate foo</Code> line to the code, or, since
+            {' '}
             <a href={RUST_EDITION_2018_URL}>Rust Edition 2018</a>, just
             {' '}
             <Code>use</Code> any item from that crate.
