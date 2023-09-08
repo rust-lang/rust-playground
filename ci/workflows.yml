@@ -447,6 +447,18 @@ workflows:
               chmod +x ./server/ui && ./server/ui &
               bundle exec rspec
 
+          - name: "Run tests with feature flags"
+            env:
+              PLAYGROUND_UI_ROOT: server/build/
+              PLAYGROUND_CORS_ENABLED: true
+              PLAYGROUND_GITHUB_TOKEN: ${{ secrets.PLAYGROUND_GITHUB_TOKEN }}
+              PLAYGROUND_ORCHESTRATOR_ENABLED: 1
+              PLAYGROUND_EXECUTE_VIA_WEBSOCKET_THRESHOLD: 1.0
+            run: |-
+              killall -q ui || true
+              chmod +x ./server/ui && ./server/ui &
+              bundle exec rspec
+
           - name: "Preserve screenshots"
             if: ${{ failure() }}
             uses: actions/upload-artifact@v3

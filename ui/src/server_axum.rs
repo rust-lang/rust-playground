@@ -8,12 +8,12 @@ use crate::{
     sandbox::{self, Channel, Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
     CachingSnafu, ClippyRequest, ClippyResponse, CompilationSnafu, CompileRequest, CompileResponse,
     CompileSnafu, Config, CreateCoordinatorSnafu, Error, ErrorJson, EvaluateRequest,
-    EvaluateResponse, EvaluationSnafu, ExecuteRequest, ExecuteResponse, ExecuteSnafu,
-    ExecutionSnafu, ExpansionSnafu, FormatRequest, FormatResponse, FormattingSnafu, GhToken,
-    GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu, LintingSnafu, MacroExpansionRequest,
-    MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse,
-    MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result, SandboxCreationSnafu,
-    ShutdownCoordinatorSnafu, TimeoutSnafu,
+    EvaluateResponse, EvaluateSnafu, EvaluationSnafu, ExecuteRequest, ExecuteResponse,
+    ExecuteSnafu, ExecutionSnafu, ExpansionSnafu, FormatRequest, FormatResponse, FormattingSnafu,
+    GhToken, GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu, LintingSnafu,
+    MacroExpansionRequest, MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest,
+    MetaGistResponse, MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result,
+    SandboxCreationSnafu, ShutdownCoordinatorSnafu, TimeoutSnafu,
 };
 use async_trait::async_trait;
 use axum::{
@@ -58,7 +58,7 @@ const MAX_AGE_ONE_YEAR: HeaderValue = HeaderValue::from_static("public, max-age=
 
 mod websocket;
 pub use websocket::CoordinatorManagerError as WebsocketCoordinatorManagerError;
-pub use websocket::ExecuteError as WebsocketExecuteError;
+pub(crate) use websocket::ExecuteError as WebsocketExecuteError;
 
 #[derive(Debug, Copy, Clone)]
 struct OrchestratorEnabled(bool);
@@ -151,15 +151,24 @@ async fn rewrite_help_as_index<B>(
 
 // This is a backwards compatibilty shim. The Rust documentation uses
 // this to run code in place.
-async fn evaluate(Json(req): Json<EvaluateRequest>) -> Result<Json<EvaluateResponse>> {
-    with_sandbox_force_endpoint(
-        req,
-        Endpoint::Evaluate,
-        |sb, req| async move { sb.execute(req).await }.boxed(),
-        EvaluationSnafu,
-    )
-    .await
-    .map(Json)
+async fn evaluate(
+    Extension(use_orchestrator): Extension<OrchestratorEnabled>,
+    Json(req): Json<EvaluateRequest>,
+) -> Result<Json<EvaluateResponse>> {
+    if use_orchestrator.0 {
+        with_coordinator(req, |c, req| c.execute(req).context(EvaluateSnafu).boxed())
+            .await
+            .map(Json)
+    } else {
+        with_sandbox_force_endpoint(
+            req,
+            Endpoint::Evaluate,
+            |sb, req| async move { sb.execute(req).await }.boxed(),
+            EvaluationSnafu,
+        )
+        .await
+        .map(Json)
+    }
 }
 
 async fn compile(
@@ -283,6 +292,10 @@ pub(crate) trait HasEndpoint {
     const ENDPOINT: Endpoint;
 }
 
+impl HasEndpoint for EvaluateRequest {
+    const ENDPOINT: Endpoint = Endpoint::Evaluate;
+}
+
 impl HasEndpoint for CompileRequest {
     const ENDPOINT: Endpoint = Endpoint::Compile;
 }
@@ -309,8 +322,9 @@ impl IsSuccess for coordinator::WithOutput<coordinator::ExecuteResponse> {
 
 async fn with_coordinator<WebReq, WebResp, Req, Resp, F>(req: WebReq, f: F) -> Result<WebResp>
 where
-    WebReq: TryInto<Req, Error = Error>,
+    WebReq: TryInto<Req>,
     WebReq: HasEndpoint,
+    Error: From<WebReq::Error>,
     Req: HasLabelsCore,
     Resp: Into<WebResp>,
     Resp: IsSuccess,
@@ -794,16 +808,92 @@ where
     }
 }
 
-mod api_orchestrator_integration_impls {
+pub(crate) mod api_orchestrator_integration_impls {
     use orchestrator::coordinator::*;
+    use snafu::prelude::*;
     use std::convert::TryFrom;
 
-    use super::{Error, Result};
+    impl TryFrom<crate::EvaluateRequest> for ExecuteRequest {
+        type Error = ParseEvaluateRequestError;
+
+        fn try_from(other: crate::EvaluateRequest) -> Result<Self, Self::Error> {
+            let crate::EvaluateRequest {
+                version,
+                optimize,
+                code,
+                edition,
+                tests,
+            } = other;
+
+            let mode = if optimize != "0" {
+                Mode::Release
+            } else {
+                Mode::Debug
+            };
+
+            let edition = if edition.trim().is_empty() {
+                Edition::Rust2015
+            } else {
+                parse_edition(&edition)?
+            };
+
+            Ok(ExecuteRequest {
+                channel: parse_channel(&version)?,
+                mode,
+                edition,
+                crate_type: CrateType::Binary,
+                tests,
+                backtrace: false,
+                code,
+            })
+        }
+    }
+
+    #[derive(Debug, Snafu)]
+    pub(crate) enum ParseEvaluateRequestError {
+        #[snafu(context(false))]
+        Channel { source: ParseChannelError },
+
+        #[snafu(context(false))]
+        Edition { source: ParseEditionError },
+    }
+
+    impl From<WithOutput<ExecuteResponse>> for crate::EvaluateResponse {
+        fn from(other: WithOutput<ExecuteResponse>) -> Self {
+            let WithOutput {
+                response,
+                stdout,
+                stderr,
+            } = other;
+
+            // The old playground didn't use Cargo, so it never had the
+            // Cargo output ("Compiling playground...") which is printed
+            // to stderr. Since this endpoint is used to inline results on
+            // the page, don't include the stderr unless an error
+            // occurred.
+            if response.success {
+                crate::EvaluateResponse {
+                    result: stdout,
+                    error: None,
+                }
+            } else {
+                // When an error occurs, *some* consumers check for an
+                // `error` key, others assume that the error is crammed in
+                // the `result` field and then they string search for
+                // `error:` or `warning:`. Ew. We can put it in both.
+                let result = stderr + &stdout;
+                crate::EvaluateResponse {
+                    result: result.clone(),
+                    error: Some(result),
+                }
+            }
+        }
+    }
 
     impl TryFrom<crate::CompileRequest> for CompileRequest {
-        type Error = Error;
+        type Error = ParseCompileRequestError;
 
-        fn try_from(other: crate::CompileRequest) -> Result<Self> {
+        fn try_from(other: crate::CompileRequest) -> Result<Self, Self::Error> {
             let crate::CompileRequest {
                 target,
                 assembly_flavor,
@@ -836,6 +926,24 @@ mod api_orchestrator_integration_impls {
         }
     }
 
+    #[derive(Debug, Snafu)]
+    pub(crate) enum ParseCompileRequestError {
+        #[snafu(context(false))]
+        Target { source: ParseCompileTargetError },
+
+        #[snafu(context(false))]
+        Channel { source: ParseChannelError },
+
+        #[snafu(context(false))]
+        CrateType { source: ParseCrateTypeError },
+
+        #[snafu(context(false))]
+        Mode { source: ParseModeError },
+
+        #[snafu(context(false))]
+        Edition { source: ParseEditionError },
+    }
+
     impl From<WithOutput<CompileResponse>> for crate::CompileResponse {
         fn from(other: WithOutput<CompileResponse>) -> Self {
             let WithOutput {
@@ -855,9 +963,9 @@ mod api_orchestrator_integration_impls {
     }
 
     impl TryFrom<crate::ExecuteRequest> for ExecuteRequest {
-        type Error = Error;
+        type Error = ParseExecuteRequestError;
 
-        fn try_from(other: crate::ExecuteRequest) -> Result<Self> {
+        fn try_from(other: crate::ExecuteRequest) -> Result<Self, Self::Error> {
             let crate::ExecuteRequest {
                 channel,
                 mode,
@@ -878,6 +986,21 @@ mod api_orchestrator_integration_impls {
                 code,
             })
         }
+    }
+
+    #[derive(Debug, Snafu)]
+    pub(crate) enum ParseExecuteRequestError {
+        #[snafu(context(false))]
+        Channel { source: ParseChannelError },
+
+        #[snafu(context(false))]
+        CrateType { source: ParseCrateTypeError },
+
+        #[snafu(context(false))]
+        Mode { source: ParseModeError },
+
+        #[snafu(context(false))]
+        Edition { source: ParseEditionError },
     }
 
     impl From<WithOutput<ExecuteResponse>> for crate::ExecuteResponse {
@@ -902,7 +1025,7 @@ mod api_orchestrator_integration_impls {
         assembly_flavor: Option<&str>,
         demangle_assembly: Option<&str>,
         process_assembly: Option<&str>,
-    ) -> Result<CompileTarget> {
+    ) -> Result<CompileTarget, ParseCompileTargetError> {
         Ok(match target {
             "asm" => {
                 let assembly_flavor = match assembly_flavor {
@@ -926,44 +1049,83 @@ mod api_orchestrator_integration_impls {
             "mir" => CompileTarget::Mir,
             "hir" => CompileTarget::Hir,
             "wasm" => CompileTarget::Wasm,
-            value => crate::InvalidTargetSnafu { value }.fail()?,
+            value => return InvalidTargetSnafu { value }.fail(),
         })
     }
 
-    fn parse_assembly_flavor(s: &str) -> Result<AssemblyFlavor> {
+    #[derive(Debug, Snafu)]
+    pub(crate) enum ParseCompileTargetError {
+        #[snafu(context(false))]
+        AssemblyFlavor { source: ParseAssemblyFlavorError },
+
+        #[snafu(context(false))]
+        DemangleAssembly { source: ParseDemangleAssemblyError },
+
+        #[snafu(context(false))]
+        ProcessAssembly { source: ParseProcessAssemblyError },
+
+        #[snafu(display("'{value}' is not a valid target"))]
+        InvalidTarget { value: String },
+    }
+
+    fn parse_assembly_flavor(s: &str) -> Result<AssemblyFlavor, ParseAssemblyFlavorError> {
         Ok(match s {
             "att" => AssemblyFlavor::Att,
             "intel" => AssemblyFlavor::Intel,
-            value => crate::InvalidAssemblyFlavorSnafu { value }.fail()?,
+            value => return ParseAssemblyFlavorSnafu { value }.fail(),
         })
     }
 
-    fn parse_demangle_assembly(s: &str) -> Result<DemangleAssembly> {
+    #[derive(Debug, Snafu)]
+    #[snafu(display("'{value}' is not a valid assembly flavor"))]
+    pub(crate) struct ParseAssemblyFlavorError {
+        value: String,
+    }
+
+    fn parse_demangle_assembly(s: &str) -> Result<DemangleAssembly, ParseDemangleAssemblyError> {
         Ok(match s {
             "demangle" => DemangleAssembly::Demangle,
             "mangle" => DemangleAssembly::Mangle,
-            value => crate::InvalidDemangleAssemblySnafu { value }.fail()?,
+            value => return ParseDemangleAssemblySnafu { value }.fail(),
         })
     }
 
-    fn parse_process_assembly(s: &str) -> Result<ProcessAssembly> {
+    #[derive(Debug, Snafu)]
+    #[snafu(display("'{value}' is not a valid demangle option"))]
+    pub(crate) struct ParseDemangleAssemblyError {
+        value: String,
+    }
+
+    fn parse_process_assembly(s: &str) -> Result<ProcessAssembly, ParseProcessAssemblyError> {
         Ok(match s {
             "filter" => ProcessAssembly::Filter,
             "raw" => ProcessAssembly::Raw,
-            value => crate::InvalidProcessAssemblySnafu { value }.fail()?,
+            value => return ParseProcessAssemblySnafu { value }.fail(),
         })
     }
 
-    pub(crate) fn parse_channel(s: &str) -> Result<Channel> {
+    #[derive(Debug, Snafu)]
+    #[snafu(display("'{value}' is not a valid assembly processing option"))]
+    pub(crate) struct ParseProcessAssemblyError {
+        value: String,
+    }
+
+    pub(crate) fn parse_channel(s: &str) -> Result<Channel, ParseChannelError> {
         Ok(match s {
             "stable" => Channel::Stable,
             "beta" => Channel::Beta,
             "nightly" => Channel::Nightly,
-            value => crate::InvalidChannelSnafu { value }.fail()?,
+            value => return ParseChannelSnafu { value }.fail(),
         })
     }
 
-    pub(crate) fn parse_crate_type(s: &str) -> Result<CrateType> {
+    #[derive(Debug, Snafu)]
+    #[snafu(display("'{value}' is not a valid channel"))]
+    pub(crate) struct ParseChannelError {
+        value: String,
+    }
+
+    pub(crate) fn parse_crate_type(s: &str) -> Result<CrateType, ParseCrateTypeError> {
         use {CrateType::*, LibraryType::*};
 
         Ok(match s {
@@ -974,24 +1136,42 @@ mod api_orchestrator_integration_impls {
             "staticlib" => Library(Staticlib),
             "cdylib" => Library(Cdylib),
             "proc-macro" => Library(ProcMacro),
-            value => crate::InvalidCrateTypeSnafu { value }.fail()?,
+            value => return ParseCrateTypeSnafu { value }.fail(),
         })
     }
 
-    pub(crate) fn parse_mode(s: &str) -> Result<Mode> {
+    #[derive(Debug, Snafu)]
+    #[snafu(display("'{value}' is not a valid crate type"))]
+    pub(crate) struct ParseCrateTypeError {
+        value: String,
+    }
+
+    pub(crate) fn parse_mode(s: &str) -> Result<Mode, ParseModeError> {
         Ok(match s {
             "debug" => Mode::Debug,
             "release" => Mode::Release,
-            value => crate::InvalidModeSnafu { value }.fail()?,
+            value => return ParseModeSnafu { value }.fail(),
         })
     }
 
-    pub(crate) fn parse_edition(s: &str) -> Result<Edition> {
+    #[derive(Debug, Snafu)]
+    #[snafu(display("'{value}' is not a valid mode"))]
+    pub(crate) struct ParseModeError {
+        value: String,
+    }
+
+    pub(crate) fn parse_edition(s: &str) -> Result<Edition, ParseEditionError> {
         Ok(match s {
             "2015" => Edition::Rust2015,
             "2018" => Edition::Rust2018,
             "2021" => Edition::Rust2021,
-            value => crate::InvalidEditionSnafu { value }.fail()?,
+            value => return ParseEditionSnafu { value }.fail(),
         })
+    }
+
+    #[derive(Debug, Snafu)]
+    #[snafu(display("'{value}' is not a valid edition"))]
+    pub(crate) struct ParseEditionError {
+        value: String,
     }
 }
