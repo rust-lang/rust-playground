@@ -210,6 +210,11 @@ enum Error {
     Serialization { source: serde_json::Error },
 
     #[snafu(context(false))]
+    EvaluateRequest {
+        source: server_axum::api_orchestrator_integration_impls::ParseEvaluateRequestError,
+    },
+
+    #[snafu(context(false))]
     CompileRequest {
         source: server_axum::api_orchestrator_integration_impls::ParseCompileRequestError,
     },
@@ -252,6 +257,11 @@ enum Error {
     #[snafu(display("Unable to shutdown the coordinator"))]
     ShutdownCoordinator {
         source: orchestrator::coordinator::Error,
+    },
+
+    #[snafu(display("Unable to convert the evaluate request"))]
+    Evaluate {
+        source: orchestrator::coordinator::ExecuteError,
     },
 
     #[snafu(display("Unable to convert the compile request"))]
