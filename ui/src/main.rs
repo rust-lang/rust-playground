@@ -179,7 +179,7 @@ impl MetricsToken {
 }
 
 #[derive(Debug, Snafu)]
-pub enum Error {
+enum Error {
     #[snafu(display("Sandbox creation failed: {}", source))]
     SandboxCreation { source: sandbox::Error },
     #[snafu(display("Compilation operation failed: {}", source))]
@@ -208,6 +208,18 @@ pub enum Error {
     Deserialization { source: serde_json::Error },
     #[snafu(display("Unable to serialize response: {}", source))]
     Serialization { source: serde_json::Error },
+
+    #[snafu(context(false))]
+    CompileRequest {
+        source: server_axum::api_orchestrator_integration_impls::ParseCompileRequestError,
+    },
+
+    #[snafu(context(false))]
+    ExecuteRequest {
+        source: server_axum::api_orchestrator_integration_impls::ParseExecuteRequestError,
+    },
+
+    // Remove at a later point. From here ...
     #[snafu(display("The value {:?} is not a valid target", value))]
     InvalidTarget { value: String },
     #[snafu(display("The value {:?} is not a valid assembly flavor", value))]
@@ -224,6 +236,7 @@ pub enum Error {
     InvalidEdition { value: String },
     #[snafu(display("The value {:?} is not a valid crate type", value))]
     InvalidCrateType { value: String },
+    // ... to here
     #[snafu(display("No request was provided"))]
     RequestMissing,
     #[snafu(display("The cache has been poisoned"))]

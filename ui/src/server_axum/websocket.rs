@@ -1,10 +1,7 @@
 use crate::{
-    metrics,
-    server_axum::api_orchestrator_integration_impls::{
-        parse_channel, parse_crate_type, parse_edition, parse_mode,
-    },
-    Error, Result, StreamingCoordinatorIdleSnafu, StreamingCoordinatorSpawnSnafu,
-    StreamingExecuteSnafu, WebSocketTaskPanicSnafu,
+    metrics, server_axum::api_orchestrator_integration_impls::*, Error, Result,
+    StreamingCoordinatorIdleSnafu, StreamingCoordinatorSpawnSnafu, StreamingExecuteSnafu,
+    WebSocketTaskPanicSnafu,
 };
 
 use axum::extract::ws::{Message, WebSocket};
@@ -65,8 +62,7 @@ struct ExecuteRequest {
 }
 
 impl TryFrom<ExecuteRequest> for coordinator::ExecuteRequest {
-    // TODO: detangle this error from the big error in `main`
-    type Error = Error;
+    type Error = ExecuteRequestParseError;
 
     fn try_from(value: ExecuteRequest) -> Result<Self, Self::Error> {
         let ExecuteRequest {
@@ -89,6 +85,21 @@ impl TryFrom<ExecuteRequest> for coordinator::ExecuteRequest {
             code,
         })
     }
+}
+
+#[derive(Debug, Snafu)]
+pub(crate) enum ExecuteRequestParseError {
+    #[snafu(context(false))]
+    Channel { source: ParseChannelError },
+
+    #[snafu(context(false))]
+    CrateType { source: ParseCrateTypeError },
+
+    #[snafu(context(false))]
+    Mode { source: ParseModeError },
+
+    #[snafu(context(false))]
+    Edition { source: ParseEditionError },
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -463,10 +474,7 @@ async fn handle_execute(
 ) -> ExecuteResult<()> {
     use execute_error::*;
 
-    let req = req.try_into().map_err(|e: Error| {
-        let inner = e.to_string();
-        BadRequestSnafu { inner }.build()
-    })?;
+    let req = req.try_into().context(BadRequestSnafu)?;
 
     let coordinator::ActiveExecution {
         mut task,
@@ -533,9 +541,9 @@ async fn handle_execute(
 
 #[derive(Debug, Snafu)]
 #[snafu(module)]
-pub enum ExecuteError {
-    #[snafu(display("The request could not be parsed: {inner}"))]
-    BadRequest { inner: String },
+pub(crate) enum ExecuteError {
+    #[snafu(display("The request could not be parsed"))]
+    BadRequest { source: ExecuteRequestParseError },
 
     #[snafu(display("Could not begin the execution session"))]
     Begin { source: coordinator::ExecuteError },
