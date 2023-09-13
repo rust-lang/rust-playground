@@ -476,18 +476,19 @@ where
             .await
     }
 
-    pub async fn shutdown(self) -> Result<B> {
+    pub async fn idle(&mut self) -> Result<()> {
         let Self {
-            backend,
             stable,
             beta,
             nightly,
             token,
+            ..
         } = self;
         token.cancel();
 
         let channels =
-            [stable, beta, nightly].map(|mut c| OptionFuture::from(c.take().map(|c| c.shutdown())));
+            [stable, beta, nightly].map(|c| OptionFuture::from(c.take().map(|c| c.shutdown())));
+
         let [stable, beta, nightly] = channels;
 
         let (stable, beta, nightly) = join!(stable, beta, nightly);
@@ -496,7 +497,12 @@ where
         beta.transpose()?;
         nightly.transpose()?;
 
-        Ok(backend)
+        Ok(())
+    }
+
+    pub async fn shutdown(mut self) -> Result<B> {
+        self.idle().await?;
+        Ok(self.backend)
     }
 
     async fn select_channel(&self, channel: Channel) -> Result<&Container, Error> {

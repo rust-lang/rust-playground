@@ -184,7 +184,7 @@ type SharedCoordinator = Arc<Coordinator<DockerBackend>>;
 ///
 /// - Allows limited parallelism between jobs of different types.
 struct CoordinatorManager {
-    coordinator: Option<SharedCoordinator>,
+    coordinator: SharedCoordinator,
     tasks: JoinSet<Result<()>>,
     semaphore: Arc<Semaphore>,
     abort_handles: [Option<AbortHandle>; Self::N_KINDS],
@@ -199,9 +199,9 @@ impl CoordinatorManager {
     const N_KINDS: usize = 1;
     const KIND_EXECUTE: usize = 0;
 
-    fn new() -> Self {
+    async fn new() -> Self {
         Self {
-            coordinator: Default::default(),
+            coordinator: Arc::new(Coordinator::new_docker().await),
             tasks: Default::default(),
             semaphore: Arc::new(Semaphore::new(Self::N_PARALLEL)),
             abort_handles: Default::default(),
@@ -223,7 +223,7 @@ impl CoordinatorManager {
         Fut: Future<Output = Result<()>>,
         Fut: 'static + Send,
     {
-        let coordinator = self.coordinator().await?;
+        let coordinator = self.coordinator.clone();
         let semaphore = self.semaphore.clone();
 
         let new_abort_handle = self.tasks.spawn(
@@ -244,36 +244,28 @@ impl CoordinatorManager {
         Ok(())
     }
 
-    async fn coordinator(&mut self) -> CoordinatorManagerResult<SharedCoordinator> {
-        let coordinator = match self.coordinator.take() {
-            Some(c) => c,
-            None => {
-                let coordinator = Coordinator::new_docker().await;
-                Arc::new(coordinator)
-            }
-        };
-        let dupe = Arc::clone(&coordinator);
-        self.coordinator = Some(coordinator);
-        Ok(dupe)
-    }
-
     async fn idle(&mut self) -> CoordinatorManagerResult<()> {
         use coordinator_manager_error::*;
 
-        if let Some(coordinator) = self.coordinator.take() {
-            Arc::into_inner(coordinator)
-                .context(OutstandingCoordinatorSnafu)?
-                .shutdown()
-                .await
-                .context(ShutdownSnafu)?;
-        }
+        Arc::get_mut(&mut self.coordinator)
+            .context(OutstandingCoordinatorIdleSnafu)?
+            .idle()
+            .await
+            .context(IdleSnafu)?;
 
         Ok(())
     }
 
     async fn shutdown(mut self) -> CoordinatorManagerResult<()> {
-        self.idle().await?;
+        use coordinator_manager_error::*;
+
+        Arc::into_inner(self.coordinator)
+            .context(OutstandingCoordinatorShutdownSnafu)?
+            .shutdown()
+            .await
+            .context(ShutdownSnafu)?;
         self.tasks.shutdown().await;
+
         Ok(())
     }
 }
@@ -281,8 +273,14 @@ impl CoordinatorManager {
 #[derive(Debug, Snafu)]
 #[snafu(module)]
 pub enum CoordinatorManagerError {
+    #[snafu(display("The coordinator is still referenced and cannot be idled"))]
+    OutstandingCoordinatorIdle,
+
+    #[snafu(display("Could not idle the coordinator"))]
+    Idle { source: coordinator::Error },
+
     #[snafu(display("The coordinator is still referenced and cannot be shut down"))]
-    OutstandingCoordinator,
+    OutstandingCoordinatorShutdown,
 
     #[snafu(display("Could not shut down the coordinator"))]
     Shutdown { source: coordinator::Error },
@@ -306,7 +304,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
         return;
     }
 
-    let mut manager = CoordinatorManager::new();
+    let mut manager = CoordinatorManager::new().await;
     tokio::pin! {
         let session_timeout = time::sleep(CoordinatorManager::SESSION_TIMEOUT);
     }
