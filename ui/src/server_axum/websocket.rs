@@ -245,12 +245,10 @@ impl CoordinatorManager {
     }
 
     async fn coordinator(&mut self) -> CoordinatorManagerResult<SharedCoordinator> {
-        use coordinator_manager_error::*;
-
         let coordinator = match self.coordinator.take() {
             Some(c) => c,
             None => {
-                let coordinator = Coordinator::new_docker().await.context(NewSnafu)?;
+                let coordinator = Coordinator::new_docker().await;
                 Arc::new(coordinator)
             }
         };
@@ -283,9 +281,6 @@ impl CoordinatorManager {
 #[derive(Debug, Snafu)]
 #[snafu(module)]
 pub enum CoordinatorManagerError {
-    #[snafu(display("Could not create the coordinator"))]
-    New { source: coordinator::Error },
-
     #[snafu(display("The coordinator is still referenced and cannot be shut down"))]
     OutstandingCoordinator,
 

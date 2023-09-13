@@ -412,16 +412,16 @@ impl<B> Coordinator<B>
 where
     B: Backend,
 {
-    pub async fn new(backend: B) -> Result<Self, Error> {
+    pub async fn new(backend: B) -> Self {
         let token = CancellationToken::new();
 
-        Ok(Self {
+        Self {
             backend,
             stable: OnceCell::new(),
             beta: OnceCell::new(),
             nightly: OnceCell::new(),
             token,
-        })
+        }
     }
 
     pub async fn execute(
@@ -513,7 +513,7 @@ where
 }
 
 impl Coordinator<DockerBackend> {
-    pub async fn new_docker() -> Result<Self, Error> {
+    pub async fn new_docker() -> Self {
         Self::new(DockerBackend(())).await
     }
 }
@@ -1402,7 +1402,7 @@ mod tests {
         }
     }
 
-    async fn new_coordinator() -> Result<Coordinator<impl Backend>> {
+    async fn new_coordinator() -> Coordinator<impl Backend> {
         Coordinator::new(TestBackend::new()).await
         //Coordinator::new_docker().await
     }
@@ -1422,7 +1422,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_execute_response() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let response = coordinator
             .execute(new_execute_request())
@@ -1450,7 +1450,7 @@ mod tests {
         ];
 
         let tests = params.into_iter().map(|(mode, expected)| async move {
-            let coordinator = new_coordinator().await?;
+            let coordinator = new_coordinator().await;
 
             let request = ExecuteRequest {
                 mode,
@@ -1482,7 +1482,7 @@ mod tests {
         let tests = params.into_iter().flat_map(|(code, works_in)| {
             Edition::ALL.into_iter().zip(works_in).map(
                 move |(edition, expected_to_work)| async move {
-                    let coordinator = new_coordinator().await?;
+                    let coordinator = new_coordinator().await;
 
                     let request = ExecuteRequest {
                         code: code.into(),
@@ -1522,7 +1522,7 @@ mod tests {
         ];
 
         let tests = params.into_iter().map(|(crate_type, expected)| async move {
-            let coordinator = new_coordinator().await?;
+            let coordinator = new_coordinator().await;
 
             let request = ExecuteRequest {
                 crate_type,
@@ -1555,7 +1555,7 @@ mod tests {
         let params = [(false, "Running `"), (true, "Running unittests")];
 
         let tests = params.into_iter().map(|(tests, expected)| async move {
-            let coordinator = new_coordinator().await?;
+            let coordinator = new_coordinator().await;
 
             let request = ExecuteRequest {
                 code: code.into(),
@@ -1588,7 +1588,7 @@ mod tests {
         ];
 
         let tests = params.into_iter().map(|(backtrace, expected)| async move {
-            let coordinator = new_coordinator().await?;
+            let coordinator = new_coordinator().await;
 
             let request = ExecuteRequest {
                 code: code.into(),
@@ -1694,7 +1694,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_response() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let response = coordinator
             .compile(new_compile_request())
@@ -1714,7 +1714,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_streaming() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let ActiveCompilation {
             task,
@@ -1749,7 +1749,7 @@ mod tests {
     #[snafu::report]
     async fn test_compile_edition() -> Result<()> {
         for edition in Edition::ALL {
-            let coordinator = new_coordinator().await?;
+            let coordinator = new_coordinator().await;
 
             let response = coordinator
                 .compile(new_compile_hir_request_for(edition))
@@ -1771,7 +1771,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_assembly() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let response = coordinator
             .compile(new_compile_assembly_request())
@@ -1796,7 +1796,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_hir() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let response = coordinator
             .compile(new_compile_hir_request())
@@ -1815,7 +1815,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_llvm_ir() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let response = coordinator
             .compile(new_compile_llvm_ir_request())
@@ -1835,7 +1835,7 @@ mod tests {
     #[snafu::report]
     async fn test_compile_wasm() -> Result<()> {
         // cargo-wasm only exists inside the container
-        let coordinator = Coordinator::new_docker().await?;
+        let coordinator = Coordinator::new_docker().await;
 
         let response = coordinator
             .compile(new_compile_wasm_request())
@@ -1857,7 +1857,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_clears_old_main_rs() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         // Create a main.rs file
         let req = ExecuteRequest {

@@ -7,13 +7,13 @@ use crate::{
     },
     sandbox::{self, Channel, Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
     CachingSnafu, ClippyRequest, ClippyResponse, CompilationSnafu, CompileRequest, CompileResponse,
-    CompileSnafu, Config, CreateCoordinatorSnafu, Error, ErrorJson, EvaluateRequest,
-    EvaluateResponse, EvaluateSnafu, EvaluationSnafu, ExecuteRequest, ExecuteResponse,
-    ExecuteSnafu, ExecutionSnafu, ExpansionSnafu, FormatRequest, FormatResponse, FormattingSnafu,
-    GhToken, GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu, LintingSnafu,
-    MacroExpansionRequest, MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest,
-    MetaGistResponse, MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result,
-    SandboxCreationSnafu, ShutdownCoordinatorSnafu, TimeoutSnafu,
+    CompileSnafu, Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu,
+    EvaluationSnafu, ExecuteRequest, ExecuteResponse, ExecuteSnafu, ExecutionSnafu, ExpansionSnafu,
+    FormatRequest, FormatResponse, FormattingSnafu, GhToken, GistCreationSnafu, GistLoadingSnafu,
+    InterpretingSnafu, LintingSnafu, MacroExpansionRequest, MacroExpansionResponse,
+    MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse, MetaVersionResponse, MetricsToken,
+    MiriRequest, MiriResponse, Result, SandboxCreationSnafu, ShutdownCoordinatorSnafu,
+    TimeoutSnafu,
 };
 use async_trait::async_trait;
 use axum::{
@@ -331,9 +331,7 @@ where
     for<'f> F:
         FnOnce(&'f coordinator::Coordinator<DockerBackend>, Req) -> BoxFuture<'f, Result<Resp>>,
 {
-    let coordinator = orchestrator::coordinator::Coordinator::new_docker()
-        .await
-        .context(CreateCoordinatorSnafu)?;
+    let coordinator = orchestrator::coordinator::Coordinator::new_docker().await;
 
     let job = async {
         let req = req.try_into()?;
