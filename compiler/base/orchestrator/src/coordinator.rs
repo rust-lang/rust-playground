@@ -1,4 +1,7 @@
-use futures::{future::BoxFuture, Future, FutureExt};
+use futures::{
+    future::{BoxFuture, OptionFuture},
+    Future, FutureExt,
+};
 use snafu::prelude::*;
 use std::{
     collections::HashMap,
@@ -14,7 +17,7 @@ use tokio::{
     join,
     process::{Child, ChildStdin, ChildStdout, Command},
     select,
-    sync::{mpsc, oneshot},
+    sync::{mpsc, oneshot, OnceCell},
     task::{JoinHandle, JoinSet},
     time::{self, MissedTickBehavior},
 };
@@ -67,8 +70,6 @@ pub enum Channel {
 }
 
 impl Channel {
-    pub(crate) const ALL: [Self; 3] = [Self::Stable, Self::Beta, Self::Nightly];
-
     #[cfg(test)]
     pub(crate) fn to_str(self) -> &'static str {
         match self {
@@ -401,9 +402,9 @@ enum DemultiplexCommand {
 pub struct Coordinator<B> {
     backend: B,
     // Consider making these lazily-created and/or idly time out
-    stable: Container,
-    beta: Container,
-    nightly: Container,
+    stable: OnceCell<Container>,
+    beta: OnceCell<Container>,
+    nightly: OnceCell<Container>,
     token: CancellationToken,
 }
 
@@ -414,20 +415,11 @@ where
     pub async fn new(backend: B) -> Result<Self, Error> {
         let token = CancellationToken::new();
 
-        let [stable, beta, nightly] =
-            Channel::ALL.map(|channel| Container::new(channel, token.clone(), &backend));
-
-        let (stable, beta, nightly) = join!(stable, beta, nightly);
-
-        let stable = stable?;
-        let beta = beta?;
-        let nightly = nightly?;
-
         Ok(Self {
             backend,
-            stable,
-            beta,
-            nightly,
+            stable: OnceCell::new(),
+            beta: OnceCell::new(),
+            nightly: OnceCell::new(),
             token,
         })
     }
@@ -436,14 +428,24 @@ where
         &self,
         request: ExecuteRequest,
     ) -> Result<WithOutput<ExecuteResponse>, ExecuteError> {
-        self.select_channel(request.channel).execute(request).await
+        use execute_error::*;
+
+        self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
+            .execute(request)
+            .await
     }
 
     pub async fn begin_execute(
         &self,
         request: ExecuteRequest,
     ) -> Result<ActiveExecution, ExecuteError> {
+        use execute_error::*;
+
         self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
             .begin_execute(request)
             .await
     }
@@ -452,14 +454,24 @@ where
         &self,
         request: CompileRequest,
     ) -> Result<WithOutput<CompileResponse>, CompileError> {
-        self.select_channel(request.channel).compile(request).await
+        use compile_error::*;
+
+        self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
+            .compile(request)
+            .await
     }
 
     pub async fn begin_compile(
         &self,
         request: CompileRequest,
     ) -> Result<ActiveCompilation, CompileError> {
+        use compile_error::*;
+
         self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
             .begin_compile(request)
             .await
     }
@@ -474,21 +486,29 @@ where
         } = self;
         token.cancel();
 
-        let (stable, beta, nightly) = join!(stable.shutdown(), beta.shutdown(), nightly.shutdown());
+        let channels =
+            [stable, beta, nightly].map(|mut c| OptionFuture::from(c.take().map(|c| c.shutdown())));
+        let [stable, beta, nightly] = channels;
 
-        stable?;
-        beta?;
-        nightly?;
+        let (stable, beta, nightly) = join!(stable, beta, nightly);
+
+        stable.transpose()?;
+        beta.transpose()?;
+        nightly.transpose()?;
 
         Ok(backend)
     }
 
-    fn select_channel(&self, channel: Channel) -> &Container {
-        match channel {
+    async fn select_channel(&self, channel: Channel) -> Result<&Container, Error> {
+        let container = match channel {
             Channel::Stable => &self.stable,
             Channel::Beta => &self.beta,
             Channel::Nightly => &self.nightly,
-        }
+        };
+
+        container
+            .get_or_try_init(|| Container::new(channel, self.token.clone(), &self.backend))
+            .await
     }
 }
 
@@ -771,6 +791,9 @@ impl fmt::Debug for ActiveExecution {
 #[derive(Debug, Snafu)]
 #[snafu(module)]
 pub enum ExecuteError {
+    #[snafu(display("Could not start the container"))]
+    CouldNotStartContainer { source: Error },
+
     #[snafu(display("Could not modify Cargo.toml"))]
     CouldNotModifyCargoToml { source: ModifyCargoTomlError },
 
@@ -809,6 +832,9 @@ impl fmt::Debug for ActiveCompilation {
 #[derive(Debug, Snafu)]
 #[snafu(module)]
 pub enum CompileError {
+    #[snafu(display("Could not start the container"))]
+    CouldNotStartContainer { source: Error },
+
     #[snafu(display("Could not modify Cargo.toml"))]
     CouldNotModifyCargoToml { source: ModifyCargoTomlError },
 
