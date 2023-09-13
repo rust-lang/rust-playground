@@ -249,11 +249,6 @@ enum Error {
     #[snafu(display("The WebSocket worker panicked: {}", text))]
     WebSocketTaskPanic { text: String },
 
-    #[snafu(display("Unable to create the coordinator"))]
-    CreateCoordinator {
-        source: orchestrator::coordinator::Error,
-    },
-
     #[snafu(display("Unable to shutdown the coordinator"))]
     ShutdownCoordinator {
         source: orchestrator::coordinator::Error,

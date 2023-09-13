@@ -1,4 +1,7 @@
-use futures::{future::BoxFuture, Future, FutureExt};
+use futures::{
+    future::{BoxFuture, OptionFuture},
+    Future, FutureExt,
+};
 use snafu::prelude::*;
 use std::{
     collections::HashMap,
@@ -14,7 +17,7 @@ use tokio::{
     join,
     process::{Child, ChildStdin, ChildStdout, Command},
     select,
-    sync::{mpsc, oneshot},
+    sync::{mpsc, oneshot, OnceCell},
     task::{JoinHandle, JoinSet},
     time::{self, MissedTickBehavior},
 };
@@ -67,8 +70,6 @@ pub enum Channel {
 }
 
 impl Channel {
-    pub(crate) const ALL: [Self; 3] = [Self::Stable, Self::Beta, Self::Nightly];
-
     #[cfg(test)]
     pub(crate) fn to_str(self) -> &'static str {
         match self {
@@ -401,9 +402,9 @@ enum DemultiplexCommand {
 pub struct Coordinator<B> {
     backend: B,
     // Consider making these lazily-created and/or idly time out
-    stable: Container,
-    beta: Container,
-    nightly: Container,
+    stable: OnceCell<Container>,
+    beta: OnceCell<Container>,
+    nightly: OnceCell<Container>,
     token: CancellationToken,
 }
 
@@ -411,39 +412,40 @@ impl<B> Coordinator<B>
 where
     B: Backend,
 {
-    pub async fn new(backend: B) -> Result<Self, Error> {
+    pub async fn new(backend: B) -> Self {
         let token = CancellationToken::new();
 
-        let [stable, beta, nightly] =
-            Channel::ALL.map(|channel| Container::new(channel, token.clone(), &backend));
-
-        let (stable, beta, nightly) = join!(stable, beta, nightly);
-
-        let stable = stable?;
-        let beta = beta?;
-        let nightly = nightly?;
-
-        Ok(Self {
+        Self {
             backend,
-            stable,
-            beta,
-            nightly,
+            stable: OnceCell::new(),
+            beta: OnceCell::new(),
+            nightly: OnceCell::new(),
             token,
-        })
+        }
     }
 
     pub async fn execute(
         &self,
         request: ExecuteRequest,
     ) -> Result<WithOutput<ExecuteResponse>, ExecuteError> {
-        self.select_channel(request.channel).execute(request).await
+        use execute_error::*;
+
+        self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
+            .execute(request)
+            .await
     }
 
     pub async fn begin_execute(
         &self,
         request: ExecuteRequest,
     ) -> Result<ActiveExecution, ExecuteError> {
+        use execute_error::*;
+
         self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
             .begin_execute(request)
             .await
     }
@@ -452,48 +454,72 @@ where
         &self,
         request: CompileRequest,
     ) -> Result<WithOutput<CompileResponse>, CompileError> {
-        self.select_channel(request.channel).compile(request).await
+        use compile_error::*;
+
+        self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
+            .compile(request)
+            .await
     }
 
     pub async fn begin_compile(
         &self,
         request: CompileRequest,
     ) -> Result<ActiveCompilation, CompileError> {
+        use compile_error::*;
+
         self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
             .begin_compile(request)
             .await
     }
 
-    pub async fn shutdown(self) -> Result<B> {
+    pub async fn idle(&mut self) -> Result<()> {
         let Self {
-            backend,
             stable,
             beta,
             nightly,
             token,
+            ..
         } = self;
         token.cancel();
 
-        let (stable, beta, nightly) = join!(stable.shutdown(), beta.shutdown(), nightly.shutdown());
+        let channels =
+            [stable, beta, nightly].map(|c| OptionFuture::from(c.take().map(|c| c.shutdown())));
 
-        stable?;
-        beta?;
-        nightly?;
+        let [stable, beta, nightly] = channels;
 
-        Ok(backend)
+        let (stable, beta, nightly) = join!(stable, beta, nightly);
+
+        stable.transpose()?;
+        beta.transpose()?;
+        nightly.transpose()?;
+
+        Ok(())
     }
 
-    fn select_channel(&self, channel: Channel) -> &Container {
-        match channel {
+    pub async fn shutdown(mut self) -> Result<B> {
+        self.idle().await?;
+        Ok(self.backend)
+    }
+
+    async fn select_channel(&self, channel: Channel) -> Result<&Container, Error> {
+        let container = match channel {
             Channel::Stable => &self.stable,
             Channel::Beta => &self.beta,
             Channel::Nightly => &self.nightly,
-        }
+        };
+
+        container
+            .get_or_try_init(|| Container::new(channel, self.token.clone(), &self.backend))
+            .await
     }
 }
 
 impl Coordinator<DockerBackend> {
-    pub async fn new_docker() -> Result<Self, Error> {
+    pub async fn new_docker() -> Self {
         Self::new(DockerBackend(())).await
     }
 }
@@ -771,6 +797,9 @@ impl fmt::Debug for ActiveExecution {
 #[derive(Debug, Snafu)]
 #[snafu(module)]
 pub enum ExecuteError {
+    #[snafu(display("Could not start the container"))]
+    CouldNotStartContainer { source: Error },
+
     #[snafu(display("Could not modify Cargo.toml"))]
     CouldNotModifyCargoToml { source: ModifyCargoTomlError },
 
@@ -809,6 +838,9 @@ impl fmt::Debug for ActiveCompilation {
 #[derive(Debug, Snafu)]
 #[snafu(module)]
 pub enum CompileError {
+    #[snafu(display("Could not start the container"))]
+    CouldNotStartContainer { source: Error },
+
     #[snafu(display("Could not modify Cargo.toml"))]
     CouldNotModifyCargoToml { source: ModifyCargoTomlError },
 
@@ -1376,7 +1408,7 @@ mod tests {
         }
     }
 
-    async fn new_coordinator() -> Result<Coordinator<impl Backend>> {
+    async fn new_coordinator() -> Coordinator<impl Backend> {
         Coordinator::new(TestBackend::new()).await
         //Coordinator::new_docker().await
     }
@@ -1396,7 +1428,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_execute_response() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let response = coordinator
             .execute(new_execute_request())
@@ -1424,7 +1456,7 @@ mod tests {
         ];
 
         let tests = params.into_iter().map(|(mode, expected)| async move {
-            let coordinator = new_coordinator().await?;
+            let coordinator = new_coordinator().await;
 
             let request = ExecuteRequest {
                 mode,
@@ -1456,7 +1488,7 @@ mod tests {
         let tests = params.into_iter().flat_map(|(code, works_in)| {
             Edition::ALL.into_iter().zip(works_in).map(
                 move |(edition, expected_to_work)| async move {
-                    let coordinator = new_coordinator().await?;
+                    let coordinator = new_coordinator().await;
 
                     let request = ExecuteRequest {
                         code: code.into(),
@@ -1496,7 +1528,7 @@ mod tests {
         ];
 
         let tests = params.into_iter().map(|(crate_type, expected)| async move {
-            let coordinator = new_coordinator().await?;
+            let coordinator = new_coordinator().await;
 
             let request = ExecuteRequest {
                 crate_type,
@@ -1529,7 +1561,7 @@ mod tests {
         let params = [(false, "Running `"), (true, "Running unittests")];
 
         let tests = params.into_iter().map(|(tests, expected)| async move {
-            let coordinator = new_coordinator().await?;
+            let coordinator = new_coordinator().await;
 
             let request = ExecuteRequest {
                 code: code.into(),
@@ -1562,7 +1594,7 @@ mod tests {
         ];
 
         let tests = params.into_iter().map(|(backtrace, expected)| async move {
-            let coordinator = new_coordinator().await?;
+            let coordinator = new_coordinator().await;
 
             let request = ExecuteRequest {
                 code: code.into(),
@@ -1668,7 +1700,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_response() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let response = coordinator
             .compile(new_compile_request())
@@ -1688,7 +1720,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_streaming() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let ActiveCompilation {
             task,
@@ -1723,7 +1755,7 @@ mod tests {
     #[snafu::report]
     async fn test_compile_edition() -> Result<()> {
         for edition in Edition::ALL {
-            let coordinator = new_coordinator().await?;
+            let coordinator = new_coordinator().await;
 
             let response = coordinator
                 .compile(new_compile_hir_request_for(edition))
@@ -1745,7 +1777,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_assembly() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let response = coordinator
             .compile(new_compile_assembly_request())
@@ -1770,7 +1802,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_hir() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let response = coordinator
             .compile(new_compile_hir_request())
@@ -1789,7 +1821,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_llvm_ir() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         let response = coordinator
             .compile(new_compile_llvm_ir_request())
@@ -1809,7 +1841,7 @@ mod tests {
     #[snafu::report]
     async fn test_compile_wasm() -> Result<()> {
         // cargo-wasm only exists inside the container
-        let coordinator = Coordinator::new_docker().await?;
+        let coordinator = Coordinator::new_docker().await;
 
         let response = coordinator
             .compile(new_compile_wasm_request())
@@ -1831,7 +1863,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn test_compile_clears_old_main_rs() -> Result<()> {
-        let coordinator = new_coordinator().await?;
+        let coordinator = new_coordinator().await;
 
         // Create a main.rs file
         let req = ExecuteRequest {
