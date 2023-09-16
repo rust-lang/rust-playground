@@ -259,12 +259,12 @@ impl CoordinatorManager {
     async fn shutdown(mut self) -> CoordinatorManagerResult<()> {
         use coordinator_manager_error::*;
 
+        self.tasks.shutdown().await;
         Arc::into_inner(self.coordinator)
             .context(OutstandingCoordinatorShutdownSnafu)?
             .shutdown()
             .await
             .context(ShutdownSnafu)?;
-        self.tasks.shutdown().await;
 
         Ok(())
     }
