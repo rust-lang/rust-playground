@@ -484,6 +484,8 @@ where
             token,
             ..
         } = self;
+
+        let token = mem::take(token);
         token.cancel();
 
         let channels =
