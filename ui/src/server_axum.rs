@@ -338,6 +338,16 @@ impl IsSuccess for coordinator::ExecuteResponse {
     }
 }
 
+impl Outcome {
+    fn from_success(other: impl IsSuccess) -> Self {
+        if other.is_success() {
+            Outcome::Success
+        } else {
+            Outcome::ErrorUserCode
+        }
+    }
+}
+
 async fn with_coordinator<WebReq, WebResp, Req, Resp, F>(req: WebReq, f: F) -> Result<WebResp>
 where
     WebReq: TryInto<Req>,
@@ -364,13 +374,7 @@ where
         let elapsed = start.elapsed();
 
         let outcome = match &resp {
-            Ok(Ok(v)) => {
-                if v.is_success() {
-                    Outcome::Success
-                } else {
-                    Outcome::ErrorUserCode
-                }
-            }
+            Ok(Ok(v)) => Outcome::from_success(v),
             Ok(Err(_)) => Outcome::ErrorServer,
             Err(_) => Outcome::ErrorTimeoutSoft,
         };
