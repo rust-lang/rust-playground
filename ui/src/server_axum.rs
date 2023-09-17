@@ -308,13 +308,31 @@ trait IsSuccess {
     fn is_success(&self) -> bool;
 }
 
-impl IsSuccess for coordinator::WithOutput<coordinator::CompileResponse> {
+impl<T> IsSuccess for &T
+where
+    T: IsSuccess,
+{
+    fn is_success(&self) -> bool {
+        T::is_success(self)
+    }
+}
+
+impl<T> IsSuccess for coordinator::WithOutput<T>
+where
+    T: IsSuccess,
+{
+    fn is_success(&self) -> bool {
+        self.response.is_success()
+    }
+}
+
+impl IsSuccess for coordinator::CompileResponse {
     fn is_success(&self) -> bool {
         self.success
     }
 }
 
-impl IsSuccess for coordinator::WithOutput<coordinator::ExecuteResponse> {
+impl IsSuccess for coordinator::ExecuteResponse {
     fn is_success(&self) -> bool {
         self.success
     }
