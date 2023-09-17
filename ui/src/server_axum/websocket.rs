@@ -1,7 +1,8 @@
 use crate::{
-    metrics, server_axum::api_orchestrator_integration_impls::*, Error, Result,
-    StreamingCoordinatorIdleSnafu, StreamingCoordinatorSpawnSnafu, StreamingExecuteSnafu,
-    WebSocketTaskPanicSnafu,
+    metrics::{self, record_metric, Endpoint, HasLabelsCore, Outcome},
+    server_axum::api_orchestrator_integration_impls::*,
+    Error, Result, StreamingCoordinatorIdleSnafu, StreamingCoordinatorSpawnSnafu,
+    StreamingExecuteSnafu, WebSocketTaskPanicSnafu,
 };
 
 use axum::extract::ws::{Message, WebSocket};
@@ -9,7 +10,7 @@ use futures::{Future, FutureExt};
 use orchestrator::coordinator::{self, Coordinator, DockerBackend};
 use snafu::prelude::*;
 use std::{
-    convert::{TryFrom, TryInto},
+    convert::TryFrom,
     sync::{
         atomic::{AtomicU64, Ordering},
         Arc,
@@ -451,10 +452,16 @@ async fn handle_msg(txt: String, tx: &ResponseTx, manager: &mut CoordinatorManag
     }
 }
 
-macro_rules! return_if_closed {
+#[derive(Debug)]
+enum CompletedOrAbandoned<T> {
+    Abandoned,
+    Completed(T),
+}
+
+macro_rules! abandon_if_closed {
     ($sent:expr) => {
         if $sent.is_err() {
-            return Ok(());
+            return Ok(CompletedOrAbandoned::Abandoned);
         }
     };
 }
@@ -466,8 +473,36 @@ async fn handle_execute(
     meta: Meta,
 ) -> ExecuteResult<()> {
     use execute_error::*;
+    use CompletedOrAbandoned::*;
 
-    let req = req.try_into().context(BadRequestSnafu)?;
+    let req = coordinator::ExecuteRequest::try_from(req).context(BadRequestSnafu)?;
+
+    let labels_core = req.labels_core();
+
+    let start = Instant::now();
+    let v = handle_execute_inner(tx, coordinator, req, meta).await;
+    let elapsed = start.elapsed();
+
+    let outcome = match &v {
+        Ok(Abandoned) => Outcome::Abandoned,
+        Ok(Completed(v)) => *v,
+        Err(_) => Outcome::ErrorServer,
+    };
+
+    record_metric(Endpoint::Execute, labels_core, outcome, elapsed);
+
+    v?;
+    Ok(())
+}
+
+async fn handle_execute_inner(
+    tx: ResponseTx,
+    coordinator: SharedCoordinator,
+    req: coordinator::ExecuteRequest,
+    meta: Meta,
+) -> ExecuteResult<CompletedOrAbandoned<Outcome>> {
+    use execute_error::*;
+    use CompletedOrAbandoned::*;
 
     let coordinator::ActiveExecution {
         mut task,
@@ -478,7 +513,7 @@ async fn handle_execute(
     let sent = tx
         .send(Ok(MessageResponse::ExecuteBegin { meta: meta.clone() }))
         .await;
-    return_if_closed!(sent);
+    abandon_if_closed!(sent);
 
     let send_stdout = |payload| async {
         let meta = meta.clone();
@@ -498,12 +533,12 @@ async fn handle_execute(
 
             Some(stdout) = stdout_rx.recv() => {
                 let sent = send_stdout(stdout).await;
-                return_if_closed!(sent);
+                abandon_if_closed!(sent);
             },
 
             Some(stderr) = stderr_rx.recv() => {
                 let sent = send_stderr(stderr).await;
-                return_if_closed!(sent);
+                abandon_if_closed!(sent);
             },
         }
     };
@@ -511,15 +546,18 @@ async fn handle_execute(
     // Drain any remaining output
     while let Some(Some(stdout)) = stdout_rx.recv().now_or_never() {
         let sent = send_stdout(stdout).await;
-        return_if_closed!(sent);
+        abandon_if_closed!(sent);
     }
 
     while let Some(Some(stderr)) = stderr_rx.recv().now_or_never() {
         let sent = send_stderr(stderr).await;
-        return_if_closed!(sent);
+        abandon_if_closed!(sent);
     }
 
-    let coordinator::ExecuteResponse { success } = status.context(EndSnafu)?;
+    let status = status.context(EndSnafu)?;
+    let outcome = Outcome::from_success(&status);
+
+    let coordinator::ExecuteResponse { success } = status;
 
     let sent = tx
         .send(Ok(MessageResponse::ExecuteEnd {
@@ -527,9 +565,9 @@ async fn handle_execute(
             meta,
         }))
         .await;
-    return_if_closed!(sent);
+    abandon_if_closed!(sent);
 
-    Ok(())
+    Ok(Completed(outcome))
 }
 
 #[derive(Debug, Snafu)]
