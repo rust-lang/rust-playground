@@ -1913,6 +1913,32 @@ mod tests {
         Ok(())
     }
 
+    #[tokio::test]
+    #[snafu::report]
+    async fn test_still_usable_after_idle() -> Result<()> {
+        let mut coordinator = new_coordinator().await;
+
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            edition: Edition::Rust2021,
+            crate_type: CrateType::Binary,
+            tests: false,
+            backtrace: false,
+            code: r#"fn main() { println!("hello") }"#.into(),
+        };
+
+        let res = coordinator.execute(req.clone()).await.unwrap();
+        assert_eq!(res.stdout, "hello\n");
+
+        coordinator.idle().await.unwrap();
+
+        let res = coordinator.execute(req).await.unwrap();
+        assert_eq!(res.stdout, "hello\n");
+
+        Ok(())
+    }
+
     trait TimeoutExt: Future + Sized {
         #[allow(clippy::type_complexity)]
         fn with_timeout(
