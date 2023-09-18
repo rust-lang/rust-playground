@@ -308,15 +308,43 @@ trait IsSuccess {
     fn is_success(&self) -> bool;
 }
 
-impl IsSuccess for coordinator::WithOutput<coordinator::CompileResponse> {
+impl<T> IsSuccess for &T
+where
+    T: IsSuccess,
+{
+    fn is_success(&self) -> bool {
+        T::is_success(self)
+    }
+}
+
+impl<T> IsSuccess for coordinator::WithOutput<T>
+where
+    T: IsSuccess,
+{
+    fn is_success(&self) -> bool {
+        self.response.is_success()
+    }
+}
+
+impl IsSuccess for coordinator::CompileResponse {
     fn is_success(&self) -> bool {
         self.success
     }
 }
 
-impl IsSuccess for coordinator::WithOutput<coordinator::ExecuteResponse> {
+impl IsSuccess for coordinator::ExecuteResponse {
     fn is_success(&self) -> bool {
         self.success
+    }
+}
+
+impl Outcome {
+    fn from_success(other: impl IsSuccess) -> Self {
+        if other.is_success() {
+            Outcome::Success
+        } else {
+            Outcome::ErrorUserCode
+        }
     }
 }
 
@@ -346,13 +374,7 @@ where
         let elapsed = start.elapsed();
 
         let outcome = match &resp {
-            Ok(Ok(v)) => {
-                if v.is_success() {
-                    Outcome::Success
-                } else {
-                    Outcome::ErrorUserCode
-                }
-            }
+            Ok(Ok(v)) => Outcome::from_success(v),
             Ok(Err(_)) => Outcome::ErrorServer,
             Err(_) => Outcome::ErrorTimeoutSoft,
         };

@@ -76,6 +76,7 @@ pub(crate) enum Outcome {
     ErrorTimeoutSoft,
     ErrorTimeoutHard,
     ErrorUserCode,
+    Abandoned,
 }
 
 pub(crate) struct LabelsCore {
