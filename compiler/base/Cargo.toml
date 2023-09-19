@@ -1170,6 +1170,10 @@ version = "=0.1.4"
 package = "strsim"
 version = "=0.10.0"
 
+[dependencies.strum]
+package = "strum"
+version = "=0.25.0"
+
 [dependencies.subtle]
 package = "subtle"
 version = "=2.5.0"
