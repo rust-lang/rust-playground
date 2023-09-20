@@ -24,7 +24,7 @@ RUN useradd -m playground -d /playground
 RUN usermod -p '!!' root # Disable all passwords for root
 
 # Attach the security note
-ADD --chown=playground attach_notice.sh security_notice.txt /playground/
+COPY --chown=playground attach_notice.sh security_notice.txt /playground/
 RUN /playground/attach_notice.sh /playground/security_notice.txt /etc/passwd && \
     /playground/attach_notice.sh /playground/security_notice.txt /etc/shadow && \
     rm -f /playground/attach_notice.sh
@@ -42,7 +42,7 @@ ADD --chown=playground https://static.rust-lang.org/rustup/release-stable.toml /
 ADD --chown=playground https://static.rust-lang.org/dist/channel-rust-${channel}-date.txt /playground/tools/rust-channel-version
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain "${channel}"
 
-ADD --chown=playground entrypoint.sh /playground/tools/
+COPY --chown=playground entrypoint.sh /playground/tools/
 
 # Fetch all the crate source files
 
@@ -50,15 +50,15 @@ FROM toolchain as bare-sources
 
 RUN cargo init /playground
 
-ADD --chown=playground Cargo.toml /playground/Cargo.toml
-ADD --chown=playground crate-information.json /playground/crate-information.json
+COPY --chown=playground Cargo.toml /playground/Cargo.toml
+COPY --chown=playground crate-information.json /playground/crate-information.json
 RUN cargo fetch
 
 # Build our tool for modifying Cargo.toml at runtime
 
 FROM bare-sources as munge
 
-ADD --chown=playground modify-cargo-toml /playground/modify-cargo-toml
+COPY --chown=playground modify-cargo-toml /playground/modify-cargo-toml
 RUN cargo build --release --manifest-path=/playground/modify-cargo-toml/Cargo.toml
 
 # Set up cargo-chef for faster builds
@@ -107,8 +107,8 @@ RUN cargo build
 RUN cargo build --release
 RUN rm src/*.rs
 
-ADD --chown=playground postinstall.sh /playground/tools/
+COPY --chown=playground postinstall.sh /playground/tools/
 RUN /playground/tools/postinstall.sh ${channel}
-ADD --chown=playground cargo-wasm /playground/.cargo/bin/
+COPY --chown=playground cargo-wasm /playground/.cargo/bin/
 
 ENTRYPOINT ["/playground/tools/entrypoint.sh"]
