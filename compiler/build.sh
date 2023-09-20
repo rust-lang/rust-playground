@@ -13,25 +13,7 @@ for channel in $channels_to_build; do
     image_name="rust-${channel}"
     full_name="${repository}/${image_name}"
 
-    # Prevent building the tool multiple times
-    # https://github.com/moby/moby/issues/34715
-    docker build -t "${full_name}:munge" \
-           --target munge \
-           --cache-from "${full_name}" \
-           --cache-from "${full_name}:munge" \
-           --build-arg channel="${channel}" \
-           .
-
-    docker build -t "${full_name}:sources" \
-           --target sources \
-           --cache-from "${full_name}" \
-           --cache-from "${full_name}:munge" \
-           --build-arg channel="${channel}" \
-           .
-
     docker build -t "${full_name}" \
-           --cache-from "${full_name}" \
-           --cache-from "${full_name}:munge" \
            --build-arg channel="${channel}" \
            .
 
