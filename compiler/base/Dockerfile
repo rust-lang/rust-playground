@@ -48,17 +48,11 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- \
 
 COPY --chown=playground entrypoint.sh /playground/tools/
 
-# Build the wasm2wat tool
+# Build wasm-tools
 
-FROM toolchain as wasm2wat
+FROM toolchain as wasm-tools
 
-ADD --chown=playground https://api.github.com/repos/WebAssembly/wabt/git/refs/heads/main /playground/tools/wasm2wat-head
-RUN <<EOF
-    git clone https://github.com/WebAssembly/wabt
-    cd wabt
-    cmake -DBUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release
-    make wasm2wat
-EOF
+RUN cargo install wasm-tools
 
 # Fetch all the crate source files
 
@@ -123,7 +117,7 @@ RUN cargo build
 RUN cargo build --release
 RUN rm src/*.rs
 
-COPY --from=wasm2wat /playground/wabt/wasm2wat /playground/.cargo/bin
+COPY --from=wasm-tools /playground/.cargo/bin/wasm-tools /playground/.cargo/bin
 COPY --chown=playground cargo-wasm /playground/.cargo/bin/
 
 ENTRYPOINT ["/playground/tools/entrypoint.sh"]
