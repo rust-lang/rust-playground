@@ -10,8 +10,19 @@ interface HighlightErrorsProps {
   label: string;
 }
 
+const onOutputPrismCopy: React.ClipboardEventHandler = event => {
+  // Blank out HTML copy data.
+  // Though linkified output is handy in the Playground, it does more harm
+  // than good when copied elsewhere, and terminal output is usable on its own.
+  const selection = document.getSelection();
+  if (selection) {
+    event.clipboardData.setData('text/plain', selection.toString());
+    event.preventDefault();
+  }
+};
+
 const HighlightErrors: React.FC<HighlightErrorsProps> = ({ label, children }) => (
-  <div data-test-id="output-stderr">
+  <div data-test-id="output-stderr" onCopy={onOutputPrismCopy}>
     <Header label={label} />
     <OutputPrism languageCode="language-rust_errors">
       {children}
