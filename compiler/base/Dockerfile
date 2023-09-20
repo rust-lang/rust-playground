@@ -124,9 +124,6 @@ RUN cargo build --release
 RUN rm src/*.rs
 
 COPY --from=wasm2wat /playground/wabt/wasm2wat /playground/.cargo/bin
-
-COPY --chown=playground postinstall.sh /playground/tools/
-RUN /playground/tools/postinstall.sh ${channel}
 COPY --chown=playground cargo-wasm /playground/.cargo/bin/
 
 ENTRYPOINT ["/playground/tools/entrypoint.sh"]
