@@ -56,7 +56,7 @@ RUN cargo install wasm-tools
 
 # Fetch all the crate source files
 
-FROM toolchain as bare-sources
+FROM toolchain as sources
 
 RUN cargo init /playground
 
@@ -66,14 +66,14 @@ RUN cargo fetch
 
 # Build our tool for modifying Cargo.toml at runtime
 
-FROM bare-sources as munge
+FROM toolchain as modify-cargo-toml
 
 COPY --chown=playground modify-cargo-toml /playground/modify-cargo-toml
 RUN cargo build --release --manifest-path=/playground/modify-cargo-toml/Cargo.toml
 
 # Set up cargo-chef for faster builds
 
-FROM bare-sources as chef-available
+FROM toolchain as chef-available
 
 RUN cargo install cargo-chef
 
@@ -100,13 +100,6 @@ RUN cargo chef cook --release
 COPY --chown=playground orchestrator /orchestrator
 RUN cargo install --path .
 
-# Compiler and sources
-
-FROM bare-sources as sources
-
-COPY --from=munge /playground/modify-cargo-toml/target/release/modify-cargo-toml /playground/.cargo/bin
-COPY --from=build-orchestrator /playground/.cargo/bin/worker /playground/.cargo/bin/worker
-
 # Compiler and pre-compiled crates
 
 FROM sources
@@ -117,6 +110,8 @@ RUN cargo build
 RUN cargo build --release
 RUN rm src/*.rs
 
+COPY --from=modify-cargo-toml /playground/modify-cargo-toml/target/release/modify-cargo-toml /playground/.cargo/bin
+COPY --from=build-orchestrator /playground/.cargo/bin/worker /playground/.cargo/bin/worker
 COPY --from=wasm-tools /playground/.cargo/bin/wasm-tools /playground/.cargo/bin
 COPY --chown=playground cargo-wasm /playground/.cargo/bin/
 
