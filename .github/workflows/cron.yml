@@ -41,83 +41,16 @@ jobs:
       with:
         username: "${{ env.DOCKER_HUB_USERNAME }}"
         password: "${{ secrets.DOCKER_HUB_TOKEN }}"
-    - name: Build and push 'toolchain' container
-      env:
-        TAG_PREFIX: "${{ env.IMAGE_NAME }}:toolchain"
-      uses: docker/build-push-action@v4
-      with:
-        context: compiler/base/
-        file: compiler/base/Dockerfile
-        build-args: channel=${{ matrix.channel }}
-        target: toolchain
-        pull: true
-        push: true
-        tags: "${{ env.TAG_PREFIX }}--${{ github.run_id }}"
-        cache-from: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-          ${{ env.TAG_PREFIX }}--latest
-        cache-to: type=inline
-    - name: Build and push 'bare-sources' container
-      env:
-        TAG_PREFIX: "${{ env.IMAGE_NAME }}:bare-sources"
-      uses: docker/build-push-action@v4
-      with:
-        context: compiler/base/
-        file: compiler/base/Dockerfile
-        build-args: channel=${{ matrix.channel }}
-        target: bare-sources
-        pull: true
-        push: true
-        tags: "${{ env.TAG_PREFIX }}--${{ github.run_id }}"
-        cache-from: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-          ${{ env.TAG_PREFIX }}--latest
-        cache-to: type=inline
-    - name: Build and push 'munge' container
-      env:
-        TAG_PREFIX: "${{ env.IMAGE_NAME }}:munge"
-      uses: docker/build-push-action@v4
-      with:
-        context: compiler/base/
-        file: compiler/base/Dockerfile
-        build-args: channel=${{ matrix.channel }}
-        target: munge
-        pull: true
-        push: true
-        tags: "${{ env.TAG_PREFIX }}--${{ github.run_id }}"
-        cache-from: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-          ${{ env.TAG_PREFIX }}--latest
-        cache-to: type=inline
-    - name: Build and push 'sources' container
-      env:
-        TAG_PREFIX: "${{ env.IMAGE_NAME }}:sources"
-      uses: docker/build-push-action@v4
-      with:
-        context: compiler/base/
-        file: compiler/base/Dockerfile
-        build-args: channel=${{ matrix.channel }}
-        target: sources
-        pull: true
-        push: true
-        tags: "${{ env.TAG_PREFIX }}--${{ github.run_id }}"
-        cache-from: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-          ${{ env.TAG_PREFIX }}--latest
-        cache-to: type=inline
     - name: Build and push container
       uses: docker/build-push-action@v4
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
         build-args: channel=${{ matrix.channel }}
-        pull: true
         push: true
         tags: "${{ env.IMAGE_NAME }}:${{ github.run_id }}"
-        cache-from: |-
-          ${{ env.IMAGE_NAME }}:${{ github.run_id }}
-          ${{ env.IMAGE_NAME }}:latest
-        cache-to: type=inline
+        cache-from: type=gha,scope=${{ matrix.channel }}
+        cache-to: type=gha,scope=${{ matrix.channel }},mode=max
     - name: Pull container
       run: docker pull ${{ env.IMAGE_NAME }}:${{ github.run_id }}
     - name: Rename container
@@ -165,14 +98,11 @@ jobs:
       with:
         context: compiler/${{ matrix.tool }}/
         file: compiler/${{ matrix.tool }}/Dockerfile
-        build-args: base_image=ghcr.io/integer32llc/rust-playground-ci-rust-nightly:sources--${{ github.run_id }}
-        pull: true
+        build-args: base_image=ghcr.io/integer32llc/rust-playground-ci-rust-nightly:${{ github.run_id }}
         push: true
         tags: "${{ env.IMAGE_NAME }}:${{ github.run_id }}"
-        cache-from: |-
-          ${{ env.IMAGE_NAME }}:${{ github.run_id }}
-          ${{ env.IMAGE_NAME }}:latest
-        cache-to: type=inline
+        cache-from: type=gha,scope=${{ matrix.tool }}
+        cache-to: type=gha,scope=${{ matrix.tool }},mode=max
     - name: Pull container
       run: docker pull ${{ env.IMAGE_NAME }}:${{ github.run_id }}
     - name: Rename container

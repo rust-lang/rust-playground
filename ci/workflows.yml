@@ -50,87 +50,7 @@ components:
   - build_compiler_containers_job_env: &build_compiler_containers_job_env
       IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
 
-  - build_compiler_containers_toolchain: &build_compiler_containers_toolchain
-      name: "Build and push 'toolchain' container"
-      env:
-        TAG_PREFIX: ${{ env.IMAGE_NAME }}:toolchain
-      uses: docker/build-push-action@v4
-      with:
-        context: compiler/base/
-        file: compiler/base/Dockerfile
-        build-args: |-
-          channel=${{ matrix.channel }}
-        target: toolchain
-        pull: true
-        push: true
-        tags: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-        cache-from: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-          ${{ env.TAG_PREFIX }}--latest
-        cache-to: type=inline
-
-  - build_compiler_containers_bare_sources: &build_compiler_containers_bare_sources
-      name: "Build and push 'bare-sources' container"
-      env:
-        TAG_PREFIX: ${{ env.IMAGE_NAME }}:bare-sources
-      uses: docker/build-push-action@v4
-      with:
-        context: compiler/base/
-        file: compiler/base/Dockerfile
-        build-args: |-
-          channel=${{ matrix.channel }}
-        target: bare-sources
-        pull: true
-        push: true
-        tags: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-        cache-from: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-          ${{ env.TAG_PREFIX }}--latest
-        cache-to: type=inline
-
-  - build_compiler_containers_munge: &build_compiler_containers_munge
-      name: "Build and push 'munge' container"
-      env:
-        TAG_PREFIX: ${{ env.IMAGE_NAME }}:munge
-      uses: docker/build-push-action@v4
-      with:
-        context: compiler/base/
-        file: compiler/base/Dockerfile
-        build-args: |-
-          channel=${{ matrix.channel }}
-        target: munge
-        pull: true
-        push: true
-        tags: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-        cache-from: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-          ${{ env.TAG_PREFIX }}--latest
-        cache-to: type=inline
-
-  - build_compiler_containers_sources: &build_compiler_containers_sources
-      name: "Build and push 'sources' container"
-      env:
-        TAG_PREFIX: ${{ env.IMAGE_NAME }}:sources
-      uses: docker/build-push-action@v4
-      with:
-        context: compiler/base/
-        file: compiler/base/Dockerfile
-        build-args: |-
-          channel=${{ matrix.channel }}
-        target: sources
-        pull: true
-        push: true
-        tags: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-        cache-from: |-
-          ${{ env.TAG_PREFIX }}--${{ github.run_id }}
-          ${{ env.TAG_PREFIX }}--latest
-        cache-to: type=inline
-
-  - build_compiler_containers_final: &build_compiler_containers_final
+  - build_compiler_containers: &build_compiler_containers
       name: "Build and push container"
       uses: docker/build-push-action@v4
       with:
@@ -138,14 +58,11 @@ components:
         file: compiler/base/Dockerfile
         build-args: |-
           channel=${{ matrix.channel }}
-        pull: true
         push: true
         tags: |-
           ${{ env.IMAGE_NAME }}:${{ github.run_id }}
-        cache-from: |-
-          ${{ env.IMAGE_NAME }}:${{ github.run_id }}
-          ${{ env.IMAGE_NAME }}:latest
-        cache-to: type=inline
+        cache-from: type=gha,scope=${{ matrix.channel }}
+        cache-to: type=gha,scope=${{ matrix.channel }},mode=max
 
   - build_tool_containers_job: &build_tool_containers_job
       name: "Build ${{ matrix.tool }} tool container"
@@ -159,22 +76,19 @@ components:
   - build_tool_containers_job_env: &build_tool_containers_job_env
       IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-tool-${{ matrix.tool }}
 
-  - build_tool_containers_final: &build_tool_containers_final
+  - build_tool_containers: &build_tool_containers
       name: "Build and push container"
       uses: docker/build-push-action@v4
       with:
         context: compiler/${{ matrix.tool }}/
         file: compiler/${{ matrix.tool }}/Dockerfile
         build-args: |-
-          base_image=ghcr.io/integer32llc/rust-playground-ci-rust-nightly:sources--${{ github.run_id }}
-        pull: true
+          base_image=ghcr.io/integer32llc/rust-playground-ci-rust-nightly:${{ github.run_id }}
         push: true
         tags: |-
           ${{ env.IMAGE_NAME }}:${{ github.run_id }}
-        cache-from: |-
-          ${{ env.IMAGE_NAME }}:${{ github.run_id }}
-          ${{ env.IMAGE_NAME }}:latest
-        cache-to: type=inline
+        cache-from: type=gha,scope=${{ matrix.tool }}
+        cache-to: type=gha,scope=${{ matrix.tool }},mode=max
 
   - pull_containers: &pull_containers
       name: "Pull containers"
@@ -236,11 +150,7 @@ workflows:
           - *checkout_pr
           - *docker_buildx
           - *login_ghcr
-          - *build_compiler_containers_toolchain
-          - *build_compiler_containers_bare_sources
-          - *build_compiler_containers_munge
-          - *build_compiler_containers_sources
-          - *build_compiler_containers_final
+          - *build_compiler_containers
 
       build_tool_containers:
         <<: *build_tool_containers_job
@@ -252,7 +162,7 @@ workflows:
           - *checkout_pr
           - *docker_buildx
           - *login_ghcr
-          - *build_tool_containers_final
+          - *build_tool_containers
 
       build_backend:
         name: "Build backend"
@@ -566,11 +476,7 @@ workflows:
           - *docker_buildx
           - *login_ghcr
           - *login_docker_hub
-          - *build_compiler_containers_toolchain
-          - *build_compiler_containers_bare_sources
-          - *build_compiler_containers_munge
-          - *build_compiler_containers_sources
-          - *build_compiler_containers_final
+          - *build_compiler_containers
 
           - *pull_current_container
           - *rename_current_container
@@ -588,7 +494,7 @@ workflows:
           - *docker_buildx
           - *login_ghcr
           - *login_docker_hub
-          - *build_tool_containers_final
+          - *build_tool_containers
 
           - *pull_current_container
           - *rename_current_container
