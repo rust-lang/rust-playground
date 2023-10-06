@@ -37,7 +37,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     scenario "choosing to test the code" do
       in_build_menu { click_on(build_button: "Test") }
       within(:output, :stdout) do
-        expect(page).to have_content "panicked at 'assertion failed: false'"
+        expect(page).to have_content "assertion failed: false"
       end
     end
   end
@@ -113,7 +113,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
 
     within(:output, :code) do
       expect(page).to have_content '(module'
-      expect(page).to have_content '(block'
+      expect(page).to have_content 'block ;;'
     end
   end
 
@@ -126,7 +126,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     in_build_menu { click_on("Wasm") }
 
     within(:output, :code) do
-      expect(page).to have_content '(func $calculator (export "calculator")'
+      expect(page).to have_content '(func $calculator'
     end
 
     expect(editor).to have_line('#![crate_type = "cdylib"]')

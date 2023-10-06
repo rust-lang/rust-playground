@@ -25,22 +25,8 @@ done
 cargo "build" "--target=wasm32-unknown-unknown" ${args[@]+"${args[@]}"}
 
 for wasm in $(find target/ -name '*wasm' -not -path '*/deps/*'); do
-    # Garbage collect to make it tidier
-    wasm-gc "${wasm}" "${wasm}.gc"
-
-    # Convert to textual format
-    wasm2wat \
-        --fold-exprs \
-        --generate-names \
-        --inline-exports \
-        --ignore-custom-section-errors \
-        -o "${output}.wat" \
-        "${wasm}.gc" \
-        2> >(grep -v 'invalid linking metadata version: 3' 1>&2)
-
-    # wasm2wat spits out an error that we don't care about, so hide it
-    # https://github.com/WebAssembly/wabt/issues/842
-    # https://stackoverflow.com/a/15936384/155423
+    # Convert to textual format, demangling as we go
+    wasm-tools demangle "${wasm}" -t -o "${output}.wat"
 
     # The streaming playground expects the file to be without the
     # extension while the original playground expects it to be with
