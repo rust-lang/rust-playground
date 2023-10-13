@@ -1211,6 +1211,8 @@ fn basic_secure_docker_command() -> Command {
         "640m",
         "--pids-limit",
         "512",
+        "--oom-score-adj",
+        "1000",
     )
 }
 
