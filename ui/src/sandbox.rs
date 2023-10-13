@@ -137,6 +137,8 @@ fn basic_secure_docker_command() -> Command {
             "PLAYGROUND_TIMEOUT={}",
             DOCKER_PROCESS_TIMEOUT_SOFT.as_secs()
         ),
+        "--oom-score-adj",
+        "1000",
     );
 
     if cfg!(feature = "fork-bomb-prevention") {
