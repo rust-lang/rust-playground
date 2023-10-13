@@ -263,7 +263,11 @@ function performAutoOnly(): ThunkAction {
 
 const performExecuteOnly = (): ThunkAction => performCommonExecute('bin', false);
 const performCompileOnly = (): ThunkAction => performCommonExecute('lib', false);
-const performTestOnly = (): ThunkAction => performCommonExecute('lib', true);
+const performTestOnly = (): ThunkAction => (dispatch, getState) => {
+  const state = getState();
+  const crateType = getCrateType(state);
+  return dispatch(performCommonExecute(crateType, true));
+};
 
 interface GenericApiFailure {
   error: string;
