@@ -36,9 +36,7 @@ fn main() {
 }
 
 #[derive(Copy, Clone)]
-pub(crate) struct FeatureFlags {
-    execute_via_websocket_threshold: Option<f64>,
-}
+pub(crate) struct FeatureFlags {}
 
 struct Config {
     address: String,
@@ -99,14 +97,7 @@ impl Config {
 
         let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
 
-        let execute_via_websocket_threshold =
-            env::var("PLAYGROUND_EXECUTE_VIA_WEBSOCKET_THRESHOLD")
-                .ok()
-                .and_then(|v| v.parse().ok());
-
-        let feature_flags = FeatureFlags {
-            execute_via_websocket_threshold,
-        };
+        let feature_flags = FeatureFlags {};
 
         Self {
             address,

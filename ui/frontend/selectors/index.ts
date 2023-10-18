@@ -353,18 +353,13 @@ const websocket = (state: State) => state.websocket;
 const clientFeatureFlagThreshold = createSelector(client, (c) => c.featureFlagThreshold);
 
 const showGemThreshold = createSelector(featureFlags, ff => ff.showGemThreshold);
-const executeViaWebsocketThreshold = createSelector(featureFlags, ff => ff.executeViaWebsocketThreshold);
 
 const createFeatureFlagSelector = (ff: (state: State) => number) =>
   createSelector(clientFeatureFlagThreshold, ff, (c, ff) => c <= ff);
 
 export const showGemSelector = createFeatureFlagSelector(showGemThreshold);
-const wsFeatureEnabled = createFeatureFlagSelector(executeViaWebsocketThreshold);
-export const executeViaWebsocketSelector = createSelector(
-  websocket,
-  wsFeatureEnabled,
-  (ws, enabled) => ws.connected && enabled,
-);
+
+export const executeViaWebsocketSelector = createSelector(websocket, (ws) => ws.connected);
 
 export type WebSocketStatus =
   { state: 'disconnected' } |

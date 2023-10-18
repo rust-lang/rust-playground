@@ -136,15 +136,11 @@ struct WSError {
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct FeatureFlags {
-    execute_via_websocket_threshold: Option<f64>,
-}
+pub(crate) struct FeatureFlags {}
 
 impl From<crate::FeatureFlags> for FeatureFlags {
-    fn from(value: crate::FeatureFlags) -> Self {
-        Self {
-            execute_via_websocket_threshold: value.execute_via_websocket_threshold,
-        }
+    fn from(_value: crate::FeatureFlags) -> Self {
+        Self {}
     }
 }
 
