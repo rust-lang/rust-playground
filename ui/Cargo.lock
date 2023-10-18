@@ -644,6 +644,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "iri-string"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21859b667d66a4c1dacd9df0863b3efb65785474255face87f5bca39dd8407c0"
+dependencies = [
+ "memchr",
+ "serde",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -833,9 +843,9 @@ dependencies = [
 
 [[package]]
 name = "octocrab"
-version = "0.25.1"
+version = "0.31.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0bc095e456c43e3afe5a53cdcf11aae1965663b941f7a5efb49b6ef53ce8529"
+checksum = "b7968954c85c6aead36c45d265898de6feccf7cd23ff7ced9df41ef8fbe414e2"
 dependencies = [
  "arc-swap",
  "async-trait",
@@ -1728,12 +1738,14 @@ dependencies = [
  "http-body",
  "http-range-header",
  "httpdate",
+ "iri-string",
  "mime",
  "mime_guess",
  "percent-encoding",
  "pin-project-lite",
  "tokio",
  "tokio-util",
+ "tower",
  "tower-layer",
  "tower-service",
  "tracing",
