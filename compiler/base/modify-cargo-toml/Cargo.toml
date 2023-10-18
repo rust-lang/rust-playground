@@ -7,5 +7,5 @@ authors = ["Jake Goulding <jake.goulding@gmail.com>"]
 
 [dependencies]
 serde = "1.0.78"
-toml = "0.7.0"
+toml = "0.8.2"
 serde_derive = "1.0.78"
