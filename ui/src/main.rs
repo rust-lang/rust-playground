@@ -76,7 +76,7 @@ impl Config {
         } else {
             error!(
                 "Playground ui does not exist at {}\n\
-                Playground will not work until `yarn run build` has been run or {PLAYGROUND_UI_ROOT} has been fixed",
+                Playground will not work until `pnpm build` has been run or {PLAYGROUND_UI_ROOT} has been fixed",
                 index_html.display(),
             );
         }

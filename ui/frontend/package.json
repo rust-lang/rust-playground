@@ -10,6 +10,7 @@
     "common-tags": "^1.8.0",
     "core-js": "^3.1.3",
     "history": "^5.3.0",
+    "immer": "^9.0.0",
     "isomorphic-fetch": "^3.0.0",
     "lodash-es": "^4.17.21",
     "monaco-editor": "^0.36.1",
@@ -23,6 +24,7 @@
     "react-prism": "^4.0.0",
     "react-redux": "^8.0.2",
     "react-shadow": "^20.0.0",
+    "redux-thunk": "^2.4.2",
     "route-parser": "^0.0.5",
     "split-grid": "^1.0.9",
     "suspend-react": "^0.1.3",
@@ -83,25 +85,25 @@
     "webpack-cli": "^5.0.1"
   },
   "resolutions": {
-    "//": "https://github.com/isaacs/jackspeak/issues/5",
     "jackspeak": "2.0.3"
   },
   "engines": {
-    "node": "^18.14"
+    "node": "^18.14",
+    "pnpm": "^8.9"
   },
   "scripts": {
     "test": "jest",
     "test:lint": "eslint '**/*.tsx' '**/*.ts'",
     "test:lint:fix": "eslint --fix '**/*.tsx' '**/*.ts'",
-    "test:style": "yarn run test:style:prettier && yarn run test:style:stylelint",
-    "test:style:fix": "yarn run test:style:prettier:fix && yarn run test:style:stylelint:fix",
+    "test:style": "pnpm run test:style:prettier && pnpm run test:style:stylelint",
+    "test:style:fix": "pnpm run test:style:prettier:fix && pnpm run test:style:stylelint:fix",
     "test:style:prettier": "prettier --check .",
     "test:style:prettier:fix": "prettier --write .",
     "test:style:stylelint": "stylelint '**/*.css'",
     "test:style:stylelint:fix": "stylelint --fix '**/*.css'",
     "build": "webpack --progress --color --mode development",
     "build:production": "webpack --progress --color --mode production",
-    "watch": "yarn run build --watch"
+    "watch": "pnpm run build --watch"
   },
   "jest": {
     "transform": {

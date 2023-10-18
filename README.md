@@ -86,8 +86,8 @@ perform tests on! Once fixed, you can choose to be credited here.
 ### Build the UI
 ```
 cd ui/frontend
-yarn
-yarn run watch # Will rebuild and watch for changes
+pnpm install
+pnpm watch # Will rebuild and watch for changes
 ```
 
 If you don't need the backend running because you are only making
