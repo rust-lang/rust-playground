@@ -16,7 +16,7 @@ snafu = { version = "0.7.4", default-features = false, features = ["futures", "s
 tokio = { version = "1.28", default-features = false, features = ["fs", "io-std", "io-util", "macros", "process", "rt", "time", "sync"] }
 tokio-stream = { version = "0.1.14", default-features = false }
 tokio-util = { version = "0.7.8", default-features = false, features = ["io", "io-util"] }
-toml = { version = "0.7.3", default-features = false, features = ["parse", "display"] }
+toml = { version = "0.8.2", default-features = false, features = ["parse", "display"] }
 tracing = { version = "0.1.37", default-features = false, features = ["attributes"] }
 
 [dev-dependencies]

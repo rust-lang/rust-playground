@@ -9,11 +9,11 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/rust-lang/rust-playground"
 
 [dependencies]
-cargo = "0.73.0"
+cargo = "0.74.0"
 itertools = "0.11.0"
 reqwest = { version = "0.11.0", features = ["blocking"] }
 semver = { version = "1.0.11", features = ["serde"] }
 serde = "1.0.1"
 serde_derive = "1.0.1"
 serde_json = "1.0.0"
-toml = "0.7.0"
+toml = "0.8.2"
