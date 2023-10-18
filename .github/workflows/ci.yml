@@ -254,7 +254,6 @@ jobs:
         PLAYGROUND_UI_ROOT: server/build/
         PLAYGROUND_CORS_ENABLED: true
         PLAYGROUND_GITHUB_TOKEN: "${{ secrets.PLAYGROUND_GITHUB_TOKEN }}"
-        PLAYGROUND_ORCHESTRATOR_ENABLED: 1
         PLAYGROUND_EXECUTE_VIA_WEBSOCKET_THRESHOLD: 1.0
       run: |-
         killall -q ui || true

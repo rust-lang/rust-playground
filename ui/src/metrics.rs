@@ -425,19 +425,6 @@ where
     track_metric_common_async(request, body, |_| {}).await
 }
 
-pub(crate) async fn track_metric_force_endpoint_async<Req, B, Resp>(
-    request: Req,
-    endpoint: Endpoint,
-    body: B,
-) -> sandbox::Result<Resp>
-where
-    Req: GenerateLabels,
-    for<'req> B: FnOnce(&'req Req) -> BoxFuture<'req, sandbox::Result<Resp>>,
-    Resp: SuccessDetails,
-{
-    track_metric_common_async(request, body, |labels| labels.endpoint = endpoint).await
-}
-
 async fn track_metric_common_async<Req, B, Resp, F>(
     request: Req,
     body: B,

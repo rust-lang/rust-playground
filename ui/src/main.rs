@@ -45,7 +45,6 @@ struct Config {
     cors_enabled: bool,
     gh_token: Option<String>,
     metrics_token: Option<String>,
-    orchestrator_enabled: bool,
     feature_flags: FeatureFlags,
     port: u16,
     root: PathBuf,
@@ -100,8 +99,6 @@ impl Config {
 
         let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
 
-        let orchestrator_enabled = env::var_os("PLAYGROUND_ORCHESTRATOR_ENABLED").is_some();
-
         let execute_via_websocket_threshold =
             env::var("PLAYGROUND_EXECUTE_VIA_WEBSOCKET_THRESHOLD")
                 .ok()
@@ -116,7 +113,6 @@ impl Config {
             cors_enabled,
             gh_token,
             metrics_token,
-            orchestrator_enabled,
             feature_flags,
             port,
             root,
@@ -133,10 +129,6 @@ impl Config {
 
     fn use_cors(&self) -> bool {
         self.cors_enabled
-    }
-
-    fn use_orchestrator(&self) -> bool {
-        self.orchestrator_enabled
     }
 
     fn metrics_token(&self) -> Option<MetricsToken> {
@@ -182,12 +174,6 @@ impl MetricsToken {
 enum Error {
     #[snafu(display("Sandbox creation failed: {}", source))]
     SandboxCreation { source: sandbox::Error },
-    #[snafu(display("Compilation operation failed: {}", source))]
-    Compilation { source: sandbox::Error },
-    #[snafu(display("Execution operation failed: {}", source))]
-    Execution { source: sandbox::Error },
-    #[snafu(display("Evaluation operation failed: {}", source))]
-    Evaluation { source: sandbox::Error },
     #[snafu(display("Linting operation failed: {}", source))]
     Linting { source: sandbox::Error },
     #[snafu(display("Expansion operation failed: {}", source))]

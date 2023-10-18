@@ -1,19 +1,17 @@
 use crate::{
     gist,
     metrics::{
-        record_metric, track_metric_async, track_metric_force_endpoint_async,
-        track_metric_no_request_async, Endpoint, GenerateLabels, HasLabelsCore, Outcome,
-        SuccessDetails, UNAVAILABLE_WS,
+        record_metric, track_metric_async, track_metric_no_request_async, Endpoint, GenerateLabels,
+        HasLabelsCore, Outcome, SuccessDetails, UNAVAILABLE_WS,
     },
     sandbox::{self, Channel, Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
-    CachingSnafu, ClippyRequest, ClippyResponse, CompilationSnafu, CompileRequest, CompileResponse,
-    CompileSnafu, Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu,
-    EvaluationSnafu, ExecuteRequest, ExecuteResponse, ExecuteSnafu, ExecutionSnafu, ExpansionSnafu,
-    FormatRequest, FormatResponse, FormattingSnafu, GhToken, GistCreationSnafu, GistLoadingSnafu,
-    InterpretingSnafu, LintingSnafu, MacroExpansionRequest, MacroExpansionResponse,
-    MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse, MetaVersionResponse, MetricsToken,
-    MiriRequest, MiriResponse, Result, SandboxCreationSnafu, ShutdownCoordinatorSnafu,
-    TimeoutSnafu,
+    CachingSnafu, ClippyRequest, ClippyResponse, CompileRequest, CompileResponse, CompileSnafu,
+    Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu, ExecuteRequest,
+    ExecuteResponse, ExecuteSnafu, ExpansionSnafu, FormatRequest, FormatResponse, FormattingSnafu,
+    GhToken, GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu, LintingSnafu,
+    MacroExpansionRequest, MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest,
+    MetaGistResponse, MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result,
+    SandboxCreationSnafu, ShutdownCoordinatorSnafu, TimeoutSnafu,
 };
 use async_trait::async_trait;
 use axum::{
@@ -60,9 +58,6 @@ mod websocket;
 pub use websocket::CoordinatorManagerError as WebsocketCoordinatorManagerError;
 pub(crate) use websocket::ExecuteError as WebsocketExecuteError;
 
-#[derive(Debug, Copy, Clone)]
-struct OrchestratorEnabled(bool);
-
 #[tokio::main]
 pub(crate) async fn serve(config: Config) {
     let root_files = static_file_service(config.root_path(), MAX_AGE_ONE_DAY);
@@ -96,8 +91,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/whynowebsocket", get(whynowebsocket))
         .layer(Extension(Arc::new(SandboxCache::default())))
         .layer(Extension(config.github_token()))
-        .layer(Extension(config.feature_flags))
-        .layer(Extension(OrchestratorEnabled(config.use_orchestrator())));
+        .layer(Extension(config.feature_flags));
 
     if let Some(token) = config.metrics_token() {
         app = app.layer(Extension(token))
@@ -151,62 +145,22 @@ async fn rewrite_help_as_index<B>(
 
 // This is a backwards compatibilty shim. The Rust documentation uses
 // this to run code in place.
-async fn evaluate(
-    Extension(use_orchestrator): Extension<OrchestratorEnabled>,
-    Json(req): Json<EvaluateRequest>,
-) -> Result<Json<EvaluateResponse>> {
-    if use_orchestrator.0 {
-        with_coordinator(req, |c, req| c.execute(req).context(EvaluateSnafu).boxed())
-            .await
-            .map(Json)
-    } else {
-        with_sandbox_force_endpoint(
-            req,
-            Endpoint::Evaluate,
-            |sb, req| async move { sb.execute(req).await }.boxed(),
-            EvaluationSnafu,
-        )
+async fn evaluate(Json(req): Json<EvaluateRequest>) -> Result<Json<EvaluateResponse>> {
+    with_coordinator(req, |c, req| c.execute(req).context(EvaluateSnafu).boxed())
         .await
         .map(Json)
-    }
 }
 
-async fn compile(
-    Extension(use_orchestrator): Extension<OrchestratorEnabled>,
-    Json(req): Json<CompileRequest>,
-) -> Result<Json<CompileResponse>> {
-    if use_orchestrator.0 {
-        with_coordinator(req, |c, req| c.compile(req).context(CompileSnafu).boxed())
-            .await
-            .map(Json)
-    } else {
-        with_sandbox(
-            req,
-            |sb, req| async move { sb.compile(req).await }.boxed(),
-            CompilationSnafu,
-        )
+async fn compile(Json(req): Json<CompileRequest>) -> Result<Json<CompileResponse>> {
+    with_coordinator(req, |c, req| c.compile(req).context(CompileSnafu).boxed())
         .await
         .map(Json)
-    }
 }
 
-async fn execute(
-    Extension(use_orchestrator): Extension<OrchestratorEnabled>,
-    Json(req): Json<ExecuteRequest>,
-) -> Result<Json<ExecuteResponse>> {
-    if use_orchestrator.0 {
-        with_coordinator(req, |c, req| c.execute(req).context(ExecuteSnafu).boxed())
-            .await
-            .map(Json)
-    } else {
-        with_sandbox(
-            req,
-            |sb, req| async move { sb.execute(req).await }.boxed(),
-            ExecutionSnafu,
-        )
+async fn execute(Json(req): Json<ExecuteRequest>) -> Result<Json<ExecuteResponse>> {
+    with_coordinator(req, |c, req| c.execute(req).context(ExecuteSnafu).boxed())
         .await
         .map(Json)
-    }
 }
 
 async fn format(Json(req): Json<FormatRequest>) -> Result<Json<FormatResponse>> {
@@ -262,27 +216,6 @@ where
     let sandbox = Sandbox::new().await.context(SandboxCreationSnafu)?;
     let request = req.try_into()?;
     track_metric_async(request, |request| f(sandbox, request))
-        .await
-        .map(Into::into)
-        .context(ctx)
-}
-
-async fn with_sandbox_force_endpoint<F, Req, Resp, SbReq, SbResp, Ctx>(
-    req: Req,
-    endpoint: Endpoint,
-    f: F,
-    ctx: Ctx,
-) -> Result<Resp>
-where
-    for<'req> F: FnOnce(Sandbox, &'req SbReq) -> BoxFuture<'req, sandbox::Result<SbResp>>,
-    Resp: From<SbResp>,
-    SbReq: TryFrom<Req, Error = Error> + GenerateLabels,
-    SbResp: SuccessDetails,
-    Ctx: IntoError<Error, Source = sandbox::Error>,
-{
-    let sandbox = Sandbox::new().await.context(SandboxCreationSnafu)?;
-    let request = req.try_into()?;
-    track_metric_force_endpoint_async(request, endpoint, |request| f(sandbox, request))
         .await
         .map(Into::into)
         .context(ctx)
