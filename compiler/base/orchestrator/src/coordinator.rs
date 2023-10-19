@@ -1624,93 +1624,30 @@ mod tests {
         Ok(())
     }
 
-    fn new_compile_request() -> CompileRequest {
-        new_compile_mir_request()
-    }
+    const HELLO_WORLD_CODE: &str = r#"fn main() { println!("Hello World!"); }"#;
 
-    fn new_compile_assembly_request() -> CompileRequest {
-        CompileRequest {
-            target: CompileTarget::Assembly(
-                AssemblyFlavor::Intel,
-                DemangleAssembly::Demangle,
-                ProcessAssembly::Filter,
-            ),
-            channel: Channel::Beta,
-            crate_type: CrateType::Library(LibraryType::Lib),
-            mode: Mode::Release,
-            edition: Edition::Rust2018,
-            tests: false,
-            backtrace: false,
-            code: r#"pub fn add(a: u8, b: u8) -> u8 { a + b }"#.to_owned(),
-        }
-    }
-
-    fn new_compile_hir_request() -> CompileRequest {
-        new_compile_hir_request_for(Edition::Rust2021)
-    }
-
-    fn new_compile_hir_request_for(edition: Edition) -> CompileRequest {
-        CompileRequest {
-            target: CompileTarget::Hir,
-            channel: Channel::Nightly,
-            crate_type: CrateType::Library(LibraryType::Lib),
-            mode: Mode::Release,
-            edition,
-            tests: false,
-            backtrace: false,
-            code: r#"pub fn sub(a: u8, b: u8) -> u8 { a - b }"#.to_owned(),
-        }
-    }
-
-    fn new_compile_llvm_ir_request() -> CompileRequest {
-        CompileRequest {
-            target: CompileTarget::LlvmIr,
-            channel: Channel::Stable,
-            crate_type: CrateType::Library(LibraryType::Lib),
-            mode: Mode::Debug,
-            edition: Edition::Rust2015,
-            tests: false,
-            backtrace: false,
-            code: r#"pub fn mul(a: u8, b: u8) -> u8 { a * b }"#.to_owned(),
-        }
-    }
-
-    fn new_compile_mir_request() -> CompileRequest {
-        CompileRequest {
-            target: CompileTarget::Mir,
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Release,
-            edition: Edition::Rust2021,
-            tests: false,
-            backtrace: false,
-            code: r#"fn main() { println!("Hello World!"); }"#.to_owned(),
-        }
-    }
-
-    fn new_compile_wasm_request() -> CompileRequest {
-        CompileRequest {
-            target: CompileTarget::Wasm,
-            channel: Channel::Nightly, // TODO: Can we run this on all channels now?
-            crate_type: CrateType::Library(LibraryType::Cdylib),
-            mode: Mode::Release,
-            edition: Edition::Rust2021,
-            tests: false,
-            backtrace: false,
-            code: r#"#[export_name = "inc"] pub fn inc(a: u8) -> u8 { a + 1 }"#.to_owned(),
-        }
-    }
+    const ARBITRARY_COMPILE_REQUEST: CompileRequest = CompileRequest {
+        target: CompileTarget::Mir,
+        channel: Channel::Stable,
+        crate_type: CrateType::Binary,
+        mode: Mode::Release,
+        edition: Edition::Rust2021,
+        tests: false,
+        backtrace: false,
+        code: String::new(),
+    };
 
     #[tokio::test]
     #[snafu::report]
     async fn compile_response() -> Result<()> {
         let coordinator = new_coordinator().await;
 
-        let response = coordinator
-            .compile(new_compile_request())
-            .with_timeout()
-            .await
-            .unwrap();
+        let req = CompileRequest {
+            code: HELLO_WORLD_CODE.into(),
+            ..ARBITRARY_COMPILE_REQUEST
+        };
+
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
 
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.stderr, "Compiling");
@@ -1726,14 +1663,16 @@ mod tests {
     async fn compile_streaming() -> Result<()> {
         let coordinator = new_coordinator().await;
 
+        let req = CompileRequest {
+            code: HELLO_WORLD_CODE.into(),
+            ..ARBITRARY_COMPILE_REQUEST
+        };
+
         let ActiveCompilation {
             task,
             stdout_rx,
             stderr_rx,
-        } = coordinator
-            .begin_compile(new_compile_request())
-            .await
-            .unwrap();
+        } = coordinator.begin_compile(req).await.unwrap();
 
         let stdout = ReceiverStream::new(stdout_rx);
         let stdout = stdout.collect::<String>();
@@ -1761,11 +1700,13 @@ mod tests {
         for edition in Edition::ALL {
             let coordinator = new_coordinator().await;
 
-            let response = coordinator
-                .compile(new_compile_hir_request_for(edition))
-                .with_timeout()
-                .await
-                .unwrap();
+            let req = CompileRequest {
+                edition,
+                code: SUBTRACT_CODE.into(),
+                ..ARBITRARY_HIR_REQUEST
+            };
+
+            let response = coordinator.compile(req).with_timeout().await.unwrap();
 
             let prelude = format!("std::prelude::rust_{}", edition.to_str());
 
@@ -1783,11 +1724,22 @@ mod tests {
     async fn compile_assembly() -> Result<()> {
         let coordinator = new_coordinator().await;
 
-        let response = coordinator
-            .compile(new_compile_assembly_request())
-            .with_timeout()
-            .await
-            .unwrap();
+        let req = CompileRequest {
+            target: CompileTarget::Assembly(
+                AssemblyFlavor::Intel,
+                DemangleAssembly::Demangle,
+                ProcessAssembly::Filter,
+            ),
+            channel: Channel::Beta,
+            crate_type: CrateType::Library(LibraryType::Lib),
+            mode: Mode::Release,
+            edition: Edition::Rust2018,
+            tests: false,
+            backtrace: false,
+            code: r#"pub fn add(a: u8, b: u8) -> u8 { a + b }"#.into(),
+        };
+
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
 
         //#[cfg(target_arch = "x86_64")]
         //let asm = "";
@@ -1803,16 +1755,30 @@ mod tests {
         Ok(())
     }
 
+    const SUBTRACT_CODE: &str = r#"pub fn sub(a: u8, b: u8) -> u8 { a - b }"#;
+
+    const ARBITRARY_HIR_REQUEST: CompileRequest = CompileRequest {
+        target: CompileTarget::Hir,
+        channel: Channel::Nightly,
+        crate_type: CrateType::Library(LibraryType::Lib),
+        mode: Mode::Release,
+        edition: Edition::Rust2021,
+        tests: false,
+        backtrace: false,
+        code: String::new(),
+    };
+
     #[tokio::test]
     #[snafu::report]
     async fn compile_hir() -> Result<()> {
         let coordinator = new_coordinator().await;
 
-        let response = coordinator
-            .compile(new_compile_hir_request())
-            .with_timeout()
-            .await
-            .unwrap();
+        let req = CompileRequest {
+            code: SUBTRACT_CODE.into(),
+            ..ARBITRARY_HIR_REQUEST
+        };
+
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
 
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.code, "extern crate std");
@@ -1827,11 +1793,18 @@ mod tests {
     async fn compile_llvm_ir() -> Result<()> {
         let coordinator = new_coordinator().await;
 
-        let response = coordinator
-            .compile(new_compile_llvm_ir_request())
-            .with_timeout()
-            .await
-            .unwrap();
+        let req = CompileRequest {
+            target: CompileTarget::LlvmIr,
+            channel: Channel::Stable,
+            crate_type: CrateType::Library(LibraryType::Lib),
+            mode: Mode::Debug,
+            edition: Edition::Rust2015,
+            tests: false,
+            backtrace: false,
+            code: r#"pub fn mul(a: u8, b: u8) -> u8 { a * b }"#.into(),
+        };
+
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
 
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.code, "@llvm.umul.with.overflow.i8(i8, i8)");
@@ -1847,11 +1820,18 @@ mod tests {
         // cargo-wasm only exists inside the container
         let coordinator = Coordinator::new_docker().await;
 
-        let response = coordinator
-            .compile(new_compile_wasm_request())
-            .with_timeout()
-            .await
-            .unwrap();
+        let req = CompileRequest {
+            target: CompileTarget::Wasm,
+            channel: Channel::Nightly,
+            crate_type: CrateType::Library(LibraryType::Cdylib),
+            mode: Mode::Release,
+            edition: Edition::Rust2021,
+            tests: false,
+            backtrace: false,
+            code: r#"#[export_name = "inc"] pub fn inc(a: u8) -> u8 { a + 1 }"#.into(),
+        };
+
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
 
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(
