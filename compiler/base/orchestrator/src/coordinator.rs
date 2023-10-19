@@ -1856,7 +1856,7 @@ mod tests {
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(
             response.code,
-            r#"(func $inc (export "inc") (type $t0) (param $p0 i32) (result i32)"#
+            r#"(func $inc (;0;) (type 0) (param i32) (result i32)"#
         );
 
         coordinator.shutdown().await?;
