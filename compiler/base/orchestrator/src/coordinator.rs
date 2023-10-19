@@ -1431,7 +1431,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_response() -> Result<()> {
+    async fn execute_response() -> Result<()> {
         let coordinator = new_coordinator().await;
 
         let response = coordinator
@@ -1453,7 +1453,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_mode() -> Result<()> {
+    async fn execute_mode() -> Result<()> {
         let params = [
             (Mode::Debug, "[unoptimized + debuginfo]"),
             (Mode::Release, "[optimized]"),
@@ -1483,7 +1483,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_edition() -> Result<()> {
+    async fn execute_edition() -> Result<()> {
         let params = [
             (r#"fn x() { let dyn = true; }"#, [true, false, false]),
             (r#"fn x() { u16::try_from(1u8); }"#, [false, false, true]),
@@ -1522,7 +1522,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_crate_type() -> Result<()> {
+    async fn execute_crate_type() -> Result<()> {
         let params = [
             (CrateType::Binary, "Running `target"),
             (
@@ -1559,7 +1559,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_tests() -> Result<()> {
+    async fn execute_tests() -> Result<()> {
         let code = r#"fn main() {} #[test] fn test() {}"#;
 
         let params = [(false, "Running `"), (true, "Running unittests")];
@@ -1589,7 +1589,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_backtrace() -> Result<()> {
+    async fn execute_backtrace() -> Result<()> {
         let code = r#"fn main() { panic!("Disco"); }"#;
 
         let params = [
@@ -1703,7 +1703,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_response() -> Result<()> {
+    async fn compile_response() -> Result<()> {
         let coordinator = new_coordinator().await;
 
         let response = coordinator
@@ -1723,7 +1723,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_streaming() -> Result<()> {
+    async fn compile_streaming() -> Result<()> {
         let coordinator = new_coordinator().await;
 
         let ActiveCompilation {
@@ -1757,7 +1757,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_edition() -> Result<()> {
+    async fn compile_edition() -> Result<()> {
         for edition in Edition::ALL {
             let coordinator = new_coordinator().await;
 
@@ -1780,7 +1780,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_assembly() -> Result<()> {
+    async fn compile_assembly() -> Result<()> {
         let coordinator = new_coordinator().await;
 
         let response = coordinator
@@ -1805,7 +1805,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_hir() -> Result<()> {
+    async fn compile_hir() -> Result<()> {
         let coordinator = new_coordinator().await;
 
         let response = coordinator
@@ -1824,7 +1824,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_llvm_ir() -> Result<()> {
+    async fn compile_llvm_ir() -> Result<()> {
         let coordinator = new_coordinator().await;
 
         let response = coordinator
@@ -1843,7 +1843,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_wasm() -> Result<()> {
+    async fn compile_wasm() -> Result<()> {
         // cargo-wasm only exists inside the container
         let coordinator = Coordinator::new_docker().await;
 
@@ -1866,7 +1866,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_clears_old_main_rs() -> Result<()> {
+    async fn compile_clears_old_main_rs() -> Result<()> {
         let coordinator = new_coordinator().await;
 
         // Create a main.rs file
@@ -1917,7 +1917,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_still_usable_after_idle() -> Result<()> {
+    async fn still_usable_after_idle() -> Result<()> {
         let mut coordinator = new_coordinator().await;
 
         let req = ExecuteRequest {
