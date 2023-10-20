@@ -6,7 +6,6 @@ import { createWebsocketResponse } from '../websocketActions';
 interface State {
   forced: boolean;
   showGemThreshold: number;
-  executeViaWebsocketThreshold: number;
 }
 
 const ENABLED = 1.0;
@@ -15,14 +14,12 @@ const DISABLED = -1.0;
 const initialState: State = {
   forced: false,
   showGemThreshold: DISABLED,
-  executeViaWebsocketThreshold: DISABLED,
 };
 
 const { action: wsFeatureFlags, schema: wsFeatureFlagsSchema } = createWebsocketResponse(
   'featureFlags',
   z.object({
     showGemThreshold: z.number().nullish(),
-    executeViaWebsocketThreshold: z.number().nullish(),
   }),
 );
 
@@ -33,12 +30,10 @@ const slice = createSlice({
     forceEnableAll: (state) => {
       state.forced = true;
       state.showGemThreshold = ENABLED;
-      state.executeViaWebsocketThreshold = ENABLED;
     },
     forceDisableAll: (state) => {
       state.forced = true;
       state.showGemThreshold = DISABLED;
-      state.executeViaWebsocketThreshold = DISABLED;
     },
   },
   extraReducers: (builder) => {
@@ -47,14 +42,10 @@ const slice = createSlice({
         return;
       }
 
-      const { showGemThreshold, executeViaWebsocketThreshold } = action.payload;
+      const { showGemThreshold } = action.payload;
 
       if (showGemThreshold) {
         state.showGemThreshold = showGemThreshold;
-      }
-
-      if (executeViaWebsocketThreshold) {
-        state.executeViaWebsocketThreshold = executeViaWebsocketThreshold;
       }
     });
   },

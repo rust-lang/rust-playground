@@ -1191,11 +1191,24 @@ macro_rules! docker_command {
     });
 }
 
-#[cfg(target_arch = "x86_64")]
-const DOCKER_ARCH: &str = "linux/amd64";
+macro_rules! docker_target_arch {
+    (x86_64: $x:expr, aarch64: $a:expr $(,)?) => {{
+        #[cfg(target_arch = "x86_64")]
+        {
+            $x
+        }
 
-#[cfg(target_arch = "aarch64")]
-const DOCKER_ARCH: &str = "linux/arm64";
+        #[cfg(target_arch = "aarch64")]
+        {
+            $a
+        }
+    }};
+}
+
+const DOCKER_ARCH: &str = docker_target_arch! {
+    x86_64: "linux/amd64",
+    aarch64: "linux/arm64",
+};
 
 fn basic_secure_docker_command() -> Command {
     docker_command!(
@@ -1365,6 +1378,19 @@ mod tests {
 
     use super::*;
 
+    #[allow(dead_code)]
+    fn setup_tracing() {
+        use tracing::Level;
+        use tracing_subscriber::fmt::TestWriter;
+
+        tracing_subscriber::fmt()
+            .with_ansi(false)
+            .with_max_level(Level::TRACE)
+            .with_writer(TestWriter::new())
+            .try_init()
+            .ok();
+    }
+
     #[derive(Debug)]
     struct TestBackend {
         project_dir: TempDir,
@@ -1431,7 +1457,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_response() -> Result<()> {
+    async fn execute_response() -> Result<()> {
         let coordinator = new_coordinator().await;
 
         let response = coordinator
@@ -1453,7 +1479,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_mode() -> Result<()> {
+    async fn execute_mode() -> Result<()> {
         let params = [
             (Mode::Debug, "[unoptimized + debuginfo]"),
             (Mode::Release, "[optimized]"),
@@ -1483,7 +1509,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_edition() -> Result<()> {
+    async fn execute_edition() -> Result<()> {
         let params = [
             (r#"fn x() { let dyn = true; }"#, [true, false, false]),
             (r#"fn x() { u16::try_from(1u8); }"#, [false, false, true]),
@@ -1522,7 +1548,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_crate_type() -> Result<()> {
+    async fn execute_crate_type() -> Result<()> {
         let params = [
             (CrateType::Binary, "Running `target"),
             (
@@ -1559,7 +1585,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_tests() -> Result<()> {
+    async fn execute_tests() -> Result<()> {
         let code = r#"fn main() {} #[test] fn test() {}"#;
 
         let params = [(false, "Running `"), (true, "Running unittests")];
@@ -1589,7 +1615,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_execute_backtrace() -> Result<()> {
+    async fn execute_backtrace() -> Result<()> {
         let code = r#"fn main() { panic!("Disco"); }"#;
 
         let params = [
@@ -1624,93 +1650,30 @@ mod tests {
         Ok(())
     }
 
-    fn new_compile_request() -> CompileRequest {
-        new_compile_mir_request()
-    }
+    const HELLO_WORLD_CODE: &str = r#"fn main() { println!("Hello World!"); }"#;
 
-    fn new_compile_assembly_request() -> CompileRequest {
-        CompileRequest {
-            target: CompileTarget::Assembly(
-                AssemblyFlavor::Intel,
-                DemangleAssembly::Demangle,
-                ProcessAssembly::Filter,
-            ),
-            channel: Channel::Beta,
-            crate_type: CrateType::Library(LibraryType::Lib),
-            mode: Mode::Release,
-            edition: Edition::Rust2018,
-            tests: false,
-            backtrace: false,
-            code: r#"pub fn add(a: u8, b: u8) -> u8 { a + b }"#.to_owned(),
-        }
-    }
-
-    fn new_compile_hir_request() -> CompileRequest {
-        new_compile_hir_request_for(Edition::Rust2021)
-    }
-
-    fn new_compile_hir_request_for(edition: Edition) -> CompileRequest {
-        CompileRequest {
-            target: CompileTarget::Hir,
-            channel: Channel::Nightly,
-            crate_type: CrateType::Library(LibraryType::Lib),
-            mode: Mode::Release,
-            edition,
-            tests: false,
-            backtrace: false,
-            code: r#"pub fn sub(a: u8, b: u8) -> u8 { a - b }"#.to_owned(),
-        }
-    }
-
-    fn new_compile_llvm_ir_request() -> CompileRequest {
-        CompileRequest {
-            target: CompileTarget::LlvmIr,
-            channel: Channel::Stable,
-            crate_type: CrateType::Library(LibraryType::Lib),
-            mode: Mode::Debug,
-            edition: Edition::Rust2015,
-            tests: false,
-            backtrace: false,
-            code: r#"pub fn mul(a: u8, b: u8) -> u8 { a * b }"#.to_owned(),
-        }
-    }
-
-    fn new_compile_mir_request() -> CompileRequest {
-        CompileRequest {
-            target: CompileTarget::Mir,
-            channel: Channel::Stable,
-            crate_type: CrateType::Binary,
-            mode: Mode::Release,
-            edition: Edition::Rust2021,
-            tests: false,
-            backtrace: false,
-            code: r#"fn main() { println!("Hello World!"); }"#.to_owned(),
-        }
-    }
-
-    fn new_compile_wasm_request() -> CompileRequest {
-        CompileRequest {
-            target: CompileTarget::Wasm,
-            channel: Channel::Nightly, // TODO: Can we run this on all channels now?
-            crate_type: CrateType::Library(LibraryType::Cdylib),
-            mode: Mode::Release,
-            edition: Edition::Rust2021,
-            tests: false,
-            backtrace: false,
-            code: r#"#[export_name = "inc"] pub fn inc(a: u8) -> u8 { a + 1 }"#.to_owned(),
-        }
-    }
+    const ARBITRARY_COMPILE_REQUEST: CompileRequest = CompileRequest {
+        target: CompileTarget::Mir,
+        channel: Channel::Stable,
+        crate_type: CrateType::Binary,
+        mode: Mode::Release,
+        edition: Edition::Rust2021,
+        tests: false,
+        backtrace: false,
+        code: String::new(),
+    };
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_response() -> Result<()> {
+    async fn compile_response() -> Result<()> {
         let coordinator = new_coordinator().await;
 
-        let response = coordinator
-            .compile(new_compile_request())
-            .with_timeout()
-            .await
-            .unwrap();
+        let req = CompileRequest {
+            code: HELLO_WORLD_CODE.into(),
+            ..ARBITRARY_COMPILE_REQUEST
+        };
+
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
 
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.stderr, "Compiling");
@@ -1723,17 +1686,19 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_streaming() -> Result<()> {
+    async fn compile_streaming() -> Result<()> {
         let coordinator = new_coordinator().await;
+
+        let req = CompileRequest {
+            code: HELLO_WORLD_CODE.into(),
+            ..ARBITRARY_COMPILE_REQUEST
+        };
 
         let ActiveCompilation {
             task,
             stdout_rx,
             stderr_rx,
-        } = coordinator
-            .begin_compile(new_compile_request())
-            .await
-            .unwrap();
+        } = coordinator.begin_compile(req).await.unwrap();
 
         let stdout = ReceiverStream::new(stdout_rx);
         let stdout = stdout.collect::<String>();
@@ -1757,15 +1722,17 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_edition() -> Result<()> {
+    async fn compile_edition() -> Result<()> {
         for edition in Edition::ALL {
             let coordinator = new_coordinator().await;
 
-            let response = coordinator
-                .compile(new_compile_hir_request_for(edition))
-                .with_timeout()
-                .await
-                .unwrap();
+            let req = CompileRequest {
+                edition,
+                code: SUBTRACT_CODE.into(),
+                ..ARBITRARY_HIR_REQUEST
+            };
+
+            let response = coordinator.compile(req).with_timeout().await.unwrap();
 
             let prelude = format!("std::prelude::rust_{}", edition.to_str());
 
@@ -1778,22 +1745,43 @@ mod tests {
         Ok(())
     }
 
+    const ADD_CODE: &str = r#"pub fn add(a: u8, b: u8) -> u8 { a + b }"#;
+
+    const ARBITRARY_ASSEMBLY_REQUEST: CompileRequest = CompileRequest {
+        target: CompileTarget::Assembly(
+            DEFAULT_ASSEMBLY_FLAVOR,
+            DEFAULT_ASSEMBLY_DEMANGLE,
+            DEFAULT_ASSEMBLY_PROCESS,
+        ),
+        channel: Channel::Beta,
+        crate_type: CrateType::Library(LibraryType::Lib),
+        mode: Mode::Release,
+        edition: Edition::Rust2018,
+        tests: false,
+        backtrace: false,
+        code: String::new(),
+    };
+
+    const DEFAULT_ASSEMBLY_FLAVOR: AssemblyFlavor = AssemblyFlavor::Intel;
+    const DEFAULT_ASSEMBLY_DEMANGLE: DemangleAssembly = DemangleAssembly::Demangle;
+    const DEFAULT_ASSEMBLY_PROCESS: ProcessAssembly = ProcessAssembly::Filter;
+
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_assembly() -> Result<()> {
+    async fn compile_assembly() -> Result<()> {
         let coordinator = new_coordinator().await;
 
-        let response = coordinator
-            .compile(new_compile_assembly_request())
-            .with_timeout()
-            .await
-            .unwrap();
+        let req = CompileRequest {
+            code: ADD_CODE.into(),
+            ..ARBITRARY_ASSEMBLY_REQUEST
+        };
 
-        //#[cfg(target_arch = "x86_64")]
-        //let asm = "";
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
 
-        #[cfg(target_arch = "aarch64")]
-        let asm = "w0, w1, w0";
+        let asm = docker_target_arch! {
+            x86_64: "eax, [rsi + rdi]",
+            aarch64: "w0, w1, w0",
+        };
 
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.code, asm);
@@ -1805,14 +1793,131 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_hir() -> Result<()> {
+    // Assembly flavor only makes sense when targeting x86(_64): this
+    // test will always fail on aarch64.
+    async fn compile_assembly_flavor() -> Result<()> {
+        let cases = [
+            (AssemblyFlavor::Att, "(%rsi,%rdi), %eax"),
+            (AssemblyFlavor::Intel, "eax, [rsi + rdi]"),
+        ];
+
+        for (flavor, expected) in cases {
+            let coordinator = new_coordinator().await;
+
+            let req = CompileRequest {
+                target: CompileTarget::Assembly(
+                    flavor,
+                    DEFAULT_ASSEMBLY_DEMANGLE,
+                    DEFAULT_ASSEMBLY_PROCESS,
+                ),
+                code: ADD_CODE.into(),
+                ..ARBITRARY_ASSEMBLY_REQUEST
+            };
+
+            let response = coordinator.compile(req).with_timeout().await.unwrap();
+
+            assert!(response.success, "stderr: {}", response.stderr);
+            assert_contains!(response.code, expected);
+
+            coordinator.shutdown().await?;
+        }
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    // The demangling expects Linux-style symbols, not macOS: this
+    // test will always fail on macOS.
+    async fn compile_assembly_demangle() -> Result<()> {
+        let cases = [
+            (DemangleAssembly::Mangle, "10playground3add"),
+            (DemangleAssembly::Demangle, "playground::add"),
+        ];
+
+        for (mangle, expected) in cases {
+            let coordinator = new_coordinator().await;
+
+            let req = CompileRequest {
+                target: CompileTarget::Assembly(
+                    DEFAULT_ASSEMBLY_FLAVOR,
+                    mangle,
+                    DEFAULT_ASSEMBLY_PROCESS,
+                ),
+                code: ADD_CODE.into(),
+                ..ARBITRARY_ASSEMBLY_REQUEST
+            };
+
+            let response = coordinator.compile(req).with_timeout().await.unwrap();
+
+            assert!(response.success, "stderr: {}", response.stderr);
+            assert_contains!(response.code, expected);
+
+            coordinator.shutdown().await?;
+        }
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn compile_assembly_process() -> Result<()> {
+        let cases = [
+            (ProcessAssembly::Raw, true),
+            (ProcessAssembly::Filter, false),
+        ];
+
+        for (process, expected) in cases {
+            let coordinator = new_coordinator().await;
+
+            let req = CompileRequest {
+                target: CompileTarget::Assembly(
+                    DEFAULT_ASSEMBLY_FLAVOR,
+                    DEFAULT_ASSEMBLY_DEMANGLE,
+                    process,
+                ),
+                code: ADD_CODE.into(),
+                ..ARBITRARY_ASSEMBLY_REQUEST
+            };
+
+            let response = coordinator.compile(req).with_timeout().await.unwrap();
+
+            assert!(response.success, "stderr: {}", response.stderr);
+            if expected {
+                assert_contains!(response.code, ".cfi_startproc");
+            } else {
+                assert_not_contains!(response.code, ".cfi_startproc");
+            }
+
+            coordinator.shutdown().await?;
+        }
+
+        Ok(())
+    }
+
+    const SUBTRACT_CODE: &str = r#"pub fn sub(a: u8, b: u8) -> u8 { a - b }"#;
+
+    const ARBITRARY_HIR_REQUEST: CompileRequest = CompileRequest {
+        target: CompileTarget::Hir,
+        channel: Channel::Nightly,
+        crate_type: CrateType::Library(LibraryType::Lib),
+        mode: Mode::Release,
+        edition: Edition::Rust2021,
+        tests: false,
+        backtrace: false,
+        code: String::new(),
+    };
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn compile_hir() -> Result<()> {
         let coordinator = new_coordinator().await;
 
-        let response = coordinator
-            .compile(new_compile_hir_request())
-            .with_timeout()
-            .await
-            .unwrap();
+        let req = CompileRequest {
+            code: SUBTRACT_CODE.into(),
+            ..ARBITRARY_HIR_REQUEST
+        };
+
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
 
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.code, "extern crate std");
@@ -1824,14 +1929,21 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_llvm_ir() -> Result<()> {
+    async fn compile_llvm_ir() -> Result<()> {
         let coordinator = new_coordinator().await;
 
-        let response = coordinator
-            .compile(new_compile_llvm_ir_request())
-            .with_timeout()
-            .await
-            .unwrap();
+        let req = CompileRequest {
+            target: CompileTarget::LlvmIr,
+            channel: Channel::Stable,
+            crate_type: CrateType::Library(LibraryType::Lib),
+            mode: Mode::Debug,
+            edition: Edition::Rust2015,
+            tests: false,
+            backtrace: false,
+            code: r#"pub fn mul(a: u8, b: u8) -> u8 { a * b }"#.into(),
+        };
+
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
 
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.code, "@llvm.umul.with.overflow.i8(i8, i8)");
@@ -1843,20 +1955,27 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_wasm() -> Result<()> {
+    async fn compile_wasm() -> Result<()> {
         // cargo-wasm only exists inside the container
         let coordinator = Coordinator::new_docker().await;
 
-        let response = coordinator
-            .compile(new_compile_wasm_request())
-            .with_timeout()
-            .await
-            .unwrap();
+        let req = CompileRequest {
+            target: CompileTarget::Wasm,
+            channel: Channel::Nightly,
+            crate_type: CrateType::Library(LibraryType::Cdylib),
+            mode: Mode::Release,
+            edition: Edition::Rust2021,
+            tests: false,
+            backtrace: false,
+            code: r#"#[export_name = "inc"] pub fn inc(a: u8) -> u8 { a + 1 }"#.into(),
+        };
+
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
 
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(
             response.code,
-            r#"(func $inc (export "inc") (type $t0) (param $p0 i32) (result i32)"#
+            r#"(func $inc (;0;) (type 0) (param i32) (result i32)"#
         );
 
         coordinator.shutdown().await?;
@@ -1866,7 +1985,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_compile_clears_old_main_rs() -> Result<()> {
+    async fn compile_clears_old_main_rs() -> Result<()> {
         let coordinator = new_coordinator().await;
 
         // Create a main.rs file
@@ -1917,7 +2036,7 @@ mod tests {
 
     #[tokio::test]
     #[snafu::report]
-    async fn test_still_usable_after_idle() -> Result<()> {
+    async fn still_usable_after_idle() -> Result<()> {
         let mut coordinator = new_coordinator().await;
 
         let req = ExecuteRequest {
@@ -1937,6 +2056,100 @@ mod tests {
 
         let res = coordinator.execute(req).await.unwrap();
         assert_eq!(res.stdout, "hello\n");
+
+        Ok(())
+    }
+
+    fn new_execution_limited_request() -> ExecuteRequest {
+        ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Debug,
+            edition: Edition::Rust2021,
+            crate_type: CrateType::Binary,
+            tests: false,
+            backtrace: false,
+            code: Default::default(),
+        }
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn network_connections_are_disabled() -> Result<()> {
+        // The limits are only applied to the container
+        let coordinator = Coordinator::new_docker().await;
+
+        let req = ExecuteRequest {
+            code: r#"
+                fn main() {
+                    match ::std::net::TcpStream::connect("google.com:80") {
+                        Ok(_) => println!("Able to connect to the outside world"),
+                        Err(e) => println!("Failed to connect {}, {:?}", e, e),
+                    }
+                }
+            "#
+            .into(),
+            ..new_execution_limited_request()
+        };
+
+        let res = coordinator.execute(req).with_timeout().await.unwrap();
+
+        assert_contains!(res.stdout, "Failed to connect");
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn memory_usage_is_limited() -> Result<()> {
+        // The limits are only applied to the container
+        let coordinator = Coordinator::new_docker().await;
+
+        let req = ExecuteRequest {
+            code: r#"
+                fn main() {
+                    let gigabyte = 1024 * 1024 * 1024;
+                    let mut big = vec![0u8; 1 * gigabyte];
+                    for i in &mut big { *i += 1; }
+                }
+            "#
+            .into(),
+            ..new_execution_limited_request()
+        };
+
+        let res = coordinator.execute(req).with_timeout().await.unwrap();
+
+        assert!(!res.success);
+        // TODO: We need to actually inform the user about this somehow. The UI is blank.
+        // assert_contains!(res.stdout, "Killed");
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn number_of_pids_is_limited() -> Result<()> {
+        // The limits are only applied to the container
+        let coordinator = Coordinator::new_docker().await;
+
+        let req = ExecuteRequest {
+            code: r##"
+                fn main() {
+                    ::std::process::Command::new("sh").arg("-c").arg(r#"
+                        z() {
+                            z&
+                            z
+                        }
+                        z
+                    "#).status().unwrap();
+                }
+            "##
+            .into(),
+            ..new_execution_limited_request()
+        };
+
+        let res = coordinator.execute(req).with_timeout().await.unwrap();
+
+        assert_contains!(res.stderr, "Cannot fork");
 
         Ok(())
     }
