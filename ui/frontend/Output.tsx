@@ -13,6 +13,7 @@ import PaneWithMir from './Output/PaneWithMir';
 import * as selectors from './selectors';
 
 import styles from './Output.module.css';
+import Stdin from './Stdin';
 
 const Tab: React.FC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
   if (selectors.hasProperties(tabProps)) {
@@ -64,6 +65,8 @@ const Output: React.FC = () => {
   const focusWasm = useCallback(() => dispatch(actions.changeFocus(Focus.Wasm)), [dispatch]);
   const focusGist = useCallback(() => dispatch(actions.changeFocus(Focus.Gist)), [dispatch]);
 
+  const showStdin = useSelector(selectors.showStdinSelector);
+
   if (!somethingToShow) {
     return null;
   }
@@ -74,19 +77,26 @@ const Output: React.FC = () => {
     close = <button className={styles.tabClose} onClick={focusClose}>Close</button>;
 
     body = (
-      <div className={styles.body}>
-        {focus === Focus.Execute && <Execute />}
-        {focus === Focus.Format && <SimplePane {...format} kind="format" />}
-        {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
-        {focus === Focus.Miri && <SimplePane {...miri} kind="miri" />}
-        {focus === Focus.MacroExpansion && <SimplePane {...macroExpansion} kind="macro-expansion" />}
-        {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
-        {focus === Focus.LlvmIr && <PaneWithCode {...llvmIr} kind="llvm-ir" />}
-        {focus === Focus.Mir && <PaneWithMir {...mir} kind="mir" />}
-        {focus === Focus.Hir && <PaneWithMir {...hir} kind="hir" />}
-        {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
-        {focus === Focus.Gist && <Gist />}
-      </div>
+      <>
+        <div className={styles.body}>
+          {focus === Focus.Execute && <Execute />}
+          {focus === Focus.Format && <SimplePane {...format} kind="format" />}
+          {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
+          {focus === Focus.Miri && <SimplePane {...miri} kind="miri" />}
+          {focus === Focus.MacroExpansion && <SimplePane {...macroExpansion} kind="macro-expansion" />}
+          {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
+          {focus === Focus.LlvmIr && <PaneWithCode {...llvmIr} kind="llvm-ir" />}
+          {focus === Focus.Mir && <PaneWithMir {...mir} kind="mir" />}
+          {focus === Focus.Hir && <PaneWithMir {...hir} kind="hir" />}
+          {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
+          {focus === Focus.Gist && <Gist />}
+        </div>
+        {showStdin && (
+          <div className={styles.stdin}>
+            <Stdin />
+          </div>
+        )}
+      </>
     );
   }
 
@@ -139,7 +149,7 @@ const Output: React.FC = () => {
           tabProps={gist} />
         {close}
       </div>
-      { body}
+      { body }
     </div>
   );
 };

@@ -108,6 +108,17 @@ const slice = createSlice({
         meta: makeWebSocketMeta(),
       }),
     },
+    wsExecuteStdin: {
+      reducer: () => {},
+
+      prepare: (payload: string, sequenceNumber: number) => ({
+        payload,
+        meta: {
+          websocket: true,
+          sequenceNumber,
+        },
+      }),
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -179,6 +190,17 @@ export const performCommonExecute =
     } else {
       dispatch(performExecute(body));
     }
+  };
+
+export const wsExecuteStdin =
+  (payload: string): SimpleThunkAction =>
+  (dispatch, getState) => {
+    const state = getState();
+    const { requestsInProgress, sequenceNumber } = state.output.execute;
+    if (requestsInProgress === 0 || !sequenceNumber) {
+      return;
+    }
+    dispatch(slice.actions.wsExecuteStdin(payload, sequenceNumber));
   };
 
 export { wsExecuteBeginSchema, wsExecuteStdoutSchema, wsExecuteStderrSchema, wsExecuteEndSchema };

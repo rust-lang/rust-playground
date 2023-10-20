@@ -79,6 +79,10 @@ Capybara.add_selector(:output) do
   end
 end
 
+Capybara.add_selector(:stdin) do
+  css { '[data-test-id = "stdin"]' }
+end
+
 RSpec.configure do |config|
   config.after(:example, :js) do
     page.execute_script <<~JS

@@ -35,6 +35,34 @@ RSpec.feature "Streaming interaction using WebSockets", type: :feature, js: true
     end
   end
 
+  scenario "input can be supplied" do
+    editor.set <<~EOF
+      fn main() {
+          println!("Enter some text!");
+          let mut input = String::new();
+          std::io::stdin().read_line(&mut input).expect("Unable to read input");
+          println!("You entered >>>{input:?}<<<");
+      }
+    EOF
+
+    click_on("Run")
+
+    within(:output, :stdout) do
+      expect(page).to have_content 'Enter some text'
+      expect(page).to_not have_content 'You entered'
+    end
+
+    within(:stdin) do
+      fill_in 'content', with: 'An automated test'
+      click_on 'Send'
+    end
+
+    within(:output, :stdout) do
+      expect(page).to have_content 'Enter some text'
+      expect(page).to have_content 'You entered >>>"An automated test\n"<<<'
+    end
+  end
+
   def editor
     Editor.new(page)
   end

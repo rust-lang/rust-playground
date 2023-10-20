@@ -1,0 +1,8 @@
+.form {
+  display: flex;
+  gap: 0.25em;
+}
+
+.text {
+  flex: 1;
+}

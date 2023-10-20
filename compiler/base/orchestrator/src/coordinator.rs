@@ -605,10 +605,12 @@ impl Container {
     ) -> Result<WithOutput<ExecuteResponse>, ExecuteError> {
         let ActiveExecution {
             task,
+            stdin_tx,
             stdout_rx,
             stderr_rx,
         } = self.begin_execute(request).await?;
 
+        drop(stdin_tx);
         WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
     }
 
@@ -636,6 +638,7 @@ impl Container {
 
         let SpawnCargo {
             task,
+            stdin_tx,
             stdout_rx,
             stderr_rx,
         } = self
@@ -660,6 +663,7 @@ impl Container {
 
         Ok(ActiveExecution {
             task,
+            stdin_tx,
             stdout_rx,
             stderr_rx,
         })
@@ -707,12 +711,15 @@ impl Container {
 
         let SpawnCargo {
             task,
+            stdin_tx,
             stdout_rx,
             stderr_rx,
         } = self
             .spawn_cargo_task(execute_cargo)
             .await
             .context(CouldNotStartCargoSnafu)?;
+
+        drop(stdin_tx);
 
         let commander = self.commander.clone();
         let task = async move {
@@ -758,10 +765,11 @@ impl Container {
     ) -> Result<SpawnCargo, SpawnCargoError> {
         use spawn_cargo_error::*;
 
+        let (stdin_tx, mut stdin_rx) = mpsc::channel(8);
         let (stdout_tx, stdout_rx) = mpsc::channel(8);
         let (stderr_tx, stderr_rx) = mpsc::channel(8);
 
-        let mut from_worker_rx = self
+        let (to_worker_tx, mut from_worker_rx) = self
             .commander
             .many(execute_cargo)
             .await
@@ -769,30 +777,41 @@ impl Container {
 
         let task = tokio::spawn({
             async move {
-                while let Some(container_msg) = from_worker_rx.recv().await {
-                    trace!("processing {container_msg:?}");
+                loop {
+                    select! {
+                        Some(stdin) = stdin_rx.recv() => {
+                            let msg = CoordinatorMessage::StdinPacket(stdin);
+                            trace!("processing {msg:?}");
+                            to_worker_tx.send(msg).await.context(StdinSnafu)?;
+                        },
 
-                    match container_msg {
-                        WorkerMessage::ExecuteCommand(resp) => {
-                            return Ok(resp);
-                        }
-                        WorkerMessage::StdoutPacket(packet) => {
-                            stdout_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
-                        }
-                        WorkerMessage::StderrPacket(packet) => {
-                            stderr_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
-                        }
-                        _ => return UnexpectedMessageSnafu.fail(),
+                        Some(container_msg) = from_worker_rx.recv() => {
+                            trace!("processing {container_msg:?}");
+
+                            match container_msg {
+                                WorkerMessage::ExecuteCommand(resp) => {
+                                    return Ok(resp);
+                                }
+                                WorkerMessage::StdoutPacket(packet) => {
+                                    stdout_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
+                                }
+                                WorkerMessage::StderrPacket(packet) => {
+                                    stderr_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
+                                }
+                                _ => return UnexpectedMessageSnafu.fail(),
+                            }
+                        },
+
+                        else => return UnexpectedEndOfMessagesSnafu.fail(),
                     }
                 }
-
-                UnexpectedEndOfMessagesSnafu.fail()
             }
             .instrument(trace_span!("cargo task").or_current())
         });
 
         Ok(SpawnCargo {
             task,
+            stdin_tx,
             stdout_rx,
             stderr_rx,
         })
@@ -812,6 +831,7 @@ impl Container {
 
 pub struct ActiveExecution {
     pub task: BoxFuture<'static, Result<ExecuteResponse, ExecuteError>>,
+    pub stdin_tx: mpsc::Sender<String>,
     pub stdout_rx: mpsc::Receiver<String>,
     pub stderr_rx: mpsc::Receiver<String>,
 }
@@ -820,6 +840,7 @@ impl fmt::Debug for ActiveExecution {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ActiveExecution")
             .field("task", &"<future>")
+            .field("stdin_tx", &self.stdin_tx)
             .field("stdout_rx", &self.stdout_rx)
             .field("stderr_rx", &self.stderr_rx)
             .finish()
@@ -900,6 +921,7 @@ pub enum CompileError {
 
 struct SpawnCargo {
     task: JoinHandle<Result<ExecuteCommandResponse, SpawnCargoError>>,
+    stdin_tx: mpsc::Sender<String>,
     stdout_rx: mpsc::Receiver<String>,
     stderr_rx: mpsc::Receiver<String>,
 }
@@ -915,6 +937,9 @@ pub enum SpawnCargoError {
 
     #[snafu(display("There are no more messages"))]
     UnexpectedEndOfMessages,
+
+    #[snafu(display("Unable to send stdin message"))]
+    Stdin { source: MultiplexedSenderError },
 }
 
 #[derive(Debug, Clone)]
@@ -1173,7 +1198,10 @@ impl Commander {
         }
     }
 
-    async fn many<M>(&self, message: M) -> Result<mpsc::Receiver<WorkerMessage>, CommanderError>
+    async fn many<M>(
+        &self,
+        message: M,
+    ) -> Result<(MultiplexedSender, mpsc::Receiver<WorkerMessage>), CommanderError>
     where
         M: Into<CoordinatorMessage>,
     {
@@ -1190,7 +1218,7 @@ impl Commander {
             .await
             .context(UnableToStartManySnafu)?;
 
-        Ok(from_worker_rx)
+        Ok((to_worker_tx, from_worker_rx))
     }
 }
 
@@ -1509,15 +1537,20 @@ mod tests {
         //Coordinator::new_docker().await
     }
 
+    const ARBITRARY_EXECUTE_REQUEST: ExecuteRequest = ExecuteRequest {
+        channel: Channel::Stable,
+        mode: Mode::Debug,
+        edition: Edition::Rust2021,
+        crate_type: CrateType::Binary,
+        tests: false,
+        backtrace: false,
+        code: String::new(),
+    };
+
     fn new_execute_request() -> ExecuteRequest {
         ExecuteRequest {
-            channel: Channel::Stable,
-            mode: Mode::Debug,
-            edition: Edition::Rust2021,
-            crate_type: CrateType::Binary,
-            tests: false,
-            backtrace: false,
             code: r#"fn main() { println!("Hello, coordinator!"); }"#.into(),
+            ..ARBITRARY_EXECUTE_REQUEST
         }
     }
 
@@ -1720,6 +1753,51 @@ mod tests {
         });
 
         try_join_all(tests).with_timeout().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn execute_stdin() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let request = ExecuteRequest {
+            code: r#"
+                fn main() {
+                    let mut input = String::new();
+                    if std::io::stdin().read_line(&mut input).is_ok() {
+                        println!("You entered >>>{input:?}<<<");
+                    }
+                }
+            "#
+            .into(),
+            ..ARBITRARY_EXECUTE_REQUEST
+        };
+
+        let ActiveExecution {
+            task,
+            stdin_tx,
+            stdout_rx,
+            stderr_rx,
+        } = coordinator.begin_execute(request).await.unwrap();
+
+        stdin_tx.send("this is stdin\n".into()).await.unwrap();
+        // Purposefully not dropping stdin_tx early -- a user might forget
+
+        let WithOutput {
+            response,
+            stdout,
+            stderr,
+        } = WithOutput::try_absorb(task, stdout_rx, stderr_rx)
+            .with_timeout()
+            .await
+            .unwrap();
+
+        assert!(response.success, "{stderr}");
+        assert_contains!(stdout, r#">>>"this is stdin\n"<<<"#);
+
+        coordinator.shutdown().await?;
 
         Ok(())
     }

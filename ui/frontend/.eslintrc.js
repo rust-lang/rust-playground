@@ -66,6 +66,7 @@ module.exports = {
         'ButtonSet.tsx',
         'Header.tsx',
         'PopButton.tsx',
+        'Stdin.tsx',
         'compileActions.ts',
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',
