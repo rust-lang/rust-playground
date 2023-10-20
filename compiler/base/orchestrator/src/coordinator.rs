@@ -1191,11 +1191,24 @@ macro_rules! docker_command {
     });
 }
 
-#[cfg(target_arch = "x86_64")]
-const DOCKER_ARCH: &str = "linux/amd64";
+macro_rules! docker_target_arch {
+    (x86_64: $x:expr, aarch64: $a:expr $(,)?) => {{
+        #[cfg(target_arch = "x86_64")]
+        {
+            $x
+        }
 
-#[cfg(target_arch = "aarch64")]
-const DOCKER_ARCH: &str = "linux/arm64";
+        #[cfg(target_arch = "aarch64")]
+        {
+            $a
+        }
+    }};
+}
+
+const DOCKER_ARCH: &str = docker_target_arch! {
+    x86_64: "linux/amd64",
+    aarch64: "linux/arm64",
+};
 
 fn basic_secure_docker_command() -> Command {
     docker_command!(
@@ -1765,11 +1778,10 @@ mod tests {
 
         let response = coordinator.compile(req).with_timeout().await.unwrap();
 
-        #[cfg(target_arch = "x86_64")]
-        let asm = "eax, [rsi + rdi]";
-
-        #[cfg(target_arch = "aarch64")]
-        let asm = "w0, w1, w0";
+        let asm = docker_target_arch! {
+            x86_64: "eax, [rsi + rdi]",
+            aarch64: "w0, w1, w0",
+        };
 
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.code, asm);
