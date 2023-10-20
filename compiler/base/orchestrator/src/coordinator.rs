@@ -1365,6 +1365,19 @@ mod tests {
 
     use super::*;
 
+    #[allow(dead_code)]
+    fn setup_tracing() {
+        use tracing::Level;
+        use tracing_subscriber::fmt::TestWriter;
+
+        tracing_subscriber::fmt()
+            .with_ansi(false)
+            .with_max_level(Level::TRACE)
+            .with_writer(TestWriter::new())
+            .try_init()
+            .ok();
+    }
+
     #[derive(Debug)]
     struct TestBackend {
         project_dir: TempDir,
