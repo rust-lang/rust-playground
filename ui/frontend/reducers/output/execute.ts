@@ -51,6 +51,7 @@ const { action: wsExecuteEnd, schema: wsExecuteEndSchema } = createWebsocketResp
   'output/execute/wsExecuteEnd',
   z.object({
     success: z.boolean(),
+    exitDetail: z.string(),
   }),
 );
 
@@ -68,6 +69,7 @@ export interface ExecuteRequestBody {
 
 interface ExecuteResponseBody {
   success: boolean;
+  exitDetail: string;
   stdout: string;
   stderr: string;
 }
@@ -113,9 +115,12 @@ const slice = createSlice({
         state.requestsInProgress += 1;
       })
       .addCase(performExecute.fulfilled, (state, action) => {
-        const { stdout, stderr } = action.payload;
+        const { success, exitDetail, stdout, stderr } = action.payload;
         Object.assign(state, { stdout, stderr });
         delete state.error;
+        if (!success) {
+          state.error = exitDetail;
+        }
         state.requestsInProgress -= 1;
       })
       .addCase(performExecute.rejected, (state, action) => {
@@ -148,8 +153,12 @@ const slice = createSlice({
       )
       .addCase(
         wsExecuteEnd,
-        sequenceNumberMatches((state) => {
+        sequenceNumberMatches((state, payload) => {
           state.requestsInProgress = 0; // Only tracking one request
+
+          if (!payload.success) {
+            state.error = payload.exitDetail;
+          }
         }),
       );
   },

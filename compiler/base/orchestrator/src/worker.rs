@@ -36,7 +36,7 @@ use std::{
     collections::HashMap,
     io,
     path::{Path, PathBuf},
-    process::Stdio,
+    process::{ExitStatus, Stdio},
 };
 use tokio::{
     fs,
@@ -509,7 +509,111 @@ async fn process_end(
     }
 
     let success = status.success();
-    Ok(ExecuteCommandResponse { success })
+    let exit_detail = extract_exit_detail(status);
+
+    Ok(ExecuteCommandResponse {
+        success,
+        exit_detail,
+    })
+}
+
+mod signals {
+    mod descriptions {
+        #![allow(dead_code)]
+
+        pub const SIGABRT: &str = "abort program";
+        pub const SIGALRM: &str = "real-time timer expired";
+        pub const SIGBUS: &str = "bus error";
+        pub const SIGEMT: &str = "emulate instruction executed";
+        pub const SIGFPE: &str = "floating-point exception";
+        pub const SIGHUP: &str = "terminal line hangup";
+        pub const SIGILL: &str = "illegal instruction";
+        pub const SIGINT: &str = "interrupt program";
+        pub const SIGKILL: &str = "kill program";
+        pub const SIGPIPE: &str = "write on a pipe with no reader";
+        pub const SIGQUIT: &str = "quit program";
+        pub const SIGSEGV: &str = "segmentation violation";
+        pub const SIGSYS: &str = "non-existent system call invoked";
+        pub const SIGTERM: &str = "software termination signal";
+        pub const SIGTRAP: &str = "trace trap";
+        pub const SIGUSR1: &str = "user-defined signal 1";
+        pub const SIGUSR2: &str = "user-defined signal 2";
+    }
+
+    type Pair = (&'static str, &'static str);
+
+    macro_rules! sigtable {
+        [$($name:ident,)*] => {
+            [
+                $((stringify!($name), descriptions::$name),)*
+            ]
+        };
+    }
+
+    #[cfg(target_os = "macos")]
+    const SIGNALS: [Pair; 15] = sigtable![
+        SIGHUP,  //  1
+        SIGINT,  //  2
+        SIGQUIT, //  3
+        SIGILL,  //  4
+        SIGTRAP, //  5
+        SIGABRT, //  6
+        SIGEMT,  //  7
+        SIGFPE,  //  8
+        SIGKILL, //  9
+        SIGBUS,  // 10
+        SIGSEGV, // 11
+        SIGSYS,  // 12
+        SIGPIPE, // 13
+        SIGALRM, // 14
+        SIGTERM, // 15
+    ];
+
+    #[cfg(target_os = "linux")]
+    const SIGNALS: [Pair; 15] = sigtable![
+        SIGHUP,  //  1
+        SIGINT,  //  2
+        SIGQUIT, //  3
+        SIGILL,  //  4
+        SIGTRAP, //  5
+        SIGABRT, //  6
+        SIGBUS,  //  7
+        SIGFPE,  //  8
+        SIGKILL, //  9
+        SIGUSR1, // 10
+        SIGSEGV, // 11
+        SIGUSR2, // 12
+        SIGPIPE, // 13
+        SIGALRM, // 14
+        SIGTERM, // 15
+    ];
+
+    const SIG_UNKNOWN: Pair = ("???", "Unknown signal");
+
+    pub fn get(signal: i32) -> Pair {
+        let details = (|| {
+            let signal = usize::try_from(signal).ok()?;
+            let signal = signal.checked_sub(1)?;
+            SIGNALS.get(signal).copied()
+        })();
+
+        details.unwrap_or(SIG_UNKNOWN)
+    }
+}
+
+fn extract_exit_detail(status: ExitStatus) -> String {
+    use std::os::unix::process::ExitStatusExt;
+
+    if let Some(code) = status.code() {
+        return format!("Exited with status {code}");
+    }
+
+    if let Some(signal) = status.signal() {
+        let (name, description) = signals::get(signal);
+        return format!("Exited with signal {signal} ({name}): {description}");
+    }
+
+    String::new()
 }
 
 #[derive(Debug, Snafu)]
