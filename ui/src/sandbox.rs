@@ -684,80 +684,6 @@ impl<R: BacktraceRequest> BacktraceRequest for &'_ R {
 }
 
 #[derive(Debug, Clone)]
-pub struct CompileRequest {
-    pub target: CompileTarget,
-    pub channel: Channel,
-    pub crate_type: CrateType,
-    pub mode: Mode,
-    pub edition: Option<Edition>,
-    pub tests: bool,
-    pub backtrace: bool,
-    pub code: String,
-}
-
-impl CrateTypeRequest for CompileRequest {
-    fn crate_type(&self) -> CrateType {
-        self.crate_type
-    }
-}
-
-impl EditionRequest for CompileRequest {
-    fn edition(&self) -> Option<Edition> {
-        self.edition
-    }
-}
-
-impl BacktraceRequest for CompileRequest {
-    fn backtrace(&self) -> bool {
-        self.backtrace
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CompileResponse {
-    pub success: bool,
-    pub code: String,
-    pub stdout: String,
-    pub stderr: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct ExecuteRequest {
-    pub channel: Channel,
-    pub mode: Mode,
-    pub edition: Option<Edition>,
-    pub crate_type: CrateType,
-    pub tests: bool,
-    pub backtrace: bool,
-    pub code: String,
-}
-
-impl CrateTypeRequest for ExecuteRequest {
-    fn crate_type(&self) -> CrateType {
-        self.crate_type
-    }
-}
-
-impl EditionRequest for ExecuteRequest {
-    fn edition(&self) -> Option<Edition> {
-        self.edition
-    }
-}
-
-impl BacktraceRequest for ExecuteRequest {
-    fn backtrace(&self) -> bool {
-        self.backtrace
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ExecuteResponse {
-    pub success: bool,
-    pub stdout: String,
-    pub stderr: String,
-}
-
-#[derive(Debug, Clone)]
 pub struct FormatRequest {
     pub code: String,
     pub edition: Option<Edition>,
@@ -962,35 +888,6 @@ mod test {
         println!("Hello, world!");
     }
     "#;
-
-    impl Default for ExecuteRequest {
-        fn default() -> Self {
-            ExecuteRequest {
-                channel: Channel::Stable,
-                crate_type: CrateType::Binary,
-                mode: Mode::Debug,
-                tests: false,
-                code: HELLO_WORLD_CODE.to_string(),
-                edition: None,
-                backtrace: false,
-            }
-        }
-    }
-
-    impl Default for CompileRequest {
-        fn default() -> Self {
-            CompileRequest {
-                target: CompileTarget::LlvmIr,
-                channel: Channel::Stable,
-                crate_type: CrateType::Binary,
-                mode: Mode::Debug,
-                tests: false,
-                code: HELLO_WORLD_CODE.to_string(),
-                edition: None,
-                backtrace: false,
-            }
-        }
-    }
 
     impl Default for ClippyRequest {
         fn default() -> Self {
