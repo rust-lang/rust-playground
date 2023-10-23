@@ -1010,6 +1010,36 @@ pub enum ModifyCargoTomlError {
     CouldNotWrite { source: CommanderError },
 }
 
+struct MultiplexedSender {
+    job_id: JobId,
+    to_worker_tx: mpsc::Sender<Multiplexed<CoordinatorMessage>>,
+}
+
+impl MultiplexedSender {
+    async fn send(
+        &self,
+        message: impl Into<CoordinatorMessage>,
+    ) -> Result<(), MultiplexedSenderError> {
+        use multiplexed_sender_error::*;
+
+        let message = message.into();
+        let message = Multiplexed(self.job_id, message);
+
+        self.to_worker_tx
+            .send(message)
+            .await
+            .drop_error_details()
+            .context(MultiplexedSenderSnafu)
+    }
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+#[snafu(display("Could not send a message to the worker"))]
+pub struct MultiplexedSenderError {
+    source: mpsc::error::SendError<()>,
+}
+
 impl Commander {
     const GC_PERIOD: Duration = Duration::from_secs(30);
 
@@ -1106,17 +1136,12 @@ impl Commander {
         ack_rx.await.context(DemultiplexerDidNotRespondSnafu)
     }
 
-    async fn send_to_worker(
-        &self,
-        message: Multiplexed<CoordinatorMessage>,
-    ) -> Result<(), CommanderError> {
-        use commander_error::*;
-
-        self.to_worker_tx
-            .send(message)
-            .await
-            .drop_error_details()
-            .context(UnableToSendToWorkerSnafu)
+    fn build_multiplexed_sender(&self, job_id: JobId) -> MultiplexedSender {
+        let to_worker_tx = self.to_worker_tx.clone();
+        MultiplexedSender {
+            job_id,
+            to_worker_tx,
+        }
     }
 
     async fn one<M>(&self, message: M) -> Result<M::Response, CommanderError>
@@ -1128,11 +1153,15 @@ impl Commander {
         use commander_error::*;
 
         let id = self.next_id();
+        let to_worker_tx = self.build_multiplexed_sender(id);
         let (from_demultiplexer_tx, from_demultiplexer_rx) = oneshot::channel();
 
         self.send_to_demultiplexer(DemultiplexCommand::ListenOnce(id, from_demultiplexer_tx))
             .await?;
-        self.send_to_worker(Multiplexed(id, message.into())).await?;
+        to_worker_tx
+            .send(message)
+            .await
+            .context(UnableToStartOneSnafu)?;
         let msg = from_demultiplexer_rx
             .await
             .context(UnableToReceiveFromDemultiplexerSnafu)?;
@@ -1148,12 +1177,18 @@ impl Commander {
     where
         M: Into<CoordinatorMessage>,
     {
+        use commander_error::*;
+
         let id = self.next_id();
+        let to_worker_tx = self.build_multiplexed_sender(id);
         let (from_worker_tx, from_worker_rx) = mpsc::channel(8);
 
         self.send_to_demultiplexer(DemultiplexCommand::Listen(id, from_worker_tx))
             .await?;
-        self.send_to_worker(Multiplexed(id, message.into())).await?;
+        to_worker_tx
+            .send(message)
+            .await
+            .context(UnableToStartManySnafu)?;
 
         Ok(from_worker_rx)
     }
@@ -1174,8 +1209,11 @@ pub enum CommanderError {
     #[snafu(display("Did not receive a response from the demultiplexer"))]
     UnableToReceiveFromDemultiplexer { source: oneshot::error::RecvError },
 
-    #[snafu(display("Could not send a message to the worker"))]
-    UnableToSendToWorker { source: mpsc::error::SendError<()> },
+    #[snafu(display("Could not start single request/response interaction"))]
+    UnableToStartOne { source: MultiplexedSenderError },
+
+    #[snafu(display("Could not start continuous interaction"))]
+    UnableToStartMany { source: MultiplexedSenderError },
 
     #[snafu(display("Did not receive the expected response type from the worker"))]
     UnexpectedResponseType,
