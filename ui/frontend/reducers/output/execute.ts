@@ -115,6 +115,7 @@ const slice = createSlice({
       .addCase(performExecute.fulfilled, (state, action) => {
         const { stdout, stderr } = action.payload;
         Object.assign(state, { stdout, stderr });
+        delete state.error;
         state.requestsInProgress -= 1;
       })
       .addCase(performExecute.rejected, (state, action) => {
@@ -130,6 +131,7 @@ const slice = createSlice({
           state.requestsInProgress = 1; // Only tracking one request
           state.stdout = '';
           state.stderr = '';
+          delete state.error;
         }),
       )
       .addCase(
