@@ -154,29 +154,40 @@ jobs:
       uses: actions/checkout@v3
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
-    - name: Get yarn cache directory path
-      id: yarn-cache-dir-path
-      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-    - name: Cache yarn intermediate products
-      uses: actions/cache@v3
-      with:
-        path: "${{ steps.yarn-cache-dir-path.outputs.dir }}"
-        key: "${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}"
-        restore-keys: "${{ runner.os }}-yarn-"
     - name: Configure node
       uses: actions/setup-node@v3
       with:
         node-version: 18.14
+    - name: Get pnpm version from package.json
+      id: pnpm-version
+      run: 'echo "pnpm_version=$(node -p ''require(`./ui/frontend/package.json`).engines.pnpm'')" >> $GITHUB_OUTPUT
+
+        '
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2.4.0
+      with:
+        version: "${{ steps.pnpm-version.outputs.pnpm_version }}"
+    - name: Get pnpm store directory
+      id: pnpm-cache-dir-path
+      run: 'echo "dir=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+        '
+    - name: Cache pnpm intermediate products
+      uses: actions/cache@v3
+      with:
+        path: "${{ steps.pnpm-cache-dir-path.outputs.dir }}"
+        key: "${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}"
+        restore-keys: "${{ runner.os }}-pnpm-\n"
     - name: Install dependencies
-      run: yarn --cwd ui/frontend/
+      run: pnpm --dir ui/frontend/ install
     - name: Run tests
-      run: yarn --cwd ui/frontend/ test
+      run: pnpm --dir ui/frontend/ run test
     - name: Lint
-      run: yarn --cwd ui/frontend/ test:lint
+      run: pnpm --dir ui/frontend/ run test:lint
     - name: Style
-      run: yarn --cwd ui/frontend/ test:style
+      run: pnpm --dir ui/frontend/ run test:style
     - name: Build frontend
-      run: yarn --cwd ui/frontend/ run build:production
+      run: pnpm --dir ui/frontend/ run build:production
     - name: Save frontend artifact
       uses: actions/upload-artifact@v3
       with:
