@@ -24,7 +24,13 @@ use tokio::{
 };
 use tracing::{error, instrument, Instrument};
 
-type Meta = Arc<serde_json::Value>;
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct MetaInner {
+    sequence_number: i64,
+}
+
+type Meta = Arc<MetaInner>;
 
 #[derive(serde::Deserialize)]
 #[serde(tag = "type")]
@@ -406,7 +412,9 @@ async fn connect_handshake(socket: &mut WebSocket) -> bool {
 }
 
 fn create_server_meta() -> Meta {
-    Arc::new(serde_json::json!({ "sequenceNumber": -1 }))
+    Arc::new(MetaInner {
+        sequence_number: -1,
+    })
 }
 
 fn error_to_response(error: Error) -> MessageResponse {
