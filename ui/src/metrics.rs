@@ -197,61 +197,6 @@ where
     }
 }
 
-impl GenerateLabels for sandbox::CompileRequest {
-    fn generate_labels(&self, outcome: Outcome) -> Labels {
-        let Self {
-            target,
-            channel,
-            crate_type,
-            mode,
-            edition,
-            tests,
-            backtrace,
-            code: _,
-        } = *self;
-
-        Labels {
-            endpoint: Endpoint::Compile,
-            outcome,
-
-            target: Some(target),
-            channel: Some(channel),
-            mode: Some(mode),
-            edition: Some(edition),
-            crate_type: Some(crate_type),
-            tests: Some(tests),
-            backtrace: Some(backtrace),
-        }
-    }
-}
-
-impl GenerateLabels for sandbox::ExecuteRequest {
-    fn generate_labels(&self, outcome: Outcome) -> Labels {
-        let Self {
-            channel,
-            mode,
-            edition,
-            crate_type,
-            tests,
-            backtrace,
-            code: _,
-        } = *self;
-
-        Labels {
-            endpoint: Endpoint::Execute,
-            outcome,
-
-            target: None,
-            channel: Some(channel),
-            mode: Some(mode),
-            edition: Some(edition),
-            crate_type: Some(crate_type),
-            tests: Some(tests),
-            backtrace: Some(backtrace),
-        }
-    }
-}
-
 impl GenerateLabels for sandbox::FormatRequest {
     fn generate_labels(&self, outcome: Outcome) -> Labels {
         let Self { edition, code: _ } = *self;
@@ -365,18 +310,6 @@ fn common_success_details(success: bool, stderr: &str) -> Outcome {
                 Outcome::ErrorUserCode
             }
         }
-    }
-}
-
-impl SuccessDetails for sandbox::CompileResponse {
-    fn success_details(&self) -> Outcome {
-        common_success_details(self.success, &self.stderr)
-    }
-}
-
-impl SuccessDetails for sandbox::ExecuteResponse {
-    fn success_details(&self) -> Outcome {
-        common_success_details(self.success, &self.stderr)
     }
 }
 
