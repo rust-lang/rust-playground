@@ -28,9 +28,9 @@ use tracing::{instrument, trace, trace_span, warn, Instrument};
 use crate::{
     bincode_input_closed,
     message::{
-        CoordinatorMessage, DeleteFileRequest, ExecuteCommandRequest, JobId, Multiplexed,
-        OneToOneResponse, ReadFileRequest, ReadFileResponse, SerializedError, WorkerMessage,
-        WriteFileRequest,
+        CoordinatorMessage, DeleteFileRequest, ExecuteCommandRequest, ExecuteCommandResponse,
+        JobId, Multiplexed, OneToOneResponse, ReadFileRequest, ReadFileResponse, SerializedError,
+        WorkerMessage, WriteFileRequest,
     },
     DropErrorDetailsExt,
 };
@@ -233,6 +233,7 @@ impl CargoTomlModifier for ExecuteRequest {
 #[derive(Debug, Clone)]
 pub struct ExecuteResponse {
     pub success: bool,
+    pub exit_detail: String,
 }
 
 #[derive(Debug, Clone)]
@@ -338,6 +339,7 @@ impl CargoTomlModifier for CompileRequest {
 #[derive(Debug, Clone)]
 pub struct CompileResponse {
     pub success: bool,
+    pub exit_detail: String,
     pub code: String,
 }
 
@@ -627,11 +629,17 @@ impl Container {
             .context(CouldNotStartCargoSnafu)?;
 
         let task = async move {
-            let success = task
+            let ExecuteCommandResponse {
+                success,
+                exit_detail,
+            } = task
                 .await
                 .context(CargoTaskPanickedSnafu)?
                 .context(CargoFailedSnafu)?;
-            Ok(ExecuteResponse { success })
+            Ok(ExecuteResponse {
+                success,
+                exit_detail,
+            })
         }
         .boxed();
 
@@ -693,7 +701,10 @@ impl Container {
 
         let commander = self.commander.clone();
         let task = async move {
-            let success = task
+            let ExecuteCommandResponse {
+                success,
+                exit_detail,
+            } = task
                 .await
                 .context(CargoTaskPanickedSnafu)?
                 .context(CargoFailedSnafu)?;
@@ -711,7 +722,11 @@ impl Container {
             // TODO: This is synchronous...
             let code = request.postprocess_result(code);
 
-            Ok(CompileResponse { success, code })
+            Ok(CompileResponse {
+                success,
+                exit_detail,
+                code,
+            })
         }
         .boxed();
 
@@ -744,7 +759,7 @@ impl Container {
 
                     match container_msg {
                         WorkerMessage::ExecuteCommand(resp) => {
-                            return Ok(resp.success);
+                            return Ok(resp);
                         }
                         WorkerMessage::StdoutPacket(packet) => {
                             stdout_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
@@ -869,7 +884,7 @@ pub enum CompileError {
 }
 
 struct SpawnCargo {
-    task: JoinHandle<Result<bool, SpawnCargoError>>,
+    task: JoinHandle<Result<ExecuteCommandResponse, SpawnCargoError>>,
     stdout_rx: mpsc::Receiver<String>,
     stderr_rx: mpsc::Receiver<String>,
 }
@@ -2056,6 +2071,31 @@ mod tests {
 
         let res = coordinator.execute(req).await.unwrap();
         assert_eq!(res.stdout, "hello\n");
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn exit_due_to_signal_is_reported() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let req = ExecuteRequest {
+            channel: Channel::Stable,
+            mode: Mode::Release,
+            edition: Edition::Rust2021,
+            crate_type: CrateType::Binary,
+            tests: false,
+            backtrace: false,
+            code: r#"fn main() { std::process::abort(); }"#.into(),
+        };
+
+        let res = coordinator.execute(req.clone()).await.unwrap();
+
+        assert!(!res.success);
+        assert_contains!(res.exit_detail, "abort");
+
+        coordinator.shutdown().await?;
 
         Ok(())
     }

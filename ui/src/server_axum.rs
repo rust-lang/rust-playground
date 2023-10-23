@@ -904,10 +904,15 @@ pub(crate) mod api_orchestrator_integration_impls {
                 stdout,
                 stderr,
             } = other;
-            let CompileResponse { success, code } = response;
+            let CompileResponse {
+                success,
+                exit_detail,
+                code,
+            } = response;
 
             Self {
                 success,
+                exit_detail,
                 code,
                 stdout,
                 stderr,
@@ -963,10 +968,14 @@ pub(crate) mod api_orchestrator_integration_impls {
                 stdout,
                 stderr,
             } = other;
-            let ExecuteResponse { success } = response;
+            let ExecuteResponse {
+                success,
+                exit_detail,
+            } = response;
 
             Self {
                 success,
+                exit_detail,
                 stdout,
                 stderr,
             }

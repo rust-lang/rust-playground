@@ -148,6 +148,7 @@ impl From<crate::FeatureFlags> for FeatureFlags {
 #[serde(rename_all = "camelCase")]
 struct ExecuteResponse {
     success: bool,
+    exit_detail: String,
 }
 
 #[instrument(skip_all, fields(ws_id))]
@@ -553,11 +554,17 @@ async fn handle_execute_inner(
     let status = status.context(EndSnafu)?;
     let outcome = Outcome::from_success(&status);
 
-    let coordinator::ExecuteResponse { success } = status;
+    let coordinator::ExecuteResponse {
+        success,
+        exit_detail,
+    } = status;
 
     let sent = tx
         .send(Ok(MessageResponse::ExecuteEnd {
-            payload: ExecuteResponse { success },
+            payload: ExecuteResponse {
+                success,
+                exit_detail,
+            },
             meta,
         }))
         .await;

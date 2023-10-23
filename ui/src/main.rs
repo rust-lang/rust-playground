@@ -284,6 +284,8 @@ struct CompileRequest {
 #[derive(Debug, Clone, Serialize)]
 struct CompileResponse {
     success: bool,
+    #[serde(rename = "exitDetail")]
+    exit_detail: String,
     code: String,
     stdout: String,
     stderr: String,
@@ -306,6 +308,8 @@ struct ExecuteRequest {
 #[derive(Debug, Clone, Serialize)]
 struct ExecuteResponse {
     success: bool,
+    #[serde(rename = "exitDetail")]
+    exit_detail: String,
     stdout: String,
     stderr: String,
 }
