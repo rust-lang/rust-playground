@@ -1,8 +1,27 @@
 .form {
   display: flex;
   gap: 0.25em;
+  align-items: flex-start;
+}
+
+.multiLine {
+  flex: 1;
+  display: grid;
+}
+
+.text,
+.sizer {
+  margin: 0;
+  padding: 0.25em;
+  grid-area: 1 / 1 / 2 /2;
+  max-height: 3.5lh;
 }
 
 .text {
-  flex: 1;
+  resize: none;
+}
+
+.sizer {
+  visibility: hidden;
+  white-space: pre-wrap;
 }
