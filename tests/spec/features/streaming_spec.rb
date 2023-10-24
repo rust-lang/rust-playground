@@ -7,10 +7,21 @@ RSpec.feature "Streaming interaction using WebSockets", type: :feature, js: true
 
   before do
     visit '/?features=true'
-    editor.set(slow_output_code)
   end
 
   scenario "output comes when it is available" do
+    editor.set <<~EOF
+      use std::time::Duration;
+
+      fn main() {
+          println!("First");
+          std::thread::sleep(Duration::from_millis(750));
+          println!("Second");
+          std::thread::sleep(Duration::from_millis(750));
+          println!("Third");
+      }
+    EOF
+
     click_on("Run")
 
     within(:output, :stdout) do
@@ -26,19 +37,5 @@ RSpec.feature "Streaming interaction using WebSockets", type: :feature, js: true
 
   def editor
     Editor.new(page)
-  end
-
-  def slow_output_code
-    <<~EOF
-    use std::time::Duration;
-
-    fn main() {
-        println!("First");
-        std::thread::sleep(Duration::from_millis(750));
-        println!("Second");
-        std::thread::sleep(Duration::from_millis(750));
-        println!("Third");
-    }
-    EOF
   end
 end
