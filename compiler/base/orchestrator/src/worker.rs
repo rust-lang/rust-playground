@@ -671,10 +671,7 @@ fn stream_stdio(
     let mut set = JoinSet::new();
 
     set.spawn(async move {
-        loop {
-            let Some(data) = stdin_rx.recv().await else {
-                break;
-            };
+        while let Some(data) = stdin_rx.recv().await {
             stdin
                 .write_all(data.as_bytes())
                 .await
