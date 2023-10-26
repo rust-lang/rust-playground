@@ -373,63 +373,121 @@ enum ProcessCommand {
     Stdin(String),
 }
 
+struct ProcessState {
+    project_path: PathBuf,
+    processes: JoinSet<Result<(), ProcessError>>,
+    stdin_senders: HashMap<JobId, mpsc::Sender<String>>,
+    stdin_shutdown_tx: mpsc::Sender<JobId>,
+}
+
+impl ProcessState {
+    fn new(project_path: PathBuf, stdin_shutdown_tx: mpsc::Sender<JobId>) -> Self {
+        Self {
+            project_path,
+            processes: Default::default(),
+            stdin_senders: Default::default(),
+            stdin_shutdown_tx,
+        }
+    }
+
+    async fn start(
+        &mut self,
+        job_id: JobId,
+        req: ExecuteCommandRequest,
+        worker_msg_tx: MultiplexingSender,
+    ) -> Result<(), ProcessError> {
+        use process_error::*;
+
+        let RunningChild {
+            child,
+            stdin_rx,
+            stdin,
+            stdout,
+            stderr,
+        } = match process_begin(req, &self.project_path, &mut self.stdin_senders, job_id) {
+            Ok(v) => v,
+            Err(e) => {
+                // Should we add a message for process started
+                // in addition to the current message which
+                // indicates that the process has ended?
+                worker_msg_tx
+                    .send_err(e)
+                    .await
+                    .context(UnableToSendExecuteCommandStartedResponseSnafu)?;
+                return Ok(());
+            }
+        };
+
+        let task_set = stream_stdio(worker_msg_tx.clone(), stdin_rx, stdin, stdout, stderr);
+
+        self.processes.spawn({
+            let stdin_shutdown_tx = self.stdin_shutdown_tx.clone();
+            async move {
+                worker_msg_tx
+                    .send(process_end(child, task_set, stdin_shutdown_tx, job_id).await)
+                    .await
+                    .context(UnableToSendExecuteCommandResponseSnafu)
+            }
+        });
+
+        Ok(())
+    }
+
+    async fn stdin(&mut self, job_id: JobId, packet: String) -> Result<(), ProcessError> {
+        use process_error::*;
+
+        if let Some(stdin_tx) = self.stdin_senders.get(&job_id) {
+            stdin_tx
+                .send(packet)
+                .await
+                .drop_error_details()
+                .context(UnableToSendStdinDataSnafu)?;
+        }
+
+        Ok(())
+    }
+
+    fn stdin_close(&mut self, job_id: JobId) {
+        self.stdin_senders.remove(&job_id);
+        // Should we care if we remove a sender that's already removed?
+    }
+
+    async fn join_process(&mut self) -> Option<Result<(), ProcessError>> {
+        use process_error::*;
+
+        let process = self.processes.join_next().await?;
+        Some(process.context(ProcessTaskPanickedSnafu).and_then(|e| e))
+    }
+}
+
 async fn manage_processes(
     mut rx: mpsc::Receiver<Multiplexed<ProcessCommand>>,
     project_path: PathBuf,
 ) -> Result<(), ProcessError> {
     use process_error::*;
 
-    let mut processes = JoinSet::new();
-    let mut stdin_senders = HashMap::new();
     let (stdin_shutdown_tx, mut stdin_shutdown_rx) = mpsc::channel(8);
+    let mut state = ProcessState::new(project_path, stdin_shutdown_tx);
 
     loop {
         select! {
             cmd = rx.recv() => {
                 let Some(Multiplexed(job_id, cmd)) = cmd else { break };
+
                 match cmd {
-                    ProcessCommand::Start(req, worker_msg_tx) => {
-                        let RunningChild { child, stdin_rx, stdin, stdout, stderr } = match process_begin(req, &project_path, &mut stdin_senders, job_id) {
-                            Ok(v) => v,
-                            Err(e) => {
-                                // Should we add a message for process started
-                                // in addition to the current message which
-                                // indicates that the process has ended?
-                                worker_msg_tx.send_err(e).await.context(UnableToSendExecuteCommandStartedResponseSnafu)?;
-                                continue;
-                            }
-                        };
+                    ProcessCommand::Start(req, worker_msg_tx) => state.start(job_id, req, worker_msg_tx).await?,
 
-                        let task_set = stream_stdio(worker_msg_tx.clone(), stdin_rx, stdin, stdout, stderr);
-
-                        processes.spawn({
-                            let stdin_shutdown_tx = stdin_shutdown_tx.clone();
-                            async move {
-                                worker_msg_tx
-                                .send(process_end(child, task_set, stdin_shutdown_tx, job_id).await)
-                                .await
-                                .context(UnableToSendExecuteCommandResponseSnafu)
-                            }
-                        });
-                    }
-
-                    ProcessCommand::Stdin(packet) => {
-                        if let Some(stdin_tx) = stdin_senders.get(&job_id) {
-                            stdin_tx.send(packet).await.drop_error_details().context(UnableToSendStdinDataSnafu)?;
-                        }
-
-                    }
+                    ProcessCommand::Stdin(packet) => state.stdin(job_id, packet).await?,
                 }
             }
 
             job_id = stdin_shutdown_rx.recv() => {
                 let job_id = job_id.context(StdinShutdownReceiverEndedSnafu)?;
-                stdin_senders.remove(&job_id);
-                // Should we care if we remove a sender that's already removed?
+                state.stdin_close(job_id);
             }
 
-            Some(process) = processes.join_next() => {
-                process.context(ProcessTaskPanickedSnafu)??;
+            Some(process) = state.join_process() => {
+                process?;
             }
         }
     }
