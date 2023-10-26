@@ -57,8 +57,6 @@ use crate::{
     DropErrorDetailsExt,
 };
 
-type CommandRequest = (Multiplexed<ExecuteCommandRequest>, MultiplexingSender);
-
 pub async fn listen(project_dir: impl Into<PathBuf>) -> Result<(), Error> {
     let project_dir = project_dir.into();
 
@@ -66,16 +64,14 @@ pub async fn listen(project_dir: impl Into<PathBuf>) -> Result<(), Error> {
     let (worker_msg_tx, worker_msg_rx) = mpsc::channel(8);
     let mut io_tasks = spawn_io_queue(coordinator_msg_tx, worker_msg_rx);
 
-    let (cmd_tx, cmd_rx) = mpsc::channel(8);
-    let (stdin_tx, stdin_rx) = mpsc::channel(8);
-    let process_task = tokio::spawn(manage_processes(stdin_rx, cmd_rx, project_dir.clone()));
+    let (process_tx, process_rx) = mpsc::channel(8);
+    let process_task = tokio::spawn(manage_processes(process_rx, project_dir.clone()));
 
     let handler_task = tokio::spawn(handle_coordinator_message(
         coordinator_msg_rx,
         worker_msg_tx,
         project_dir,
-        cmd_tx,
-        stdin_tx,
+        process_tx,
     ));
 
     select! {
@@ -122,8 +118,7 @@ async fn handle_coordinator_message(
     mut coordinator_msg_rx: mpsc::Receiver<Multiplexed<CoordinatorMessage>>,
     worker_msg_tx: mpsc::Sender<Multiplexed<WorkerMessage>>,
     project_dir: PathBuf,
-    cmd_tx: mpsc::Sender<CommandRequest>,
-    stdin_tx: mpsc::Sender<Multiplexed<String>>,
+    process_tx: mpsc::Sender<Multiplexed<ProcessCommand>>,
 ) -> Result<(), HandleCoordinatorMessageError> {
     use handle_coordinator_message_error::*;
 
@@ -177,16 +172,16 @@ async fn handle_coordinator_message(
                     }
 
                     CoordinatorMessage::ExecuteCommand(req) => {
-                        cmd_tx
-                            .send((Multiplexed(job_id, req), worker_msg_tx()))
+                        process_tx
+                            .send(Multiplexed(job_id, ProcessCommand::Start(req, worker_msg_tx())))
                             .await
                             .drop_error_details()
                             .context(UnableToSendCommandExecutionRequestSnafu)?;
                     }
 
                     CoordinatorMessage::StdinPacket(data) => {
-                        stdin_tx
-                            .send(Multiplexed(job_id, data))
+                        process_tx
+                            .send(Multiplexed(job_id, ProcessCommand::Stdin(data)))
                             .await
                             .drop_error_details()
                             .context(UnableToSendStdinPacketSnafu)?;
@@ -373,9 +368,13 @@ fn parse_working_dir(cwd: Option<String>, project_path: impl Into<PathBuf>) -> P
     final_path
 }
 
+enum ProcessCommand {
+    Start(ExecuteCommandRequest, MultiplexingSender),
+    Stdin(String),
+}
+
 async fn manage_processes(
-    mut stdin_rx: mpsc::Receiver<Multiplexed<String>>,
-    mut cmd_rx: mpsc::Receiver<CommandRequest>,
+    mut rx: mpsc::Receiver<Multiplexed<ProcessCommand>>,
     project_path: PathBuf,
 ) -> Result<(), ProcessError> {
     use process_error::*;
@@ -386,39 +385,40 @@ async fn manage_processes(
 
     loop {
         select! {
-            cmd_req = cmd_rx.recv() => {
-                let Some((Multiplexed(job_id, req), worker_msg_tx)) = cmd_req else { break };
+            cmd = rx.recv() => {
+                let Some(Multiplexed(job_id, cmd)) = cmd else { break };
+                match cmd {
+                    ProcessCommand::Start(req, worker_msg_tx) => {
+                        let RunningChild { child, stdin_rx, stdin, stdout, stderr } = match process_begin(req, &project_path, &mut stdin_senders, job_id) {
+                            Ok(v) => v,
+                            Err(e) => {
+                                // Should we add a message for process started
+                                // in addition to the current message which
+                                // indicates that the process has ended?
+                                worker_msg_tx.send_err(e).await.context(UnableToSendExecuteCommandStartedResponseSnafu)?;
+                                continue;
+                            }
+                        };
 
-                let RunningChild { child, stdin_rx, stdin, stdout, stderr } = match process_begin(req, &project_path, &mut stdin_senders, job_id) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        // Should we add a message for process started
-                        // in addition to the current message which
-                        // indicates that the process has ended?
-                        worker_msg_tx.send_err(e).await.context(UnableToSendExecuteCommandStartedResponseSnafu)?;
-                        continue;
+                        let task_set = stream_stdio(worker_msg_tx.clone(), stdin_rx, stdin, stdout, stderr);
+
+                        processes.spawn({
+                            let stdin_shutdown_tx = stdin_shutdown_tx.clone();
+                            async move {
+                                worker_msg_tx
+                                .send(process_end(child, task_set, stdin_shutdown_tx, job_id).await)
+                                .await
+                                .context(UnableToSendExecuteCommandResponseSnafu)
+                            }
+                        });
                     }
-                };
 
-                let task_set = stream_stdio(worker_msg_tx.clone(), stdin_rx, stdin, stdout, stderr);
+                    ProcessCommand::Stdin(packet) => {
+                        if let Some(stdin_tx) = stdin_senders.get(&job_id) {
+                            stdin_tx.send(packet).await.drop_error_details().context(UnableToSendStdinDataSnafu)?;
+                        }
 
-                processes.spawn({
-                    let stdin_shutdown_tx = stdin_shutdown_tx.clone();
-                    async move {
-                        worker_msg_tx
-                            .send(process_end(child, task_set, stdin_shutdown_tx, job_id).await)
-                            .await
-                            .context(UnableToSendExecuteCommandResponseSnafu)
                     }
-                });
-            }
-
-            stdin_packet = stdin_rx.recv() => {
-                // Dispatch stdin packet to different child by attached command id.
-                let Some(Multiplexed(job_id, packet)) = stdin_packet else { break };
-
-                if let Some(stdin_tx) = stdin_senders.get(&job_id) {
-                    stdin_tx.send(packet).await.drop_error_details().context(UnableToSendStdinDataSnafu)?;
                 }
             }
 
