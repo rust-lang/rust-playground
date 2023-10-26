@@ -186,6 +186,14 @@ async fn handle_coordinator_message(
                             .drop_error_details()
                             .context(UnableToSendStdinPacketSnafu)?;
                     }
+
+                    CoordinatorMessage::StdinClose => {
+                        process_tx
+                            .send(Multiplexed(job_id, ProcessCommand::StdinClose))
+                            .await
+                            .drop_error_details()
+                            .context(UnableToSendStdinCloseSnafu)?;
+                    }
                 }
             }
 
@@ -215,6 +223,9 @@ pub enum HandleCoordinatorMessageError {
 
     #[snafu(display("Failed to send stdin packet to the command task"))]
     UnableToSendStdinPacket { source: mpsc::error::SendError<()> },
+
+    #[snafu(display("Failed to send stdin close request to the command task"))]
+    UnableToSendStdinClose { source: mpsc::error::SendError<()> },
 
     #[snafu(display("A coordinator command handler background task panicked"))]
     TaskPanicked { source: tokio::task::JoinError },
@@ -371,6 +382,7 @@ fn parse_working_dir(cwd: Option<String>, project_path: impl Into<PathBuf>) -> P
 enum ProcessCommand {
     Start(ExecuteCommandRequest, MultiplexingSender),
     Stdin(String),
+    StdinClose,
 }
 
 struct ProcessState {
@@ -478,6 +490,8 @@ async fn manage_processes(
                     ProcessCommand::Start(req, worker_msg_tx) => state.start(job_id, req, worker_msg_tx).await?,
 
                     ProcessCommand::Stdin(packet) => state.stdin(job_id, packet).await?,
+
+                    ProcessCommand::StdinClose => state.stdin_close(job_id),
                 }
             }
 

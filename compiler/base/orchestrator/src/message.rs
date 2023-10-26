@@ -26,6 +26,7 @@ pub enum CoordinatorMessage {
     ReadFile(ReadFileRequest),
     ExecuteCommand(ExecuteCommandRequest),
     StdinPacket(String),
+    StdinClose,
 }
 
 impl_narrow_to_broad!(

@@ -62,6 +62,9 @@ enum WSMessageRequest {
 
     #[serde(rename = "output/execute/wsExecuteStdin")]
     ExecuteStdin { payload: String, meta: Meta },
+
+    #[serde(rename = "output/execute/wsExecuteStdinClose")]
+    ExecuteStdinClose { meta: Meta },
 }
 
 #[derive(serde::Deserialize)]
@@ -500,6 +503,11 @@ async fn handle_msg(
             }
         }
 
+        Ok(ExecuteStdinClose { meta }) => {
+            let execution_tx = active_executions.remove(&meta.sequence_number);
+            drop(execution_tx); // Signal closed
+        }
+
         Err(e) => {
             tx.send(Err(e)).await.ok(/* We don't care if the channel is closed */);
         }
@@ -572,6 +580,8 @@ async fn handle_execute_inner(
         .await;
     abandon_if_closed!(sent);
 
+    let mut stdin_tx = Some(stdin_tx);
+
     let send_stdout = |payload| async {
         let meta = meta.clone();
         tx.send(Ok(MessageResponse::ExecuteStdout { payload, meta }))
@@ -588,12 +598,22 @@ async fn handle_execute_inner(
         tokio::select! {
             status = &mut task => break status,
 
-            Some(stdin) = rx.recv() => {
-                stdin_tx
-                    .send(stdin)
-                    .await
-                    .drop_error_details()
-                    .context(StdinSnafu)?;
+            stdin = rx.recv(), if stdin_tx.is_some() => {
+                match stdin {
+                    Some(stdin) => {
+                        stdin_tx
+                            .as_ref()
+                            .unwrap(/* This is a precondition */)
+                            .send(stdin)
+                            .await
+                            .drop_error_details()
+                            .context(StdinSnafu)?;
+                    }
+                    None => {
+                        let stdin_tx = stdin_tx.take();
+                        drop(stdin_tx); // Signal closed
+                    }
+                }
             }
 
             Some(stdout) = stdout_rx.recv() => {

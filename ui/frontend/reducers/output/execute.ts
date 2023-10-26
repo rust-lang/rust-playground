@@ -1,4 +1,4 @@
-import { Draft, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { AnyAction, Draft, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
 import { SimpleThunkAction, adaptFetchError, jsonPost, routes } from '../../actions';
@@ -78,6 +78,14 @@ export const performExecute = createAsyncThunk(sliceName, async (payload: Execut
   adaptFetchError(() => jsonPost<ExecuteResponseBody>(routes.execute, payload)),
 );
 
+const prepareWithCurrentSequenceNumber = <P>(payload: P, sequenceNumber: number) => ({
+  payload,
+  meta: {
+    websocket: true,
+    sequenceNumber,
+  },
+});
+
 const sequenceNumberMatches =
   <P>(whenMatch: (state: Draft<State>, payload: P) => void) =>
   (state: Draft<State>, action: WsPayloadAction<P>) => {
@@ -111,13 +119,12 @@ const slice = createSlice({
     wsExecuteStdin: {
       reducer: () => {},
 
-      prepare: (payload: string, sequenceNumber: number) => ({
-        payload,
-        meta: {
-          websocket: true,
-          sequenceNumber,
-        },
-      }),
+      prepare: prepareWithCurrentSequenceNumber,
+    },
+    wsExecuteStdinClose: {
+      reducer: () => {},
+
+      prepare: prepareWithCurrentSequenceNumber,
     },
   },
   extraReducers: (builder) => {
@@ -192,16 +199,26 @@ export const performCommonExecute =
     }
   };
 
-export const wsExecuteStdin =
-  (payload: string): SimpleThunkAction =>
+const dispatchWhenSequenceNumber =
+  <A extends AnyAction>(cb: (sequenceNumber: number) => A): SimpleThunkAction =>
   (dispatch, getState) => {
     const state = getState();
-    const { requestsInProgress, sequenceNumber } = state.output.execute;
-    if (requestsInProgress === 0 || !sequenceNumber) {
-      return;
+    const { sequenceNumber } = state.output.execute;
+    if (sequenceNumber) {
+      const action = cb(sequenceNumber);
+      dispatch(action);
     }
-    dispatch(slice.actions.wsExecuteStdin(payload, sequenceNumber));
   };
+
+export const wsExecuteStdin = (payload: string): SimpleThunkAction =>
+  dispatchWhenSequenceNumber((sequenceNumber) =>
+    slice.actions.wsExecuteStdin(payload, sequenceNumber),
+  );
+
+export const wsExecuteStdinClose = (): SimpleThunkAction =>
+  dispatchWhenSequenceNumber((sequenceNumber) =>
+    slice.actions.wsExecuteStdinClose(undefined, sequenceNumber),
+  );
 
 export { wsExecuteBeginSchema, wsExecuteStdoutSchema, wsExecuteStderrSchema, wsExecuteEndSchema };
 

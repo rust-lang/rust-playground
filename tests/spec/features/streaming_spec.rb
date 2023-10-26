@@ -63,6 +63,30 @@ RSpec.feature "Streaming interaction using WebSockets", type: :feature, js: true
     end
   end
 
+  scenario "input can be closed" do
+    editor.set <<~EOF
+      fn main() {
+          let mut input = String::new();
+          while std::io::stdin().read_line(&mut input).unwrap() != 0 {
+              println!("You entered >>>{input:?}<<<");
+              input.clear();
+          }
+          println!("All done");
+      }
+    EOF
+
+    click_on("Run")
+
+    within(:stdin) do
+      click_on 'Execution control'
+      click_on 'Close stdin'
+    end
+
+    within(:output, :stdout) do
+      expect(page).to have_content 'All done'
+    end
+  end
+
   def editor
     Editor.new(page)
   end

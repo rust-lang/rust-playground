@@ -777,10 +777,22 @@ impl Container {
 
         let task = tokio::spawn({
             async move {
+                let mut stdin_open = true;
+
                 loop {
                     select! {
-                        Some(stdin) = stdin_rx.recv() => {
-                            let msg = CoordinatorMessage::StdinPacket(stdin);
+                        stdin = stdin_rx.recv(), if stdin_open => {
+                            let msg = match stdin {
+                                Some(stdin) => {
+                                    CoordinatorMessage::StdinPacket(stdin)
+                                }
+
+                                None => {
+                                    stdin_open = false;
+                                    CoordinatorMessage::StdinClose
+                                }
+                            };
+
                             trace!("processing {msg:?}");
                             to_worker_tx.send(msg).await.context(StdinSnafu)?;
                         },
@@ -1796,6 +1808,62 @@ mod tests {
 
         assert!(response.success, "{stderr}");
         assert_contains!(stdout, r#">>>"this is stdin\n"<<<"#);
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn execute_stdin_close() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let request = ExecuteRequest {
+            code: r#"
+                fn main() {
+                    let mut input = String::new();
+                    while let Ok(n) = std::io::stdin().read_line(&mut input) {
+                        if n == 0 {
+                            break;
+                        }
+                        println!("You entered >>>{input:?}<<<");
+                        input.clear();
+                    }
+                }
+            "#
+            .into(),
+            ..ARBITRARY_EXECUTE_REQUEST
+        };
+
+        let ActiveExecution {
+            task,
+            stdin_tx,
+            stdout_rx,
+            stderr_rx,
+        } = coordinator.begin_execute(request).await.unwrap();
+
+        for i in 0..3 {
+            stdin_tx.send(format!("line {i}\n")).await.unwrap();
+        }
+
+        stdin_tx.send("no newline".into()).await.unwrap();
+        drop(stdin_tx); // Close the stdin handle
+
+        let WithOutput {
+            response,
+            stdout,
+            stderr,
+        } = WithOutput::try_absorb(task, stdout_rx, stderr_rx)
+            .with_timeout()
+            .await
+            .unwrap();
+
+        assert!(response.success, "{stderr}");
+        assert_contains!(stdout, r#">>>"line 0\n"<<<"#);
+        assert_contains!(stdout, r#">>>"line 1\n"<<<"#);
+        assert_contains!(stdout, r#">>>"line 2\n"<<<"#);
+        assert_contains!(stdout, r#">>>"no newline"<<<"#);
 
         coordinator.shutdown().await?;
 
