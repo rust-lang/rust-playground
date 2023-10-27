@@ -1441,8 +1441,6 @@ mod tests {
     use futures::{future::try_join_all, Future, FutureExt};
     use std::{sync::Once, time::Duration};
     use tempdir::TempDir;
-    use tokio::join;
-    use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 
     use super::*;
 
@@ -1776,16 +1774,13 @@ mod tests {
             stderr_rx,
         } = coordinator.begin_compile(req).await.unwrap();
 
-        let stdout = ReceiverStream::new(stdout_rx);
-        let stdout = stdout.collect::<String>();
-
-        let stderr = ReceiverStream::new(stderr_rx);
-        let stderr = stderr.collect::<String>();
-
-        let (complete, _stdout, stderr) =
-            async { join!(task, stdout, stderr) }.with_timeout().await;
-
-        let response = complete.unwrap();
+        let WithOutput {
+            response,
+            stdout: _,
+            stderr,
+        } = WithOutput::try_absorb(task, stdout_rx, stderr_rx)
+            .await
+            .unwrap();
 
         assert!(response.success, "stderr: {}", stderr);
         assert_contains!(stderr, "Compiling");
