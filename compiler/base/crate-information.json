@@ -11,7 +11,7 @@
   },
   {
     "name": "ahash",
-    "version": "0.8.3",
+    "version": "0.8.6",
     "id": "ahash"
   },
   {
@@ -96,7 +96,7 @@
   },
   {
     "name": "base64",
-    "version": "0.21.4",
+    "version": "0.21.5",
     "id": "base64"
   },
   {
@@ -171,22 +171,22 @@
   },
   {
     "name": "clap",
-    "version": "4.4.6",
+    "version": "4.4.7",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.4.6",
+    "version": "4.4.7",
     "id": "clap_builder"
   },
   {
     "name": "clap_derive",
-    "version": "4.4.2",
+    "version": "4.4.7",
     "id": "clap_derive"
   },
   {
     "name": "clap_lex",
-    "version": "0.5.1",
+    "version": "0.6.0",
     "id": "clap_lex"
   },
   {
@@ -216,7 +216,7 @@
   },
   {
     "name": "cpufeatures",
-    "version": "0.2.10",
+    "version": "0.2.11",
     "id": "cpufeatures"
   },
   {
@@ -411,7 +411,7 @@
   },
   {
     "name": "futures",
-    "version": "0.3.28",
+    "version": "0.3.29",
     "id": "futures"
   },
   {
@@ -421,42 +421,42 @@
   },
   {
     "name": "futures-channel",
-    "version": "0.3.28",
+    "version": "0.3.29",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.3.28",
+    "version": "0.3.29",
     "id": "futures_core"
   },
   {
     "name": "futures-executor",
-    "version": "0.3.28",
+    "version": "0.3.29",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.3.28",
+    "version": "0.3.29",
     "id": "futures_io"
   },
   {
     "name": "futures-macro",
-    "version": "0.3.28",
+    "version": "0.3.29",
     "id": "futures_macro"
   },
   {
     "name": "futures-sink",
-    "version": "0.3.28",
+    "version": "0.3.29",
     "id": "futures_sink"
   },
   {
     "name": "futures-task",
-    "version": "0.3.28",
+    "version": "0.3.29",
     "id": "futures_task"
   },
   {
     "name": "futures-util",
-    "version": "0.3.28",
+    "version": "0.3.29",
     "id": "futures_util"
   },
   {
@@ -606,7 +606,7 @@
   },
   {
     "name": "ipnet",
-    "version": "2.8.0",
+    "version": "2.9.0",
     "id": "ipnet"
   },
   {
@@ -751,7 +751,7 @@
   },
   {
     "name": "mio",
-    "version": "0.8.8",
+    "version": "0.8.9",
     "id": "mio"
   },
   {
@@ -1071,7 +1071,7 @@
   },
   {
     "name": "rustix",
-    "version": "0.38.20",
+    "version": "0.38.21",
     "id": "rustix"
   },
   {
@@ -1106,12 +1106,12 @@
   },
   {
     "name": "serde",
-    "version": "1.0.189",
+    "version": "1.0.190",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.189",
+    "version": "1.0.190",
     "id": "serde_derive"
   },
   {
@@ -1121,7 +1121,7 @@
   },
   {
     "name": "serde_spanned",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "id": "serde_spanned"
   },
   {
@@ -1186,13 +1186,13 @@
   },
   {
     "name": "socket2",
-    "version": "0.5.4",
+    "version": "0.5.5",
     "id": "socket2"
   },
   {
     "name": "socket2",
-    "version": "0.4.9",
-    "id": "socket2_0_4_9"
+    "version": "0.4.10",
+    "id": "socket2_0_4_10"
   },
   {
     "name": "spin",
@@ -1241,7 +1241,7 @@
   },
   {
     "name": "tempfile",
-    "version": "3.8.0",
+    "version": "3.8.1",
     "id": "tempfile"
   },
   {
@@ -1346,22 +1346,22 @@
   },
   {
     "name": "tokio-util",
-    "version": "0.7.9",
+    "version": "0.7.10",
     "id": "tokio_util"
   },
   {
     "name": "toml",
-    "version": "0.8.2",
+    "version": "0.8.5",
     "id": "toml"
   },
   {
     "name": "toml_datetime",
-    "version": "0.6.3",
+    "version": "0.6.5",
     "id": "toml_datetime"
   },
   {
     "name": "toml_edit",
-    "version": "0.20.2",
+    "version": "0.20.5",
     "id": "toml_edit"
   },
   {
@@ -1523,6 +1523,11 @@
     "name": "yaml-rust",
     "version": "0.4.5",
     "id": "yaml_rust"
+  },
+  {
+    "name": "zerocopy",
+    "version": "0.7.15",
+    "id": "zerocopy"
   },
   {
     "name": "zeroize",

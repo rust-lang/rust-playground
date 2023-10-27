@@ -32,7 +32,7 @@ default-features = false
 
 [dependencies.ahash]
 package = "ahash"
-version = "=0.8.3"
+version = "=0.8.6"
 features = ["getrandom", "runtime-rng", "std"]
 
 [dependencies.aho_corasick]
@@ -111,8 +111,8 @@ features = ["std"]
 
 [dependencies.base64]
 package = "base64"
-version = "=0.21.4"
-features = ["std"]
+version = "=0.21.5"
+features = ["alloc", "std"]
 
 [dependencies.bit_field]
 package = "bit_field"
@@ -180,22 +180,22 @@ features = ["android-tzdata", "clock", "iana-time-zone", "js-sys", "oldtime", "s
 
 [dependencies.clap]
 package = "clap"
-version = "=4.4.6"
+version = "=4.4.7"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.4.6"
+version = "=4.4.7"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
 default-features = false
 
 [dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.4.2"
+version = "=4.4.7"
 
 [dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.5.1"
+version = "=0.6.0"
 
 [dependencies.color_quant]
 package = "color_quant"
@@ -221,7 +221,7 @@ version = "=0.16.2"
 
 [dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.2.10"
+version = "=0.2.11"
 
 [dependencies.crc32fast]
 package = "crc32fast"
@@ -405,7 +405,7 @@ version = "=0.1.5"
 
 [dependencies.futures]
 package = "futures"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "async-await", "compat", "executor", "futures-executor", "io-compat", "std", "thread-pool"]
 
 [dependencies.futures_0_1_31]
@@ -415,42 +415,42 @@ features = ["use_std", "with-deprecated"]
 
 [dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "futures-sink", "sink", "std"]
 
 [dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "std"]
 
 [dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["num_cpus", "std", "thread-pool"]
 default-features = false
 
 [dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["std"]
 
 [dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.28"
+version = "=0.3.29"
 
 [dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "std"]
 
 [dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "std"]
 
 [dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "async-await", "async-await-macro", "channel", "compat", "futures-channel", "futures-io", "futures-macro", "futures-sink", "futures_01", "io", "io-compat", "memchr", "sink", "slab", "std", "tokio-io"]
 
 [dependencies.generic_array]
@@ -588,7 +588,7 @@ version = "=0.1.4"
 
 [dependencies.ipnet]
 package = "ipnet"
-version = "=2.8.0"
+version = "=2.9.0"
 features = ["std"]
 
 [dependencies.is_terminal]
@@ -722,7 +722,7 @@ features = ["simd", "simd-adler32", "with-alloc"]
 
 [dependencies.mio]
 package = "mio"
-version = "=0.8.8"
+version = "=0.8.9"
 features = ["log", "net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
@@ -1021,7 +1021,7 @@ version = "=0.4.0"
 
 [dependencies.rustix]
 package = "rustix"
-version = "=0.38.20"
+version = "=0.38.21"
 features = ["alloc", "fs", "std", "termios", "use-libc-auxv"]
 
 [dependencies.ryu]
@@ -1053,12 +1053,12 @@ features = ["std"]
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.189"
+version = "=1.0.190"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.189"
+version = "=1.0.190"
 
 [dependencies.serde_json]
 package = "serde_json"
@@ -1067,7 +1067,7 @@ features = ["raw_value", "std"]
 
 [dependencies.serde_spanned]
 package = "serde_spanned"
-version = "=0.6.3"
+version = "=0.6.4"
 features = ["serde"]
 
 [dependencies.serde_urlencoded]
@@ -1126,12 +1126,12 @@ version = "=0.3.2"
 
 [dependencies.socket2]
 package = "socket2"
-version = "=0.5.4"
+version = "=0.5.5"
 features = ["all"]
 
-[dependencies.socket2_0_4_9]
+[dependencies.socket2_0_4_10]
 package = "socket2"
-version = "=0.4.9"
+version = "=0.4.10"
 features = ["all"]
 
 [dependencies.spin]
@@ -1178,7 +1178,7 @@ features = ["xattr"]
 
 [dependencies.tempfile]
 package = "tempfile"
-version = "=3.8.0"
+version = "=3.8.1"
 
 [dependencies.tendril]
 package = "tendril"
@@ -1268,22 +1268,22 @@ features = ["runtime"]
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.9"
+version = "=0.7.10"
 features = ["codec", "tracing"]
 
 [dependencies.toml]
 package = "toml"
-version = "=0.8.2"
+version = "=0.8.5"
 features = ["display", "parse"]
 
 [dependencies.toml_datetime]
 package = "toml_datetime"
-version = "=0.6.3"
+version = "=0.6.5"
 features = ["serde"]
 
 [dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.20.2"
+version = "=0.20.5"
 features = ["serde"]
 
 [dependencies.tower_service]
@@ -1427,6 +1427,12 @@ version = "=0.17.0"
 package = "yaml-rust"
 version = "=0.4.5"
 
+[dependencies.zerocopy]
+package = "zerocopy"
+version = "=0.7.15"
+features = ["simd"]
+default-features = false
+
 [dependencies.zeroize]
 package = "zeroize"
 version = "=1.6.0"
@@ -1450,7 +1456,7 @@ default-features = false
 
 [build_dependencies.ahash]
 package = "ahash"
-version = "=0.8.3"
+version = "=0.8.6"
 features = ["getrandom", "runtime-rng", "std"]
 
 [build_dependencies.aho_corasick]
@@ -1529,8 +1535,8 @@ features = ["std"]
 
 [build_dependencies.base64]
 package = "base64"
-version = "=0.21.4"
-features = ["std"]
+version = "=0.21.5"
+features = ["alloc", "std"]
 
 [build_dependencies.bit_field]
 package = "bit_field"
@@ -1598,22 +1604,22 @@ features = ["android-tzdata", "clock", "iana-time-zone", "js-sys", "oldtime", "s
 
 [build_dependencies.clap]
 package = "clap"
-version = "=4.4.6"
+version = "=4.4.7"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build_dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.4.6"
+version = "=4.4.7"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
 default-features = false
 
 [build_dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.4.2"
+version = "=4.4.7"
 
 [build_dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.5.1"
+version = "=0.6.0"
 
 [build_dependencies.color_quant]
 package = "color_quant"
@@ -1639,7 +1645,7 @@ version = "=0.16.2"
 
 [build_dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.2.10"
+version = "=0.2.11"
 
 [build_dependencies.crc32fast]
 package = "crc32fast"
@@ -1823,7 +1829,7 @@ version = "=0.1.5"
 
 [build_dependencies.futures]
 package = "futures"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "async-await", "compat", "executor", "futures-executor", "io-compat", "std", "thread-pool"]
 
 [build_dependencies.futures_0_1_31]
@@ -1833,42 +1839,42 @@ features = ["use_std", "with-deprecated"]
 
 [build_dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "futures-sink", "sink", "std"]
 
 [build_dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "std"]
 
 [build_dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["num_cpus", "std", "thread-pool"]
 default-features = false
 
 [build_dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["std"]
 
 [build_dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.28"
+version = "=0.3.29"
 
 [build_dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "std"]
 
 [build_dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "std"]
 
 [build_dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.28"
+version = "=0.3.29"
 features = ["alloc", "async-await", "async-await-macro", "channel", "compat", "futures-channel", "futures-io", "futures-macro", "futures-sink", "futures_01", "io", "io-compat", "memchr", "sink", "slab", "std", "tokio-io"]
 
 [build_dependencies.generic_array]
@@ -2006,7 +2012,7 @@ version = "=0.1.4"
 
 [build_dependencies.ipnet]
 package = "ipnet"
-version = "=2.8.0"
+version = "=2.9.0"
 features = ["std"]
 
 [build_dependencies.is_terminal]
@@ -2140,7 +2146,7 @@ features = ["simd", "simd-adler32", "with-alloc"]
 
 [build_dependencies.mio]
 package = "mio"
-version = "=0.8.8"
+version = "=0.8.9"
 features = ["log", "net", "os-ext", "os-poll"]
 
 [build_dependencies.nalgebra]
@@ -2439,7 +2445,7 @@ version = "=0.4.0"
 
 [build_dependencies.rustix]
 package = "rustix"
-version = "=0.38.20"
+version = "=0.38.21"
 features = ["alloc", "fs", "std", "termios", "use-libc-auxv"]
 
 [build_dependencies.ryu]
@@ -2471,12 +2477,12 @@ features = ["std"]
 
 [build_dependencies.serde]
 package = "serde"
-version = "=1.0.189"
+version = "=1.0.190"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [build_dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.189"
+version = "=1.0.190"
 
 [build_dependencies.serde_json]
 package = "serde_json"
@@ -2485,7 +2491,7 @@ features = ["raw_value", "std"]
 
 [build_dependencies.serde_spanned]
 package = "serde_spanned"
-version = "=0.6.3"
+version = "=0.6.4"
 features = ["serde"]
 
 [build_dependencies.serde_urlencoded]
@@ -2544,12 +2550,12 @@ version = "=0.3.2"
 
 [build_dependencies.socket2]
 package = "socket2"
-version = "=0.5.4"
+version = "=0.5.5"
 features = ["all"]
 
-[build_dependencies.socket2_0_4_9]
+[build_dependencies.socket2_0_4_10]
 package = "socket2"
-version = "=0.4.9"
+version = "=0.4.10"
 features = ["all"]
 
 [build_dependencies.spin]
@@ -2596,7 +2602,7 @@ features = ["xattr"]
 
 [build_dependencies.tempfile]
 package = "tempfile"
-version = "=3.8.0"
+version = "=3.8.1"
 
 [build_dependencies.tendril]
 package = "tendril"
@@ -2686,22 +2692,22 @@ features = ["runtime"]
 
 [build_dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.9"
+version = "=0.7.10"
 features = ["codec", "tracing"]
 
 [build_dependencies.toml]
 package = "toml"
-version = "=0.8.2"
+version = "=0.8.5"
 features = ["display", "parse"]
 
 [build_dependencies.toml_datetime]
 package = "toml_datetime"
-version = "=0.6.3"
+version = "=0.6.5"
 features = ["serde"]
 
 [build_dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.20.2"
+version = "=0.20.5"
 features = ["serde"]
 
 [build_dependencies.tower_service]
@@ -2844,6 +2850,12 @@ version = "=0.17.0"
 [build_dependencies.yaml_rust]
 package = "yaml-rust"
 version = "=0.4.5"
+
+[build_dependencies.zerocopy]
+package = "zerocopy"
+version = "=0.7.15"
+features = ["simd"]
+default-features = false
 
 [build_dependencies.zeroize]
 package = "zeroize"
