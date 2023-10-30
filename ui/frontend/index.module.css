@@ -9,6 +9,44 @@
   --header-tint: #428bca;
   --header-border-radius: 4px;
   --header-accent-border: #bdbdbd;
+
+  /* The big red button */
+
+  --button-primary-color: white;
+  --button-primary-bg-color: var(--rust);
+  --button-primary-border-color: var(--rust-dark);
+  --button-primary-bg-color-light: color-mix(in hsl, var(--button-primary-bg-color), white);
+  --button-primary-border-color-light: color-mix(in hsl, var(--button-primary-border-color), white);
+
+  /* Clicked */
+  --button-primary-active-color: color-mix(in hsl, white, black 30%);
+
+  /* Not the big red button */
+
+  --button-secondary-color: #444;
+  --button-secondary-bg-color-top: #fff;
+  --button-secondary-bg-color-bottom: #f9f9f9;
+  --button-secondary-border-color: color-mix(
+    in hsl,
+    var(--button-secondary-bg-color-bottom),
+    black 20%
+  );
+
+  /* Disabled */
+  --button-secondary-bg-color-light: color-mix(
+    in hsl,
+    var(--button-secondary-bg-color-bottom),
+    white
+  );
+  --button-secondary-border-color-light: color-mix(
+    in hsl,
+    var(--button-secondary-border-color),
+    white
+  );
+  --button-secondary-color-light: color-mix(in hsl, var(--button-secondary-color), white);
+
+  /* Clicked */
+  --button-secondary-active-color: color-mix(in hsl, black, white 30%);
 }
 
 /* Modify normalized styles */

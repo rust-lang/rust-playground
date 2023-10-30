@@ -14,6 +14,7 @@ node_modules
 # Slowly migrate files that we've touched
 !.eslintrc.js
 !BuildMenu.tsx
+!ButtonSet.tsx
 !PopButton.tsx
 !compileActions.ts
 !editor/AceEditor.tsx

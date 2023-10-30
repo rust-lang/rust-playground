@@ -1,0 +1,112 @@
+$width: 1px;
+$radius: 4px;
+
+.set {
+  display: flex;
+}
+
+.-border {
+  border-width: $width 0;
+  border-style: solid;
+
+  &:first-child {
+    border-top-left-radius: $radius;
+    border-bottom-left-radius: $radius;
+    border-left-width: $width;
+  }
+
+  &:last-child {
+    border-top-right-radius: $radius;
+    border-bottom-right-radius: $radius;
+    border-right-width: $width;
+  }
+}
+
+.-button {
+  composes: -buttonReset from './shared.module.css';
+  display: grid;
+  grid-auto-flow: column;
+  gap: 0.5em;
+  align-content: center;
+  align-items: center;
+  padding: 0 1.25em;
+  height: 3em;
+  font-weight: 600;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &:enabled {
+    cursor: pointer;
+  }
+}
+
+.primary {
+  composes: -border -button;
+  background-color: var(--button-primary-bg-color);
+  border-color: var(--button-primary-border-color);
+  color: var(--button-primary-color);
+  font-weight: 700;
+
+  &:disabled {
+    background-color: var(--button-primary-bg-color-light);
+    border-color: var(--button-primary-border-color-light);
+  }
+
+  &:hover:enabled {
+    background-color: var(--button-primary-border-color);
+  }
+
+  &:active:enabled {
+    box-shadow: inset 0 0 5px var(--button-primary-active-color);
+  }
+}
+
+.secondary {
+  composes: -border -button;
+  background: linear-gradient(
+    to bottom,
+    var(--button-secondary-bg-color-top),
+    var(--button-secondary-bg-color-bottom)
+  );
+  border-color: var(--button-secondary-border-color);
+  color: var(--button-secondary-color);
+
+  &:disabled {
+    background: inherit;
+    background-color: var(--button-secondary-bg-color-light);
+    border-color: var(--button-secondary-border-color-light);
+    color: var(--button-secondary-color-light);
+  }
+
+  &:hover:enabled {
+    background: inherit;
+    background-color: var(--button-secondary-border-color);
+  }
+
+  &:active:enabled {
+    box-shadow: inset 0 0 5px var(--button-secondary-active-color);
+  }
+}
+
+.iconLeft {
+  transform: translate(-0.25em, 0);
+}
+
+.iconRight {
+  transform: translate(0.25em, 0);
+}
+
+.rule {
+  composes: -border;
+  background-color: var(--button-secondary-border-color);
+  width: 1px;
+  border-color: var(--button-secondary-border-color);
+}
+
+.icon {
+  composes: secondary;
+  padding: 0;
+  aspect-ratio: 1/1;
+  justify-items: center;
+}
