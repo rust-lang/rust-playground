@@ -23,14 +23,19 @@ $radius: 4px;
 }
 
 .-button {
+  --button-gap: 0.5em;
+  --button-side-padding: 1.25em;
+  --button-height: 3em;
+  --button-side-icon-nudge: 0.25em;
+
   composes: -buttonReset from './shared.module.css';
   display: grid;
   grid-auto-flow: column;
-  gap: 0.5em;
+  gap: var(--button-gap);
   align-content: center;
   align-items: center;
-  padding: 0 1.25em;
-  height: 3em;
+  padding: 0 var(--button-side-padding);
+  height: var(--button-height);
   font-weight: 600;
   text-decoration: none;
   text-transform: uppercase;
@@ -39,6 +44,13 @@ $radius: 4px;
   &:enabled {
     cursor: pointer;
   }
+}
+
+.small {
+  --button-gap: 0.25em;
+  --button-side-padding: 0.75em;
+  --button-height: 2.5em;
+  --button-side-icon-nudge: 0.125em;
 }
 
 .primary {
@@ -90,11 +102,11 @@ $radius: 4px;
 }
 
 .iconLeft {
-  transform: translate(-0.25em, 0);
+  transform: translate(calc(-1 * var(--button-side-icon-nudge)), 0);
 }
 
 .iconRight {
-  transform: translate(0.25em, 0);
+  transform: translate(var(--button-side-icon-nudge), 0);
 }
 
 .rule {
