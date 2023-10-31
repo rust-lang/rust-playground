@@ -1,6 +1,7 @@
 import {
   FloatingArrow,
   FloatingFocusManager,
+  Placement,
   arrow,
   autoUpdate,
   flip,
@@ -31,6 +32,11 @@ interface NewPopProps {
   menuContainer?: React.RefObject<HTMLDivElement>;
 }
 
+const CONTAINER_STYLE: { [key in Placement]?: string } = {
+  top: styles.contentTop,
+  bottom: styles.contentBottom,
+};
+
 const PopButton: React.FC<NewPopProps> = ({ Button, Menu, menuContainer }) => {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = useCallback(() => setIsOpen((v) => !v), []);
@@ -38,12 +44,14 @@ const PopButton: React.FC<NewPopProps> = ({ Button, Menu, menuContainer }) => {
 
   const arrowRef = useRef(null);
 
-  const { x, y, refs, strategy, context } = useFloating({
+  const { x, y, refs, strategy, context, placement } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
     middleware: [offset(10), flip(), shift(), arrow({ element: arrowRef })],
     whileElementsMounted: autoUpdate,
   });
+
+  const containerClass = CONTAINER_STYLE[placement] ?? '';
 
   const click = useClick(context);
   const dismiss = useDismiss(context);
