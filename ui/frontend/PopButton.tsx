@@ -17,13 +17,17 @@ import { createPortal } from 'react-dom';
 
 import styles from './PopButton.module.css';
 
+export interface ButtonProps {
+  toggle: () => void;
+}
+
+export interface MenuProps {
+  close: () => void;
+}
+
 interface NewPopProps {
-  Button: React.ComponentType<
-    {
-      toggle: () => void;
-    } & React.RefAttributes<HTMLButtonElement>
-  >;
-  Menu: React.ComponentType<{ close: () => void }>;
+  Button: React.ComponentType<ButtonProps & React.RefAttributes<HTMLButtonElement>>;
+  Menu: React.ComponentType<MenuProps>;
   menuContainer?: React.RefObject<HTMLDivElement>;
 }
 
