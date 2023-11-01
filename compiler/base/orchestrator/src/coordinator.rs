@@ -456,6 +456,7 @@ where
 
     pub async fn begin_execute(
         &self,
+        token: CancellationToken,
         request: ExecuteRequest,
     ) -> Result<ActiveExecution, ExecuteError> {
         use execute_error::*;
@@ -463,7 +464,7 @@ where
         self.select_channel(request.channel)
             .await
             .context(CouldNotStartContainerSnafu)?
-            .begin_execute(request)
+            .begin_execute(token, request)
             .await
     }
 
@@ -482,6 +483,7 @@ where
 
     pub async fn begin_compile(
         &self,
+        token: CancellationToken,
         request: CompileRequest,
     ) -> Result<ActiveCompilation, CompileError> {
         use compile_error::*;
@@ -489,7 +491,7 @@ where
         self.select_channel(request.channel)
             .await
             .context(CouldNotStartContainerSnafu)?
-            .begin_compile(request)
+            .begin_compile(token, request)
             .await
     }
 
@@ -603,12 +605,14 @@ impl Container {
         &self,
         request: ExecuteRequest,
     ) -> Result<WithOutput<ExecuteResponse>, ExecuteError> {
+        let token = Default::default();
+
         let ActiveExecution {
             task,
             stdin_tx,
             stdout_rx,
             stderr_rx,
-        } = self.begin_execute(request).await?;
+        } = self.begin_execute(token, request).await?;
 
         drop(stdin_tx);
         WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
@@ -617,6 +621,7 @@ impl Container {
     #[instrument(skip_all)]
     async fn begin_execute(
         &self,
+        token: CancellationToken,
         request: ExecuteRequest,
     ) -> Result<ActiveExecution, ExecuteError> {
         use execute_error::*;
@@ -642,7 +647,7 @@ impl Container {
             stdout_rx,
             stderr_rx,
         } = self
-            .spawn_cargo_task(execute_cargo)
+            .spawn_cargo_task(token, execute_cargo)
             .await
             .context(CouldNotStartCargoSnafu)?;
 
@@ -673,11 +678,13 @@ impl Container {
         &self,
         request: CompileRequest,
     ) -> Result<WithOutput<CompileResponse>, CompileError> {
+        let token = Default::default();
+
         let ActiveCompilation {
             task,
             stdout_rx,
             stderr_rx,
-        } = self.begin_compile(request).await?;
+        } = self.begin_compile(token, request).await?;
 
         WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
     }
@@ -685,6 +692,7 @@ impl Container {
     #[instrument(skip_all)]
     async fn begin_compile(
         &self,
+        token: CancellationToken,
         request: CompileRequest,
     ) -> Result<ActiveCompilation, CompileError> {
         use compile_error::*;
@@ -715,7 +723,7 @@ impl Container {
             stdout_rx,
             stderr_rx,
         } = self
-            .spawn_cargo_task(execute_cargo)
+            .spawn_cargo_task(token, execute_cargo)
             .await
             .context(CouldNotStartCargoSnafu)?;
 
@@ -761,6 +769,7 @@ impl Container {
 
     async fn spawn_cargo_task(
         &self,
+        token: CancellationToken,
         execute_cargo: ExecuteCommandRequest,
     ) -> Result<SpawnCargo, SpawnCargoError> {
         use spawn_cargo_error::*;
@@ -777,10 +786,19 @@ impl Container {
 
         let task = tokio::spawn({
             async move {
+                let mut already_cancelled = false;
                 let mut stdin_open = true;
 
                 loop {
                     select! {
+                        () = token.cancelled(), if !already_cancelled => {
+                            already_cancelled = true;
+
+                            let msg = CoordinatorMessage::Kill;
+                            trace!("processing {msg:?}");
+                            to_worker_tx.send(msg).await.context(KillSnafu)?;
+                        },
+
                         stdin = stdin_rx.recv(), if stdin_open => {
                             let msg = match stdin {
                                 Some(stdin) => {
@@ -952,6 +970,9 @@ pub enum SpawnCargoError {
 
     #[snafu(display("Unable to send stdin message"))]
     Stdin { source: MultiplexedSenderError },
+
+    #[snafu(display("Unable to send kill message"))]
+    Kill { source: MultiplexedSenderError },
 }
 
 #[derive(Debug, Clone)]
@@ -1787,12 +1808,13 @@ mod tests {
             ..ARBITRARY_EXECUTE_REQUEST
         };
 
+        let token = Default::default();
         let ActiveExecution {
             task,
             stdin_tx,
             stdout_rx,
             stderr_rx,
-        } = coordinator.begin_execute(request).await.unwrap();
+        } = coordinator.begin_execute(token, request).await.unwrap();
 
         stdin_tx.send("this is stdin\n".into()).await.unwrap();
         // Purposefully not dropping stdin_tx early -- a user might forget
@@ -1836,12 +1858,13 @@ mod tests {
             ..ARBITRARY_EXECUTE_REQUEST
         };
 
+        let token = Default::default();
         let ActiveExecution {
             task,
             stdin_tx,
             stdout_rx,
             stderr_rx,
-        } = coordinator.begin_execute(request).await.unwrap();
+        } = coordinator.begin_execute(token, request).await.unwrap();
 
         for i in 0..3 {
             stdin_tx.send(format!("line {i}\n")).await.unwrap();
@@ -1864,6 +1887,62 @@ mod tests {
         assert_contains!(stdout, r#">>>"line 1\n"<<<"#);
         assert_contains!(stdout, r#">>>"line 2\n"<<<"#);
         assert_contains!(stdout, r#">>>"no newline"<<<"#);
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn execute_kill() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let request = ExecuteRequest {
+            code: r#"
+                fn main() {
+                    println!("Before");
+                    loop {
+                        std::thread::sleep(std::time::Duration::from_secs(1));
+                    }
+                    println!("After");
+                }
+            "#
+            .into(),
+            ..ARBITRARY_EXECUTE_REQUEST
+        };
+
+        let token = CancellationToken::new();
+        let ActiveExecution {
+            task,
+            stdin_tx: _,
+            mut stdout_rx,
+            stderr_rx,
+        } = coordinator
+            .begin_execute(token.clone(), request)
+            .await
+            .unwrap();
+
+        // Wait for some output before killing
+        let early_stdout = stdout_rx.recv().await.unwrap();
+
+        token.cancel();
+
+        let WithOutput {
+            response,
+            stdout,
+            stderr,
+        } = WithOutput::try_absorb(task, stdout_rx, stderr_rx)
+            .with_timeout()
+            .await
+            .unwrap();
+
+        assert!(!response.success, "{stderr}");
+        assert_contains!(response.exit_detail, "kill");
+
+        assert_contains!(early_stdout, "Before");
+        assert_not_contains!(stdout, "Before");
+        assert_not_contains!(stdout, "After");
 
         coordinator.shutdown().await?;
 
@@ -1914,11 +1993,12 @@ mod tests {
             ..ARBITRARY_COMPILE_REQUEST
         };
 
+        let token = Default::default();
         let ActiveCompilation {
             task,
             stdout_rx,
             stderr_rx,
-        } = coordinator.begin_compile(req).await.unwrap();
+        } = coordinator.begin_compile(token, req).await.unwrap();
 
         let WithOutput {
             response,

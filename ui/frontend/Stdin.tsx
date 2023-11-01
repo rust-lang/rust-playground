@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, ButtonSet, IconButton } from './ButtonSet';
 import PopButton, { ButtonProps, MenuProps } from './PopButton';
-import { wsExecuteStdin, wsExecuteStdinClose } from './reducers/output/execute';
+import { wsExecuteKill, wsExecuteStdin, wsExecuteStdinClose } from './reducers/output/execute';
 import { enableStdinSelector } from './selectors';
 
 import styles from './Stdin.module.css';
@@ -21,6 +21,10 @@ const Stdin: React.FC = () => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         form.current?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      }
+
+      if (e.key === 'c' && e.ctrlKey) {
+        dispatch(wsExecuteKill());
       }
 
       if (e.key === 'd' && e.ctrlKey && content.length === 0) {
@@ -107,11 +111,21 @@ const MoreMenu: React.FC<MenuProps> = ({ close }) => {
     close();
   }, [dispatch, close]);
 
+  const kill = useCallback(() => {
+    dispatch(wsExecuteKill());
+    close();
+  }, [dispatch, close]);
+
   return (
     <ul className={styles.menu}>
       <li>
         <button type="button" className={styles.button} onClick={stdinClose}>
           Close stdin
+        </button>
+      </li>
+      <li>
+        <button type="button" className={styles.button} onClick={kill}>
+          Kill process
         </button>
       </li>
     </ul>

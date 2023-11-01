@@ -126,6 +126,11 @@ const slice = createSlice({
 
       prepare: prepareWithCurrentSequenceNumber,
     },
+    wsExecuteKill: {
+      reducer: () => {},
+
+      prepare: prepareWithCurrentSequenceNumber,
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -218,6 +223,11 @@ export const wsExecuteStdin = (payload: string): SimpleThunkAction =>
 export const wsExecuteStdinClose = (): SimpleThunkAction =>
   dispatchWhenSequenceNumber((sequenceNumber) =>
     slice.actions.wsExecuteStdinClose(undefined, sequenceNumber),
+  );
+
+export const wsExecuteKill = (): SimpleThunkAction =>
+  dispatchWhenSequenceNumber((sequenceNumber) =>
+    slice.actions.wsExecuteKill(undefined, sequenceNumber),
   );
 
 export { wsExecuteBeginSchema, wsExecuteStdoutSchema, wsExecuteStderrSchema, wsExecuteEndSchema };

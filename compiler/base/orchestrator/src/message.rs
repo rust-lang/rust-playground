@@ -27,6 +27,7 @@ pub enum CoordinatorMessage {
     ExecuteCommand(ExecuteCommandRequest),
     StdinPacket(String),
     StdinClose,
+    Kill,
 }
 
 impl_narrow_to_broad!(

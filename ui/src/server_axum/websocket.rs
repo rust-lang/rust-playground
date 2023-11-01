@@ -27,6 +27,7 @@ use tokio::{
     task::{AbortHandle, JoinSet},
     time,
 };
+use tokio_util::sync::CancellationToken;
 use tracing::{error, instrument, warn, Instrument};
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -65,6 +66,9 @@ enum WSMessageRequest {
 
     #[serde(rename = "output/execute/wsExecuteStdinClose")]
     ExecuteStdinClose { meta: Meta },
+
+    #[serde(rename = "output/execute/wsExecuteKill")]
+    ExecuteKill { meta: Meta },
 }
 
 #[derive(serde::Deserialize)]
@@ -390,7 +394,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
             _ = active_execution_gc_interval.tick() => {
                 active_executions = mem::take(&mut active_executions)
                     .into_iter()
-                    .filter(|(_id, tx)| !tx.is_closed())
+                    .filter(|(_id, (_, tx))| !tx.is_closed())
                     .collect();
             },
 
@@ -458,7 +462,7 @@ async fn handle_msg(
     txt: String,
     tx: &ResponseTx,
     manager: &mut CoordinatorManager,
-    active_executions: &mut BTreeMap<i64, mpsc::Sender<String>>,
+    active_executions: &mut BTreeMap<i64, (CancellationToken, mpsc::Sender<String>)>,
 ) {
     use WSMessageRequest::*;
 
@@ -466,16 +470,17 @@ async fn handle_msg(
 
     match msg {
         Ok(ExecuteRequest { payload, meta }) => {
+            let token = CancellationToken::new();
             let (execution_tx, execution_rx) = mpsc::channel(8);
 
-            active_executions.insert(meta.sequence_number, execution_tx);
+            active_executions.insert(meta.sequence_number, (token.clone(), execution_tx));
 
             // TODO: Should a single execute / build / etc. session have a timeout of some kind?
             let spawned = manager
                 .spawn({
                     let tx = tx.clone();
                     |coordinator| {
-                        handle_execute(execution_rx, tx, coordinator, payload, meta)
+                        handle_execute(token, execution_rx, tx, coordinator, payload, meta)
                             .context(StreamingExecuteSnafu)
                     }
                 })
@@ -488,7 +493,7 @@ async fn handle_msg(
         }
 
         Ok(ExecuteStdin { payload, meta }) => {
-            let Some(execution_tx) = active_executions.get(&meta.sequence_number) else {
+            let Some((_, execution_tx)) = active_executions.get(&meta.sequence_number) else {
                 warn!("Received stdin for an execution that is no longer active");
                 return;
             };
@@ -506,6 +511,12 @@ async fn handle_msg(
         Ok(ExecuteStdinClose { meta }) => {
             let execution_tx = active_executions.remove(&meta.sequence_number);
             drop(execution_tx); // Signal closed
+        }
+
+        Ok(ExecuteKill { meta }) => {
+            if let Some((token, _)) = active_executions.remove(&meta.sequence_number) {
+                token.cancel();
+            }
         }
 
         Err(e) => {
@@ -529,6 +540,7 @@ macro_rules! abandon_if_closed {
 }
 
 async fn handle_execute(
+    token: CancellationToken,
     rx: mpsc::Receiver<String>,
     tx: ResponseTx,
     coordinator: SharedCoordinator,
@@ -543,7 +555,7 @@ async fn handle_execute(
     let labels_core = req.labels_core();
 
     let start = Instant::now();
-    let v = handle_execute_inner(rx, tx, coordinator, req, meta).await;
+    let v = handle_execute_inner(token, rx, tx, coordinator, req, meta).await;
     let elapsed = start.elapsed();
 
     let outcome = match &v {
@@ -559,6 +571,7 @@ async fn handle_execute(
 }
 
 async fn handle_execute_inner(
+    token: CancellationToken,
     mut rx: mpsc::Receiver<String>,
     tx: ResponseTx,
     coordinator: SharedCoordinator,
@@ -573,7 +586,10 @@ async fn handle_execute_inner(
         stdin_tx,
         mut stdout_rx,
         mut stderr_rx,
-    } = coordinator.begin_execute(req).await.context(BeginSnafu)?;
+    } = coordinator
+        .begin_execute(token.clone(), req)
+        .await
+        .context(BeginSnafu)?;
 
     let sent = tx
         .send(Ok(MessageResponse::ExecuteBegin { meta: meta.clone() }))

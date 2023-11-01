@@ -46,6 +46,7 @@ use tokio::{
     sync::mpsc,
     task::JoinSet,
 };
+use tokio_util::sync::CancellationToken;
 
 use crate::{
     bincode_input_closed,
@@ -194,6 +195,14 @@ async fn handle_coordinator_message(
                             .drop_error_details()
                             .context(UnableToSendStdinCloseSnafu)?;
                     }
+
+                    CoordinatorMessage::Kill => {
+                        process_tx
+                        .send(Multiplexed(job_id, ProcessCommand::Kill))
+                        .await
+                        .drop_error_details()
+                        .context(UnableToSendKillSnafu)?;
+                    }
                 }
             }
 
@@ -226,6 +235,9 @@ pub enum HandleCoordinatorMessageError {
 
     #[snafu(display("Failed to send stdin close request to the command task"))]
     UnableToSendStdinClose { source: mpsc::error::SendError<()> },
+
+    #[snafu(display("Failed to send kill request to the command task"))]
+    UnableToSendKill { source: mpsc::error::SendError<()> },
 
     #[snafu(display("A coordinator command handler background task panicked"))]
     TaskPanicked { source: tokio::task::JoinError },
@@ -383,6 +395,7 @@ enum ProcessCommand {
     Start(ExecuteCommandRequest, MultiplexingSender),
     Stdin(String),
     StdinClose,
+    Kill,
 }
 
 struct ProcessState {
@@ -390,6 +403,7 @@ struct ProcessState {
     processes: JoinSet<Result<(), ProcessError>>,
     stdin_senders: HashMap<JobId, mpsc::Sender<String>>,
     stdin_shutdown_tx: mpsc::Sender<JobId>,
+    kill_tokens: HashMap<JobId, CancellationToken>,
 }
 
 impl ProcessState {
@@ -399,6 +413,7 @@ impl ProcessState {
             processes: Default::default(),
             stdin_senders: Default::default(),
             stdin_shutdown_tx,
+            kill_tokens: Default::default(),
         }
     }
 
@@ -409,6 +424,8 @@ impl ProcessState {
         worker_msg_tx: MultiplexingSender,
     ) -> Result<(), ProcessError> {
         use process_error::*;
+
+        let token = CancellationToken::new();
 
         let RunningChild {
             child,
@@ -432,11 +449,13 @@ impl ProcessState {
 
         let task_set = stream_stdio(worker_msg_tx.clone(), stdin_rx, stdin, stdout, stderr);
 
+        self.kill_tokens.insert(job_id, token.clone());
+
         self.processes.spawn({
             let stdin_shutdown_tx = self.stdin_shutdown_tx.clone();
             async move {
                 worker_msg_tx
-                    .send(process_end(child, task_set, stdin_shutdown_tx, job_id).await)
+                    .send(process_end(token, child, task_set, stdin_shutdown_tx, job_id).await)
                     .await
                     .context(UnableToSendExecuteCommandResponseSnafu)
             }
@@ -470,6 +489,12 @@ impl ProcessState {
         let process = self.processes.join_next().await?;
         Some(process.context(ProcessTaskPanickedSnafu).and_then(|e| e))
     }
+
+    fn kill(&mut self, job_id: JobId) {
+        if let Some(token) = self.kill_tokens.get(&job_id) {
+            token.cancel();
+        }
+    }
 }
 
 async fn manage_processes(
@@ -492,6 +517,8 @@ async fn manage_processes(
                     ProcessCommand::Stdin(packet) => state.stdin(job_id, packet).await?,
 
                     ProcessCommand::StdinClose => state.stdin_close(job_id),
+
+                    ProcessCommand::Kill => state.kill(job_id),
                 }
             }
 
@@ -560,12 +587,18 @@ fn process_begin(
 }
 
 async fn process_end(
+    token: CancellationToken,
     mut child: Child,
     mut task_set: JoinSet<Result<(), StdioError>>,
     stdin_shutdown_tx: mpsc::Sender<JobId>,
     job_id: JobId,
 ) -> Result<ExecuteCommandResponse, ProcessError> {
     use process_error::*;
+
+    select! {
+        () = token.cancelled() => child.kill().await.context(KillChildSnafu)?,
+        _ = child.wait() => {},
+    };
 
     let status = child.wait().await.context(WaitChildSnafu)?;
 
@@ -705,6 +738,9 @@ pub enum ProcessError {
 
     #[snafu(display("Failed to send stdin data"))]
     UnableToSendStdinData { source: mpsc::error::SendError<()> },
+
+    #[snafu(display("Failed to kill the child process"))]
+    KillChild { source: std::io::Error },
 
     #[snafu(display("Failed to wait for child process exiting"))]
     WaitChild { source: std::io::Error },
