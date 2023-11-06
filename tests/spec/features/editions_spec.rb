@@ -37,6 +37,27 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
     end
   end
 
+  scenario "using the 2024 edition" do
+    editor.set <<-EOF
+      #![feature(gen_blocks)]
+
+      fn main() {
+          let mut x = gen { yield 1 };
+
+          eprintln!("{:?}", x.next());
+          eprintln!("{:?}", x.next());
+      }
+    EOF
+
+    in_advanced_options_menu { select '2024' }
+    click_on("Run")
+
+    within(:output, :stderr) do
+      expect(page).to have_content 'Some(1)'
+      expect(page).to have_content 'None'
+    end
+  end
+
   def editor
     Editor.new(page)
   end

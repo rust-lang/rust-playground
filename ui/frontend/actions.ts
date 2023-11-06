@@ -155,8 +155,16 @@ export const changeChannel = (channel: Channel) =>
 export const changeMode = (mode: Mode) =>
   createAction(ActionType.ChangeMode, { mode });
 
-export const changeEdition = (edition: Edition) =>
+const changeEditionRaw = (edition: Edition) =>
   createAction(ActionType.ChangeEdition, { edition });
+
+export const changeEdition = (edition: Edition): ThunkAction => dispatch => {
+  if (edition === Edition.Rust2024) {
+    dispatch(changeChannel(Channel.Nightly));
+  }
+
+  dispatch(changeEditionRaw(edition));
+}
 
 export const changeBacktrace = (backtrace: Backtrace) =>
   createAction(ActionType.ChangeBacktrace, { backtrace });
@@ -561,6 +569,8 @@ function parseEdition(s?: string): Edition | null {
       return Edition.Rust2018;
     case '2021':
       return Edition.Rust2021;
+    case '2024':
+      return Edition.Rust2024;
     default:
       return null;
   }
@@ -599,7 +609,7 @@ export function indexPageLoad({
 
     dispatch(changeChannel(channel));
     dispatch(changeMode(mode));
-    dispatch(changeEdition(edition));
+    dispatch(changeEditionRaw(edition));
   };
 }
 
@@ -622,7 +632,7 @@ export type Action =
   | ReturnType<typeof changeBacktrace>
   | ReturnType<typeof changeChannel>
   | ReturnType<typeof changeDemangleAssembly>
-  | ReturnType<typeof changeEdition>
+  | ReturnType<typeof changeEditionRaw>
   | ReturnType<typeof changeEditor>
   | ReturnType<typeof changeFocus>
   | ReturnType<typeof changeKeybinding>

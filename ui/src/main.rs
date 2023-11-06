@@ -548,6 +548,7 @@ fn parse_edition(s: &str) -> Result<Option<sandbox::Edition>> {
         "2015" => Some(sandbox::Edition::Rust2015),
         "2018" => Some(sandbox::Edition::Rust2018),
         "2021" => Some(sandbox::Edition::Rust2021),
+        "2024" => Some(sandbox::Edition::Rust2024),
         value => InvalidEditionSnafu { value }.fail()?,
     })
 }

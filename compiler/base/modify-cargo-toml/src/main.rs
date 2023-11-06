@@ -19,6 +19,10 @@ fn main() {
     let mut cargo_toml: Value = toml::from_str(&input)
         .unwrap_or_else(|e| panic!("Cannot parse {} as TOML: {}", input_filename.display(), e));
 
+    if env::var_os("PLAYGROUND_FEATURE_EDITION2024").is_some() {
+        cargo_toml = set_feature_edition2024(cargo_toml);
+    }
+
     if let Ok(edition) = env::var("PLAYGROUND_EDITION") {
         cargo_toml = set_edition(cargo_toml, &edition);
     }

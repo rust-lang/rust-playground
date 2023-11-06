@@ -98,6 +98,7 @@ export enum Edition {
   Rust2015 = '2015',
   Rust2018 = '2018',
   Rust2021 = '2021',
+  Rust2024 = '2024',
 }
 
 export enum Backtrace {

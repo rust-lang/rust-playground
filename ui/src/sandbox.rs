@@ -565,6 +565,7 @@ pub enum Edition {
     Rust2015,
     Rust2018,
     Rust2021, // TODO - add parallel tests for 2021
+    Rust2024,
 }
 
 impl Edition {
@@ -575,6 +576,7 @@ impl Edition {
             Rust2015 => "2015",
             Rust2018 => "2018",
             Rust2021 => "2021",
+            Rust2024 => "2024",
         }
     }
 }
@@ -639,6 +641,10 @@ impl DockerCommandExt for Command {
 
     fn apply_edition(&mut self, req: impl EditionRequest) {
         if let Some(edition) = req.edition() {
+            if edition == Edition::Rust2024 {
+                self.args(&["--env", &format!("PLAYGROUND_FEATURE_EDITION2024=true")]);
+            }
+
             self.args(&[
                 "--env",
                 &format!("PLAYGROUND_EDITION={}", edition.cargo_ident()),
@@ -799,6 +805,7 @@ mod sandbox_orchestrator_integration_impls {
                 coordinator::Edition::Rust2015 => super::Edition::Rust2015,
                 coordinator::Edition::Rust2018 => super::Edition::Rust2018,
                 coordinator::Edition::Rust2021 => super::Edition::Rust2021,
+                coordinator::Edition::Rust2024 => super::Edition::Rust2024,
             }
         }
     }

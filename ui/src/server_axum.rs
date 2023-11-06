@@ -1127,6 +1127,7 @@ pub(crate) mod api_orchestrator_integration_impls {
             "2015" => Edition::Rust2015,
             "2018" => Edition::Rust2018,
             "2021" => Edition::Rust2021,
+            "2024" => Edition::Rust2024,
             value => return ParseEditionSnafu { value }.fail(),
         })
     }
