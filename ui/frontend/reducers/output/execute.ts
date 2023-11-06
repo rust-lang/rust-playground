@@ -155,6 +155,7 @@ const slice = createSlice({
         wsExecuteEnd,
         sequenceNumberMatches((state, payload) => {
           state.requestsInProgress = 0; // Only tracking one request
+          delete state.sequenceNumber;
 
           if (!payload.success) {
             state.error = payload.exitDetail;
