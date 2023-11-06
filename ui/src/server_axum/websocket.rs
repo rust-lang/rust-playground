@@ -343,20 +343,25 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
 
             // We don't care if there are no running tasks
             Some(task) = manager.join_next() => {
-                let Err(error) = task else { continue };
-                // The task was cancelled; no need to report
-                let Ok(panic) = error.try_into_panic() else { continue };
+                let error = match task {
+                    Ok(Ok(())) => continue,
+                    Ok(Err(error)) => error,
+                    Err(error) => {
+                        // The task was cancelled; no need to report
+                        let Ok(panic) = error.try_into_panic() else { continue };
 
-                let text = match panic.downcast::<String>() {
-                    Ok(text) => *text,
-                    Err(panic) => match panic.downcast::<&str>() {
-                        Ok(text) => text.to_string(),
-                        _ => "An unknown panic occurred".into(),
+                        let text = match panic.downcast::<String>() {
+                            Ok(text) => *text,
+                            Err(panic) => match panic.downcast::<&str>() {
+                                Ok(text) => text.to_string(),
+                                _ => "An unknown panic occurred".into(),
+                            }
+                        };
+                        WebSocketTaskPanicSnafu { text }.build()
                     }
                 };
-                let error = WebSocketTaskPanicSnafu { text }.fail();
 
-                if tx.send(error).await.is_err() {
+                if tx.send(Err(error)).await.is_err() {
                     // We can't send a response
                     break;
                 }
