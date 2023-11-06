@@ -91,17 +91,24 @@ pub enum Edition {
     Rust2015,
     Rust2018,
     Rust2021,
+    Rust2024,
 }
 
 impl Edition {
     #[cfg(test)]
-    pub(crate) const ALL: [Self; 3] = [Self::Rust2015, Self::Rust2018, Self::Rust2021];
+    pub(crate) const ALL: [Self; 4] = [
+        Self::Rust2015,
+        Self::Rust2018,
+        Self::Rust2021,
+        Self::Rust2024,
+    ];
 
     pub(crate) fn to_str(self) -> &'static str {
         match self {
             Edition::Rust2015 => "2015",
             Edition::Rust2018 => "2018",
             Edition::Rust2021 => "2021",
+            Edition::Rust2024 => "2024",
         }
     }
 
@@ -221,6 +228,10 @@ impl ExecuteRequest {
 
 impl CargoTomlModifier for ExecuteRequest {
     fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
+        if self.edition == Edition::Rust2024 {
+            cargo_toml = modify_cargo_toml::set_feature_edition2024(cargo_toml);
+        }
+
         cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
 
         if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
@@ -321,6 +332,10 @@ impl CompileRequest {
 
 impl CargoTomlModifier for CompileRequest {
     fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
+        if self.edition == Edition::Rust2024 {
+            cargo_toml = modify_cargo_toml::set_feature_edition2024(cargo_toml);
+        }
+
         cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
 
         if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
@@ -1526,8 +1541,16 @@ mod tests {
     #[snafu::report]
     async fn execute_edition() -> Result<()> {
         let params = [
-            (r#"fn x() { let dyn = true; }"#, [true, false, false]),
-            (r#"fn x() { u16::try_from(1u8); }"#, [false, false, true]),
+            (r#"fn x() { let dyn = true; }"#, [true, false, false, false]),
+            (
+                r#"fn x() { u16::try_from(1u8); }"#,
+                [false, false, true, true],
+            ),
+            (
+                r#"#![feature(gen_blocks)]
+                   fn x() { gen { yield 1u8 }; }"#,
+                [false, false, false, true],
+            ),
         ];
 
         let tests = params.into_iter().flat_map(|(code, works_in)| {
