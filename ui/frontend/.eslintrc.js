@@ -63,7 +63,10 @@ module.exports = {
       files: [
         '.eslintrc.js',
         'BuildMenu.tsx',
+        'ButtonSet.tsx',
+        'Header.tsx',
         'PopButton.tsx',
+        'Stdin.tsx',
         'compileActions.ts',
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',

@@ -6,6 +6,7 @@ import {
   Backtrace,
   Channel,
   Edition,
+  Focus,
   Orientation,
   PrimaryActionAuto,
   PrimaryActionCore,
@@ -320,6 +321,15 @@ export const isOutputFocused = createSelector(
   focus,
   (focus) => !!focus,
 );
+
+export const showStdinSelector = createSelector(
+  focus,
+  (focus) => focus == Focus.Execute,
+)
+export const enableStdinSelector = createSelector(
+  (state: State) => state.output.execute.requestsInProgress,
+  (req) => req > 0,
+)
 
 const orientationConfig = (state: State) => state.configuration.orientation;
 const browserWidthIsSmall = (state: State) => state.browser.isSmall;

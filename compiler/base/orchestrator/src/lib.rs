@@ -4,7 +4,7 @@ pub mod coordinator;
 mod message;
 pub mod worker;
 
-trait DropErrorDetailsExt<T> {
+pub trait DropErrorDetailsExt<T> {
     fn drop_error_details(self) -> Result<T, tokio::sync::mpsc::error::SendError<()>>;
 }
 

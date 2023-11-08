@@ -13,15 +13,22 @@ $arrow-width: 20px;
   }
 }
 
-.content {
-  margin: 0 $arrow-height $arrow-height $arrow-height;
+.-content {
+  margin: $arrow-height;
   box-shadow:
-    0 1px 4px -2px rgb(0 0 0 / 60%),
-    inset 0 1px 0 white;
-  border-right: 1px solid $vertical-border-color;
-  border-bottom: 1px solid var(--header-accent-border);
-  border-left: 1px solid $vertical-border-color;
+    5px 5px 20px -3px rgb(0 0 0 / 25%),
+    0 0 5px -2px rgb(0 0 0 / 90%);
   border-radius: var(--header-border-radius);
   background: $bg-color;
   color: $fg-color;
+}
+
+.contentBottom {
+  composes: -content;
+  margin-top: 0;
+}
+
+.contentTop {
+  composes: -content;
+  margin-bottom: 0;
 }

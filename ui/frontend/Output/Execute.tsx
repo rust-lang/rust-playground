@@ -21,7 +21,6 @@ const Execute: React.FC = () => {
     <SimplePane {...details} kind="execute">
       {isAutoBuild && <Warning addMainFunction={addMainFunction} />}
     </SimplePane>
-
   );
 };
 

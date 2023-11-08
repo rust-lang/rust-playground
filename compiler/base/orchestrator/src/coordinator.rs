@@ -456,6 +456,7 @@ where
 
     pub async fn begin_execute(
         &self,
+        token: CancellationToken,
         request: ExecuteRequest,
     ) -> Result<ActiveExecution, ExecuteError> {
         use execute_error::*;
@@ -463,7 +464,7 @@ where
         self.select_channel(request.channel)
             .await
             .context(CouldNotStartContainerSnafu)?
-            .begin_execute(request)
+            .begin_execute(token, request)
             .await
     }
 
@@ -482,6 +483,7 @@ where
 
     pub async fn begin_compile(
         &self,
+        token: CancellationToken,
         request: CompileRequest,
     ) -> Result<ActiveCompilation, CompileError> {
         use compile_error::*;
@@ -489,7 +491,7 @@ where
         self.select_channel(request.channel)
             .await
             .context(CouldNotStartContainerSnafu)?
-            .begin_compile(request)
+            .begin_compile(token, request)
             .await
     }
 
@@ -603,18 +605,23 @@ impl Container {
         &self,
         request: ExecuteRequest,
     ) -> Result<WithOutput<ExecuteResponse>, ExecuteError> {
+        let token = Default::default();
+
         let ActiveExecution {
             task,
+            stdin_tx,
             stdout_rx,
             stderr_rx,
-        } = self.begin_execute(request).await?;
+        } = self.begin_execute(token, request).await?;
 
+        drop(stdin_tx);
         WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
     }
 
     #[instrument(skip_all)]
     async fn begin_execute(
         &self,
+        token: CancellationToken,
         request: ExecuteRequest,
     ) -> Result<ActiveExecution, ExecuteError> {
         use execute_error::*;
@@ -636,10 +643,11 @@ impl Container {
 
         let SpawnCargo {
             task,
+            stdin_tx,
             stdout_rx,
             stderr_rx,
         } = self
-            .spawn_cargo_task(execute_cargo)
+            .spawn_cargo_task(token, execute_cargo)
             .await
             .context(CouldNotStartCargoSnafu)?;
 
@@ -660,6 +668,7 @@ impl Container {
 
         Ok(ActiveExecution {
             task,
+            stdin_tx,
             stdout_rx,
             stderr_rx,
         })
@@ -669,11 +678,13 @@ impl Container {
         &self,
         request: CompileRequest,
     ) -> Result<WithOutput<CompileResponse>, CompileError> {
+        let token = Default::default();
+
         let ActiveCompilation {
             task,
             stdout_rx,
             stderr_rx,
-        } = self.begin_compile(request).await?;
+        } = self.begin_compile(token, request).await?;
 
         WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
     }
@@ -681,6 +692,7 @@ impl Container {
     #[instrument(skip_all)]
     async fn begin_compile(
         &self,
+        token: CancellationToken,
         request: CompileRequest,
     ) -> Result<ActiveCompilation, CompileError> {
         use compile_error::*;
@@ -707,12 +719,15 @@ impl Container {
 
         let SpawnCargo {
             task,
+            stdin_tx,
             stdout_rx,
             stderr_rx,
         } = self
-            .spawn_cargo_task(execute_cargo)
+            .spawn_cargo_task(token, execute_cargo)
             .await
             .context(CouldNotStartCargoSnafu)?;
+
+        drop(stdin_tx);
 
         let commander = self.commander.clone();
         let task = async move {
@@ -754,14 +769,16 @@ impl Container {
 
     async fn spawn_cargo_task(
         &self,
+        token: CancellationToken,
         execute_cargo: ExecuteCommandRequest,
     ) -> Result<SpawnCargo, SpawnCargoError> {
         use spawn_cargo_error::*;
 
+        let (stdin_tx, mut stdin_rx) = mpsc::channel(8);
         let (stdout_tx, stdout_rx) = mpsc::channel(8);
         let (stderr_tx, stderr_rx) = mpsc::channel(8);
 
-        let mut from_worker_rx = self
+        let (to_worker_tx, mut from_worker_rx) = self
             .commander
             .many(execute_cargo)
             .await
@@ -769,30 +786,62 @@ impl Container {
 
         let task = tokio::spawn({
             async move {
-                while let Some(container_msg) = from_worker_rx.recv().await {
-                    trace!("processing {container_msg:?}");
+                let mut already_cancelled = false;
+                let mut stdin_open = true;
 
-                    match container_msg {
-                        WorkerMessage::ExecuteCommand(resp) => {
-                            return Ok(resp);
-                        }
-                        WorkerMessage::StdoutPacket(packet) => {
-                            stdout_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
-                        }
-                        WorkerMessage::StderrPacket(packet) => {
-                            stderr_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
-                        }
-                        _ => return UnexpectedMessageSnafu.fail(),
+                loop {
+                    select! {
+                        () = token.cancelled(), if !already_cancelled => {
+                            already_cancelled = true;
+
+                            let msg = CoordinatorMessage::Kill;
+                            trace!("processing {msg:?}");
+                            to_worker_tx.send(msg).await.context(KillSnafu)?;
+                        },
+
+                        stdin = stdin_rx.recv(), if stdin_open => {
+                            let msg = match stdin {
+                                Some(stdin) => {
+                                    CoordinatorMessage::StdinPacket(stdin)
+                                }
+
+                                None => {
+                                    stdin_open = false;
+                                    CoordinatorMessage::StdinClose
+                                }
+                            };
+
+                            trace!("processing {msg:?}");
+                            to_worker_tx.send(msg).await.context(StdinSnafu)?;
+                        },
+
+                        Some(container_msg) = from_worker_rx.recv() => {
+                            trace!("processing {container_msg:?}");
+
+                            match container_msg {
+                                WorkerMessage::ExecuteCommand(resp) => {
+                                    return Ok(resp);
+                                }
+                                WorkerMessage::StdoutPacket(packet) => {
+                                    stdout_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
+                                }
+                                WorkerMessage::StderrPacket(packet) => {
+                                    stderr_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
+                                }
+                                _ => return UnexpectedMessageSnafu.fail(),
+                            }
+                        },
+
+                        else => return UnexpectedEndOfMessagesSnafu.fail(),
                     }
                 }
-
-                UnexpectedEndOfMessagesSnafu.fail()
             }
             .instrument(trace_span!("cargo task").or_current())
         });
 
         Ok(SpawnCargo {
             task,
+            stdin_tx,
             stdout_rx,
             stderr_rx,
         })
@@ -812,6 +861,7 @@ impl Container {
 
 pub struct ActiveExecution {
     pub task: BoxFuture<'static, Result<ExecuteResponse, ExecuteError>>,
+    pub stdin_tx: mpsc::Sender<String>,
     pub stdout_rx: mpsc::Receiver<String>,
     pub stderr_rx: mpsc::Receiver<String>,
 }
@@ -820,6 +870,7 @@ impl fmt::Debug for ActiveExecution {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ActiveExecution")
             .field("task", &"<future>")
+            .field("stdin_tx", &self.stdin_tx)
             .field("stdout_rx", &self.stdout_rx)
             .field("stderr_rx", &self.stderr_rx)
             .finish()
@@ -900,6 +951,7 @@ pub enum CompileError {
 
 struct SpawnCargo {
     task: JoinHandle<Result<ExecuteCommandResponse, SpawnCargoError>>,
+    stdin_tx: mpsc::Sender<String>,
     stdout_rx: mpsc::Receiver<String>,
     stderr_rx: mpsc::Receiver<String>,
 }
@@ -915,6 +967,12 @@ pub enum SpawnCargoError {
 
     #[snafu(display("There are no more messages"))]
     UnexpectedEndOfMessages,
+
+    #[snafu(display("Unable to send stdin message"))]
+    Stdin { source: MultiplexedSenderError },
+
+    #[snafu(display("Unable to send kill message"))]
+    Kill { source: MultiplexedSenderError },
 }
 
 #[derive(Debug, Clone)]
@@ -1008,6 +1066,36 @@ pub enum ModifyCargoTomlError {
 
     #[snafu(display("Could not write the file"))]
     CouldNotWrite { source: CommanderError },
+}
+
+struct MultiplexedSender {
+    job_id: JobId,
+    to_worker_tx: mpsc::Sender<Multiplexed<CoordinatorMessage>>,
+}
+
+impl MultiplexedSender {
+    async fn send(
+        &self,
+        message: impl Into<CoordinatorMessage>,
+    ) -> Result<(), MultiplexedSenderError> {
+        use multiplexed_sender_error::*;
+
+        let message = message.into();
+        let message = Multiplexed(self.job_id, message);
+
+        self.to_worker_tx
+            .send(message)
+            .await
+            .drop_error_details()
+            .context(MultiplexedSenderSnafu)
+    }
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+#[snafu(display("Could not send a message to the worker"))]
+pub struct MultiplexedSenderError {
+    source: mpsc::error::SendError<()>,
 }
 
 impl Commander {
@@ -1106,17 +1194,12 @@ impl Commander {
         ack_rx.await.context(DemultiplexerDidNotRespondSnafu)
     }
 
-    async fn send_to_worker(
-        &self,
-        message: Multiplexed<CoordinatorMessage>,
-    ) -> Result<(), CommanderError> {
-        use commander_error::*;
-
-        self.to_worker_tx
-            .send(message)
-            .await
-            .drop_error_details()
-            .context(UnableToSendToWorkerSnafu)
+    fn build_multiplexed_sender(&self, job_id: JobId) -> MultiplexedSender {
+        let to_worker_tx = self.to_worker_tx.clone();
+        MultiplexedSender {
+            job_id,
+            to_worker_tx,
+        }
     }
 
     async fn one<M>(&self, message: M) -> Result<M::Response, CommanderError>
@@ -1128,11 +1211,15 @@ impl Commander {
         use commander_error::*;
 
         let id = self.next_id();
+        let to_worker_tx = self.build_multiplexed_sender(id);
         let (from_demultiplexer_tx, from_demultiplexer_rx) = oneshot::channel();
 
         self.send_to_demultiplexer(DemultiplexCommand::ListenOnce(id, from_demultiplexer_tx))
             .await?;
-        self.send_to_worker(Multiplexed(id, message.into())).await?;
+        to_worker_tx
+            .send(message)
+            .await
+            .context(UnableToStartOneSnafu)?;
         let msg = from_demultiplexer_rx
             .await
             .context(UnableToReceiveFromDemultiplexerSnafu)?;
@@ -1144,18 +1231,27 @@ impl Commander {
         }
     }
 
-    async fn many<M>(&self, message: M) -> Result<mpsc::Receiver<WorkerMessage>, CommanderError>
+    async fn many<M>(
+        &self,
+        message: M,
+    ) -> Result<(MultiplexedSender, mpsc::Receiver<WorkerMessage>), CommanderError>
     where
         M: Into<CoordinatorMessage>,
     {
+        use commander_error::*;
+
         let id = self.next_id();
+        let to_worker_tx = self.build_multiplexed_sender(id);
         let (from_worker_tx, from_worker_rx) = mpsc::channel(8);
 
         self.send_to_demultiplexer(DemultiplexCommand::Listen(id, from_worker_tx))
             .await?;
-        self.send_to_worker(Multiplexed(id, message.into())).await?;
+        to_worker_tx
+            .send(message)
+            .await
+            .context(UnableToStartManySnafu)?;
 
-        Ok(from_worker_rx)
+        Ok((to_worker_tx, from_worker_rx))
     }
 }
 
@@ -1174,8 +1270,11 @@ pub enum CommanderError {
     #[snafu(display("Did not receive a response from the demultiplexer"))]
     UnableToReceiveFromDemultiplexer { source: oneshot::error::RecvError },
 
-    #[snafu(display("Could not send a message to the worker"))]
-    UnableToSendToWorker { source: mpsc::error::SendError<()> },
+    #[snafu(display("Could not start single request/response interaction"))]
+    UnableToStartOne { source: MultiplexedSenderError },
+
+    #[snafu(display("Could not start continuous interaction"))]
+    UnableToStartMany { source: MultiplexedSenderError },
 
     #[snafu(display("Did not receive the expected response type from the worker"))]
     UnexpectedResponseType,
@@ -1403,8 +1502,6 @@ mod tests {
     use futures::{future::try_join_all, Future, FutureExt};
     use std::{sync::Once, time::Duration};
     use tempdir::TempDir;
-    use tokio::join;
-    use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 
     use super::*;
 
@@ -1473,15 +1570,20 @@ mod tests {
         //Coordinator::new_docker().await
     }
 
+    const ARBITRARY_EXECUTE_REQUEST: ExecuteRequest = ExecuteRequest {
+        channel: Channel::Stable,
+        mode: Mode::Debug,
+        edition: Edition::Rust2021,
+        crate_type: CrateType::Binary,
+        tests: false,
+        backtrace: false,
+        code: String::new(),
+    };
+
     fn new_execute_request() -> ExecuteRequest {
         ExecuteRequest {
-            channel: Channel::Stable,
-            mode: Mode::Debug,
-            edition: Edition::Rust2021,
-            crate_type: CrateType::Binary,
-            tests: false,
-            backtrace: false,
             code: r#"fn main() { println!("Hello, coordinator!"); }"#.into(),
+            ..ARBITRARY_EXECUTE_REQUEST
         }
     }
 
@@ -1688,6 +1790,165 @@ mod tests {
         Ok(())
     }
 
+    #[tokio::test]
+    #[snafu::report]
+    async fn execute_stdin() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let request = ExecuteRequest {
+            code: r#"
+                fn main() {
+                    let mut input = String::new();
+                    if std::io::stdin().read_line(&mut input).is_ok() {
+                        println!("You entered >>>{input:?}<<<");
+                    }
+                }
+            "#
+            .into(),
+            ..ARBITRARY_EXECUTE_REQUEST
+        };
+
+        let token = Default::default();
+        let ActiveExecution {
+            task,
+            stdin_tx,
+            stdout_rx,
+            stderr_rx,
+        } = coordinator.begin_execute(token, request).await.unwrap();
+
+        stdin_tx.send("this is stdin\n".into()).await.unwrap();
+        // Purposefully not dropping stdin_tx early -- a user might forget
+
+        let WithOutput {
+            response,
+            stdout,
+            stderr,
+        } = WithOutput::try_absorb(task, stdout_rx, stderr_rx)
+            .with_timeout()
+            .await
+            .unwrap();
+
+        assert!(response.success, "{stderr}");
+        assert_contains!(stdout, r#">>>"this is stdin\n"<<<"#);
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn execute_stdin_close() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let request = ExecuteRequest {
+            code: r#"
+                fn main() {
+                    let mut input = String::new();
+                    while let Ok(n) = std::io::stdin().read_line(&mut input) {
+                        if n == 0 {
+                            break;
+                        }
+                        println!("You entered >>>{input:?}<<<");
+                        input.clear();
+                    }
+                }
+            "#
+            .into(),
+            ..ARBITRARY_EXECUTE_REQUEST
+        };
+
+        let token = Default::default();
+        let ActiveExecution {
+            task,
+            stdin_tx,
+            stdout_rx,
+            stderr_rx,
+        } = coordinator.begin_execute(token, request).await.unwrap();
+
+        for i in 0..3 {
+            stdin_tx.send(format!("line {i}\n")).await.unwrap();
+        }
+
+        stdin_tx.send("no newline".into()).await.unwrap();
+        drop(stdin_tx); // Close the stdin handle
+
+        let WithOutput {
+            response,
+            stdout,
+            stderr,
+        } = WithOutput::try_absorb(task, stdout_rx, stderr_rx)
+            .with_timeout()
+            .await
+            .unwrap();
+
+        assert!(response.success, "{stderr}");
+        assert_contains!(stdout, r#">>>"line 0\n"<<<"#);
+        assert_contains!(stdout, r#">>>"line 1\n"<<<"#);
+        assert_contains!(stdout, r#">>>"line 2\n"<<<"#);
+        assert_contains!(stdout, r#">>>"no newline"<<<"#);
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn execute_kill() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let request = ExecuteRequest {
+            code: r#"
+                fn main() {
+                    println!("Before");
+                    loop {
+                        std::thread::sleep(std::time::Duration::from_secs(1));
+                    }
+                    println!("After");
+                }
+            "#
+            .into(),
+            ..ARBITRARY_EXECUTE_REQUEST
+        };
+
+        let token = CancellationToken::new();
+        let ActiveExecution {
+            task,
+            stdin_tx: _,
+            mut stdout_rx,
+            stderr_rx,
+        } = coordinator
+            .begin_execute(token.clone(), request)
+            .await
+            .unwrap();
+
+        // Wait for some output before killing
+        let early_stdout = stdout_rx.recv().await.unwrap();
+
+        token.cancel();
+
+        let WithOutput {
+            response,
+            stdout,
+            stderr,
+        } = WithOutput::try_absorb(task, stdout_rx, stderr_rx)
+            .with_timeout()
+            .await
+            .unwrap();
+
+        assert!(!response.success, "{stderr}");
+        assert_contains!(response.exit_detail, "kill");
+
+        assert_contains!(early_stdout, "Before");
+        assert_not_contains!(stdout, "Before");
+        assert_not_contains!(stdout, "After");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
     const HELLO_WORLD_CODE: &str = r#"fn main() { println!("Hello World!"); }"#;
 
     const ARBITRARY_COMPILE_REQUEST: CompileRequest = CompileRequest {
@@ -1732,22 +1993,20 @@ mod tests {
             ..ARBITRARY_COMPILE_REQUEST
         };
 
+        let token = Default::default();
         let ActiveCompilation {
             task,
             stdout_rx,
             stderr_rx,
-        } = coordinator.begin_compile(req).await.unwrap();
+        } = coordinator.begin_compile(token, req).await.unwrap();
 
-        let stdout = ReceiverStream::new(stdout_rx);
-        let stdout = stdout.collect::<String>();
-
-        let stderr = ReceiverStream::new(stderr_rx);
-        let stderr = stderr.collect::<String>();
-
-        let (complete, _stdout, stderr) =
-            async { join!(task, stdout, stderr) }.with_timeout().await;
-
-        let response = complete.unwrap();
+        let WithOutput {
+            response,
+            stdout: _,
+            stderr,
+        } = WithOutput::try_absorb(task, stdout_rx, stderr_rx)
+            .await
+            .unwrap();
 
         assert!(response.success, "stderr: {}", stderr);
         assert_contains!(stderr, "Compiling");

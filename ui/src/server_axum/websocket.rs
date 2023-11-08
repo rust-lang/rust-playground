@@ -1,16 +1,21 @@
 use crate::{
     metrics::{self, record_metric, Endpoint, HasLabelsCore, Outcome},
     server_axum::api_orchestrator_integration_impls::*,
-    Error, Result, StreamingCoordinatorIdleSnafu, StreamingCoordinatorSpawnSnafu,
-    StreamingExecuteSnafu, WebSocketTaskPanicSnafu,
+    Error, Result, StreamingCoordinatorExecuteStdinSnafu, StreamingCoordinatorIdleSnafu,
+    StreamingCoordinatorSpawnSnafu, StreamingExecuteSnafu, WebSocketTaskPanicSnafu,
 };
 
 use axum::extract::ws::{Message, WebSocket};
 use futures::{Future, FutureExt};
-use orchestrator::coordinator::{self, Coordinator, DockerBackend};
+use orchestrator::{
+    coordinator::{self, Coordinator, DockerBackend},
+    DropErrorDetailsExt,
+};
 use snafu::prelude::*;
 use std::{
+    collections::BTreeMap,
     convert::TryFrom,
+    mem,
     sync::{
         atomic::{AtomicU64, Ordering},
         Arc,
@@ -22,9 +27,16 @@ use tokio::{
     task::{AbortHandle, JoinSet},
     time,
 };
-use tracing::{error, instrument, Instrument};
+use tokio_util::sync::CancellationToken;
+use tracing::{error, instrument, warn, Instrument};
 
-type Meta = Arc<serde_json::Value>;
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct MetaInner {
+    sequence_number: i64,
+}
+
+type Meta = Arc<MetaInner>;
 
 #[derive(serde::Deserialize)]
 #[serde(tag = "type")]
@@ -48,6 +60,15 @@ struct Connected {
 enum WSMessageRequest {
     #[serde(rename = "output/execute/wsExecuteRequest")]
     ExecuteRequest { payload: ExecuteRequest, meta: Meta },
+
+    #[serde(rename = "output/execute/wsExecuteStdin")]
+    ExecuteStdin { payload: String, meta: Meta },
+
+    #[serde(rename = "output/execute/wsExecuteStdinClose")]
+    ExecuteStdinClose { meta: Meta },
+
+    #[serde(rename = "output/execute/wsExecuteKill")]
+    ExecuteKill { meta: Meta },
 }
 
 #[derive(serde::Deserialize)]
@@ -307,6 +328,9 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
         let session_timeout = time::sleep(CoordinatorManager::SESSION_TIMEOUT);
     }
 
+    let mut active_executions = BTreeMap::new();
+    let mut active_execution_gc_interval = time::interval(Duration::from_secs(30));
+
     loop {
         tokio::select! {
             request = socket.recv() => {
@@ -317,7 +341,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
                         // browser disconnected
                         break;
                     }
-                    Some(Ok(Message::Text(txt))) => handle_msg(txt, &tx, &mut manager).await,
+                    Some(Ok(Message::Text(txt))) => handle_msg(txt, &tx, &mut manager, &mut active_executions).await,
                     Some(Ok(_)) => {
                         // unknown message type
                         continue;
@@ -367,6 +391,13 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
                 }
             },
 
+            _ = active_execution_gc_interval.tick() => {
+                active_executions = mem::take(&mut active_executions)
+                    .into_iter()
+                    .filter(|(_id, (_, tx))| !tx.is_closed())
+                    .collect();
+            },
+
             _ = time::sleep(CoordinatorManager::IDLE_TIMEOUT), if manager.is_empty() => {
                 let idled = manager.idle().await.context(StreamingCoordinatorIdleSnafu);
 
@@ -406,7 +437,9 @@ async fn connect_handshake(socket: &mut WebSocket) -> bool {
 }
 
 fn create_server_meta() -> Meta {
-    Arc::new(serde_json::json!({ "sequenceNumber": -1 }))
+    Arc::new(MetaInner {
+        sequence_number: -1,
+    })
 }
 
 fn error_to_response(error: Error) -> MessageResponse {
@@ -425,19 +458,29 @@ fn response_to_message(response: MessageResponse) -> Message {
     Message::Text(resp)
 }
 
-async fn handle_msg(txt: String, tx: &ResponseTx, manager: &mut CoordinatorManager) {
+async fn handle_msg(
+    txt: String,
+    tx: &ResponseTx,
+    manager: &mut CoordinatorManager,
+    active_executions: &mut BTreeMap<i64, (CancellationToken, mpsc::Sender<String>)>,
+) {
     use WSMessageRequest::*;
 
     let msg = serde_json::from_str(&txt).context(crate::DeserializationSnafu);
 
     match msg {
         Ok(ExecuteRequest { payload, meta }) => {
+            let token = CancellationToken::new();
+            let (execution_tx, execution_rx) = mpsc::channel(8);
+
+            active_executions.insert(meta.sequence_number, (token.clone(), execution_tx));
+
             // TODO: Should a single execute / build / etc. session have a timeout of some kind?
             let spawned = manager
                 .spawn({
                     let tx = tx.clone();
                     |coordinator| {
-                        handle_execute(tx, coordinator, payload, meta)
+                        handle_execute(token, execution_rx, tx, coordinator, payload, meta)
                             .context(StreamingExecuteSnafu)
                     }
                 })
@@ -448,6 +491,34 @@ async fn handle_msg(txt: String, tx: &ResponseTx, manager: &mut CoordinatorManag
                 tx.send(Err(e)).await.ok(/* We don't care if the channel is closed */);
             }
         }
+
+        Ok(ExecuteStdin { payload, meta }) => {
+            let Some((_, execution_tx)) = active_executions.get(&meta.sequence_number) else {
+                warn!("Received stdin for an execution that is no longer active");
+                return;
+            };
+            let sent = execution_tx
+                .send(payload)
+                .await
+                .drop_error_details()
+                .context(StreamingCoordinatorExecuteStdinSnafu);
+
+            if let Err(e) = sent {
+                tx.send(Err(e)).await.ok(/* We don't care if the channel is closed */);
+            }
+        }
+
+        Ok(ExecuteStdinClose { meta }) => {
+            let execution_tx = active_executions.remove(&meta.sequence_number);
+            drop(execution_tx); // Signal closed
+        }
+
+        Ok(ExecuteKill { meta }) => {
+            if let Some((token, _)) = active_executions.remove(&meta.sequence_number) {
+                token.cancel();
+            }
+        }
+
         Err(e) => {
             tx.send(Err(e)).await.ok(/* We don't care if the channel is closed */);
         }
@@ -469,6 +540,8 @@ macro_rules! abandon_if_closed {
 }
 
 async fn handle_execute(
+    token: CancellationToken,
+    rx: mpsc::Receiver<String>,
     tx: ResponseTx,
     coordinator: SharedCoordinator,
     req: ExecuteRequest,
@@ -482,7 +555,7 @@ async fn handle_execute(
     let labels_core = req.labels_core();
 
     let start = Instant::now();
-    let v = handle_execute_inner(tx, coordinator, req, meta).await;
+    let v = handle_execute_inner(token, rx, tx, coordinator, req, meta).await;
     let elapsed = start.elapsed();
 
     let outcome = match &v {
@@ -498,6 +571,8 @@ async fn handle_execute(
 }
 
 async fn handle_execute_inner(
+    token: CancellationToken,
+    mut rx: mpsc::Receiver<String>,
     tx: ResponseTx,
     coordinator: SharedCoordinator,
     req: coordinator::ExecuteRequest,
@@ -508,14 +583,20 @@ async fn handle_execute_inner(
 
     let coordinator::ActiveExecution {
         mut task,
+        stdin_tx,
         mut stdout_rx,
         mut stderr_rx,
-    } = coordinator.begin_execute(req).await.context(BeginSnafu)?;
+    } = coordinator
+        .begin_execute(token.clone(), req)
+        .await
+        .context(BeginSnafu)?;
 
     let sent = tx
         .send(Ok(MessageResponse::ExecuteBegin { meta: meta.clone() }))
         .await;
     abandon_if_closed!(sent);
+
+    let mut stdin_tx = Some(stdin_tx);
 
     let send_stdout = |payload| async {
         let meta = meta.clone();
@@ -532,6 +613,24 @@ async fn handle_execute_inner(
     let status = loop {
         tokio::select! {
             status = &mut task => break status,
+
+            stdin = rx.recv(), if stdin_tx.is_some() => {
+                match stdin {
+                    Some(stdin) => {
+                        stdin_tx
+                            .as_ref()
+                            .unwrap(/* This is a precondition */)
+                            .send(stdin)
+                            .await
+                            .drop_error_details()
+                            .context(StdinSnafu)?;
+                    }
+                    None => {
+                        let stdin_tx = stdin_tx.take();
+                        drop(stdin_tx); // Signal closed
+                    }
+                }
+            }
 
             Some(stdout) = stdout_rx.recv() => {
                 let sent = send_stdout(stdout).await;
@@ -589,6 +688,11 @@ pub(crate) enum ExecuteError {
 
     #[snafu(display("Could not end the execution session"))]
     End { source: coordinator::ExecuteError },
+
+    #[snafu(display("Could not send stdin to the coordinator"))]
+    Stdin {
+        source: tokio::sync::mpsc::error::SendError<()>,
+    },
 }
 
 type ExecuteResult<T, E = ExecuteError> = std::result::Result<T, E>;

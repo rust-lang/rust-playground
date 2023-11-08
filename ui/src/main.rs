@@ -251,6 +251,11 @@ enum Error {
     StreamingExecute {
         source: server_axum::WebsocketExecuteError,
     },
+
+    #[snafu(display("Unable to pass stdin to the active execution"))]
+    StreamingCoordinatorExecuteStdin {
+        source: tokio::sync::mpsc::error::SendError<()>,
+    },
 }
 
 type Result<T, E = Error> = ::std::result::Result<T, E>;

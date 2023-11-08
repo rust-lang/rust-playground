@@ -7,10 +7,21 @@ RSpec.feature "Streaming interaction using WebSockets", type: :feature, js: true
 
   before do
     visit '/?features=true'
-    editor.set(slow_output_code)
   end
 
   scenario "output comes when it is available" do
+    editor.set <<~EOF
+      use std::time::Duration;
+
+      fn main() {
+          println!("First");
+          std::thread::sleep(Duration::from_millis(750));
+          println!("Second");
+          std::thread::sleep(Duration::from_millis(750));
+          println!("Third");
+      }
+    EOF
+
     click_on("Run")
 
     within(:output, :stdout) do
@@ -24,21 +35,81 @@ RSpec.feature "Streaming interaction using WebSockets", type: :feature, js: true
     end
   end
 
-  def editor
-    Editor.new(page)
+  scenario "input can be supplied" do
+    editor.set <<~EOF
+      fn main() {
+          println!("Enter some text!");
+          let mut input = String::new();
+          std::io::stdin().read_line(&mut input).expect("Unable to read input");
+          println!("You entered >>>{input:?}<<<");
+      }
+    EOF
+
+    click_on("Run")
+
+    within(:output, :stdout) do
+      expect(page).to have_content 'Enter some text'
+      expect(page).to_not have_content 'You entered'
+    end
+
+    within(:stdin) do
+      fill_in 'content', with: 'An automated test'
+      click_on 'Send'
+    end
+
+    within(:output, :stdout) do
+      expect(page).to have_content 'Enter some text'
+      expect(page).to have_content 'You entered >>>"An automated test\n"<<<'
+    end
   end
 
-  def slow_output_code
-    <<~EOF
-    use std::time::Duration;
-
-    fn main() {
-        println!("First");
-        std::thread::sleep(Duration::from_millis(750));
-        println!("Second");
-        std::thread::sleep(Duration::from_millis(750));
-        println!("Third");
-    }
+  scenario "input can be closed" do
+    editor.set <<~EOF
+      fn main() {
+          let mut input = String::new();
+          while std::io::stdin().read_line(&mut input).unwrap() != 0 {
+              println!("You entered >>>{input:?}<<<");
+              input.clear();
+          }
+          println!("All done");
+      }
     EOF
+
+    click_on("Run")
+
+    within(:stdin) do
+      click_on 'Execution control'
+      click_on 'Close stdin'
+    end
+
+    within(:output, :stdout) do
+      expect(page).to have_content 'All done'
+    end
+  end
+
+  scenario "The process can be killed" do
+    editor.set <<~EOF
+      fn main() {
+          loop {
+              std::thread::sleep(std::time::Duration::from_secs(1));
+          }
+      }
+    EOF
+
+    click_on("Run")
+
+    within(:stdin) do
+      click_on 'Execution control'
+      click_on 'Kill process'
+    end
+
+    within(:output, :error) do
+      expect(page).to have_content 'SIGKILL'
+    end
+  end
+
+
+  def editor
+    Editor.new(page)
   end
 end

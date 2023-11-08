@@ -1,21 +1,12 @@
-.container {
+.container,
+.left,
+.right {
   display: flex;
-  padding: 1.25em 0;
+  gap: 0.5em;
+}
+
+.container {
   font-size: 12px;
-
-  & button:enabled {
-    cursor: pointer;
-  }
-}
-
-.set {
-  margin-right: 0.5em;
-
-  &:last-child {
-    margin-right: 0;
-  }
-}
-
-.setChannelMode {
-  margin-right: auto;
+  padding: 1.25em 0;
+  justify-content: space-between;
 }
