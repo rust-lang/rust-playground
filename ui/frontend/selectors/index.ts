@@ -20,7 +20,7 @@ export const selectionSelector = (state: State) => state.selection;
 const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
 export const hasTestsSelector = createSelector(codeSelector, code => !!code.match(HAS_TESTS_RE));
 
-const HAS_MAIN_FUNCTION_RE = /^\s*(pub\s+)?\s*(const\s+)?\s*(async\s+)?\s*fn\s+main\s*\(\s*\)/m;
+const HAS_MAIN_FUNCTION_RE = /^\s*(pub\s+)?\s*(const\s+)?\s*(async\s+)?\s*fn\s+main\s*(<\s*>)?\(\s*\)/m;
 export const hasMainFunctionSelector = createSelector(codeSelector, code => !!code.match(HAS_MAIN_FUNCTION_RE));
 
 const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
