@@ -71,6 +71,9 @@ pub enum Channel {
 
 impl Channel {
     #[cfg(test)]
+    pub(crate) const ALL: [Self; 3] = [Self::Stable, Self::Beta, Self::Nightly];
+
+    #[cfg(test)]
     pub(crate) fn to_str(self) -> &'static str {
         match self {
             Channel::Stable => "stable",
@@ -359,6 +362,55 @@ pub struct CompileResponse {
 }
 
 #[derive(Debug, Clone)]
+pub struct FormatRequest {
+    pub channel: Channel,
+    pub crate_type: CrateType,
+    pub edition: Edition,
+    pub code: String,
+}
+
+impl FormatRequest {
+    pub(crate) fn delete_previous_main_request(&self) -> DeleteFileRequest {
+        delete_previous_primary_file_request(self.crate_type)
+    }
+
+    pub(crate) fn write_main_request(&self) -> WriteFileRequest {
+        write_primary_file_request(self.crate_type, &self.code)
+    }
+
+    pub(crate) fn execute_cargo_request(&self) -> ExecuteCommandRequest {
+        ExecuteCommandRequest {
+            cmd: "cargo".to_owned(),
+            args: vec!["fmt".to_owned()],
+            envs: Default::default(),
+            cwd: None,
+        }
+    }
+}
+
+impl CargoTomlModifier for FormatRequest {
+    fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
+        if self.edition == Edition::Rust2024 {
+            cargo_toml = modify_cargo_toml::set_feature_edition2024(cargo_toml);
+        }
+
+        cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
+
+        if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
+            cargo_toml = modify_cargo_toml::set_crate_type(cargo_toml, crate_type);
+        }
+        cargo_toml
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FormatResponse {
+    pub success: bool,
+    pub exit_detail: String,
+    pub code: String,
+}
+
+#[derive(Debug, Clone)]
 pub struct WithOutput<T> {
     pub response: T,
     pub stdout: String,
@@ -492,6 +544,33 @@ where
             .await
             .context(CouldNotStartContainerSnafu)?
             .begin_compile(token, request)
+            .await
+    }
+
+    pub async fn format(
+        &self,
+        request: FormatRequest,
+    ) -> Result<WithOutput<FormatResponse>, FormatError> {
+        use format_error::*;
+
+        self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
+            .format(request)
+            .await
+    }
+
+    pub async fn begin_format(
+        &self,
+        token: CancellationToken,
+        request: FormatRequest,
+    ) -> Result<ActiveFormatting, FormatError> {
+        use format_error::*;
+
+        self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
+            .begin_format(token, request)
             .await
     }
 
@@ -767,6 +846,89 @@ impl Container {
         })
     }
 
+    async fn format(
+        &self,
+        request: FormatRequest,
+    ) -> Result<WithOutput<FormatResponse>, FormatError> {
+        let token = Default::default();
+
+        let ActiveFormatting {
+            task,
+            stdout_rx,
+            stderr_rx,
+        } = self.begin_format(token, request).await?;
+
+        WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
+    }
+
+    async fn begin_format(
+        &self,
+        token: CancellationToken,
+        request: FormatRequest,
+    ) -> Result<ActiveFormatting, FormatError> {
+        use format_error::*;
+
+        let delete_previous_main = request.delete_previous_main_request();
+        let write_main = request.write_main_request();
+        let execute_cargo = request.execute_cargo_request();
+        let read_output = ReadFileRequest {
+            path: request.crate_type.primary_path().to_owned(),
+        };
+
+        let delete_previous_main = self.commander.one(delete_previous_main);
+        let write_main = self.commander.one(write_main);
+        let modify_cargo_toml = self.modify_cargo_toml.modify_for(&request);
+
+        let (delete_previous_main, write_main, modify_cargo_toml) =
+            join!(delete_previous_main, write_main, modify_cargo_toml);
+
+        delete_previous_main.context(CouldNotDeletePreviousCodeSnafu)?;
+        write_main.context(CouldNotWriteCodeSnafu)?;
+        modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
+
+        let SpawnCargo {
+            task,
+            stdin_tx,
+            stdout_rx,
+            stderr_rx,
+        } = self
+            .spawn_cargo_task(token, execute_cargo)
+            .await
+            .context(CouldNotStartCargoSnafu)?;
+
+        drop(stdin_tx);
+
+        let commander = self.commander.clone();
+        let task = async move {
+            let ExecuteCommandResponse {
+                success,
+                exit_detail,
+            } = task
+                .await
+                .context(CargoTaskPanickedSnafu)?
+                .context(CargoFailedSnafu)?;
+
+            let file = commander
+                .one(read_output)
+                .await
+                .context(CouldNotReadCodeSnafu)?;
+            let code = String::from_utf8(file.0).context(CodeNotUtf8Snafu)?;
+
+            Ok(FormatResponse {
+                success,
+                exit_detail,
+                code,
+            })
+        }
+        .boxed();
+
+        Ok(ActiveFormatting {
+            task,
+            stdout_rx,
+            stderr_rx,
+        })
+    }
+
     async fn spawn_cargo_task(
         &self,
         token: CancellationToken,
@@ -921,6 +1083,53 @@ impl fmt::Debug for ActiveCompilation {
 #[derive(Debug, Snafu)]
 #[snafu(module)]
 pub enum CompileError {
+    #[snafu(display("Could not start the container"))]
+    CouldNotStartContainer { source: Error },
+
+    #[snafu(display("Could not modify Cargo.toml"))]
+    CouldNotModifyCargoToml { source: ModifyCargoTomlError },
+
+    #[snafu(display("Could not delete previous source code"))]
+    CouldNotDeletePreviousCode { source: CommanderError },
+
+    #[snafu(display("Could not write source code"))]
+    CouldNotWriteCode { source: CommanderError },
+
+    #[snafu(display("Could not start Cargo task"))]
+    CouldNotStartCargo { source: SpawnCargoError },
+
+    #[snafu(display("The Cargo task panicked"))]
+    CargoTaskPanicked { source: tokio::task::JoinError },
+
+    #[snafu(display("Cargo task failed"))]
+    CargoFailed { source: SpawnCargoError },
+
+    #[snafu(display("Could not read the compilation output"))]
+    CouldNotReadCode { source: CommanderError },
+
+    #[snafu(display("The compilation output was not UTF-8"))]
+    CodeNotUtf8 { source: std::string::FromUtf8Error },
+}
+
+pub struct ActiveFormatting {
+    pub task: BoxFuture<'static, Result<FormatResponse, FormatError>>,
+    pub stdout_rx: mpsc::Receiver<String>,
+    pub stderr_rx: mpsc::Receiver<String>,
+}
+
+impl fmt::Debug for ActiveFormatting {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ActiveFormatting")
+            .field("task", &"<future>")
+            .field("stdout_rx", &self.stdout_rx)
+            .field("stderr_rx", &self.stderr_rx)
+            .finish()
+    }
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum FormatError {
     #[snafu(display("Could not start the container"))]
     CouldNotStartContainer { source: Error },
 
@@ -2281,6 +2490,93 @@ mod tests {
 
         Ok(())
     }
+
+    const ARBITRARY_FORMAT_REQUEST: FormatRequest = FormatRequest {
+        channel: Channel::Stable,
+        crate_type: CrateType::Binary,
+        edition: Edition::Rust2015,
+        code: String::new(),
+    };
+
+    const ARBITRARY_FORMAT_INPUT: &str = "fn main(){1+1;}";
+    #[rustfmt::skip]
+    const ARBITRARY_FORMAT_OUTPUT: &[&str] = &[
+        "fn main() {",
+        "    1 + 1;",
+        "}"
+    ];
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn format() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let req = FormatRequest {
+            code: ARBITRARY_FORMAT_INPUT.into(),
+            ..ARBITRARY_FORMAT_REQUEST
+        };
+
+        let response = coordinator.format(req).with_timeout().await.unwrap();
+
+        assert!(response.success, "stderr: {}", response.stderr);
+        let lines = response.code.lines().collect::<Vec<_>>();
+        assert_eq!(ARBITRARY_FORMAT_OUTPUT, lines);
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn format_channel() -> Result<()> {
+        for channel in Channel::ALL {
+            let coordinator = new_coordinator().await;
+
+            let req = FormatRequest {
+                channel,
+                code: ARBITRARY_FORMAT_INPUT.into(),
+                ..ARBITRARY_FORMAT_REQUEST
+            };
+
+            let response = coordinator.format(req).with_timeout().await.unwrap();
+
+            assert!(response.success, "stderr: {}", response.stderr);
+            let lines = response.code.lines().collect::<Vec<_>>();
+            assert_eq!(ARBITRARY_FORMAT_OUTPUT, lines);
+        }
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn format_edition() -> Result<()> {
+        let cases = [
+            ("fn main() { async { 1 } }", [false, true, true, true]),
+            ("fn main() { gen { 1 } }", [false, false, false, true]),
+        ];
+
+        for (code, works_in) in cases {
+            let coordinator = new_coordinator().await;
+
+            for (edition, works) in Edition::ALL.into_iter().zip(works_in) {
+                let req = FormatRequest {
+                    edition,
+                    code: code.into(),
+                    channel: Channel::Nightly, // To allow 2024 while it is unstable
+                    ..ARBITRARY_FORMAT_REQUEST
+                };
+
+                let response = coordinator.format(req).with_timeout().await.unwrap();
+
+                assert_eq!(response.success, works, "{code} in {edition:?}");
+            }
+        }
+
+        Ok(())
+    }
+
+    // The next set of tests are broader than the functionality of a
+    // single operation.
 
     #[tokio::test]
     #[snafu::report]

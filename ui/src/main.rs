@@ -169,8 +169,6 @@ enum Error {
     Linting { source: sandbox::Error },
     #[snafu(display("Expansion operation failed: {}", source))]
     Expansion { source: sandbox::Error },
-    #[snafu(display("Formatting operation failed: {}", source))]
-    Formatting { source: sandbox::Error },
     #[snafu(display("Interpreting operation failed: {}", source))]
     Interpreting { source: sandbox::Error },
     #[snafu(display("Caching operation failed: {}", source))]
@@ -199,6 +197,11 @@ enum Error {
     #[snafu(context(false))]
     ExecuteRequest {
         source: server_axum::api_orchestrator_integration_impls::ParseExecuteRequestError,
+    },
+
+    #[snafu(context(false))]
+    FormatRequest {
+        source: server_axum::api_orchestrator_integration_impls::ParseFormatRequestError,
     },
 
     // Remove at a later point. From here ...
@@ -232,6 +235,11 @@ enum Error {
     #[snafu(display("Unable to convert the execute request"))]
     Execute {
         source: orchestrator::coordinator::ExecuteError,
+    },
+
+    #[snafu(display("Unable to convert the format request"))]
+    Format {
+        source: orchestrator::coordinator::FormatError,
     },
 
     #[snafu(display("The operation timed out"))]
@@ -329,6 +337,8 @@ struct FormatRequest {
 #[derive(Debug, Clone, Serialize)]
 struct FormatResponse {
     success: bool,
+    #[serde(rename = "exitDetail")]
+    exit_detail: String,
     code: String,
     stdout: String,
     stderr: String,
@@ -424,28 +434,6 @@ struct EvaluateRequest {
 struct EvaluateResponse {
     result: String,
     error: Option<String>,
-}
-
-impl TryFrom<FormatRequest> for sandbox::FormatRequest {
-    type Error = Error;
-
-    fn try_from(me: FormatRequest) -> Result<Self> {
-        Ok(sandbox::FormatRequest {
-            code: me.code,
-            edition: parse_edition(&me.edition)?,
-        })
-    }
-}
-
-impl From<sandbox::FormatResponse> for FormatResponse {
-    fn from(me: sandbox::FormatResponse) -> Self {
-        FormatResponse {
-            success: me.success,
-            code: me.code,
-            stdout: me.stdout,
-            stderr: me.stderr,
-        }
-    }
 }
 
 impl TryFrom<ClippyRequest> for sandbox::ClippyRequest {

@@ -197,25 +197,6 @@ where
     }
 }
 
-impl GenerateLabels for sandbox::FormatRequest {
-    fn generate_labels(&self, outcome: Outcome) -> Labels {
-        let Self { edition, code: _ } = *self;
-
-        Labels {
-            endpoint: Endpoint::Format,
-            outcome,
-
-            target: None,
-            channel: None,
-            mode: None,
-            edition: Some(edition),
-            crate_type: None,
-            tests: None,
-            backtrace: None,
-        }
-    }
-}
-
 impl GenerateLabels for sandbox::ClippyRequest {
     fn generate_labels(&self, outcome: Outcome) -> Labels {
         let Self {
@@ -310,12 +291,6 @@ fn common_success_details(success: bool, stderr: &str) -> Outcome {
                 Outcome::ErrorUserCode
             }
         }
-    }
-}
-
-impl SuccessDetails for sandbox::FormatResponse {
-    fn success_details(&self) -> Outcome {
-        common_success_details(self.success, &self.stderr)
     }
 }
 
@@ -465,6 +440,27 @@ impl HasLabelsCore for coordinator::ExecuteRequest {
             crate_type: Some(crate_type.into()),
             tests: Some(tests),
             backtrace: Some(backtrace),
+        }
+    }
+}
+
+impl HasLabelsCore for coordinator::FormatRequest {
+    fn labels_core(&self) -> LabelsCore {
+        let Self {
+            channel,
+            crate_type,
+            edition,
+            code: _,
+        } = *self;
+
+        LabelsCore {
+            target: None,
+            channel: Some(channel.into()),
+            mode: None,
+            edition: Some(Some(edition.into())),
+            crate_type: Some(crate_type.into()),
+            tests: None,
+            backtrace: None,
         }
     }
 }
