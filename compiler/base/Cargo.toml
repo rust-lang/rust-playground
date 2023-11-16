@@ -180,12 +180,12 @@ features = ["android-tzdata", "clock", "iana-time-zone", "js-sys", "oldtime", "s
 
 [dependencies.clap]
 package = "clap"
-version = "=4.4.7"
+version = "=4.4.8"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.4.7"
+version = "=4.4.8"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
 default-features = false
 
@@ -312,7 +312,7 @@ features = ["alloc"]
 
 [dependencies.env_logger]
 package = "env_logger"
-version = "=0.10.0"
+version = "=0.10.1"
 features = ["auto-color", "color", "humantime", "regex"]
 
 [dependencies.equivalent]
@@ -321,7 +321,7 @@ version = "=1.0.1"
 
 [dependencies.errno]
 package = "errno"
-version = "=0.3.5"
+version = "=0.3.7"
 features = ["std"]
 default-features = false
 
@@ -335,6 +335,11 @@ package = "exr"
 version = "=1.71.0"
 
 [dependencies.fallible_iterator]
+package = "fallible-iterator"
+version = "=0.3.0"
+features = ["alloc"]
+
+[dependencies.fallible_iterator_0_2_0]
 package = "fallible-iterator"
 version = "=0.2.0"
 features = ["std"]
@@ -355,7 +360,7 @@ features = ["alloc", "std"]
 
 [dependencies.fdeflate]
 package = "fdeflate"
-version = "=0.3.0"
+version = "=0.3.1"
 
 [dependencies.filetime]
 package = "filetime"
@@ -465,7 +470,7 @@ features = ["more_lengths"]
 
 [dependencies.getrandom]
 package = "getrandom"
-version = "=0.2.10"
+version = "=0.2.11"
 features = ["std"]
 
 [dependencies.gif]
@@ -485,7 +490,11 @@ version = "=0.3.1"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.3.21"
+version = "=0.4.0"
+
+[dependencies.h2_0_3_22]
+package = "h2"
+version = "=0.3.22"
 
 [dependencies.half]
 package = "half"
@@ -521,9 +530,18 @@ version = "=0.26.0"
 
 [dependencies.http]
 package = "http"
-version = "=0.2.9"
+version = "=1.0.0"
+features = ["std"]
+
+[dependencies.http_0_2_11]
+package = "http"
+version = "=0.2.11"
 
 [dependencies.http_body]
+package = "http-body"
+version = "=1.0.0"
+
+[dependencies.http_body_0_4_5]
 package = "http-body"
 version = "=0.4.5"
 
@@ -542,8 +560,14 @@ version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
+version = "=1.0.0"
+features = ["client", "full", "http1", "http2", "server"]
+
+[dependencies.hyper_0_14_27]
+package = "hyper"
 version = "=0.14.27"
 features = ["client", "full", "h2", "http1", "http2", "runtime", "server", "socket2", "stream", "tcp"]
+default-features = false
 
 [dependencies.hyper_tls]
 package = "hyper-tls"
@@ -574,7 +598,7 @@ features = ["bmp", "dds", "dxt", "exr", "farbfeld", "gif", "hdr", "ico", "jpeg",
 
 [dependencies.indexmap]
 package = "indexmap"
-version = "=2.0.2"
+version = "=2.1.0"
 features = ["std"]
 
 [dependencies.indexmap_1_9_3]
@@ -597,7 +621,7 @@ version = "=0.4.9"
 
 [dependencies.itertools]
 package = "itertools"
-version = "=0.11.0"
+version = "=0.12.0"
 features = ["use_alloc", "use_std"]
 
 [dependencies.itoa]
@@ -620,7 +644,7 @@ version = "=0.5.2"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.149"
+version = "=0.2.150"
 features = ["extra_traits", "std"]
 
 [dependencies.libm]
@@ -629,7 +653,7 @@ version = "=0.2.8"
 
 [dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.26.0"
+version = "=0.27.0"
 features = ["bundled", "bundled_bindings", "cc", "min_sqlite_version_3_14_0", "pkg-config", "unlock_notify", "vcpkg"]
 
 [dependencies.linked_hash_map]
@@ -638,7 +662,7 @@ version = "=0.5.6"
 
 [dependencies.linux_raw_sys]
 package = "linux-raw-sys"
-version = "=0.4.10"
+version = "=0.4.11"
 features = ["elf", "errno", "general", "ioctl", "no_std"]
 default-features = false
 
@@ -804,7 +828,7 @@ features = ["alloc", "race", "std", "unstable"]
 
 [dependencies.openssl]
 package = "openssl"
-version = "=0.10.57"
+version = "=0.10.59"
 
 [dependencies.openssl_macros]
 package = "openssl-macros"
@@ -816,7 +840,7 @@ version = "=0.1.5"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.93"
+version = "=0.9.95"
 
 [dependencies.ordered_float]
 package = "ordered-float"
@@ -1008,7 +1032,7 @@ features = ["alloc", "dev_urandom_fallback"]
 
 [dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.29.0"
+version = "=0.30.0"
 features = ["array", "backup", "blob", "bundled", "bundled-full", "chrono", "collation", "column_decltype", "csv", "csvtab", "extra_check", "functions", "hooks", "i128_blob", "limits", "load_extension", "modern-full", "modern_sqlite", "serde_json", "series", "time", "trace", "unlock_notify", "url", "uuid", "vtab", "window"]
 
 [dependencies.rustc_demangle]
@@ -1021,7 +1045,7 @@ version = "=0.4.0"
 
 [dependencies.rustix]
 package = "rustix"
-version = "=0.38.21"
+version = "=0.38.24"
 features = ["alloc", "fs", "std", "termios", "use-libc-auxv"]
 
 [dependencies.ryu]
@@ -1053,16 +1077,16 @@ features = ["std"]
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.190"
+version = "=1.0.192"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.190"
+version = "=1.0.192"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.107"
+version = "=1.0.108"
 features = ["raw_value", "std"]
 
 [dependencies.serde_spanned]
@@ -1118,7 +1142,7 @@ features = ["std"]
 
 [dependencies.smallvec]
 package = "smallvec"
-version = "=1.11.1"
+version = "=1.11.2"
 
 [dependencies.smawk]
 package = "smawk"
@@ -1163,7 +1187,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=2.0.38"
+version = "=2.0.39"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1186,7 +1210,7 @@ version = "=0.4.3"
 
 [dependencies.termcolor]
 package = "termcolor"
-version = "=1.3.0"
+version = "=1.4.0"
 
 [dependencies.terminal_size]
 package = "terminal_size"
@@ -1246,7 +1270,7 @@ version = "=0.1.1"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.33.0"
+version = "=1.34.0"
 features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "windows-sys"]
 
 [dependencies.tokio_io]
@@ -1255,7 +1279,7 @@ version = "=0.1.13"
 
 [dependencies.tokio_macros]
 package = "tokio-macros"
-version = "=2.1.0"
+version = "=2.2.0"
 
 [dependencies.tokio_native_tls]
 package = "tokio-native-tls"
@@ -1269,11 +1293,11 @@ features = ["runtime"]
 [dependencies.tokio_util]
 package = "tokio-util"
 version = "=0.7.10"
-features = ["codec", "tracing"]
+features = ["codec", "io", "tracing"]
 
 [dependencies.toml]
 package = "toml"
-version = "=0.8.5"
+version = "=0.8.8"
 features = ["display", "parse"]
 
 [dependencies.toml_datetime]
@@ -1283,8 +1307,9 @@ features = ["serde"]
 
 [dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.20.5"
-features = ["serde"]
+version = "=0.21.0"
+features = ["display", "parse", "serde"]
+default-features = false
 
 [dependencies.tower_service]
 package = "tower-service"
@@ -1411,7 +1436,7 @@ default-features = false
 
 [dependencies.winnow]
 package = "winnow"
-version = "=0.5.17"
+version = "=0.5.19"
 features = ["alloc", "std"]
 
 [dependencies.xattr]
@@ -1429,13 +1454,17 @@ version = "=0.4.5"
 
 [dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.7.15"
-features = ["simd"]
+version = "=0.7.26"
+features = ["__internal_use_only_features_that_work_on_stable", "alloc", "derive", "simd", "zerocopy-derive"]
 default-features = false
+
+[dependencies.zerocopy_derive]
+package = "zerocopy-derive"
+version = "=0.7.26"
 
 [dependencies.zeroize]
 package = "zeroize"
-version = "=1.6.0"
+version = "=1.6.1"
 default-features = false
 
 [dependencies.zune_inflate]
@@ -1604,12 +1633,12 @@ features = ["android-tzdata", "clock", "iana-time-zone", "js-sys", "oldtime", "s
 
 [build_dependencies.clap]
 package = "clap"
-version = "=4.4.7"
+version = "=4.4.8"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build_dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.4.7"
+version = "=4.4.8"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
 default-features = false
 
@@ -1736,7 +1765,7 @@ features = ["alloc"]
 
 [build_dependencies.env_logger]
 package = "env_logger"
-version = "=0.10.0"
+version = "=0.10.1"
 features = ["auto-color", "color", "humantime", "regex"]
 
 [build_dependencies.equivalent]
@@ -1745,7 +1774,7 @@ version = "=1.0.1"
 
 [build_dependencies.errno]
 package = "errno"
-version = "=0.3.5"
+version = "=0.3.7"
 features = ["std"]
 default-features = false
 
@@ -1759,6 +1788,11 @@ package = "exr"
 version = "=1.71.0"
 
 [build_dependencies.fallible_iterator]
+package = "fallible-iterator"
+version = "=0.3.0"
+features = ["alloc"]
+
+[build_dependencies.fallible_iterator_0_2_0]
 package = "fallible-iterator"
 version = "=0.2.0"
 features = ["std"]
@@ -1779,7 +1813,7 @@ features = ["alloc", "std"]
 
 [build_dependencies.fdeflate]
 package = "fdeflate"
-version = "=0.3.0"
+version = "=0.3.1"
 
 [build_dependencies.filetime]
 package = "filetime"
@@ -1889,7 +1923,7 @@ features = ["more_lengths"]
 
 [build_dependencies.getrandom]
 package = "getrandom"
-version = "=0.2.10"
+version = "=0.2.11"
 features = ["std"]
 
 [build_dependencies.gif]
@@ -1909,7 +1943,11 @@ version = "=0.3.1"
 
 [build_dependencies.h2]
 package = "h2"
-version = "=0.3.21"
+version = "=0.4.0"
+
+[build_dependencies.h2_0_3_22]
+package = "h2"
+version = "=0.3.22"
 
 [build_dependencies.half]
 package = "half"
@@ -1945,9 +1983,18 @@ version = "=0.26.0"
 
 [build_dependencies.http]
 package = "http"
-version = "=0.2.9"
+version = "=1.0.0"
+features = ["std"]
+
+[build_dependencies.http_0_2_11]
+package = "http"
+version = "=0.2.11"
 
 [build_dependencies.http_body]
+package = "http-body"
+version = "=1.0.0"
+
+[build_dependencies.http_body_0_4_5]
 package = "http-body"
 version = "=0.4.5"
 
@@ -1966,8 +2013,14 @@ version = "=2.1.0"
 
 [build_dependencies.hyper]
 package = "hyper"
+version = "=1.0.0"
+features = ["client", "full", "http1", "http2", "server"]
+
+[build_dependencies.hyper_0_14_27]
+package = "hyper"
 version = "=0.14.27"
 features = ["client", "full", "h2", "http1", "http2", "runtime", "server", "socket2", "stream", "tcp"]
+default-features = false
 
 [build_dependencies.hyper_tls]
 package = "hyper-tls"
@@ -1998,7 +2051,7 @@ features = ["bmp", "dds", "dxt", "exr", "farbfeld", "gif", "hdr", "ico", "jpeg",
 
 [build_dependencies.indexmap]
 package = "indexmap"
-version = "=2.0.2"
+version = "=2.1.0"
 features = ["std"]
 
 [build_dependencies.indexmap_1_9_3]
@@ -2021,7 +2074,7 @@ version = "=0.4.9"
 
 [build_dependencies.itertools]
 package = "itertools"
-version = "=0.11.0"
+version = "=0.12.0"
 features = ["use_alloc", "use_std"]
 
 [build_dependencies.itoa]
@@ -2044,7 +2097,7 @@ version = "=0.5.2"
 
 [build_dependencies.libc]
 package = "libc"
-version = "=0.2.149"
+version = "=0.2.150"
 features = ["extra_traits", "std"]
 
 [build_dependencies.libm]
@@ -2053,7 +2106,7 @@ version = "=0.2.8"
 
 [build_dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.26.0"
+version = "=0.27.0"
 features = ["bundled", "bundled_bindings", "cc", "min_sqlite_version_3_14_0", "pkg-config", "unlock_notify", "vcpkg"]
 
 [build_dependencies.linked_hash_map]
@@ -2062,7 +2115,7 @@ version = "=0.5.6"
 
 [build_dependencies.linux_raw_sys]
 package = "linux-raw-sys"
-version = "=0.4.10"
+version = "=0.4.11"
 features = ["elf", "errno", "general", "ioctl", "no_std"]
 default-features = false
 
@@ -2228,7 +2281,7 @@ features = ["alloc", "race", "std", "unstable"]
 
 [build_dependencies.openssl]
 package = "openssl"
-version = "=0.10.57"
+version = "=0.10.59"
 
 [build_dependencies.openssl_macros]
 package = "openssl-macros"
@@ -2240,7 +2293,7 @@ version = "=0.1.5"
 
 [build_dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.93"
+version = "=0.9.95"
 
 [build_dependencies.ordered_float]
 package = "ordered-float"
@@ -2432,7 +2485,7 @@ features = ["alloc", "dev_urandom_fallback"]
 
 [build_dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.29.0"
+version = "=0.30.0"
 features = ["array", "backup", "blob", "bundled", "bundled-full", "chrono", "collation", "column_decltype", "csv", "csvtab", "extra_check", "functions", "hooks", "i128_blob", "limits", "load_extension", "modern-full", "modern_sqlite", "serde_json", "series", "time", "trace", "unlock_notify", "url", "uuid", "vtab", "window"]
 
 [build_dependencies.rustc_demangle]
@@ -2445,7 +2498,7 @@ version = "=0.4.0"
 
 [build_dependencies.rustix]
 package = "rustix"
-version = "=0.38.21"
+version = "=0.38.24"
 features = ["alloc", "fs", "std", "termios", "use-libc-auxv"]
 
 [build_dependencies.ryu]
@@ -2477,16 +2530,16 @@ features = ["std"]
 
 [build_dependencies.serde]
 package = "serde"
-version = "=1.0.190"
+version = "=1.0.192"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [build_dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.190"
+version = "=1.0.192"
 
 [build_dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.107"
+version = "=1.0.108"
 features = ["raw_value", "std"]
 
 [build_dependencies.serde_spanned]
@@ -2542,7 +2595,7 @@ features = ["std"]
 
 [build_dependencies.smallvec]
 package = "smallvec"
-version = "=1.11.1"
+version = "=1.11.2"
 
 [build_dependencies.smawk]
 package = "smawk"
@@ -2587,7 +2640,7 @@ default-features = false
 
 [build_dependencies.syn]
 package = "syn"
-version = "=2.0.38"
+version = "=2.0.39"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"]
 
 [build_dependencies.syn_1_0_109]
@@ -2610,7 +2663,7 @@ version = "=0.4.3"
 
 [build_dependencies.termcolor]
 package = "termcolor"
-version = "=1.3.0"
+version = "=1.4.0"
 
 [build_dependencies.terminal_size]
 package = "terminal_size"
@@ -2670,7 +2723,7 @@ version = "=0.1.1"
 
 [build_dependencies.tokio]
 package = "tokio"
-version = "=1.33.0"
+version = "=1.34.0"
 features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "windows-sys"]
 
 [build_dependencies.tokio_io]
@@ -2679,7 +2732,7 @@ version = "=0.1.13"
 
 [build_dependencies.tokio_macros]
 package = "tokio-macros"
-version = "=2.1.0"
+version = "=2.2.0"
 
 [build_dependencies.tokio_native_tls]
 package = "tokio-native-tls"
@@ -2693,11 +2746,11 @@ features = ["runtime"]
 [build_dependencies.tokio_util]
 package = "tokio-util"
 version = "=0.7.10"
-features = ["codec", "tracing"]
+features = ["codec", "io", "tracing"]
 
 [build_dependencies.toml]
 package = "toml"
-version = "=0.8.5"
+version = "=0.8.8"
 features = ["display", "parse"]
 
 [build_dependencies.toml_datetime]
@@ -2707,8 +2760,9 @@ features = ["serde"]
 
 [build_dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.20.5"
-features = ["serde"]
+version = "=0.21.0"
+features = ["display", "parse", "serde"]
+default-features = false
 
 [build_dependencies.tower_service]
 package = "tower-service"
@@ -2835,7 +2889,7 @@ default-features = false
 
 [build_dependencies.winnow]
 package = "winnow"
-version = "=0.5.17"
+version = "=0.5.19"
 features = ["alloc", "std"]
 
 [build_dependencies.xattr]
@@ -2853,13 +2907,17 @@ version = "=0.4.5"
 
 [build_dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.7.15"
-features = ["simd"]
+version = "=0.7.26"
+features = ["__internal_use_only_features_that_work_on_stable", "alloc", "derive", "simd", "zerocopy-derive"]
 default-features = false
+
+[build_dependencies.zerocopy_derive]
+package = "zerocopy-derive"
+version = "=0.7.26"
 
 [build_dependencies.zeroize]
 package = "zeroize"
-version = "=1.6.0"
+version = "=1.6.1"
 default-features = false
 
 [build_dependencies.zune_inflate]

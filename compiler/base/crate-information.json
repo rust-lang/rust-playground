@@ -171,12 +171,12 @@
   },
   {
     "name": "clap",
-    "version": "4.4.7",
+    "version": "4.4.8",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.4.7",
+    "version": "4.4.8",
     "id": "clap_builder"
   },
   {
@@ -311,7 +311,7 @@
   },
   {
     "name": "env_logger",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "id": "env_logger"
   },
   {
@@ -321,7 +321,7 @@
   },
   {
     "name": "errno",
-    "version": "0.3.5",
+    "version": "0.3.7",
     "id": "errno"
   },
   {
@@ -336,8 +336,13 @@
   },
   {
     "name": "fallible-iterator",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "id": "fallible_iterator"
+  },
+  {
+    "name": "fallible-iterator",
+    "version": "0.2.0",
+    "id": "fallible_iterator_0_2_0"
   },
   {
     "name": "fallible-streaming-iterator",
@@ -356,7 +361,7 @@
   },
   {
     "name": "fdeflate",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "id": "fdeflate"
   },
   {
@@ -471,7 +476,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.2.10",
+    "version": "0.2.11",
     "id": "getrandom"
   },
   {
@@ -491,8 +496,13 @@
   },
   {
     "name": "h2",
-    "version": "0.3.21",
+    "version": "0.4.0",
     "id": "h2"
+  },
+  {
+    "name": "h2",
+    "version": "0.3.22",
+    "id": "h2_0_3_22"
   },
   {
     "name": "half",
@@ -531,13 +541,23 @@
   },
   {
     "name": "http",
-    "version": "0.2.9",
+    "version": "1.0.0",
     "id": "http"
+  },
+  {
+    "name": "http",
+    "version": "0.2.11",
+    "id": "http_0_2_11"
+  },
+  {
+    "name": "http-body",
+    "version": "1.0.0",
+    "id": "http_body"
   },
   {
     "name": "http-body",
     "version": "0.4.5",
-    "id": "http_body"
+    "id": "http_body_0_4_5"
   },
   {
     "name": "httparse",
@@ -556,8 +576,13 @@
   },
   {
     "name": "hyper",
-    "version": "0.14.27",
+    "version": "1.0.0",
     "id": "hyper"
+  },
+  {
+    "name": "hyper",
+    "version": "0.14.27",
+    "id": "hyper_0_14_27"
   },
   {
     "name": "hyper-tls",
@@ -591,7 +616,7 @@
   },
   {
     "name": "indexmap",
-    "version": "2.0.2",
+    "version": "2.1.0",
     "id": "indexmap"
   },
   {
@@ -616,7 +641,7 @@
   },
   {
     "name": "itertools",
-    "version": "0.11.0",
+    "version": "0.12.0",
     "id": "itertools"
   },
   {
@@ -641,7 +666,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.149",
+    "version": "0.2.150",
     "id": "libc"
   },
   {
@@ -651,7 +676,7 @@
   },
   {
     "name": "libsqlite3-sys",
-    "version": "0.26.0",
+    "version": "0.27.0",
     "id": "libsqlite3_sys"
   },
   {
@@ -661,7 +686,7 @@
   },
   {
     "name": "linux-raw-sys",
-    "version": "0.4.10",
+    "version": "0.4.11",
     "id": "linux_raw_sys"
   },
   {
@@ -831,7 +856,7 @@
   },
   {
     "name": "openssl",
-    "version": "0.10.57",
+    "version": "0.10.59",
     "id": "openssl"
   },
   {
@@ -846,7 +871,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.93",
+    "version": "0.9.95",
     "id": "openssl_sys"
   },
   {
@@ -1056,7 +1081,7 @@
   },
   {
     "name": "rusqlite",
-    "version": "0.29.0",
+    "version": "0.30.0",
     "id": "rusqlite"
   },
   {
@@ -1071,7 +1096,7 @@
   },
   {
     "name": "rustix",
-    "version": "0.38.21",
+    "version": "0.38.24",
     "id": "rustix"
   },
   {
@@ -1106,17 +1131,17 @@
   },
   {
     "name": "serde",
-    "version": "1.0.190",
+    "version": "1.0.192",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.190",
+    "version": "1.0.192",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.107",
+    "version": "1.0.108",
     "id": "serde_json"
   },
   {
@@ -1176,7 +1201,7 @@
   },
   {
     "name": "smallvec",
-    "version": "1.11.1",
+    "version": "1.11.2",
     "id": "smallvec"
   },
   {
@@ -1226,7 +1251,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.38",
+    "version": "2.0.39",
     "id": "syn"
   },
   {
@@ -1251,7 +1276,7 @@
   },
   {
     "name": "termcolor",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "id": "termcolor"
   },
   {
@@ -1321,7 +1346,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.33.0",
+    "version": "1.34.0",
     "id": "tokio"
   },
   {
@@ -1331,7 +1356,7 @@
   },
   {
     "name": "tokio-macros",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "id": "tokio_macros"
   },
   {
@@ -1351,7 +1376,7 @@
   },
   {
     "name": "toml",
-    "version": "0.8.5",
+    "version": "0.8.8",
     "id": "toml"
   },
   {
@@ -1361,7 +1386,7 @@
   },
   {
     "name": "toml_edit",
-    "version": "0.20.5",
+    "version": "0.21.0",
     "id": "toml_edit"
   },
   {
@@ -1506,7 +1531,7 @@
   },
   {
     "name": "winnow",
-    "version": "0.5.17",
+    "version": "0.5.19",
     "id": "winnow"
   },
   {
@@ -1526,12 +1551,17 @@
   },
   {
     "name": "zerocopy",
-    "version": "0.7.15",
+    "version": "0.7.26",
     "id": "zerocopy"
   },
   {
+    "name": "zerocopy-derive",
+    "version": "0.7.26",
+    "id": "zerocopy_derive"
+  },
+  {
     "name": "zeroize",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "id": "zeroize"
   },
   {
