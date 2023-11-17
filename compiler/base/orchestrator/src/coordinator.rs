@@ -1775,8 +1775,15 @@ mod tests {
     }
 
     async fn new_coordinator() -> Coordinator<impl Backend> {
-        Coordinator::new(TestBackend::new()).await
-        //Coordinator::new_docker().await
+        #[cfg(not(force_docker))]
+        {
+            Coordinator::new(TestBackend::new()).await
+        }
+
+        #[cfg(force_docker)]
+        {
+            Coordinator::new_docker().await
+        }
     }
 
     const ARBITRARY_EXECUTE_REQUEST: ExecuteRequest = ExecuteRequest {
