@@ -1664,7 +1664,8 @@ mod tests {
                         code: code.into(),
                         edition,
                         crate_type: CrateType::Library(LibraryType::Lib),
-                        ..new_execute_request()
+                        channel: Channel::Nightly, // To allow 2024 while it is unstable
+                        ..ARBITRARY_EXECUTE_REQUEST
                     };
                     let response = coordinator.execute(request).await.unwrap();
 
@@ -2026,6 +2027,7 @@ mod tests {
             let req = CompileRequest {
                 edition,
                 code: SUBTRACT_CODE.into(),
+                channel: Channel::Nightly, // To allow 2024 while it is unstable
                 ..ARBITRARY_HIR_REQUEST
             };
 
