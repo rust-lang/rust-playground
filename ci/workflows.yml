@@ -312,6 +312,8 @@ workflows:
               path: tests/server/build/
 
           - name: "Run orchestrator unit tests"
+            env:
+              TESTS_MAX_CONCURRENCY: 3
             run: |-
               chmod +x ./server/unit_tests_orchestrator && ./server/unit_tests_orchestrator
 

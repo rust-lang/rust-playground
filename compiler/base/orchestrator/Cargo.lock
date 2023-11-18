@@ -316,6 +316,7 @@ dependencies = [
  "bincode",
  "futures",
  "modify-cargo-toml",
+ "once_cell",
  "serde",
  "snafu",
  "tempdir",

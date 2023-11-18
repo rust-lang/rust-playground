@@ -1709,8 +1709,10 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
 mod tests {
     use assertables::*;
     use futures::{future::try_join_all, Future, FutureExt};
-    use std::{sync::Once, time::Duration};
+    use once_cell::sync::Lazy;
+    use std::{env, sync::Once, time::Duration};
     use tempdir::TempDir;
+    use tokio::sync::{OwnedSemaphorePermit, Semaphore};
 
     use super::*;
 
@@ -1774,15 +1776,78 @@ mod tests {
         }
     }
 
-    async fn new_coordinator() -> Coordinator<impl Backend> {
+    const MAX_CONCURRENT_TESTS: Lazy<usize> = Lazy::new(|| {
+        env::var("TESTS_MAX_CONCURRENCY")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(5)
+    });
+
+    static CONCURRENT_TEST_SEMAPHORE: Lazy<Arc<Semaphore>> =
+        Lazy::new(|| Arc::new(Semaphore::new(*MAX_CONCURRENT_TESTS)));
+
+    struct RestrictedCoordinator<T> {
+        _permit: OwnedSemaphorePermit,
+        coordinator: Coordinator<T>,
+    }
+
+    impl<T> RestrictedCoordinator<T>
+    where
+        T: Backend,
+    {
+        async fn with<F, Fut>(f: F) -> Self
+        where
+            F: FnOnce() -> Fut,
+            Fut: Future<Output = Coordinator<T>>,
+        {
+            let semaphore = CONCURRENT_TEST_SEMAPHORE.clone();
+            let permit = semaphore
+                .acquire_owned()
+                .await
+                .expect("Unable to acquire permit");
+            let coordinator = f().await;
+            Self {
+                _permit: permit,
+                coordinator,
+            }
+        }
+
+        async fn shutdown(self) -> super::Result<T, super::Error> {
+            self.coordinator.shutdown().await
+        }
+    }
+
+    impl<T> ops::Deref for RestrictedCoordinator<T> {
+        type Target = Coordinator<T>;
+
+        fn deref(&self) -> &Self::Target {
+            &self.coordinator
+        }
+    }
+
+    impl<T> ops::DerefMut for RestrictedCoordinator<T> {
+        fn deref_mut(&mut self) -> &mut Self::Target {
+            &mut self.coordinator
+        }
+    }
+
+    async fn new_coordinator_test() -> RestrictedCoordinator<impl Backend> {
+        RestrictedCoordinator::with(|| Coordinator::new(TestBackend::new())).await
+    }
+
+    async fn new_coordinator_docker() -> RestrictedCoordinator<impl Backend> {
+        RestrictedCoordinator::with(|| Coordinator::new_docker()).await
+    }
+
+    async fn new_coordinator() -> RestrictedCoordinator<impl Backend> {
         #[cfg(not(force_docker))]
         {
-            Coordinator::new(TestBackend::new()).await
+            new_coordinator_test().await
         }
 
         #[cfg(force_docker)]
         {
-            Coordinator::new_docker().await
+            new_coordinator_docker().await
         }
     }
 
@@ -2472,7 +2537,7 @@ mod tests {
     #[snafu::report]
     async fn compile_wasm() -> Result<()> {
         // cargo-wasm only exists inside the container
-        let coordinator = Coordinator::new_docker().await;
+        let coordinator = new_coordinator_docker().await;
 
         let req = CompileRequest {
             target: CompileTarget::Wasm,
@@ -2703,7 +2768,7 @@ mod tests {
     #[snafu::report]
     async fn network_connections_are_disabled() -> Result<()> {
         // The limits are only applied to the container
-        let coordinator = Coordinator::new_docker().await;
+        let coordinator = new_coordinator_docker().await;
 
         let req = ExecuteRequest {
             code: r#"
@@ -2729,7 +2794,7 @@ mod tests {
     #[snafu::report]
     async fn memory_usage_is_limited() -> Result<()> {
         // The limits are only applied to the container
-        let coordinator = Coordinator::new_docker().await;
+        let coordinator = new_coordinator_docker().await;
 
         let req = ExecuteRequest {
             code: r#"
@@ -2756,7 +2821,7 @@ mod tests {
     #[snafu::report]
     async fn number_of_pids_is_limited() -> Result<()> {
         // The limits are only applied to the container
-        let coordinator = Coordinator::new_docker().await;
+        let coordinator = new_coordinator_docker().await;
 
         let req = ExecuteRequest {
             code: r##"
