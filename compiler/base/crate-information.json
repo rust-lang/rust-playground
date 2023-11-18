@@ -576,7 +576,7 @@
   },
   {
     "name": "hyper",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "hyper"
   },
   {
@@ -1561,7 +1561,7 @@
   },
   {
     "name": "zeroize",
-    "version": "1.6.1",
+    "version": "1.7.0",
     "id": "zeroize"
   },
   {
