@@ -2044,7 +2044,7 @@ mod tests {
         Ok(())
     }
 
-    const ADD_CODE: &str = r#"pub fn add(a: u8, b: u8) -> u8 { a + b }"#;
+    const ADD_CODE: &str = r#"#[inline(never)] pub fn add(a: u8, b: u8) -> u8 { a + b }"#;
 
     const ARBITRARY_ASSEMBLY_REQUEST: CompileRequest = CompileRequest {
         target: CompileTarget::Assembly(
