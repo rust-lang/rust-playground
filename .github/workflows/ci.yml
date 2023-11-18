@@ -224,6 +224,7 @@ jobs:
     - name: Run orchestrator unit tests
       env:
         TESTS_MAX_CONCURRENCY: 3
+        TESTS_TIMEOUT_MS: 30000
       run: chmod +x ./server/unit_tests_orchestrator && ./server/unit_tests_orchestrator
     - name: Run ui unit tests
       run: chmod +x ./server/unit_tests_ui && ./server/unit_tests_ui

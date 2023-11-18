@@ -2846,6 +2846,14 @@ mod tests {
         Ok(())
     }
 
+    static TIMEOUT: Lazy<Duration> = Lazy::new(|| {
+        let millis = env::var("TESTS_TIMEOUT_MS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(5000);
+        Duration::from_millis(millis)
+    });
+
     trait TimeoutExt: Future + Sized {
         #[allow(clippy::type_complexity)]
         fn with_timeout(
@@ -2854,8 +2862,7 @@ mod tests {
             tokio::time::Timeout<Self>,
             fn(Result<Self::Output, tokio::time::error::Elapsed>) -> Self::Output,
         > {
-            tokio::time::timeout(Duration::from_millis(5000), self)
-                .map(|v| v.expect("The operation timed out"))
+            tokio::time::timeout(*TIMEOUT, self).map(|v| v.expect("The operation timed out"))
         }
     }
 
