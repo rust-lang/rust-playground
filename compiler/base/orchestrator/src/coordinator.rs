@@ -2206,7 +2206,7 @@ mod tests {
             .unwrap();
 
         // Wait for some output before killing
-        let early_stdout = stdout_rx.recv().await.unwrap();
+        let early_stdout = stdout_rx.recv().with_timeout().await.unwrap();
 
         token.cancel();
 
