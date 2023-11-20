@@ -165,8 +165,6 @@ impl MetricsToken {
 enum Error {
     #[snafu(display("Sandbox creation failed: {}", source))]
     SandboxCreation { source: sandbox::Error },
-    #[snafu(display("Linting operation failed: {}", source))]
-    Linting { source: sandbox::Error },
     #[snafu(display("Expansion operation failed: {}", source))]
     Expansion { source: sandbox::Error },
     #[snafu(display("Interpreting operation failed: {}", source))]
@@ -204,11 +202,14 @@ enum Error {
         source: server_axum::api_orchestrator_integration_impls::ParseFormatRequestError,
     },
 
+    #[snafu(context(false))]
+    ClippyRequest {
+        source: server_axum::api_orchestrator_integration_impls::ParseClippyRequestError,
+    },
+
     // Remove at a later point. From here ...
     #[snafu(display("The value {:?} is not a valid edition", value))]
     InvalidEdition { value: String },
-    #[snafu(display("The value {:?} is not a valid crate type", value))]
-    InvalidCrateType { value: String },
     // ... to here
     #[snafu(display("No request was provided"))]
     RequestMissing,
@@ -240,6 +241,11 @@ enum Error {
     #[snafu(display("Unable to convert the format request"))]
     Format {
         source: orchestrator::coordinator::FormatError,
+    },
+
+    #[snafu(display("Unable to convert the Clippy request"))]
+    Clippy {
+        source: orchestrator::coordinator::ClippyError,
     },
 
     #[snafu(display("The operation timed out"))]
@@ -356,6 +362,7 @@ struct ClippyRequest {
 #[derive(Debug, Clone, Serialize)]
 struct ClippyResponse {
     success: bool,
+    exit_detail: String,
     stdout: String,
     stderr: String,
 }
@@ -434,28 +441,6 @@ struct EvaluateRequest {
 struct EvaluateResponse {
     result: String,
     error: Option<String>,
-}
-
-impl TryFrom<ClippyRequest> for sandbox::ClippyRequest {
-    type Error = Error;
-
-    fn try_from(me: ClippyRequest) -> Result<Self> {
-        Ok(sandbox::ClippyRequest {
-            code: me.code,
-            crate_type: parse_crate_type(&me.crate_type)?,
-            edition: parse_edition(&me.edition)?,
-        })
-    }
-}
-
-impl From<sandbox::ClippyResponse> for ClippyResponse {
-    fn from(me: sandbox::ClippyResponse) -> Self {
-        ClippyResponse {
-            success: me.success,
-            stdout: me.stdout,
-            stderr: me.stderr,
-        }
-    }
 }
 
 impl TryFrom<MiriRequest> for sandbox::MiriRequest {
@@ -543,20 +528,6 @@ fn parse_edition(s: &str) -> Result<Option<sandbox::Edition>> {
         "2021" => Some(sandbox::Edition::Rust2021),
         "2024" => Some(sandbox::Edition::Rust2024),
         value => InvalidEditionSnafu { value }.fail()?,
-    })
-}
-
-fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
-    use crate::sandbox::{CrateType::*, LibraryType::*};
-    Ok(match s {
-        "bin" => Binary,
-        "lib" => Library(Lib),
-        "dylib" => Library(Dylib),
-        "rlib" => Library(Rlib),
-        "staticlib" => Library(Staticlib),
-        "cdylib" => Library(Cdylib),
-        "proc-macro" => Library(ProcMacro),
-        value => InvalidCrateTypeSnafu { value }.fail()?,
     })
 }
 

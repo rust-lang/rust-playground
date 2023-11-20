@@ -411,6 +411,54 @@ pub struct FormatResponse {
 }
 
 #[derive(Debug, Clone)]
+pub struct ClippyRequest {
+    pub channel: Channel,
+    pub crate_type: CrateType,
+    pub edition: Edition,
+    pub code: String,
+}
+
+impl ClippyRequest {
+    pub(crate) fn delete_previous_main_request(&self) -> DeleteFileRequest {
+        delete_previous_primary_file_request(self.crate_type)
+    }
+
+    pub(crate) fn write_main_request(&self) -> WriteFileRequest {
+        write_primary_file_request(self.crate_type, &self.code)
+    }
+
+    pub(crate) fn execute_cargo_request(&self) -> ExecuteCommandRequest {
+        ExecuteCommandRequest {
+            cmd: "cargo".to_owned(),
+            args: vec!["clippy".to_owned()],
+            envs: Default::default(),
+            cwd: None,
+        }
+    }
+}
+
+impl CargoTomlModifier for ClippyRequest {
+    fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
+        if self.edition == Edition::Rust2024 {
+            cargo_toml = modify_cargo_toml::set_feature_edition2024(cargo_toml);
+        }
+
+        cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
+
+        if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
+            cargo_toml = modify_cargo_toml::set_crate_type(cargo_toml, crate_type);
+        }
+        cargo_toml
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ClippyResponse {
+    pub success: bool,
+    pub exit_detail: String,
+}
+
+#[derive(Debug, Clone)]
 pub struct WithOutput<T> {
     pub response: T,
     pub stdout: String,
@@ -571,6 +619,33 @@ where
             .await
             .context(CouldNotStartContainerSnafu)?
             .begin_format(token, request)
+            .await
+    }
+
+    pub async fn clippy(
+        &self,
+        request: ClippyRequest,
+    ) -> Result<WithOutput<ClippyResponse>, ClippyError> {
+        use clippy_error::*;
+
+        self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
+            .clippy(request)
+            .await
+    }
+
+    pub async fn begin_clippy(
+        &self,
+        token: CancellationToken,
+        request: ClippyRequest,
+    ) -> Result<ActiveClippy, ClippyError> {
+        use clippy_error::*;
+
+        self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
+            .begin_clippy(token, request)
             .await
     }
 
@@ -929,6 +1004,78 @@ impl Container {
         })
     }
 
+    async fn clippy(
+        &self,
+        request: ClippyRequest,
+    ) -> Result<WithOutput<ClippyResponse>, ClippyError> {
+        let token = Default::default();
+
+        let ActiveClippy {
+            task,
+            stdout_rx,
+            stderr_rx,
+        } = self.begin_clippy(token, request).await?;
+
+        WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
+    }
+
+    async fn begin_clippy(
+        &self,
+        token: CancellationToken,
+        request: ClippyRequest,
+    ) -> Result<ActiveClippy, ClippyError> {
+        use clippy_error::*;
+
+        let delete_previous_main = request.delete_previous_main_request();
+        let write_main = request.write_main_request();
+        let execute_cargo = request.execute_cargo_request();
+
+        let delete_previous_main = self.commander.one(delete_previous_main);
+        let write_main = self.commander.one(write_main);
+        let modify_cargo_toml = self.modify_cargo_toml.modify_for(&request);
+
+        let (delete_previous_main, write_main, modify_cargo_toml) =
+            join!(delete_previous_main, write_main, modify_cargo_toml);
+
+        delete_previous_main.context(CouldNotDeletePreviousCodeSnafu)?;
+        write_main.context(CouldNotWriteCodeSnafu)?;
+        modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
+
+        let SpawnCargo {
+            task,
+            stdin_tx,
+            stdout_rx,
+            stderr_rx,
+        } = self
+            .spawn_cargo_task(token, execute_cargo)
+            .await
+            .context(CouldNotStartCargoSnafu)?;
+
+        drop(stdin_tx);
+
+        let task = async move {
+            let ExecuteCommandResponse {
+                success,
+                exit_detail,
+            } = task
+                .await
+                .context(CargoTaskPanickedSnafu)?
+                .context(CargoFailedSnafu)?;
+
+            Ok(ClippyResponse {
+                success,
+                exit_detail,
+            })
+        }
+        .boxed();
+
+        Ok(ActiveClippy {
+            task,
+            stdout_rx,
+            stderr_rx,
+        })
+    }
+
     async fn spawn_cargo_task(
         &self,
         token: CancellationToken,
@@ -1156,6 +1303,47 @@ pub enum FormatError {
 
     #[snafu(display("The compilation output was not UTF-8"))]
     CodeNotUtf8 { source: std::string::FromUtf8Error },
+}
+
+pub struct ActiveClippy {
+    pub task: BoxFuture<'static, Result<ClippyResponse, ClippyError>>,
+    pub stdout_rx: mpsc::Receiver<String>,
+    pub stderr_rx: mpsc::Receiver<String>,
+}
+
+impl fmt::Debug for ActiveClippy {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ActiveClippy")
+            .field("task", &"<future>")
+            .field("stdout_rx", &self.stdout_rx)
+            .field("stderr_rx", &self.stderr_rx)
+            .finish()
+    }
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum ClippyError {
+    #[snafu(display("Could not start the container"))]
+    CouldNotStartContainer { source: Error },
+
+    #[snafu(display("Could not modify Cargo.toml"))]
+    CouldNotModifyCargoToml { source: ModifyCargoTomlError },
+
+    #[snafu(display("Could not delete previous source code"))]
+    CouldNotDeletePreviousCode { source: CommanderError },
+
+    #[snafu(display("Could not write source code"))]
+    CouldNotWriteCode { source: CommanderError },
+
+    #[snafu(display("Could not start Cargo task"))]
+    CouldNotStartCargo { source: SpawnCargoError },
+
+    #[snafu(display("The Cargo task panicked"))]
+    CargoTaskPanicked { source: tokio::task::JoinError },
+
+    #[snafu(display("Cargo task failed"))]
+    CargoFailed { source: SpawnCargoError },
 }
 
 struct SpawnCargo {
@@ -2648,6 +2836,76 @@ mod tests {
                 assert_eq!(response.success, works, "{code} in {edition:?}");
             }
         }
+
+        Ok(())
+    }
+
+    const ARBITRARY_CLIPPY_REQUEST: ClippyRequest = ClippyRequest {
+        channel: Channel::Stable,
+        crate_type: CrateType::Library(LibraryType::Rlib),
+        edition: Edition::Rust2021,
+        code: String::new(),
+    };
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn clippy() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let req = ClippyRequest {
+            code: r#"
+                fn main() {
+                    let a = 0.0 / 0.0;
+                    println!("NaN is {}", a);
+                }
+                "#
+            .into(),
+            ..ARBITRARY_CLIPPY_REQUEST
+        };
+
+        let response = coordinator.clippy(req).with_timeout().await.unwrap();
+
+        assert!(!response.success, "stderr: {}", response.stderr);
+        assert_contains!(response.stderr, "deny(clippy::eq_op)");
+        assert_contains!(response.stderr, "warn(clippy::zero_divided_by_zero)");
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn clippy_edition() -> Result<()> {
+        let cases = [(
+            "#![deny(clippy::single_element_loop)]
+              fn a() { for i in [1] { dbg!(i); } }",
+            [true, true, false, false],
+        )];
+
+        let tests = cases.into_iter().flat_map(|(code, expected_to_be_clean)| {
+            Edition::ALL.into_iter().zip(expected_to_be_clean).map(
+                move |(edition, expected_to_be_clean)| async move {
+                    let coordinator = new_coordinator().await;
+
+                    let req = ClippyRequest {
+                        edition,
+                        code: code.into(),
+                        ..ARBITRARY_CLIPPY_REQUEST
+                    };
+
+                    let response = coordinator.clippy(req).with_timeout().await.unwrap();
+
+                    assert_eq!(
+                        response.success, expected_to_be_clean,
+                        "{code:?} in {edition:?}, {}",
+                        response.stderr
+                    );
+
+                    Ok(())
+                },
+            )
+        });
+
+        try_join_all(tests).with_timeout().await?;
 
         Ok(())
     }

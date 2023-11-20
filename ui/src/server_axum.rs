@@ -5,10 +5,10 @@ use crate::{
         HasLabelsCore, Outcome, SuccessDetails, UNAVAILABLE_WS,
     },
     sandbox::{self, Channel, Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
-    CachingSnafu, ClippyRequest, ClippyResponse, CompileRequest, CompileResponse, CompileSnafu,
-    Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu, ExecuteRequest,
-    ExecuteResponse, ExecuteSnafu, ExpansionSnafu, FormatRequest, FormatResponse, FormatSnafu,
-    GhToken, GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu, LintingSnafu,
+    CachingSnafu, ClippyRequest, ClippyResponse, ClippySnafu, CompileRequest, CompileResponse,
+    CompileSnafu, Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu,
+    ExecuteRequest, ExecuteResponse, ExecuteSnafu, ExpansionSnafu, FormatRequest, FormatResponse,
+    FormatSnafu, GhToken, GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu,
     MacroExpansionRequest, MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest,
     MetaGistResponse, MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result,
     SandboxCreationSnafu, ShutdownCoordinatorSnafu, TimeoutSnafu,
@@ -170,13 +170,9 @@ async fn format(Json(req): Json<FormatRequest>) -> Result<Json<FormatResponse>> 
 }
 
 async fn clippy(Json(req): Json<ClippyRequest>) -> Result<Json<ClippyResponse>> {
-    with_sandbox(
-        req,
-        |sb, req| async move { sb.clippy(req).await }.boxed(),
-        LintingSnafu,
-    )
-    .await
-    .map(Json)
+    with_coordinator(req, |c, req| c.clippy(req).context(ClippySnafu).boxed())
+        .await
+        .map(Json)
 }
 
 async fn miri(Json(req): Json<MiriRequest>) -> Result<Json<MiriResponse>> {
@@ -237,6 +233,10 @@ impl HasEndpoint for FormatRequest {
     const ENDPOINT: Endpoint = Endpoint::Format;
 }
 
+impl HasEndpoint for ClippyRequest {
+    const ENDPOINT: Endpoint = Endpoint::Clippy;
+}
+
 trait IsSuccess {
     fn is_success(&self) -> bool;
 }
@@ -272,6 +272,12 @@ impl IsSuccess for coordinator::ExecuteResponse {
 }
 
 impl IsSuccess for coordinator::FormatResponse {
+    fn is_success(&self) -> bool {
+        self.success
+    }
+}
+
+impl IsSuccess for coordinator::ClippyResponse {
     fn is_success(&self) -> bool {
         self.success
     }
@@ -1026,6 +1032,55 @@ pub(crate) mod api_orchestrator_integration_impls {
                 success,
                 exit_detail,
                 code,
+                stdout,
+                stderr,
+            }
+        }
+    }
+
+    impl TryFrom<crate::ClippyRequest> for ClippyRequest {
+        type Error = ParseClippyRequestError;
+
+        fn try_from(other: crate::ClippyRequest) -> std::result::Result<Self, Self::Error> {
+            let crate::ClippyRequest {
+                code,
+                edition,
+                crate_type,
+            } = other;
+
+            Ok(ClippyRequest {
+                channel: Channel::Nightly, // TODO: use what user has submitted
+                crate_type: parse_crate_type(&crate_type)?,
+                edition: parse_edition(&edition)?,
+                code,
+            })
+        }
+    }
+
+    #[derive(Debug, Snafu)]
+    pub(crate) enum ParseClippyRequestError {
+        #[snafu(context(false))]
+        Edition { source: ParseEditionError },
+
+        #[snafu(context(false))]
+        CrateType { source: ParseCrateTypeError },
+    }
+
+    impl From<WithOutput<ClippyResponse>> for crate::ClippyResponse {
+        fn from(other: WithOutput<ClippyResponse>) -> Self {
+            let WithOutput {
+                response,
+                stdout,
+                stderr,
+            } = other;
+            let ClippyResponse {
+                success,
+                exit_detail,
+            } = response;
+
+            Self {
+                success,
+                exit_detail,
                 stdout,
                 stderr,
             }

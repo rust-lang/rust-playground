@@ -178,19 +178,6 @@ impl Sandbox {
         })
     }
 
-    pub async fn clippy(&self, req: &ClippyRequest) -> Result<ClippyResponse> {
-        self.write_source_code(&req.code).await?;
-        let command = self.clippy_command(req);
-
-        let output = run_command_with_timeout(command).await?;
-
-        Ok(ClippyResponse {
-            success: output.status.success(),
-            stdout: vec_to_str(output.stdout)?,
-            stderr: vec_to_str(output.stderr)?,
-        })
-    }
-
     pub async fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
         self.write_source_code(&req.code).await?;
         let command = self.miri_command(req);
@@ -319,19 +306,6 @@ impl Sandbox {
             self.input_file.display()
         );
         Ok(())
-    }
-
-    fn clippy_command(&self, req: impl CrateTypeRequest + EditionRequest) -> Command {
-        let mut cmd = self.docker_command(Some(req.crate_type()));
-
-        cmd.apply_crate_type(&req);
-        cmd.apply_edition(&req);
-
-        cmd.arg("clippy").args(&["cargo", "clippy"]);
-
-        debug!("Clippy command is {:?}", cmd);
-
-        cmd
     }
 
     fn miri_command(&self, req: impl EditionRequest) -> Command {
@@ -647,32 +621,6 @@ impl<R: BacktraceRequest> BacktraceRequest for &'_ R {
 }
 
 #[derive(Debug, Clone)]
-pub struct ClippyRequest {
-    pub code: String,
-    pub edition: Option<Edition>,
-    pub crate_type: CrateType,
-}
-
-impl CrateTypeRequest for ClippyRequest {
-    fn crate_type(&self) -> CrateType {
-        self.crate_type
-    }
-}
-
-impl EditionRequest for ClippyRequest {
-    fn edition(&self) -> Option<Edition> {
-        self.edition
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ClippyResponse {
-    pub success: bool,
-    pub stdout: String,
-    pub stderr: String,
-}
-
-#[derive(Debug, Clone)]
 pub struct MiriRequest {
     pub code: String,
     pub edition: Option<Edition>,
@@ -832,63 +780,6 @@ mod test {
         println!("Hello, world!");
     }
     "#;
-
-    impl Default for ClippyRequest {
-        fn default() -> Self {
-            ClippyRequest {
-                code: HELLO_WORLD_CODE.to_string(),
-                crate_type: CrateType::Binary,
-                edition: None,
-            }
-        }
-    }
-
-    #[tokio::test]
-    async fn linting_code() {
-        let _singleton = one_test_at_a_time();
-        let code = r#"
-        fn main() {
-            let a = 0.0 / 0.0;
-            println!("NaN is {}", a);
-        }
-        "#;
-
-        let req = ClippyRequest {
-            code: code.to_string(),
-            ..ClippyRequest::default()
-        };
-
-        let sb = Sandbox::new().await.expect("Unable to create sandbox");
-        let resp = sb.clippy(&req).await.expect("Unable to lint code");
-
-        assert!(resp.stderr.contains("deny(clippy::eq_op)"));
-        assert!(resp.stderr.contains("warn(clippy::zero_divided_by_zero)"));
-    }
-
-    #[tokio::test]
-    async fn linting_code_options() {
-        let _singleton = one_test_at_a_time();
-        let code = r#"
-        use itertools::Itertools; // Edition 2018 feature
-
-        fn example() {
-            let a = 0.0 / 0.0;
-            println!("NaN is {}", a);
-        }
-        "#;
-
-        let req = ClippyRequest {
-            code: code.to_string(),
-            crate_type: CrateType::Library(LibraryType::Rlib),
-            edition: Some(Edition::Rust2018),
-        };
-
-        let sb = Sandbox::new().await.expect("Unable to create sandbox");
-        let resp = sb.clippy(&req).await.expect("Unable to lint code");
-
-        assert!(resp.stderr.contains("deny(clippy::eq_op)"));
-        assert!(resp.stderr.contains("warn(clippy::zero_divided_by_zero)"));
-    }
 
     #[tokio::test]
     async fn interpreting_code() -> Result<()> {
