@@ -74,8 +74,10 @@ const slice = createSlice({
         state.focus = Focus.Format;
       })
 
-      .addCase(performFormat.fulfilled, (state) => {
-        state.focus = undefined;
+      .addCase(performFormat.fulfilled, (state, action) => {
+        if (action.payload.success) {
+          state.focus = undefined;
+        }
       })
 
       .addCase(performGistLoad.pending, setGist)
