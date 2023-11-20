@@ -44,7 +44,8 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- \
     -y \
     --profile minimal \
     --default-toolchain "${channel}" \
-    --target wasm32-unknown-unknown
+    --target wasm32-unknown-unknown \
+    --component rustfmt
 
 COPY --chown=playground entrypoint.sh /playground/tools/
 

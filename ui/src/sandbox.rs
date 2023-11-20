@@ -1,12 +1,7 @@
 use serde_derive::Deserialize;
 use snafu::prelude::*;
 use std::{
-    collections::BTreeMap,
-    fmt, io,
-    io::ErrorKind,
-    os::unix::fs::PermissionsExt,
-    path::{Path, PathBuf},
-    string,
+    collections::BTreeMap, fmt, io, os::unix::fs::PermissionsExt, path::PathBuf, string,
     time::Duration,
 };
 use tempfile::TempDir;
@@ -183,22 +178,6 @@ impl Sandbox {
         })
     }
 
-    pub async fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
-        self.write_source_code(&req.code).await?;
-        let command = self.format_command(req);
-
-        let output = run_command_with_timeout(command).await?;
-
-        Ok(FormatResponse {
-            success: output.status.success(),
-            code: read(self.input_file.as_ref())
-                .await?
-                .context(OutputMissingSnafu)?,
-            stdout: vec_to_str(output.stdout)?,
-            stderr: vec_to_str(output.stderr)?,
-        })
-    }
-
     pub async fn clippy(&self, req: &ClippyRequest) -> Result<ClippyResponse> {
         self.write_source_code(&req.code).await?;
         let command = self.clippy_command(req);
@@ -342,20 +321,6 @@ impl Sandbox {
         Ok(())
     }
 
-    fn format_command(&self, req: impl EditionRequest) -> Command {
-        let crate_type = CrateType::Binary;
-
-        let mut cmd = self.docker_command(Some(crate_type));
-
-        cmd.apply_edition(req);
-
-        cmd.arg("rustfmt").args(&["cargo", "fmt"]);
-
-        debug!("Formatting command is {:?}", cmd);
-
-        cmd
-    }
-
     fn clippy_command(&self, req: impl CrateTypeRequest + EditionRequest) -> Command {
         let mut cmd = self.docker_command(Some(req.crate_type()));
 
@@ -484,14 +449,6 @@ async fn run_command_with_timeout(mut command: Command) -> Result<std::process::
     output.status = code;
 
     Ok(output)
-}
-
-async fn read(path: &Path) -> Result<Option<String>> {
-    match fs::read_to_string(path).await {
-        Ok(s) => Ok(Some(s)),
-        Err(e) if e.kind() == ErrorKind::NotFound => Ok(None),
-        Err(e) => Err(e).context(UnableToReadOutputSnafu),
-    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -690,26 +647,6 @@ impl<R: BacktraceRequest> BacktraceRequest for &'_ R {
 }
 
 #[derive(Debug, Clone)]
-pub struct FormatRequest {
-    pub code: String,
-    pub edition: Option<Edition>,
-}
-
-impl EditionRequest for FormatRequest {
-    fn edition(&self) -> Option<Edition> {
-        self.edition
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct FormatResponse {
-    pub success: bool,
-    pub code: String,
-    pub stdout: String,
-    pub stderr: String,
-}
-
-#[derive(Debug, Clone)]
 pub struct ClippyRequest {
     pub code: String,
     pub edition: Option<Edition>,
@@ -904,67 +841,6 @@ mod test {
                 edition: None,
             }
         }
-    }
-
-    #[tokio::test]
-    async fn formatting_code() {
-        let _singleton = one_test_at_a_time();
-        let req = FormatRequest {
-            code: "fn foo () { method_call(); }".to_string(),
-            edition: None,
-        };
-
-        let sb = Sandbox::new().await.expect("Unable to create sandbox");
-        let resp = sb.format(&req).await.expect("Unable to format code");
-
-        let lines: Vec<_> = resp.code.lines().collect();
-
-        assert_eq!(lines[0], "fn foo() {");
-        assert_eq!(lines[1], "    method_call();");
-        assert_eq!(lines[2], "}");
-    }
-
-    // Code that is only syntactically valid in Rust 2018
-    const FORMAT_IN_EDITION_2018: &str = r#"fn main() { use std::num::ParseIntError; let result: Result<i32, ParseIntError> = try { "1".parse::<i32>()? + "2".parse::<i32>()? + "3".parse::<i32>()? }; assert_eq!(result, Ok(6)); }"#;
-
-    const FORMAT_ERROR: &str = r#"error: expected identifier, found `"1"`"#;
-
-    #[tokio::test]
-    async fn formatting_code_edition_2015() -> Result<()> {
-        let _singleton = one_test_at_a_time();
-        let req = FormatRequest {
-            code: FORMAT_IN_EDITION_2018.to_string(),
-            edition: Some(Edition::Rust2015),
-        };
-
-        let resp = Sandbox::new().await?.format(&req).await?;
-
-        assert!(resp.stderr.contains(FORMAT_ERROR));
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn formatting_code_edition_2018() -> Result<()> {
-        let _singleton = one_test_at_a_time();
-        let req = FormatRequest {
-            code: FORMAT_IN_EDITION_2018.to_string(),
-            edition: Some(Edition::Rust2018),
-        };
-
-        let resp = Sandbox::new().await?.format(&req).await?;
-        assert!(!resp.stderr.contains(FORMAT_ERROR));
-
-        let lines: Vec<_> = resp.code.lines().collect();
-        assert_eq!(lines[0], r#"fn main() {"#);
-        assert_eq!(lines[1], r#"    use std::num::ParseIntError;"#);
-        assert_eq!(lines[2], r#"    let result: Result<i32, ParseIntError> ="#);
-        assert_eq!(
-            lines[3],
-            r#"        try { "1".parse::<i32>()? + "2".parse::<i32>()? + "3".parse::<i32>()? };"#
-        );
-        assert_eq!(lines[4], r#"    assert_eq!(result, Ok(6));"#);
-        assert_eq!(lines[5], r#"}"#);
-        Ok(())
     }
 
     #[tokio::test]

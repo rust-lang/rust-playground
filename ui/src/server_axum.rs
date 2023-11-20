@@ -7,7 +7,7 @@ use crate::{
     sandbox::{self, Channel, Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
     CachingSnafu, ClippyRequest, ClippyResponse, CompileRequest, CompileResponse, CompileSnafu,
     Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu, ExecuteRequest,
-    ExecuteResponse, ExecuteSnafu, ExpansionSnafu, FormatRequest, FormatResponse, FormattingSnafu,
+    ExecuteResponse, ExecuteSnafu, ExpansionSnafu, FormatRequest, FormatResponse, FormatSnafu,
     GhToken, GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu, LintingSnafu,
     MacroExpansionRequest, MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest,
     MetaGistResponse, MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result,
@@ -164,13 +164,9 @@ async fn execute(Json(req): Json<ExecuteRequest>) -> Result<Json<ExecuteResponse
 }
 
 async fn format(Json(req): Json<FormatRequest>) -> Result<Json<FormatResponse>> {
-    with_sandbox(
-        req,
-        |sb, req| async move { sb.format(req).await }.boxed(),
-        FormattingSnafu,
-    )
-    .await
-    .map(Json)
+    with_coordinator(req, |c, req| c.format(req).context(FormatSnafu).boxed())
+        .await
+        .map(Json)
 }
 
 async fn clippy(Json(req): Json<ClippyRequest>) -> Result<Json<ClippyResponse>> {
@@ -237,6 +233,10 @@ impl HasEndpoint for ExecuteRequest {
     const ENDPOINT: Endpoint = Endpoint::Execute;
 }
 
+impl HasEndpoint for FormatRequest {
+    const ENDPOINT: Endpoint = Endpoint::Format;
+}
+
 trait IsSuccess {
     fn is_success(&self) -> bool;
 }
@@ -266,6 +266,12 @@ impl IsSuccess for coordinator::CompileResponse {
 }
 
 impl IsSuccess for coordinator::ExecuteResponse {
+    fn is_success(&self) -> bool {
+        self.success
+    }
+}
+
+impl IsSuccess for coordinator::FormatResponse {
     fn is_success(&self) -> bool {
         self.success
     }
@@ -976,6 +982,50 @@ pub(crate) mod api_orchestrator_integration_impls {
             Self {
                 success,
                 exit_detail,
+                stdout,
+                stderr,
+            }
+        }
+    }
+
+    impl TryFrom<crate::FormatRequest> for FormatRequest {
+        type Error = ParseFormatRequestError;
+
+        fn try_from(other: crate::FormatRequest) -> std::result::Result<Self, Self::Error> {
+            let crate::FormatRequest { code, edition } = other;
+
+            Ok(FormatRequest {
+                channel: Channel::Nightly,     // TODO: use what user has submitted
+                crate_type: CrateType::Binary, // TODO: use what user has submitted
+                edition: parse_edition(&edition)?,
+                code,
+            })
+        }
+    }
+
+    #[derive(Debug, Snafu)]
+    pub(crate) enum ParseFormatRequestError {
+        #[snafu(context(false))]
+        Edition { source: ParseEditionError },
+    }
+
+    impl From<WithOutput<FormatResponse>> for crate::FormatResponse {
+        fn from(other: WithOutput<FormatResponse>) -> Self {
+            let WithOutput {
+                response,
+                stdout,
+                stderr,
+            } = other;
+            let FormatResponse {
+                success,
+                exit_detail,
+                code,
+            } = response;
+
+            Self {
+                success,
+                exit_detail,
+                code,
                 stdout,
                 stderr,
             }
