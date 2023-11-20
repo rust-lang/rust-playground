@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import * as actions from './actions';
+import { changeFocus } from './reducers/output/meta';
 import { State } from './reducers';
 import { Focus } from './types';
 
@@ -52,18 +52,18 @@ const Output: React.FC = () => {
     useSelector((state: State) => state.output);
 
   const dispatch = useDispatch();
-  const focusClose = useCallback(() => dispatch(actions.changeFocus()), [dispatch]);
-  const focusExecute = useCallback(() => dispatch(actions.changeFocus(Focus.Execute)), [dispatch]);
-  const focusFormat = useCallback(() => dispatch(actions.changeFocus(Focus.Format)), [dispatch]);
-  const focusClippy = useCallback(() => dispatch(actions.changeFocus(Focus.Clippy)), [dispatch]);
-  const focusMiri = useCallback(() => dispatch(actions.changeFocus(Focus.Miri)), [dispatch]);
-  const focusMacroExpansion = useCallback(() => dispatch(actions.changeFocus(Focus.MacroExpansion)), [dispatch]);
-  const focusAssembly = useCallback(() => dispatch(actions.changeFocus(Focus.Asm)), [dispatch]);
-  const focusLlvmIr = useCallback(() => dispatch(actions.changeFocus(Focus.LlvmIr)), [dispatch]);
-  const focusMir = useCallback(() => dispatch(actions.changeFocus(Focus.Mir)), [dispatch]);
-  const focusHir = useCallback(() => dispatch(actions.changeFocus(Focus.Hir)), [dispatch]);
-  const focusWasm = useCallback(() => dispatch(actions.changeFocus(Focus.Wasm)), [dispatch]);
-  const focusGist = useCallback(() => dispatch(actions.changeFocus(Focus.Gist)), [dispatch]);
+  const focusClose = useCallback(() => dispatch(changeFocus()), [dispatch]);
+  const focusExecute = useCallback(() => dispatch(changeFocus(Focus.Execute)), [dispatch]);
+  const focusFormat = useCallback(() => dispatch(changeFocus(Focus.Format)), [dispatch]);
+  const focusClippy = useCallback(() => dispatch(changeFocus(Focus.Clippy)), [dispatch]);
+  const focusMiri = useCallback(() => dispatch(changeFocus(Focus.Miri)), [dispatch]);
+  const focusMacroExpansion = useCallback(() => dispatch(changeFocus(Focus.MacroExpansion)), [dispatch]);
+  const focusAssembly = useCallback(() => dispatch(changeFocus(Focus.Asm)), [dispatch]);
+  const focusLlvmIr = useCallback(() => dispatch(changeFocus(Focus.LlvmIr)), [dispatch]);
+  const focusMir = useCallback(() => dispatch(changeFocus(Focus.Mir)), [dispatch]);
+  const focusHir = useCallback(() => dispatch(changeFocus(Focus.Hir)), [dispatch]);
+  const focusWasm = useCallback(() => dispatch(changeFocus(Focus.Wasm)), [dispatch]);
+  const focusGist = useCallback(() => dispatch(changeFocus(Focus.Gist)), [dispatch]);
 
   const showStdin = useSelector(selectors.showStdinSelector);
 

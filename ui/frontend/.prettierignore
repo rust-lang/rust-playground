@@ -30,6 +30,7 @@ node_modules
 !reducers/output/gist.ts
 !reducers/output/hir.ts
 !reducers/output/llvmIr.ts
+!reducers/output/meta.ts
 !reducers/output/mir.ts
 !reducers/output/wasm.ts
 !reducers/websocket.ts
