@@ -16,7 +16,6 @@ import {
   DemangleAssembly,
   Edition,
   Editor,
-  Focus,
   Mode,
   Notification,
   Orientation,
@@ -86,7 +85,6 @@ export enum ActionType {
   ChangeMode = 'CHANGE_MODE',
   ChangeEdition = 'CHANGE_EDITION',
   ChangeBacktrace = 'CHANGE_BACKTRACE',
-  ChangeFocus = 'CHANGE_FOCUS',
   EditCode = 'EDIT_CODE',
   AddMainFunction = 'ADD_MAIN_FUNCTION',
   AddImport = 'ADD_IMPORT',
@@ -173,9 +171,6 @@ export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
   dispatch(changeBacktrace(Backtrace.Enabled));
   dispatch(performExecuteOnly());
 };
-
-export const changeFocus = (focus?: Focus) =>
-  createAction(ActionType.ChangeFocus, { focus });
 
 type FetchArg = Parameters<typeof fetch>[0];
 
@@ -634,7 +629,6 @@ export type Action =
   | ReturnType<typeof changeDemangleAssembly>
   | ReturnType<typeof changeEditionRaw>
   | ReturnType<typeof changeEditor>
-  | ReturnType<typeof changeFocus>
   | ReturnType<typeof changeKeybinding>
   | ReturnType<typeof changeMode>
   | ReturnType<typeof changeOrientation>
