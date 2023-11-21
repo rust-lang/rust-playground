@@ -64,36 +64,10 @@ components:
         cache-from: type=gha,scope=${{ matrix.channel }}
         cache-to: type=gha,scope=${{ matrix.channel }},mode=max
 
-  - build_tool_containers_job: &build_tool_containers_job
-      name: "Build ${{ matrix.tool }} tool container"
-      runs-on: ubuntu-latest
-      needs: build_compiler_containers
-
-      strategy:
-        matrix:
-          tool: [clippy, miri, rustfmt]
-
-  - build_tool_containers_job_env: &build_tool_containers_job_env
-      IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-tool-${{ matrix.tool }}
-
-  - build_tool_containers: &build_tool_containers
-      name: "Build and push container"
-      uses: docker/build-push-action@v4
-      with:
-        context: compiler/${{ matrix.tool }}/
-        file: compiler/${{ matrix.tool }}/Dockerfile
-        build-args: |-
-          base_image=ghcr.io/integer32llc/rust-playground-ci-rust-nightly:${{ github.run_id }}
-        push: true
-        tags: |-
-          ${{ env.IMAGE_NAME }}:${{ github.run_id }}
-        cache-from: type=gha,scope=${{ matrix.tool }}
-        cache-to: type=gha,scope=${{ matrix.tool }},mode=max
-
   - pull_containers: &pull_containers
       name: "Pull containers"
       run: |-
-        echo ghcr.io/integer32llc/rust-playground-ci-{rust-{stable,beta,nightly},tool-{clippy,rustfmt,miri}}:${{ github.run_id }} | xargs -n1 docker pull
+        echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull
 
   - rename_all_containers: &rename_all_containers
       name: "Rename containers"
@@ -102,11 +76,6 @@ components:
           docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} ghcr.io/integer32llc/rust-playground-ci-rust-$c
           docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} shepmaster/rust-$c
           docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} rust-$c
-        done
-        for t in clippy miri rustfmt; do
-          docker tag ghcr.io/integer32llc/rust-playground-ci-tool-$t:${{ github.run_id }} ghcr.io/integer32llc/rust-playground-ci-tool-$t
-          docker tag ghcr.io/integer32llc/rust-playground-ci-tool-$t:${{ github.run_id }} shepmaster/$t
-          docker tag ghcr.io/integer32llc/rust-playground-ci-tool-$t:${{ github.run_id }} $t
         done
 
   - pull_current_container: &pull_current_container
@@ -151,18 +120,6 @@ workflows:
           - *docker_buildx
           - *login_ghcr
           - *build_compiler_containers
-
-      build_tool_containers:
-        <<: *build_tool_containers_job
-        if: "github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'CI: approved')"
-        env:
-          <<: *build_tool_containers_job_env
-
-        steps:
-          - *checkout_pr
-          - *docker_buildx
-          - *login_ghcr
-          - *build_tool_containers
 
       build_backend:
         name: "Build backend"
@@ -266,7 +223,6 @@ workflows:
         if: "github.event_name == 'push' || contains(github.event.pull_request.labels.*.name, 'CI: approved')"
         needs:
           - build_compiler_containers
-          - build_tool_containers
           - build_backend
           - build_frontend
 
@@ -367,10 +323,6 @@ workflows:
                 docker push ghcr.io/integer32llc/rust-playground-ci-rust-$c
                 docker push shepmaster/rust-$c
               done
-              for t in clippy miri rustfmt; do
-                docker push ghcr.io/integer32llc/rust-playground-ci-tool-$t
-                docker push shepmaster/$t
-              done
 
           - name: "Download backend"
             uses: actions/download-artifact@v3
@@ -440,24 +392,6 @@ workflows:
           - *login_ghcr
           - *login_docker_hub
           - *build_compiler_containers
-
-          - *pull_current_container
-          - *rename_current_container
-          - *push_current_container
-
-      build_tool_containers:
-        <<: *build_tool_containers_job
-        env:
-          <<: *build_tool_containers_job_env
-          DOCKER_HUB_IMAGE_NAME: shepmaster/${{ matrix.tool }}
-        continue-on-error: true
-
-        steps:
-          - *checkout
-          - *docker_buildx
-          - *login_ghcr
-          - *login_docker_hub
-          - *build_tool_containers
 
           - *pull_current_container
           - *rename_current_container
