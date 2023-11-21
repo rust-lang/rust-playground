@@ -1,15 +1,15 @@
 use crate::{
     gist,
     metrics::{
-        record_metric, track_metric_async, track_metric_no_request_async, Endpoint, GenerateLabels,
-        HasLabelsCore, Outcome, SuccessDetails, UNAVAILABLE_WS,
+        record_metric, track_metric_no_request_async, Endpoint, HasLabelsCore, Outcome,
+        UNAVAILABLE_WS,
     },
-    sandbox::{self, Channel, Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
+    sandbox::{Channel, Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
     CachingSnafu, ClippyRequest, ClippyResponse, ClippySnafu, CompileRequest, CompileResponse,
     CompileSnafu, Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu,
-    ExecuteRequest, ExecuteResponse, ExecuteSnafu, ExpansionSnafu, FormatRequest, FormatResponse,
-    FormatSnafu, GhToken, GistCreationSnafu, GistLoadingSnafu, MacroExpansionRequest,
-    MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse,
+    ExecuteRequest, ExecuteResponse, ExecuteSnafu, FormatRequest, FormatResponse, FormatSnafu,
+    GhToken, GistCreationSnafu, GistLoadingSnafu, MacroExpansionRequest, MacroExpansionResponse,
+    MacroExpansionSnafu, MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse,
     MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, MiriSnafu, Result,
     SandboxCreationSnafu, ShutdownCoordinatorSnafu, TimeoutSnafu,
 };
@@ -28,9 +28,9 @@ use axum::{
 };
 use futures::{future::BoxFuture, FutureExt};
 use orchestrator::coordinator::{self, DockerBackend};
-use snafu::{prelude::*, IntoError};
+use snafu::prelude::*;
 use std::{
-    convert::{TryFrom, TryInto},
+    convert::TryInto,
     future::Future,
     mem, path,
     str::FromStr,
@@ -184,29 +184,11 @@ async fn miri(Json(req): Json<MiriRequest>) -> Result<Json<MiriResponse>> {
 async fn macro_expansion(
     Json(req): Json<MacroExpansionRequest>,
 ) -> Result<Json<MacroExpansionResponse>> {
-    with_sandbox(
-        req,
-        |sb, req| async move { sb.macro_expansion(req).await }.boxed(),
-        ExpansionSnafu,
-    )
+    with_coordinator(req, |c, req| {
+        c.macro_expansion(req).context(MacroExpansionSnafu).boxed()
+    })
     .await
     .map(Json)
-}
-
-async fn with_sandbox<F, Req, Resp, SbReq, SbResp, Ctx>(req: Req, f: F, ctx: Ctx) -> Result<Resp>
-where
-    for<'req> F: FnOnce(Sandbox, &'req SbReq) -> BoxFuture<'req, sandbox::Result<SbResp>>,
-    Resp: From<SbResp>,
-    SbReq: TryFrom<Req, Error = Error> + GenerateLabels,
-    SbResp: SuccessDetails,
-    Ctx: IntoError<Error, Source = sandbox::Error>,
-{
-    let sandbox = Sandbox::new().await.context(SandboxCreationSnafu)?;
-    let request = req.try_into()?;
-    track_metric_async(request, |request| f(sandbox, request))
-        .await
-        .map(Into::into)
-        .context(ctx)
 }
 
 pub(crate) trait HasEndpoint {
@@ -235,6 +217,10 @@ impl HasEndpoint for ClippyRequest {
 
 impl HasEndpoint for MiriRequest {
     const ENDPOINT: Endpoint = Endpoint::Miri;
+}
+
+impl HasEndpoint for MacroExpansionRequest {
+    const ENDPOINT: Endpoint = Endpoint::MacroExpansion;
 }
 
 trait IsSuccess {
@@ -284,6 +270,12 @@ impl IsSuccess for coordinator::ClippyResponse {
 }
 
 impl IsSuccess for coordinator::MiriResponse {
+    fn is_success(&self) -> bool {
+        self.success
+    }
+}
+
+impl IsSuccess for coordinator::MacroExpansionResponse {
     fn is_success(&self) -> bool {
         self.success
     }
@@ -1122,6 +1114,48 @@ pub(crate) mod api_orchestrator_integration_impls {
                 stderr,
             } = other;
             let MiriResponse {
+                success,
+                exit_detail,
+            } = response;
+
+            Self {
+                success,
+                exit_detail,
+                stdout,
+                stderr,
+            }
+        }
+    }
+
+    impl TryFrom<crate::MacroExpansionRequest> for MacroExpansionRequest {
+        type Error = ParseMacroExpansionRequestError;
+
+        fn try_from(other: crate::MacroExpansionRequest) -> std::result::Result<Self, Self::Error> {
+            let crate::MacroExpansionRequest { code, edition } = other;
+
+            Ok(MacroExpansionRequest {
+                channel: Channel::Nightly,     // TODO: use what user has submitted
+                crate_type: CrateType::Binary, // TODO: use what user has submitted
+                edition: parse_edition(&edition)?,
+                code,
+            })
+        }
+    }
+
+    #[derive(Debug, Snafu)]
+    pub(crate) enum ParseMacroExpansionRequestError {
+        #[snafu(context(false))]
+        Edition { source: ParseEditionError },
+    }
+
+    impl From<WithOutput<MacroExpansionResponse>> for crate::MacroExpansionResponse {
+        fn from(other: WithOutput<MacroExpansionResponse>) -> Self {
+            let WithOutput {
+                response,
+                stdout,
+                stderr,
+            } = other;
+            let MacroExpansionResponse {
                 success,
                 exit_detail,
             } = response;

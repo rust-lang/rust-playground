@@ -1,12 +1,8 @@
 use serde_derive::Deserialize;
 use snafu::prelude::*;
-use std::{
-    collections::BTreeMap, fmt, io, os::unix::fs::PermissionsExt, path::PathBuf, string,
-    time::Duration,
-};
+use std::{collections::BTreeMap, fmt, io, string, time::Duration};
 use tempfile::TempDir;
-use tokio::{fs, process::Command, time};
-use tracing::debug;
+use tokio::{process::Command, time};
 
 pub(crate) const DOCKER_PROCESS_TIMEOUT_SOFT: Duration = Duration::from_secs(10);
 const DOCKER_PROCESS_TIMEOUT_HARD: Duration = Duration::from_secs(12);
@@ -43,14 +39,6 @@ pub struct Version {
 pub enum Error {
     #[snafu(display("Unable to create temporary directory: {}", source))]
     UnableToCreateTempDir { source: io::Error },
-    #[snafu(display("Unable to create output directory: {}", source))]
-    UnableToCreateOutputDir { source: io::Error },
-    #[snafu(display("Unable to set permissions for output directory: {}", source))]
-    UnableToSetOutputPermissions { source: io::Error },
-    #[snafu(display("Unable to create source file: {}", source))]
-    UnableToCreateSourceFile { source: io::Error },
-    #[snafu(display("Unable to set permissions for source file: {}", source))]
-    UnableToSetSourcePermissions { source: io::Error },
 
     #[snafu(display("Unable to start the compiler: {}", source))]
     UnableToStartCompiler { source: io::Error },
@@ -68,14 +56,10 @@ pub enum Error {
         timeout: Duration,
     },
 
-    #[snafu(display("Unable to read output file: {}", source))]
-    UnableToReadOutput { source: io::Error },
     #[snafu(display("Unable to read crate information: {}", source))]
     UnableToParseCrateInformation { source: ::serde_json::Error },
     #[snafu(display("Output was not valid UTF-8: {}", source))]
     OutputNotUtf8 { source: string::FromUtf8Error },
-    #[snafu(display("Output was missing"))]
-    OutputMissing,
     #[snafu(display("Release was missing from the version output"))]
     VersionReleaseMissing,
     #[snafu(display("Commit hash was missing from the version output"))]
@@ -88,16 +72,6 @@ pub type Result<T, E = Error> = ::std::result::Result<T, E>;
 
 fn vec_to_str(v: Vec<u8>) -> Result<String> {
     String::from_utf8(v).context(OutputNotUtf8Snafu)
-}
-
-// We must create a world-writable files (rustfmt) and directories
-// (LLVM IR) so that the process inside the Docker container can write
-// into it.
-//
-// This problem does *not* occur when using the indirection of
-// docker-machine.
-fn wide_open_permissions() -> std::fs::Permissions {
-    PermissionsExt::from_mode(0o777)
 }
 
 macro_rules! docker_command {
@@ -147,8 +121,6 @@ fn basic_secure_docker_command() -> Command {
 pub struct Sandbox {
     #[allow(dead_code)]
     scratch: TempDir,
-    input_file: PathBuf,
-    output_dir: PathBuf,
 }
 
 impl Sandbox {
@@ -161,37 +133,8 @@ impl Sandbox {
             .prefix("playground")
             .tempdir()
             .context(UnableToCreateTempDirSnafu)?;
-        let input_file = scratch.path().join("input.rs");
-        let output_dir = scratch.path().join("output");
 
-        fs::create_dir(&output_dir)
-            .await
-            .context(UnableToCreateOutputDirSnafu)?;
-        fs::set_permissions(&output_dir, wide_open_permissions())
-            .await
-            .context(UnableToSetOutputPermissionsSnafu)?;
-
-        Ok(Sandbox {
-            scratch,
-            input_file,
-            output_dir,
-        })
-    }
-
-    pub async fn macro_expansion(
-        &self,
-        req: &MacroExpansionRequest,
-    ) -> Result<MacroExpansionResponse> {
-        self.write_source_code(&req.code).await?;
-        let command = self.macro_expansion_command(req);
-
-        let output = run_command_with_timeout(command).await?;
-
-        Ok(MacroExpansionResponse {
-            success: output.status.success(),
-            stdout: vec_to_str(output.stdout)?,
-            stderr: vec_to_str(output.stderr)?,
-        })
+        Ok(Sandbox { scratch })
     }
 
     pub async fn crates(&self) -> Result<Vec<CrateInformation>> {
@@ -277,60 +220,6 @@ impl Sandbox {
             commit_hash,
             commit_date,
         })
-    }
-
-    async fn write_source_code(&self, code: &str) -> Result<()> {
-        fs::write(&self.input_file, code)
-            .await
-            .context(UnableToCreateSourceFileSnafu)?;
-        fs::set_permissions(&self.input_file, wide_open_permissions())
-            .await
-            .context(UnableToSetSourcePermissionsSnafu)?;
-
-        debug!(
-            "Wrote {} bytes of source to {}",
-            code.len(),
-            self.input_file.display()
-        );
-        Ok(())
-    }
-
-    fn macro_expansion_command(&self, req: impl EditionRequest) -> Command {
-        let mut cmd = self.docker_command(None);
-        cmd.apply_edition(req);
-
-        cmd.arg(&Channel::Nightly.container_name()).args(&[
-            "cargo",
-            "rustc",
-            "--",
-            "-Zunpretty=expanded",
-        ]);
-
-        debug!("Macro expansion command is {:?}", cmd);
-
-        cmd
-    }
-
-    fn docker_command(&self, crate_type: Option<CrateType>) -> Command {
-        let crate_type = crate_type.unwrap_or(CrateType::Binary);
-
-        let mut mount_input_file = self.input_file.as_os_str().to_os_string();
-        mount_input_file.push(":");
-        mount_input_file.push("/playground/");
-        mount_input_file.push(crate_type.file_name());
-
-        let mut mount_output_dir = self.output_dir.as_os_str().to_os_string();
-        mount_output_dir.push(":");
-        mount_output_dir.push("/playground-result");
-
-        let mut cmd = basic_secure_docker_command();
-
-        cmd.arg("--volume")
-            .arg(&mount_input_file)
-            .arg("--volume")
-            .arg(&mount_output_dir);
-
-        cmd
     }
 }
 
@@ -494,17 +383,6 @@ pub enum CrateType {
     Library(LibraryType),
 }
 
-impl CrateType {
-    fn file_name(&self) -> &'static str {
-        use self::CrateType::*;
-
-        match *self {
-            Binary => "src/main.rs",
-            Library(_) => "src/lib.rs",
-        }
-    }
-}
-
 #[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum LibraryType {
     Lib,
@@ -594,25 +472,6 @@ impl<R: BacktraceRequest> BacktraceRequest for &'_ R {
     fn backtrace(&self) -> bool {
         (*self).backtrace()
     }
-}
-
-#[derive(Debug, Clone)]
-pub struct MacroExpansionRequest {
-    pub code: String,
-    pub edition: Option<Edition>,
-}
-
-impl EditionRequest for MacroExpansionRequest {
-    fn edition(&self) -> Option<Edition> {
-        self.edition
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct MacroExpansionResponse {
-    pub success: bool,
-    pub stdout: String,
-    pub stderr: String,
 }
 
 mod sandbox_orchestrator_integration_impls {

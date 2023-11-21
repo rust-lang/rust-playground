@@ -4,7 +4,6 @@ use crate::env::{PLAYGROUND_GITHUB_TOKEN, PLAYGROUND_UI_ROOT};
 use serde::{Deserialize, Serialize};
 use snafu::prelude::*;
 use std::{
-    convert::TryFrom,
     net::SocketAddr,
     path::{Path, PathBuf},
     sync::Arc,
@@ -165,8 +164,6 @@ impl MetricsToken {
 enum Error {
     #[snafu(display("Sandbox creation failed: {}", source))]
     SandboxCreation { source: sandbox::Error },
-    #[snafu(display("Expansion operation failed: {}", source))]
-    Expansion { source: sandbox::Error },
     #[snafu(display("Caching operation failed: {}", source))]
     Caching { source: sandbox::Error },
     #[snafu(display("Gist creation failed: {}", source))]
@@ -210,10 +207,11 @@ enum Error {
         source: server_axum::api_orchestrator_integration_impls::ParseMiriRequestError,
     },
 
-    // Remove at a later point. From here ...
-    #[snafu(display("The value {:?} is not a valid edition", value))]
-    InvalidEdition { value: String },
-    // ... to here
+    #[snafu(context(false))]
+    MacroExpansionRequest {
+        source: server_axum::api_orchestrator_integration_impls::ParseMacroExpansionRequestError,
+    },
+
     #[snafu(display("No request was provided"))]
     RequestMissing,
     #[snafu(display("The cache has been poisoned"))]
@@ -254,6 +252,11 @@ enum Error {
     #[snafu(display("Unable to convert the Miri request"))]
     Miri {
         source: orchestrator::coordinator::MiriError,
+    },
+
+    #[snafu(display("Unable to convert the macro expansion request"))]
+    MacroExpansion {
+        source: orchestrator::coordinator::MacroExpansionError,
     },
 
     #[snafu(display("The operation timed out"))]
@@ -400,6 +403,7 @@ struct MacroExpansionRequest {
 #[derive(Debug, Clone, Serialize)]
 struct MacroExpansionResponse {
     success: bool,
+    exit_detail: String,
     stdout: String,
     stderr: String,
 }
@@ -452,27 +456,6 @@ struct EvaluateResponse {
     error: Option<String>,
 }
 
-impl TryFrom<MacroExpansionRequest> for sandbox::MacroExpansionRequest {
-    type Error = Error;
-
-    fn try_from(me: MacroExpansionRequest) -> Result<Self> {
-        Ok(sandbox::MacroExpansionRequest {
-            code: me.code,
-            edition: parse_edition(&me.edition)?,
-        })
-    }
-}
-
-impl From<sandbox::MacroExpansionResponse> for MacroExpansionResponse {
-    fn from(me: sandbox::MacroExpansionResponse) -> Self {
-        MacroExpansionResponse {
-            success: me.success,
-            stdout: me.stdout,
-            stderr: me.stderr,
-        }
-    }
-}
-
 impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
     fn from(me: Vec<sandbox::CrateInformation>) -> Self {
         let crates = me
@@ -506,17 +489,6 @@ impl From<gist::Gist> for MetaGistResponse {
             code: me.code,
         }
     }
-}
-
-fn parse_edition(s: &str) -> Result<Option<sandbox::Edition>> {
-    Ok(match s {
-        "" => None,
-        "2015" => Some(sandbox::Edition::Rust2015),
-        "2018" => Some(sandbox::Edition::Rust2018),
-        "2021" => Some(sandbox::Edition::Rust2021),
-        "2024" => Some(sandbox::Edition::Rust2024),
-        value => InvalidEditionSnafu { value }.fail()?,
-    })
 }
 
 fn default_crate_type() -> String {
