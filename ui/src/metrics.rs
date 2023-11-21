@@ -197,25 +197,6 @@ where
     }
 }
 
-impl GenerateLabels for sandbox::MiriRequest {
-    fn generate_labels(&self, outcome: Outcome) -> Labels {
-        let Self { code: _, edition } = *self;
-
-        Labels {
-            endpoint: Endpoint::Miri,
-            outcome,
-
-            target: None,
-            channel: None,
-            mode: None,
-            edition: Some(edition),
-            crate_type: None,
-            tests: None,
-            backtrace: None,
-        }
-    }
-}
-
 impl GenerateLabels for sandbox::MacroExpansionRequest {
     fn generate_labels(&self, outcome: Outcome) -> Labels {
         let Self { code: _, edition } = *self;
@@ -268,12 +249,6 @@ fn common_success_details(success: bool, stderr: &str) -> Outcome {
                 Outcome::ErrorUserCode
             }
         }
-    }
-}
-
-impl SuccessDetails for sandbox::MiriResponse {
-    fn success_details(&self) -> Outcome {
-        common_success_details(self.success, &self.stderr)
     }
 }
 
@@ -437,6 +412,27 @@ impl HasLabelsCore for coordinator::FormatRequest {
 }
 
 impl HasLabelsCore for coordinator::ClippyRequest {
+    fn labels_core(&self) -> LabelsCore {
+        let Self {
+            channel,
+            crate_type,
+            edition,
+            code: _,
+        } = *self;
+
+        LabelsCore {
+            target: None,
+            channel: Some(channel.into()),
+            mode: None,
+            edition: Some(Some(edition.into())),
+            crate_type: Some(crate_type.into()),
+            tests: None,
+            backtrace: None,
+        }
+    }
+}
+
+impl HasLabelsCore for coordinator::MiriRequest {
     fn labels_core(&self) -> LabelsCore {
         let Self {
             channel,

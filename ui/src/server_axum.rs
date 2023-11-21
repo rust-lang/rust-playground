@@ -8,9 +8,9 @@ use crate::{
     CachingSnafu, ClippyRequest, ClippyResponse, ClippySnafu, CompileRequest, CompileResponse,
     CompileSnafu, Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu,
     ExecuteRequest, ExecuteResponse, ExecuteSnafu, ExpansionSnafu, FormatRequest, FormatResponse,
-    FormatSnafu, GhToken, GistCreationSnafu, GistLoadingSnafu, InterpretingSnafu,
-    MacroExpansionRequest, MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest,
-    MetaGistResponse, MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, Result,
+    FormatSnafu, GhToken, GistCreationSnafu, GistLoadingSnafu, MacroExpansionRequest,
+    MacroExpansionResponse, MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse,
+    MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, MiriSnafu, Result,
     SandboxCreationSnafu, ShutdownCoordinatorSnafu, TimeoutSnafu,
 };
 use async_trait::async_trait;
@@ -176,13 +176,9 @@ async fn clippy(Json(req): Json<ClippyRequest>) -> Result<Json<ClippyResponse>> 
 }
 
 async fn miri(Json(req): Json<MiriRequest>) -> Result<Json<MiriResponse>> {
-    with_sandbox(
-        req,
-        |sb, req| async move { sb.miri(req).await }.boxed(),
-        InterpretingSnafu,
-    )
-    .await
-    .map(Json)
+    with_coordinator(req, |c, req| c.miri(req).context(MiriSnafu).boxed())
+        .await
+        .map(Json)
 }
 
 async fn macro_expansion(
@@ -237,6 +233,10 @@ impl HasEndpoint for ClippyRequest {
     const ENDPOINT: Endpoint = Endpoint::Clippy;
 }
 
+impl HasEndpoint for MiriRequest {
+    const ENDPOINT: Endpoint = Endpoint::Miri;
+}
+
 trait IsSuccess {
     fn is_success(&self) -> bool;
 }
@@ -278,6 +278,12 @@ impl IsSuccess for coordinator::FormatResponse {
 }
 
 impl IsSuccess for coordinator::ClippyResponse {
+    fn is_success(&self) -> bool {
+        self.success
+    }
+}
+
+impl IsSuccess for coordinator::MiriResponse {
     fn is_success(&self) -> bool {
         self.success
     }
@@ -1074,6 +1080,48 @@ pub(crate) mod api_orchestrator_integration_impls {
                 stderr,
             } = other;
             let ClippyResponse {
+                success,
+                exit_detail,
+            } = response;
+
+            Self {
+                success,
+                exit_detail,
+                stdout,
+                stderr,
+            }
+        }
+    }
+
+    impl TryFrom<crate::MiriRequest> for MiriRequest {
+        type Error = ParseMiriRequestError;
+
+        fn try_from(other: crate::MiriRequest) -> std::result::Result<Self, Self::Error> {
+            let crate::MiriRequest { code, edition } = other;
+
+            Ok(MiriRequest {
+                channel: Channel::Nightly,     // TODO: use what user has submitted
+                crate_type: CrateType::Binary, // TODO: use what user has submitted
+                edition: parse_edition(&edition)?,
+                code,
+            })
+        }
+    }
+
+    #[derive(Debug, Snafu)]
+    pub(crate) enum ParseMiriRequestError {
+        #[snafu(context(false))]
+        Edition { source: ParseEditionError },
+    }
+
+    impl From<WithOutput<MiriResponse>> for crate::MiriResponse {
+        fn from(other: WithOutput<MiriResponse>) -> Self {
+            let WithOutput {
+                response,
+                stdout,
+                stderr,
+            } = other;
+            let MiriResponse {
                 success,
                 exit_detail,
             } = response;

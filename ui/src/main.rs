@@ -167,8 +167,6 @@ enum Error {
     SandboxCreation { source: sandbox::Error },
     #[snafu(display("Expansion operation failed: {}", source))]
     Expansion { source: sandbox::Error },
-    #[snafu(display("Interpreting operation failed: {}", source))]
-    Interpreting { source: sandbox::Error },
     #[snafu(display("Caching operation failed: {}", source))]
     Caching { source: sandbox::Error },
     #[snafu(display("Gist creation failed: {}", source))]
@@ -205,6 +203,11 @@ enum Error {
     #[snafu(context(false))]
     ClippyRequest {
         source: server_axum::api_orchestrator_integration_impls::ParseClippyRequestError,
+    },
+
+    #[snafu(context(false))]
+    MiriRequest {
+        source: server_axum::api_orchestrator_integration_impls::ParseMiriRequestError,
     },
 
     // Remove at a later point. From here ...
@@ -246,6 +249,11 @@ enum Error {
     #[snafu(display("Unable to convert the Clippy request"))]
     Clippy {
         source: orchestrator::coordinator::ClippyError,
+    },
+
+    #[snafu(display("Unable to convert the Miri request"))]
+    Miri {
+        source: orchestrator::coordinator::MiriError,
     },
 
     #[snafu(display("The operation timed out"))]
@@ -377,6 +385,7 @@ struct MiriRequest {
 #[derive(Debug, Clone, Serialize)]
 struct MiriResponse {
     success: bool,
+    exit_detail: String,
     stdout: String,
     stderr: String,
 }
@@ -441,27 +450,6 @@ struct EvaluateRequest {
 struct EvaluateResponse {
     result: String,
     error: Option<String>,
-}
-
-impl TryFrom<MiriRequest> for sandbox::MiriRequest {
-    type Error = Error;
-
-    fn try_from(me: MiriRequest) -> Result<Self> {
-        Ok(sandbox::MiriRequest {
-            code: me.code,
-            edition: parse_edition(&me.edition)?,
-        })
-    }
-}
-
-impl From<sandbox::MiriResponse> for MiriResponse {
-    fn from(me: sandbox::MiriResponse) -> Self {
-        MiriResponse {
-            success: me.success,
-            stdout: me.stdout,
-            stderr: me.stderr,
-        }
-    }
 }
 
 impl TryFrom<MacroExpansionRequest> for sandbox::MacroExpansionRequest {
