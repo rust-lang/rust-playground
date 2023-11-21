@@ -46,7 +46,9 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- \
     --default-toolchain "${channel}" \
     --target wasm32-unknown-unknown \
     --component rustfmt \
-    --component clippy
+    --component clippy \
+    --component rust-src
+RUN if [ "${channel}" = 'nightly' ]; then rustup component add miri; fi
 
 COPY --chown=playground entrypoint.sh /playground/tools/
 
@@ -111,11 +113,13 @@ ARG channel
 RUN cargo build
 RUN cargo build --release
 RUN cargo clippy
+RUN if [ "${channel}" = 'nightly' ]; then cargo miri setup; cargo miri run; fi
 RUN rm src/*.rs
 
 COPY --from=modify-cargo-toml /playground/modify-cargo-toml/target/release/modify-cargo-toml /playground/.cargo/bin
 COPY --from=build-orchestrator /playground/.cargo/bin/worker /playground/.cargo/bin/worker
 COPY --from=wasm-tools /playground/.cargo/bin/wasm-tools /playground/.cargo/bin
-COPY --chown=playground cargo-wasm /playground/.cargo/bin/
+COPY --chown=playground cargo-wasm /playground/.cargo/bin
+COPY --chown=playground cargo-miri-playground /playground/.cargo/bin
 
 ENTRYPOINT ["/playground/tools/entrypoint.sh"]
