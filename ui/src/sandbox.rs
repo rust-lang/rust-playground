@@ -1,6 +1,6 @@
 use serde_derive::Deserialize;
 use snafu::prelude::*;
-use std::{collections::BTreeMap, fmt, io, string, time::Duration};
+use std::{collections::BTreeMap, io, string, time::Duration};
 use tempfile::TempDir;
 use tokio::{process::Command, time};
 
@@ -290,47 +290,6 @@ async fn run_command_with_timeout(mut command: Command) -> Result<std::process::
     Ok(output)
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub enum AssemblyFlavor {
-    Att,
-    Intel,
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub enum DemangleAssembly {
-    Demangle,
-    Mangle,
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub enum ProcessAssembly {
-    Filter,
-    Raw,
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
-pub enum CompileTarget {
-    Assembly(AssemblyFlavor, DemangleAssembly, ProcessAssembly),
-    LlvmIr,
-    Mir,
-    Hir,
-    Wasm,
-}
-
-impl fmt::Display for CompileTarget {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        use self::CompileTarget::*;
-
-        match *self {
-            Assembly(_, _, _) => "assembly".fmt(f),
-            LlvmIr => "LLVM IR".fmt(f),
-            Mir => "Rust MIR".fmt(f),
-            Hir => "Rust HIR".fmt(f),
-            Wasm => "WebAssembly".fmt(f),
-        }
-    }
-}
-
 #[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
 pub enum Channel {
     Stable,
@@ -347,129 +306,5 @@ impl Channel {
             Beta => "rust-beta",
             Nightly => "rust-nightly",
         }
-    }
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
-pub enum Mode {
-    Debug,
-    Release,
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
-pub enum Edition {
-    Rust2015,
-    Rust2018,
-    Rust2021, // TODO - add parallel tests for 2021
-    Rust2024,
-}
-
-impl Edition {
-    fn cargo_ident(&self) -> &'static str {
-        use self::Edition::*;
-
-        match *self {
-            Rust2015 => "2015",
-            Rust2018 => "2018",
-            Rust2021 => "2021",
-            Rust2024 => "2024",
-        }
-    }
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
-pub enum CrateType {
-    Binary,
-    Library(LibraryType),
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, strum::IntoStaticStr)]
-pub enum LibraryType {
-    Lib,
-    Dylib,
-    Rlib,
-    Staticlib,
-    Cdylib,
-    ProcMacro,
-}
-
-impl LibraryType {
-    fn cargo_ident(&self) -> &'static str {
-        use self::LibraryType::*;
-
-        match *self {
-            Lib => "lib",
-            Dylib => "dylib",
-            Rlib => "rlib",
-            Staticlib => "staticlib",
-            Cdylib => "cdylib",
-            ProcMacro => "proc-macro",
-        }
-    }
-}
-
-trait DockerCommandExt {
-    fn apply_crate_type(&mut self, req: impl CrateTypeRequest);
-    fn apply_edition(&mut self, req: impl EditionRequest);
-    fn apply_backtrace(&mut self, req: impl BacktraceRequest);
-}
-
-impl DockerCommandExt for Command {
-    fn apply_crate_type(&mut self, req: impl CrateTypeRequest) {
-        if let CrateType::Library(lib) = req.crate_type() {
-            self.args(&[
-                "--env",
-                &format!("PLAYGROUND_CRATE_TYPE={}", lib.cargo_ident()),
-            ]);
-        }
-    }
-
-    fn apply_edition(&mut self, req: impl EditionRequest) {
-        if let Some(edition) = req.edition() {
-            if edition == Edition::Rust2024 {
-                self.args(&["--env", &format!("PLAYGROUND_FEATURE_EDITION2024=true")]);
-            }
-
-            self.args(&[
-                "--env",
-                &format!("PLAYGROUND_EDITION={}", edition.cargo_ident()),
-            ]);
-        }
-    }
-
-    fn apply_backtrace(&mut self, req: impl BacktraceRequest) {
-        if req.backtrace() {
-            self.args(&["--env", "RUST_BACKTRACE=1"]);
-        }
-    }
-}
-
-trait CrateTypeRequest {
-    fn crate_type(&self) -> CrateType;
-}
-
-impl<R: CrateTypeRequest> CrateTypeRequest for &'_ R {
-    fn crate_type(&self) -> CrateType {
-        (*self).crate_type()
-    }
-}
-
-trait EditionRequest {
-    fn edition(&self) -> Option<Edition>;
-}
-
-impl<R: EditionRequest> EditionRequest for &'_ R {
-    fn edition(&self) -> Option<Edition> {
-        (*self).edition()
-    }
-}
-
-trait BacktraceRequest {
-    fn backtrace(&self) -> bool;
-}
-
-impl<R: BacktraceRequest> BacktraceRequest for &'_ R {
-    fn backtrace(&self) -> bool {
-        (*self).backtrace()
     }
 }
