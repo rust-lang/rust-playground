@@ -1,5 +1,5 @@
 use lazy_static::lazy_static;
-use orchestrator::coordinator;
+use orchestrator::coordinator::{self, Channel, CompileTarget, CrateType, Edition, Mode};
 use prometheus::{
     self, register_histogram, register_histogram_vec, register_int_counter,
     register_int_counter_vec, register_int_gauge, Histogram, HistogramVec, IntCounter,
@@ -10,7 +10,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::sandbox::{self, Channel, CompileTarget, CrateType, Edition, Mode};
+use crate::sandbox;
 
 lazy_static! {
     pub(crate) static ref REQUESTS: HistogramVec = register_histogram_vec!(
@@ -132,15 +132,38 @@ impl Labels {
             v.map_or("", |v| if v { "true" } else { "false" })
         }
 
-        let target = target.map_or("", Into::into);
-        let channel = channel.map_or("", Into::into);
-        let mode = mode.map_or("", Into::into);
+        let target = match target {
+            Some(CompileTarget::Assembly(_, _, _)) => "Assembly",
+            Some(CompileTarget::Hir) => "Hir",
+            Some(CompileTarget::LlvmIr) => "LlvmIr",
+            Some(CompileTarget::Mir) => "Mir",
+            Some(CompileTarget::Wasm) => "Wasm",
+            None => "",
+        };
+        let channel = match channel {
+            Some(Channel::Stable) => "Stable",
+            Some(Channel::Beta) => "Beta",
+            Some(Channel::Nightly) => "Nightly",
+            None => "",
+        };
+        let mode = match mode {
+            Some(Mode::Debug) => "Debug",
+            Some(Mode::Release) => "Release",
+            None => "",
+        };
         let edition = match edition {
             None => "",
             Some(None) => "Unspecified",
-            Some(Some(v)) => v.into(),
+            Some(Some(Edition::Rust2015)) => "Rust2015",
+            Some(Some(Edition::Rust2018)) => "Rust2018",
+            Some(Some(Edition::Rust2021)) => "Rust2021",
+            Some(Some(Edition::Rust2024)) => "Rust2024",
         };
-        let crate_type = crate_type.map_or("", Into::into);
+        let crate_type = match crate_type {
+            Some(CrateType::Binary) => "Binary",
+            Some(CrateType::Library(_)) => "Library",
+            None => "",
+        };
         let tests = b(tests);
         let backtrace = b(backtrace);
 
@@ -262,11 +285,11 @@ impl HasLabelsCore for coordinator::CompileRequest {
         } = *self;
 
         LabelsCore {
-            target: Some(target.into()),
-            channel: Some(channel.into()),
-            mode: Some(mode.into()),
-            edition: Some(Some(edition.into())),
-            crate_type: Some(crate_type.into()),
+            target: Some(target),
+            channel: Some(channel),
+            mode: Some(mode),
+            edition: Some(Some(edition)),
+            crate_type: Some(crate_type),
             tests: Some(tests),
             backtrace: Some(backtrace),
         }
@@ -287,10 +310,10 @@ impl HasLabelsCore for coordinator::ExecuteRequest {
 
         LabelsCore {
             target: None,
-            channel: Some(channel.into()),
-            mode: Some(mode.into()),
-            edition: Some(Some(edition.into())),
-            crate_type: Some(crate_type.into()),
+            channel: Some(channel),
+            mode: Some(mode),
+            edition: Some(Some(edition)),
+            crate_type: Some(crate_type),
             tests: Some(tests),
             backtrace: Some(backtrace),
         }
@@ -308,10 +331,10 @@ impl HasLabelsCore for coordinator::FormatRequest {
 
         LabelsCore {
             target: None,
-            channel: Some(channel.into()),
+            channel: Some(channel),
             mode: None,
-            edition: Some(Some(edition.into())),
-            crate_type: Some(crate_type.into()),
+            edition: Some(Some(edition)),
+            crate_type: Some(crate_type),
             tests: None,
             backtrace: None,
         }
@@ -329,10 +352,10 @@ impl HasLabelsCore for coordinator::ClippyRequest {
 
         LabelsCore {
             target: None,
-            channel: Some(channel.into()),
+            channel: Some(channel),
             mode: None,
-            edition: Some(Some(edition.into())),
-            crate_type: Some(crate_type.into()),
+            edition: Some(Some(edition)),
+            crate_type: Some(crate_type),
             tests: None,
             backtrace: None,
         }
@@ -350,10 +373,10 @@ impl HasLabelsCore for coordinator::MiriRequest {
 
         LabelsCore {
             target: None,
-            channel: Some(channel.into()),
+            channel: Some(channel),
             mode: None,
-            edition: Some(Some(edition.into())),
-            crate_type: Some(crate_type.into()),
+            edition: Some(Some(edition)),
+            crate_type: Some(crate_type),
             tests: None,
             backtrace: None,
         }
@@ -371,10 +394,10 @@ impl HasLabelsCore for coordinator::MacroExpansionRequest {
 
         LabelsCore {
             target: None,
-            channel: Some(channel.into()),
+            channel: Some(channel),
             mode: None,
-            edition: Some(Some(edition.into())),
-            crate_type: Some(crate_type.into()),
+            edition: Some(Some(edition)),
+            crate_type: Some(crate_type),
             tests: None,
             backtrace: None,
         }
