@@ -219,6 +219,14 @@ enum Error {
     #[snafu(display("The WebSocket worker panicked: {}", text))]
     WebSocketTaskPanic { text: String },
 
+    #[snafu(display("Unable to find the available versions"))]
+    Versions {
+        source: orchestrator::coordinator::VersionsError,
+    },
+
+    #[snafu(display("The Miri version was missing"))]
+    MiriVersion,
+
     #[snafu(display("Unable to shutdown the coordinator"))]
     ShutdownCoordinator {
         source: orchestrator::coordinator::Error,
@@ -468,16 +476,6 @@ impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
             .collect();
 
         MetaCratesResponse { crates }
-    }
-}
-
-impl From<sandbox::Version> for MetaVersionResponse {
-    fn from(me: sandbox::Version) -> Self {
-        MetaVersionResponse {
-            version: me.release.into(),
-            hash: me.commit_hash.into(),
-            date: me.commit_date.into(),
-        }
     }
 }
 

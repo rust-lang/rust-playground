@@ -35,6 +35,134 @@ use crate::{
     DropErrorDetailsExt,
 };
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Versions {
+    pub stable: ChannelVersions,
+    pub beta: ChannelVersions,
+    pub nightly: ChannelVersions,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ChannelVersions {
+    pub rustc: Version,
+    pub rustfmt: Version,
+    pub clippy: Version,
+    pub miri: Option<Version>,
+}
+
+/// Parsing this struct is very lenient — we'd rather return some
+/// partial data instead of absolutely nothing.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Version {
+    pub release: String,
+    pub commit_hash: String,
+    pub commit_date: String,
+}
+
+impl Version {
+    fn parse_rustc_version_verbose(rustc_version: &str) -> Self {
+        let mut release = "";
+        let mut commit_hash = "";
+        let mut commit_date = "";
+
+        let fields = rustc_version.lines().skip(1).filter_map(|line| {
+            let mut pieces = line.splitn(2, ':');
+            let key = pieces.next()?.trim();
+            let value = pieces.next()?.trim();
+            Some((key, value))
+        });
+
+        for (k, v) in fields {
+            match k {
+                "release" => release = v,
+                "commit-hash" => commit_hash = v,
+                "commit-date" => commit_date = v,
+                _ => {}
+            }
+        }
+
+        Self {
+            release: release.into(),
+            commit_hash: commit_hash.into(),
+            commit_date: commit_date.into(),
+        }
+    }
+
+    // Parses versions of the shape `toolname 0.0.0 (0000000 0000-00-00)`
+    fn parse_tool_version(tool_version: &str) -> Self {
+        let mut parts = tool_version.split_whitespace().fuse().skip(1);
+
+        let release = parts.next().unwrap_or("").into();
+        let commit_hash = parts.next().unwrap_or("").trim_start_matches('(').into();
+        let commit_date = parts.next().unwrap_or("").trim_end_matches(')').into();
+
+        Self {
+            release,
+            commit_hash,
+            commit_date,
+        }
+    }
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum VersionsError {
+    #[snafu(display("Unable to determine versions for the stable channel"))]
+    Stable { source: VersionsChannelError },
+
+    #[snafu(display("Unable to determine versions for the beta channel"))]
+    Beta { source: VersionsChannelError },
+
+    #[snafu(display("Unable to determine versions for the nightly channel"))]
+    Nightly { source: VersionsChannelError },
+}
+
+#[derive(Debug, Snafu)]
+pub enum VersionsChannelError {
+    #[snafu(context(false))] // transparent
+    Channel { source: Error },
+
+    #[snafu(context(false))] // transparent
+    Versions { source: ContainerVersionsError },
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum ContainerVersionsError {
+    #[snafu(display("Failed to get `rustc` version"))]
+    Rustc { source: VersionError },
+
+    #[snafu(display("`rustc` not executable"))]
+    RustcMissing,
+
+    #[snafu(display("Failed to get `rustfmt` version"))]
+    Rustfmt { source: VersionError },
+
+    #[snafu(display("`cargo fmt` not executable"))]
+    RustfmtMissing,
+
+    #[snafu(display("Failed to get clippy version"))]
+    Clippy { source: VersionError },
+
+    #[snafu(display("`cargo clippy` not executable"))]
+    ClippyMissing,
+
+    #[snafu(display("Failed to get miri version"))]
+    Miri { source: VersionError },
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum VersionError {
+    #[snafu(display("Could not start the process"))]
+    #[snafu(context(false))]
+    SpawnProcess { source: SpawnCargoError },
+
+    #[snafu(display("The task panicked"))]
+    #[snafu(context(false))]
+    TaskPanic { source: tokio::task::JoinError },
+}
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum AssemblyFlavor {
     Att,
@@ -639,6 +767,28 @@ where
         }
     }
 
+    pub async fn versions(&self) -> Result<Versions, VersionsError> {
+        use versions_error::*;
+
+        let [stable, beta, nightly] =
+            [Channel::Stable, Channel::Beta, Channel::Nightly].map(|c| async move {
+                let c = self.select_channel(c).await?;
+                c.versions().await.map_err(VersionsChannelError::from)
+            });
+
+        let (stable, beta, nightly) = join!(stable, beta, nightly);
+
+        let stable = stable.context(StableSnafu)?;
+        let beta = beta.context(BetaSnafu)?;
+        let nightly = nightly.context(NightlySnafu)?;
+
+        Ok(Versions {
+            stable,
+            beta,
+            nightly,
+        })
+    }
+
     pub async fn execute(
         &self,
         request: ExecuteRequest,
@@ -902,6 +1052,72 @@ impl Container {
             modify_cargo_toml,
             commander,
         })
+    }
+
+    async fn versions(&self) -> Result<ChannelVersions, ContainerVersionsError> {
+        use container_versions_error::*;
+
+        let token = CancellationToken::new();
+
+        let rustc = self.rustc_version(token.clone());
+        let rustfmt = self.tool_version(token.clone(), "fmt");
+        let clippy = self.tool_version(token.clone(), "clippy");
+        let miri = self.tool_version(token, "miri");
+
+        let (rustc, rustfmt, clippy, miri) = join!(rustc, rustfmt, clippy, miri);
+
+        let rustc = rustc.context(RustcSnafu)?.context(RustcMissingSnafu)?;
+        let rustfmt = rustfmt
+            .context(RustfmtSnafu)?
+            .context(RustfmtMissingSnafu)?;
+        let clippy = clippy.context(ClippySnafu)?.context(ClippyMissingSnafu)?;
+        let miri = miri.context(MiriSnafu)?;
+
+        Ok(ChannelVersions {
+            rustc,
+            rustfmt,
+            clippy,
+            miri,
+        })
+    }
+
+    async fn rustc_version(
+        &self,
+        token: CancellationToken,
+    ) -> Result<Option<Version>, VersionError> {
+        let rustc_cmd = ExecuteCommandRequest::simple("rustc", ["--version", "--verbose"]);
+        let output = self.version_output(token, rustc_cmd).await?;
+
+        Ok(output.map(|o| Version::parse_rustc_version_verbose(&o)))
+    }
+
+    async fn tool_version(
+        &self,
+        token: CancellationToken,
+        subcommand_name: &str,
+    ) -> Result<Option<Version>, VersionError> {
+        let tool_cmd = ExecuteCommandRequest::simple("cargo", [subcommand_name, "--version"]);
+        let output = self.version_output(token, tool_cmd).await?;
+
+        Ok(output.map(|o| Version::parse_tool_version(&o)))
+    }
+
+    async fn version_output(
+        &self,
+        token: CancellationToken,
+        cmd: ExecuteCommandRequest,
+    ) -> Result<Option<String>, VersionError> {
+        let v = self.spawn_cargo_task(token.clone(), cmd).await?;
+        let SpawnCargo {
+            task,
+            stdin_tx,
+            stdout_rx,
+            stderr_rx,
+        } = v;
+        drop(stdin_tx);
+        let task = async { task.await?.map_err(VersionError::from) };
+        let o = WithOutput::try_absorb(task, stdout_rx, stderr_rx).await?;
+        Ok(if o.success { Some(o.stdout) } else { None })
     }
 
     async fn execute(
@@ -2414,6 +2630,20 @@ mod tests {
         {
             new_coordinator_docker().await
         }
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn versions() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let versions = coordinator.versions().with_timeout().await.unwrap();
+
+        assert_starts_with!(versions.stable.rustc.release, "1.");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
     }
 
     const ARBITRARY_EXECUTE_REQUEST: ExecuteRequest = ExecuteRequest {

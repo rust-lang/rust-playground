@@ -116,6 +116,20 @@ pub struct ExecuteCommandRequest {
     pub cwd: Option<String>, // None means in project direcotry.
 }
 
+impl ExecuteCommandRequest {
+    pub fn simple(
+        cmd: impl Into<String>,
+        args: impl IntoIterator<Item = impl Into<String>>,
+    ) -> Self {
+        Self {
+            cmd: cmd.into(),
+            args: args.into_iter().map(Into::into).collect(),
+            envs: Default::default(),
+            cwd: None,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ExecuteCommandResponse {
     pub success: bool,

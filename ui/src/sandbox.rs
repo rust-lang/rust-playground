@@ -1,6 +1,6 @@
 use serde_derive::Deserialize;
 use snafu::prelude::*;
-use std::{collections::BTreeMap, io, string, time::Duration};
+use std::{io, time::Duration};
 use tempfile::TempDir;
 use tokio::{process::Command, time};
 
@@ -28,13 +28,6 @@ impl From<CrateInformationInner> for CrateInformation {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct Version {
-    pub release: String,
-    pub commit_hash: String,
-    pub commit_date: String,
-}
-
 #[derive(Debug, Snafu)]
 pub enum Error {
     #[snafu(display("Unable to create temporary directory: {}", source))]
@@ -58,21 +51,9 @@ pub enum Error {
 
     #[snafu(display("Unable to read crate information: {}", source))]
     UnableToParseCrateInformation { source: ::serde_json::Error },
-    #[snafu(display("Output was not valid UTF-8: {}", source))]
-    OutputNotUtf8 { source: string::FromUtf8Error },
-    #[snafu(display("Release was missing from the version output"))]
-    VersionReleaseMissing,
-    #[snafu(display("Commit hash was missing from the version output"))]
-    VersionHashMissing,
-    #[snafu(display("Commit date was missing from the version output"))]
-    VersionDateMissing,
 }
 
 pub type Result<T, E = Error> = ::std::result::Result<T, E>;
-
-fn vec_to_str(v: Vec<u8>) -> Result<String> {
-    String::from_utf8(v).context(OutputNotUtf8Snafu)
-}
 
 macro_rules! docker_command {
     ($($arg:expr),* $(,)?) => ({
@@ -150,76 +131,6 @@ impl Sandbox {
         let crates = crate_info.into_iter().map(Into::into).collect();
 
         Ok(crates)
-    }
-
-    pub async fn version(&self, channel: Channel) -> Result<Version> {
-        let mut command = basic_secure_docker_command();
-        command.args(&[channel.container_name()]);
-        command.args(&["rustc", "--version", "--verbose"]);
-
-        let output = run_command_with_timeout(command).await?;
-        let version_output = vec_to_str(output.stdout)?;
-
-        let mut info: BTreeMap<String, String> = version_output
-            .lines()
-            .skip(1)
-            .filter_map(|line| {
-                let mut pieces = line.splitn(2, ':').fuse();
-                match (pieces.next(), pieces.next()) {
-                    (Some(name), Some(value)) => Some((name.trim().into(), value.trim().into())),
-                    _ => None,
-                }
-            })
-            .collect();
-
-        let release = info.remove("release").context(VersionReleaseMissingSnafu)?;
-        let commit_hash = info
-            .remove("commit-hash")
-            .context(VersionHashMissingSnafu)?;
-        let commit_date = info
-            .remove("commit-date")
-            .context(VersionDateMissingSnafu)?;
-
-        Ok(Version {
-            release,
-            commit_hash,
-            commit_date,
-        })
-    }
-
-    pub async fn version_rustfmt(&self) -> Result<Version> {
-        let mut command = basic_secure_docker_command();
-        command.args(&["rustfmt", "cargo", "fmt", "--version"]);
-        self.cargo_tool_version(command).await
-    }
-
-    pub async fn version_clippy(&self) -> Result<Version> {
-        let mut command = basic_secure_docker_command();
-        command.args(&["clippy", "cargo", "clippy", "--version"]);
-        self.cargo_tool_version(command).await
-    }
-
-    pub async fn version_miri(&self) -> Result<Version> {
-        let mut command = basic_secure_docker_command();
-        command.args(&["miri", "cargo", "miri", "--version"]);
-        self.cargo_tool_version(command).await
-    }
-
-    // Parses versions of the shape `toolname 0.0.0 (0000000 0000-00-00)`
-    async fn cargo_tool_version(&self, command: Command) -> Result<Version> {
-        let output = run_command_with_timeout(command).await?;
-        let version_output = vec_to_str(output.stdout)?;
-        let mut parts = version_output.split_whitespace().fuse().skip(1);
-
-        let release = parts.next().unwrap_or("").into();
-        let commit_hash = parts.next().unwrap_or("").trim_start_matches('(').into();
-        let commit_date = parts.next().unwrap_or("").trim_end_matches(')').into();
-
-        Ok(Version {
-            release,
-            commit_hash,
-            commit_date,
-        })
     }
 }
 

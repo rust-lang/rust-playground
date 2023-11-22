@@ -227,12 +227,6 @@ impl SuccessDetails for Vec<sandbox::CrateInformation> {
     }
 }
 
-impl SuccessDetails for sandbox::Version {
-    fn success_details(&self) -> Outcome {
-        Outcome::Success
-    }
-}
-
 pub(crate) async fn track_metric_no_request_async<B, Fut, Resp>(
     endpoint: Endpoint,
     body: B,
