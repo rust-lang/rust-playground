@@ -1749,16 +1749,22 @@ mod tests {
             let project_dir =
                 TempDir::new("playground").expect("Failed to create temporary project directory");
 
-            let output = std::process::Command::new("cargo")
-                .arg("init")
-                .args(["--name", "playground"])
-                .arg(project_dir.path())
-                .output()
-                .expect("Build failed");
-            assert!(output.status.success(), "Cargo initialization failed");
+            for channel in Channel::ALL {
+                let channel = channel.to_str();
+                let channel_dir = project_dir.path().join(channel);
 
-            let main = project_dir.path().join("src").join("main.rs");
-            std::fs::remove_file(main).expect("Could not delete main.rs");
+                let output = std::process::Command::new("cargo")
+                    .arg(format!("+{channel}"))
+                    .arg("new")
+                    .args(["--name", "playground"])
+                    .arg(&channel_dir)
+                    .output()
+                    .expect("Cargo new failed");
+                assert!(output.status.success(), "Cargo new failed");
+
+                let main = channel_dir.join("src").join("main.rs");
+                std::fs::remove_file(main).expect("Could not delete main.rs");
+            }
 
             Self { project_dir }
         }
@@ -1766,12 +1772,11 @@ mod tests {
 
     impl Backend for TestBackend {
         fn prepare_worker_command(&self, channel: Channel) -> Command {
-            let toolchain_file = format!(r#"[toolchain]\nchannel = "{}""#, channel.to_str());
-            let path = self.project_dir.path().join("rust-toolchain.toml");
-            std::fs::write(path, toolchain_file).expect("Couldn't write toolchain file");
+            let channel_dir = self.project_dir.path().join(channel.to_str());
 
             let mut command = Command::new("./target/debug/worker");
-            command.arg(self.project_dir.path());
+            command.env("RUSTUP_TOOLCHAIN", channel.to_str());
+            command.arg(channel_dir);
             command
         }
     }
