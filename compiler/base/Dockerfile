@@ -45,7 +45,8 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- \
     --profile minimal \
     --default-toolchain "${channel}" \
     --target wasm32-unknown-unknown \
-    --component rustfmt
+    --component rustfmt \
+    --component clippy
 
 COPY --chown=playground entrypoint.sh /playground/tools/
 
@@ -109,6 +110,7 @@ ARG channel
 
 RUN cargo build
 RUN cargo build --release
+RUN cargo clippy
 RUN rm src/*.rs
 
 COPY --from=modify-cargo-toml /playground/modify-cargo-toml/target/release/modify-cargo-toml /playground/.cargo/bin
