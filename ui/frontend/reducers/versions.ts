@@ -1,25 +1,37 @@
-import { Action, ActionType } from '../actions';
-import { Version } from '../types';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import * as z from 'zod';
 
-const DEFAULT: State = {
-};
+import { adaptFetchError, jsonGet, routes } from '../actions';
+import { ChannelVersion } from '../types';
 
-export interface State {
-  stable?: Version;
-  beta?: Version;
-  nightly?: Version;
-  rustfmt?: Version;
-  clippy?: Version;
-  miri?: Version;
-}
+const sliceName = 'versions';
 
-export default function crates(state = DEFAULT, action: Action) {
-  switch (action.type) {
-    case ActionType.VersionsLoadSucceeded: {
-      const { stable, beta, nightly, rustfmt, clippy, miri } = action;
-      return { stable, beta, nightly, rustfmt, clippy, miri };
-    }
-    default:
-      return state;
-  }
-}
+const initialState: State = {};
+
+type State = Partial<Response>;
+
+const Response = z.object({
+  stable: ChannelVersion,
+  beta: ChannelVersion,
+  nightly: ChannelVersion,
+});
+
+type Response = z.infer<typeof Response>;
+
+export const performVersionsLoad = createAsyncThunk(sliceName, async () => {
+  const d = await adaptFetchError(() => jsonGet(routes.meta.versions));
+  return Response.parseAsync(d);
+});
+
+const slice = createSlice({
+  name: sliceName,
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(performVersionsLoad.fulfilled, (state, versions) => {
+      Object.assign(state, versions.payload);
+    });
+  },
+});
+
+export default slice.reducer;

@@ -430,6 +430,22 @@ struct MetaCratesResponse {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
+struct MetaVersionsResponse {
+    stable: MetaChannelVersionResponse,
+    beta: MetaChannelVersionResponse,
+    nightly: MetaChannelVersionResponse,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+struct MetaChannelVersionResponse {
+    rustc: MetaVersionResponse,
+    rustfmt: MetaVersionResponse,
+    clippy: MetaVersionResponse,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    miri: Option<MetaVersionResponse>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
 struct MetaVersionResponse {
     version: Arc<str>,
     hash: Arc<str>,

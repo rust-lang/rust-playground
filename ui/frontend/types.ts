@@ -1,3 +1,5 @@
+import * as z from 'zod';
+
 export type Page = 'index' | 'help';
 
 export interface Position {
@@ -19,11 +21,22 @@ export interface Crate {
   version: string;
 }
 
-export interface Version {
-  version: string;
-  hash: string;
-  date: string;
-}
+export const Version = z.object({
+  version: z.string(),
+  hash: z.string(),
+  date: z.string(),
+});
+
+export type Version = z.infer<typeof Version>;
+
+export const ChannelVersion = z.object({
+  rustc: Version,
+  rustfmt: Version,
+  clippy: Version,
+  miri: Version.optional(),
+});
+
+export type ChannelVersion = z.infer<typeof ChannelVersion>;
 
 export interface CommonEditorProps {
   code: string;

@@ -82,6 +82,7 @@ module.exports = {
         'reducers/output/meta.ts',
         'reducers/output/mir.ts',
         'reducers/output/wasm.ts',
+        'reducers/versions.ts',
         'reducers/websocket.ts',
         'websocketActions.ts',
         'websocketMiddleware.ts',
