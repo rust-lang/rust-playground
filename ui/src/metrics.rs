@@ -10,8 +10,6 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::sandbox;
-
 lazy_static! {
     pub(crate) static ref REQUESTS: HistogramVec = register_histogram_vec!(
         "playground_request_duration_seconds",
@@ -201,29 +199,6 @@ impl Labels {
             tests,
             backtrace,
         }
-    }
-}
-
-pub(crate) trait GenerateLabels {
-    fn generate_labels(&self, outcome: Outcome) -> Labels;
-}
-
-impl<T> GenerateLabels for &'_ T
-where
-    T: GenerateLabels,
-{
-    fn generate_labels(&self, outcome: Outcome) -> Labels {
-        T::generate_labels(self, outcome)
-    }
-}
-
-pub(crate) trait SuccessDetails: Sized {
-    fn success_details(&self) -> Outcome;
-}
-
-impl SuccessDetails for Vec<sandbox::CrateInformation> {
-    fn success_details(&self) -> Outcome {
-        Outcome::Success
     }
 }
 

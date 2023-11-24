@@ -4,14 +4,14 @@ use crate::{
         record_metric, track_metric_no_request_async, Endpoint, HasLabelsCore, Outcome,
         UNAVAILABLE_WS,
     },
-    sandbox::{Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
-    CachingSnafu, ClippyRequest, ClippyResponse, ClippySnafu, CompileRequest, CompileResponse,
-    CompileSnafu, Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu,
+    sandbox::DOCKER_PROCESS_TIMEOUT_SOFT,
+    ClippyRequest, ClippyResponse, ClippySnafu, CompileRequest, CompileResponse, CompileSnafu,
+    Config, CratesSnafu, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu,
     ExecuteRequest, ExecuteResponse, ExecuteSnafu, FormatRequest, FormatResponse, FormatSnafu,
     GhToken, GistCreationSnafu, GistLoadingSnafu, MacroExpansionRequest, MacroExpansionResponse,
     MacroExpansionSnafu, MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse,
     MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, MiriSnafu, MiriVersionSnafu,
-    Result, SandboxCreationSnafu, ShutdownCoordinatorSnafu, TimeoutSnafu, VersionsSnafu,
+    Result, ShutdownCoordinatorSnafu, TimeoutSnafu, VersionsSnafu,
 };
 use async_trait::async_trait;
 use axum::{
@@ -346,7 +346,6 @@ async fn meta_crates(
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
-    // Json<MetaCratesResponse
     let value = track_metric_no_request_async(Endpoint::MetaCrates, || cache.crates()).await?;
 
     apply_timestamped_caching(value, if_none_match)
@@ -561,10 +560,9 @@ struct SandboxCache {
 
 impl SandboxCache {
     async fn crates(&self) -> Result<Stamped<MetaCratesResponse>> {
+        let coordinator = Coordinator::new_docker().await;
         self.crates
-            .fetch(
-                |sandbox| async move { Ok(sandbox.crates().await.context(CachingSnafu)?.into()) },
-            )
+            .fetch(|| async { Ok(coordinator.crates().await.context(CratesSnafu)?.into()) })
             .await
     }
 
@@ -572,7 +570,7 @@ impl SandboxCache {
         let coordinator = Coordinator::new_docker().await;
 
         self.versions
-            .fetch2(|| async {
+            .fetch(|| async {
                 Ok(Arc::new(
                     coordinator.versions().await.context(VersionsSnafu)?,
                 ))
@@ -633,7 +631,7 @@ where
 {
     async fn fetch<F, FFut>(&self, generator: F) -> Result<Stamped<T>>
     where
-        F: FnOnce(Sandbox) -> FFut,
+        F: FnOnce() -> FFut,
         FFut: Future<Output = Result<T>>,
     {
         let data = &mut *self.0.lock().await;
@@ -650,60 +648,6 @@ where
     }
 
     async fn set_value<F, FFut>(data: &mut Option<CacheInfo<T>>, generator: F) -> Result<Stamped<T>>
-    where
-        F: FnOnce(Sandbox) -> FFut,
-        FFut: Future<Output = Result<T>>,
-    {
-        let sandbox = Sandbox::new().await.context(SandboxCreationSnafu)?;
-        let value = generator(sandbox).await?;
-
-        let old_info = data.take();
-        let new_info = CacheInfo::build(value);
-
-        let info = match old_info {
-            Some(mut old_value) => {
-                if old_value.value == new_info.value {
-                    // The value hasn't changed; record that we have
-                    // checked recently, but keep the creation time to
-                    // preserve caching.
-                    old_value.validation_time = new_info.validation_time;
-                    old_value
-                } else {
-                    new_info
-                }
-            }
-            None => new_info,
-        };
-
-        let value = info.stamped_value();
-
-        *data = Some(info);
-
-        Ok(value)
-    }
-
-    async fn fetch2<F, FFut>(&self, generator: F) -> Result<Stamped<T>>
-    where
-        F: FnOnce() -> FFut,
-        FFut: Future<Output = Result<T>>,
-    {
-        let data = &mut *self.0.lock().await;
-        match data {
-            Some(info) => {
-                if info.validation_time.elapsed() <= SANDBOX_CACHE_TIME_TO_LIVE {
-                    Ok(info.stamped_value())
-                } else {
-                    Self::set_value2(data, generator).await
-                }
-            }
-            None => Self::set_value2(data, generator).await,
-        }
-    }
-
-    async fn set_value2<F, FFut>(
-        data: &mut Option<CacheInfo<T>>,
-        generator: F,
-    ) -> Result<Stamped<T>>
     where
         F: FnOnce() -> FFut,
         FFut: Future<Output = Result<T>>,
@@ -811,6 +755,19 @@ pub(crate) mod api_orchestrator_integration_impls {
     use orchestrator::coordinator::*;
     use snafu::prelude::*;
     use std::convert::TryFrom;
+
+    impl From<Vec<Crate>> for crate::MetaCratesResponse {
+        fn from(other: Vec<Crate>) -> Self {
+            let crates = other
+                .into_iter()
+                .map(|c| {
+                    let Crate { name, version, id } = c;
+                    crate::CrateInformation { name, version, id }
+                })
+                .collect();
+            Self { crates }
+        }
+    }
 
     impl From<&Version> for crate::MetaVersionResponse {
         fn from(other: &Version) -> Self {

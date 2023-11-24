@@ -2,6 +2,7 @@ use futures::{
     future::{BoxFuture, OptionFuture},
     Future, FutureExt,
 };
+use serde::Deserialize;
 use snafu::prelude::*;
 use std::{
     collections::HashMap,
@@ -161,6 +162,48 @@ pub enum VersionError {
     #[snafu(display("The task panicked"))]
     #[snafu(context(false))]
     TaskPanic { source: tokio::task::JoinError },
+}
+
+#[derive(Debug, Clone)]
+pub struct Crate {
+    pub name: String,
+    pub version: String,
+    pub id: String,
+}
+
+#[derive(Deserialize)]
+struct InternalCrate {
+    name: String,
+    version: String,
+    id: String,
+}
+
+impl From<InternalCrate> for Crate {
+    fn from(other: InternalCrate) -> Self {
+        let InternalCrate { name, version, id } = other;
+        Self { name, version, id }
+    }
+}
+
+#[derive(Debug, Snafu)]
+pub enum CratesError {
+    #[snafu(display("Could not start the container"))]
+    #[snafu(context(false))]
+    Start { source: Error },
+
+    #[snafu(context(false))] // transparent
+    Container { source: ContainerCratesError },
+}
+
+#[derive(Debug, Snafu)]
+pub enum ContainerCratesError {
+    #[snafu(display("Could not read the crate information file"))]
+    #[snafu(context(false))]
+    Read { source: CommanderError },
+
+    #[snafu(display("Could not parse the crate information file"))]
+    #[snafu(context(false))]
+    Deserialization { source: serde_json::Error },
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -789,6 +832,14 @@ where
         })
     }
 
+    pub async fn crates(&self) -> Result<Vec<Crate>, CratesError> {
+        self.select_channel(Channel::Stable)
+            .await?
+            .crates()
+            .await
+            .map_err(Into::into)
+    }
+
     pub async fn execute(
         &self,
         request: ExecuteRequest,
@@ -1118,6 +1169,15 @@ impl Container {
         let task = async { task.await?.map_err(VersionError::from) };
         let o = WithOutput::try_absorb(task, stdout_rx, stderr_rx).await?;
         Ok(if o.success { Some(o.stdout) } else { None })
+    }
+
+    async fn crates(&self) -> Result<Vec<Crate>, ContainerCratesError> {
+        let read = ReadFileRequest {
+            path: "crate-information.json".into(),
+        };
+        let read = self.commander.one(read).await?;
+        let crates = serde_json::from_slice::<Vec<InternalCrate>>(&read.0)?;
+        Ok(crates.into_iter().map(Into::into).collect())
     }
 
     async fn execute(

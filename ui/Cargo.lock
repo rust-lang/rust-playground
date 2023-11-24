@@ -893,6 +893,7 @@ dependencies = [
  "futures",
  "modify-cargo-toml",
  "serde",
+ "serde_json",
  "snafu",
  "tokio",
  "tokio-stream",

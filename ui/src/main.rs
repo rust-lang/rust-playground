@@ -162,10 +162,6 @@ impl MetricsToken {
 
 #[derive(Debug, Snafu)]
 enum Error {
-    #[snafu(display("Sandbox creation failed: {}", source))]
-    SandboxCreation { source: sandbox::Error },
-    #[snafu(display("Caching operation failed: {}", source))]
-    Caching { source: sandbox::Error },
     #[snafu(display("Gist creation failed: {}", source))]
     GistCreation { source: octocrab::Error },
     #[snafu(display("Gist loading failed: {}", source))]
@@ -218,6 +214,11 @@ enum Error {
     CachePoisoned,
     #[snafu(display("The WebSocket worker panicked: {}", text))]
     WebSocketTaskPanic { text: String },
+
+    #[snafu(display("Unable to find the available crates"))]
+    Crates {
+        source: orchestrator::coordinator::CratesError,
+    },
 
     #[snafu(display("Unable to find the available versions"))]
     Versions {
@@ -462,21 +463,6 @@ struct EvaluateRequest {
 struct EvaluateResponse {
     result: String,
     error: Option<String>,
-}
-
-impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
-    fn from(me: Vec<sandbox::CrateInformation>) -> Self {
-        let crates = me
-            .into_iter()
-            .map(|cv| CrateInformation {
-                name: cv.name,
-                version: cv.version,
-                id: cv.id,
-            })
-            .collect();
-
-        MetaCratesResponse { crates }
-    }
 }
 
 impl From<gist::Gist> for MetaGistResponse {
