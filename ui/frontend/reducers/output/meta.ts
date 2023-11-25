@@ -4,6 +4,7 @@ import { Draft } from 'immer';
 import { ActionType } from '../../actions';
 import { Focus } from '../../types';
 import { performCompileAssembly } from './assembly';
+import { performClippy } from './clippy';
 import { performExecute, wsExecuteRequest } from './execute';
 import { performFormat } from './format';
 import { performGistLoad, performGistSave } from './gist';
@@ -35,7 +36,7 @@ const slice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(ActionType.RequestClippy, (state) => {
+      .addCase(performClippy.pending, (state) => {
         state.focus = Focus.Clippy;
       })
 

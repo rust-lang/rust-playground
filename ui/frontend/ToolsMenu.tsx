@@ -9,6 +9,7 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import { useAppDispatch } from './configureStore';
 import { performFormat } from './reducers/output/format';
+import { performClippy } from './reducers/output/clippy';
 
 interface ToolsMenuProps {
   close: () => void;
@@ -26,7 +27,7 @@ const ToolsMenu: React.FC<ToolsMenuProps> = props => {
 
   const dispatch = useAppDispatch();
   const clippy = useCallback(() => {
-    dispatch(actions.performClippy());
+    dispatch(performClippy());
     props.close();
   }, [dispatch, props]);
   const miri = useCallback(() => {
