@@ -120,7 +120,7 @@ const getStable = (state: State) => state.versions.stable?.rustc;
 const getBeta = (state: State) => state.versions.beta?.rustc;
 const getNightly = (state: State) => state.versions.nightly?.rustc;
 const getRustfmt = createSelector(selectedChannelVersionsSelector, (versions) => versions?.rustfmt);
-const getClippy = (state: State) => state.versions.nightly?.clippy;
+const getClippy = createSelector(selectedChannelVersionsSelector, (versions) => versions?.clippy);
 const getMiri = (state: State) => state.versions?.nightly?.miri;
 
 const versionNumber = (v: Version | undefined) => v ? v.version : '';
@@ -319,10 +319,11 @@ export const anyNotificationsToShowSelector = createSelector(
 );
 
 export const clippyRequestSelector = createSelector(
-  codeSelector,
-  editionSelector,
+  channelSelector,
   getCrateType,
-  (code, edition, crateType) => ({ code, edition, crateType }),
+  editionSelector,
+  codeSelector,
+  (channel, crateType, edition, code) => ({ channel, crateType, edition, code }),
 );
 
 export const formatRequestSelector = createSelector(

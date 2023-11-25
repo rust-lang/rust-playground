@@ -19,9 +19,10 @@ interface State {
 }
 
 interface ClippyRequestBody {
-  code: string;
-  edition: string;
+  channel: string;
   crateType: string;
+  edition: string;
+  code: string;
 }
 
 const ClippyResponseBody = z.object({

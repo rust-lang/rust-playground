@@ -1109,13 +1109,19 @@ pub(crate) mod api_orchestrator_integration_impls {
 
         fn try_from(other: crate::ClippyRequest) -> std::result::Result<Self, Self::Error> {
             let crate::ClippyRequest {
-                code,
-                edition,
+                channel,
                 crate_type,
+                edition,
+                code,
             } = other;
 
+            let channel = match channel {
+                Some(c) => parse_channel(&c)?,
+                None => Channel::Nightly,
+            };
+
             Ok(ClippyRequest {
-                channel: Channel::Nightly, // TODO: use what user has submitted
+                channel,
                 crate_type: parse_crate_type(&crate_type)?,
                 edition: parse_edition(&edition)?,
                 code,
@@ -1126,10 +1132,13 @@ pub(crate) mod api_orchestrator_integration_impls {
     #[derive(Debug, Snafu)]
     pub(crate) enum ParseClippyRequestError {
         #[snafu(context(false))]
-        Edition { source: ParseEditionError },
+        Channel { source: ParseChannelError },
 
         #[snafu(context(false))]
         CrateType { source: ParseCrateTypeError },
+
+        #[snafu(context(false))]
+        Edition { source: ParseEditionError },
     }
 
     impl From<WithOutput<ClippyResponse>> for crate::ClippyResponse {
