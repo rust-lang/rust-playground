@@ -123,8 +123,11 @@ export const miriVersionDetailsText = createSelector(getMiri, versionDetails);
 
 const editionSelector = (state: State) => state.configuration.edition;
 
-export const isNightlyChannel = (state: State) => (
-  state.configuration.channel === Channel.Nightly
+const channelSelector = (state: State) => state.configuration.channel;
+
+export const isNightlyChannel = createSelector(
+  channelSelector,
+  (channel) => channel === Channel.Nightly,
 );
 export const isHirAvailable = isNightlyChannel;
 
@@ -142,10 +145,7 @@ export const getModeLabel = (state: State) => {
   return `${mode}`;
 };
 
-export const getChannelLabel = (state: State) => {
-  const { configuration: { channel } } = state;
-  return `${channel}`;
-};
+export const getChannelLabel = createSelector(channelSelector, (channel) => `${channel}`);
 
 export const isEditionDefault = createSelector(
   editionSelector,
@@ -387,11 +387,12 @@ export const websocketStatusSelector = createSelector(
 
 export const executeRequestPayloadSelector = createSelector(
   codeSelector,
+  channelSelector,
   (state: State) => state.configuration,
   getBacktraceSet,
   (_state: State, { crateType, tests }: { crateType: string, tests: boolean }) => ({ crateType, tests }),
-  (code, configuration, backtrace, { crateType, tests }) => ({
-    channel: configuration.channel,
+  (code, channel, configuration, backtrace, { crateType, tests }) => ({
+    channel,
     mode: configuration.mode,
     edition: configuration.edition,
     crateType,
@@ -403,13 +404,14 @@ export const executeRequestPayloadSelector = createSelector(
 
 export const compileRequestPayloadSelector = createSelector(
   codeSelector,
+  channelSelector,
   (state: State) => state.configuration,
   getCrateType,
   runAsTest,
   getBacktraceSet,
   (_state: State, { target }: { target: string }) => ({ target }),
-  (code, configuration, crateType, tests, backtrace, { target }) => ({
-    channel: configuration.channel,
+  (code, channel, configuration, crateType, tests, backtrace, { target }) => ({
+    channel,
     mode: configuration.mode,
     edition: configuration.edition,
     crateType,
