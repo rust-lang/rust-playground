@@ -99,10 +99,27 @@ const LABELS: { [index in PrimaryActionCore]: string } = {
 
 export const getExecutionLabel = createSelector(primaryActionSelector, primaryAction => LABELS[primaryAction]);
 
+const channelSelector = (state: State) => state.configuration.channel;
+
+const selectedChannelVersionsSelector = createSelector(
+  channelSelector,
+  (state: State) => state.versions,
+  (channel, versions) => {
+    switch (channel) {
+      case Channel.Stable:
+        return versions.stable;
+      case Channel.Beta:
+        return versions.beta;
+      case Channel.Nightly:
+        return versions.nightly;
+    }
+  },
+)
+
 const getStable = (state: State) => state.versions.stable?.rustc;
 const getBeta = (state: State) => state.versions.beta?.rustc;
 const getNightly = (state: State) => state.versions.nightly?.rustc;
-const getRustfmt = (state: State) => state.versions.nightly?.rustfmt;
+const getRustfmt = createSelector(selectedChannelVersionsSelector, (versions) => versions?.rustfmt);
 const getClippy = (state: State) => state.versions.nightly?.clippy;
 const getMiri = (state: State) => state.versions?.nightly?.miri;
 
@@ -122,8 +139,6 @@ export const rustfmtVersionDetailsText = createSelector(getRustfmt, versionDetai
 export const miriVersionDetailsText = createSelector(getMiri, versionDetails);
 
 const editionSelector = (state: State) => state.configuration.edition;
-
-const channelSelector = (state: State) => state.configuration.channel;
 
 export const isNightlyChannel = createSelector(
   channelSelector,
@@ -311,9 +326,10 @@ export const clippyRequestSelector = createSelector(
 );
 
 export const formatRequestSelector = createSelector(
-  codeSelector,
+  channelSelector,
   editionSelector,
-  (code, edition) => ({ code, edition }),
+  codeSelector,
+  (channel, edition, code) => ({ channel, edition, code }),
 );
 
 const focus = (state: State) => state.output.meta.focus;

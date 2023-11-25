@@ -355,9 +355,11 @@ struct ExecuteResponse {
 
 #[derive(Debug, Clone, Deserialize)]
 struct FormatRequest {
-    code: String,
+    #[serde(default)]
+    channel: Option<String>,
     #[serde(default)]
     edition: String,
+    code: String,
 }
 
 #[derive(Debug, Clone, Serialize)]

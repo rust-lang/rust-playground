@@ -18,8 +18,9 @@ interface State {
 }
 
 interface FormatRequestBody {
-  code: string;
+  channel: string;
   edition: string;
+  code: string;
 }
 
 const FormatResponseBody = z.object({
