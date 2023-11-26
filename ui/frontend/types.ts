@@ -15,11 +15,13 @@ export interface Selection {
   end?: Position;
 }
 
-export interface Crate {
-  id: string;
-  name: string;
-  version: string;
-}
+export const Crate = z.object({
+  id: z.string(),
+  name: z.string(),
+  version: z.string(),
+});
+
+export type Crate = z.infer<typeof Crate>;
 
 export const Version = z.object({
   version: z.string(),

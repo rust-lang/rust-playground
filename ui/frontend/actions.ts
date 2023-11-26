@@ -26,7 +26,6 @@ import {
   ProcessAssembly,
   Position,
   makePosition,
-  Crate,
 } from './types';
 
 import { performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
@@ -86,8 +85,6 @@ export enum ActionType {
   RequestMacroExpansion = 'REQUEST_MACRO_EXPANSION',
   MacroExpansionSucceeded = 'MACRO_EXPANSION_SUCCEEDED',
   MacroExpansionFailed = 'MACRO_EXPANSION_FAILED',
-  RequestCratesLoad = 'REQUEST_CRATES_LOAD',
-  CratesLoadSucceeded = 'CRATES_LOAD_SUCCEEDED',
   NotificationSeen = 'NOTIFICATION_SEEN',
   BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
 }
@@ -379,22 +376,6 @@ export function performMacroExpansion(): ThunkAction {
   };
 }
 
-const requestCratesLoad = () =>
-  createAction(ActionType.RequestCratesLoad);
-
-const receiveCratesLoadSuccess = ({ crates }: { crates: Crate[] }) =>
-  createAction(ActionType.CratesLoadSucceeded, { crates });
-
-export function performCratesLoad(): ThunkAction {
-  return function(dispatch) {
-    dispatch(requestCratesLoad());
-
-    return jsonGet(routes.meta.crates)
-      .then(json => dispatch(receiveCratesLoadSuccess(json)));
-    // TODO: Failure case
-  };
-}
-
 const notificationSeen = (notification: Notification) =>
   createAction(ActionType.NotificationSeen, { notification });
 
@@ -517,8 +498,6 @@ export type Action =
   | ReturnType<typeof requestMacroExpansion>
   | ReturnType<typeof receiveMacroExpansionSuccess>
   | ReturnType<typeof receiveMacroExpansionFailure>
-  | ReturnType<typeof requestCratesLoad>
-  | ReturnType<typeof receiveCratesLoadSuccess>
   | ReturnType<typeof notificationSeen>
   | ReturnType<typeof browserWidthChanged>
   | ReturnType<typeof wsExecuteRequest>

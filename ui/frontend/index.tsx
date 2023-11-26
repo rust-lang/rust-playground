@@ -14,7 +14,6 @@ import {
   gotoPosition,
   selectText,
   addImport,
-  performCratesLoad,
   reExecuteWithBacktrace,
   browserWidthChanged,
 } from './actions';
@@ -27,6 +26,7 @@ import { disableSyncChangesToStorage } from './reducers/globalConfiguration';
 import Router from './Router';
 import configureStore from './configureStore';
 import { performVersionsLoad } from './reducers/versions';
+import { performCratesLoad } from './reducers/crates';
 
 const store = configureStore(window);
 

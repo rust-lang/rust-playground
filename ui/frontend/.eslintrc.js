@@ -71,6 +71,7 @@ module.exports = {
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',
         'reducers/client.ts',
+        'reducers/crates.ts',
         'reducers/featureFlags.ts',
         'reducers/globalConfiguration.ts',
         'reducers/output/assembly.ts',
