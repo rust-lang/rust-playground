@@ -83,9 +83,6 @@ export enum ActionType {
   EnableFeatureGate = 'ENABLE_FEATURE_GATE',
   GotoPosition = 'GOTO_POSITION',
   SelectText = 'SELECT_TEXT',
-  RequestMiri = 'REQUEST_MIRI',
-  MiriSucceeded = 'MIRI_SUCCEEDED',
-  MiriFailed = 'MIRI_FAILED',
   RequestMacroExpansion = 'REQUEST_MACRO_EXPANSION',
   MacroExpansionSucceeded = 'MACRO_EXPANSION_SUCCEEDED',
   MacroExpansionFailed = 'MACRO_EXPANSION_FAILED',
@@ -342,46 +339,6 @@ interface GeneralSuccess {
   stderr: string;
 }
 
-const requestMiri = () =>
-  createAction(ActionType.RequestMiri);
-
-interface MiriRequestBody {
-  code: string;
-  edition: string;
-}
-
-interface MiriResponseBody {
-  success: boolean;
-  stdout: string;
-  stderr: string;
-}
-
-type MiriSuccess = GeneralSuccess;
-
-const receiveMiriSuccess = ({ stdout, stderr }: MiriSuccess) =>
-  createAction(ActionType.MiriSucceeded, { stdout, stderr });
-
-const receiveMiriFailure = ({ error }: GenericApiFailure) =>
-  createAction(ActionType.MiriFailed, { error });
-
-export function performMiri(): ThunkAction {
-  // TODO: Check a cache
-  return function(dispatch, getState) {
-    dispatch(requestMiri());
-
-    const state = getState();
-    const code = codeSelector(state);
-    const { configuration: {
-      edition,
-    } } = state;
-    const body: MiriRequestBody = { code, edition };
-
-    return jsonPost<MiriResponseBody>(routes.miri, body)
-      .then(json => dispatch(receiveMiriSuccess(json)))
-      .catch(json => dispatch(receiveMiriFailure(json)));
-  };
-}
-
 const requestMacroExpansion = () =>
   createAction(ActionType.RequestMacroExpansion);
 
@@ -557,9 +514,6 @@ export type Action =
   | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof gotoPosition>
   | ReturnType<typeof selectText>
-  | ReturnType<typeof requestMiri>
-  | ReturnType<typeof receiveMiriSuccess>
-  | ReturnType<typeof receiveMiriFailure>
   | ReturnType<typeof requestMacroExpansion>
   | ReturnType<typeof receiveMacroExpansionSuccess>
   | ReturnType<typeof receiveMacroExpansionFailure>

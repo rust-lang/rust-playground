@@ -11,6 +11,7 @@ import { performGistLoad, performGistSave } from './gist';
 import { performCompileHir } from './hir';
 import { performCompileLlvmIr } from './llvmIr';
 import { performCompileMir } from './mir';
+import { performMiri } from './miri';
 import { performCompileWasm } from './wasm';
 
 const initialState: State = {};
@@ -40,7 +41,7 @@ const slice = createSlice({
         state.focus = Focus.Clippy;
       })
 
-      .addCase(ActionType.RequestMiri, (state) => {
+      .addCase(performMiri.pending, (state) => {
         state.focus = Focus.Miri;
       })
 

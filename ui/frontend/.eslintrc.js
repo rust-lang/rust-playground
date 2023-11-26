@@ -82,6 +82,7 @@ module.exports = {
         'reducers/output/llvmIr.ts',
         'reducers/output/meta.ts',
         'reducers/output/mir.ts',
+        'reducers/output/miri.ts',
         'reducers/output/wasm.ts',
         'reducers/versions.ts',
         'reducers/websocket.ts',

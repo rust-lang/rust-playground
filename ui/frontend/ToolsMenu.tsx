@@ -10,6 +10,7 @@ import * as actions from './actions';
 import { useAppDispatch } from './configureStore';
 import { performFormat } from './reducers/output/format';
 import { performClippy } from './reducers/output/clippy';
+import { performMiri } from './reducers/output/miri';
 
 interface ToolsMenuProps {
   close: () => void;
@@ -31,7 +32,7 @@ const ToolsMenu: React.FC<ToolsMenuProps> = props => {
     props.close();
   }, [dispatch, props]);
   const miri = useCallback(() => {
-    dispatch(actions.performMiri());
+    dispatch(performMiri());
     props.close();
   }, [dispatch, props]);
   const format = useCallback(() => {
