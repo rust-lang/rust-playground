@@ -6,11 +6,11 @@ import MenuGroup from './MenuGroup';
 import MenuAside from './MenuAside';
 
 import * as selectors from './selectors';
-import * as actions from './actions';
 import { useAppDispatch } from './configureStore';
 import { performFormat } from './reducers/output/format';
 import { performClippy } from './reducers/output/clippy';
 import { performMiri } from './reducers/output/miri';
+import { performMacroExpansion } from './reducers/output/macroExpansion';
 
 interface ToolsMenuProps {
   close: () => void;
@@ -40,7 +40,7 @@ const ToolsMenu: React.FC<ToolsMenuProps> = props => {
     props.close();
   }, [dispatch, props]);
   const expandMacros = useCallback(() => {
-    dispatch(actions.performMacroExpansion());
+    dispatch(performMacroExpansion());
     props.close();
   }, [dispatch, props]);
 

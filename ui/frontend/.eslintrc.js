@@ -81,6 +81,7 @@ module.exports = {
         'reducers/output/gist.ts',
         'reducers/output/hir.ts',
         'reducers/output/llvmIr.ts',
+        'reducers/output/macroExpansion.ts',
         'reducers/output/meta.ts',
         'reducers/output/mir.ts',
         'reducers/output/miri.ts',
