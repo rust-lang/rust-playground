@@ -1,4 +1,3 @@
-use futures::future::BoxFuture;
 use lazy_static::lazy_static;
 use orchestrator::coordinator;
 use prometheus::{
@@ -6,7 +5,6 @@ use prometheus::{
     register_int_counter_vec, register_int_gauge, Histogram, HistogramVec, IntCounter,
     IntCounterVec, IntGauge,
 };
-use regex::Regex;
 use std::{
     future::Future,
     time::{Duration, Instant},
@@ -74,7 +72,6 @@ pub(crate) enum Outcome {
     Success,
     ErrorServer,
     ErrorTimeoutSoft,
-    ErrorTimeoutHard,
     ErrorUserCode,
     Abandoned,
 }
@@ -197,65 +194,8 @@ where
     }
 }
 
-impl GenerateLabels for sandbox::MacroExpansionRequest {
-    fn generate_labels(&self, outcome: Outcome) -> Labels {
-        let Self { code: _, edition } = *self;
-
-        Labels {
-            endpoint: Endpoint::MacroExpansion,
-            outcome,
-
-            target: None,
-            channel: None,
-            mode: None,
-            edition: Some(edition),
-            crate_type: None,
-            tests: None,
-            backtrace: None,
-        }
-    }
-}
-
 pub(crate) trait SuccessDetails: Sized {
     fn success_details(&self) -> Outcome;
-
-    fn for_sandbox_result(r: &Result<Self, sandbox::Error>) -> Outcome {
-        use sandbox::Error::*;
-
-        match r {
-            Ok(v) => v.success_details(),
-            Err(CompilerExecutionTimedOut { .. }) => Outcome::ErrorTimeoutHard,
-            Err(_) => Outcome::ErrorServer,
-        }
-    }
-}
-
-fn common_success_details(success: bool, stderr: &str) -> Outcome {
-    lazy_static! {
-        // Memory allocation failures are "Aborted"
-        static ref SOFT_TIMEOUT_REGEX: Regex = Regex::new("entrypoint.sh.*Killed.*timeout").unwrap();
-    }
-
-    match success {
-        true => Outcome::Success,
-        false => {
-            if stderr
-                .lines()
-                .next_back()
-                .map_or(false, |l| SOFT_TIMEOUT_REGEX.is_match(l))
-            {
-                Outcome::ErrorTimeoutSoft
-            } else {
-                Outcome::ErrorUserCode
-            }
-        }
-    }
-}
-
-impl SuccessDetails for sandbox::MacroExpansionResponse {
-    fn success_details(&self) -> Outcome {
-        common_success_details(self.success, &self.stderr)
-    }
 }
 
 impl SuccessDetails for Vec<sandbox::CrateInformation> {
@@ -268,39 +208,6 @@ impl SuccessDetails for sandbox::Version {
     fn success_details(&self) -> Outcome {
         Outcome::Success
     }
-}
-
-pub(crate) async fn track_metric_async<Req, B, Resp>(request: Req, body: B) -> sandbox::Result<Resp>
-where
-    Req: GenerateLabels,
-    for<'req> B: FnOnce(&'req Req) -> BoxFuture<'req, sandbox::Result<Resp>>,
-    Resp: SuccessDetails,
-{
-    track_metric_common_async(request, body, |_| {}).await
-}
-
-async fn track_metric_common_async<Req, B, Resp, F>(
-    request: Req,
-    body: B,
-    f: F,
-) -> sandbox::Result<Resp>
-where
-    Req: GenerateLabels,
-    for<'req> B: FnOnce(&'req Req) -> BoxFuture<'req, sandbox::Result<Resp>>,
-    Resp: SuccessDetails,
-    F: FnOnce(&mut Labels),
-{
-    let start = Instant::now();
-    let response = body(&request).await;
-    let elapsed = start.elapsed();
-
-    let outcome = SuccessDetails::for_sandbox_result(&response);
-    let mut labels = request.generate_labels(outcome);
-    f(&mut labels);
-
-    record_metric_complete(labels, elapsed);
-
-    response
 }
 
 pub(crate) async fn track_metric_no_request_async<B, Fut, Resp>(
@@ -433,6 +340,27 @@ impl HasLabelsCore for coordinator::ClippyRequest {
 }
 
 impl HasLabelsCore for coordinator::MiriRequest {
+    fn labels_core(&self) -> LabelsCore {
+        let Self {
+            channel,
+            crate_type,
+            edition,
+            code: _,
+        } = *self;
+
+        LabelsCore {
+            target: None,
+            channel: Some(channel.into()),
+            mode: None,
+            edition: Some(Some(edition.into())),
+            crate_type: Some(crate_type.into()),
+            tests: None,
+            backtrace: None,
+        }
+    }
+}
+
+impl HasLabelsCore for coordinator::MacroExpansionRequest {
     fn labels_core(&self) -> LabelsCore {
         let Self {
             channel,

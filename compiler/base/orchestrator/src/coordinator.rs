@@ -507,6 +507,56 @@ pub struct MiriResponse {
 }
 
 #[derive(Debug, Clone)]
+pub struct MacroExpansionRequest {
+    pub channel: Channel,
+    pub crate_type: CrateType,
+    pub edition: Edition,
+    pub code: String,
+}
+
+impl MacroExpansionRequest {
+    pub(crate) fn delete_previous_main_request(&self) -> DeleteFileRequest {
+        delete_previous_primary_file_request(self.crate_type)
+    }
+
+    pub(crate) fn write_main_request(&self) -> WriteFileRequest {
+        write_primary_file_request(self.crate_type, &self.code)
+    }
+
+    pub(crate) fn execute_cargo_request(&self) -> ExecuteCommandRequest {
+        ExecuteCommandRequest {
+            cmd: "cargo".to_owned(),
+            args: ["rustc", "--", "-Zunpretty=expanded"]
+                .map(str::to_owned)
+                .to_vec(),
+            envs: Default::default(),
+            cwd: None,
+        }
+    }
+}
+
+impl CargoTomlModifier for MacroExpansionRequest {
+    fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
+        if self.edition == Edition::Rust2024 {
+            cargo_toml = modify_cargo_toml::set_feature_edition2024(cargo_toml);
+        }
+
+        cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
+
+        if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
+            cargo_toml = modify_cargo_toml::set_crate_type(cargo_toml, crate_type);
+        }
+        cargo_toml
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MacroExpansionResponse {
+    pub success: bool,
+    pub exit_detail: String,
+}
+
+#[derive(Debug, Clone)]
 pub struct WithOutput<T> {
     pub response: T,
     pub stdout: String,
@@ -718,6 +768,33 @@ where
             .await
             .context(CouldNotStartContainerSnafu)?
             .begin_miri(token, request)
+            .await
+    }
+
+    pub async fn macro_expansion(
+        &self,
+        request: MacroExpansionRequest,
+    ) -> Result<WithOutput<MacroExpansionResponse>, MacroExpansionError> {
+        use macro_expansion_error::*;
+
+        self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
+            .macro_expansion(request)
+            .await
+    }
+
+    pub async fn begin_macro_expansion(
+        &self,
+        token: CancellationToken,
+        request: MacroExpansionRequest,
+    ) -> Result<ActiveMacroExpansion, MacroExpansionError> {
+        use macro_expansion_error::*;
+
+        self.select_channel(request.channel)
+            .await
+            .context(CouldNotStartContainerSnafu)?
+            .begin_macro_expansion(token, request)
             .await
     }
 
@@ -1217,6 +1294,78 @@ impl Container {
         })
     }
 
+    async fn macro_expansion(
+        &self,
+        request: MacroExpansionRequest,
+    ) -> Result<WithOutput<MacroExpansionResponse>, MacroExpansionError> {
+        let token = Default::default();
+
+        let ActiveMacroExpansion {
+            task,
+            stdout_rx,
+            stderr_rx,
+        } = self.begin_macro_expansion(token, request).await?;
+
+        WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
+    }
+
+    async fn begin_macro_expansion(
+        &self,
+        token: CancellationToken,
+        request: MacroExpansionRequest,
+    ) -> Result<ActiveMacroExpansion, MacroExpansionError> {
+        use macro_expansion_error::*;
+
+        let delete_previous_main = request.delete_previous_main_request();
+        let write_main = request.write_main_request();
+        let execute_cargo = request.execute_cargo_request();
+
+        let delete_previous_main = self.commander.one(delete_previous_main);
+        let write_main = self.commander.one(write_main);
+        let modify_cargo_toml = self.modify_cargo_toml.modify_for(&request);
+
+        let (delete_previous_main, write_main, modify_cargo_toml) =
+            join!(delete_previous_main, write_main, modify_cargo_toml);
+
+        delete_previous_main.context(CouldNotDeletePreviousCodeSnafu)?;
+        write_main.context(CouldNotWriteCodeSnafu)?;
+        modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
+
+        let SpawnCargo {
+            task,
+            stdin_tx,
+            stdout_rx,
+            stderr_rx,
+        } = self
+            .spawn_cargo_task(token, execute_cargo)
+            .await
+            .context(CouldNotStartCargoSnafu)?;
+
+        drop(stdin_tx);
+
+        let task = async move {
+            let ExecuteCommandResponse {
+                success,
+                exit_detail,
+            } = task
+                .await
+                .context(CargoTaskPanickedSnafu)?
+                .context(CargoFailedSnafu)?;
+
+            Ok(MacroExpansionResponse {
+                success,
+                exit_detail,
+            })
+        }
+        .boxed();
+
+        Ok(ActiveMacroExpansion {
+            task,
+            stdout_rx,
+            stderr_rx,
+        })
+    }
+
     async fn spawn_cargo_task(
         &self,
         token: CancellationToken,
@@ -1506,6 +1655,47 @@ impl fmt::Debug for ActiveMiri {
 #[derive(Debug, Snafu)]
 #[snafu(module)]
 pub enum MiriError {
+    #[snafu(display("Could not start the container"))]
+    CouldNotStartContainer { source: Error },
+
+    #[snafu(display("Could not modify Cargo.toml"))]
+    CouldNotModifyCargoToml { source: ModifyCargoTomlError },
+
+    #[snafu(display("Could not delete previous source code"))]
+    CouldNotDeletePreviousCode { source: CommanderError },
+
+    #[snafu(display("Could not write source code"))]
+    CouldNotWriteCode { source: CommanderError },
+
+    #[snafu(display("Could not start Cargo task"))]
+    CouldNotStartCargo { source: SpawnCargoError },
+
+    #[snafu(display("The Cargo task panicked"))]
+    CargoTaskPanicked { source: tokio::task::JoinError },
+
+    #[snafu(display("Cargo task failed"))]
+    CargoFailed { source: SpawnCargoError },
+}
+
+pub struct ActiveMacroExpansion {
+    pub task: BoxFuture<'static, Result<MacroExpansionResponse, MacroExpansionError>>,
+    pub stdout_rx: mpsc::Receiver<String>,
+    pub stderr_rx: mpsc::Receiver<String>,
+}
+
+impl fmt::Debug for ActiveMacroExpansion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ActiveMacroExpansion")
+            .field("task", &"<future>")
+            .field("stdout_rx", &self.stdout_rx)
+            .field("stderr_rx", &self.stderr_rx)
+            .finish()
+    }
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum MacroExpansionError {
     #[snafu(display("Could not start the container"))]
     CouldNotStartContainer { source: Error },
 
@@ -3125,6 +3315,42 @@ mod tests {
         assert_contains!(response.stderr, "starting at offset 0");
         assert_contains!(response.stderr, "is out-of-bounds");
         assert_contains!(response.stderr, "has size 0");
+
+        Ok(())
+    }
+
+    const ARBITRARY_MACRO_EXPANSION_REQUEST: MacroExpansionRequest = MacroExpansionRequest {
+        channel: Channel::Nightly,
+        crate_type: CrateType::Library(LibraryType::Cdylib),
+        edition: Edition::Rust2018,
+        code: String::new(),
+    };
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn macro_expansion() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let req = MacroExpansionRequest {
+            code: r#"
+                #[derive(Debug)]
+                struct Dummy;
+
+                fn main() { println!("Hello!"); }
+                "#
+            .into(),
+            ..ARBITRARY_MACRO_EXPANSION_REQUEST
+        };
+
+        let response = coordinator
+            .macro_expansion(req)
+            .with_timeout()
+            .await
+            .unwrap();
+
+        assert!(response.success, "stderr: {}", response.stderr);
+        assert_contains!(response.stdout, "impl ::core::fmt::Debug for Dummy");
+        assert_contains!(response.stdout, "Formatter::write_str");
 
         Ok(())
     }
