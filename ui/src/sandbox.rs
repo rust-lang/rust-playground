@@ -178,19 +178,6 @@ impl Sandbox {
         })
     }
 
-    pub async fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
-        self.write_source_code(&req.code).await?;
-        let command = self.miri_command(req);
-
-        let output = run_command_with_timeout(command).await?;
-
-        Ok(MiriResponse {
-            success: output.status.success(),
-            stdout: vec_to_str(output.stdout)?,
-            stderr: vec_to_str(output.stderr)?,
-        })
-    }
-
     pub async fn macro_expansion(
         &self,
         req: &MacroExpansionRequest,
@@ -306,17 +293,6 @@ impl Sandbox {
             self.input_file.display()
         );
         Ok(())
-    }
-
-    fn miri_command(&self, req: impl EditionRequest) -> Command {
-        let mut cmd = self.docker_command(None);
-        cmd.apply_edition(req);
-
-        cmd.arg("miri").args(&["cargo", "miri-playground"]);
-
-        debug!("Miri command is {:?}", cmd);
-
-        cmd
     }
 
     fn macro_expansion_command(&self, req: impl EditionRequest) -> Command {
@@ -621,25 +597,6 @@ impl<R: BacktraceRequest> BacktraceRequest for &'_ R {
 }
 
 #[derive(Debug, Clone)]
-pub struct MiriRequest {
-    pub code: String,
-    pub edition: Option<Edition>,
-}
-
-impl EditionRequest for MiriRequest {
-    fn edition(&self) -> Option<Edition> {
-        self.edition
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct MiriResponse {
-    pub success: bool,
-    pub stdout: String,
-    pub stderr: String,
-}
-
-#[derive(Debug, Clone)]
 pub struct MacroExpansionRequest {
     pub code: String,
     pub edition: Option<Edition>,
@@ -752,74 +709,5 @@ mod sandbox_orchestrator_integration_impls {
                 coordinator::LibraryType::ProcMacro => super::LibraryType::ProcMacro,
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    // Running the tests completely in parallel causes spurious
-    // failures due to my resource-limited Docker
-    // environment. Additionally, we have some tests that *require*
-    // that no other Docker processes are running.
-    fn one_test_at_a_time() -> impl Drop {
-        use lazy_static::lazy_static;
-        use std::sync::Mutex;
-
-        lazy_static! {
-            static ref DOCKER_SINGLETON: Mutex<()> = Default::default();
-        }
-
-        // We can't poison the empty tuple
-        DOCKER_SINGLETON.lock().unwrap_or_else(|e| e.into_inner())
-    }
-
-    const HELLO_WORLD_CODE: &'static str = r#"
-    fn main() {
-        println!("Hello, world!");
-    }
-    "#;
-
-    #[tokio::test]
-    async fn interpreting_code() -> Result<()> {
-        let _singleton = one_test_at_a_time();
-        let code = r#"
-        fn main() {
-            let mut a: [u8; 0] = [];
-            unsafe { *a.get_unchecked_mut(1) = 1; }
-        }
-        "#;
-
-        let req = MiriRequest {
-            code: code.to_string(),
-            edition: None,
-        };
-
-        let sb = Sandbox::new().await?;
-        let resp = sb.miri(&req).await?;
-
-        assert!(
-            resp.stderr.contains("Undefined Behavior"),
-            "was: {}",
-            resp.stderr
-        );
-        assert!(
-            resp.stderr.contains("pointer to 1 byte"),
-            "was: {}",
-            resp.stderr
-        );
-        assert!(
-            resp.stderr.contains("starting at offset 0"),
-            "was: {}",
-            resp.stderr
-        );
-        assert!(
-            resp.stderr.contains("is out-of-bounds"),
-            "was: {}",
-            resp.stderr
-        );
-        assert!(resp.stderr.contains("has size 0"), "was: {}", resp.stderr);
-        Ok(())
     }
 }
