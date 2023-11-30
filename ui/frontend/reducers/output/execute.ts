@@ -2,7 +2,7 @@ import { AnyAction, Draft, createAsyncThunk, createSlice } from '@reduxjs/toolki
 import * as z from 'zod';
 
 import { SimpleThunkAction } from '../../actions';
-import { adaptFetchError, jsonPost, routes } from '../../api';
+import { jsonPost, routes } from '../../api';
 import { executeRequestPayloadSelector, executeViaWebsocketSelector } from '../../selectors';
 import { Channel, Edition, Mode } from '../../types';
 import {
@@ -77,7 +77,7 @@ const ExecuteResponseBody = z.object({
 type ExecuteResponseBody = z.infer<typeof ExecuteResponseBody>;
 
 export const performExecute = createAsyncThunk(sliceName, async (payload: ExecuteRequestBody) => {
-  const d = await adaptFetchError(() => jsonPost(routes.execute, payload));
+  const d = await jsonPost(routes.execute, payload);
   return ExecuteResponseBody.parseAsync(d);
 });
 

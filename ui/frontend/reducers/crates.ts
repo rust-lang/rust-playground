@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { sortBy } from 'lodash-es';
 import * as z from 'zod';
 
-import { adaptFetchError, jsonGet, routes } from '../api';
+import { jsonGet, routes } from '../api';
 import { Crate } from '../types';
 
 const sliceName = 'crates';
@@ -17,7 +17,7 @@ const CratesResponse = z.object({
 type CratesResponse = z.infer<typeof CratesResponse>;
 
 export const performCratesLoad = createAsyncThunk(sliceName, async () => {
-  const d = await adaptFetchError(() => jsonGet(routes.meta.crates));
+  const d = await jsonGet(routes.meta.crates);
   const crates = await CratesResponse.parseAsync(d);
   return sortBy(crates.crates, (c) => c.name);
 });

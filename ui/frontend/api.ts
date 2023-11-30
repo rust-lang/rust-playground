@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch';
+import * as z from 'zod';
 
 export const routes = {
   compile: '/compile',
@@ -30,74 +31,24 @@ export function jsonPost(url: FetchArg, body: Record<string, any>): Promise<unkn
   });
 }
 
+const ErrorResponse = z.object({
+  error: z.string(),
+});
+type ErrorResponse = z.infer<typeof ErrorResponse>;
+
 async function fetchJson(url: FetchArg, args: RequestInit) {
   const headers = new Headers(args.headers);
   headers.set('Content-Type', 'application/json');
 
-  let response;
-  try {
-    response = await fetch(url, { ...args, headers });
-  } catch (networkError) {
-    // e.g. server unreachable
-    if (networkError instanceof Error) {
-      throw {
-        error: `Network error: ${networkError.toString()}`,
-      };
-    } else {
-      throw {
-        error: 'Unknown error while fetching JSON',
-      };
-    }
-  }
-
-  let body;
-  try {
-    body = await response.json();
-  } catch (convertError) {
-    if (convertError instanceof Error) {
-      throw {
-        error: `Response was not JSON: ${convertError.toString()}`,
-      };
-    } else {
-      throw {
-        error: 'Unknown error while converting JSON',
-      };
-    }
-  }
+  const response = await fetch(url, { ...args, headers });
+  const body = await response.json();
 
   if (response.ok) {
     // HTTP 2xx
     return body;
   } else {
     // HTTP 4xx, 5xx (e.g. malformed JSON request)
-    throw body;
+    const error = await ErrorResponse.parseAsync(body);
+    throw new Error(`The server reported an error: ${error.error}`);
   }
 }
-
-// We made some strange decisions with how the `fetchJson` function
-// communicates errors, so we untwist those here to fit better with
-// redux-toolkit's ideas.
-export const adaptFetchError = async <R>(cb: () => Promise<R>): Promise<R> => {
-  let result;
-
-  try {
-    result = await cb();
-  } catch (e) {
-    if (e && typeof e === 'object' && 'error' in e && typeof e.error === 'string') {
-      throw new Error(e.error);
-    } else {
-      throw new Error('An unknown error occurred');
-    }
-  }
-
-  if (
-    result &&
-    typeof result === 'object' &&
-    'error' in result &&
-    typeof result.error === 'string'
-  ) {
-    throw new Error(result.error);
-  }
-
-  return result;
-};

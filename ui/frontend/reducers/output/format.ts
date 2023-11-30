@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { adaptFetchError, jsonPost, routes } from '../../api';
+import { jsonPost, routes } from '../../api';
 import { formatRequestSelector } from '../../selectors';
 import RootState from '../../state';
 
@@ -37,7 +37,7 @@ export const performFormat = createAsyncThunk<FormatResponseBody, void, { state:
   async (_arg: void, { getState }) => {
     const body: FormatRequestBody = formatRequestSelector(getState());
 
-    const d = await adaptFetchError(() => jsonPost(routes.format, body));
+    const d = await jsonPost(routes.format, body);
     return FormatResponseBody.parseAsync(d);
   },
 );

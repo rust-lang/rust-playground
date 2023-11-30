@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { adaptFetchError, jsonPost, routes } from '../../api';
+import { jsonPost, routes } from '../../api';
 import { miriRequestSelector } from '../../selectors';
 import RootState from '../../state';
 
@@ -36,7 +36,7 @@ export const performMiri = createAsyncThunk<MiriResponseBody, void, { state: Roo
   async (_arg: void, { getState }) => {
     const body: MiriRequestBody = miriRequestSelector(getState());
 
-    const d = await adaptFetchError(() => jsonPost(routes.miri, body));
+    const d = await jsonPost(routes.miri, body);
     return MiriResponseBody.parseAsync(d);
   },
 );

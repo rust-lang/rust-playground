@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { adaptFetchError, jsonPost, routes } from '../../api';
+import { jsonPost, routes } from '../../api';
 import { clippyRequestSelector } from '../../selectors';
 import RootState from '../../state';
 
@@ -38,7 +38,7 @@ export const performClippy = createAsyncThunk<ClippyResponseBody, void, { state:
   async (_arg: void, { getState }) => {
     const body: ClippyRequestBody = clippyRequestSelector(getState());
 
-    const d = await adaptFetchError(() => jsonPost(routes.clippy, body));
+    const d = await jsonPost(routes.clippy, body);
     return ClippyResponseBody.parseAsync(d);
   },
 );
