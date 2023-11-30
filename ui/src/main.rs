@@ -233,37 +233,37 @@ enum Error {
         source: orchestrator::coordinator::Error,
     },
 
-    #[snafu(display("Unable to convert the evaluate request"))]
+    #[snafu(display("Unable to process the evaluate request"))]
     Evaluate {
         source: orchestrator::coordinator::ExecuteError,
     },
 
-    #[snafu(display("Unable to convert the compile request"))]
+    #[snafu(display("Unable to process the compile request"))]
     Compile {
         source: orchestrator::coordinator::CompileError,
     },
 
-    #[snafu(display("Unable to convert the execute request"))]
+    #[snafu(display("Unable to process the execute request"))]
     Execute {
         source: orchestrator::coordinator::ExecuteError,
     },
 
-    #[snafu(display("Unable to convert the format request"))]
+    #[snafu(display("Unable to process the format request"))]
     Format {
         source: orchestrator::coordinator::FormatError,
     },
 
-    #[snafu(display("Unable to convert the Clippy request"))]
+    #[snafu(display("Unable to process the Clippy request"))]
     Clippy {
         source: orchestrator::coordinator::ClippyError,
     },
 
-    #[snafu(display("Unable to convert the Miri request"))]
+    #[snafu(display("Unable to process the Miri request"))]
     Miri {
         source: orchestrator::coordinator::MiriError,
     },
 
-    #[snafu(display("Unable to convert the macro expansion request"))]
+    #[snafu(display("Unable to process the macro expansion request"))]
     MacroExpansion {
         source: orchestrator::coordinator::MacroExpansionError,
     },
