@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { sortBy } from 'lodash-es';
 import * as z from 'zod';
 
-import { adaptFetchError, jsonGet, routes } from '../actions';
+import { adaptFetchError, jsonGet, routes } from '../api';
 import { Crate } from '../types';
 
 const sliceName = 'crates';

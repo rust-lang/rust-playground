@@ -1,7 +1,8 @@
 import { AsyncThunk, createAsyncThunk } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { SimpleThunkAction, adaptFetchError, jsonPost, routes } from './actions';
+import { SimpleThunkAction } from './actions';
+import { adaptFetchError, jsonPost, routes } from './api';
 import { compileRequestPayloadSelector } from './selectors';
 
 interface CompileRequestBody {

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { adaptFetchError, jsonPost, routes } from '../../actions';
+import { adaptFetchError, jsonPost, routes } from '../../api';
 import { formatRequestSelector } from '../../selectors';
 import RootState from '../../state';
 

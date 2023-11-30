@@ -1,7 +1,7 @@
 import { Draft, PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { adaptFetchError, jsonGet, jsonPost, routes } from '../../actions';
+import { adaptFetchError, jsonGet, jsonPost, routes } from '../../api';
 import { baseUrlSelector, codeSelector } from '../../selectors';
 import RootState from '../../state';
 import { Channel, Edition, Mode } from '../../types';

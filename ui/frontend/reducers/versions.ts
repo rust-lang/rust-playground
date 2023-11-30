@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { adaptFetchError, jsonGet, routes } from '../actions';
+import { adaptFetchError, jsonGet, routes } from '../api';
 import { ChannelVersion } from '../types';
 
 const sliceName = 'versions';

@@ -1,7 +1,8 @@
 import { AnyAction, Draft, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { SimpleThunkAction, adaptFetchError, jsonPost, routes } from '../../actions';
+import { SimpleThunkAction } from '../../actions';
+import { adaptFetchError, jsonPost, routes } from '../../api';
 import { executeRequestPayloadSelector, executeViaWebsocketSelector } from '../../selectors';
 import { Channel, Edition, Mode } from '../../types';
 import {
