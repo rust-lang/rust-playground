@@ -4,7 +4,6 @@ import { jsonGet, jsonPost, routes } from '../../actions';
 import { baseUrlSelector, codeSelector } from '../../selectors';
 import RootState from '../../state';
 import { Channel, Edition, Mode } from '../../types';
-import { RequestsInProgress } from './sharedStateManagement';
 
 const sliceName = 'output/gist';
 
@@ -12,7 +11,8 @@ const initialState: State = {
   requestsInProgress: 0,
 };
 
-interface State extends RequestsInProgress {
+interface State {
+  requestsInProgress: number;
   id?: string;
   url?: string;
   code?: string;
