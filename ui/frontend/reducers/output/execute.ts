@@ -67,16 +67,18 @@ export interface ExecuteRequestBody {
   backtrace: boolean;
 }
 
-interface ExecuteResponseBody {
-  success: boolean;
-  exitDetail: string;
-  stdout: string;
-  stderr: string;
-}
+const ExecuteResponseBody = z.object({
+  success: z.boolean(),
+  exitDetail: z.string(),
+  stdout: z.string(),
+  stderr: z.string(),
+});
+type ExecuteResponseBody = z.infer<typeof ExecuteResponseBody>;
 
-export const performExecute = createAsyncThunk(sliceName, async (payload: ExecuteRequestBody) =>
-  adaptFetchError(() => jsonPost<ExecuteResponseBody>(routes.execute, payload)),
-);
+export const performExecute = createAsyncThunk(sliceName, async (payload: ExecuteRequestBody) => {
+  const d = await adaptFetchError(() => jsonPost(routes.execute, payload));
+  return ExecuteResponseBody.parseAsync(d);
+});
 
 const prepareWithCurrentSequenceNumber = <P>(payload: P, sequenceNumber: number) => ({
   payload,
