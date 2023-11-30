@@ -4,14 +4,14 @@ use crate::{
         record_metric, track_metric_no_request_async, Endpoint, HasLabelsCore, Outcome,
         UNAVAILABLE_WS,
     },
-    sandbox::{Channel, Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
+    sandbox::{Sandbox, DOCKER_PROCESS_TIMEOUT_SOFT},
     CachingSnafu, ClippyRequest, ClippyResponse, ClippySnafu, CompileRequest, CompileResponse,
     CompileSnafu, Config, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu,
     ExecuteRequest, ExecuteResponse, ExecuteSnafu, FormatRequest, FormatResponse, FormatSnafu,
     GhToken, GistCreationSnafu, GistLoadingSnafu, MacroExpansionRequest, MacroExpansionResponse,
     MacroExpansionSnafu, MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse,
-    MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, MiriSnafu, Result,
-    SandboxCreationSnafu, ShutdownCoordinatorSnafu, TimeoutSnafu,
+    MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, MiriSnafu, MiriVersionSnafu,
+    Result, SandboxCreationSnafu, ShutdownCoordinatorSnafu, TimeoutSnafu, VersionsSnafu,
 };
 use async_trait::async_trait;
 use axum::{
@@ -27,7 +27,7 @@ use axum::{
     Router,
 };
 use futures::{future::BoxFuture, FutureExt};
-use orchestrator::coordinator::{self, DockerBackend};
+use orchestrator::coordinator::{self, Coordinator, DockerBackend, Versions};
 use snafu::prelude::*;
 use std::{
     convert::TryInto,
@@ -556,12 +556,7 @@ type Stamped<T> = (T, SystemTime);
 #[derive(Debug, Default)]
 struct SandboxCache {
     crates: CacheOne<MetaCratesResponse>,
-    version_stable: CacheOne<MetaVersionResponse>,
-    version_beta: CacheOne<MetaVersionResponse>,
-    version_nightly: CacheOne<MetaVersionResponse>,
-    version_rustfmt: CacheOne<MetaVersionResponse>,
-    version_clippy: CacheOne<MetaVersionResponse>,
-    version_miri: CacheOne<MetaVersionResponse>,
+    versions: CacheOne<Arc<Versions>>,
 }
 
 impl SandboxCache {
@@ -573,65 +568,53 @@ impl SandboxCache {
             .await
     }
 
-    async fn version_stable(&self) -> Result<Stamped<MetaVersionResponse>> {
-        self.version_stable
-            .fetch(|sandbox| async move {
-                let version = sandbox
-                    .version(Channel::Stable)
-                    .await
-                    .context(CachingSnafu)?;
-                Ok(version.into())
+    async fn versions(&self) -> Result<Stamped<Arc<Versions>>> {
+        let coordinator = Coordinator::new_docker().await;
+
+        self.versions
+            .fetch2(|| async {
+                Ok(Arc::new(
+                    coordinator.versions().await.context(VersionsSnafu)?,
+                ))
             })
             .await
+    }
+
+    async fn version_stable(&self) -> Result<Stamped<MetaVersionResponse>> {
+        let (v, t) = self.versions().await?;
+        let v = (&v.stable.rustc).into();
+        Ok((v, t))
     }
 
     async fn version_beta(&self) -> Result<Stamped<MetaVersionResponse>> {
-        self.version_beta
-            .fetch(|sandbox| async move {
-                let version = sandbox.version(Channel::Beta).await.context(CachingSnafu)?;
-                Ok(version.into())
-            })
-            .await
+        let (v, t) = self.versions().await?;
+        let v = (&v.beta.rustc).into();
+        Ok((v, t))
     }
 
     async fn version_nightly(&self) -> Result<Stamped<MetaVersionResponse>> {
-        self.version_nightly
-            .fetch(|sandbox| async move {
-                let version = sandbox
-                    .version(Channel::Nightly)
-                    .await
-                    .context(CachingSnafu)?;
-                Ok(version.into())
-            })
-            .await
+        let (v, t) = self.versions().await?;
+        let v = (&v.nightly.rustc).into();
+        Ok((v, t))
     }
 
     async fn version_rustfmt(&self) -> Result<Stamped<MetaVersionResponse>> {
-        self.version_rustfmt
-            .fetch(|sandbox| async move {
-                Ok(sandbox
-                    .version_rustfmt()
-                    .await
-                    .context(CachingSnafu)?
-                    .into())
-            })
-            .await
+        let (v, t) = self.versions().await?;
+        let v = (&v.nightly.rustfmt).into();
+        Ok((v, t))
     }
 
     async fn version_clippy(&self) -> Result<Stamped<MetaVersionResponse>> {
-        self.version_clippy
-            .fetch(|sandbox| async move {
-                Ok(sandbox.version_clippy().await.context(CachingSnafu)?.into())
-            })
-            .await
+        let (v, t) = self.versions().await?;
+        let v = (&v.nightly.clippy).into();
+        Ok((v, t))
     }
 
     async fn version_miri(&self) -> Result<Stamped<MetaVersionResponse>> {
-        self.version_miri
-            .fetch(|sandbox| async move {
-                Ok(sandbox.version_miri().await.context(CachingSnafu)?.into())
-            })
-            .await
+        let (v, t) = self.versions().await?;
+        let v = v.nightly.miri.as_ref().context(MiriVersionSnafu)?;
+        let v = v.into();
+        Ok((v, t))
     }
 }
 
@@ -673,6 +656,59 @@ where
     {
         let sandbox = Sandbox::new().await.context(SandboxCreationSnafu)?;
         let value = generator(sandbox).await?;
+
+        let old_info = data.take();
+        let new_info = CacheInfo::build(value);
+
+        let info = match old_info {
+            Some(mut old_value) => {
+                if old_value.value == new_info.value {
+                    // The value hasn't changed; record that we have
+                    // checked recently, but keep the creation time to
+                    // preserve caching.
+                    old_value.validation_time = new_info.validation_time;
+                    old_value
+                } else {
+                    new_info
+                }
+            }
+            None => new_info,
+        };
+
+        let value = info.stamped_value();
+
+        *data = Some(info);
+
+        Ok(value)
+    }
+
+    async fn fetch2<F, FFut>(&self, generator: F) -> Result<Stamped<T>>
+    where
+        F: FnOnce() -> FFut,
+        FFut: Future<Output = Result<T>>,
+    {
+        let data = &mut *self.0.lock().await;
+        match data {
+            Some(info) => {
+                if info.validation_time.elapsed() <= SANDBOX_CACHE_TIME_TO_LIVE {
+                    Ok(info.stamped_value())
+                } else {
+                    Self::set_value2(data, generator).await
+                }
+            }
+            None => Self::set_value2(data, generator).await,
+        }
+    }
+
+    async fn set_value2<F, FFut>(
+        data: &mut Option<CacheInfo<T>>,
+        generator: F,
+    ) -> Result<Stamped<T>>
+    where
+        F: FnOnce() -> FFut,
+        FFut: Future<Output = Result<T>>,
+    {
+        let value = generator().await?;
 
         let old_info = data.take();
         let new_info = CacheInfo::build(value);
@@ -775,6 +811,16 @@ pub(crate) mod api_orchestrator_integration_impls {
     use orchestrator::coordinator::*;
     use snafu::prelude::*;
     use std::convert::TryFrom;
+
+    impl From<&Version> for crate::MetaVersionResponse {
+        fn from(other: &Version) -> Self {
+            Self {
+                version: (&*other.release).into(),
+                hash: (&*other.commit_hash).into(),
+                date: (&*other.commit_date).into(),
+            }
+        }
+    }
 
     impl TryFrom<crate::EvaluateRequest> for ExecuteRequest {
         type Error = ParseEvaluateRequestError;
