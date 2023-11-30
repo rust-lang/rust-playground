@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import * as z from 'zod';
 
 export const routes = {
