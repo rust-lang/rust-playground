@@ -727,10 +727,13 @@ impl<T> CacheInfo<T> {
 
 impl IntoResponse for Error {
     fn into_response(self) -> axum::response::Response {
-        Json(ErrorJson {
-            error: self.to_string(),
-        })
-        .into_response()
+        let error = snafu::CleanedErrorText::new(&self)
+            .map(|(_, s, _)| s)
+            .reduce(|l, r| l + ": " + &r)
+            .unwrap_or_default();
+        let resp = Json(ErrorJson { error });
+        let resp = (StatusCode::INTERNAL_SERVER_ERROR, resp);
+        resp.into_response()
     }
 }
 
@@ -754,7 +757,9 @@ where
             Ok(v) => Ok(Self(v.0)),
             Err(e) => {
                 let error = format!("Unable to deserialize request: {e}");
-                Err(axum::Json(ErrorJson { error }).into_response())
+                let resp = axum::Json(ErrorJson { error });
+                let resp = (StatusCode::BAD_REQUEST, resp);
+                Err(resp.into_response())
             }
         }
     }
