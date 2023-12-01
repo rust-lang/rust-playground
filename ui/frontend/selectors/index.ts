@@ -357,15 +357,15 @@ const notificationsSelector = (state: State) => state.notifications;
 
 const NOW = new Date();
 
-const RUST_SURVEY_2022_END = new Date('2022-12-19T00:00:00Z');
-const RUST_SURVEY_2022_OPEN = NOW <= RUST_SURVEY_2022_END;
-export const showRustSurvey2022Selector = createSelector(
+const RUST_SURVEY_2023_END = new Date('2024-01-15T00:00:00Z');
+const RUST_SURVEY_2023_OPEN = NOW <= RUST_SURVEY_2023_END;
+export const showRustSurvey2023Selector = createSelector(
   notificationsSelector,
-  notifications => RUST_SURVEY_2022_OPEN && !notifications.seenRustSurvey2022,
+  notifications => RUST_SURVEY_2023_OPEN && !notifications.seenRustSurvey2023,
 );
 
 export const anyNotificationsToShowSelector = createSelector(
-  showRustSurvey2022Selector,
+  showRustSurvey2023Selector,
   excessiveExecutionSelector,
   (...allNotifications) => allNotifications.some(n => n),
 );

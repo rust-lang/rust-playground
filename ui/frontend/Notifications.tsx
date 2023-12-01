@@ -3,36 +3,36 @@ import { Portal } from 'react-portal';
 
 import { Close } from './Icon';
 import { useAppDispatch, useAppSelector } from './hooks';
-import { seenRustSurvey2022 } from './reducers/notifications';
+import { seenRustSurvey2023 } from './reducers/notifications';
 import { allowLongRun, wsExecuteKillCurrent } from './reducers/output/execute';
 import * as selectors from './selectors';
 
 import styles from './Notifications.module.css';
 
-const SURVEY_URL = 'https://blog.rust-lang.org/2022/12/05/survey-launch.html';
+const SURVEY_URL = 'https://blog.rust-lang.org/2023/12/18/survey-launch.html';
 
 const Notifications: React.FC = () => {
   return (
     <Portal>
       <div className={styles.container}>
-        <RustSurvey2022Notification />
+        <RustSurvey2023Notification />
         <ExcessiveExecutionNotification />
       </div>
     </Portal>
   );
 };
 
-const RustSurvey2022Notification: React.FC = () => {
-  const showRustSurvey2022 = useAppSelector(selectors.showRustSurvey2022Selector);
+const RustSurvey2023Notification: React.FC = () => {
+  const showIt = useAppSelector(selectors.showRustSurvey2023Selector);
 
   const dispatch = useAppDispatch();
-  const seenRustSurvey2021 = useCallback(() => dispatch(seenRustSurvey2022()), [dispatch]);
+  const seenIt = useCallback(() => dispatch(seenRustSurvey2023()), [dispatch]);
 
-  return showRustSurvey2022 ? (
-    <Notification onClose={seenRustSurvey2021}>
+  return showIt ? (
+    <Notification onClose={seenIt}>
       Please help us take a look at who the Rust community is composed of, how the Rust project is
       doing, and how we can improve the Rust programming experience by completing the{' '}
-      <a href={SURVEY_URL}>2022 State of Rust Survey</a>. Whether or not you use Rust today, we want
+      <a href={SURVEY_URL}>2023 State of Rust Survey</a>. Whether or not you use Rust today, we want
       to know your opinions.
     </Notification>
   ) : null;
