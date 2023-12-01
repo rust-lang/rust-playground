@@ -14,6 +14,9 @@ import {
   PrimaryAction,
   PrimaryActionAuto,
   PrimaryActionCore,
+  parseChannel,
+  parseEdition,
+  parseMode,
 } from './types';
 
 import { performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
@@ -124,45 +127,6 @@ export const performCompileToNightlyHir =
   performAndSwitchPrimaryAction(performCompileToNightlyHirOnly, PrimaryActionCore.Hir);
 export const performCompileToWasm =
   performAndSwitchPrimaryAction(performCompileToCdylibWasmOnly, PrimaryActionCore.Wasm);
-
-function parseChannel(s?: string): Channel | null {
-  switch (s) {
-    case 'stable':
-      return Channel.Stable;
-    case 'beta':
-      return Channel.Beta;
-    case 'nightly':
-      return Channel.Nightly;
-    default:
-      return null;
-  }
-}
-
-function parseMode(s?: string): Mode | null {
-  switch (s) {
-    case 'debug':
-      return Mode.Debug;
-    case 'release':
-      return Mode.Release;
-    default:
-      return null;
-  }
-}
-
-function parseEdition(s?: string): Edition | null {
-  switch (s) {
-    case '2015':
-      return Edition.Rust2015;
-    case '2018':
-      return Edition.Rust2018;
-    case '2021':
-      return Edition.Rust2021;
-    case '2024':
-      return Edition.Rust2024;
-    default:
-      return null;
-  }
-}
 
 export function indexPageLoad({
   code,

@@ -7,8 +7,10 @@ export interface Position {
   column: number;
 }
 
-export const makePosition = (line: string | number, column: string | number): Position =>
-  ({ line: +line, column: +column });
+export const makePosition = (line: string | number, column: string | number): Position => ({
+  line: +line,
+  column: +column,
+});
 
 export interface Selection {
   start?: Position;
@@ -104,9 +106,23 @@ export enum Channel {
   Nightly = 'nightly',
 }
 
+const ChannelEnum = z.nativeEnum(Channel);
+
+export function parseChannel(s?: string): Channel | null {
+  const p = ChannelEnum.safeParse(s);
+  return p.success ? p.data : null;
+}
+
 export enum Mode {
   Debug = 'debug',
   Release = 'release',
+}
+
+const ModeEnum = z.nativeEnum(Mode);
+
+export function parseMode(s?: string): Mode | null {
+  const p = ModeEnum.safeParse(s);
+  return p.success ? p.data : null;
 }
 
 export enum Edition {
@@ -114,6 +130,13 @@ export enum Edition {
   Rust2018 = '2018',
   Rust2021 = '2021',
   Rust2024 = '2024',
+}
+
+const EditionEnum = z.nativeEnum(Edition);
+
+export function parseEdition(s?: string): Edition | null {
+  const p = EditionEnum.safeParse(s);
+  return p.success ? p.data : null;
 }
 
 export enum Backtrace {
