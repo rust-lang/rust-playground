@@ -9,10 +9,7 @@ import { Provider } from 'react-redux';
 import { v4 } from 'uuid';
 
 import {
-  editCode,
-  enableFeatureGate,
   selectText,
-  addImport,
   reExecuteWithBacktrace,
   browserWidthChanged,
 } from './actions';
@@ -27,6 +24,7 @@ import configureStore from './configureStore';
 import { performVersionsLoad } from './reducers/versions';
 import { performCratesLoad } from './reducers/crates';
 import { gotoPosition } from './reducers/position';
+import { addImport, editCode, enableFeatureGate } from './reducers/code';
 
 const store = configureStore(window);
 

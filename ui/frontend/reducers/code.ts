@@ -1,40 +1,37 @@
-import { Action, ActionType } from '../actions';
-import { performGistLoad } from './output/gist'
-import { performFormat } from './output/format'
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-const DEFAULT: State = `fn main() {
+import { performFormat } from './output/format';
+import { performGistLoad } from './output/gist';
+
+const initialState: string = `fn main() {
     println!("Hello, world!");
 }`;
 
-export type State = string;
+const slice = createSlice({
+  name: 'code',
+  initialState,
+  reducers: {
+    editCode: (_state, action: PayloadAction<string>) => action.payload,
 
-export default function code(state = DEFAULT, action: Action): State {
-  switch (action.type) {
-    case ActionType.EditCode:
-      return action.code;
+    addMainFunction: (state) => `${state}\n\n${initialState}`,
 
-    case ActionType.AddMainFunction:
-      return `${state}\n\n${DEFAULT}`;
+    addImport: (state, action: PayloadAction<string>) => action.payload + state,
 
-    case ActionType.AddImport:
-      return action.code + state;
+    addCrateType: (state, action: PayloadAction<string>) =>
+      `#![crate_type = "${action.payload}"]\n${state}`,
 
-    case ActionType.AddCrateType:
-      return `#![crate_type = "${action.crateType}"]\n${state}`;
+    enableFeatureGate: (state, action: PayloadAction<string>) =>
+      `#![feature(${action.payload})]\n${state}`,
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(performGistLoad.pending, () => '')
+      .addCase(performGistLoad.fulfilled, (_state, action) => action.payload.code)
+      .addCase(performFormat.fulfilled, (_state, action) => action.payload.code);
+  },
+});
 
-    case ActionType.EnableFeatureGate:
-      return `#![feature(${action.featureGate})]\n${state}`;
+export const { editCode, addMainFunction, addImport, addCrateType, enableFeatureGate } =
+  slice.actions;
 
-    default: {
-      if (performGistLoad.pending.match(action)) {
-        return '';
-      } else if (performGistLoad.fulfilled.match(action)) {
-        return action.payload.code;
-      } else if (performFormat.fulfilled.match(action)) {
-        return action.payload.code;
-      } else {
-        return state;
-      }
-    }
-  }
-}
+export default slice.reducer;

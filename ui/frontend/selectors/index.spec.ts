@@ -1,5 +1,5 @@
-import { editCode } from '../actions';
 import reducer from '../reducers';
+import { editCode } from '../reducers/code';
 
 import { hasMainFunctionSelector } from './index';
 

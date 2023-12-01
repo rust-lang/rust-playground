@@ -10,6 +10,7 @@ import MonacoEditor from './MonacoEditor';
 import { Editor as EditorType } from '../types';
 import { codeSelector, positionSelector, selectionSelector } from '../selectors';
 import { State } from '../reducers';
+import { editCode } from '../reducers/code';
 
 import styles from './Editor.module.css';
 
@@ -28,7 +29,7 @@ const Editor: React.FC = () => {
 
   const dispatch = useAppDispatch();
   const execute = useCallback(() => dispatch(actions.performPrimaryAction()), [dispatch]);
-  const onEditCode = useCallback((c: string) => dispatch(actions.editCode(c)), [dispatch]);
+  const onEditCode = useCallback((c: string) => dispatch(editCode(c)), [dispatch]);
 
   const SelectedEditor = editorMap[editor];
 

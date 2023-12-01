@@ -32,6 +32,7 @@ import { performCompileToLlvmIrOnly } from './reducers/output/llvmIr';
 import { performCompileToMirOnly } from './reducers/output/mir';
 import { performCompileToWasmOnly } from './reducers/output/wasm';
 import { navigateToHelp, navigateToIndex } from './reducers/page';
+import { addCrateType, editCode } from './reducers/code';
 
 export type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, Action>;
 export type SimpleThunkAction<T = void> = ReduxThunkAction<T, State, {}, AnyAction>;
@@ -56,11 +57,6 @@ export enum ActionType {
   ChangeMode = 'CHANGE_MODE',
   ChangeEdition = 'CHANGE_EDITION',
   ChangeBacktrace = 'CHANGE_BACKTRACE',
-  EditCode = 'EDIT_CODE',
-  AddMainFunction = 'ADD_MAIN_FUNCTION',
-  AddImport = 'ADD_IMPORT',
-  AddCrateType = 'ADD_CRATE_TYPE',
-  EnableFeatureGate = 'ENABLE_FEATURE_GATE',
   SelectText = 'SELECT_TEXT',
   NotificationSeen = 'NOTIFICATION_SEEN',
   BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
@@ -196,21 +192,6 @@ export const performCompileToNightlyHir =
 export const performCompileToWasm =
   performAndSwitchPrimaryAction(performCompileToCdylibWasmOnly, PrimaryActionCore.Wasm);
 
-export const editCode = (code: string) =>
-  createAction(ActionType.EditCode, { code });
-
-export const addMainFunction = () =>
-  createAction(ActionType.AddMainFunction);
-
-export const addImport = (code: string) =>
-  createAction(ActionType.AddImport, { code });
-
-export const addCrateType = (crateType: string) =>
-  createAction(ActionType.AddCrateType, { crateType });
-
-export const enableFeatureGate = (featureGate: string) =>
-  createAction(ActionType.EnableFeatureGate, { featureGate });
-
 export const selectText = (start: Position, end: Position) =>
   createAction(ActionType.SelectText, { start, end });
 
@@ -323,14 +304,11 @@ export type Action =
   | ReturnType<typeof changeProcessAssembly>
   | ReturnType<typeof changeAceTheme>
   | ReturnType<typeof changeMonacoTheme>
-  | ReturnType<typeof editCode>
-  | ReturnType<typeof addMainFunction>
-  | ReturnType<typeof addImport>
-  | ReturnType<typeof addCrateType>
-  | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof selectText>
   | ReturnType<typeof notificationSeen>
   | ReturnType<typeof browserWidthChanged>
+  | ReturnType<typeof editCode>
+  | ReturnType<typeof addCrateType>
   | ReturnType<typeof navigateToIndex>
   | ReturnType<typeof wsExecuteRequest>
   ;
