@@ -1,10 +1,22 @@
-import { ThunkAction as ReduxThunkAction, AnyAction } from '@reduxjs/toolkit';
+import { AnyAction, ThunkAction as ReduxThunkAction } from '@reduxjs/toolkit';
 
+import { addCrateType, editCode } from './reducers/code';
 import {
-  getCrateType,
-  runAsTest,
-  wasmLikelyToWork,
-} from './selectors';
+  changeBacktrace,
+  changeChannel,
+  changeEditionRaw,
+  changeMode,
+  changePrimaryAction,
+} from './reducers/configuration';
+import { performCompileToAssemblyOnly } from './reducers/output/assembly';
+import { performCommonExecute } from './reducers/output/execute';
+import { performGistLoad } from './reducers/output/gist';
+import { performCompileToHirOnly } from './reducers/output/hir';
+import { performCompileToLlvmIrOnly } from './reducers/output/llvmIr';
+import { performCompileToMirOnly } from './reducers/output/mir';
+import { performCompileToWasmOnly } from './reducers/output/wasm';
+import { navigateToHelp, navigateToIndex } from './reducers/page';
+import { getCrateType, runAsTest, wasmLikelyToWork } from './selectors';
 import State from './state';
 import {
   Backtrace,
@@ -19,33 +31,15 @@ import {
   parseMode,
 } from './types';
 
-import { performCommonExecute } from './reducers/output/execute';
-import { performGistLoad } from './reducers/output/gist';
-import { performCompileToAssemblyOnly } from './reducers/output/assembly';
-import { performCompileToHirOnly } from './reducers/output/hir';
-import { performCompileToLlvmIrOnly } from './reducers/output/llvmIr';
-import { performCompileToMirOnly } from './reducers/output/mir';
-import { performCompileToWasmOnly } from './reducers/output/wasm';
-import { navigateToHelp, navigateToIndex } from './reducers/page';
-import { addCrateType, editCode } from './reducers/code';
-import {
-  changeBacktrace,
-  changeChannel,
-  changeEditionRaw,
-  changeMode,
-  changePrimaryAction,
-} from './reducers/configuration';
-
 export type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, AnyAction>;
 
-export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
+export const reExecuteWithBacktrace = (): ThunkAction => (dispatch) => {
   dispatch(changeBacktrace(Backtrace.Enabled));
   dispatch(performExecuteOnly());
 };
 
-
 function performAutoOnly(): ThunkAction {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const state = getState();
     const crateType = getCrateType(state);
     const tests = runAsTest(state);
@@ -62,7 +56,7 @@ const performTestOnly = (): ThunkAction => (dispatch, getState) => {
   return dispatch(performCommonExecute(crateType, true));
 };
 
-const performCompileToNightlyHirOnly = (): ThunkAction => dispatch => {
+const performCompileToNightlyHirOnly = (): ThunkAction => (dispatch) => {
   dispatch(changeChannel(Channel.Nightly));
   dispatch(performCompileToHirOnly());
 };
@@ -94,27 +88,41 @@ export const performPrimaryAction = (): ThunkAction => (dispatch, getState) => {
   dispatch(primaryAction());
 };
 
-const performAndSwitchPrimaryAction = (inner: () => ThunkAction, id: PrimaryAction) => (): ThunkAction => dispatch => {
-  dispatch(changePrimaryAction(id));
-  dispatch(inner());
-};
+const performAndSwitchPrimaryAction =
+  (inner: () => ThunkAction, id: PrimaryAction) => (): ThunkAction => (dispatch) => {
+    dispatch(changePrimaryAction(id));
+    dispatch(inner());
+  };
 
-export const performExecute =
-  performAndSwitchPrimaryAction(performExecuteOnly, PrimaryActionCore.Execute);
-export const performCompile =
-  performAndSwitchPrimaryAction(performCompileOnly, PrimaryActionCore.Compile);
-export const performTest =
-  performAndSwitchPrimaryAction(performTestOnly, PrimaryActionCore.Test);
-export const performCompileToAssembly =
-  performAndSwitchPrimaryAction(performCompileToAssemblyOnly, PrimaryActionCore.Asm);
-export const performCompileToLLVM =
-  performAndSwitchPrimaryAction(performCompileToLlvmIrOnly, PrimaryActionCore.LlvmIr);
-export const performCompileToMir =
-  performAndSwitchPrimaryAction(performCompileToMirOnly, PrimaryActionCore.Mir);
-export const performCompileToNightlyHir =
-  performAndSwitchPrimaryAction(performCompileToNightlyHirOnly, PrimaryActionCore.Hir);
-export const performCompileToWasm =
-  performAndSwitchPrimaryAction(performCompileToCdylibWasmOnly, PrimaryActionCore.Wasm);
+export const performExecute = performAndSwitchPrimaryAction(
+  performExecuteOnly,
+  PrimaryActionCore.Execute,
+);
+export const performCompile = performAndSwitchPrimaryAction(
+  performCompileOnly,
+  PrimaryActionCore.Compile,
+);
+export const performTest = performAndSwitchPrimaryAction(performTestOnly, PrimaryActionCore.Test);
+export const performCompileToAssembly = performAndSwitchPrimaryAction(
+  performCompileToAssemblyOnly,
+  PrimaryActionCore.Asm,
+);
+export const performCompileToLLVM = performAndSwitchPrimaryAction(
+  performCompileToLlvmIrOnly,
+  PrimaryActionCore.LlvmIr,
+);
+export const performCompileToMir = performAndSwitchPrimaryAction(
+  performCompileToMirOnly,
+  PrimaryActionCore.Mir,
+);
+export const performCompileToNightlyHir = performAndSwitchPrimaryAction(
+  performCompileToNightlyHirOnly,
+  PrimaryActionCore.Hir,
+);
+export const performCompileToWasm = performAndSwitchPrimaryAction(
+  performCompileToCdylibWasmOnly,
+  PrimaryActionCore.Wasm,
+);
 
 export function indexPageLoad({
   code,
@@ -122,8 +130,14 @@ export function indexPageLoad({
   version,
   mode: modeString,
   edition: editionString,
-}: { code?: string, gist?: string, version?: string, mode?: string, edition?: string }): ThunkAction {
-  return function(dispatch) {
+}: {
+  code?: string;
+  gist?: string;
+  version?: string;
+  mode?: string;
+  edition?: string;
+}): ThunkAction {
+  return function (dispatch) {
     const channel = parseChannel(version) || Channel.Stable;
     const mode = parseMode(modeString) || Mode.Debug;
     let maybeEdition = parseEdition(editionString);
@@ -156,7 +170,7 @@ export function indexPageLoad({
 export const helpPageLoad = navigateToHelp;
 
 export function showExample(code: string): ThunkAction {
-  return function(dispatch) {
+  return function (dispatch) {
     dispatch(navigateToIndex());
     dispatch(editCode(code));
   };
