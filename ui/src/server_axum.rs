@@ -15,9 +15,9 @@ use crate::{
 };
 use async_trait::async_trait;
 use axum::{
-    extract::{self, ws::WebSocketUpgrade, Extension, Path, TypedHeader},
+    body::Body,
+    extract::{self, ws::WebSocketUpgrade, Extension, Path},
     handler::Handler,
-    headers::{authorization::Bearer, Authorization, CacheControl, ETag, IfNoneMatch},
     http::{
         header, request::Parts, uri::PathAndQuery, HeaderValue, Method, Request, StatusCode, Uri,
     },
@@ -25,6 +25,10 @@ use axum::{
     response::IntoResponse,
     routing::{get, get_service, post, MethodRouter},
     Router,
+};
+use axum_extra::{
+    headers::{authorization::Bearer, Authorization, CacheControl, ETag, IfNoneMatch},
+    TypedHeader,
 };
 use futures::{future::BoxFuture, FutureExt};
 use orchestrator::coordinator::{self, Coordinator, DockerBackend, Versions};
@@ -112,8 +116,11 @@ pub(crate) async fn serve(config: Config) {
     // Basic access logging
     app = app.layer(TraceLayer::new_for_http());
 
-    axum::Server::bind(&config.server_socket_addr())
-        .serve(app.into_make_service())
+    let listener = tokio::net::TcpListener::bind(config.server_socket_addr())
+        .await
+        .unwrap();
+
+    axum::serve(listener, app.into_make_service())
         .await
         .unwrap();
 }
@@ -130,9 +137,9 @@ fn static_file_service(root: impl AsRef<path::Path>, max_age: HeaderValue) -> Me
     get_service(with_caching)
 }
 
-async fn rewrite_help_as_index<B>(
-    mut req: Request<B>,
-    next: middleware::Next<B>,
+async fn rewrite_help_as_index(
+    mut req: Request<Body>,
+    next: middleware::Next,
 ) -> impl IntoResponse {
     let uri = req.uri_mut();
     if uri.path() == "/help" {
@@ -742,17 +749,14 @@ impl IntoResponse for Error {
 struct Json<T>(T);
 
 #[async_trait]
-impl<T, S, B> extract::FromRequest<S, B> for Json<T>
+impl<T, S> extract::FromRequest<S> for Json<T>
 where
     T: serde::de::DeserializeOwned,
     S: Send + Sync,
-    B: axum::body::HttpBody + Send + 'static,
-    B::Data: Send,
-    B::Error: Into<axum::BoxError>,
 {
     type Rejection = axum::response::Response;
 
-    async fn from_request(req: Request<B>, state: &S) -> Result<Self, Self::Rejection> {
+    async fn from_request(req: Request<Body>, state: &S) -> Result<Self, Self::Rejection> {
         match axum::Json::<T>::from_request(req, state).await {
             Ok(v) => Ok(Self(v.0)),
             Err(e) => {
