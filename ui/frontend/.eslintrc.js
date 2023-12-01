@@ -71,6 +71,7 @@ module.exports = {
         'compileActions.ts',
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',
+        'reducers/browser.ts',
         'reducers/client.ts',
         'reducers/code.ts',
         'reducers/crates.ts',

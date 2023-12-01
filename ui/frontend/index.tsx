@@ -11,7 +11,6 @@ import { v4 } from 'uuid';
 import {
   selectText,
   reExecuteWithBacktrace,
-  browserWidthChanged,
 } from './actions';
 import { configureRustErrors } from './highlighting';
 import PageSwitcher from './PageSwitcher';
@@ -25,6 +24,7 @@ import { performVersionsLoad } from './reducers/versions';
 import { performCratesLoad } from './reducers/crates';
 import { gotoPosition } from './reducers/position';
 import { addImport, editCode, enableFeatureGate } from './reducers/code';
+import { browserWidthChanged } from './reducers/browser';
 
 const store = configureStore(window);
 

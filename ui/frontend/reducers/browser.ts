@@ -1,6 +1,6 @@
-import { Action, ActionType } from '../actions';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-const DEFAULT: State = {
+const initialState: State = {
   isSmall: true,
 };
 
@@ -8,12 +8,16 @@ export type State = {
   isSmall: boolean;
 };
 
-export default function code(state = DEFAULT, action: Action): State {
-  switch (action.type) {
-    case ActionType.BrowserWidthChanged:
-      return { ...state, isSmall: action.isSmall };
+const slice = createSlice({
+  name: 'browser',
+  initialState,
+  reducers: {
+    browserWidthChanged: (state, action: PayloadAction<boolean>) => {
+      state.isSmall = action.payload;
+    },
+  },
+});
 
-    default:
-      return state;
-  }
-}
+export const { browserWidthChanged } = slice.actions;
+
+export default slice.reducer;

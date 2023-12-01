@@ -59,7 +59,6 @@ export enum ActionType {
   ChangeBacktrace = 'CHANGE_BACKTRACE',
   SelectText = 'SELECT_TEXT',
   NotificationSeen = 'NOTIFICATION_SEEN',
-  BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
 }
 
 export const initializeApplication = () => createAction(ActionType.InitializeApplication);
@@ -200,9 +199,6 @@ const notificationSeen = (notification: Notification) =>
 
 export const seenRustSurvey2022 = () => notificationSeen(Notification.RustSurvey2022);
 
-export const browserWidthChanged = (isSmall: boolean) =>
-  createAction(ActionType.BrowserWidthChanged, { isSmall });
-
 function parseChannel(s?: string): Channel | null {
   switch (s) {
     case 'stable':
@@ -306,7 +302,6 @@ export type Action =
   | ReturnType<typeof changeMonacoTheme>
   | ReturnType<typeof selectText>
   | ReturnType<typeof notificationSeen>
-  | ReturnType<typeof browserWidthChanged>
   | ReturnType<typeof editCode>
   | ReturnType<typeof addCrateType>
   | ReturnType<typeof navigateToIndex>
