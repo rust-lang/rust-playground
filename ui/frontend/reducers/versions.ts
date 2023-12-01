@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { adaptFetchError, jsonGet, routes } from '../actions';
+import { jsonGet, routes } from '../api';
 import { ChannelVersion } from '../types';
 
 const sliceName = 'versions';
@@ -19,7 +19,7 @@ const Response = z.object({
 type Response = z.infer<typeof Response>;
 
 export const performVersionsLoad = createAsyncThunk(sliceName, async () => {
-  const d = await adaptFetchError(() => jsonGet(routes.meta.versions));
+  const d = await jsonGet(routes.meta.versions);
   return Response.parseAsync(d);
 });
 

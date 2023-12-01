@@ -67,6 +67,7 @@ module.exports = {
         'Header.tsx',
         'PopButton.tsx',
         'Stdin.tsx',
+        'api.ts',
         'compileActions.ts',
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',

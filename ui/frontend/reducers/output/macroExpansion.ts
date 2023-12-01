@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { adaptFetchError, jsonPost, routes } from '../../actions';
+import { jsonPost, routes } from '../../api';
 import { macroExpansionRequestSelector } from '../../selectors';
 import RootState from '../../state';
 
@@ -38,7 +38,7 @@ export const performMacroExpansion = createAsyncThunk<
 >(sliceName, async (_arg: void, { getState }) => {
   const body: MacroExpansionRequestBody = macroExpansionRequestSelector(getState());
 
-  const d = await adaptFetchError(() => jsonPost(routes.macroExpansion, body));
+  const d = await jsonPost(routes.macroExpansion, body);
   return MacroExpansionResponseBody.parseAsync(d);
 });
 

@@ -1,7 +1,7 @@
 import { Draft, PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { adaptFetchError, jsonGet, jsonPost, routes } from '../../actions';
+import { jsonGet, jsonPost, routes } from '../../api';
 import { baseUrlSelector, codeSelector } from '../../selectors';
 import RootState from '../../state';
 import { Channel, Edition, Mode } from '../../types';
@@ -57,7 +57,7 @@ export const performGistLoad = createAsyncThunk<
   const gistUrl = new URL(routes.meta.gistLoad, baseUrl);
   const u = new URL(id, gistUrl);
 
-  const d = await adaptFetchError(() => jsonGet(u));
+  const d = await jsonGet(u);
   const gist = await GistResponseBody.parseAsync(d);
   return { ...gist, channel, mode, edition, stdout: '', stderr: '' };
 });
@@ -74,7 +74,7 @@ export const performGistSave = createAsyncThunk<SuccessProps, void, { state: Roo
       },
     } = state;
 
-    const d = await adaptFetchError(() => jsonPost(routes.meta.gistSave, { code }));
+    const d = await jsonPost(routes.meta.gistSave, { code });
     const gist = await GistResponseBody.parseAsync(d);
     return { ...gist, code, stdout, stderr, channel, mode, edition };
   },
