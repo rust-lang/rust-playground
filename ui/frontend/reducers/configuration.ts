@@ -16,7 +16,7 @@ import {
   ProcessAssembly,
 } from '../types';
 
-export interface State {
+interface State {
   editor: Editor;
   ace: {
     keybinding: string;

@@ -9,7 +9,7 @@ const sliceName = 'crates';
 
 const initialState: State = [];
 
-export type State = Crate[];
+type State = Crate[];
 
 const CratesResponse = z.object({
   crates: Crate.array(),

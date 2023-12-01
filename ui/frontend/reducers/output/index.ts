@@ -28,6 +28,4 @@ const output = combineReducers({
   gist,
 });
 
-export type State = ReturnType<typeof output>;
-
 export default output;
