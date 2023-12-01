@@ -77,6 +77,7 @@ module.exports = {
         'reducers/crates.ts',
         'reducers/featureFlags.ts',
         'reducers/globalConfiguration.ts',
+        'reducers/notifications.ts',
         'reducers/output/assembly.ts',
         'reducers/output/clippy.ts',
         'reducers/output/execute.ts',

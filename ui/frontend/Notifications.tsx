@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Close } from './Icon';
 
-import * as actions from './actions';
 import * as selectors from './selectors';
+import { seenRustSurvey2022 } from './reducers/notifications';
 
 import styles from './Notifications.module.css';
 
@@ -25,7 +25,7 @@ const RustSurvey2022Notification: React.FC = () => {
   const showRustSurvey2022 = useSelector(selectors.showRustSurvey2022Selector);
 
   const dispatch = useDispatch();
-  const seenRustSurvey2021 = useCallback(() => dispatch(actions.seenRustSurvey2022()), [dispatch]);
+  const seenRustSurvey2021 = useCallback(() => dispatch(seenRustSurvey2022()), [dispatch]);
 
   return showRustSurvey2022 ? (
     <Notification onClose={seenRustSurvey2021}>

@@ -14,7 +14,6 @@ import {
   Edition,
   Editor,
   Mode,
-  Notification,
   Orientation,
   PairCharacters,
   PrimaryAction,
@@ -58,7 +57,6 @@ export enum ActionType {
   ChangeEdition = 'CHANGE_EDITION',
   ChangeBacktrace = 'CHANGE_BACKTRACE',
   SelectText = 'SELECT_TEXT',
-  NotificationSeen = 'NOTIFICATION_SEEN',
 }
 
 export const initializeApplication = () => createAction(ActionType.InitializeApplication);
@@ -194,11 +192,6 @@ export const performCompileToWasm =
 export const selectText = (start: Position, end: Position) =>
   createAction(ActionType.SelectText, { start, end });
 
-const notificationSeen = (notification: Notification) =>
-  createAction(ActionType.NotificationSeen, { notification });
-
-export const seenRustSurvey2022 = () => notificationSeen(Notification.RustSurvey2022);
-
 function parseChannel(s?: string): Channel | null {
   switch (s) {
     case 'stable':
@@ -301,7 +294,6 @@ export type Action =
   | ReturnType<typeof changeAceTheme>
   | ReturnType<typeof changeMonacoTheme>
   | ReturnType<typeof selectText>
-  | ReturnType<typeof notificationSeen>
   | ReturnType<typeof editCode>
   | ReturnType<typeof addCrateType>
   | ReturnType<typeof navigateToIndex>
