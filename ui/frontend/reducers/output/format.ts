@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import * as z from 'zod';
 
 import { adaptFetchError, jsonPost, routes } from '../../actions';
 import { formatRequestSelector } from '../../selectors';
@@ -17,23 +18,27 @@ interface State {
 }
 
 interface FormatRequestBody {
-  code: string;
+  channel: string;
   edition: string;
+  code: string;
 }
 
-interface FormatResponseBody {
-  success: boolean;
-  code: string;
-  stdout: string;
-  stderr: string;
-}
+const FormatResponseBody = z.object({
+  success: z.boolean(),
+  code: z.string(),
+  stdout: z.string(),
+  stderr: z.string(),
+});
+
+type FormatResponseBody = z.infer<typeof FormatResponseBody>;
 
 export const performFormat = createAsyncThunk<FormatResponseBody, void, { state: RootState }>(
   sliceName,
   async (_arg: void, { getState }) => {
     const body: FormatRequestBody = formatRequestSelector(getState());
 
-    return adaptFetchError(() => jsonPost<FormatResponseBody>(routes.format, body));
+    const d = await adaptFetchError(() => jsonPost(routes.format, body));
+    return FormatResponseBody.parseAsync(d);
   },
 );
 

@@ -99,10 +99,27 @@ const LABELS: { [index in PrimaryActionCore]: string } = {
 
 export const getExecutionLabel = createSelector(primaryActionSelector, primaryAction => LABELS[primaryAction]);
 
+const channelSelector = (state: State) => state.configuration.channel;
+
+const selectedChannelVersionsSelector = createSelector(
+  channelSelector,
+  (state: State) => state.versions,
+  (channel, versions) => {
+    switch (channel) {
+      case Channel.Stable:
+        return versions.stable;
+      case Channel.Beta:
+        return versions.beta;
+      case Channel.Nightly:
+        return versions.nightly;
+    }
+  },
+)
+
 const getStable = (state: State) => state.versions.stable?.rustc;
 const getBeta = (state: State) => state.versions.beta?.rustc;
 const getNightly = (state: State) => state.versions.nightly?.rustc;
-const getRustfmt = (state: State) => state.versions.nightly?.rustfmt;
+const getRustfmt = createSelector(selectedChannelVersionsSelector, (versions) => versions?.rustfmt);
 const getClippy = (state: State) => state.versions.nightly?.clippy;
 const getMiri = (state: State) => state.versions?.nightly?.miri;
 
@@ -123,8 +140,9 @@ export const miriVersionDetailsText = createSelector(getMiri, versionDetails);
 
 const editionSelector = (state: State) => state.configuration.edition;
 
-export const isNightlyChannel = (state: State) => (
-  state.configuration.channel === Channel.Nightly
+export const isNightlyChannel = createSelector(
+  channelSelector,
+  (channel) => channel === Channel.Nightly,
 );
 export const isHirAvailable = isNightlyChannel;
 
@@ -142,10 +160,7 @@ export const getModeLabel = (state: State) => {
   return `${mode}`;
 };
 
-export const getChannelLabel = (state: State) => {
-  const { configuration: { channel } } = state;
-  return `${channel}`;
-};
+export const getChannelLabel = createSelector(channelSelector, (channel) => `${channel}`);
 
 export const isEditionDefault = createSelector(
   editionSelector,
@@ -311,9 +326,10 @@ export const clippyRequestSelector = createSelector(
 );
 
 export const formatRequestSelector = createSelector(
-  codeSelector,
+  channelSelector,
   editionSelector,
-  (code, edition) => ({ code, edition }),
+  codeSelector,
+  (channel, edition, code) => ({ channel, edition, code }),
 );
 
 const focus = (state: State) => state.output.meta.focus;
@@ -387,11 +403,12 @@ export const websocketStatusSelector = createSelector(
 
 export const executeRequestPayloadSelector = createSelector(
   codeSelector,
+  channelSelector,
   (state: State) => state.configuration,
   getBacktraceSet,
   (_state: State, { crateType, tests }: { crateType: string, tests: boolean }) => ({ crateType, tests }),
-  (code, configuration, backtrace, { crateType, tests }) => ({
-    channel: configuration.channel,
+  (code, channel, configuration, backtrace, { crateType, tests }) => ({
+    channel,
     mode: configuration.mode,
     edition: configuration.edition,
     crateType,
@@ -403,13 +420,14 @@ export const executeRequestPayloadSelector = createSelector(
 
 export const compileRequestPayloadSelector = createSelector(
   codeSelector,
+  channelSelector,
   (state: State) => state.configuration,
   getCrateType,
   runAsTest,
   getBacktraceSet,
   (_state: State, { target }: { target: string }) => ({ target }),
-  (code, configuration, crateType, tests, backtrace, { target }) => ({
-    channel: configuration.channel,
+  (code, channel, configuration, crateType, tests, backtrace, { target }) => ({
+    channel,
     mode: configuration.mode,
     edition: configuration.edition,
     crateType,

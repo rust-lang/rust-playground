@@ -1052,10 +1052,19 @@ pub(crate) mod api_orchestrator_integration_impls {
         type Error = ParseFormatRequestError;
 
         fn try_from(other: crate::FormatRequest) -> std::result::Result<Self, Self::Error> {
-            let crate::FormatRequest { code, edition } = other;
+            let crate::FormatRequest {
+                channel,
+                edition,
+                code,
+            } = other;
+
+            let channel = match channel {
+                Some(c) => parse_channel(&c)?,
+                None => Channel::Nightly,
+            };
 
             Ok(FormatRequest {
-                channel: Channel::Nightly,     // TODO: use what user has submitted
+                channel,
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
                 code,
@@ -1065,6 +1074,9 @@ pub(crate) mod api_orchestrator_integration_impls {
 
     #[derive(Debug, Snafu)]
     pub(crate) enum ParseFormatRequestError {
+        #[snafu(context(false))]
+        Channel { source: ParseChannelError },
+
         #[snafu(context(false))]
         Edition { source: ParseEditionError },
     }
