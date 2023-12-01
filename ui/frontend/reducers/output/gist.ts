@@ -1,6 +1,7 @@
 import { Draft, PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import * as z from 'zod';
 
-import { jsonGet, jsonPost, routes } from '../../actions';
+import { adaptFetchError, jsonGet, jsonPost, routes } from '../../actions';
 import { baseUrlSelector, codeSelector } from '../../selectors';
 import RootState from '../../state';
 import { Channel, Edition, Mode } from '../../types';
@@ -39,11 +40,12 @@ type PerformGistLoadProps = Pick<
   Exclude<keyof SuccessProps, 'url' | 'code' | 'stdout' | 'stderr'>
 >;
 
-interface GistResponseBody {
-  id: string;
-  url: string;
-  code: string;
-}
+const GistResponseBody = z.object({
+  id: z.string(),
+  url: z.string(),
+  code: z.string(),
+});
+type GistResponseBody = z.infer<typeof GistResponseBody>;
 
 export const performGistLoad = createAsyncThunk<
   SuccessProps,
@@ -55,8 +57,9 @@ export const performGistLoad = createAsyncThunk<
   const gistUrl = new URL(routes.meta.gistLoad, baseUrl);
   const u = new URL(id, gistUrl);
 
-  const gist = await jsonGet(u);
-  return { channel, mode, edition, ...gist };
+  const d = await adaptFetchError(() => jsonGet(u));
+  const gist = await GistResponseBody.parseAsync(d);
+  return { ...gist, channel, mode, edition, stdout: '', stderr: '' };
 });
 
 export const performGistSave = createAsyncThunk<SuccessProps, void, { state: RootState }>(
@@ -71,8 +74,9 @@ export const performGistSave = createAsyncThunk<SuccessProps, void, { state: Roo
       },
     } = state;
 
-    const json = await jsonPost<GistResponseBody>(routes.meta.gistSave, { code });
-    return { ...json, code, stdout, stderr, channel, mode, edition };
+    const d = await adaptFetchError(() => jsonPost(routes.meta.gistSave, { code }));
+    const gist = await GistResponseBody.parseAsync(d);
+    return { ...gist, code, stdout, stderr, channel, mode, edition };
   },
 );
 

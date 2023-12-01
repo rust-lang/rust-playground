@@ -150,13 +150,13 @@ export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
 
 type FetchArg = Parameters<typeof fetch>[0];
 
-export function jsonGet(url: FetchArg) {
+export function jsonGet(url: FetchArg): Promise<unknown> {
   return fetchJson(url, {
     method: 'get',
   });
 }
 
-export function jsonPost<T>(url: FetchArg, body: Record<string, any>): Promise<T> {
+export function jsonPost(url: FetchArg, body: Record<string, any>): Promise<unknown> {
   return fetchJson(url, {
     method: 'post',
     body: JSON.stringify(body),
