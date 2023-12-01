@@ -10,8 +10,8 @@ use crate::{
     ExecuteRequest, ExecuteResponse, ExecuteSnafu, FormatRequest, FormatResponse, FormatSnafu,
     GhToken, GistCreationSnafu, GistLoadingSnafu, MacroExpansionRequest, MacroExpansionResponse,
     MacroExpansionSnafu, MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse,
-    MetaVersionResponse, MetricsToken, MiriRequest, MiriResponse, MiriSnafu, MiriVersionSnafu,
-    Result, ShutdownCoordinatorSnafu, TimeoutSnafu, VersionsSnafu,
+    MetaVersionResponse, MetaVersionsResponse, MetricsToken, MiriRequest, MiriResponse, MiriSnafu,
+    MiriVersionSnafu, Result, ShutdownCoordinatorSnafu, TimeoutSnafu, VersionsSnafu,
 };
 use async_trait::async_trait;
 use axum::{
@@ -76,6 +76,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/miri", post(miri))
         .route("/macro-expansion", post(macro_expansion))
         .route("/meta/crates", get_or_post(meta_crates))
+        .route("/meta/versions", get(meta_versions))
         .route("/meta/version/stable", get_or_post(meta_version_stable))
         .route("/meta/version/beta", get_or_post(meta_version_beta))
         .route("/meta/version/nightly", get_or_post(meta_version_nightly))
@@ -351,6 +352,14 @@ async fn meta_crates(
     apply_timestamped_caching(value, if_none_match)
 }
 
+async fn meta_versions(
+    Extension(cache): Extension<Arc<SandboxCache>>,
+    if_none_match: Option<TypedHeader<IfNoneMatch>>,
+) -> Result<impl IntoResponse> {
+    let value = track_metric_no_request_async(Endpoint::MetaVersions, || cache.versions()).await?;
+    apply_timestamped_caching(value, if_none_match)
+}
+
 async fn meta_version_stable(
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
@@ -555,7 +564,8 @@ type Stamped<T> = (T, SystemTime);
 #[derive(Debug, Default)]
 struct SandboxCache {
     crates: CacheOne<MetaCratesResponse>,
-    versions: CacheOne<Arc<Versions>>,
+    versions: CacheOne<MetaVersionsResponse>,
+    raw_versions: CacheOne<Arc<Versions>>,
 }
 
 impl SandboxCache {
@@ -566,10 +576,18 @@ impl SandboxCache {
             .await
     }
 
-    async fn versions(&self) -> Result<Stamped<Arc<Versions>>> {
+    async fn versions(&self) -> Result<Stamped<MetaVersionsResponse>> {
         let coordinator = Coordinator::new_docker().await;
 
         self.versions
+            .fetch(|| async { Ok(coordinator.versions().await.context(VersionsSnafu)?.into()) })
+            .await
+    }
+
+    async fn raw_versions(&self) -> Result<Stamped<Arc<Versions>>> {
+        let coordinator = Coordinator::new_docker().await;
+
+        self.raw_versions
             .fetch(|| async {
                 Ok(Arc::new(
                     coordinator.versions().await.context(VersionsSnafu)?,
@@ -579,37 +597,37 @@ impl SandboxCache {
     }
 
     async fn version_stable(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.versions().await?;
+        let (v, t) = self.raw_versions().await?;
         let v = (&v.stable.rustc).into();
         Ok((v, t))
     }
 
     async fn version_beta(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.versions().await?;
+        let (v, t) = self.raw_versions().await?;
         let v = (&v.beta.rustc).into();
         Ok((v, t))
     }
 
     async fn version_nightly(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.versions().await?;
+        let (v, t) = self.raw_versions().await?;
         let v = (&v.nightly.rustc).into();
         Ok((v, t))
     }
 
     async fn version_rustfmt(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.versions().await?;
+        let (v, t) = self.raw_versions().await?;
         let v = (&v.nightly.rustfmt).into();
         Ok((v, t))
     }
 
     async fn version_clippy(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.versions().await?;
+        let (v, t) = self.raw_versions().await?;
         let v = (&v.nightly.clippy).into();
         Ok((v, t))
     }
 
     async fn version_miri(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.versions().await?;
+        let (v, t) = self.raw_versions().await?;
         let v = v.nightly.miri.as_ref().context(MiriVersionSnafu)?;
         let v = v.into();
         Ok((v, t))
@@ -766,6 +784,41 @@ pub(crate) mod api_orchestrator_integration_impls {
                 })
                 .collect();
             Self { crates }
+        }
+    }
+
+    impl From<Versions> for crate::MetaVersionsResponse {
+        fn from(other: Versions) -> Self {
+            let Versions {
+                stable,
+                beta,
+                nightly,
+            } = other;
+            let [stable, beta, nightly] = [stable, beta, nightly].map(Into::into);
+            Self {
+                stable,
+                beta,
+                nightly,
+            }
+        }
+    }
+
+    impl From<ChannelVersions> for crate::MetaChannelVersionResponse {
+        fn from(other: ChannelVersions) -> Self {
+            let ChannelVersions {
+                rustc,
+                rustfmt,
+                clippy,
+                miri,
+            } = other;
+            let [rustc, rustfmt, clippy] = [rustc, rustfmt, clippy].map(|v| (&v).into());
+            let miri = miri.map(|v| (&v).into());
+            Self {
+                rustc,
+                rustfmt,
+                clippy,
+                miri,
+            }
         }
     }
 

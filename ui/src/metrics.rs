@@ -56,6 +56,7 @@ pub(crate) enum Endpoint {
     Clippy,
     MacroExpansion,
     MetaCrates,
+    MetaVersions,
     MetaVersionStable,
     MetaVersionBeta,
     MetaVersionNightly,

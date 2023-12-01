@@ -99,12 +99,12 @@ const LABELS: { [index in PrimaryActionCore]: string } = {
 
 export const getExecutionLabel = createSelector(primaryActionSelector, primaryAction => LABELS[primaryAction]);
 
-const getStable = (state: State) => state.versions?.stable;
-const getBeta = (state: State) => state.versions?.beta;
-const getNightly = (state: State) => state.versions?.nightly;
-const getRustfmt = (state: State) => state.versions?.rustfmt;
-const getClippy = (state: State) => state.versions?.clippy;
-const getMiri = (state: State) => state.versions?.miri;
+const getStable = (state: State) => state.versions.stable?.rustc;
+const getBeta = (state: State) => state.versions.beta?.rustc;
+const getNightly = (state: State) => state.versions.nightly?.rustc;
+const getRustfmt = (state: State) => state.versions.nightly?.rustfmt;
+const getClippy = (state: State) => state.versions.nightly?.clippy;
+const getMiri = (state: State) => state.versions?.nightly?.miri;
 
 const versionNumber = (v: Version | undefined) => v ? v.version : '';
 export const stableVersionText = createSelector(getStable, versionNumber);

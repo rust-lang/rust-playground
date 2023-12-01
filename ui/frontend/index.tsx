@@ -15,7 +15,6 @@ import {
   selectText,
   addImport,
   performCratesLoad,
-  performVersionsLoad,
   reExecuteWithBacktrace,
   browserWidthChanged,
 } from './actions';
@@ -27,6 +26,7 @@ import { featureFlagsForceDisableAll, featureFlagsForceEnableAll } from './reduc
 import { disableSyncChangesToStorage } from './reducers/globalConfiguration';
 import Router from './Router';
 import configureStore from './configureStore';
+import { performVersionsLoad } from './reducers/versions';
 
 const store = configureStore(window);
 

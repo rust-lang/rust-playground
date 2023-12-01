@@ -27,7 +27,6 @@ import {
   ProcessAssembly,
   Position,
   makePosition,
-  Version,
   Crate,
 } from './types';
 
@@ -48,14 +47,7 @@ export const routes = {
   macroExpansion: '/macro-expansion',
   meta: {
     crates: '/meta/crates',
-    version: {
-      stable: '/meta/version/stable',
-      beta: '/meta/version/beta',
-      nightly: '/meta/version/nightly',
-      rustfmt: '/meta/version/rustfmt',
-      clippy: '/meta/version/clippy',
-      miri: '/meta/version/miri',
-    },
+    versions: '/meta/versions',
     gistSave: '/meta/gist',
     gistLoad: '/meta/gist/id',
   },
@@ -103,8 +95,6 @@ export enum ActionType {
   MacroExpansionFailed = 'MACRO_EXPANSION_FAILED',
   RequestCratesLoad = 'REQUEST_CRATES_LOAD',
   CratesLoadSucceeded = 'CRATES_LOAD_SUCCEEDED',
-  RequestVersionsLoad = 'REQUEST_VERSIONS_LOAD',
-  VersionsLoadSucceeded = 'VERSIONS_LOAD_SUCCEEDED',
   NotificationSeen = 'NOTIFICATION_SEEN',
   BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
 }
@@ -488,42 +478,6 @@ export function performCratesLoad(): ThunkAction {
   };
 }
 
-const requestVersionsLoad = () =>
-  createAction(ActionType.RequestVersionsLoad);
-
-const receiveVersionsLoadSuccess = ({
-  stable, beta, nightly, rustfmt, clippy, miri,
-}: {
-  stable: Version, beta: Version, nightly: Version, rustfmt: Version, clippy: Version, miri: Version,
-}) =>
-  createAction(ActionType.VersionsLoadSucceeded, { stable, beta, nightly, rustfmt, clippy, miri });
-
-export function performVersionsLoad(): ThunkAction {
-  return function(dispatch) {
-    dispatch(requestVersionsLoad());
-
-    const stable = jsonGet(routes.meta.version.stable);
-    const beta = jsonGet(routes.meta.version.beta);
-    const nightly = jsonGet(routes.meta.version.nightly);
-    const rustfmt = jsonGet(routes.meta.version.rustfmt);
-    const clippy = jsonGet(routes.meta.version.clippy);
-    const miri = jsonGet(routes.meta.version.miri);
-
-    const all = Promise.all([stable, beta, nightly, rustfmt, clippy, miri]);
-
-    return all
-      .then(([stable, beta, nightly, rustfmt, clippy, miri]) => dispatch(receiveVersionsLoadSuccess({
-        stable,
-        beta,
-        nightly,
-        rustfmt,
-        clippy,
-        miri,
-      })));
-    // TODO: Failure case
-  };
-}
-
 const notificationSeen = (notification: Notification) =>
   createAction(ActionType.NotificationSeen, { notification });
 
@@ -654,8 +608,6 @@ export type Action =
   | ReturnType<typeof receiveMacroExpansionFailure>
   | ReturnType<typeof requestCratesLoad>
   | ReturnType<typeof receiveCratesLoadSuccess>
-  | ReturnType<typeof requestVersionsLoad>
-  | ReturnType<typeof receiveVersionsLoadSuccess>
   | ReturnType<typeof notificationSeen>
   | ReturnType<typeof browserWidthChanged>
   | ReturnType<typeof wsExecuteRequest>
