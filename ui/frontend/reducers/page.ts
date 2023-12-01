@@ -1,13 +1,22 @@
-import { Action, ActionType } from '../actions';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+
 import { Page } from '../types';
 
-export type State = Page;
+const initialState = 'index' as Page;
 
-export default function page(state: State = 'index', action: Action) {
-  switch (action.type) {
-    case ActionType.SetPage:
-      return action.page;
-    default:
-      return state;
-  }
-}
+const slice = createSlice({
+  name: 'page',
+  initialState,
+  reducers: {
+    setPage: (_state, action: PayloadAction<Page>) => {
+      return action.payload;
+    },
+  },
+});
+
+export const { setPage } = slice.actions;
+
+export const navigateToIndex = () => setPage('index');
+export const navigateToHelp = () => setPage('help');
+
+export default slice.reducer;

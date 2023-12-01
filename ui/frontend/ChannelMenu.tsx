@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import MenuGroup from './MenuGroup';
 import SelectOne from './SelectOne';
 
-import * as actions from './actions';
+import * as config from './reducers/configuration';
 import * as selectors from './selectors';
 import State from './state';
 import { Channel } from './types';
@@ -25,7 +25,7 @@ const ChannelMenu: React.FC<ChannelMenuProps> = props => {
 
   const dispatch = useDispatch();
   const changeChannel = useCallback((channel: Channel) => {
-    dispatch(actions.changeChannel(channel));
+    dispatch(config.changeChannel(channel));
     props.close();
   }, [dispatch, props]);
 

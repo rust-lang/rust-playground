@@ -1,4 +1,5 @@
-import { Action, ActionType } from '../actions';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+
 import { Notification } from '../types';
 
 interface State {
@@ -11,7 +12,7 @@ interface State {
   seenRustSurvey2022: boolean;
 }
 
-const DEFAULT: State = {
+const initialState: State = {
   seenRustSurvey2018: true,
   seenRust2018IsDefault: true,
   seenRustSurvey2020: true,
@@ -21,16 +22,22 @@ const DEFAULT: State = {
   seenRustSurvey2022: false,
 };
 
-export default function notifications(state = DEFAULT, action: Action): State {
-  switch (action.type) {
-    case ActionType.NotificationSeen: {
-      switch (action.notification) {
+const slice = createSlice({
+  name: 'notifications',
+  initialState,
+  reducers: {
+    notificationSeen: (state, action: PayloadAction<Notification>) => {
+      switch (action.payload) {
         case Notification.RustSurvey2022: {
-          return { ...state, seenRustSurvey2022: true };
+          state.seenRustSurvey2022 = true;
         }
       }
-    }
-    default:
-      return state;
-  }
-}
+    },
+  },
+});
+
+const { notificationSeen } = slice.actions;
+
+export const seenRustSurvey2022 = () => notificationSeen(Notification.RustSurvey2022);
+
+export default slice.reducer;

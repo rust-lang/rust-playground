@@ -1,12 +1,12 @@
 import React from 'react';
 
-import * as actions from './actions';
 import Example from './HelpExample';
 import Link from './uss-router/Link';
 
 import styles from './Help.module.css';
 
 import integer32Logo from './assets/integer32-logo.svg';
+import { navigateToIndex } from './reducers/page';
 
 const ACE_URL = 'https://github.com/ajaxorg/ace';
 const CLIPPY_URL = 'https://github.com/rust-lang/rust-clippy';
@@ -79,7 +79,7 @@ const Help: React.FC = () => {
   return (
     <section className={styles.container}>
       <h1>The Rust Playground</h1>
-      <Link action={actions.navigateToIndex}>Return to the playground</Link>
+      <Link action={navigateToIndex}>Return to the playground</Link>
 
       <LinkableSection id="about" header="About" level="h2">
         <p>

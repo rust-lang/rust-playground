@@ -4,7 +4,7 @@ import { Channel, makePosition, Position } from './types';
 interface ConfigureRustErrorsArgs {
   enableFeatureGate: (feature: string) => void;
   getChannel: () => Channel;
-  gotoPosition: (line: string | number, column: string | number) => void;
+  gotoPosition: (p: Position) => void;
   selectText: (start: Position, end: Position) => void;
   addImport: (code: string) => void;
   reExecuteWithBacktrace: () => void;
@@ -154,7 +154,7 @@ export function configureRustErrors({
         link.onclick = e => {
           e.preventDefault();
           if (line && col) {
-            gotoPosition(line, col);
+            gotoPosition(makePosition(line, col));
           }
         };
       }
@@ -178,7 +178,7 @@ export function configureRustErrors({
           e.preventDefault();
           if (link.dataset.featureGate) {
             enableFeatureGate(link.dataset.featureGate);
-            gotoPosition(1, 1);
+            gotoPosition(makePosition(1, 1));
           }
         };
       }

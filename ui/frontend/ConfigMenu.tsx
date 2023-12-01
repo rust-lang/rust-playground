@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Either as EitherConfig, Select as SelectConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
 
-import * as actions from './actions';
+import * as config from './reducers/configuration';
 import State from './state';
 import {
   AssemblyFlavor,
@@ -33,19 +33,19 @@ const ConfigMenu: React.FC = () => {
   const processAssembly = useSelector((state: State) => state.configuration.processAssembly);
 
   const dispatch = useDispatch();
-  const changeAceTheme = useCallback((t: string) => dispatch(actions.changeAceTheme(t)), [dispatch]);
-  const changeMonacoTheme = useCallback((t: string) => dispatch(actions.changeMonacoTheme(t)), [dispatch]);
-  const changeKeybinding = useCallback((k: string) => dispatch(actions.changeKeybinding(k)), [dispatch]);
-  const changeOrientation = useCallback((o: Orientation) => dispatch(actions.changeOrientation(o)), [dispatch]);
-  const changeEditorStyle = useCallback((e: Editor) => dispatch(actions.changeEditor(e)), [dispatch]);
+  const changeAceTheme = useCallback((t: string) => dispatch(config.changeAceTheme(t)), [dispatch]);
+  const changeMonacoTheme = useCallback((t: string) => dispatch(config.changeMonacoTheme(t)), [dispatch]);
+  const changeKeybinding = useCallback((k: string) => dispatch(config.changeKeybinding(k)), [dispatch]);
+  const changeOrientation = useCallback((o: Orientation) => dispatch(config.changeOrientation(o)), [dispatch]);
+  const changeEditorStyle = useCallback((e: Editor) => dispatch(config.changeEditor(e)), [dispatch]);
   const changeAssemblyFlavor =
-    useCallback((a: AssemblyFlavor) => dispatch(actions.changeAssemblyFlavor(a)), [dispatch]);
+    useCallback((a: AssemblyFlavor) => dispatch(config.changeAssemblyFlavor(a)), [dispatch]);
   const changePairCharacters =
-    useCallback((p: PairCharacters) => dispatch(actions.changePairCharacters(p)), [dispatch]);
+    useCallback((p: PairCharacters) => dispatch(config.changePairCharacters(p)), [dispatch]);
   const changeProcessAssembly =
-    useCallback((p: ProcessAssembly) => dispatch(actions.changeProcessAssembly(p)), [dispatch]);
+    useCallback((p: ProcessAssembly) => dispatch(config.changeProcessAssembly(p)), [dispatch]);
   const changeDemangleAssembly =
-    useCallback((d: DemangleAssembly) => dispatch(actions.changeDemangleAssembly(d)), [dispatch]);
+    useCallback((d: DemangleAssembly) => dispatch(config.changeDemangleAssembly(d)), [dispatch]);
 
   return (
     <Fragment>
