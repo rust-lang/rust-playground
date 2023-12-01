@@ -374,11 +374,13 @@ struct FormatResponse {
 
 #[derive(Debug, Clone, Deserialize)]
 struct ClippyRequest {
-    code: String,
     #[serde(default)]
-    edition: String,
+    channel: Option<String>,
     #[serde(default = "default_crate_type", rename = "crateType")]
     crate_type: String,
+    #[serde(default)]
+    edition: String,
+    code: String,
 }
 
 #[derive(Debug, Clone, Serialize)]

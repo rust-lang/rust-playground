@@ -3,7 +3,6 @@ import { ThunkAction as ReduxThunkAction, AnyAction } from '@reduxjs/toolkit';
 
 import {
   codeSelector,
-  clippyRequestSelector,
   getCrateType,
   runAsTest,
   wasmLikelyToWork,
@@ -84,9 +83,6 @@ export enum ActionType {
   EnableFeatureGate = 'ENABLE_FEATURE_GATE',
   GotoPosition = 'GOTO_POSITION',
   SelectText = 'SELECT_TEXT',
-  RequestClippy = 'REQUEST_CLIPPY',
-  ClippySucceeded = 'CLIPPY_SUCCEEDED',
-  ClippyFailed = 'CLIPPY_FAILED',
   RequestMiri = 'REQUEST_MIRI',
   MiriSucceeded = 'MIRI_SUCCEEDED',
   MiriFailed = 'MIRI_FAILED',
@@ -346,42 +342,6 @@ interface GeneralSuccess {
   stderr: string;
 }
 
-const requestClippy = () =>
-  createAction(ActionType.RequestClippy);
-
-interface ClippyRequestBody {
-  code: string;
-  edition: string;
-  crateType: string;
-}
-
-interface ClippyResponseBody {
-  success: boolean;
-  stdout: string;
-  stderr: string;
-}
-
-type ClippySuccess = GeneralSuccess;
-
-const receiveClippySuccess = ({ stdout, stderr }: ClippySuccess) =>
-  createAction(ActionType.ClippySucceeded, { stdout, stderr });
-
-const receiveClippyFailure = ({ error }: GenericApiFailure) =>
-  createAction(ActionType.ClippyFailed, { error });
-
-export function performClippy(): ThunkAction {
-  // TODO: Check a cache
-  return function(dispatch, getState) {
-    dispatch(requestClippy());
-
-    const body: ClippyRequestBody = clippyRequestSelector(getState());
-
-    return jsonPost<ClippyResponseBody>(routes.clippy, body)
-      .then(json => dispatch(receiveClippySuccess(json)))
-      .catch(json => dispatch(receiveClippyFailure(json)));
-  };
-}
-
 const requestMiri = () =>
   createAction(ActionType.RequestMiri);
 
@@ -597,9 +557,6 @@ export type Action =
   | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof gotoPosition>
   | ReturnType<typeof selectText>
-  | ReturnType<typeof requestClippy>
-  | ReturnType<typeof receiveClippySuccess>
-  | ReturnType<typeof receiveClippyFailure>
   | ReturnType<typeof requestMiri>
   | ReturnType<typeof receiveMiriSuccess>
   | ReturnType<typeof receiveMiriFailure>
