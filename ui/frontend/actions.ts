@@ -19,7 +19,7 @@ import {
   parseMode,
 } from './types';
 
-import { performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
+import { performCommonExecute } from './reducers/output/execute';
 import { performGistLoad } from './reducers/output/gist';
 import { performCompileToAssemblyOnly } from './reducers/output/assembly';
 import { performCompileToHirOnly } from './reducers/output/hir';
@@ -36,10 +36,7 @@ import {
   changePrimaryAction,
 } from './reducers/configuration';
 
-export type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, Action>;
-export type SimpleThunkAction<T = void> = ReduxThunkAction<T, State, {}, AnyAction>;
-
-export enum ActionType {}
+export type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, AnyAction>;
 
 export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
   dispatch(changeBacktrace(Backtrace.Enabled));
@@ -164,15 +161,3 @@ export function showExample(code: string): ThunkAction {
     dispatch(editCode(code));
   };
 }
-
-export type Action =
-  | ReturnType<typeof changeBacktrace>
-  | ReturnType<typeof changeChannel>
-  | ReturnType<typeof changeEditionRaw>
-  | ReturnType<typeof changeMode>
-  | ReturnType<typeof changePrimaryAction>
-  | ReturnType<typeof editCode>
-  | ReturnType<typeof addCrateType>
-  | ReturnType<typeof navigateToIndex>
-  | ReturnType<typeof wsExecuteRequest>
-  ;

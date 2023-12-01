@@ -14,7 +14,7 @@ interface BuildMenuProps {
   close: () => void;
 }
 
-const useDispatchAndClose = (action: () => actions.SimpleThunkAction, close: () => void) => {
+const useDispatchAndClose = (action: () => actions.ThunkAction, close: () => void) => {
   const dispatch = useAppDispatch();
 
   return useCallback(() => {

@@ -1,7 +1,7 @@
 import { AnyAction, Draft, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { SimpleThunkAction } from '../../actions';
+import { ThunkAction } from '../../actions';
 import { jsonPost, routes } from '../../api';
 import { executeRequestPayloadSelector, executeViaWebsocketSelector } from '../../selectors';
 import { Channel, Edition, Mode } from '../../types';
@@ -194,7 +194,7 @@ const slice = createSlice({
 export const { wsExecuteRequest } = slice.actions;
 
 export const performCommonExecute =
-  (crateType: string, tests: boolean): SimpleThunkAction =>
+  (crateType: string, tests: boolean): ThunkAction =>
   (dispatch, getState) => {
     const state = getState();
     const body = executeRequestPayloadSelector(state, { crateType, tests });
@@ -208,7 +208,7 @@ export const performCommonExecute =
   };
 
 const dispatchWhenSequenceNumber =
-  <A extends AnyAction>(cb: (sequenceNumber: number) => A): SimpleThunkAction =>
+  <A extends AnyAction>(cb: (sequenceNumber: number) => A): ThunkAction =>
   (dispatch, getState) => {
     const state = getState();
     const { sequenceNumber } = state.output.execute;
@@ -218,17 +218,17 @@ const dispatchWhenSequenceNumber =
     }
   };
 
-export const wsExecuteStdin = (payload: string): SimpleThunkAction =>
+export const wsExecuteStdin = (payload: string): ThunkAction =>
   dispatchWhenSequenceNumber((sequenceNumber) =>
     slice.actions.wsExecuteStdin(payload, sequenceNumber),
   );
 
-export const wsExecuteStdinClose = (): SimpleThunkAction =>
+export const wsExecuteStdinClose = (): ThunkAction =>
   dispatchWhenSequenceNumber((sequenceNumber) =>
     slice.actions.wsExecuteStdinClose(undefined, sequenceNumber),
   );
 
-export const wsExecuteKill = (): SimpleThunkAction =>
+export const wsExecuteKill = (): ThunkAction =>
   dispatchWhenSequenceNumber((sequenceNumber) =>
     slice.actions.wsExecuteKill(undefined, sequenceNumber),
   );
