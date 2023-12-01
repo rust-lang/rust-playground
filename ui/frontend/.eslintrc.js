@@ -97,6 +97,7 @@ module.exports = {
         'reducers/selection.ts',
         'reducers/versions.ts',
         'reducers/websocket.ts',
+        'selectors/index.spec.ts',
         'types.ts',
         'websocketActions.ts',
         'websocketMiddleware.ts',
