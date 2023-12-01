@@ -1,17 +1,36 @@
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { sortBy } from 'lodash-es';
+import * as z from 'zod';
 
-import { Action, ActionType } from '../actions';
+import { adaptFetchError, jsonGet, routes } from '../actions';
 import { Crate } from '../types';
 
-const DEFAULT: State = [];
+const sliceName = 'crates';
+
+const initialState: State = [];
 
 export type State = Crate[];
 
-export default function crates(state = DEFAULT, action: Action) {
-  switch (action.type) {
-    case ActionType.CratesLoadSucceeded:
-      return sortBy(action.crates, c => c.name);
-    default:
-      return state;
-  }
-}
+const CratesResponse = z.object({
+  crates: Crate.array(),
+});
+type CratesResponse = z.infer<typeof CratesResponse>;
+
+export const performCratesLoad = createAsyncThunk(sliceName, async () => {
+  const d = await adaptFetchError(() => jsonGet(routes.meta.crates));
+  const crates = await CratesResponse.parseAsync(d);
+  return sortBy(crates.crates, (c) => c.name);
+});
+
+const slice = createSlice({
+  name: sliceName,
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(performCratesLoad.fulfilled, (_state, action) => {
+      return action.payload;
+    });
+  },
+});
+
+export default slice.reducer;

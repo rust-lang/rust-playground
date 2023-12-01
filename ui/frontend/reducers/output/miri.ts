@@ -1,7 +1,13 @@
-import { Action, ActionType } from '../../actions';
-import { finish, start } from './sharedStateManagement';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import * as z from 'zod';
 
-const DEFAULT: State = {
+import { adaptFetchError, jsonPost, routes } from '../../actions';
+import { miriRequestSelector } from '../../selectors';
+import RootState from '../../state';
+
+const sliceName = 'output/miri';
+
+const initialState: State = {
   requestsInProgress: 0,
 };
 
@@ -12,17 +18,46 @@ interface State {
   error?: string;
 }
 
-export default function miri(state = DEFAULT, action: Action) {
-  switch (action.type) {
-    case ActionType.RequestMiri:
-      return start(DEFAULT, state);
-    case ActionType.MiriSucceeded: {
-      const { stdout = '', stderr = '' } = action;
-      return finish(state, { stdout, stderr });
-    }
-    case ActionType.MiriFailed:
-      return finish(state, { error: action.error });
-    default:
-      return state;
-  }
+interface MiriRequestBody {
+  code: string;
+  edition: string;
 }
+
+const MiriResponseBody = z.object({
+  success: z.boolean(),
+  stdout: z.string(),
+  stderr: z.string(),
+});
+
+type MiriResponseBody = z.infer<typeof MiriResponseBody>;
+
+export const performMiri = createAsyncThunk<MiriResponseBody, void, { state: RootState }>(
+  sliceName,
+  async (_arg: void, { getState }) => {
+    const body: MiriRequestBody = miriRequestSelector(getState());
+
+    const d = await adaptFetchError(() => jsonPost(routes.miri, body));
+    return MiriResponseBody.parseAsync(d);
+  },
+);
+
+const slice = createSlice({
+  name: sliceName,
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(performMiri.pending, (state) => {
+        state.requestsInProgress += 1;
+      })
+      .addCase(performMiri.fulfilled, (state, action) => {
+        state.requestsInProgress -= 1;
+        Object.assign(state, action.payload);
+      })
+      .addCase(performMiri.rejected, (state) => {
+        state.requestsInProgress -= 1;
+      });
+  },
+});
+
+export default slice.reducer;
