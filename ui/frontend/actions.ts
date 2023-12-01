@@ -39,16 +39,7 @@ import {
 export type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, Action>;
 export type SimpleThunkAction<T = void> = ReduxThunkAction<T, State, {}, AnyAction>;
 
-const createAction = <T extends string, P extends {}>(type: T, props?: P) => (
-  Object.assign({ type }, props)
-);
-
-export enum ActionType {
-  InitializeApplication = 'INITIALIZE_APPLICATION',
-}
-
-export const initializeApplication = () => createAction(ActionType.InitializeApplication);
-
+export enum ActionType {}
 
 export const reExecuteWithBacktrace = (): ThunkAction => dispatch => {
   dispatch(changeBacktrace(Backtrace.Enabled));
@@ -175,7 +166,6 @@ export function showExample(code: string): ThunkAction {
 }
 
 export type Action =
-  | ReturnType<typeof initializeApplication>
   | ReturnType<typeof changeBacktrace>
   | ReturnType<typeof changeChannel>
   | ReturnType<typeof changeEditionRaw>
