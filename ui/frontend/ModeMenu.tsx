@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import MenuGroup from './MenuGroup';
 import SelectOne from './SelectOne';
 
-import * as actions from './actions';
+import * as config from './reducers/configuration';
 import State from './state';
 import { Mode } from './types';
 
@@ -16,7 +16,7 @@ const ModeMenu: React.FC<ModeMenuProps> = props => {
   const mode = useSelector((state: State) => state.configuration.mode);
   const dispatch = useDispatch();
   const changeMode = useCallback((mode: Mode) => {
-    dispatch(actions.changeMode(mode));
+    dispatch(config.changeMode(mode));
     props.close();
   }, [dispatch, props]
   );

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import * as actions from './actions';
+import * as config from './reducers/configuration';
 import { Either as EitherConfig, Select as SelectConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
 import { State } from './reducers';
@@ -16,8 +16,8 @@ const AdvancedOptionsMenu: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const changeEdition = useCallback((e: Edition) => dispatch(actions.changeEdition(e)), [dispatch]);
-  const changeBacktrace = useCallback((b: Backtrace) => dispatch(actions.changeBacktrace(b)), [dispatch]);
+  const changeEdition = useCallback((e: Edition) => dispatch(config.changeEdition(e)), [dispatch]);
+  const changeBacktrace = useCallback((b: Backtrace) => dispatch(config.changeBacktrace(b)), [dispatch]);
 
   const channel  = useSelector((state: State) => state.configuration.channel);
   const switchText = (channel !== Channel.Nightly) ? ' (will select nightly Rust)' : '';

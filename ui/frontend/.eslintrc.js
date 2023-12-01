@@ -74,6 +74,7 @@ module.exports = {
         'reducers/browser.ts',
         'reducers/client.ts',
         'reducers/code.ts',
+        'reducers/configuration.ts',
         'reducers/crates.ts',
         'reducers/featureFlags.ts',
         'reducers/globalConfiguration.ts',
