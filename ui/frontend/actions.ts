@@ -22,7 +22,6 @@ import {
   PrimaryActionCore,
   ProcessAssembly,
   Position,
-  makePosition,
 } from './types';
 
 import { performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
@@ -62,7 +61,6 @@ export enum ActionType {
   AddImport = 'ADD_IMPORT',
   AddCrateType = 'ADD_CRATE_TYPE',
   EnableFeatureGate = 'ENABLE_FEATURE_GATE',
-  GotoPosition = 'GOTO_POSITION',
   SelectText = 'SELECT_TEXT',
   NotificationSeen = 'NOTIFICATION_SEEN',
   BrowserWidthChanged = 'BROWSER_WIDTH_CHANGED',
@@ -213,9 +211,6 @@ export const addCrateType = (crateType: string) =>
 export const enableFeatureGate = (featureGate: string) =>
   createAction(ActionType.EnableFeatureGate, { featureGate });
 
-export const gotoPosition = (line: string | number, column: string | number) =>
-  createAction(ActionType.GotoPosition, makePosition(line, column));
-
 export const selectText = (start: Position, end: Position) =>
   createAction(ActionType.SelectText, { start, end });
 
@@ -333,7 +328,6 @@ export type Action =
   | ReturnType<typeof addImport>
   | ReturnType<typeof addCrateType>
   | ReturnType<typeof enableFeatureGate>
-  | ReturnType<typeof gotoPosition>
   | ReturnType<typeof selectText>
   | ReturnType<typeof notificationSeen>
   | ReturnType<typeof browserWidthChanged>

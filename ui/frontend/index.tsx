@@ -11,7 +11,6 @@ import { v4 } from 'uuid';
 import {
   editCode,
   enableFeatureGate,
-  gotoPosition,
   selectText,
   addImport,
   reExecuteWithBacktrace,
@@ -27,6 +26,7 @@ import Router from './Router';
 import configureStore from './configureStore';
 import { performVersionsLoad } from './reducers/versions';
 import { performCratesLoad } from './reducers/crates';
+import { gotoPosition } from './reducers/position';
 
 const store = configureStore(window);
 
@@ -61,7 +61,7 @@ maxWidthMediaQuery.addEventListener('change', whenBrowserWidthChanged);
 
 configureRustErrors({
   enableFeatureGate: featureGate => store.dispatch(enableFeatureGate(featureGate)),
-  gotoPosition: (line, col) => store.dispatch(gotoPosition(line, col)),
+  gotoPosition: (p) => store.dispatch(gotoPosition(p)),
   selectText: (start, end) => store.dispatch(selectText(start, end)),
   addImport: (code) => store.dispatch(addImport(code)),
   reExecuteWithBacktrace: () => store.dispatch(reExecuteWithBacktrace()),

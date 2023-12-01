@@ -1,20 +1,22 @@
-import { Action, ActionType } from '../actions';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+
 import { Position } from '../types';
 
-const DEFAULT: Position = {
+const initialState: Position = {
   line: 0,
   column: 0,
 };
 
-export type State = Position;
+const slice = createSlice({
+  name: 'position',
+  initialState,
+  reducers: {
+    gotoPosition: (_state, action: PayloadAction<Position>) => {
+      return action.payload;
+    },
+  },
+});
 
-export default function position(state = DEFAULT, action: Action) {
-  switch (action.type) {
-    case ActionType.GotoPosition: {
-      const { line, column } = action;
-      return { ...state, line, column };
-    }
-    default:
-      return state;
-  }
-}
+export const { gotoPosition } = slice.actions;
+
+export default slice.reducer;
