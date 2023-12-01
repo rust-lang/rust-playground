@@ -16,7 +16,6 @@ import {
   Mode,
   Notification,
   Orientation,
-  Page,
   PairCharacters,
   PrimaryAction,
   PrimaryActionAuto,
@@ -33,6 +32,7 @@ import { performCompileToHirOnly } from './reducers/output/hir';
 import { performCompileToLlvmIrOnly } from './reducers/output/llvmIr';
 import { performCompileToMirOnly } from './reducers/output/mir';
 import { performCompileToWasmOnly } from './reducers/output/wasm';
+import { navigateToHelp, navigateToIndex } from './reducers/page';
 
 export type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, Action>;
 export type SimpleThunkAction<T = void> = ReduxThunkAction<T, State, {}, AnyAction>;
@@ -43,7 +43,6 @@ const createAction = <T extends string, P extends {}>(type: T, props?: P) => (
 
 export enum ActionType {
   InitializeApplication = 'INITIALIZE_APPLICATION',
-  SetPage = 'SET_PAGE',
   ChangeEditor = 'CHANGE_EDITOR',
   ChangeKeybinding = 'CHANGE_KEYBINDING',
   ChangeAceTheme = 'CHANGE_ACE_THEME',
@@ -70,12 +69,6 @@ export enum ActionType {
 }
 
 export const initializeApplication = () => createAction(ActionType.InitializeApplication);
-
-const setPage = (page: Page) =>
-  createAction(ActionType.SetPage, { page });
-
-export const navigateToIndex = () => setPage('index');
-export const navigateToHelp = () => setPage('help');
 
 export const changeEditor = (editor: Editor) =>
   createAction(ActionType.ChangeEditor, { editor });
@@ -310,9 +303,7 @@ export function indexPageLoad({
   };
 }
 
-export function helpPageLoad() {
-  return navigateToHelp();
-}
+export const helpPageLoad = navigateToHelp;
 
 export function showExample(code: string): ThunkAction {
   return function(dispatch) {
@@ -323,7 +314,6 @@ export function showExample(code: string): ThunkAction {
 
 export type Action =
   | ReturnType<typeof initializeApplication>
-  | ReturnType<typeof setPage>
   | ReturnType<typeof changePairCharacters>
   | ReturnType<typeof changeAssemblyFlavor>
   | ReturnType<typeof changeBacktrace>
@@ -347,5 +337,6 @@ export type Action =
   | ReturnType<typeof selectText>
   | ReturnType<typeof notificationSeen>
   | ReturnType<typeof browserWidthChanged>
+  | ReturnType<typeof navigateToIndex>
   | ReturnType<typeof wsExecuteRequest>
   ;

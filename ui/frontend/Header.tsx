@@ -20,6 +20,7 @@ import ToolsMenu from './ToolsMenu';
 import * as actions from './actions';
 import { useAppDispatch } from './configureStore';
 import { performGistSave } from './reducers/output/gist';
+import { navigateToHelp } from './reducers/page';
 import * as selectors from './selectors';
 
 import styles from './Header.module.css';
@@ -195,7 +196,7 @@ const ConfigMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
 };
 
 const HelpButton: React.FC = () => (
-  <IconLink title="View help" action={actions.navigateToHelp}>
+  <IconLink title="View help" action={navigateToHelp}>
     <HelpIcon />
   </IconLink>
 );
