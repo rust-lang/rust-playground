@@ -20,7 +20,6 @@ import {
   PrimaryActionAuto,
   PrimaryActionCore,
   ProcessAssembly,
-  Position,
 } from './types';
 
 import { performCommonExecute, wsExecuteRequest } from './reducers/output/execute';
@@ -56,7 +55,6 @@ export enum ActionType {
   ChangeMode = 'CHANGE_MODE',
   ChangeEdition = 'CHANGE_EDITION',
   ChangeBacktrace = 'CHANGE_BACKTRACE',
-  SelectText = 'SELECT_TEXT',
 }
 
 export const initializeApplication = () => createAction(ActionType.InitializeApplication);
@@ -189,9 +187,6 @@ export const performCompileToNightlyHir =
 export const performCompileToWasm =
   performAndSwitchPrimaryAction(performCompileToCdylibWasmOnly, PrimaryActionCore.Wasm);
 
-export const selectText = (start: Position, end: Position) =>
-  createAction(ActionType.SelectText, { start, end });
-
 function parseChannel(s?: string): Channel | null {
   switch (s) {
     case 'stable':
@@ -293,7 +288,6 @@ export type Action =
   | ReturnType<typeof changeProcessAssembly>
   | ReturnType<typeof changeAceTheme>
   | ReturnType<typeof changeMonacoTheme>
-  | ReturnType<typeof selectText>
   | ReturnType<typeof editCode>
   | ReturnType<typeof addCrateType>
   | ReturnType<typeof navigateToIndex>

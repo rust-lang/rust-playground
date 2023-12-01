@@ -1,16 +1,21 @@
-import { Action, ActionType } from '../actions';
-import { Selection } from '../types';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-const DEFAULT: Selection = {
-};
+import { Position, Selection } from '../types';
 
-export default function position(state = DEFAULT, action: Action) {
-  switch (action.type) {
-    case ActionType.SelectText: {
-      const { start, end } = action;
-      return { ...state, start, end };
-    }
-    default:
-      return state;
-  }
-}
+const initialState: Selection = {};
+
+const slice = createSlice({
+  name: 'selection',
+  initialState,
+  reducers: {
+    selectText: {
+      reducer: (_state, action: PayloadAction<Selection>) => action.payload,
+
+      prepare: (start: Position, end: Position) => ({ payload: { start, end } }),
+    },
+  },
+});
+
+export const { selectText } = slice.actions;
+
+export default slice.reducer;

@@ -92,6 +92,7 @@ module.exports = {
         'reducers/output/wasm.ts',
         'reducers/page.ts',
         'reducers/position.ts',
+        'reducers/selection.ts',
         'reducers/versions.ts',
         'reducers/websocket.ts',
         'websocketActions.ts',
