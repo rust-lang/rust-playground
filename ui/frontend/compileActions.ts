@@ -1,7 +1,7 @@
 import { AsyncThunk, createAsyncThunk } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
-import { SimpleThunkAction } from './actions';
+import { ThunkAction } from './actions';
 import { jsonPost, routes } from './api';
 import { compileRequestPayloadSelector } from './selectors';
 
@@ -33,7 +33,7 @@ interface Props {
 
 interface CompileActions {
   action: AsyncThunk<CompileResponseBody, CompileRequestBody, {}>;
-  performCompile: () => SimpleThunkAction;
+  performCompile: () => ThunkAction;
 }
 
 export const makeCompileActions = ({ sliceName, target }: Props): CompileActions => {
@@ -42,7 +42,7 @@ export const makeCompileActions = ({ sliceName, target }: Props): CompileActions
     return CompileResponseBody.parseAsync(d);
   });
 
-  const performCompile = (): SimpleThunkAction => (dispatch, getState) => {
+  const performCompile = (): ThunkAction => (dispatch, getState) => {
     const state = getState();
     const body = compileRequestPayloadSelector(state, { target });
     dispatch(action(body));

@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import { SimpleThunkAction } from '../actions';
+import { ThunkAction } from '../actions';
 import {
   AssemblyFlavor,
   Backtrace,
@@ -16,7 +16,7 @@ import {
   ProcessAssembly,
 } from '../types';
 
-export interface State {
+interface State {
   editor: Editor;
   ace: {
     keybinding: string;
@@ -138,7 +138,7 @@ export const {
 } = slice.actions;
 
 export const changeEdition =
-  (edition: Edition): SimpleThunkAction =>
+  (edition: Edition): ThunkAction =>
   (dispatch) => {
     if (edition === Edition.Rust2024) {
       dispatch(changeChannel(Channel.Nightly));

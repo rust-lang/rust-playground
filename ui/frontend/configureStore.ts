@@ -4,7 +4,6 @@ import { configureStore as reduxConfigureStore } from '@reduxjs/toolkit';
 import { produce } from 'immer';
 import type {} from 'redux-thunk/extend-redux';
 
-import { initializeApplication } from './actions';
 import initializeLocalStorage from './local_storage';
 import initializeSessionStorage from './session_storage';
 import { websocketMiddleware } from './websocketMiddleware';
@@ -19,7 +18,7 @@ export default function configureStore(window: Window) {
       baseUrl,
     },
   };
-  const initialAppState = reducer(undefined, initializeApplication());
+  const initialAppState = reducer(undefined, { type: 'initializeForStore' });
 
   const localStorage = initializeLocalStorage();
   const sessionStorage = initializeSessionStorage();

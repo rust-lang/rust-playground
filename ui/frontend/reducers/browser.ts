@@ -4,7 +4,7 @@ const initialState: State = {
   isSmall: true,
 };
 
-export type State = {
+type State = {
   isSmall: boolean;
 };
 

@@ -3,7 +3,7 @@ import z from 'zod';
 
 import { createWebsocketResponseSchema, makeWebSocketMeta } from '../websocketActions';
 
-export type State = {
+type State = {
   connected: boolean;
   error?: string;
 };
