@@ -1,4 +1,10 @@
-import { Draft, PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import {
+  Draft,
+  PayloadAction,
+  SerializedError,
+  createAsyncThunk,
+  createSlice,
+} from '@reduxjs/toolkit';
 import * as z from 'zod';
 
 import { jsonGet, jsonPost, routes } from '../../api';
@@ -22,6 +28,7 @@ interface State {
   channel?: Channel;
   mode?: Mode;
   edition?: Edition;
+  error?: string;
 }
 
 interface SuccessProps {
@@ -81,12 +88,21 @@ export const performGistSave = createAsyncThunk<SuccessProps, void, { state: Roo
 );
 
 const pending = (state: Draft<State>) => {
+  delete state.error;
   state.requestsInProgress += 1;
 };
 
 const fulfilled = (state: Draft<State>, action: PayloadAction<SuccessProps>) => {
   state.requestsInProgress -= 1;
   Object.assign(state, action.payload);
+};
+
+const rejected = (
+  state: Draft<State>,
+  action: PayloadAction<unknown, string, unknown, SerializedError>,
+) => {
+  state.requestsInProgress -= 1;
+  state.error = action.error.message;
 };
 
 const slice = createSlice({
@@ -97,8 +113,10 @@ const slice = createSlice({
     builder
       .addCase(performGistLoad.pending, pending)
       .addCase(performGistLoad.fulfilled, fulfilled)
+      .addCase(performGistLoad.rejected, rejected)
       .addCase(performGistSave.pending, pending)
-      .addCase(performGistSave.fulfilled, fulfilled);
+      .addCase(performGistSave.fulfilled, fulfilled)
+      .addCase(performGistSave.rejected, rejected);
   },
 });
 

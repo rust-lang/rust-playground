@@ -13,13 +13,22 @@ import styles from './Gist.module.css';
 
 const Gist: React.FC = () => {
   const showLoader = useSelector(selectors.showGistLoaderSelector);
+  const error = useSelector((state: State) => state.output.gist.error);
 
-  return (
-    <div>
-      { showLoader ? <Loader /> : <Links />}
-    </div>
-  );
+  if (showLoader) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <Error error={error} />;
+  }
+
+  return <Links />;
 };
+
+const Error: React.FC<{error: string}> = ({ error }) => (
+  <Section kind="error" label="Errors">{error}</Section>
+);
 
 interface CopiedProps {
   children: React.ReactNode;
