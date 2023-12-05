@@ -589,8 +589,9 @@ async fn handle_execute_inner(
         stdin_tx,
         mut stdout_rx,
         mut stderr_rx,
+        mut status_rx,
     } = coordinator
-        .begin_execute(token.clone(), req)
+        .begin_execute(token.clone(), req.clone())
         .await
         .context(BeginSnafu)?;
 
@@ -612,6 +613,8 @@ async fn handle_execute_inner(
         tx.send(Ok(MessageResponse::ExecuteStderr { payload, meta }))
             .await
     };
+
+    let mut reported = false;
 
     let status = loop {
         tokio::select! {
@@ -644,6 +647,13 @@ async fn handle_execute_inner(
                 let sent = send_stderr(stderr).await;
                 abandon_if_closed!(sent);
             },
+
+            Some(status) = status_rx.recv() => {
+                if !reported && status.total_time_secs > 60.0 {
+                    error!("Request consumed more than 60s of CPU time: {req:?}");
+                    reported = true;
+                }
+            }
         }
     };
 

@@ -447,6 +447,12 @@ impl ProcessState {
             }
         };
 
+        let statistics_task = tokio::task::spawn_blocking({
+            let child_id = child.id();
+            let worker_msg_tx = worker_msg_tx.clone();
+            move || stream_command_statistics(child_id, worker_msg_tx)
+        });
+
         let task_set = stream_stdio(worker_msg_tx.clone(), stdin_rx, stdin, stdout, stderr);
 
         self.kill_tokens.insert(job_id, token.clone());
@@ -455,7 +461,17 @@ impl ProcessState {
             let stdin_shutdown_tx = self.stdin_shutdown_tx.clone();
             async move {
                 worker_msg_tx
-                    .send(process_end(token, child, task_set, stdin_shutdown_tx, job_id).await)
+                    .send(
+                        process_end(
+                            token,
+                            child,
+                            task_set,
+                            statistics_task,
+                            stdin_shutdown_tx,
+                            job_id,
+                        )
+                        .await,
+                    )
                     .await
                     .context(UnableToSendExecuteCommandResponseSnafu)
             }
@@ -590,6 +606,7 @@ async fn process_end(
     token: CancellationToken,
     mut child: Child,
     mut task_set: JoinSet<Result<(), StdioError>>,
+    statistics_task: tokio::task::JoinHandle<Result<(), CommandStatisticsError>>,
     stdin_shutdown_tx: mpsc::Sender<JobId>,
     job_id: JobId,
 ) -> Result<ExecuteCommandResponse, ProcessError> {
@@ -612,6 +629,11 @@ async fn process_end(
         task.context(StdioTaskPanickedSnafu)?
             .context(StdioTaskFailedSnafu)?;
     }
+
+    statistics_task
+        .await
+        .context(StatisticsTaskPanickedSnafu)?
+        .context(StatisticsTaskFailedSnafu)?;
 
     let success = status.success();
     let exit_detail = extract_exit_detail(status);
@@ -754,6 +776,12 @@ pub enum ProcessError {
     #[snafu(display("The command's stdio task failed"))]
     StdioTaskFailed { source: StdioError },
 
+    #[snafu(display("The command's statistics task panicked"))]
+    StatisticsTaskPanicked { source: tokio::task::JoinError },
+
+    #[snafu(display("The command's statistics task failed"))]
+    StatisticsTaskFailed { source: CommandStatisticsError },
+
     #[snafu(display("Failed to send the command started response to the coordinator"))]
     UnableToSendExecuteCommandStartedResponse { source: MultiplexingSenderError },
 
@@ -765,6 +793,183 @@ pub enum ProcessError {
 
     #[snafu(display("The process task panicked"))]
     ProcessTaskPanicked { source: tokio::task::JoinError },
+}
+
+#[cfg(target_os = "macos")]
+mod stats {
+    use libc;
+    use mach2::mach_time::{mach_timebase_info, mach_timebase_info_data_t};
+    use snafu::prelude::*;
+    use std::mem::MaybeUninit;
+
+    use crate::message::CommandStatistics;
+
+    pub struct Process {
+        pid: i32,
+        timebase: mach_timebase_info_data_t,
+    }
+
+    impl Process {
+        pub fn new(pid: i32) -> Result<Self, Error> {
+            let timebase = timebase()?;
+            Ok(Self { pid, timebase })
+        }
+
+        pub fn stats(&self) -> Option<CommandStatistics> {
+            let usage = proc_pid_rusage(self.pid).ok()?;
+
+            let total_time_secs = self.ticks_to_seconds(usage.ri_user_time + usage.ri_system_time);
+            let resident_set_size_bytes = usage.ri_resident_size;
+
+            Some(CommandStatistics {
+                total_time_secs,
+                resident_set_size_bytes,
+            })
+        }
+
+        fn ticks_to_seconds(&self, v: u64) -> f64 {
+            let nanos = v as f64 / self.timebase.denom as f64 * self.timebase.numer as f64;
+            nanos / 1_000_000_000.0
+        }
+    }
+
+    fn timebase() -> Result<mach_timebase_info_data_t, Error> {
+        let mut timebase = Default::default();
+
+        // SAFETY: We've initialized the data structure
+        let retval = unsafe { mach_timebase_info(&mut timebase) };
+
+        if retval != mach2::kern_return::KERN_SUCCESS {
+            Snafu.fail()
+        } else {
+            Ok(timebase)
+        }
+    }
+
+    fn proc_pid_rusage(pid: i32) -> std::io::Result<libc::rusage_info_v4> {
+        // SAFETY: We only access the usage information after checking
+        // the function call succeeded.
+        unsafe {
+            let mut ri = MaybeUninit::<libc::rusage_info_v4>::uninit();
+
+            let retval = libc::proc_pid_rusage(pid, libc::RUSAGE_INFO_V4, ri.as_mut_ptr().cast());
+
+            if retval == 0 {
+                Ok(ri.assume_init())
+            } else {
+                Err(std::io::Error::last_os_error())
+            }
+        }
+    }
+
+    #[derive(Debug, Snafu)]
+    #[snafu(display("Unable to get the timebase conversion"))]
+    pub struct Error;
+}
+
+#[cfg(target_os = "linux")]
+mod stats {
+    use procfs::process::Process as ProcfsProcess;
+    use snafu::prelude::*;
+
+    use crate::message::CommandStatistics;
+
+    pub struct Process {
+        process: ProcfsProcess,
+        ticks_per_second: u64,
+        page_size: u64,
+    }
+
+    impl Process {
+        pub fn new(pid: i32) -> Result<Self, Error> {
+            let process = ProcfsProcess::new(pid).context(Snafu)?;
+
+            let ticks_per_second = procfs::ticks_per_second();
+            let page_size = procfs::page_size();
+
+            Ok(Self {
+                process,
+                ticks_per_second,
+                page_size,
+            })
+        }
+
+        pub fn stats(&self) -> Option<CommandStatistics> {
+            let stat = self.process.stat().ok()?;
+
+            let total_time_secs = self.ticks_to_seconds(stat.utime + stat.stime);
+            let resident_set_size_bytes = self.pages_to_bytes(stat.rss);
+
+            Some(CommandStatistics {
+                total_time_secs,
+                resident_set_size_bytes,
+            })
+        }
+
+        fn ticks_to_seconds(&self, v: u64) -> f64 {
+            v as f64 / self.ticks_per_second as f64
+        }
+
+        fn pages_to_bytes(&self, v: u64) -> u64 {
+            v * self.page_size
+        }
+    }
+
+    #[derive(Debug, Snafu)]
+    #[snafu(display("Could not get information for the process"))]
+    pub struct Error {
+        source: procfs::ProcError,
+    }
+}
+
+fn stream_command_statistics(
+    child_id: Option<u32>,
+    worker_msg_tx: MultiplexingSender,
+) -> Result<(), CommandStatisticsError> {
+    use command_statistics_error::*;
+    use stats::*;
+    use std::time::Duration;
+
+    const STATISTIC_INTERVAL: Duration = Duration::from_secs(1);
+
+    let process_id = child_id.context(ChildIdMissingSnafu)?;
+
+    let process_id = process_id
+        .try_into()
+        .context(ProcessIdOutOfRangeSnafu { process_id })?;
+
+    let process = Process::new(process_id).context(InvalidProcessSnafu { process_id })?;
+
+    while let Some(stats) = process.stats() {
+        let sent = futures::executor::block_on(worker_msg_tx.send_ok(stats));
+        if sent.is_err() {
+            // No one listening anymore
+            break;
+        }
+
+        std::thread::sleep(STATISTIC_INTERVAL);
+    }
+
+    Ok(())
+}
+
+#[derive(Debug, Snafu)]
+#[snafu(module)]
+pub enum CommandStatisticsError {
+    #[snafu(display("The child did not have a process ID"))]
+    ChildIdMissing,
+
+    #[snafu(display("The process ID {process_id} could not be converted"))]
+    ProcessIdOutOfRange {
+        source: std::num::TryFromIntError,
+        process_id: u32,
+    },
+
+    #[snafu(display("The process ID {process_id} is not valid"))]
+    InvalidProcess {
+        source: stats::Error,
+        process_id: i32,
+    },
 }
 
 fn stream_stdio(
