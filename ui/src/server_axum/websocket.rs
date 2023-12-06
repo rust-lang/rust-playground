@@ -443,7 +443,10 @@ fn create_server_meta() -> Meta {
 }
 
 fn error_to_response(error: Error) -> MessageResponse {
-    let error = error.to_string();
+    let error = snafu::CleanedErrorText::new(&error)
+        .map(|(_, t, _)| t)
+        .reduce(|e, t| e + ": " + &t)
+        .unwrap_or_default();
     let payload = WSError { error };
     // TODO: thread through the Meta from the originating request
     let meta = create_server_meta();
