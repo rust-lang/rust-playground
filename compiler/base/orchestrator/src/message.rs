@@ -46,6 +46,7 @@ pub enum WorkerMessage {
     ExecuteCommand(ExecuteCommandResponse),
     StdoutPacket(String),
     StderrPacket(String),
+    CommandStatistics(CommandStatistics),
     Error(SerializedError),
 }
 
@@ -73,6 +74,7 @@ impl_narrow_to_broad!(
     DeleteFile => DeleteFileResponse,
     ReadFile => ReadFileResponse,
     ExecuteCommand => ExecuteCommandResponse,
+    CommandStatistics => CommandStatistics,
 );
 
 impl_broad_to_narrow_with_error!(
@@ -134,6 +136,12 @@ impl ExecuteCommandRequest {
 pub struct ExecuteCommandResponse {
     pub success: bool,
     pub exit_detail: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CommandStatistics {
+    pub total_time_secs: f64,
+    pub resident_set_size_bytes: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

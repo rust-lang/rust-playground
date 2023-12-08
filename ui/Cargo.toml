@@ -11,7 +11,8 @@ fork-bomb-prevention = []
 [dependencies]
 asm-cleanup = { path = "../compiler/base/asm-cleanup" }
 async-trait = "0.1.52"
-axum = { version = "0.6", features = ["headers", "ws"] }
+axum = { version = "0.7", features = ["ws"] }
+axum-extra = { version = "0.9.0", features = ["typed-header"] }
 dotenv = "0.15.0"
 futures = "0.3.21"
 lazy_static = "1.0.0"
@@ -28,6 +29,6 @@ strum = { version = "0.25.0", features = ["derive"] }
 tempfile = "3"
 tokio = { version = "1.9", features = ["macros", "time", "process", "rt-multi-thread"] }
 tokio-util = "0.7.9"
-tower-http = { version = "0.4", features = ["cors", "fs", "set-header", "trace"] }
+tower-http = { version = "0.5", features = ["cors", "fs", "set-header", "trace"] }
 tracing = { version = "0.1.37", features = ["attributes"] }
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }

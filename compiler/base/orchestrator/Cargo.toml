@@ -20,6 +20,13 @@ tokio-util = { version = "0.7.8", default-features = false, features = ["io", "i
 toml = { version = "0.8.2", default-features = false, features = ["parse", "display"] }
 tracing = { version = "0.1.37", default-features = false, features = ["attributes"] }
 
+[target.'cfg(target_os = "linux")'.dependencies]
+procfs = { version = "0.16.0", default-features = false }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+libc = { version = "0.2.150", default-features = false }
+mach2 = { version = "0.4.1", default-features = false }
+
 [dev-dependencies]
 assert_matches = "1.5.0"
 assertables = "7.0.1"

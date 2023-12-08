@@ -29,9 +29,9 @@ use tracing::{instrument, trace, trace_span, warn, Instrument};
 use crate::{
     bincode_input_closed,
     message::{
-        CoordinatorMessage, DeleteFileRequest, ExecuteCommandRequest, ExecuteCommandResponse,
-        JobId, Multiplexed, OneToOneResponse, ReadFileRequest, ReadFileResponse, SerializedError,
-        WorkerMessage, WriteFileRequest,
+        CommandStatistics, CoordinatorMessage, DeleteFileRequest, ExecuteCommandRequest,
+        ExecuteCommandResponse, JobId, Multiplexed, OneToOneResponse, ReadFileRequest,
+        ReadFileResponse, SerializedError, WorkerMessage, WriteFileRequest,
     },
     DropErrorDetailsExt,
 };
@@ -1164,8 +1164,12 @@ impl Container {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx,
         } = v;
+
         drop(stdin_tx);
+        drop(status_rx);
+
         let task = async { task.await?.map_err(VersionError::from) };
         let o = WithOutput::try_absorb(task, stdout_rx, stderr_rx).await?;
         Ok(if o.success { Some(o.stdout) } else { None })
@@ -1191,9 +1195,12 @@ impl Container {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx,
         } = self.begin_execute(token, request).await?;
 
         drop(stdin_tx);
+        drop(status_rx);
+
         WithOutput::try_absorb(task, stdout_rx, stderr_rx).await
     }
 
@@ -1225,6 +1232,7 @@ impl Container {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx,
         } = self
             .spawn_cargo_task(token, execute_cargo)
             .await
@@ -1250,6 +1258,7 @@ impl Container {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx,
         })
     }
 
@@ -1301,12 +1310,14 @@ impl Container {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx,
         } = self
             .spawn_cargo_task(token, execute_cargo)
             .await
             .context(CouldNotStartCargoSnafu)?;
 
         drop(stdin_tx);
+        drop(status_rx);
 
         let commander = self.commander.clone();
         let task = async move {
@@ -1391,12 +1402,14 @@ impl Container {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx,
         } = self
             .spawn_cargo_task(token, execute_cargo)
             .await
             .context(CouldNotStartCargoSnafu)?;
 
         drop(stdin_tx);
+        drop(status_rx);
 
         let commander = self.commander.clone();
         let task = async move {
@@ -1471,12 +1484,14 @@ impl Container {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx,
         } = self
             .spawn_cargo_task(token, execute_cargo)
             .await
             .context(CouldNotStartCargoSnafu)?;
 
         drop(stdin_tx);
+        drop(status_rx);
 
         let task = async move {
             let ExecuteCommandResponse {
@@ -1540,12 +1555,14 @@ impl Container {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx,
         } = self
             .spawn_cargo_task(token, execute_cargo)
             .await
             .context(CouldNotStartCargoSnafu)?;
 
         drop(stdin_tx);
+        drop(status_rx);
 
         let task = async move {
             let ExecuteCommandResponse {
@@ -1612,12 +1629,14 @@ impl Container {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx,
         } = self
             .spawn_cargo_task(token, execute_cargo)
             .await
             .context(CouldNotStartCargoSnafu)?;
 
         drop(stdin_tx);
+        drop(status_rx);
 
         let task = async move {
             let ExecuteCommandResponse {
@@ -1652,6 +1671,7 @@ impl Container {
         let (stdin_tx, mut stdin_rx) = mpsc::channel(8);
         let (stdout_tx, stdout_rx) = mpsc::channel(8);
         let (stderr_tx, stderr_rx) = mpsc::channel(8);
+        let (status_tx, status_rx) = mpsc::channel(8);
 
         let (to_worker_tx, mut from_worker_rx) = self
             .commander
@@ -1703,6 +1723,9 @@ impl Container {
                                 WorkerMessage::StderrPacket(packet) => {
                                     stderr_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
                                 }
+                                WorkerMessage::CommandStatistics(stats) => {
+                                    status_tx.send(stats).await.ok(/* Receiver gone, that's OK */);
+                                }
                                 _ => return UnexpectedMessageSnafu.fail(),
                             }
                         },
@@ -1719,6 +1742,7 @@ impl Container {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx,
         })
     }
 
@@ -1739,6 +1763,7 @@ pub struct ActiveExecution {
     pub stdin_tx: mpsc::Sender<String>,
     pub stdout_rx: mpsc::Receiver<String>,
     pub stderr_rx: mpsc::Receiver<String>,
+    pub status_rx: mpsc::Receiver<CommandStatistics>,
 }
 
 impl fmt::Debug for ActiveExecution {
@@ -1999,6 +2024,7 @@ struct SpawnCargo {
     stdin_tx: mpsc::Sender<String>,
     stdout_rx: mpsc::Receiver<String>,
     stderr_rx: mpsc::Receiver<String>,
+    status_rx: mpsc::Receiver<CommandStatistics>,
 }
 
 #[derive(Debug, Snafu)]
@@ -2544,7 +2570,10 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
 #[cfg(test)]
 mod tests {
     use assertables::*;
-    use futures::{future::try_join_all, Future, FutureExt};
+    use futures::{
+        future::{join, try_join_all},
+        Future, FutureExt,
+    };
     use once_cell::sync::Lazy;
     use std::{env, sync::Once, time::Duration};
     use tempdir::TempDir;
@@ -2951,10 +2980,12 @@ mod tests {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx: _status_rx,
         } = coordinator.begin_execute(token, request).await.unwrap();
 
         stdin_tx.send("this is stdin\n".into()).await.unwrap();
-        // Purposefully not dropping stdin_tx early -- a user might forget
+        // Purposefully not dropping stdin_tx / status_rx early --
+        // real users might forget.
 
         let WithOutput {
             response,
@@ -3001,6 +3032,7 @@ mod tests {
             stdin_tx,
             stdout_rx,
             stderr_rx,
+            status_rx: _,
         } = coordinator.begin_execute(token, request).await.unwrap();
 
         for i in 0..3 {
@@ -3055,6 +3087,7 @@ mod tests {
             stdin_tx: _,
             mut stdout_rx,
             stderr_rx,
+            status_rx: _,
         } = coordinator
             .begin_execute(token.clone(), request)
             .await
@@ -3080,6 +3113,72 @@ mod tests {
         assert_contains!(early_stdout, "Before");
         assert_not_contains!(stdout, "Before");
         assert_not_contains!(stdout, "After");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn execute_status() -> Result<()> {
+        let coordinator = new_coordinator().await;
+
+        let request = ExecuteRequest {
+            code: r#"
+                use std::{time::{Instant, Duration}, thread};
+
+                const MORE_THAN_STATUS_INTERVAL: Duration = Duration::from_millis(1100);
+
+                fn main() {
+                    let start = Instant::now();
+                    while start.elapsed() < MORE_THAN_STATUS_INTERVAL {
+                        // Busy loop
+                    }
+                    thread::sleep(MORE_THAN_STATUS_INTERVAL);
+                }
+            "#
+            .into(),
+            ..ARBITRARY_EXECUTE_REQUEST
+        };
+
+        let token = CancellationToken::new();
+        let ActiveExecution {
+            task,
+            stdin_tx: _,
+            stdout_rx,
+            stderr_rx,
+            mut status_rx,
+        } = coordinator
+            .begin_execute(token.clone(), request)
+            .await
+            .unwrap();
+
+        let statuses = async {
+            let mut statuses = Vec::new();
+            while let Some(s) = status_rx.recv().await {
+                statuses.push(s);
+            }
+            statuses
+        };
+
+        let output = WithOutput::try_absorb(task, stdout_rx, stderr_rx);
+
+        let (statuses, output) = join(statuses, output).with_timeout().await;
+
+        let WithOutput {
+            response, stderr, ..
+        } = output.unwrap();
+
+        assert!(response.success, "{stderr}");
+
+        let [first, last] = [statuses.first(), statuses.last()].map(|s| s.unwrap().total_time_secs);
+
+        let cpu_time_used = last - first;
+        assert!(
+            cpu_time_used > 1.0,
+            "CPU usage did not increase enough ({first} -> {last})"
+        );
 
         coordinator.shutdown().await?;
 
