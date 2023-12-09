@@ -1,9 +1,8 @@
 import React, { ChangeEvent, FormEvent, KeyboardEvent, useCallback, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { Button, ButtonSet, IconButton } from './ButtonSet';
 import PopButton, { ButtonProps, MenuProps } from './PopButton';
-import { useAppDispatch } from './hooks';
+import { useAppDispatch, useAppSelector } from './hooks';
 import { wsExecuteKill, wsExecuteStdin, wsExecuteStdinClose } from './reducers/output/execute';
 import { enableStdinSelector } from './selectors';
 
@@ -11,7 +10,7 @@ import styles from './Stdin.module.css';
 
 const Stdin: React.FC = () => {
   const dispatch = useAppDispatch();
-  const disabled = !useSelector(enableStdinSelector);
+  const disabled = !useAppSelector(enableStdinSelector);
 
   const [content, setContent] = useState('');
 
@@ -87,7 +86,7 @@ const Stdin: React.FC = () => {
 };
 
 const MoreButton = React.forwardRef<HTMLButtonElement, ButtonProps>(({ toggle }, ref) => {
-  const disabled = !useSelector(enableStdinSelector);
+  const disabled = !useAppSelector(enableStdinSelector);
 
   return (
     <IconButton

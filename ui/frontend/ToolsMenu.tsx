@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import { useSelector } from 'react-redux';
 
 import ButtonMenuItem from './ButtonMenuItem';
 import MenuGroup from './MenuGroup';
@@ -11,20 +10,21 @@ import { performFormat } from './reducers/output/format';
 import { performClippy } from './reducers/output/clippy';
 import { performMiri } from './reducers/output/miri';
 import { performMacroExpansion } from './reducers/output/macroExpansion';
+import { useAppSelector } from './hooks';
 
 interface ToolsMenuProps {
   close: () => void;
 }
 
 const ToolsMenu: React.FC<ToolsMenuProps> = props => {
-  const rustfmtVersion = useSelector(selectors.rustfmtVersionText);
-  const rustfmtVersionDetails = useSelector(selectors.rustfmtVersionDetailsText);
-  const clippyVersionDetails = useSelector(selectors.clippyVersionDetailsText);
-  const clippyVersion = useSelector(selectors.clippyVersionText);
-  const miriVersionDetails = useSelector(selectors.miriVersionDetailsText);
-  const miriVersion = useSelector(selectors.miriVersionText);
-  const nightlyVersion = useSelector(selectors.nightlyVersionText);
-  const nightlyVersionDetails = useSelector(selectors.nightlyVersionDetailsText);
+  const rustfmtVersion = useAppSelector(selectors.rustfmtVersionText);
+  const rustfmtVersionDetails = useAppSelector(selectors.rustfmtVersionDetailsText);
+  const clippyVersionDetails = useAppSelector(selectors.clippyVersionDetailsText);
+  const clippyVersion = useAppSelector(selectors.clippyVersionText);
+  const miriVersionDetails = useAppSelector(selectors.miriVersionDetailsText);
+  const miriVersion = useAppSelector(selectors.miriVersionText);
+  const nightlyVersion = useAppSelector(selectors.nightlyVersionText);
+  const nightlyVersionDetails = useAppSelector(selectors.nightlyVersionDetailsText);
 
   const dispatch = useAppDispatch();
   const clippy = useCallback(() => {

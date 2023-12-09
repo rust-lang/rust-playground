@@ -1,12 +1,11 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 
 import Help from './Help';
 import Playground from './Playground';
-import { State } from './reducers';
+import { useAppSelector } from './hooks';
 
 const PageSwitcher: React.FC = () => {
-  const page = useSelector((state: State) => state.page);
+  const page = useAppSelector((state) => state.page);
 
   switch (page) {
     case 'index':

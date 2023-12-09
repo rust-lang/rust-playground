@@ -21,6 +21,10 @@ module.exports = {
         message: 'Use `useAppDispatch` instead',
         selector: 'CallExpression[callee.name="useDispatch"]',
       },
+      {
+        message: 'Use `useAppSelector` instead',
+        selector: 'CallExpression[callee.name="useSelector"]',
+      },
     ],
     'no-trailing-spaces': 'error',
     quotes: ['error', 'single'],

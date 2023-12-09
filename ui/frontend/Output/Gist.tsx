@@ -1,10 +1,9 @@
 import React, { Fragment } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { useSelector } from 'react-redux';
 
 import { ClipboardIcon } from '../Icon';
-import { State } from '../reducers';
 import * as selectors from '../selectors';
+import { useAppSelector } from '../hooks';
 
 import Loader from './Loader';
 import Section from './Section';
@@ -12,8 +11,8 @@ import Section from './Section';
 import styles from './Gist.module.css';
 
 const Gist: React.FC = () => {
-  const showLoader = useSelector(selectors.showGistLoaderSelector);
-  const error = useSelector((state: State) => state.output.gist.error);
+  const showLoader = useAppSelector(selectors.showGistLoaderSelector);
+  const error = useAppSelector((state) => state.output.gist.error);
 
   if (showLoader) {
     return <Loader />;
@@ -64,11 +63,11 @@ class Copied extends React.PureComponent<CopiedProps, CopiedState> {
 }
 
 const Links: React.FC = () => {
-  const codeUrl = useSelector(selectors.codeUrlSelector);
-  const gistUrl = useSelector((state: State) => state.output.gist.url);
-  const permalink = useSelector(selectors.permalinkSelector);
-  const urloUrl = useSelector(selectors.urloUrlSelector);
-  const textChanged = useSelector(selectors.textChangedSinceShareSelector);
+  const codeUrl = useAppSelector(selectors.codeUrlSelector);
+  const gistUrl = useAppSelector((state) => state.output.gist.url);
+  const permalink = useAppSelector(selectors.permalinkSelector);
+  const urloUrl = useAppSelector(selectors.urloUrlSelector);
+  const textChanged = useAppSelector(selectors.textChangedSinceShareSelector);
 
   return (
     <Fragment>

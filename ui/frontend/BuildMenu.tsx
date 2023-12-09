@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react';
-import { useSelector } from 'react-redux';
 
 import ButtonMenuItem from './ButtonMenuItem';
 import MenuAside from './MenuAside';
 import MenuGroup from './MenuGroup';
 import * as actions from './actions';
-import { useAppDispatch } from './hooks';
+import { useAppDispatch, useAppSelector } from './hooks';
 import * as selectors from './selectors';
 
 import styles from './BuildMenu.module.css';
@@ -24,8 +23,8 @@ const useAppDispatchAndClose = (action: () => actions.ThunkAction, close: () => 
 };
 
 const BuildMenu: React.FC<BuildMenuProps> = (props) => {
-  const isHirAvailable = useSelector(selectors.isHirAvailable);
-  const wasmLikelyToWork = useSelector(selectors.wasmLikelyToWork);
+  const isHirAvailable = useAppSelector(selectors.isHirAvailable);
+  const wasmLikelyToWork = useAppSelector(selectors.wasmLikelyToWork);
 
   const compile = useAppDispatchAndClose(actions.performCompile, props.close);
   const compileToAssembly = useAppDispatchAndClose(actions.performCompileToAssembly, props.close);
