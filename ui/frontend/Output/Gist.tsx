@@ -63,12 +63,41 @@ class Copied extends React.PureComponent<CopiedProps, CopiedState> {
   }
 }
 
+interface ReportProps {
+  snippet: string;
+}
+
+class CopyReport extends React.PureComponent<ReportProps, CopiedState> {
+  public constructor(props: ReportProps) {
+    super(props);
+    this.state = { copied: false };
+  }
+
+    public render() {
+    return (
+      <p className={this.state.copied ? styles.active : styles.container}>
+        <CopyToClipboard text={this.props.snippet} onCopy={this.copied}>
+          <div className={styles.container}><a href="#">Copy a Markdown formatted report of results</a>
+          <button className={styles.button}><ClipboardIcon /></button></div>
+        </CopyToClipboard>
+        <span className={styles.text}>Copied!</span>
+      </p>
+    );
+  }
+
+  private copied = () => {
+    this.setState({ copied: true });
+    setTimeout(() => { this.setState({ copied: false }); }, 1000);
+  }
+}
+
 const Links: React.FC = () => {
   const codeUrl = useSelector(selectors.codeUrlSelector);
   const gistUrl = useSelector((state: State) => state.output.gist.url);
   const permalink = useSelector(selectors.permalinkSelector);
   const urloUrl = useSelector(selectors.urloUrlSelector);
   const textChanged = useSelector(selectors.textChangedSinceShareSelector);
+  const markdownSnippet = useSelector(selectors.snippetSelector);
 
   return (
     <Fragment>
@@ -79,6 +108,7 @@ const Links: React.FC = () => {
       {textChanged ? <Section kind="warning" label="Code changed">
         Source code has been changed since gist was saved
       </Section>: null }
+      <CopyReport snippet={markdownSnippet} />
     </Fragment>
   );
 };
