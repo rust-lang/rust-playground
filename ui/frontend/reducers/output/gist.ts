@@ -8,8 +8,8 @@ import {
 import * as z from 'zod';
 
 import { jsonGet, jsonPost, routes } from '../../api';
+import { State as RootState } from '../../reducers';
 import { baseUrlSelector, codeSelector } from '../../selectors';
-import RootState from '../../state';
 import { Channel, Edition, Mode } from '../../types';
 
 const sliceName = 'output/gist';

@@ -5,7 +5,7 @@ import MenuGroup from './MenuGroup';
 import SelectOne from './SelectOne';
 
 import * as config from './reducers/configuration';
-import State from './state';
+import { State } from './reducers';
 import { Mode } from './types';
 
 interface ModeMenuProps {

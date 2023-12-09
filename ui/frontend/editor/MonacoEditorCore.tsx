@@ -2,7 +2,7 @@ import React from 'react';
 import { CommonEditorProps } from '../types';
 import MonacoEditor, { EditorDidMount, EditorWillMount } from 'react-monaco-editor';
 import { useSelector } from 'react-redux';
-import State from '../state';
+import { State } from '../reducers';
 import { config, grammar, themeVsDarkPlus } from './rust_monaco_def';
 
 import styles from './Editor.module.css';

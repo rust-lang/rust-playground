@@ -9,7 +9,7 @@ import qs from 'qs';
 import Route from 'route-parser';
 
 import * as actions from './actions';
-import State from './state';
+import { State } from './reducers';
 import { Channel, Edition, Mode, Page } from './types';
 
 const homeRoute = new Route('/');

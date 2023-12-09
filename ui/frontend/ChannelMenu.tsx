@@ -6,7 +6,7 @@ import SelectOne from './SelectOne';
 
 import * as config from './reducers/configuration';
 import * as selectors from './selectors';
-import State from './state';
+import { State } from './reducers';
 import { Channel } from './types';
 
 import styles from './ChannelMenu.module.css';

@@ -7,7 +7,7 @@ import { Either as EitherConfig, Select as SelectConfig } from './ConfigElement'
 import MenuGroup from './MenuGroup';
 
 import * as config from './reducers/configuration';
-import State from './state';
+import { State } from './reducers';
 import {
   AssemblyFlavor,
   DemangleAssembly,

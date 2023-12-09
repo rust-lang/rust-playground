@@ -1,6 +1,6 @@
 import { DeepPartial } from 'ts-essentials';
 
-import State from './state';
+import { State } from './reducers';
 
 type SimpleStorage = Pick<Storage, 'getItem' | 'setItem'>;
 
