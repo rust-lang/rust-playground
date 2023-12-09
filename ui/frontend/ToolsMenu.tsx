@@ -6,7 +6,7 @@ import MenuGroup from './MenuGroup';
 import MenuAside from './MenuAside';
 
 import * as selectors from './selectors';
-import { useAppDispatch } from './configureStore';
+import { useAppDispatch } from './hooks';
 import { performFormat } from './reducers/output/format';
 import { performClippy } from './reducers/output/clippy';
 import { performMiri } from './reducers/output/miri';

@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
 import { Portal } from 'react-portal';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { Close } from './Icon';
+import { useAppDispatch } from './hooks';
 import { seenRustSurvey2022 } from './reducers/notifications';
 import * as selectors from './selectors';
 
@@ -23,7 +24,7 @@ const Notifications: React.FC = () => {
 const RustSurvey2022Notification: React.FC = () => {
   const showRustSurvey2022 = useSelector(selectors.showRustSurvey2022Selector);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const seenRustSurvey2021 = useCallback(() => dispatch(seenRustSurvey2022()), [dispatch]);
 
   return showRustSurvey2022 ? (

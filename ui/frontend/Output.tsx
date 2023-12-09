@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector  } from 'react-redux';
 
 import { changeFocus } from './reducers/output/meta';
 import { State } from './reducers';
@@ -11,6 +11,7 @@ import Section from './Output/Section';
 import SimplePane, { SimplePaneProps } from './Output/SimplePane';
 import PaneWithMir from './Output/PaneWithMir';
 import * as selectors from './selectors';
+import { useAppDispatch } from './hooks';
 
 import styles from './Output.module.css';
 import Stdin from './Stdin';
@@ -51,7 +52,7 @@ const Output: React.FC = () => {
   const { meta: { focus }, execute, format, clippy, miri, macroExpansion, assembly, llvmIr, mir, hir, wasm, gist } =
     useSelector((state: State) => state.output);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const focusClose = useCallback(() => dispatch(changeFocus()), [dispatch]);
   const focusExecute = useCallback(() => dispatch(changeFocus(Focus.Execute)), [dispatch]);
   const focusFormat = useCallback(() => dispatch(changeFocus(Focus.Format)), [dispatch]);

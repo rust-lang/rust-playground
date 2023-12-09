@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import MenuGroup from './MenuGroup';
 import SelectOne from './SelectOne';
@@ -7,6 +7,7 @@ import SelectOne from './SelectOne';
 import * as config from './reducers/configuration';
 import { State } from './reducers';
 import { Mode } from './types';
+import { useAppDispatch } from './hooks';
 
 interface ModeMenuProps {
   close: () => void;
@@ -14,7 +15,7 @@ interface ModeMenuProps {
 
 const ModeMenu: React.FC<ModeMenuProps> = props => {
   const mode = useSelector((state: State) => state.configuration.mode);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const changeMode = useCallback((mode: Mode) => {
     dispatch(config.changeMode(mode));
     props.close();

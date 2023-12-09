@@ -1,15 +1,16 @@
 import React, { ChangeEvent, FormEvent, KeyboardEvent, useCallback, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { Button, ButtonSet, IconButton } from './ButtonSet';
 import PopButton, { ButtonProps, MenuProps } from './PopButton';
+import { useAppDispatch } from './hooks';
 import { wsExecuteKill, wsExecuteStdin, wsExecuteStdinClose } from './reducers/output/execute';
 import { enableStdinSelector } from './selectors';
 
 import styles from './Stdin.module.css';
 
 const Stdin: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const disabled = !useSelector(enableStdinSelector);
 
   const [content, setContent] = useState('');
@@ -104,7 +105,7 @@ const MoreButton = React.forwardRef<HTMLButtonElement, ButtonProps>(({ toggle },
 MoreButton.displayName = 'MoreButton';
 
 const MoreMenu: React.FC<MenuProps> = ({ close }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const stdinClose = useCallback(() => {
     dispatch(wsExecuteStdinClose());

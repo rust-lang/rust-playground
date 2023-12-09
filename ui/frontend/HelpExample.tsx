@@ -5,7 +5,7 @@ import 'prismjs/components/prism-rust.min';
 import { PrismCode } from 'react-prism';
 
 import * as actions from './actions';
-import { useAppDispatch } from './configureStore';
+import { useAppDispatch } from './hooks';
 
 import styles from './HelpExample.module.css';
 import prismTheme from 'prismjs/themes/prism-okaidia.css';

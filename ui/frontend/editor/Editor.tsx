@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
 import * as actions from '../actions';
-import { useAppDispatch } from '../configureStore';
+import { useAppDispatch } from '../hooks';
 
 import AceEditor from './AceEditor';
 import SimpleEditor from './SimpleEditor';

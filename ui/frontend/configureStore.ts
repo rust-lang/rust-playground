@@ -1,5 +1,4 @@
 import { merge } from 'lodash-es';
-import { useDispatch } from 'react-redux';
 import { configureStore as reduxConfigureStore } from '@reduxjs/toolkit';
 import { produce } from 'immer';
 import type {} from 'redux-thunk/extend-redux';
@@ -56,4 +55,3 @@ export default function configureStore(window: Window) {
 }
 
 export type AppDispatch = ReturnType<typeof configureStore>['dispatch'];
-export const useAppDispatch = () => useDispatch<AppDispatch>()

@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import * as selectors from '../selectors';
 import { State } from '../reducers';
 import * as code from '../reducers/code';
+import { useAppDispatch } from '../hooks';
 
 import Section from './Section';
 import SimplePane from './SimplePane';
@@ -14,7 +15,7 @@ const Execute: React.FC = () => {
   const details = useSelector((state: State) => state.output.execute);
   const isAutoBuild = useSelector(selectors.isAutoBuildSelector);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const addMainFunction = useCallback(() => dispatch(code.addMainFunction()), [dispatch]);
 
   return (

@@ -1,7 +1,7 @@
 import React, { useContext, useCallback, MouseEventHandler } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { Context } from './Router';
+import { useAppDispatch } from '../hooks';
 
 type Anchor = JSX.IntrinsicElements['a'];
 type SlimAnchor = Omit<Anchor, 'action' | 'onClick'>;
@@ -12,7 +12,7 @@ export interface LinkProps extends SlimAnchor {
 }
 
 const Link: React.FC<LinkProps> = (props) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const router = useContext(Context);
   const { action, onClick, children, ...anchorProps } = props;
 

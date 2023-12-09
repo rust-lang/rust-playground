@@ -24,6 +24,7 @@ node_modules
 !compileActions.ts
 !editor/AceEditor.tsx
 !editor/SimpleEditor.tsx
+!hooks.ts
 !reducers/browser.ts
 !reducers/client.ts
 !reducers/code.ts

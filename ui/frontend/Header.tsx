@@ -18,7 +18,7 @@ import ModeMenu from './ModeMenu';
 import PopButton, { ButtonProps } from './PopButton';
 import ToolsMenu from './ToolsMenu';
 import * as actions from './actions';
-import { useAppDispatch } from './configureStore';
+import { useAppDispatch } from './hooks';
 import { performGistSave } from './reducers/output/gist';
 import { navigateToHelp } from './reducers/page';
 import * as selectors from './selectors';

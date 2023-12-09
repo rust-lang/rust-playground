@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import MenuGroup from './MenuGroup';
 import SelectOne from './SelectOne';
@@ -8,6 +8,7 @@ import * as config from './reducers/configuration';
 import * as selectors from './selectors';
 import { State } from './reducers';
 import { Channel } from './types';
+import { useAppDispatch } from './hooks';
 
 import styles from './ChannelMenu.module.css';
 
@@ -23,7 +24,7 @@ const ChannelMenu: React.FC<ChannelMenuProps> = props => {
   const betaVersionDetails = useSelector(selectors.betaVersionDetailsText);
   const nightlyVersionDetails = useSelector(selectors.nightlyVersionDetailsText);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const changeChannel = useCallback((channel: Channel) => {
     dispatch(config.changeChannel(channel));
     props.close();

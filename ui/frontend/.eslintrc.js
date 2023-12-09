@@ -15,6 +15,13 @@ module.exports = {
         code: 120,
       },
     ],
+    'no-restricted-syntax': [
+      'error',
+      {
+        message: 'Use `useAppDispatch` instead',
+        selector: 'CallExpression[callee.name="useDispatch"]',
+      },
+    ],
     'no-trailing-spaces': 'error',
     quotes: ['error', 'single'],
 
@@ -73,6 +80,7 @@ module.exports = {
         'compileActions.ts',
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',
+        'hooks.ts',
         'reducers/browser.ts',
         'reducers/client.ts',
         'reducers/code.ts',

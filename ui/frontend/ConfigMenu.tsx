@@ -1,10 +1,11 @@
 /* global ACE_KEYBINDINGS:false, ACE_THEMES:false */
 
 import React, { Fragment, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { Either as EitherConfig, Select as SelectConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
+import { useAppDispatch } from './hooks';
 
 import * as config from './reducers/configuration';
 import { State } from './reducers';
@@ -32,7 +33,7 @@ const ConfigMenu: React.FC = () => {
   const demangleAssembly = useSelector((state: State) => state.configuration.demangleAssembly);
   const processAssembly = useSelector((state: State) => state.configuration.processAssembly);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const changeAceTheme = useCallback((t: string) => dispatch(config.changeAceTheme(t)), [dispatch]);
   const changeMonacoTheme = useCallback((t: string) => dispatch(config.changeMonacoTheme(t)), [dispatch]);
   const changeKeybinding = useCallback((k: string) => dispatch(config.changeKeybinding(k)), [dispatch]);
