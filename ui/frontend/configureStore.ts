@@ -1,7 +1,6 @@
 import { merge } from 'lodash-es';
 import { configureStore as reduxConfigureStore } from '@reduxjs/toolkit';
 import { produce } from 'immer';
-import type {} from 'redux-thunk/extend-redux';
 
 import initializeLocalStorage from './local_storage';
 import initializeSessionStorage from './session_storage';

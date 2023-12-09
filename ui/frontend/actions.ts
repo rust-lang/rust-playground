@@ -1,4 +1,4 @@
-import { AnyAction, ThunkAction as ReduxThunkAction } from '@reduxjs/toolkit';
+import { ThunkAction as ReduxThunkAction, UnknownAction } from '@reduxjs/toolkit';
 
 import { State } from './reducers';
 import { addCrateType, editCode } from './reducers/code';
@@ -31,7 +31,7 @@ import {
   parseMode,
 } from './types';
 
-export type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, AnyAction>;
+export type ThunkAction<T = void> = ReduxThunkAction<T, State, unknown, UnknownAction>;
 
 export const reExecuteWithBacktrace = (): ThunkAction => (dispatch) => {
   dispatch(changeBacktrace(Backtrace.Enabled));

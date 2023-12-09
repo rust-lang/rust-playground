@@ -1,4 +1,4 @@
-import { AnyAction, Draft, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { Draft, UnknownAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
 import { ThunkAction } from '../../actions';
@@ -208,7 +208,7 @@ export const performCommonExecute =
   };
 
 const dispatchWhenSequenceNumber =
-  <A extends AnyAction>(cb: (sequenceNumber: number) => A): ThunkAction =>
+  <A extends UnknownAction>(cb: (sequenceNumber: number) => A): ThunkAction =>
   (dispatch, getState) => {
     const state = getState();
     const { sequenceNumber } = state.output.execute;
