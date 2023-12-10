@@ -10,6 +10,8 @@ import * as selectors from './selectors';
 import { Orientation } from './types';
 
 import styles from './Playground.module.css';
+import { useKeyDown } from './hooks/shortcuts';
+import { useAppDispatch } from './configureStore';
 
 const TRACK_OPTION_NAME = {
   [Orientation.Horizontal]: 'rowGutters',
@@ -108,7 +110,35 @@ const WebSocketStatus: React.FC = () => {
 }
 
 const Playground: React.FC = () => {
-  const showNotifications = useSelector(selectors.anyNotificationsToShowSelector);
+  const showNotifications = useSelector(
+    selectors.anyNotificationsToShowSelector
+  );
+
+  const dispatch = useAppDispatch();
+  const handleRustFmt = useCallback((_event) => {
+    dispatch(actions.performFormat());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const handleClippy = useCallback((_event) => {
+    dispatch(actions.performClippy());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const handleMiri = useCallback((_event) => {
+    dispatch(actions.performMiri());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const handleMacroExpansion = useCallback((_event) => {
+    dispatch(actions.performMacroExpansion());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const shortcutMap = new Map([
+    [['Control', 'Alt', 'f'], handleRustFmt],
+    [['Control', 'Alt', 'c'], handleClippy],
+    [['Control', 'Alt', 'm'], handleMiri],
+    [['Control', 'Alt', 'x'], handleMacroExpansion],
+  ]);
+  useKeyDown(shortcutMap);
 
   return (
     <>
@@ -117,7 +147,7 @@ const Playground: React.FC = () => {
         <Header />
         <ResizableArea />
       </div>
-      { showNotifications && <Notifications />}
+      {showNotifications && <Notifications />}
     </>
   );
 }

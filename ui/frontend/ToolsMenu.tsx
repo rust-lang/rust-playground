@@ -12,6 +12,8 @@ import { performClippy } from './reducers/output/clippy';
 import { performMiri } from './reducers/output/miri';
 import { performMacroExpansion } from './reducers/output/macroExpansion';
 
+import styles from './ToolsMenu.module.css';
+
 interface ToolsMenuProps {
   close: () => void;
 }
@@ -49,18 +51,21 @@ const ToolsMenu: React.FC<ToolsMenuProps> = props => {
       <ButtonMenuItem
         name="Rustfmt"
         onClick={format}>
+        <span className={styles.shortcut}>⌘/Ctrl + Alt + f</span>
         <div>Format this code with Rustfmt.</div>
         <MenuAside>{rustfmtVersion} ({rustfmtVersionDetails})</MenuAside>
       </ButtonMenuItem>
       <ButtonMenuItem
         name="Clippy"
         onClick={clippy}>
+        <span className={styles.shortcut}>⌘/Ctrl + Alt + c</span>
         <div>Catch common mistakes and improve the code using the Clippy linter.</div>
         <MenuAside>{clippyVersion} ({clippyVersionDetails})</MenuAside>
       </ButtonMenuItem>
       <ButtonMenuItem
         name="Miri"
         onClick={miri}>
+        <span className={styles.shortcut}>⌘/Ctrl + Alt + m</span>
         <div>
           Execute this program in the Miri interpreter to detect certain
           cases of undefined behavior (like out-of-bounds memory access).
@@ -70,6 +75,7 @@ const ToolsMenu: React.FC<ToolsMenuProps> = props => {
       <ButtonMenuItem
         name="Expand macros"
         onClick={expandMacros}>
+        <span className={styles.shortcut}>⌘/Ctrl + Alt + x</span>
         <div>
           Expand macros in code using the nightly compiler.
         </div>
