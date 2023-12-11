@@ -28,3 +28,10 @@ $space: 0.25em;
   background: #e1e1db;
   padding: $space;
 }
+
+.action {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5em;
+  gap: 0.5em;
+}

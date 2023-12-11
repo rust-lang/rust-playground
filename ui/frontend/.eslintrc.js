@@ -86,6 +86,7 @@ module.exports = {
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',
         'hooks.ts',
+        'observer.ts',
         'reducers/browser.ts',
         'reducers/client.ts',
         'reducers/code.ts',

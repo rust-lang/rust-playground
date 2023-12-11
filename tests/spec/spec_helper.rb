@@ -83,6 +83,10 @@ Capybara.add_selector(:stdin) do
   css { '[data-test-id = "stdin"]' }
 end
 
+Capybara.add_selector(:notification) do
+  css { '[data-test-id = "notification"]' }
+end
+
 RSpec.configure do |config|
   config.after(:example, :js) do
     page.execute_script <<~JS

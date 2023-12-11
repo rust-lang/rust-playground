@@ -5,6 +5,7 @@ import { wsFeatureFlagsSchema } from './reducers/featureFlags';
 import {
   wsExecuteBeginSchema,
   wsExecuteEndSchema,
+  wsExecuteStatusSchema,
   wsExecuteStderrSchema,
   wsExecuteStdoutSchema,
 } from './reducers/output/execute';
@@ -21,6 +22,7 @@ const WSMessageResponse = z.discriminatedUnion('type', [
   websocketErrorSchema,
   wsExecuteBeginSchema,
   wsExecuteEndSchema,
+  wsExecuteStatusSchema,
   wsExecuteStderrSchema,
   wsExecuteStdoutSchema,
   wsFeatureFlagsSchema,

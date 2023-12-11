@@ -4,6 +4,8 @@ import * as z from 'zod';
 const StateOverride = z.object({
   baseUrl: z.string().optional(),
   syncChangesToStorage: z.boolean().optional(),
+  excessiveExecutionTimeS: z.number().optional(),
+  killGracePeriodS: z.number().optional(),
 });
 type StateOverride = z.infer<typeof StateOverride>;
 
@@ -12,6 +14,8 @@ type State = Required<StateOverride>;
 const initialState: State = {
   baseUrl: '',
   syncChangesToStorage: true,
+  excessiveExecutionTimeS: 15.0,
+  killGracePeriodS: 15.0,
 };
 
 const slice = createSlice({

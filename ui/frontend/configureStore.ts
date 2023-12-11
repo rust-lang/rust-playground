@@ -3,6 +3,7 @@ import { produce } from 'immer';
 import { merge } from 'lodash-es';
 
 import initializeLocalStorage from './local_storage';
+import { observer } from './observer';
 import reducer from './reducers';
 import initializeSessionStorage from './session_storage';
 import { websocketMiddleware } from './websocketMiddleware';
@@ -33,7 +34,8 @@ export default function configureStore(window: Window) {
   const store = reduxConfigureStore({
     reducer,
     preloadedState,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(websocket),
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(websocket).prepend(observer.middleware),
   });
 
   store.subscribe(() => {
