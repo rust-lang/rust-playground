@@ -2,6 +2,7 @@ use futures::{
     future::{BoxFuture, OptionFuture},
     Future, FutureExt,
 };
+use once_cell::sync::Lazy;
 use serde::Deserialize;
 use snafu::prelude::*;
 use std::{
@@ -1052,6 +1053,7 @@ impl Coordinator<DockerBackend> {
 #[derive(Debug)]
 struct Container {
     task: JoinHandle<Result<()>>,
+    kill_child: Option<Command>,
     modify_cargo_toml: ModifyCargoToml,
     commander: Commander,
 }
@@ -1062,7 +1064,7 @@ impl Container {
         token: CancellationToken,
         backend: &impl Backend,
     ) -> Result<Self> {
-        let (mut child, stdin, stdout) = backend.run_worker_in_background(channel)?;
+        let (mut child, kill_child, stdin, stdout) = backend.run_worker_in_background(channel)?;
         let IoQueue {
             mut tasks,
             to_worker_tx,
@@ -1076,6 +1078,7 @@ impl Container {
         let task = tokio::spawn(
             async move {
                 let (c, d, t) = join!(child.wait(), demultiplex_task, tasks.join_next());
+
                 c.context(JoinWorkerSnafu)?;
                 d.context(DemultiplexerTaskPanickedSnafu)?
                     .context(DemultiplexerTaskFailedSnafu)?;
@@ -1100,6 +1103,7 @@ impl Container {
 
         Ok(Container {
             task,
+            kill_child,
             modify_cargo_toml,
             commander,
         })
@@ -1749,11 +1753,25 @@ impl Container {
     async fn shutdown(self) -> Result<()> {
         let Self {
             task,
+            kill_child,
             modify_cargo_toml,
             commander,
         } = self;
         drop(commander);
         drop(modify_cargo_toml);
+
+        if let Some(mut kill_child) = kill_child {
+            // We don't care if the command itself succeeds or not; it
+            // may already be dead!
+            let _ = kill_child
+                .stdin(Stdio::null())
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .status()
+                .await
+                .context(KillWorkerSnafu)?;
+        }
+
         task.await.context(ContainerTaskPanickedSnafu)?
     }
 }
@@ -2358,9 +2376,10 @@ pub trait Backend {
     fn run_worker_in_background(
         &self,
         channel: Channel,
-    ) -> Result<(Child, ChildStdin, ChildStdout)> {
-        let mut child = self
-            .prepare_worker_command(channel)
+    ) -> Result<(Child, Option<Command>, ChildStdin, ChildStdout)> {
+        let (mut start, kill) = self.prepare_worker_command(channel);
+
+        let mut child = start
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
@@ -2368,17 +2387,17 @@ pub trait Backend {
             .context(SpawnWorkerSnafu)?;
         let stdin = child.stdin.take().context(WorkerStdinCaptureSnafu)?;
         let stdout = child.stdout.take().context(WorkerStdoutCaptureSnafu)?;
-        Ok((child, stdin, stdout))
+        Ok((child, kill, stdin, stdout))
     }
 
-    fn prepare_worker_command(&self, channel: Channel) -> Command;
+    fn prepare_worker_command(&self, channel: Channel) -> (Command, Option<Command>);
 }
 
 impl<B> Backend for &B
 where
     B: Backend,
 {
-    fn prepare_worker_command(&self, channel: Channel) -> Command {
+    fn prepare_worker_command(&self, channel: Channel) -> (Command, Option<Command>) {
         B::prepare_worker_command(self, channel)
     }
 }
@@ -2429,12 +2448,34 @@ fn basic_secure_docker_command() -> Command {
     )
 }
 
+static DOCKER_BACKEND_START: Lazy<u64> = Lazy::new(|| {
+    use std::time;
+
+    let now = time::SystemTime::now();
+    now.duration_since(time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
+});
+
+static DOCKER_BACKEND_ID: AtomicU64 = AtomicU64::new(0);
+
 pub struct DockerBackend(());
 
+impl DockerBackend {
+    fn next_name(&self) -> String {
+        let start = *DOCKER_BACKEND_START;
+        let id = DOCKER_BACKEND_ID.fetch_add(1, Ordering::SeqCst);
+        format!("playground-{start}-{id}")
+    }
+}
+
 impl Backend for DockerBackend {
-    fn prepare_worker_command(&self, channel: Channel) -> Command {
+    fn prepare_worker_command(&self, channel: Channel) -> (Command, Option<Command>) {
+        let name = self.next_name();
+
         let mut command = basic_secure_docker_command();
         command
+            .args(["--name", &name])
             .arg("-i")
             .args(["-a", "stdin", "-a", "stdout", "-a", "stderr"])
             .args(["-e", "PLAYGROUND_ORCHESTRATOR=1"])
@@ -2442,7 +2483,11 @@ impl Backend for DockerBackend {
             .arg(channel.to_container_name())
             .arg("worker")
             .arg("/playground");
-        command
+
+        let mut kill = Command::new("docker");
+        kill.arg("kill").args(["--signal", "KILL"]).arg(name);
+
+        (command, Some(kill))
     }
 }
 
@@ -2474,6 +2519,9 @@ pub enum Error {
 
     #[snafu(display("The IO queue task panicked"))]
     IoQueuePanicked { source: tokio::task::JoinError },
+
+    #[snafu(display("Unable to kill the child process"))]
+    KillWorker { source: std::io::Error },
 
     #[snafu(display("The container task panicked"))]
     ContainerTaskPanicked { source: tokio::task::JoinError },
@@ -2636,13 +2684,14 @@ mod tests {
     }
 
     impl Backend for TestBackend {
-        fn prepare_worker_command(&self, channel: Channel) -> Command {
+        fn prepare_worker_command(&self, channel: Channel) -> (Command, Option<Command>) {
             let channel_dir = self.project_dir.path().join(channel.to_str());
 
             let mut command = Command::new("./target/debug/worker");
             command.env("RUSTUP_TOOLCHAIN", channel.to_str());
             command.arg(channel_dir);
-            command
+
+            (command, None)
         }
     }
 
