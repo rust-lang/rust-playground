@@ -1035,6 +1035,7 @@ dependencies = [
  "libc",
  "mach2",
  "modify-cargo-toml",
+ "once_cell",
  "procfs",
  "serde",
  "serde_json",
