@@ -1,4 +1,4 @@
-import { PayloadAction } from '@reduxjs/toolkit';
+import { PayloadAction, isAction } from '@reduxjs/toolkit';
 import z from 'zod';
 
 export type WsPayloadAction<P = void, T extends string = string> = PayloadAction<
@@ -12,8 +12,9 @@ export const createWebsocketResponseAction = <P, T extends string = string>(type
     throw 'Should never be executed by JS';
   }
   actionCreator.type = type;
-  actionCreator.toString = () => type;
-  // TODO: Add .match() ?
+  actionCreator.match = function (action: unknown): action is WsPayloadAction<P, T> {
+    return isAction(action) && action.type === type;
+  };
 
   return actionCreator;
 };
