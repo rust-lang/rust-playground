@@ -228,7 +228,7 @@ export const wsExecuteStdinClose = (): ThunkAction =>
     slice.actions.wsExecuteStdinClose(undefined, sequenceNumber),
   );
 
-export const wsExecuteKill = (): ThunkAction =>
+export const wsExecuteKillCurrent = (): ThunkAction =>
   dispatchWhenSequenceNumber((sequenceNumber) =>
     slice.actions.wsExecuteKill(undefined, sequenceNumber),
   );

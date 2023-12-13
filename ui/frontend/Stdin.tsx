@@ -3,7 +3,11 @@ import React, { ChangeEvent, FormEvent, KeyboardEvent, useCallback, useRef, useS
 import { Button, ButtonSet, IconButton } from './ButtonSet';
 import PopButton, { ButtonProps, MenuProps } from './PopButton';
 import { useAppDispatch, useAppSelector } from './hooks';
-import { wsExecuteKill, wsExecuteStdin, wsExecuteStdinClose } from './reducers/output/execute';
+import {
+  wsExecuteKillCurrent,
+  wsExecuteStdin,
+  wsExecuteStdinClose,
+} from './reducers/output/execute';
 import { enableStdinSelector } from './selectors';
 
 import styles from './Stdin.module.css';
@@ -24,7 +28,7 @@ const Stdin: React.FC = () => {
       }
 
       if (e.key === 'c' && e.ctrlKey) {
-        dispatch(wsExecuteKill());
+        dispatch(wsExecuteKillCurrent());
       }
 
       if (e.key === 'd' && e.ctrlKey && content.length === 0) {
@@ -112,7 +116,7 @@ const MoreMenu: React.FC<MenuProps> = ({ close }) => {
   }, [dispatch, close]);
 
   const kill = useCallback(() => {
-    dispatch(wsExecuteKill());
+    dispatch(wsExecuteKillCurrent());
     close();
   }, [dispatch, close]);
 
