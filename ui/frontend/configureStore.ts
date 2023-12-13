@@ -1,11 +1,11 @@
-import { merge } from 'lodash-es';
 import { configureStore as reduxConfigureStore } from '@reduxjs/toolkit';
 import { produce } from 'immer';
+import { merge } from 'lodash-es';
 
 import initializeLocalStorage from './local_storage';
+import reducer from './reducers';
 import initializeSessionStorage from './session_storage';
 import { websocketMiddleware } from './websocketMiddleware';
-import reducer from './reducers';
 
 export default function configureStore(window: Window) {
   const baseUrl = new URL('/', window.location.href).href;
@@ -21,18 +21,20 @@ export default function configureStore(window: Window) {
   const localStorage = initializeLocalStorage();
   const sessionStorage = initializeSessionStorage();
 
-  const preloadedState = produce(initialAppState, (initialAppState) => merge(
-    initialAppState,
-    initialGlobalState,
-    localStorage.initialState,
-    sessionStorage.initialState,
-  ));
+  const preloadedState = produce(initialAppState, (initialAppState) =>
+    merge(
+      initialAppState,
+      initialGlobalState,
+      localStorage.initialState,
+      sessionStorage.initialState,
+    ),
+  );
 
   const store = reduxConfigureStore({
     reducer,
     preloadedState,
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(websocket),
-  })
+  });
 
   store.subscribe(() => {
     const state = store.getState();
@@ -48,7 +50,7 @@ export default function configureStore(window: Window) {
       localStorage.saveChanges(state);
       sessionStorage.saveChanges(state);
     }
-  })
+  });
 
   return store;
 }

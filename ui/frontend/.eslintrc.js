@@ -82,6 +82,7 @@ module.exports = {
         'actions.ts',
         'api.ts',
         'compileActions.ts',
+        'configureStore.ts',
         'editor/AceEditor.tsx',
         'editor/SimpleEditor.tsx',
         'hooks.ts',
