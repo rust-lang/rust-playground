@@ -6,7 +6,7 @@ use crate::{
 };
 
 use axum::extract::ws::{Message, WebSocket};
-use futures::{Future, FutureExt};
+use futures::{Future, FutureExt, StreamExt};
 use orchestrator::{
     coordinator::{self, Coordinator, DockerBackend},
     DropErrorDetailsExt,
@@ -648,7 +648,7 @@ async fn handle_execute_inner(
                 abandon_if_closed!(sent);
             },
 
-            Some(status) = status_rx.recv() => {
+            Some(status) = status_rx.next() => {
                 if !reported && status.total_time_secs > 60.0 {
                     error!("Request consumed more than 60s of CPU time: {req:?}");
                     reported = true;
