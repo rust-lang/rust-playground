@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
-import { useSelector } from 'react-redux';
 import { suspend } from 'suspend-react';
 
+import { useAppSelector } from '../hooks';
 import {
   aceKeybinding,
   acePairCharacters,
@@ -40,10 +40,10 @@ const AceEditorLazy = React.lazy(() => import('./AceEditorCore'));
 //
 // Themes and keybindings can be changed at runtime.
 const AceEditorAsync: React.FC<CommonEditorProps> = (props) => {
-  const autocompleteOnUse = useSelector(offerCrateAutocompleteOnUse);
-  const keybinding = useSelector(aceKeybinding);
-  const pairCharacters = useSelector(acePairCharacters);
-  const theme = useSelector(aceTheme);
+  const autocompleteOnUse = useAppSelector(offerCrateAutocompleteOnUse);
+  const keybinding = useAppSelector(aceKeybinding);
+  const pairCharacters = useAppSelector(acePairCharacters);
+  const theme = useAppSelector(aceTheme);
 
   return (
     <Suspense fallback={'Loading the ACE editor...'}>

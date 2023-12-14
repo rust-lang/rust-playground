@@ -16,7 +16,7 @@ import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
 import { clientSetIdentifiers } from './reducers/client';
 import { featureFlagsForceDisableAll, featureFlagsForceEnableAll } from './reducers/featureFlags';
-import { disableSyncChangesToStorage } from './reducers/globalConfiguration';
+import { disableSyncChangesToStorage, override } from './reducers/globalConfiguration';
 import Router from './Router';
 import configureStore from './configureStore';
 import { performVersionsLoad } from './reducers/versions';
@@ -48,6 +48,10 @@ if (params.has('features')) {
   } else {
     store.dispatch(featureFlagsForceEnableAll());
   }
+}
+const configOverrides = params.get('whte_rbt.obj');
+if (configOverrides) {
+  store.dispatch(override(configOverrides));
 }
 
 const whenBrowserWidthChanged = (evt: MediaQueryList | MediaQueryListEvent) =>

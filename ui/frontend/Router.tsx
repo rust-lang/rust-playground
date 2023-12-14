@@ -1,5 +1,5 @@
 import React from 'react';
-import { AnyAction } from '@reduxjs/toolkit';
+import { UnknownAction } from '@reduxjs/toolkit';
 
 import { createBrowserHistory as createHistory, Path, Location } from 'history';
 import { createRouter, PlainOrThunk } from './uss-router';
@@ -9,7 +9,7 @@ import qs from 'qs';
 import Route from 'route-parser';
 
 import * as actions from './actions';
-import State from './state';
+import { State } from './reducers';
 import { Channel, Edition, Mode, Page } from './types';
 
 const homeRoute = new Route('/');
@@ -65,7 +65,7 @@ const stateToLocation = ({ page, configuration, output }: Substate): Partial<Pat
   }
 };
 
-const locationToAction = (location: Location): PlainOrThunk<State, AnyAction> | null => {
+const locationToAction = (location: Location): PlainOrThunk<State, UnknownAction> | null => {
   const matchedHelp = helpRoute.match(location.pathname);
 
   if (matchedHelp) {

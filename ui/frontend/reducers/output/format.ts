@@ -2,8 +2,8 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as z from 'zod';
 
 import { jsonPost, routes } from '../../api';
+import { State as RootState } from '../../reducers';
 import { formatRequestSelector } from '../../selectors';
-import RootState from '../../state';
 
 const sliceName = 'output/format';
 

@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react';
-import { useSelector } from 'react-redux';
 
 import ButtonMenuItem from './ButtonMenuItem';
 import MenuAside from './MenuAside';
 import MenuGroup from './MenuGroup';
 import * as actions from './actions';
-import { useAppDispatch } from './configureStore';
+import { useAppDispatch, useAppSelector } from './hooks';
 import * as selectors from './selectors';
 
 import styles from './BuildMenu.module.css';
@@ -14,7 +13,7 @@ interface BuildMenuProps {
   close: () => void;
 }
 
-const useDispatchAndClose = (action: () => actions.ThunkAction, close: () => void) => {
+const useAppDispatchAndClose = (action: () => actions.ThunkAction, close: () => void) => {
   const dispatch = useAppDispatch();
 
   return useCallback(() => {
@@ -24,17 +23,17 @@ const useDispatchAndClose = (action: () => actions.ThunkAction, close: () => voi
 };
 
 const BuildMenu: React.FC<BuildMenuProps> = (props) => {
-  const isHirAvailable = useSelector(selectors.isHirAvailable);
-  const wasmLikelyToWork = useSelector(selectors.wasmLikelyToWork);
+  const isHirAvailable = useAppSelector(selectors.isHirAvailable);
+  const wasmLikelyToWork = useAppSelector(selectors.wasmLikelyToWork);
 
-  const compile = useDispatchAndClose(actions.performCompile, props.close);
-  const compileToAssembly = useDispatchAndClose(actions.performCompileToAssembly, props.close);
-  const compileToLLVM = useDispatchAndClose(actions.performCompileToLLVM, props.close);
-  const compileToMir = useDispatchAndClose(actions.performCompileToMir, props.close);
-  const compileToHir = useDispatchAndClose(actions.performCompileToNightlyHir, props.close);
-  const compileToWasm = useDispatchAndClose(actions.performCompileToWasm, props.close);
-  const execute = useDispatchAndClose(actions.performExecute, props.close);
-  const test = useDispatchAndClose(actions.performTest, props.close);
+  const compile = useAppDispatchAndClose(actions.performCompile, props.close);
+  const compileToAssembly = useAppDispatchAndClose(actions.performCompileToAssembly, props.close);
+  const compileToLLVM = useAppDispatchAndClose(actions.performCompileToLLVM, props.close);
+  const compileToMir = useAppDispatchAndClose(actions.performCompileToMir, props.close);
+  const compileToHir = useAppDispatchAndClose(actions.performCompileToNightlyHir, props.close);
+  const compileToWasm = useAppDispatchAndClose(actions.performCompileToWasm, props.close);
+  const execute = useAppDispatchAndClose(actions.performExecute, props.close);
+  const test = useAppDispatchAndClose(actions.performTest, props.close);
 
   return (
     <MenuGroup title="What do you want to do?">

@@ -6,7 +6,7 @@ use crate::{
 };
 
 use axum::extract::ws::{Message, WebSocket};
-use futures::{Future, FutureExt};
+use futures::{Future, FutureExt, StreamExt};
 use orchestrator::{
     coordinator::{self, Coordinator, DockerBackend},
     DropErrorDetailsExt,
@@ -142,6 +142,9 @@ enum MessageResponse {
     #[serde(rename = "output/execute/wsExecuteStderr")]
     ExecuteStderr { payload: String, meta: Meta },
 
+    #[serde(rename = "output/execute/wsExecuteStatus")]
+    ExecuteStatus { payload: ExecuteStatus, meta: Meta },
+
     #[serde(rename = "output/execute/wsExecuteEnd")]
     ExecuteEnd {
         payload: ExecuteResponse,
@@ -162,6 +165,27 @@ pub(crate) struct FeatureFlags {}
 impl From<crate::FeatureFlags> for FeatureFlags {
     fn from(_value: crate::FeatureFlags) -> Self {
         Self {}
+    }
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct ExecuteStatus {
+    resident_set_size_bytes: u64,
+    total_time_secs: f64,
+}
+
+impl From<orchestrator::coordinator::ExecuteStatus> for ExecuteStatus {
+    fn from(value: orchestrator::coordinator::ExecuteStatus) -> Self {
+        let coordinator::ExecuteStatus {
+            resident_set_size_bytes,
+            total_time_secs,
+        } = value;
+
+        Self {
+            resident_set_size_bytes,
+            total_time_secs,
+        }
     }
 }
 
@@ -648,11 +672,16 @@ async fn handle_execute_inner(
                 abandon_if_closed!(sent);
             },
 
-            Some(status) = status_rx.recv() => {
+            Some(status) = status_rx.next() => {
                 if !reported && status.total_time_secs > 60.0 {
                     error!("Request consumed more than 60s of CPU time: {req:?}");
                     reported = true;
                 }
+
+                let payload = status.into();
+                let meta = meta.clone();
+                let sent = tx.send(Ok(MessageResponse::ExecuteStatus { payload, meta })).await;
+                abandon_if_closed!(sent);
             }
         }
     };

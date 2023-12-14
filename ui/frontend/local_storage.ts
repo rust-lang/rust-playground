@@ -2,7 +2,7 @@
 // preserved between completely independent sessions of the
 // playground.
 
-import State from './state';
+import { State } from './reducers';
 import {removeVersion, initializeStorage, PartialState} from './storage';
 import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, PairCharacters, ProcessAssembly } from './types';
 import { codeSelector } from './selectors';

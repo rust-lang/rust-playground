@@ -16,13 +16,17 @@ node_modules
 !BuildMenu.tsx
 !ButtonSet.tsx
 !Header.tsx
+!Notifications.tsx
 !PopButton.tsx
 !Stdin.tsx
 !actions.ts
 !api.ts
 !compileActions.ts
+!configureStore.ts
 !editor/AceEditor.tsx
 !editor/SimpleEditor.tsx
+!hooks.ts
+!observer.ts
 !reducers/browser.ts
 !reducers/client.ts
 !reducers/code.ts

@@ -1,5 +1,6 @@
-import { AnyAction, ThunkAction as ReduxThunkAction } from '@reduxjs/toolkit';
+import { ThunkAction as ReduxThunkAction, UnknownAction } from '@reduxjs/toolkit';
 
+import { State } from './reducers';
 import { addCrateType, editCode } from './reducers/code';
 import {
   changeBacktrace,
@@ -17,7 +18,6 @@ import { performCompileToMirOnly } from './reducers/output/mir';
 import { performCompileToWasmOnly } from './reducers/output/wasm';
 import { navigateToHelp, navigateToIndex } from './reducers/page';
 import { getCrateType, runAsTest, wasmLikelyToWork } from './selectors';
-import State from './state';
 import {
   Backtrace,
   Channel,
@@ -31,7 +31,7 @@ import {
   parseMode,
 } from './types';
 
-export type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, AnyAction>;
+export type ThunkAction<T = void> = ReduxThunkAction<T, State, unknown, UnknownAction>;
 
 export const reExecuteWithBacktrace = (): ThunkAction => (dispatch) => {
   dispatch(changeBacktrace(Backtrace.Enabled));

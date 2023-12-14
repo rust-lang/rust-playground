@@ -210,6 +210,49 @@ export const getSomethingToShow = createSelector(
 export const baseUrlSelector = (state: State) =>
   state.globalConfiguration.baseUrl;
 
+const excessiveExecutionTimeSSelector = (state: State) =>
+  state.globalConfiguration.excessiveExecutionTimeS;
+
+const killGracePeriodSSelector = (state: State) =>
+  state.globalConfiguration.killGracePeriodS;
+
+export const killGracePeriodMsSelector = createSelector(
+  killGracePeriodSSelector,
+  (t) => t * 1000,
+);
+
+const formatSeconds = (seconds: number) => {
+  if (seconds === 1) {
+    return '1 second';
+  } else if (seconds % 1 === 0) {
+    return `${seconds.toFixed(0)} seconds`;
+  } else {
+    return `${seconds.toFixed(1)} seconds`;
+  }
+};
+
+export const excessiveExecutionTimeSelector = createSelector(
+  excessiveExecutionTimeSSelector,
+  formatSeconds,
+);
+
+export const killGracePeriodTimeSelector = createSelector(
+  killGracePeriodSSelector,
+  formatSeconds,
+);
+
+export const currentExecutionSequenceNumberSelector = (state: State) =>
+  state.output.execute.sequenceNumber;
+
+export const excessiveExecutionSelector = createSelector(
+  (state: State) => state.output.execute,
+  excessiveExecutionTimeSSelector,
+  (e, limit) =>
+    e.requestsInProgress > 0 &&
+    !e.allowLongRun &&
+    (e.totalTimeSecs ?? 0.0) >= limit,
+);
+
 const gistSelector = (state: State) =>
   state.output.gist;
 
@@ -323,6 +366,7 @@ export const showRustSurvey2022Selector = createSelector(
 
 export const anyNotificationsToShowSelector = createSelector(
   showRustSurvey2022Selector,
+  excessiveExecutionSelector,
   (...allNotifications) => allNotifications.some(n => n),
 );
 

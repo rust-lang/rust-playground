@@ -1,6 +1,7 @@
 use futures::{
     future::{BoxFuture, OptionFuture},
-    Future, FutureExt,
+    stream::BoxStream,
+    Future, FutureExt, StreamExt,
 };
 use once_cell::sync::Lazy;
 use serde::Deserialize;
@@ -23,7 +24,7 @@ use tokio::{
     task::{JoinHandle, JoinSet},
     time::{self, MissedTickBehavior},
 };
-use tokio_stream::{wrappers::ReceiverStream, StreamExt};
+use tokio_stream::wrappers::ReceiverStream;
 use tokio_util::{io::SyncIoBridge, sync::CancellationToken};
 use tracing::{instrument, trace, trace_span, warn, Instrument};
 
@@ -413,6 +414,25 @@ impl CargoTomlModifier for ExecuteRequest {
             cargo_toml = modify_cargo_toml::set_crate_type(cargo_toml, crate_type);
         }
         cargo_toml
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ExecuteStatus {
+    pub resident_set_size_bytes: u64,
+    pub total_time_secs: f64,
+}
+
+impl From<CommandStatistics> for ExecuteStatus {
+    fn from(value: CommandStatistics) -> Self {
+        let CommandStatistics {
+            total_time_secs,
+            resident_set_size_bytes,
+        } = value;
+        Self {
+            resident_set_size_bytes,
+            total_time_secs,
+        }
     }
 }
 
@@ -1257,6 +1277,19 @@ impl Container {
         }
         .boxed();
 
+        let status_rx = tokio_stream::wrappers::ReceiverStream::new(status_rx)
+            .map(|s| {
+                let CommandStatistics {
+                    total_time_secs,
+                    resident_set_size_bytes,
+                } = s;
+                ExecuteStatus {
+                    resident_set_size_bytes,
+                    total_time_secs,
+                }
+            })
+            .boxed();
+
         Ok(ActiveExecution {
             task,
             stdin_tx,
@@ -1781,7 +1814,7 @@ pub struct ActiveExecution {
     pub stdin_tx: mpsc::Sender<String>,
     pub stdout_rx: mpsc::Receiver<String>,
     pub stderr_rx: mpsc::Receiver<String>,
-    pub status_rx: mpsc::Receiver<CommandStatistics>,
+    pub status_rx: BoxStream<'static, ExecuteStatus>,
 }
 
 impl fmt::Debug for ActiveExecution {
@@ -3197,19 +3230,13 @@ mod tests {
             stdin_tx: _,
             stdout_rx,
             stderr_rx,
-            mut status_rx,
+            status_rx,
         } = coordinator
             .begin_execute(token.clone(), request)
             .await
             .unwrap();
 
-        let statuses = async {
-            let mut statuses = Vec::new();
-            while let Some(s) = status_rx.recv().await {
-                statuses.push(s);
-            }
-            statuses
-        };
+        let statuses = status_rx.collect::<Vec<_>>();
 
         let output = WithOutput::try_absorb(task, stdout_rx, stderr_rx);
 

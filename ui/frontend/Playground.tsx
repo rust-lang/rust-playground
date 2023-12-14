@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import Split from 'split-grid';
 
 import Editor from './editor/Editor';
@@ -8,6 +7,7 @@ import Notifications from './Notifications';
 import Output from './Output';
 import * as selectors from './selectors';
 import { Orientation } from './types';
+import { useAppSelector } from './hooks';
 
 import styles from './Playground.module.css';
 
@@ -36,9 +36,9 @@ const HANDLE_STYLES = {
 // component is remounted. Each time it's remounted, we see a flicker and
 // lose state (like undo history).
 const ResizableArea: React.FC = () => {
-  const somethingToShow = useSelector(selectors.getSomethingToShow);
-  const isFocused = useSelector(selectors.isOutputFocused);
-  const orientation = useSelector(selectors.orientation);
+  const somethingToShow = useAppSelector(selectors.getSomethingToShow);
+  const isFocused = useAppSelector(selectors.isOutputFocused);
+  const orientation = useAppSelector(selectors.orientation);
 
   const grid = useRef<HTMLDivElement | null>(null);
   const dragHandle = useRef(null);
@@ -82,8 +82,8 @@ const ResizableArea: React.FC = () => {
 
 
 const WebSocketStatus: React.FC = () => {
-  const enabled = useSelector(selectors.showGemSelector);
-  const status = useSelector(selectors.websocketStatusSelector);
+  const enabled = useAppSelector(selectors.showGemSelector);
+  const status = useAppSelector(selectors.websocketStatusSelector);
 
   if (!enabled) { return null; }
 
@@ -108,7 +108,7 @@ const WebSocketStatus: React.FC = () => {
 }
 
 const Playground: React.FC = () => {
-  const showNotifications = useSelector(selectors.anyNotificationsToShowSelector);
+  const showNotifications = useAppSelector(selectors.anyNotificationsToShowSelector);
 
   return (
     <>

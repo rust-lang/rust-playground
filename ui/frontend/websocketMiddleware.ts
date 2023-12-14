@@ -1,10 +1,11 @@
-import { AnyAction, Middleware } from '@reduxjs/toolkit';
+import { Middleware } from '@reduxjs/toolkit';
 import { z } from 'zod';
 
 import { wsFeatureFlagsSchema } from './reducers/featureFlags';
 import {
   wsExecuteBeginSchema,
   wsExecuteEndSchema,
+  wsExecuteStatusSchema,
   wsExecuteStderrSchema,
   wsExecuteStdoutSchema,
 } from './reducers/output/execute';
@@ -21,6 +22,7 @@ const WSMessageResponse = z.discriminatedUnion('type', [
   websocketErrorSchema,
   wsExecuteBeginSchema,
   wsExecuteEndSchema,
+  wsExecuteStatusSchema,
   wsExecuteStderrSchema,
   wsExecuteStdoutSchema,
   wsFeatureFlagsSchema,
@@ -167,4 +169,13 @@ export const websocketMiddleware =
     };
   };
 
-const sendActionOnWebsocket = (action: AnyAction): boolean => action?.meta?.websocket;
+const WebsocketRequestAction = z.object({
+  meta: z.object({
+    websocket: z.boolean(),
+  }),
+});
+
+const sendActionOnWebsocket = (action: unknown): boolean => {
+  const p = WebsocketRequestAction.safeParse(action);
+  return p.success && p.data.meta.websocket;
+};

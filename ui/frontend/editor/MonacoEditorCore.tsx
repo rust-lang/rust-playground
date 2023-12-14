@@ -1,8 +1,7 @@
 import React from 'react';
 import { CommonEditorProps } from '../types';
 import MonacoEditor, { EditorDidMount, EditorWillMount } from 'react-monaco-editor';
-import { useSelector } from 'react-redux';
-import State from '../state';
+import { useAppSelector } from '../hooks';
 import { config, grammar, themeVsDarkPlus } from './rust_monaco_def';
 
 import styles from './Editor.module.css';
@@ -33,7 +32,7 @@ const initEditor = (execute: () => any): EditorDidMount => (editor, monaco) => {
 };
 
 const MonacoEditorCore: React.FC<CommonEditorProps> = props => {
-  const theme = useSelector((s: State) => s.configuration.monaco.theme);
+  const theme = useAppSelector((s) => s.configuration.monaco.theme);
 
   return (
     <MonacoEditor
