@@ -3,9 +3,8 @@ import { Portal } from 'react-portal';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Close } from './Icon';
-
-import * as selectors from './selectors';
 import { seenRustSurvey2022 } from './reducers/notifications';
+import * as selectors from './selectors';
 
 import styles from './Notifications.module.css';
 
@@ -29,11 +28,10 @@ const RustSurvey2022Notification: React.FC = () => {
 
   return showRustSurvey2022 ? (
     <Notification onClose={seenRustSurvey2021}>
-      Please help us take a look at who the Rust community is
-      composed of, how the Rust project is doing, and how we can
-      improve the Rust programming experience by completing the <a
-        href={SURVEY_URL}>2022 State of Rust Survey</a>. Whether or
-      not you use Rust today, we want to know your opinions.
+      Please help us take a look at who the Rust community is composed of, how the Rust project is
+      doing, and how we can improve the Rust programming experience by completing the{' '}
+      <a href={SURVEY_URL}>2022 State of Rust Survey</a>. Whether or not you use Rust today, we want
+      to know your opinions.
     </Notification>
   ) : null;
 };
@@ -46,7 +44,9 @@ interface NotificationProps {
 const Notification: React.FC<NotificationProps> = ({ onClose, children }) => (
   <div className={styles.notification}>
     <div className={styles.notificationContent}>{children}</div>
-    <button className={styles.close} onClick={onClose}><Close /></button>
+    <button className={styles.close} onClick={onClose}>
+      <Close />
+    </button>
   </div>
 );
 

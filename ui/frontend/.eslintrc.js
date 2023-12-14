@@ -65,6 +65,7 @@ module.exports = {
         'BuildMenu.tsx',
         'ButtonSet.tsx',
         'Header.tsx',
+        'Notifications.tsx',
         'PopButton.tsx',
         'Stdin.tsx',
         'actions.ts',
