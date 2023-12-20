@@ -159,5 +159,5 @@ export enum Focus {
 }
 
 export enum Notification {
-  RustSurvey2022 = 'rust-survey-2022',
+  RustSurvey2023 = 'rust-survey-2023',
 }
