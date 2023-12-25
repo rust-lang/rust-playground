@@ -45,7 +45,7 @@ const initialState: State = {
     pairCharacters: PairCharacters.Enabled,
   },
   monaco: {
-    theme: 'vscode-dark-plus',
+    theme: 'vs',
   },
   orientation: Orientation.Automatic,
   assemblyFlavor: AssemblyFlavor.Att,

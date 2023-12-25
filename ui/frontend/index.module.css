@@ -1,52 +1,154 @@
+/* Non-theme variables */
 :root {
+  /* Fonts */
   --primary-font: 'Open Sans', sans-serif;
-  --rust: #a42;
-  --rust-dark: #80331a;
-  --border-color: #bbb;
-  --border: 1px solid var(--border-color);
-  --header-main-border: #dedede;
+
+  /* Header */
   --header-transition: 0.2s ease-in-out;
-  --header-tint: #428bca;
   --header-border-radius: 4px;
+
+  /* Border */
+  --border: 1px solid var(--border-color);
+}
+
+/* Light theme */
+/* stylelint-disable-next-line no-duplicate-selectors */
+:root {
+  --positive-luminance: white;
+  --negative-luminance: black;
+
+  /* Fonts */
+  --font-color: #444;
+  --font-color-high-contrast: var(--negative-luminance);
+
+  /* Links */
+  --link-color: #00e;
+  --link-color-visited: #551a8b;
+
+  /* Background */
+  --background-color: #e1e1db;
+  --background-color-high-contrast: var(--positive-luminance);
+
+  /* Code */
+  --code-background-color: #eee;
+
+  /* Border */
+  --border-color: #bbb;
+
+  /* Header */
+  --header-link-color: var(--negative-luminance);
+  --header-main-border: #dedede;
+  --header-tint: #428bca;
   --header-accent-border: #bdbdbd;
 
   /* The big red button */
-
-  --button-primary-color: white;
-  --button-primary-bg-color: var(--rust);
-  --button-primary-border-color: var(--rust-dark);
-  --button-primary-bg-color-light: color-mix(in hsl, var(--button-primary-bg-color), white);
-  --button-primary-border-color-light: color-mix(in hsl, var(--button-primary-border-color), white);
+  --button-primary-color: var(--positive-luminance);
+  --button-primary-bg-color: #a42;
+  --button-primary-border-color: #80331a;
+  --button-primary-bg-color-light: color-mix(
+    in hsl,
+    var(--button-primary-bg-color),
+    var(--positive-luminance)
+  );
+  --button-primary-border-color-light: color-mix(
+    in hsl,
+    var(--button-primary-border-color),
+    var(--positive-luminance)
+  );
 
   /* Clicked */
-  --button-primary-active-color: color-mix(in hsl, white, black 30%);
+  --button-primary-active-color: color-mix(
+    in hsl,
+    var(--positive-luminance),
+    var(--negative-luminance) 30%
+  );
 
   /* Not the big red button */
-
   --button-secondary-color: #444;
   --button-secondary-bg-color-top: #fff;
   --button-secondary-bg-color-bottom: #f9f9f9;
+  --button-secondary-bg-color: linear-gradient(
+    to bottom,
+    var(--button-secondary-bg-color-top),
+    var(--button-secondary-bg-color-bottom)
+  );
   --button-secondary-border-color: color-mix(
     in hsl,
     var(--button-secondary-bg-color-bottom),
-    black 20%
+    var(--negative-luminance) 20%
   );
 
   /* Disabled */
   --button-secondary-bg-color-light: color-mix(
     in hsl,
     var(--button-secondary-bg-color-bottom),
-    white
+    var(--positive-luminance)
   );
   --button-secondary-border-color-light: color-mix(
     in hsl,
     var(--button-secondary-border-color),
-    white
+    var(--positive-luminance)
   );
-  --button-secondary-color-light: color-mix(in hsl, var(--button-secondary-color), white);
+  --button-secondary-color-light: color-mix(
+    in hsl,
+    var(--button-secondary-color),
+    var(--positive-luminance)
+  );
 
   /* Clicked */
-  --button-secondary-active-color: color-mix(in hsl, black, white 30%);
+  --button-secondary-active-color: color-mix(
+    in hsl,
+    var(--negative-luminance),
+    var(--positive-luminance) 30%
+  );
+
+  /* Output tabs */
+  --output-background-tab: #fcfcfc;
+  --output-current-tab: #f9ffff;
+}
+
+/* Automatic dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --positive-luminance: black;
+    --negative-luminance: white;
+
+    /* Fonts */
+    --font-color: #b4aea6;
+    --font-color-high-contrast: #dcdbd8;
+
+    /* Links */
+    --link-color: #308af2;
+    --link-color-visited: #9f5fe1;
+
+    /* Background */
+    --background-color: #292c2e;
+    --background-color-high-contrast: #17191a;
+
+    /* Code */
+    --code-background-color: #3c3c3c;
+
+    /* Border */
+    --border-color: #404548;
+
+    /* Header */
+    --header-main-border: #363b3d;
+    --header-accent-border: #bdbdbd;
+
+    /* The big red button */
+    --button-primary-color: #dcdbd8;
+    --button-primary-bg-color: #81331a;
+    --button-primary-border-color: #612714;
+
+    /* Not the big red button */
+    --button-secondary-color: #b4aea6;
+    --button-secondary-bg-color-top: #17191a;
+    --button-secondary-bg-color-bottom: #1a1c1d;
+
+    /* Output tabs */
+    --output-background-tab: #191b1c;
+    --output-current-tab: #343434;
+  }
 }
 
 /* Modify normalized styles */
@@ -55,12 +157,19 @@ input,
 optgroup,
 select,
 textarea {
-  color: text;
   font-family: var(--primary-font);
 }
 
 html {
   box-sizing: border-box;
+}
+
+a {
+  color: var(--link-color);
+}
+
+a:visited {
+  color: var(--link-color-visited);
 }
 
 *,
@@ -70,7 +179,8 @@ html {
 }
 
 body {
-  background-color: #e1e1db;
+  color: var(--font-color);
+  background-color: var(--background-color);
   padding: 0 1em;
   font-family: var(--primary-font);
 }
