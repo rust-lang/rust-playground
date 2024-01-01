@@ -111,16 +111,16 @@ impl TryFrom<ExecuteRequest> for coordinator::ExecuteRequest {
 
 #[derive(Debug, Snafu)]
 pub(crate) enum ExecuteRequestParseError {
-    #[snafu(context(false))]
+    #[snafu(transparent)]
     Channel { source: ParseChannelError },
 
-    #[snafu(context(false))]
+    #[snafu(transparent)]
     CrateType { source: ParseCrateTypeError },
 
-    #[snafu(context(false))]
+    #[snafu(transparent)]
     Mode { source: ParseModeError },
 
-    #[snafu(context(false))]
+    #[snafu(transparent)]
     Edition { source: ParseEditionError },
 }
 

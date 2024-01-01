@@ -6,11 +6,14 @@ use cargo::{
         package::PackageSet,
         registry::PackageRegistry,
         resolver::{self, features::RequestedFeatures, ResolveOpts, VersionPreferences},
-        source::SourceMap,
-        Dependency, Package, PackageId, QueryKind, Source, SourceId, Summary, Target,
+        Dependency, Package, PackageId, SourceId, Summary, Target,
     },
-    sources::RegistrySource,
-    util::{interning::InternedString, Config, VersionExt},
+    sources::{
+        source::{QueryKind, Source, SourceMap},
+        RegistrySource,
+    },
+    util::{cache_lock::CacheLockMode, interning::InternedString, Config},
+    util_semver::VersionExt,
 };
 use itertools::Itertools;
 use semver::Version;
@@ -438,7 +441,7 @@ pub fn generate_info(
 ) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
     // Setup to interact with cargo.
     let config = Config::default().expect("Unable to create default Cargo config");
-    let _lock = config.acquire_package_cache_lock();
+    let _lock = config.acquire_package_cache_lock(CacheLockMode::DownloadExclusive);
     let mut global = make_global_state(&config, modifications);
 
     let mut resolved_crates = populate_initial_direct_dependencies(&mut global);

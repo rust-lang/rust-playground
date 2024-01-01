@@ -122,10 +122,10 @@ pub enum VersionsError {
 
 #[derive(Debug, Snafu)]
 pub enum VersionsChannelError {
-    #[snafu(context(false))] // transparent
+    #[snafu(transparent)]
     Channel { source: Error },
 
-    #[snafu(context(false))] // transparent
+    #[snafu(transparent)]
     Versions { source: ContainerVersionsError },
 }
 
@@ -193,7 +193,7 @@ pub enum CratesError {
     #[snafu(context(false))]
     Start { source: Error },
 
-    #[snafu(context(false))] // transparent
+    #[snafu(transparent)]
     Container { source: ContainerCratesError },
 }
 
