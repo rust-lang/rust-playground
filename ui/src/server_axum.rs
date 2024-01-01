@@ -879,10 +879,10 @@ pub(crate) mod api_orchestrator_integration_impls {
 
     #[derive(Debug, Snafu)]
     pub(crate) enum ParseEvaluateRequestError {
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Channel { source: ParseChannelError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Edition { source: ParseEditionError },
     }
 
@@ -956,19 +956,19 @@ pub(crate) mod api_orchestrator_integration_impls {
 
     #[derive(Debug, Snafu)]
     pub(crate) enum ParseCompileRequestError {
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Target { source: ParseCompileTargetError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Channel { source: ParseChannelError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         CrateType { source: ParseCrateTypeError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Mode { source: ParseModeError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Edition { source: ParseEditionError },
     }
 
@@ -1023,16 +1023,16 @@ pub(crate) mod api_orchestrator_integration_impls {
 
     #[derive(Debug, Snafu)]
     pub(crate) enum ParseExecuteRequestError {
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Channel { source: ParseChannelError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         CrateType { source: ParseCrateTypeError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Mode { source: ParseModeError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Edition { source: ParseEditionError },
     }
 
@@ -1083,10 +1083,10 @@ pub(crate) mod api_orchestrator_integration_impls {
 
     #[derive(Debug, Snafu)]
     pub(crate) enum ParseFormatRequestError {
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Channel { source: ParseChannelError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Edition { source: ParseEditionError },
     }
 
@@ -1140,13 +1140,13 @@ pub(crate) mod api_orchestrator_integration_impls {
 
     #[derive(Debug, Snafu)]
     pub(crate) enum ParseClippyRequestError {
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Channel { source: ParseChannelError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         CrateType { source: ParseCrateTypeError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Edition { source: ParseEditionError },
     }
 
@@ -1188,7 +1188,7 @@ pub(crate) mod api_orchestrator_integration_impls {
 
     #[derive(Debug, Snafu)]
     pub(crate) enum ParseMiriRequestError {
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Edition { source: ParseEditionError },
     }
 
@@ -1230,7 +1230,7 @@ pub(crate) mod api_orchestrator_integration_impls {
 
     #[derive(Debug, Snafu)]
     pub(crate) enum ParseMacroExpansionRequestError {
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         Edition { source: ParseEditionError },
     }
 
@@ -1290,13 +1290,13 @@ pub(crate) mod api_orchestrator_integration_impls {
 
     #[derive(Debug, Snafu)]
     pub(crate) enum ParseCompileTargetError {
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         AssemblyFlavor { source: ParseAssemblyFlavorError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         DemangleAssembly { source: ParseDemangleAssemblyError },
 
-        #[snafu(context(false))]
+        #[snafu(transparent)]
         ProcessAssembly { source: ParseProcessAssemblyError },
 
         #[snafu(display("'{value}' is not a valid target"))]

@@ -1005,7 +1005,7 @@ dependencies = [
  "serde_json",
  "serde_path_to_error",
  "serde_urlencoded",
- "snafu",
+ "snafu 0.7.5",
  "tokio",
  "tower",
  "tower-http 0.4.4",
@@ -1039,7 +1039,7 @@ dependencies = [
  "procfs",
  "serde",
  "serde_json",
- "snafu",
+ "snafu 0.8.0",
  "tokio",
  "tokio-stream",
  "tokio-util",
@@ -1562,9 +1562,18 @@ checksum = "e4de37ad025c587a29e8f3f5605c00f70b98715ef90b9061a815b9e59e9042d6"
 dependencies = [
  "backtrace",
  "doc-comment",
+ "snafu-derive 0.7.5",
+]
+
+[[package]]
+name = "snafu"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d342c51730e54029130d7dc9fd735d28c4cd360f1368c01981d4f03ff207f096"
+dependencies = [
  "futures-core",
  "pin-project",
- "snafu-derive",
+ "snafu-derive 0.8.0",
 ]
 
 [[package]]
@@ -1577,6 +1586,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "snafu-derive"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "080c44971436b1af15d6f61ddd8b543995cf63ab8e677d46b00cc06f4ef267a0"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.41",
 ]
 
 [[package]]
@@ -2039,7 +2060,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "snafu",
+ "snafu 0.8.0",
  "strum",
  "tempfile",
  "tokio",

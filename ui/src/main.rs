@@ -173,37 +173,37 @@ enum Error {
     #[snafu(display("Unable to serialize response: {}", source))]
     Serialization { source: serde_json::Error },
 
-    #[snafu(context(false))]
+    #[snafu(transparent)]
     EvaluateRequest {
         source: server_axum::api_orchestrator_integration_impls::ParseEvaluateRequestError,
     },
 
-    #[snafu(context(false))]
+    #[snafu(transparent)]
     CompileRequest {
         source: server_axum::api_orchestrator_integration_impls::ParseCompileRequestError,
     },
 
-    #[snafu(context(false))]
+    #[snafu(transparent)]
     ExecuteRequest {
         source: server_axum::api_orchestrator_integration_impls::ParseExecuteRequestError,
     },
 
-    #[snafu(context(false))]
+    #[snafu(transparent)]
     FormatRequest {
         source: server_axum::api_orchestrator_integration_impls::ParseFormatRequestError,
     },
 
-    #[snafu(context(false))]
+    #[snafu(transparent)]
     ClippyRequest {
         source: server_axum::api_orchestrator_integration_impls::ParseClippyRequestError,
     },
 
-    #[snafu(context(false))]
+    #[snafu(transparent)]
     MiriRequest {
         source: server_axum::api_orchestrator_integration_impls::ParseMiriRequestError,
     },
 
-    #[snafu(context(false))]
+    #[snafu(transparent)]
     MacroExpansionRequest {
         source: server_axum::api_orchestrator_integration_impls::ParseMacroExpansionRequestError,
     },
