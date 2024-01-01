@@ -32,7 +32,7 @@ default-features = false
 
 [dependencies.ahash]
 package = "ahash"
-version = "=0.8.6"
+version = "=0.8.7"
 features = ["getrandom", "runtime-rng", "std"]
 
 [dependencies.aho_corasick]
@@ -71,7 +71,7 @@ version = "=1.0.2"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.75"
+version = "=1.0.78"
 features = ["std"]
 
 [dependencies.approx]
@@ -89,7 +89,7 @@ version = "=1.0.5"
 
 [dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.74"
+version = "=0.1.76"
 
 [dependencies.atomic]
 package = "atomic"
@@ -180,12 +180,12 @@ features = ["android-tzdata", "clock", "iana-time-zone", "js-sys", "oldtime", "s
 
 [dependencies.clap]
 package = "clap"
-version = "=4.4.11"
+version = "=4.4.12"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.4.11"
+version = "=4.4.12"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
 default-features = false
 
@@ -230,13 +230,13 @@ features = ["std"]
 
 [dependencies.crossbeam]
 package = "crossbeam"
-version = "=0.8.2"
+version = "=0.8.3"
 features = ["alloc", "crossbeam-channel", "crossbeam-deque", "crossbeam-epoch", "crossbeam-queue", "std"]
 
 [dependencies.crossbeam_channel]
 package = "crossbeam-channel"
-version = "=0.5.9"
-features = ["crossbeam-utils", "std"]
+version = "=0.5.10"
+features = ["std"]
 
 [dependencies.crossbeam_deque]
 package = "crossbeam-deque"
@@ -245,18 +245,18 @@ features = ["crossbeam-epoch", "crossbeam-utils", "std"]
 
 [dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.16"
+version = "=0.9.17"
 features = ["alloc", "std"]
 
 [dependencies.crossbeam_queue]
 package = "crossbeam-queue"
-version = "=0.3.9"
+version = "=0.3.10"
 features = ["alloc", "std"]
 default-features = false
 
 [dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.17"
+version = "=0.8.18"
 features = ["std"]
 
 [dependencies.crypto_common]
@@ -283,7 +283,7 @@ version = "=1.0.4"
 
 [dependencies.deranged]
 package = "deranged"
-version = "=0.3.10"
+version = "=0.3.11"
 features = ["alloc", "powerfmt", "std"]
 default-features = false
 
@@ -360,7 +360,7 @@ features = ["alloc", "std"]
 
 [dependencies.fdeflate]
 package = "fdeflate"
-version = "=0.3.1"
+version = "=0.3.3"
 
 [dependencies.filetime]
 package = "filetime"
@@ -410,7 +410,7 @@ version = "=0.1.5"
 
 [dependencies.futures]
 package = "futures"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "async-await", "compat", "executor", "futures-executor", "io-compat", "std", "thread-pool"]
 
 [dependencies.futures_0_1_31]
@@ -420,42 +420,42 @@ features = ["use_std", "with-deprecated"]
 
 [dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "futures-sink", "sink", "std"]
 
 [dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "std"]
 
 [dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["num_cpus", "std", "thread-pool"]
 default-features = false
 
 [dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["std"]
 
 [dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.29"
+version = "=0.3.30"
 
 [dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "std"]
 
 [dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "std"]
 
 [dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "async-await", "async-await-macro", "channel", "compat", "futures-channel", "futures-io", "futures-macro", "futures-sink", "futures_01", "io", "io-compat", "memchr", "sink", "slab", "std", "tokio-io"]
 
 [dependencies.generic_array]
@@ -575,7 +575,7 @@ version = "=0.5.0"
 
 [dependencies.iana_time_zone]
 package = "iana-time-zone"
-version = "=0.1.58"
+version = "=0.1.59"
 features = ["fallback"]
 
 [dependencies.idna]
@@ -617,7 +617,7 @@ features = ["std"]
 
 [dependencies.is_terminal]
 package = "is-terminal"
-version = "=0.4.9"
+version = "=0.4.10"
 
 [dependencies.itertools]
 package = "itertools"
@@ -713,7 +713,7 @@ features = ["std"]
 
 [dependencies.memchr]
 package = "memchr"
-version = "=2.6.4"
+version = "=2.7.1"
 features = ["alloc", "std"]
 
 [dependencies.memmap]
@@ -767,6 +767,10 @@ package = "ndarray"
 version = "=0.15.6"
 features = ["std"]
 
+[dependencies.nix]
+package = "nix"
+version = "=0.27.1"
+
 [dependencies.nom]
 package = "nom"
 version = "=7.1.3"
@@ -817,18 +821,18 @@ features = ["i128", "libm", "std"]
 
 [dependencies.object]
 package = "object"
-version = "=0.32.1"
+version = "=0.32.2"
 features = ["archive", "coff", "elf", "macho", "pe", "read_core", "unaligned"]
 default-features = false
 
 [dependencies.once_cell]
 package = "once_cell"
 version = "=1.19.0"
-features = ["alloc", "race", "std", "unstable"]
+features = ["alloc", "race", "std"]
 
 [dependencies.openssl]
 package = "openssl"
-version = "=0.10.61"
+version = "=0.10.62"
 
 [dependencies.openssl_macros]
 package = "openssl-macros"
@@ -840,7 +844,7 @@ version = "=0.1.5"
 
 [dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.97"
+version = "=0.9.98"
 
 [dependencies.ordered_float]
 package = "ordered-float"
@@ -916,7 +920,7 @@ version = "=0.1.0"
 
 [dependencies.pkg_config]
 package = "pkg-config"
-version = "=0.3.27"
+version = "=0.3.28"
 
 [dependencies.png]
 package = "png"
@@ -950,7 +954,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.70"
+version = "=1.0.73"
 features = ["proc-macro", "span-locations"]
 
 [dependencies.psl_types]
@@ -969,7 +973,7 @@ features = ["std"]
 
 [dependencies.quote]
 package = "quote"
-version = "=1.0.33"
+version = "=1.0.34"
 features = ["proc-macro"]
 
 [dependencies.rand]
@@ -1086,7 +1090,7 @@ version = "=1.0.193"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.108"
+version = "=1.0.109"
 features = ["raw_value", "std"]
 
 [dependencies.serde_spanned]
@@ -1182,7 +1186,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=2.0.41"
+version = "=2.0.44"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1197,7 +1201,7 @@ features = ["xattr"]
 
 [dependencies.tempfile]
 package = "tempfile"
-version = "=3.8.1"
+version = "=3.9.0"
 
 [dependencies.tendril]
 package = "tendril"
@@ -1218,11 +1222,11 @@ features = ["smawk", "unicode-linebreak", "unicode-width"]
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.51"
+version = "=1.0.53"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.51"
+version = "=1.0.53"
 
 [dependencies.thread_id]
 package = "thread-id"
@@ -1431,12 +1435,12 @@ default-features = false
 
 [dependencies.winnow]
 package = "winnow"
-version = "=0.5.30"
+version = "=0.5.31"
 features = ["alloc", "std"]
 
 [dependencies.xattr]
 package = "xattr"
-version = "=1.1.3"
+version = "=1.2.0"
 features = ["unsupported"]
 
 [dependencies.xml5ever]
@@ -1449,13 +1453,13 @@ version = "=0.4.5"
 
 [dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.7.31"
+version = "=0.7.32"
 features = ["__internal_use_only_features_that_work_on_stable", "alloc", "derive", "simd", "zerocopy-derive"]
 default-features = false
 
 [dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.7.31"
+version = "=0.7.32"
 
 [dependencies.zeroize]
 package = "zeroize"
@@ -1480,7 +1484,7 @@ default-features = false
 
 [build_dependencies.ahash]
 package = "ahash"
-version = "=0.8.6"
+version = "=0.8.7"
 features = ["getrandom", "runtime-rng", "std"]
 
 [build_dependencies.aho_corasick]
@@ -1519,7 +1523,7 @@ version = "=1.0.2"
 
 [build_dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.75"
+version = "=1.0.78"
 features = ["std"]
 
 [build_dependencies.approx]
@@ -1537,7 +1541,7 @@ version = "=1.0.5"
 
 [build_dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.74"
+version = "=0.1.76"
 
 [build_dependencies.atomic]
 package = "atomic"
@@ -1628,12 +1632,12 @@ features = ["android-tzdata", "clock", "iana-time-zone", "js-sys", "oldtime", "s
 
 [build_dependencies.clap]
 package = "clap"
-version = "=4.4.11"
+version = "=4.4.12"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build_dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.4.11"
+version = "=4.4.12"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
 default-features = false
 
@@ -1678,13 +1682,13 @@ features = ["std"]
 
 [build_dependencies.crossbeam]
 package = "crossbeam"
-version = "=0.8.2"
+version = "=0.8.3"
 features = ["alloc", "crossbeam-channel", "crossbeam-deque", "crossbeam-epoch", "crossbeam-queue", "std"]
 
 [build_dependencies.crossbeam_channel]
 package = "crossbeam-channel"
-version = "=0.5.9"
-features = ["crossbeam-utils", "std"]
+version = "=0.5.10"
+features = ["std"]
 
 [build_dependencies.crossbeam_deque]
 package = "crossbeam-deque"
@@ -1693,18 +1697,18 @@ features = ["crossbeam-epoch", "crossbeam-utils", "std"]
 
 [build_dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.16"
+version = "=0.9.17"
 features = ["alloc", "std"]
 
 [build_dependencies.crossbeam_queue]
 package = "crossbeam-queue"
-version = "=0.3.9"
+version = "=0.3.10"
 features = ["alloc", "std"]
 default-features = false
 
 [build_dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.17"
+version = "=0.8.18"
 features = ["std"]
 
 [build_dependencies.crypto_common]
@@ -1731,7 +1735,7 @@ version = "=1.0.4"
 
 [build_dependencies.deranged]
 package = "deranged"
-version = "=0.3.10"
+version = "=0.3.11"
 features = ["alloc", "powerfmt", "std"]
 default-features = false
 
@@ -1808,7 +1812,7 @@ features = ["alloc", "std"]
 
 [build_dependencies.fdeflate]
 package = "fdeflate"
-version = "=0.3.1"
+version = "=0.3.3"
 
 [build_dependencies.filetime]
 package = "filetime"
@@ -1858,7 +1862,7 @@ version = "=0.1.5"
 
 [build_dependencies.futures]
 package = "futures"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "async-await", "compat", "executor", "futures-executor", "io-compat", "std", "thread-pool"]
 
 [build_dependencies.futures_0_1_31]
@@ -1868,42 +1872,42 @@ features = ["use_std", "with-deprecated"]
 
 [build_dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "futures-sink", "sink", "std"]
 
 [build_dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "std"]
 
 [build_dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["num_cpus", "std", "thread-pool"]
 default-features = false
 
 [build_dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["std"]
 
 [build_dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.29"
+version = "=0.3.30"
 
 [build_dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "std"]
 
 [build_dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "std"]
 
 [build_dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.29"
+version = "=0.3.30"
 features = ["alloc", "async-await", "async-await-macro", "channel", "compat", "futures-channel", "futures-io", "futures-macro", "futures-sink", "futures_01", "io", "io-compat", "memchr", "sink", "slab", "std", "tokio-io"]
 
 [build_dependencies.generic_array]
@@ -2023,7 +2027,7 @@ version = "=0.5.0"
 
 [build_dependencies.iana_time_zone]
 package = "iana-time-zone"
-version = "=0.1.58"
+version = "=0.1.59"
 features = ["fallback"]
 
 [build_dependencies.idna]
@@ -2065,7 +2069,7 @@ features = ["std"]
 
 [build_dependencies.is_terminal]
 package = "is-terminal"
-version = "=0.4.9"
+version = "=0.4.10"
 
 [build_dependencies.itertools]
 package = "itertools"
@@ -2161,7 +2165,7 @@ features = ["std"]
 
 [build_dependencies.memchr]
 package = "memchr"
-version = "=2.6.4"
+version = "=2.7.1"
 features = ["alloc", "std"]
 
 [build_dependencies.memmap]
@@ -2215,6 +2219,10 @@ package = "ndarray"
 version = "=0.15.6"
 features = ["std"]
 
+[build_dependencies.nix]
+package = "nix"
+version = "=0.27.1"
+
 [build_dependencies.nom]
 package = "nom"
 version = "=7.1.3"
@@ -2265,18 +2273,18 @@ features = ["i128", "libm", "std"]
 
 [build_dependencies.object]
 package = "object"
-version = "=0.32.1"
+version = "=0.32.2"
 features = ["archive", "coff", "elf", "macho", "pe", "read_core", "unaligned"]
 default-features = false
 
 [build_dependencies.once_cell]
 package = "once_cell"
 version = "=1.19.0"
-features = ["alloc", "race", "std", "unstable"]
+features = ["alloc", "race", "std"]
 
 [build_dependencies.openssl]
 package = "openssl"
-version = "=0.10.61"
+version = "=0.10.62"
 
 [build_dependencies.openssl_macros]
 package = "openssl-macros"
@@ -2288,7 +2296,7 @@ version = "=0.1.5"
 
 [build_dependencies.openssl_sys]
 package = "openssl-sys"
-version = "=0.9.97"
+version = "=0.9.98"
 
 [build_dependencies.ordered_float]
 package = "ordered-float"
@@ -2364,7 +2372,7 @@ version = "=0.1.0"
 
 [build_dependencies.pkg_config]
 package = "pkg-config"
-version = "=0.3.27"
+version = "=0.3.28"
 
 [build_dependencies.png]
 package = "png"
@@ -2398,7 +2406,7 @@ version = "=0.1.1"
 
 [build_dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.70"
+version = "=1.0.73"
 features = ["proc-macro", "span-locations"]
 
 [build_dependencies.psl_types]
@@ -2417,7 +2425,7 @@ features = ["std"]
 
 [build_dependencies.quote]
 package = "quote"
-version = "=1.0.33"
+version = "=1.0.34"
 features = ["proc-macro"]
 
 [build_dependencies.rand]
@@ -2534,7 +2542,7 @@ version = "=1.0.193"
 
 [build_dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.108"
+version = "=1.0.109"
 features = ["raw_value", "std"]
 
 [build_dependencies.serde_spanned]
@@ -2630,7 +2638,7 @@ default-features = false
 
 [build_dependencies.syn]
 package = "syn"
-version = "=2.0.41"
+version = "=2.0.44"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"]
 
 [build_dependencies.syn_1_0_109]
@@ -2645,7 +2653,7 @@ features = ["xattr"]
 
 [build_dependencies.tempfile]
 package = "tempfile"
-version = "=3.8.1"
+version = "=3.9.0"
 
 [build_dependencies.tendril]
 package = "tendril"
@@ -2666,11 +2674,11 @@ features = ["smawk", "unicode-linebreak", "unicode-width"]
 
 [build_dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.51"
+version = "=1.0.53"
 
 [build_dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.51"
+version = "=1.0.53"
 
 [build_dependencies.thread_id]
 package = "thread-id"
@@ -2879,12 +2887,12 @@ default-features = false
 
 [build_dependencies.winnow]
 package = "winnow"
-version = "=0.5.30"
+version = "=0.5.31"
 features = ["alloc", "std"]
 
 [build_dependencies.xattr]
 package = "xattr"
-version = "=1.1.3"
+version = "=1.2.0"
 features = ["unsupported"]
 
 [build_dependencies.xml5ever]
@@ -2897,13 +2905,13 @@ version = "=0.4.5"
 
 [build_dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.7.31"
+version = "=0.7.32"
 features = ["__internal_use_only_features_that_work_on_stable", "alloc", "derive", "simd", "zerocopy-derive"]
 default-features = false
 
 [build_dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.7.31"
+version = "=0.7.32"
 
 [build_dependencies.zeroize]
 package = "zeroize"
