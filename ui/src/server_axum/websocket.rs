@@ -418,7 +418,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
             _ = active_execution_gc_interval.tick() => {
                 active_executions = mem::take(&mut active_executions)
                     .into_iter()
-                    .filter(|(_id, (_, tx))| !tx.is_closed())
+                    .filter(|(_id, (_, tx))| tx.as_ref().map_or(false, |tx| !tx.is_closed()))
                     .collect();
             },
 
@@ -489,7 +489,7 @@ async fn handle_msg(
     txt: String,
     tx: &ResponseTx,
     manager: &mut CoordinatorManager,
-    active_executions: &mut BTreeMap<i64, (CancellationToken, mpsc::Sender<String>)>,
+    active_executions: &mut BTreeMap<i64, (CancellationToken, Option<mpsc::Sender<String>>)>,
 ) {
     use WSMessageRequest::*;
 
@@ -500,7 +500,7 @@ async fn handle_msg(
             let token = CancellationToken::new();
             let (execution_tx, execution_rx) = mpsc::channel(8);
 
-            active_executions.insert(meta.sequence_number, (token.clone(), execution_tx));
+            active_executions.insert(meta.sequence_number, (token.clone(), Some(execution_tx)));
 
             // TODO: Should a single execute / build / etc. session have a timeout of some kind?
             let spawned = manager
@@ -520,7 +520,7 @@ async fn handle_msg(
         }
 
         Ok(ExecuteStdin { payload, meta }) => {
-            let Some((_, execution_tx)) = active_executions.get(&meta.sequence_number) else {
+            let Some((_, Some(execution_tx))) = active_executions.get(&meta.sequence_number) else {
                 warn!("Received stdin for an execution that is no longer active");
                 return;
             };
@@ -536,14 +536,20 @@ async fn handle_msg(
         }
 
         Ok(ExecuteStdinClose { meta }) => {
-            let execution_tx = active_executions.remove(&meta.sequence_number);
-            drop(execution_tx); // Signal closed
+            let Some((_, execution_tx)) = active_executions.get_mut(&meta.sequence_number) else {
+                warn!("Received stdin close for an execution that is no longer active");
+                return;
+            };
+
+            *execution_tx = None; // Drop to signal closed
         }
 
         Ok(ExecuteKill { meta }) => {
-            if let Some((token, _)) = active_executions.remove(&meta.sequence_number) {
-                token.cancel();
-            }
+            let Some((token, _)) = active_executions.get(&meta.sequence_number) else {
+                warn!("Received kill for an execution that is no longer active");
+                return;
+            };
+            token.cancel();
         }
 
         Err(e) => {

@@ -108,6 +108,28 @@ RSpec.feature "Streaming interaction using WebSockets", type: :feature, js: true
     end
   end
 
+  scenario "The process can be killed after stdin is closed" do
+    editor.set <<~EOF
+      fn main() {
+          loop {
+              std::thread::sleep(std::time::Duration::from_secs(1));
+          }
+      }
+    EOF
+
+    click_on("Run")
+
+    within(:stdin) do
+      click_on 'Execution control'
+      click_on 'Close stdin'
+      click_on 'Execution control'
+      click_on 'Kill process'
+    end
+
+    within(:output, :error) do
+      expect(page).to have_content 'SIGKILL'
+    end
+  end
 
   def editor
     Editor.new(page)
