@@ -10,6 +10,7 @@ import {
   Orientation,
   PrimaryActionAuto,
   PrimaryActionCore,
+  Theme,
   Version,
 } from '../types';
 
@@ -504,4 +505,9 @@ export const compileRequestPayloadSelector = createSelector(
     processAssembly: configuration.processAssembly,
     backtrace,
   }),
+);
+
+export const themeSelector = createSelector(
+  (state: State) => state,
+  (state) => state.configuration.theme,
 );

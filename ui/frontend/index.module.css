@@ -11,9 +11,7 @@
   --border: 1px solid var(--border-color);
 }
 
-/* Light theme */
-/* stylelint-disable-next-line no-duplicate-selectors */
-:root {
+@define-mixin light-theme-vars {
   --positive-luminance: white;
   --negative-luminance: black;
 
@@ -107,48 +105,60 @@
   --output-current-tab: #f9ffff;
 }
 
-/* Automatic dark mode */
+@define-mixin dark-theme-vars {
+  --positive-luminance: black;
+  --negative-luminance: white;
+
+  /* Fonts */
+  --font-color: #b4aea6;
+  --font-color-high-contrast: #dcdbd8;
+
+  /* Links */
+  --link-color: #308af2;
+  --link-color-visited: #9f5fe1;
+
+  /* Background */
+  --background-color: #292c2e;
+  --background-color-high-contrast: #17191a;
+
+  /* Code */
+  --code-background-color: #3c3c3c;
+
+  /* Border */
+  --border-color: #404548;
+
+  /* Header */
+  --header-main-border: #363b3d;
+  --header-accent-border: #bdbdbd;
+
+  /* The big red button */
+  --button-primary-color: #dcdbd8;
+  --button-primary-bg-color: #81331a;
+  --button-primary-border-color: #612714;
+
+  /* Not the big red button */
+  --button-secondary-color: #b4aea6;
+  --button-secondary-bg-color-top: #17191a;
+  --button-secondary-bg-color-bottom: #1a1c1d;
+
+  /* Output tabs */
+  --output-background-tab: #191b1c;
+  --output-current-tab: #343434;
+}
+
+:root,
+[data-theme='light']:root {
+  @mixin light-theme-vars;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --positive-luminance: black;
-    --negative-luminance: white;
-
-    /* Fonts */
-    --font-color: #b4aea6;
-    --font-color-high-contrast: #dcdbd8;
-
-    /* Links */
-    --link-color: #308af2;
-    --link-color-visited: #9f5fe1;
-
-    /* Background */
-    --background-color: #292c2e;
-    --background-color-high-contrast: #17191a;
-
-    /* Code */
-    --code-background-color: #3c3c3c;
-
-    /* Border */
-    --border-color: #404548;
-
-    /* Header */
-    --header-main-border: #363b3d;
-    --header-accent-border: #bdbdbd;
-
-    /* The big red button */
-    --button-primary-color: #dcdbd8;
-    --button-primary-bg-color: #81331a;
-    --button-primary-border-color: #612714;
-
-    /* Not the big red button */
-    --button-secondary-color: #b4aea6;
-    --button-secondary-bg-color-top: #17191a;
-    --button-secondary-bg-color-bottom: #1a1c1d;
-
-    /* Output tabs */
-    --output-background-tab: #191b1c;
-    --output-current-tab: #343434;
+    @mixin dark-theme-vars;
   }
+}
+
+[data-theme='dark']:root {
+  @mixin dark-theme-vars;
 }
 
 /* Modify normalized styles */
