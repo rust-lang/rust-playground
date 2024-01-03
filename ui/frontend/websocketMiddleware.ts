@@ -10,10 +10,10 @@ import {
   wsExecuteStdoutSchema,
 } from './reducers/output/execute';
 import {
+  websocketClientError,
   websocketConnected,
   websocketConnectedSchema,
   websocketDisconnected,
-  websocketError,
   websocketErrorSchema,
 } from './reducers/websocket';
 
@@ -126,7 +126,7 @@ export const websocketMiddleware =
           // We cannot get detailed information about the failure
           // https://stackoverflow.com/a/31003057/155423
           const error = 'Generic WebSocket Error';
-          store.dispatch(websocketError({ error }));
+          store.dispatch(websocketClientError(error));
           reportWebSocketError(error);
         });
 

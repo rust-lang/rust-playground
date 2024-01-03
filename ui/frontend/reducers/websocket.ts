@@ -1,7 +1,11 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import z from 'zod';
 
-import { createWebsocketResponseSchema, makeWebSocketMeta } from '../websocketActions';
+import {
+  createWebsocketResponse,
+  createWebsocketResponseSchema,
+  makeWebSocketMeta,
+} from '../websocketActions';
 
 type State = {
   connected: boolean;
@@ -17,10 +21,12 @@ const websocketConnectedPayloadSchema = z.object({
 });
 type websocketConnectedPayload = z.infer<typeof websocketConnectedPayloadSchema>;
 
-const websocketErrorPayloadSchema = z.object({
-  error: z.string(),
-});
-type websocketErrorPayload = z.infer<typeof websocketErrorPayloadSchema>;
+const { action: websocketError, schema: websocketErrorSchema } = createWebsocketResponse(
+  'websocket/error',
+  z.object({
+    error: z.string(),
+  }),
+);
 
 const slice = createSlice({
   name: 'websocket',
@@ -44,26 +50,28 @@ const slice = createSlice({
       state.connected = false;
     },
 
-    error: (state, action: PayloadAction<websocketErrorPayload>) => {
-      state.error = action.payload.error;
+    clientError: (state, action: PayloadAction<string>) => {
+      state.error = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(websocketError, (state, action) => {
+      state.error = action.payload.error;
+    });
   },
 });
 
 export const {
   connected: websocketConnected,
   disconnected: websocketDisconnected,
-  error: websocketError,
+  clientError: websocketClientError,
 } = slice.actions;
+
+export { websocketError, websocketErrorSchema };
 
 export const websocketConnectedSchema = createWebsocketResponseSchema(
   websocketConnected,
   websocketConnectedPayloadSchema,
-);
-
-export const websocketErrorSchema = createWebsocketResponseSchema(
-  websocketError,
-  websocketErrorPayloadSchema,
 );
 
 export default slice.reducer;
