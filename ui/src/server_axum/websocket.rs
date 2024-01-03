@@ -6,7 +6,7 @@ use crate::{
 };
 
 use axum::extract::ws::{Message, WebSocket};
-use futures::{Future, FutureExt, StreamExt};
+use futures::{Future, FutureExt, StreamExt, TryFutureExt};
 use orchestrator::{
     coordinator::{self, Coordinator, DockerBackend},
     DropErrorDetailsExt,
@@ -213,7 +213,8 @@ pub(crate) async fn handle(socket: WebSocket, feature_flags: FeatureFlags) {
     metrics::DURATION_WS.observe(elapsed.as_secs_f64());
 }
 
-type ResponseTx = mpsc::Sender<Result<MessageResponse>>;
+type TaggedError = (Error, Option<Meta>);
+type ResponseTx = mpsc::Sender<Result<MessageResponse, TaggedError>>;
 type SharedCoordinator = Arc<Coordinator<DockerBackend>>;
 
 /// Manages a limited amount of access to the `Coordinator`.
@@ -228,7 +229,7 @@ type SharedCoordinator = Arc<Coordinator<DockerBackend>>;
 /// - Allows limited parallelism between jobs of different types.
 struct CoordinatorManager {
     coordinator: SharedCoordinator,
-    tasks: JoinSet<Result<()>>,
+    tasks: JoinSet<Result<(), TaggedError>>,
     semaphore: Arc<Semaphore>,
     abort_handles: [Option<AbortHandle>; Self::N_KINDS],
 }
@@ -255,7 +256,9 @@ impl CoordinatorManager {
         self.tasks.is_empty()
     }
 
-    async fn join_next(&mut self) -> Option<Result<Result<()>, tokio::task::JoinError>> {
+    async fn join_next(
+        &mut self,
+    ) -> Option<Result<Result<(), TaggedError>, tokio::task::JoinError>> {
         self.tasks.join_next().await
     }
 
@@ -263,7 +266,7 @@ impl CoordinatorManager {
     where
         F: FnOnce(SharedCoordinator) -> Fut,
         F: 'static + Send,
-        Fut: Future<Output = Result<()>>,
+        Fut: Future<Output = Result<(), TaggedError>>,
         Fut: 'static + Send,
     {
         let coordinator = self.coordinator.clone();
@@ -391,7 +394,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
 
             // We don't care if there are no running tasks
             Some(task) = manager.join_next() => {
-                let error = match task {
+                let (error, meta) = match task {
                     Ok(Ok(())) => continue,
                     Ok(Err(error)) => error,
                     Err(error) => {
@@ -405,11 +408,11 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
                                 _ => "An unknown panic occurred".into(),
                             }
                         };
-                        WebSocketTaskPanicSnafu { text }.build()
+                        (WebSocketTaskPanicSnafu { text }.build(), None)
                     }
                 };
 
-                if tx.send(Err(error)).await.is_err() {
+                if tx.send(Err((error, meta))).await.is_err() {
                     // We can't send a response
                     break;
                 }
@@ -427,7 +430,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
 
                 let Err(error) = idled else { continue };
 
-                if tx.send(Err(error)).await.is_err() {
+                if tx.send(Err((error, None))).await.is_err() {
                     // We can't send a response
                     break;
                 }
@@ -466,14 +469,14 @@ fn create_server_meta() -> Meta {
     })
 }
 
-fn error_to_response(error: Error) -> MessageResponse {
+fn error_to_response((error, meta): TaggedError) -> MessageResponse {
     let error = snafu::CleanedErrorText::new(&error)
         .map(|(_, t, _)| t)
         .reduce(|e, t| e + ": " + &t)
         .unwrap_or_default();
     let payload = WSError { error };
-    // TODO: thread through the Meta from the originating request
-    let meta = create_server_meta();
+
+    let meta = meta.unwrap_or_else(create_server_meta);
 
     MessageResponse::Error { payload, meta }
 }
@@ -506,16 +509,18 @@ async fn handle_msg(
             let spawned = manager
                 .spawn({
                     let tx = tx.clone();
+                    let meta = meta.clone();
                     |coordinator| {
-                        handle_execute(token, execution_rx, tx, coordinator, payload, meta)
+                        handle_execute(token, execution_rx, tx, coordinator, payload, meta.clone())
                             .context(StreamingExecuteSnafu)
+                            .map_err(|e| (e, Some(meta)))
                     }
                 })
                 .await
                 .context(StreamingCoordinatorSpawnSnafu);
 
             if let Err(e) = spawned {
-                tx.send(Err(e)).await.ok(/* We don't care if the channel is closed */);
+                tx.send(Err((e, Some(meta)))).await.ok(/* We don't care if the channel is closed */);
             }
         }
 
@@ -531,7 +536,7 @@ async fn handle_msg(
                 .context(StreamingCoordinatorExecuteStdinSnafu);
 
             if let Err(e) = sent {
-                tx.send(Err(e)).await.ok(/* We don't care if the channel is closed */);
+                tx.send(Err((e, Some(meta)))).await.ok(/* We don't care if the channel is closed */);
             }
         }
 
@@ -553,7 +558,7 @@ async fn handle_msg(
         }
 
         Err(e) => {
-            tx.send(Err(e)).await.ok(/* We don't care if the channel is closed */);
+            tx.send(Err((e, None))).await.ok(/* We don't care if the channel is closed */);
         }
     }
 }
