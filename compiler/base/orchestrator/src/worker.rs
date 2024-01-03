@@ -53,7 +53,7 @@ use crate::{
     message::{
         CoordinatorMessage, DeleteFileRequest, DeleteFileResponse, ExecuteCommandRequest,
         ExecuteCommandResponse, JobId, Multiplexed, ReadFileRequest, ReadFileResponse,
-        SerializedError, WorkerMessage, WriteFileRequest, WriteFileResponse,
+        SerializedError2, WorkerMessage, WriteFileRequest, WriteFileResponse,
     },
     DropErrorDetailsExt,
 };
@@ -268,7 +268,7 @@ impl MultiplexingSender {
     }
 
     async fn send_err(&self, e: impl std::error::Error) -> Result<(), MultiplexingSenderError> {
-        self.send_raw(WorkerMessage::Error(SerializedError::new(e)))
+        self.send_raw(WorkerMessage::Error2(SerializedError2::new(e)))
             .await
     }
 

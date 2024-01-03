@@ -33,7 +33,7 @@ use crate::{
     message::{
         CommandStatistics, CoordinatorMessage, DeleteFileRequest, ExecuteCommandRequest,
         ExecuteCommandResponse, JobId, Multiplexed, OneToOneResponse, ReadFileRequest,
-        ReadFileResponse, SerializedError, WorkerMessage, WriteFileRequest,
+        ReadFileResponse, SerializedError2, WorkerMessage, WriteFileRequest,
     },
     DropErrorDetailsExt,
 };
@@ -1754,15 +1754,25 @@ impl Container {
                                 WorkerMessage::ExecuteCommand(resp) => {
                                     return Ok(resp);
                                 }
+
                                 WorkerMessage::StdoutPacket(packet) => {
                                     stdout_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
                                 }
+
                                 WorkerMessage::StderrPacket(packet) => {
                                     stderr_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
                                 }
+
                                 WorkerMessage::CommandStatistics(stats) => {
                                     status_tx.send(stats).await.ok(/* Receiver gone, that's OK */);
                                 }
+
+                                WorkerMessage::Error(e) =>
+                                    return Err(SerializedError2::adapt(e)).context(WorkerSnafu),
+
+                                WorkerMessage::Error2(e) =>
+                                    return Err(e).context(WorkerSnafu),
+
                                 _ => return UnexpectedMessageSnafu.fail(),
                             }
                         },
@@ -2084,6 +2094,9 @@ pub enum SpawnCargoError {
     #[snafu(display("Could not start Cargo"))]
     CouldNotStartCargo { source: CommanderError },
 
+    #[snafu(display("The worker operation failed"))]
+    Worker { source: SerializedError2 },
+
     #[snafu(display("Received an unexpected message"))]
     UnexpectedMessage,
 
@@ -2328,7 +2341,7 @@ impl Commander {
     where
         M: Into<CoordinatorMessage>,
         M: OneToOneResponse,
-        Result<M::Response, SerializedError>: TryFrom<WorkerMessage>,
+        Result<M::Response, SerializedError2>: TryFrom<WorkerMessage>,
     {
         use commander_error::*;
 
@@ -2346,9 +2359,8 @@ impl Commander {
             .await
             .context(UnableToReceiveFromDemultiplexerSnafu)?;
 
-        match msg.try_into() {
-            Ok(Ok(v)) => Ok(v),
-            Ok(Err(e)) => WorkerOperationFailedSnafu { text: e.0 }.fail(),
+        match <Result<_, _>>::try_from(msg) {
+            Ok(v) => v.context(WorkerOperationFailedSnafu),
             Err(_) => UnexpectedResponseTypeSnafu.fail(),
         }
     }
@@ -2401,8 +2413,8 @@ pub enum CommanderError {
     #[snafu(display("Did not receive the expected response type from the worker"))]
     UnexpectedResponseType,
 
-    #[snafu(display("The worker operation failed: {text}"))]
-    WorkerOperationFailed { text: String },
+    #[snafu(display("The worker operation failed"))]
+    WorkerOperationFailed { source: SerializedError2 },
 }
 
 pub trait Backend {
