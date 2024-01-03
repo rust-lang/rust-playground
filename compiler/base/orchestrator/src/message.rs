@@ -41,7 +41,7 @@ impl_narrow_to_broad!(
     ExecuteCommand => ExecuteCommandRequest,
 );
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, strum_macros::AsRefStr)]
 pub enum WorkerMessage {
     WriteFile(WriteFileResponse),
     DeleteFile(DeleteFileResponse),

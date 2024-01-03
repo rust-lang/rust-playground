@@ -1040,6 +1040,7 @@ dependencies = [
  "serde",
  "serde_json",
  "snafu 0.8.0",
+ "strum_macros",
  "tokio",
  "tokio-stream",
  "tokio-util",

@@ -1773,7 +1773,10 @@ impl Container {
                                 WorkerMessage::Error2(e) =>
                                     return Err(e).context(WorkerSnafu),
 
-                                _ => return UnexpectedMessageSnafu.fail(),
+                                _ => {
+                                    let message = container_msg.as_ref();
+                                    return UnexpectedMessageSnafu { message }.fail()
+                                },
                             }
                         },
 
@@ -2097,8 +2100,8 @@ pub enum SpawnCargoError {
     #[snafu(display("The worker operation failed"))]
     Worker { source: SerializedError2 },
 
-    #[snafu(display("Received an unexpected message"))]
-    UnexpectedMessage,
+    #[snafu(display("Received the unexpected message `{message}`"))]
+    UnexpectedMessage { message: String },
 
     #[snafu(display("There are no more messages"))]
     UnexpectedEndOfMessages,
