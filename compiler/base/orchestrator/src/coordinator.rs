@@ -4055,6 +4055,39 @@ mod tests {
         Ok(())
     }
 
+    #[tokio::test]
+    #[snafu::report]
+    async fn amount_of_output_is_limited() -> Result<()> {
+        // The limits are only applied to the container
+        let coordinator = new_coordinator_docker().await;
+
+        let req = ExecuteRequest {
+            code: r##"
+                use std::io::Write;
+
+                fn main() {
+                    let a = "a".repeat(1024);
+                    let out = std::io::stdout();
+                    let mut out = out.lock();
+                    loop {//for _ in 0..1_000_000 {
+                        let _ = out.write_all(a.as_bytes());
+                        let _ = out.write_all(b"\n");
+                    }
+                }
+            "##
+            .into(),
+            ..new_execution_limited_request()
+        };
+
+        let err = coordinator.execute(req).with_timeout().await.unwrap_err();
+        let err = snafu::ChainCompat::new(&err).last().unwrap();
+        assert_contains!(err.to_string(), "bytes of output, exiting");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
     static TIMEOUT: Lazy<Duration> = Lazy::new(|| {
         let millis = env::var("TESTS_TIMEOUT_MS")
             .ok()
