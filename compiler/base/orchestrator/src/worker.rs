@@ -53,7 +53,7 @@ use crate::{
     message::{
         CoordinatorMessage, DeleteFileRequest, DeleteFileResponse, ExecuteCommandRequest,
         ExecuteCommandResponse, JobId, Multiplexed, ReadFileRequest, ReadFileResponse,
-        SerializedError, WorkerMessage, WriteFileRequest, WriteFileResponse,
+        SerializedError2, WorkerMessage, WriteFileRequest, WriteFileResponse,
     },
     DropErrorDetailsExt,
 };
@@ -268,7 +268,7 @@ impl MultiplexingSender {
     }
 
     async fn send_err(&self, e: impl std::error::Error) -> Result<(), MultiplexingSenderError> {
-        self.send_raw(WorkerMessage::Error(SerializedError::new(e)))
+        self.send_raw(WorkerMessage::Error2(SerializedError2::new(e)))
             .await
     }
 
@@ -612,12 +612,29 @@ async fn process_end(
 ) -> Result<ExecuteCommandResponse, ProcessError> {
     use process_error::*;
 
-    select! {
-        () = token.cancelled() => child.kill().await.context(KillChildSnafu)?,
-        _ = child.wait() => {},
+    let mut killed = false;
+
+    let status = loop {
+        select! {
+            // The user requested that the process be killed
+            () = token.cancelled(), if !killed => {
+                child.kill().await.context(KillChildSnafu)?;
+                killed = true;
+            },
+
+            // The process exited normally
+            status = child.wait() => break status,
+
+            // One of our tasks exited unexpectedly
+            // TODO: dedupe errors or fully split them
+            Some(task) = task_set.join_next() => {
+                task.context(StdioTaskPanickedSnafu)?
+                    .context(StdioTaskFailedSnafu)?;
+            },
+        };
     };
 
-    let status = child.wait().await.context(WaitChildSnafu)?;
+    let status = status.context(WaitChildSnafu)?;
 
     stdin_shutdown_tx
         .send(job_id)
@@ -625,11 +642,13 @@ async fn process_end(
         .drop_error_details()
         .context(UnableToSendStdinShutdownSnafu)?;
 
+    // Check any remaining tasks to see if they had an error
     while let Some(task) = task_set.join_next().await {
         task.context(StdioTaskPanickedSnafu)?
             .context(StdioTaskFailedSnafu)?;
     }
 
+    // TODO: check this for death earlier?
     statistics_task
         .await
         .context(StatisticsTaskPanickedSnafu)?
@@ -1213,6 +1232,8 @@ mod test {
     }
 }
 
+const OUTPUT_BYTE_LIMIT: usize = 640 * 1024;
+
 async fn copy_child_output(
     output: impl AsyncRead + Unpin,
     coordinator_tx: MultiplexingSender,
@@ -1221,16 +1242,27 @@ async fn copy_child_output(
     use copy_child_output_error::*;
 
     let mut buf = Utf8BufReader::new(output);
+    let mut n_total_bytes: usize = 0;
 
     while let Some(buffer) = buf.next().await.context(UnableToReadSnafu)? {
+        let n_bytes = buffer.len();
+
         coordinator_tx
             .send_ok(xform(buffer))
             .await
             .context(UnableToSendSnafu)?;
+
+        n_total_bytes = n_total_bytes.saturating_add(n_bytes);
+        ensure!(
+            n_total_bytes <= OUTPUT_BYTE_LIMIT,
+            TooManyBytesSnafu { n_total_bytes }
+        );
     }
 
     Ok(())
 }
+
+const BYTE_LIMIT_URL: &str = "https://github.com/rust-lang/rust-playground/discussions/1027";
 
 #[derive(Debug, Snafu)]
 #[snafu(module)]
@@ -1240,6 +1272,11 @@ pub enum CopyChildOutputError {
 
     #[snafu(display("Failed to send output packet"))]
     UnableToSend { source: MultiplexingSenderError },
+
+    #[snafu(display(
+        "Generated {n_total_bytes} bytes of output, exiting (640K ought to be enough for anybody). If this was not an accident, tell us more at {BYTE_LIMIT_URL}"
+    ))]
+    TooManyBytes { n_total_bytes: usize },
 }
 
 // stdin/out <--> messages.

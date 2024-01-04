@@ -14,6 +14,7 @@ import {
   createWebsocketResponse,
   makeWebSocketMeta,
 } from '../../websocketActions';
+import { websocketError } from '../websocket';
 
 const initialState: State = {
   requestsInProgress: 0,
@@ -215,6 +216,12 @@ const slice = createSlice({
           if (!payload.success) {
             state.error = payload.exitDetail;
           }
+        }),
+      )
+      .addCase(
+        websocketError,
+        sequenceNumberMatches((state, payload) => {
+          state.error = payload.error;
         }),
       );
   },

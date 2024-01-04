@@ -33,7 +33,7 @@ use crate::{
     message::{
         CommandStatistics, CoordinatorMessage, DeleteFileRequest, ExecuteCommandRequest,
         ExecuteCommandResponse, JobId, Multiplexed, OneToOneResponse, ReadFileRequest,
-        ReadFileResponse, SerializedError, WorkerMessage, WriteFileRequest,
+        ReadFileResponse, SerializedError2, WorkerMessage, WriteFileRequest,
     },
     DropErrorDetailsExt,
 };
@@ -1754,16 +1754,29 @@ impl Container {
                                 WorkerMessage::ExecuteCommand(resp) => {
                                     return Ok(resp);
                                 }
+
                                 WorkerMessage::StdoutPacket(packet) => {
                                     stdout_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
                                 }
+
                                 WorkerMessage::StderrPacket(packet) => {
                                     stderr_tx.send(packet).await.ok(/* Receiver gone, that's OK */);
                                 }
+
                                 WorkerMessage::CommandStatistics(stats) => {
                                     status_tx.send(stats).await.ok(/* Receiver gone, that's OK */);
                                 }
-                                _ => return UnexpectedMessageSnafu.fail(),
+
+                                WorkerMessage::Error(e) =>
+                                    return Err(SerializedError2::adapt(e)).context(WorkerSnafu),
+
+                                WorkerMessage::Error2(e) =>
+                                    return Err(e).context(WorkerSnafu),
+
+                                _ => {
+                                    let message = container_msg.as_ref();
+                                    return UnexpectedMessageSnafu { message }.fail()
+                                },
                             }
                         },
 
@@ -2084,8 +2097,11 @@ pub enum SpawnCargoError {
     #[snafu(display("Could not start Cargo"))]
     CouldNotStartCargo { source: CommanderError },
 
-    #[snafu(display("Received an unexpected message"))]
-    UnexpectedMessage,
+    #[snafu(display("The worker operation failed"))]
+    Worker { source: SerializedError2 },
+
+    #[snafu(display("Received the unexpected message `{message}`"))]
+    UnexpectedMessage { message: String },
 
     #[snafu(display("There are no more messages"))]
     UnexpectedEndOfMessages,
@@ -2328,7 +2344,7 @@ impl Commander {
     where
         M: Into<CoordinatorMessage>,
         M: OneToOneResponse,
-        Result<M::Response, SerializedError>: TryFrom<WorkerMessage>,
+        Result<M::Response, SerializedError2>: TryFrom<WorkerMessage>,
     {
         use commander_error::*;
 
@@ -2346,9 +2362,8 @@ impl Commander {
             .await
             .context(UnableToReceiveFromDemultiplexerSnafu)?;
 
-        match msg.try_into() {
-            Ok(Ok(v)) => Ok(v),
-            Ok(Err(e)) => WorkerOperationFailedSnafu { text: e.0 }.fail(),
+        match <Result<_, _>>::try_from(msg) {
+            Ok(v) => v.context(WorkerOperationFailedSnafu),
             Err(_) => UnexpectedResponseTypeSnafu.fail(),
         }
     }
@@ -2401,8 +2416,8 @@ pub enum CommanderError {
     #[snafu(display("Did not receive the expected response type from the worker"))]
     UnexpectedResponseType,
 
-    #[snafu(display("The worker operation failed: {text}"))]
-    WorkerOperationFailed { text: String },
+    #[snafu(display("The worker operation failed"))]
+    WorkerOperationFailed { source: SerializedError2 },
 }
 
 pub trait Backend {
@@ -3431,6 +3446,7 @@ mod tests {
 
             coordinator.shutdown().await?;
         }
+
         Ok(())
     }
 
@@ -3624,6 +3640,8 @@ mod tests {
         let lines = response.code.lines().collect::<Vec<_>>();
         assert_eq!(ARBITRARY_FORMAT_OUTPUT, lines);
 
+        coordinator.shutdown().await?;
+
         Ok(())
     }
 
@@ -3644,6 +3662,8 @@ mod tests {
             assert!(response.success, "stderr: {}", response.stderr);
             let lines = response.code.lines().collect::<Vec<_>>();
             assert_eq!(ARBITRARY_FORMAT_OUTPUT, lines);
+
+            coordinator.shutdown().await?;
         }
 
         Ok(())
@@ -3706,6 +3726,8 @@ mod tests {
         assert_contains!(response.stderr, "deny(clippy::eq_op)");
         assert_contains!(response.stderr, "warn(clippy::zero_divided_by_zero)");
 
+        coordinator.shutdown().await?;
+
         Ok(())
     }
 
@@ -3736,6 +3758,8 @@ mod tests {
                         "{code:?} in {edition:?}, {}",
                         response.stderr
                     );
+
+                    coordinator.shutdown().await?;
 
                     Ok(())
                 },
@@ -3781,6 +3805,8 @@ mod tests {
         assert_contains!(response.stderr, "is out-of-bounds");
         assert_contains!(response.stderr, "has size 0");
 
+        coordinator.shutdown().await?;
+
         Ok(())
     }
 
@@ -3816,6 +3842,8 @@ mod tests {
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.stdout, "impl ::core::fmt::Debug for Dummy");
         assert_contains!(response.stdout, "Formatter::write_str");
+
+        coordinator.shutdown().await?;
 
         Ok(())
     }
@@ -3897,6 +3925,8 @@ mod tests {
         let res = coordinator.execute(req).await.unwrap();
         assert_eq!(res.stdout, "hello\n");
 
+        coordinator.shutdown().await?;
+
         Ok(())
     }
 
@@ -3960,6 +3990,8 @@ mod tests {
 
         assert_contains!(res.stdout, "Failed to connect");
 
+        coordinator.shutdown().await?;
+
         Ok(())
     }
 
@@ -3986,6 +4018,8 @@ mod tests {
         assert!(!res.success);
         // TODO: We need to actually inform the user about this somehow. The UI is blank.
         // assert_contains!(res.stdout, "Killed");
+
+        coordinator.shutdown().await?;
 
         Ok(())
     }
@@ -4015,6 +4049,41 @@ mod tests {
         let res = coordinator.execute(req).with_timeout().await.unwrap();
 
         assert_contains!(res.stderr, "Cannot fork");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn amount_of_output_is_limited() -> Result<()> {
+        // The limits are only applied to the container
+        let coordinator = new_coordinator_docker().await;
+
+        let req = ExecuteRequest {
+            code: r##"
+                use std::io::Write;
+
+                fn main() {
+                    let a = "a".repeat(1024);
+                    let out = std::io::stdout();
+                    let mut out = out.lock();
+                    loop {//for _ in 0..1_000_000 {
+                        let _ = out.write_all(a.as_bytes());
+                        let _ = out.write_all(b"\n");
+                    }
+                }
+            "##
+            .into(),
+            ..new_execution_limited_request()
+        };
+
+        let err = coordinator.execute(req).with_timeout().await.unwrap_err();
+        let err = snafu::ChainCompat::new(&err).last().unwrap();
+        assert_contains!(err.to_string(), "bytes of output, exiting");
+
+        coordinator.shutdown().await?;
 
         Ok(())
     }
