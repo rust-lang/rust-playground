@@ -3446,6 +3446,7 @@ mod tests {
 
             coordinator.shutdown().await?;
         }
+
         Ok(())
     }
 
@@ -3639,6 +3640,8 @@ mod tests {
         let lines = response.code.lines().collect::<Vec<_>>();
         assert_eq!(ARBITRARY_FORMAT_OUTPUT, lines);
 
+        coordinator.shutdown().await?;
+
         Ok(())
     }
 
@@ -3659,6 +3662,8 @@ mod tests {
             assert!(response.success, "stderr: {}", response.stderr);
             let lines = response.code.lines().collect::<Vec<_>>();
             assert_eq!(ARBITRARY_FORMAT_OUTPUT, lines);
+
+            coordinator.shutdown().await?;
         }
 
         Ok(())
@@ -3721,6 +3726,8 @@ mod tests {
         assert_contains!(response.stderr, "deny(clippy::eq_op)");
         assert_contains!(response.stderr, "warn(clippy::zero_divided_by_zero)");
 
+        coordinator.shutdown().await?;
+
         Ok(())
     }
 
@@ -3751,6 +3758,8 @@ mod tests {
                         "{code:?} in {edition:?}, {}",
                         response.stderr
                     );
+
+                    coordinator.shutdown().await?;
 
                     Ok(())
                 },
@@ -3796,6 +3805,8 @@ mod tests {
         assert_contains!(response.stderr, "is out-of-bounds");
         assert_contains!(response.stderr, "has size 0");
 
+        coordinator.shutdown().await?;
+
         Ok(())
     }
 
@@ -3831,6 +3842,8 @@ mod tests {
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.stdout, "impl ::core::fmt::Debug for Dummy");
         assert_contains!(response.stdout, "Formatter::write_str");
+
+        coordinator.shutdown().await?;
 
         Ok(())
     }
@@ -3912,6 +3925,8 @@ mod tests {
         let res = coordinator.execute(req).await.unwrap();
         assert_eq!(res.stdout, "hello\n");
 
+        coordinator.shutdown().await?;
+
         Ok(())
     }
 
@@ -3975,6 +3990,8 @@ mod tests {
 
         assert_contains!(res.stdout, "Failed to connect");
 
+        coordinator.shutdown().await?;
+
         Ok(())
     }
 
@@ -4001,6 +4018,8 @@ mod tests {
         assert!(!res.success);
         // TODO: We need to actually inform the user about this somehow. The UI is blank.
         // assert_contains!(res.stdout, "Killed");
+
+        coordinator.shutdown().await?;
 
         Ok(())
     }
@@ -4030,6 +4049,8 @@ mod tests {
         let res = coordinator.execute(req).with_timeout().await.unwrap();
 
         assert_contains!(res.stderr, "Cannot fork");
+
+        coordinator.shutdown().await?;
 
         Ok(())
     }
