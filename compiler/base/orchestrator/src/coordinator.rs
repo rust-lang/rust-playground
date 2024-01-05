@@ -1,7 +1,7 @@
 use futures::{
     future::{BoxFuture, OptionFuture},
     stream::BoxStream,
-    Future, FutureExt, StreamExt,
+    Future, FutureExt, Stream, StreamExt,
 };
 use once_cell::sync::Lazy;
 use serde::Deserialize;
@@ -26,7 +26,7 @@ use tokio::{
 };
 use tokio_stream::wrappers::ReceiverStream;
 use tokio_util::{io::SyncIoBridge, sync::CancellationToken};
-use tracing::{instrument, trace, trace_span, warn, Instrument};
+use tracing::{info_span, instrument, trace, trace_span, warn, Instrument};
 
 use crate::{
     bincode_input_closed,
@@ -764,8 +764,24 @@ impl<T> WithOutput<T> {
     where
         F: Future<Output = Result<T, E>>,
     {
-        let stdout = ReceiverStream::new(stdout_rx).collect();
-        let stderr = ReceiverStream::new(stderr_rx).collect();
+        Self::try_absorb_stream(
+            task,
+            ReceiverStream::new(stdout_rx),
+            ReceiverStream::new(stderr_rx),
+        )
+        .await
+    }
+
+    async fn try_absorb_stream<F, E>(
+        task: F,
+        stdout_rx: impl Stream<Item = String>,
+        stderr_rx: impl Stream<Item = String>,
+    ) -> Result<WithOutput<T>, E>
+    where
+        F: Future<Output = Result<T, E>>,
+    {
+        let stdout = stdout_rx.collect();
+        let stderr = stderr_rx.collect();
 
         let (result, stdout, stderr) = join!(task, stdout, stderr);
         let response = result?;
@@ -815,6 +831,15 @@ pub struct Coordinator<B> {
     token: CancellationToken,
 }
 
+/// Runs things.
+///
+/// # Liveness concerns
+///
+/// If you use one of the streaming versions (e.g. `begin_execute`),
+/// you need to make sure that the stdout / stderr / status channels
+/// are continuously read from or dropped completely. If not, one
+/// channel can fill up, preventing the other channels from receiving
+/// data as well.
 impl<B> Coordinator<B>
 where
     B: Backend,
@@ -2610,6 +2635,9 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
 
     let (tx, from_worker_rx) = mpsc::channel(8);
     tasks.spawn_blocking(move || {
+        let span = info_span!("child_io_queue::input");
+        let _span = span.enter();
+
         let stdout = SyncIoBridge::new(stdout);
         let mut stdout = BufReader::new(stdout);
 
@@ -2632,6 +2660,9 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
 
     let (to_worker_tx, mut rx) = mpsc::channel(8);
     tasks.spawn_blocking(move || {
+        let span = info_span!("child_io_queue::output");
+        let _span = span.enter();
+
         let stdin = SyncIoBridge::new(stdin);
         let mut stdin = BufWriter::new(stdin);
 
@@ -3182,7 +3213,7 @@ mod tests {
         let ActiveExecution {
             task,
             stdin_tx: _,
-            mut stdout_rx,
+            stdout_rx,
             stderr_rx,
             status_rx: _,
         } = coordinator
@@ -3190,16 +3221,19 @@ mod tests {
             .await
             .unwrap();
 
-        // Wait for some output before killing
-        let early_stdout = stdout_rx.recv().with_timeout().await.unwrap();
+        let stdout_rx = ReceiverStream::new(stdout_rx);
+        let stderr_rx = ReceiverStream::new(stderr_rx);
 
-        token.cancel();
+        // We (a) want to wait for some output before we try to
+        // kill the process and (b) need to keep pumping stdout /
+        // stderr / status to avoid locking up the output.
+        let stdout_rx = stdout_rx.inspect(|_| token.cancel());
 
         let WithOutput {
             response,
             stdout,
             stderr,
-        } = WithOutput::try_absorb(task, stdout_rx, stderr_rx)
+        } = WithOutput::try_absorb_stream(task, stdout_rx, stderr_rx)
             .with_timeout()
             .await
             .unwrap();
@@ -3207,8 +3241,7 @@ mod tests {
         assert!(!response.success, "{stderr}");
         assert_contains!(response.exit_detail, "kill");
 
-        assert_contains!(early_stdout, "Before");
-        assert_not_contains!(stdout, "Before");
+        assert_contains!(stdout, "Before");
         assert_not_contains!(stdout, "After");
 
         coordinator.shutdown().await?;

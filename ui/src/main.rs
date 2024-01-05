@@ -170,8 +170,6 @@ enum Error {
     NoGithubToken,
     #[snafu(display("Unable to deserialize request: {}", source))]
     Deserialization { source: serde_json::Error },
-    #[snafu(display("Unable to serialize response: {}", source))]
-    Serialization { source: serde_json::Error },
 
     #[snafu(transparent)]
     EvaluateRequest {
@@ -208,10 +206,6 @@ enum Error {
         source: server_axum::api_orchestrator_integration_impls::ParseMacroExpansionRequestError,
     },
 
-    #[snafu(display("No request was provided"))]
-    RequestMissing,
-    #[snafu(display("The cache has been poisoned"))]
-    CachePoisoned,
     #[snafu(display("The WebSocket worker panicked: {}", text))]
     WebSocketTaskPanic { text: String },
 
