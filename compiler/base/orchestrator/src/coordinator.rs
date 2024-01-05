@@ -26,7 +26,7 @@ use tokio::{
 };
 use tokio_stream::wrappers::ReceiverStream;
 use tokio_util::{io::SyncIoBridge, sync::CancellationToken};
-use tracing::{instrument, trace, trace_span, warn, Instrument};
+use tracing::{info_span, instrument, trace, trace_span, warn, Instrument};
 
 use crate::{
     bincode_input_closed,
@@ -2610,6 +2610,9 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
 
     let (tx, from_worker_rx) = mpsc::channel(8);
     tasks.spawn_blocking(move || {
+        let span = info_span!("child_io_queue::input");
+        let _span = span.enter();
+
         let stdout = SyncIoBridge::new(stdout);
         let mut stdout = BufReader::new(stdout);
 
@@ -2632,6 +2635,9 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
 
     let (to_worker_tx, mut rx) = mpsc::channel(8);
     tasks.spawn_blocking(move || {
+        let span = info_span!("child_io_queue::output");
+        let _span = span.enter();
+
         let stdin = SyncIoBridge::new(stdin);
         let mut stdin = BufWriter::new(stdin);
 
