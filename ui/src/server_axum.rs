@@ -19,7 +19,8 @@ use axum::{
     extract::{self, ws::WebSocketUpgrade, Extension, Path},
     handler::Handler,
     http::{
-        header, request::Parts, uri::PathAndQuery, HeaderValue, Method, Request, StatusCode, Uri,
+        header, request::Parts, uri::PathAndQuery, HeaderName, HeaderValue, Method, Request,
+        StatusCode, Uri,
     },
     middleware,
     response::IntoResponse,
@@ -44,10 +45,12 @@ use std::{
 use tokio::sync::Mutex;
 use tower_http::{
     cors::{self, CorsLayer},
+    request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer},
     services::ServeDir,
     set_header::SetResponseHeader,
     trace::TraceLayer,
 };
+use tracing::{error, error_span, field};
 
 const ONE_HOUR: Duration = Duration::from_secs(60 * 60);
 const CORS_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
@@ -113,8 +116,39 @@ pub(crate) async fn serve(config: Config) {
         });
     }
 
+    let x_request_id = HeaderName::from_static("x-request-id");
+
     // Basic access logging
-    app = app.layer(TraceLayer::new_for_http());
+    app = app.layer(
+        TraceLayer::new_for_http().make_span_with(move |req: &Request<_>| {
+            const REQUEST_ID: &str = "request_id";
+
+            let method = req.method();
+            let uri = req.uri();
+            let request_id = req
+                .headers()
+                .get(&x_request_id)
+                .and_then(|id| id.to_str().ok());
+
+            let span = error_span!("request", %method, %uri, { REQUEST_ID } = field::Empty);
+
+            if let Some(request_id) = request_id {
+                span.record(REQUEST_ID, field::display(request_id));
+            }
+
+            span
+        }),
+    );
+
+    let x_request_id = HeaderName::from_static("x-request-id");
+
+    // propagate `x-request-id` headers from request to response
+    app = app.layer(PropagateRequestIdLayer::new(x_request_id.clone()));
+
+    app = app.layer(SetRequestIdLayer::new(
+        x_request_id.clone(),
+        MakeRequestUuid::default(),
+    ));
 
     let listener = tokio::net::TcpListener::bind(config.server_socket_addr())
         .await
@@ -738,6 +772,7 @@ impl IntoResponse for Error {
             .map(|(_, s, _)| s)
             .reduce(|l, r| l + ": " + &r)
             .unwrap_or_default();
+        error!(error, "Returning an error to the client");
         let resp = Json(ErrorJson { error });
         let resp = (StatusCode::INTERNAL_SERVER_ERROR, resp);
         resp.into_response()
