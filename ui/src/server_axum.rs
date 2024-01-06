@@ -772,6 +772,7 @@ impl IntoResponse for Error {
             .map(|(_, s, _)| s)
             .reduce(|l, r| l + ": " + &r)
             .unwrap_or_default();
+        error!(error, "Returning an error to the client");
         let resp = Json(ErrorJson { error });
         let resp = (StatusCode::INTERNAL_SERVER_ERROR, resp);
         resp.into_response()
