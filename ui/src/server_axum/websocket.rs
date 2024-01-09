@@ -16,6 +16,7 @@ use std::{
     collections::BTreeMap,
     convert::TryFrom,
     mem,
+    pin::pin,
     sync::{
         atomic::{AtomicU64, Ordering},
         Arc,
@@ -351,9 +352,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
     }
 
     let mut manager = CoordinatorManager::new().await;
-    tokio::pin! {
-        let session_timeout = time::sleep(CoordinatorManager::SESSION_TIMEOUT);
-    }
+    let mut session_timeout = pin!(time::sleep(CoordinatorManager::SESSION_TIMEOUT));
 
     let mut active_executions = BTreeMap::new();
     let mut active_execution_gc_interval = time::interval(Duration::from_secs(30));
