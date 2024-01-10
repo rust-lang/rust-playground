@@ -1087,11 +1087,11 @@ where
 
             // We can't parse any UTF-8
             if valid_utf_8_bytes == 0 {
+                // This should be enough bytes to get one UTF-8 character.
+                ensure!(n_valid < 4, InvalidUtf8Snafu);
+
                 // We aren't going to get any more input
                 ensure!(n_read != 0, RanOutOfInputSnafu);
-
-                // This should be enough bytes to get one UTF-8 character.
-                ensure!(n_valid < 4, InvalidUtf8Snafu)
             }
 
             // Safety: We just calculated the number of valid UTF-8 bytes
@@ -1106,11 +1106,6 @@ where
             self.buffer.copy_within(valid_utf_8_bytes..n_valid, 0);
 
             self.n_incomplete = n_valid - valid_utf_8_bytes;
-            assert!(
-                self.n_incomplete < 4,
-                "Should never have 4 or more incomplete bytes, had {}",
-                self.n_incomplete,
-            );
 
             if !s.is_empty() {
                 return Ok(Some(s));
@@ -1215,6 +1210,18 @@ mod test {
 
         assert_matches!(buffer.next().await, Err(Utf8BufReaderError::InvalidUtf8));
         assert!(!buffer.reader.is_empty());
+    }
+
+    #[tokio::test]
+    async fn valid_followed_by_invalid_utf8() {
+        let bytes = [b'A', 0xc3, 0x28, 0xc3, 0x28, 0xc3, 0x28];
+
+        let reader = FixedAsyncRead::success_exact([bytes]);
+        let mut buffer = Utf8BufReader::new(reader);
+
+        assert_matches!(buffer.next().await, Ok(Some(s)) => s == "A");
+        assert_matches!(buffer.next().await, Err(Utf8BufReaderError::InvalidUtf8));
+        assert!(buffer.reader.is_empty());
     }
 
     #[tokio::test]
