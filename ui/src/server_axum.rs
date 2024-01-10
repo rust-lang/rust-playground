@@ -612,29 +612,54 @@ struct SandboxCache {
 impl SandboxCache {
     async fn crates(&self) -> Result<Stamped<MetaCratesResponse>> {
         let coordinator = Coordinator::new_docker().await;
-        self.crates
+
+        let c = self
+            .crates
             .fetch(|| async { Ok(coordinator.crates().await.context(CratesSnafu)?.into()) })
+            .await;
+
+        coordinator
+            .shutdown()
             .await
+            .context(ShutdownCoordinatorSnafu)?;
+
+        c
     }
 
     async fn versions(&self) -> Result<Stamped<MetaVersionsResponse>> {
         let coordinator = Coordinator::new_docker().await;
 
-        self.versions
+        let v = self
+            .versions
             .fetch(|| async { Ok(coordinator.versions().await.context(VersionsSnafu)?.into()) })
+            .await;
+
+        coordinator
+            .shutdown()
             .await
+            .context(ShutdownCoordinatorSnafu)?;
+
+        v
     }
 
     async fn raw_versions(&self) -> Result<Stamped<Arc<Versions>>> {
         let coordinator = Coordinator::new_docker().await;
 
-        self.raw_versions
+        let rv = self
+            .raw_versions
             .fetch(|| async {
                 Ok(Arc::new(
                     coordinator.versions().await.context(VersionsSnafu)?,
                 ))
             })
+            .await;
+
+        coordinator
+            .shutdown()
             .await
+            .context(ShutdownCoordinatorSnafu)?;
+
+        rv
     }
 
     async fn version_stable(&self) -> Result<Stamped<MetaVersionResponse>> {

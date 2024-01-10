@@ -6,7 +6,7 @@ use crate::{
 };
 
 use axum::extract::ws::{Message, WebSocket};
-use futures::{Future, FutureExt, StreamExt, TryFutureExt};
+use futures::{future::Fuse, Future, FutureExt, StreamExt, TryFutureExt};
 use orchestrator::{
     coordinator::{self, Coordinator, DockerBackend},
     DropErrorDetailsExt,
@@ -16,6 +16,7 @@ use std::{
     collections::BTreeMap,
     convert::TryFrom,
     mem,
+    pin::pin,
     sync::{
         atomic::{AtomicU64, Ordering},
         Arc,
@@ -351,9 +352,8 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
     }
 
     let mut manager = CoordinatorManager::new().await;
-    tokio::pin! {
-        let session_timeout = time::sleep(CoordinatorManager::SESSION_TIMEOUT);
-    }
+    let mut session_timeout = pin!(time::sleep(CoordinatorManager::SESSION_TIMEOUT));
+    let mut idle_timeout = pin!(Fuse::terminated());
 
     let mut active_executions = BTreeMap::new();
     let mut active_execution_gc_interval = time::interval(Duration::from_secs(30));
@@ -394,6 +394,12 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
 
             // We don't care if there are no running tasks
             Some(task) = manager.join_next() => {
+                // The last task has completed which means we are a
+                // candidate for idling in a little while.
+                if manager.is_empty() {
+                    idle_timeout.set(time::sleep(CoordinatorManager::IDLE_TIMEOUT).fuse());
+                }
+
                 let (error, meta) = match task {
                     Ok(Ok(())) => continue,
                     Ok(Err(error)) => error,
@@ -425,7 +431,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
                     .collect();
             },
 
-            _ = time::sleep(CoordinatorManager::IDLE_TIMEOUT), if manager.is_empty() => {
+            _ = &mut idle_timeout, if manager.is_empty() => {
                 let idled = manager.idle().await.context(StreamingCoordinatorIdleSnafu);
 
                 let Err(error) = idled else { continue };
