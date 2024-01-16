@@ -10,9 +10,6 @@ name: Validate everything
     - labeled
     branches:
     - master
-env:
-  GH_CONTAINER_REGISTRY_USERNAME: CjS77
-  AWS_ACCESS_KEY_ID: AKIAnnnnnnnnnnnn
 jobs:
   build_compiler_containers:
     name: Build ${{ matrix.channel }} compiler container
@@ -32,7 +29,7 @@ jobs:
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
       with:
         driver-opts: image=moby/buildkit:v0.11.6
     - name: Login to GitHub Container Registry
@@ -42,7 +39,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build and push container
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
@@ -211,11 +208,11 @@ jobs:
       id-token: write
     steps:
     - name: Login to GitHub Container Registry
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
-        username: "${{ env.GH_CONTAINER_REGISTRY_USERNAME }}"
-        password: "${{ secrets.GH_CONTAINER_REGISTRY_TOKEN }}"
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     - name: Pull containers
       run: echo ghcr.io/tari-project/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull
     - name: Rename containers
