@@ -4,7 +4,7 @@ set -euv -o pipefail
 
 channels_to_build="${CHANNELS_TO_BUILD-stable beta nightly}"
 
-repository=shepmaster
+repository=tari-project
 
 for channel in $channels_to_build; do
     cd "base"

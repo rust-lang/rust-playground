@@ -31,7 +31,7 @@
   },
   {
     "name": "anstream",
-    "version": "0.6.5",
+    "version": "0.6.8",
     "id": "anstream"
   },
   {
@@ -51,7 +51,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.78",
+    "version": "1.0.79",
     "id": "anyhow"
   },
   {
@@ -71,7 +71,7 @@
   },
   {
     "name": "async-trait",
-    "version": "0.1.76",
+    "version": "0.1.77",
     "id": "async_trait"
   },
   {
@@ -95,9 +95,24 @@
     "id": "backtrace"
   },
   {
+    "name": "base58-monero",
+    "version": "0.3.2",
+    "id": "base58_monero"
+  },
+  {
     "name": "base64",
-    "version": "0.21.5",
+    "version": "0.21.7",
     "id": "base64"
+  },
+  {
+    "name": "base64",
+    "version": "0.13.1",
+    "id": "base64_0_13_1"
+  },
+  {
+    "name": "bincode",
+    "version": "1.3.3",
+    "id": "bincode"
   },
   {
     "name": "bit_field",
@@ -116,7 +131,7 @@
   },
   {
     "name": "bitflags",
-    "version": "2.4.1",
+    "version": "2.4.2",
     "id": "bitflags"
   },
   {
@@ -125,9 +140,24 @@
     "id": "bitflags_1_3_2"
   },
   {
+    "name": "blake2",
+    "version": "0.10.6",
+    "id": "blake2"
+  },
+  {
     "name": "block-buffer",
     "version": "0.10.4",
     "id": "block_buffer"
+  },
+  {
+    "name": "borsh",
+    "version": "1.3.1",
+    "id": "borsh"
+  },
+  {
+    "name": "borsh-derive",
+    "version": "1.3.1",
+    "id": "borsh_derive"
   },
   {
     "name": "bytemuck",
@@ -160,6 +190,11 @@
     "id": "cc"
   },
   {
+    "name": "cfg_aliases",
+    "version": "0.1.1",
+    "id": "cfg_aliases"
+  },
+  {
     "name": "cfg-if",
     "version": "1.0.0",
     "id": "cfg_if"
@@ -171,12 +206,12 @@
   },
   {
     "name": "clap",
-    "version": "4.4.12",
+    "version": "4.4.18",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.4.12",
+    "version": "4.4.18",
     "id": "clap_builder"
   },
   {
@@ -205,6 +240,11 @@
     "id": "const_default"
   },
   {
+    "name": "convert_case",
+    "version": "0.4.0",
+    "id": "convert_case"
+  },
+  {
     "name": "cookie",
     "version": "0.16.2",
     "id": "cookie"
@@ -216,7 +256,7 @@
   },
   {
     "name": "cpufeatures",
-    "version": "0.2.11",
+    "version": "0.2.12",
     "id": "cpufeatures"
   },
   {
@@ -225,33 +265,38 @@
     "id": "crc32fast"
   },
   {
+    "name": "critical-section",
+    "version": "1.1.2",
+    "id": "critical_section"
+  },
+  {
     "name": "crossbeam",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "id": "crossbeam"
   },
   {
     "name": "crossbeam-channel",
-    "version": "0.5.10",
+    "version": "0.5.11",
     "id": "crossbeam_channel"
   },
   {
     "name": "crossbeam-deque",
-    "version": "0.8.4",
+    "version": "0.8.5",
     "id": "crossbeam_deque"
   },
   {
     "name": "crossbeam-epoch",
-    "version": "0.9.17",
+    "version": "0.9.18",
     "id": "crossbeam_epoch"
   },
   {
     "name": "crossbeam-queue",
-    "version": "0.3.10",
+    "version": "0.3.11",
     "id": "crossbeam_queue"
   },
   {
     "name": "crossbeam-utils",
-    "version": "0.8.18",
+    "version": "0.8.19",
     "id": "crossbeam_utils"
   },
   {
@@ -268,6 +313,11 @@
     "name": "csv-core",
     "version": "0.1.11",
     "id": "csv_core"
+  },
+  {
+    "name": "curve25519-dalek-derive",
+    "version": "0.1.1",
+    "id": "curve25519_dalek_derive"
   },
   {
     "name": "data-encoding",
@@ -290,6 +340,11 @@
     "id": "derivative"
   },
   {
+    "name": "derive_more",
+    "version": "0.99.17",
+    "id": "derive_more"
+  },
+  {
     "name": "destructure_traitobject",
     "version": "0.2.0",
     "id": "destructure_traitobject"
@@ -298,6 +353,11 @@
     "name": "digest",
     "version": "0.10.7",
     "id": "digest"
+  },
+  {
+    "name": "doc-comment",
+    "version": "0.3.3",
+    "id": "doc_comment"
   },
   {
     "name": "either",
@@ -476,7 +536,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.2.11",
+    "version": "0.2.12",
     "id": "getrandom"
   },
   {
@@ -496,13 +556,13 @@
   },
   {
     "name": "h2",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "id": "h2"
   },
   {
     "name": "h2",
-    "version": "0.3.22",
-    "id": "h2_0_3_22"
+    "version": "0.3.23",
+    "id": "h2_0_3_23"
   },
   {
     "name": "half",
@@ -528,6 +588,16 @@
     "name": "heck",
     "version": "0.4.1",
     "id": "heck"
+  },
+  {
+    "name": "hex",
+    "version": "0.4.3",
+    "id": "hex"
+  },
+  {
+    "name": "hex-literal",
+    "version": "0.3.4",
+    "id": "hex_literal"
   },
   {
     "name": "hmac",
@@ -611,7 +681,7 @@
   },
   {
     "name": "image",
-    "version": "0.24.7",
+    "version": "0.24.8",
     "id": "image"
   },
   {
@@ -645,14 +715,24 @@
     "id": "itertools"
   },
   {
+    "name": "itertools",
+    "version": "0.6.5",
+    "id": "itertools_0_6_5"
+  },
+  {
     "name": "itoa",
     "version": "1.0.10",
     "id": "itoa"
   },
   {
     "name": "jpeg-decoder",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "id": "jpeg_decoder"
+  },
+  {
+    "name": "keccak",
+    "version": "0.1.5",
+    "id": "keccak"
   },
   {
     "name": "lazy_static",
@@ -666,7 +746,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.151",
+    "version": "0.2.152",
     "id": "libc"
   },
   {
@@ -755,6 +835,11 @@
     "id": "memoffset"
   },
   {
+    "name": "merlin",
+    "version": "3.0.0",
+    "id": "merlin"
+  },
+  {
     "name": "mime",
     "version": "0.3.17",
     "id": "mime"
@@ -800,9 +885,9 @@
     "id": "ndarray"
   },
   {
-    "name": "nix",
-    "version": "0.27.1",
-    "id": "nix"
+    "name": "newtype-ops",
+    "version": "0.1.4",
+    "id": "newtype_ops"
   },
   {
     "name": "nom",
@@ -965,9 +1050,19 @@
     "id": "pkg_config"
   },
   {
+    "name": "platforms",
+    "version": "3.3.0",
+    "id": "platforms"
+  },
+  {
     "name": "png",
-    "version": "0.17.10",
+    "version": "0.17.11",
     "id": "png"
+  },
+  {
+    "name": "portable-atomic",
+    "version": "1.6.0",
+    "id": "portable_atomic"
   },
   {
     "name": "postgres",
@@ -1001,8 +1096,23 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.73",
+    "version": "1.0.76",
     "id": "proc_macro2"
+  },
+  {
+    "name": "proc-macro-crate",
+    "version": "3.0.0",
+    "id": "proc_macro_crate"
+  },
+  {
+    "name": "proc-macro-error",
+    "version": "1.0.4",
+    "id": "proc_macro_error"
+  },
+  {
+    "name": "proc-macro-error-attr",
+    "version": "1.0.4",
+    "id": "proc_macro_error_attr"
   },
   {
     "name": "psl-types",
@@ -1021,7 +1131,7 @@
   },
   {
     "name": "quote",
-    "version": "1.0.34",
+    "version": "1.0.35",
     "id": "quote"
   },
   {
@@ -1101,7 +1211,7 @@
   },
   {
     "name": "rustix",
-    "version": "0.38.28",
+    "version": "0.38.30",
     "id": "rustix"
   },
   {
@@ -1131,22 +1241,22 @@
   },
   {
     "name": "semver",
-    "version": "1.0.20",
+    "version": "1.0.21",
     "id": "semver"
   },
   {
     "name": "serde",
-    "version": "1.0.193",
+    "version": "1.0.195",
     "id": "serde"
   },
   {
     "name": "serde_derive",
-    "version": "1.0.193",
+    "version": "1.0.195",
     "id": "serde_derive"
   },
   {
     "name": "serde_json",
-    "version": "1.0.109",
+    "version": "1.0.111",
     "id": "serde_json"
   },
   {
@@ -1170,6 +1280,11 @@
     "id": "serde_yaml"
   },
   {
+    "name": "sha1",
+    "version": "0.6.0",
+    "id": "sha1"
+  },
+  {
     "name": "sha1_smol",
     "version": "1.0.0",
     "id": "sha1_smol"
@@ -1178,6 +1293,11 @@
     "name": "sha2",
     "version": "0.10.8",
     "id": "sha2"
+  },
+  {
+    "name": "sha3",
+    "version": "0.10.8",
+    "id": "sha3"
   },
   {
     "name": "signal-hook-registry",
@@ -1206,13 +1326,23 @@
   },
   {
     "name": "smallvec",
-    "version": "1.11.2",
+    "version": "1.12.0",
     "id": "smallvec"
   },
   {
     "name": "smawk",
     "version": "0.3.2",
     "id": "smawk"
+  },
+  {
+    "name": "snafu",
+    "version": "0.7.5",
+    "id": "snafu"
+  },
+  {
+    "name": "snafu-derive",
+    "version": "0.7.5",
+    "id": "snafu_derive"
   },
   {
     "name": "socket2",
@@ -1241,8 +1371,13 @@
   },
   {
     "name": "strsim",
-    "version": "0.10.0",
+    "version": "0.11.0",
     "id": "strsim"
+  },
+  {
+    "name": "strsim",
+    "version": "0.10.0",
+    "id": "strsim_0_10_0"
   },
   {
     "name": "subtle",
@@ -1251,7 +1386,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.44",
+    "version": "2.0.48",
     "id": "syn"
   },
   {
@@ -1260,9 +1395,34 @@
     "id": "syn_1_0_109"
   },
   {
+    "name": "syn_derive",
+    "version": "0.1.8",
+    "id": "syn_derive"
+  },
+  {
     "name": "tar",
     "version": "0.4.40",
     "id": "tar"
+  },
+  {
+    "name": "tari_bulletproofs_plus",
+    "version": "0.3.2",
+    "id": "tari_bulletproofs_plus"
+  },
+  {
+    "name": "tari_crypto",
+    "version": "0.20.0",
+    "id": "tari_crypto"
+  },
+  {
+    "name": "tari-curve25519-dalek",
+    "version": "4.0.3",
+    "id": "tari_curve25519_dalek"
+  },
+  {
+    "name": "tari_utilities",
+    "version": "0.7.0",
+    "id": "tari_utilities"
   },
   {
     "name": "tempfile",
@@ -1276,7 +1436,7 @@
   },
   {
     "name": "termcolor",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "id": "termcolor"
   },
   {
@@ -1291,12 +1451,12 @@
   },
   {
     "name": "thiserror",
-    "version": "1.0.53",
+    "version": "1.0.56",
     "id": "thiserror"
   },
   {
     "name": "thiserror-impl",
-    "version": "1.0.53",
+    "version": "1.0.56",
     "id": "thiserror_impl"
   },
   {
@@ -1305,18 +1465,13 @@
     "id": "thread_id"
   },
   {
-    "name": "thread_local",
-    "version": "1.1.7",
-    "id": "thread_local"
-  },
-  {
     "name": "threadpool",
     "version": "1.8.1",
     "id": "threadpool"
   },
   {
     "name": "tiff",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "id": "tiff"
   },
   {
@@ -1388,6 +1543,11 @@
     "name": "toml_edit",
     "version": "0.21.0",
     "id": "toml_edit"
+  },
+  {
+    "name": "tor-hash-passwd",
+    "version": "1.0.1",
+    "id": "tor_hash_passwd"
   },
   {
     "name": "tower-service",
@@ -1531,12 +1691,12 @@
   },
   {
     "name": "winnow",
-    "version": "0.5.31",
+    "version": "0.5.34",
     "id": "winnow"
   },
   {
     "name": "xattr",
-    "version": "1.2.0",
+    "version": "1.3.1",
     "id": "xattr"
   },
   {
@@ -1563,6 +1723,11 @@
     "name": "zeroize",
     "version": "1.7.0",
     "id": "zeroize"
+  },
+  {
+    "name": "zeroize_derive",
+    "version": "1.4.2",
+    "id": "zeroize_derive"
   },
   {
     "name": "zune-inflate",

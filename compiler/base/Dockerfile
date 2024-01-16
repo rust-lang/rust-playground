@@ -1,8 +1,8 @@
 #syntax=docker/dockerfile:1.5
 
-FROM ubuntu:20.04 as toolchain
-
-ARG channel
+FROM ubuntu:22.04 as toolchain
+ARG channel=nightly
+ARG version=2023-08-10
 
 ENV DEBIAN_FRONTEND="noninteractive"
 
@@ -17,7 +17,18 @@ RUN apt-get update && apt-get install -y \
     git \
     libssl-dev \
     pkg-config \
-    python \
+    python3 \
+    openssl \
+    libssl-dev \
+    libsqlite3-dev \
+    dh-autoreconf \
+    libc++-dev \
+    libc++abi-dev \
+    libprotobuf-dev \
+    protobuf-compiler \
+    libncurses5-dev \
+    libncursesw5-dev \
+    zip \
  && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m playground -d /playground
@@ -40,6 +51,7 @@ WORKDIR /playground
 # installation of Rust.
 ADD --chown=playground https://static.rust-lang.org/rustup/release-stable.toml /playground/tools/rustup-manifest.toml
 ADD --chown=playground https://static.rust-lang.org/dist/channel-rust-${channel}-date.txt /playground/tools/rust-channel-version
+RUN echo $version > /playground/tools/rust-channel-version
 RUN curl https://sh.rustup.rs -sSf | sh -s -- \
     -y \
     --profile minimal \

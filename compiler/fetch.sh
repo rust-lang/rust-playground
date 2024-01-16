@@ -2,7 +2,7 @@
 
 set -euv -o pipefail
 
-repository=shepmaster
+repository=tari-project
 
 for image in rust-stable rust-beta rust-nightly; do
     docker pull "${repository}/${image}"
