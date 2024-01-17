@@ -11,6 +11,7 @@ RSpec.feature "Sharing the code with others", :external, type: :feature, js: tru
   # This test does more than one thing so we can avoid sending too
   # many requests to GitHub
   scenario "saving to a Gist" do
+    skip "Gist not supported yet"
     editor.set(code)
 
     in_channel_menu { click_on("Nightly") }

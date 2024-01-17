@@ -13,7 +13,7 @@ RSpec.feature "Security concerns", type: :feature, js: true do
   scenario "a notice is present for filesystem snoopers" do
     within(:header) { click_on("Run") }
     within(:output, :stdout) do
-      expect(page).to have_content 'www.rust-lang.org/policies/security'
+      expect(page).to have_content 'https://github.com/tari-project/tari/blob/development/SECURITY.md'
     end
   end
 

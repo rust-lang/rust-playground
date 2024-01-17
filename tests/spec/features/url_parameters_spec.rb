@@ -32,12 +32,14 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
   end
 
   scenario "loading from a Gist" do
+    skip "Gist not supported yet"
     visit '/?gist=20fb1e0475f890d0fdb7864e3ad0820c'
 
     expect(editor).to have_line 'This source code came from a Gist'
   end
 
   scenario "loading from a Gist preserves the links" do
+    skip "Gist not supported yet"
     visit '/?gist=20fb1e0475f890d0fdb7864e3ad0820c'
 
     within(:output) { click_on 'Share' }
@@ -45,6 +47,7 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
   end
 
   scenario "loading from a Gist with a channel preserves the channel" do
+    skip "Gist not supported yet"
     visit '/?gist=20fb1e0475f890d0fdb7864e3ad0820c&version=beta'
 
     expect(page).to have_channel('Beta')
@@ -52,6 +55,7 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
   end
 
   scenario "loading from a Gist with a mode preserves the mode" do
+    skip "Gist not supported yet"
     visit '/?gist=20fb1e0475f890d0fdb7864e3ad0820c&mode=release'
 
     expect(page).to have_mode('Release')
@@ -59,6 +63,7 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
   end
 
   scenario "loading from a Gist with an edition preserves the edition" do
+    skip "Gist not supported yet"
     visit '/?gist=20fb1e0475f890d0fdb7864e3ad0820c&edition=2018'
 
     expect(page).to have_edition('2018')
@@ -66,6 +71,7 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
   end
 
   scenario "loading from a Gist without an edition selects Rust 2015" do
+    skip "Gist not supported yet"
     visit '/?gist=20fb1e0475f890d0fdb7864e3ad0820c'
 
     expect(page).to have_edition('2015')
