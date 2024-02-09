@@ -27,7 +27,7 @@ jobs:
       IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
     - name: Set up Docker Buildx
@@ -56,7 +56,7 @@ jobs:
     if: 'github.event_name == ''push'' || contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
     - name: Install Rust
@@ -85,7 +85,7 @@ jobs:
     if: 'github.event_name == ''push'' || contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
     - name: Configure node
@@ -140,7 +140,7 @@ jobs:
         working-directory: tests
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: "${{ github.event.pull_request.head.sha }}"
     - name: Configure Ruby

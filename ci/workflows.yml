@@ -7,13 +7,13 @@ components:
 
   - checkout: &checkout
       name: "Checkout code"
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
   # This should only be used when we know that the code being tested
   # doesn't make use of our secrets or elevated GitHub token.
   - checkout_pr: &checkout_pr
       name: "Checkout code"
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
