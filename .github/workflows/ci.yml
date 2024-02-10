@@ -98,7 +98,7 @@ jobs:
 
         '
     - name: Install pnpm
-      uses: pnpm/action-setup@v2.4.0
+      uses: pnpm/action-setup@v3
       with:
         version: "${{ steps.pnpm-version.outputs.pnpm_version }}"
     - name: Get pnpm store directory
