@@ -1,8 +1,7 @@
-import React, { useCallback } from 'react';
-import root from 'react-shadow';
-
 import 'prismjs/components/prism-rust.min';
+import React, { useCallback } from 'react';
 import { PrismCode } from 'react-prism';
+import root from 'react-shadow';
 
 import * as actions from './actions';
 import { useAppDispatch } from './hooks';
@@ -16,10 +15,7 @@ export interface HelpExampleProps {
 
 const HelpExample: React.FC<HelpExampleProps> = ({ code }) => {
   const dispatch = useAppDispatch();
-  const showExample = useCallback(
-    () => dispatch(actions.showExample(code)),
-    [dispatch, code]
-  );
+  const showExample = useCallback(() => dispatch(actions.showExample(code)), [dispatch, code]);
 
   return (
     <div className={styles.container}>
@@ -30,9 +26,7 @@ const HelpExample: React.FC<HelpExampleProps> = ({ code }) => {
         <link href={prismTheme} rel="stylesheet" />
 
         <pre>
-          <PrismCode className="language-rust">
-            {code}
-          </PrismCode>
+          <PrismCode className="language-rust">{code}</PrismCode>
         </pre>
       </root.div>
     </div>

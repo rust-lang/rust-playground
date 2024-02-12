@@ -10,9 +10,7 @@ interface OutputPrismProps {
 
 const OutputPrism: React.FC<OutputPrismProps> = ({ languageCode, children }) => (
   <pre>
-    <PrismCode className={`${styles.container} ${languageCode}`}>
-      {children}
-    </PrismCode>
+    <PrismCode className={`${styles.container} ${languageCode}`}>{children}</PrismCode>
   </pre>
 );
 
