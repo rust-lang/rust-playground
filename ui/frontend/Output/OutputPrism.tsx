@@ -1,19 +1,18 @@
 import React from 'react';
-import { PrismCode } from 'react-prism';
+
+import Prism from '../Prism';
 
 import styles from './OutputPrism.module.css';
 
 interface OutputPrismProps {
-  children: React.ReactNode;
-  languageCode: 'language-rust_mir' | 'language-rust_errors';
+  children?: string;
+  language: 'rust_mir' | 'rust_errors';
 }
 
-const OutputPrism: React.FC<OutputPrismProps> = ({ languageCode, children }) => (
-  <pre>
-    <PrismCode className={`${styles.container} ${languageCode}`}>
-      {children}
-    </PrismCode>
-  </pre>
+const OutputPrism: React.FC<OutputPrismProps> = ({ language, children }) => (
+  <Prism className={styles.container} language={language}>
+    {children}
+  </Prism>
 );
 
 export default OutputPrism;

@@ -20,7 +20,6 @@
     "react-dom": "^18.2.0",
     "react-monaco-editor": "^0.55.0",
     "react-portal": "^4.1.4",
-    "react-prism": "^4.0.0",
     "react-redux": "^9.0.2",
     "react-shadow": "^20.0.0",
     "redux-thunk": "^3.1.0",

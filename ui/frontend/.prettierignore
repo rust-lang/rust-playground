@@ -16,8 +16,13 @@ node_modules
 !BuildMenu.tsx
 !ButtonSet.tsx
 !Header.tsx
+!HelpExample.tsx
 !Notifications.tsx
+!Output/OutputPrism.tsx
+!Output/PaneWithMir.tsx
+!Output/SimplePane.tsx
 !PopButton.tsx
+!Prism.tsx
 !Stdin.tsx
 !actions.ts
 !api.ts
@@ -27,6 +32,7 @@ node_modules
 !editor/SimpleEditor.tsx
 !hooks.ts
 !observer.ts
+!prism-shim.ts
 !reducers/**/*.ts
 !selectors/index.spec.ts
 !types.ts

@@ -2,15 +2,15 @@ import React from 'react';
 
 import Header from './Header';
 import Loader from './Loader';
-import Section from './Section';
 import OutputPrism from './OutputPrism';
+import Section from './Section';
 
 interface HighlightErrorsProps {
-  children: React.ReactNode;
+  children?: string;
   label: string;
 }
 
-const onOutputPrismCopy: React.ClipboardEventHandler = event => {
+const onOutputPrismCopy: React.ClipboardEventHandler = (event) => {
   // Blank out HTML copy data.
   // Though linkified output is handy in the Playground, it does more harm
   // than good when copied elsewhere, and terminal output is usable on its own.
@@ -24,9 +24,7 @@ const onOutputPrismCopy: React.ClipboardEventHandler = event => {
 const HighlightErrors: React.FC<HighlightErrorsProps> = ({ label, children }) => (
   <div data-test-id="output-stderr" onCopy={onOutputPrismCopy}>
     <Header label={label} />
-    <OutputPrism languageCode="language-rust_errors">
-      {children}
-    </OutputPrism>
+    <OutputPrism language="rust_errors">{children}</OutputPrism>
   </div>
 );
 
@@ -42,12 +40,16 @@ export interface ReallySimplePaneProps {
   error?: string;
 }
 
-const SimplePane: React.FC<SimplePaneProps> = props => (
+const SimplePane: React.FC<SimplePaneProps> = (props) => (
   <div data-test-id={`output-${props.kind}`}>
-    {(props.requestsInProgress > 0) && <Loader />}
-    <Section kind="error" label="Errors">{props.error}</Section>
+    {props.requestsInProgress > 0 && <Loader />}
+    <Section kind="error" label="Errors">
+      {props.error}
+    </Section>
     <HighlightErrors label="Standard Error">{props.stderr}</HighlightErrors>
-    <Section kind="stdout" label="Standard Output">{props.stdout}</Section>
+    <Section kind="stdout" label="Standard Output">
+      {props.stdout}
+    </Section>
     {props.children}
   </div>
 );
