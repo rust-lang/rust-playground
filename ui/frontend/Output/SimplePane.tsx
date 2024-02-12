@@ -6,7 +6,7 @@ import OutputPrism from './OutputPrism';
 import Section from './Section';
 
 interface HighlightErrorsProps {
-  children: React.ReactNode;
+  children?: string;
   label: string;
 }
 
@@ -24,7 +24,7 @@ const onOutputPrismCopy: React.ClipboardEventHandler = (event) => {
 const HighlightErrors: React.FC<HighlightErrorsProps> = ({ label, children }) => (
   <div data-test-id="output-stderr" onCopy={onOutputPrismCopy}>
     <Header label={label} />
-    <OutputPrism languageCode="language-rust_errors">{children}</OutputPrism>
+    <OutputPrism language="rust_errors">{children}</OutputPrism>
   </div>
 );
 

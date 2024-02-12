@@ -12,7 +12,7 @@ const PaneWithMir: React.FC<PaneWithMirProps> = ({ code, ...rest }) => (
   <SimplePane {...rest}>
     <div data-test-id="output-result">
       <Header label="Result" />
-      <OutputPrism languageCode="language-rust_mir">{code}</OutputPrism>
+      <OutputPrism language="rust_mir">{code}</OutputPrism>
     </div>
   </SimplePane>
 );

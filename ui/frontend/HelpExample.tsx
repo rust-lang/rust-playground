@@ -1,8 +1,7 @@
-import 'prismjs/components/prism-rust.min';
 import React, { useCallback } from 'react';
-import { PrismCode } from 'react-prism';
 import root from 'react-shadow';
 
+import Prism from './Prism';
 import * as actions from './actions';
 import { useAppDispatch } from './hooks';
 
@@ -25,9 +24,7 @@ const HelpExample: React.FC<HelpExampleProps> = ({ code }) => {
       <root.div>
         <link href={prismTheme} rel="stylesheet" />
 
-        <pre>
-          <PrismCode className="language-rust">{code}</PrismCode>
-        </pre>
+        <Prism language="rust">{code}</Prism>
       </root.div>
     </div>
   );
