@@ -1,5 +1,6 @@
 use crate::{
     metrics::{self, record_metric, Endpoint, HasLabelsCore, Outcome},
+    request_database::{Handle, How},
     server_axum::api_orchestrator_integration_impls::*,
     Error, Result, StreamingCoordinatorExecuteStdinSnafu, StreamingCoordinatorIdleSnafu,
     StreamingCoordinatorSpawnSnafu, StreamingExecuteSnafu, WebSocketTaskPanicSnafu,
@@ -198,7 +199,7 @@ struct ExecuteResponse {
 }
 
 #[instrument(skip_all, fields(ws_id))]
-pub(crate) async fn handle(socket: WebSocket, feature_flags: FeatureFlags) {
+pub(crate) async fn handle(socket: WebSocket, feature_flags: FeatureFlags, db: Handle) {
     static WEBSOCKET_ID: AtomicU64 = AtomicU64::new(0);
 
     metrics::LIVE_WS.inc();
@@ -207,7 +208,7 @@ pub(crate) async fn handle(socket: WebSocket, feature_flags: FeatureFlags) {
     let id = WEBSOCKET_ID.fetch_add(1, Ordering::SeqCst);
     tracing::Span::current().record("ws_id", &id);
 
-    handle_core(socket, feature_flags).await;
+    handle_core(socket, feature_flags, db).await;
 
     metrics::LIVE_WS.dec();
     let elapsed = start.elapsed();
@@ -335,7 +336,7 @@ pub enum CoordinatorManagerError {
 
 type CoordinatorManagerResult<T, E = CoordinatorManagerError> = std::result::Result<T, E>;
 
-async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
+async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags, db: Handle) {
     if !connect_handshake(&mut socket).await {
         return;
     }
@@ -368,7 +369,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
                         // browser disconnected
                         break;
                     }
-                    Some(Ok(Message::Text(txt))) => handle_msg(txt, &tx, &mut manager, &mut active_executions).await,
+                    Some(Ok(Message::Text(txt))) => handle_msg(txt, &tx, &mut manager, &mut active_executions, &db).await,
                     Some(Ok(_)) => {
                         // unknown message type
                         continue;
@@ -379,6 +380,13 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
 
             resp = rx.recv() => {
                 let resp = resp.expect("The rx should never close as we have a tx");
+
+                if let Ok(MessageResponse::ExecuteEnd { meta, .. }) = &resp {
+                    if let Some((_, _, Some(db_id))) = active_executions.get(&meta.sequence_number) {
+                         db.attempt_end_request(*db_id, How::Complete).await;
+                    }
+                }
+
                 let success = resp.is_ok();
                 let resp = resp.unwrap_or_else(error_to_response);
                 let resp = response_to_message(resp);
@@ -427,7 +435,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
             _ = active_execution_gc_interval.tick() => {
                 active_executions = mem::take(&mut active_executions)
                     .into_iter()
-                    .filter(|(_id, (_, tx))| tx.as_ref().map_or(false, |tx| !tx.is_closed()))
+                    .filter(|(_id, (_, tx, _))| tx.as_ref().map_or(false, |tx| !tx.is_closed()))
                     .collect();
             },
 
@@ -445,6 +453,12 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags) {
             _ = &mut session_timeout => {
                 break;
             }
+        }
+    }
+
+    for (_, (_, _, db_id)) in active_executions {
+        if let Some(db_id) = db_id {
+            db.attempt_end_request(db_id, How::Abandoned).await;
         }
     }
 
@@ -494,11 +508,18 @@ fn response_to_message(response: MessageResponse) -> Message {
     Message::Text(resp)
 }
 
+type ActiveExecutionInfo = (
+    CancellationToken,
+    Option<mpsc::Sender<String>>,
+    Option<crate::request_database::Id>,
+);
+
 async fn handle_msg(
     txt: String,
     tx: &ResponseTx,
     manager: &mut CoordinatorManager,
-    active_executions: &mut BTreeMap<i64, (CancellationToken, Option<mpsc::Sender<String>>)>,
+    active_executions: &mut BTreeMap<i64, ActiveExecutionInfo>,
+    db: &Handle,
 ) {
     use WSMessageRequest::*;
 
@@ -509,7 +530,12 @@ async fn handle_msg(
             let token = CancellationToken::new();
             let (execution_tx, execution_rx) = mpsc::channel(8);
 
-            active_executions.insert(meta.sequence_number, (token.clone(), Some(execution_tx)));
+            let id = db.attempt_start_request("ws.Execute", &txt).await;
+
+            active_executions.insert(
+                meta.sequence_number,
+                (token.clone(), Some(execution_tx), id),
+            );
 
             // TODO: Should a single execute / build / etc. session have a timeout of some kind?
             let spawned = manager
@@ -531,7 +557,8 @@ async fn handle_msg(
         }
 
         Ok(ExecuteStdin { payload, meta }) => {
-            let Some((_, Some(execution_tx))) = active_executions.get(&meta.sequence_number) else {
+            let Some((_, Some(execution_tx), _)) = active_executions.get(&meta.sequence_number)
+            else {
                 warn!("Received stdin for an execution that is no longer active");
                 return;
             };
@@ -547,7 +574,8 @@ async fn handle_msg(
         }
 
         Ok(ExecuteStdinClose { meta }) => {
-            let Some((_, execution_tx)) = active_executions.get_mut(&meta.sequence_number) else {
+            let Some((_, execution_tx, _)) = active_executions.get_mut(&meta.sequence_number)
+            else {
                 warn!("Received stdin close for an execution that is no longer active");
                 return;
             };
@@ -556,7 +584,7 @@ async fn handle_msg(
         }
 
         Ok(ExecuteKill { meta }) => {
-            let Some((token, _)) = active_executions.get(&meta.sequence_number) else {
+            let Some((token, _, _)) = active_executions.get(&meta.sequence_number) else {
                 warn!("Received kill for an execution that is no longer active");
                 return;
             };

@@ -4,6 +4,7 @@ use crate::{
         record_metric, track_metric_no_request_async, Endpoint, HasLabelsCore, Outcome,
         UNAVAILABLE_WS,
     },
+    request_database::{Handle, How},
     sandbox::DOCKER_PROCESS_TIMEOUT_SOFT,
     ClippyRequest, ClippyResponse, ClippySnafu, CompileRequest, CompileResponse, CompileSnafu,
     Config, CratesSnafu, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu,
@@ -67,6 +68,9 @@ pub(crate) use websocket::ExecuteError as WebsocketExecuteError;
 
 #[tokio::main]
 pub(crate) async fn serve(config: Config) {
+    let request_db = config.request_database();
+    let (_db_task, db_handle) = request_db.spawn();
+
     let root_files = static_file_service(config.root_path(), MAX_AGE_ONE_DAY);
     let asset_files = static_file_service(config.asset_path(), MAX_AGE_ONE_YEAR);
     let rewrite_help_as_index = middleware::from_fn(rewrite_help_as_index);
@@ -97,6 +101,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/websocket", get(websocket))
         .route("/nowebsocket", post(nowebsocket))
         .route("/whynowebsocket", get(whynowebsocket))
+        .layer(Extension(db_handle))
         .layer(Extension(Arc::new(SandboxCache::default())))
         .layer(Extension(config.github_token()))
         .layer(Extension(config.feature_flags));
@@ -185,52 +190,110 @@ async fn rewrite_help_as_index(
     next.run(req).await
 }
 
+async fn attempt_record_request<T, RFut, R>(db: Handle, req: T, f: impl FnOnce(T) -> RFut) -> R
+where
+    T: HasEndpoint + serde::Serialize,
+    RFut: Future<Output = R>,
+{
+    let category = format!("http.{}", <&str>::from(T::ENDPOINT));
+    let payload = serde_json::to_string(&req).unwrap_or_else(|_| String::from("<invalid JSON>"));
+    let id = db.attempt_start_request(category, payload).await;
+
+    let r = f(req).await;
+
+    if let Some(id) = id {
+        db.attempt_end_request(id, How::Complete).await;
+    }
+
+    r
+}
+
 // This is a backwards compatibilty shim. The Rust documentation uses
 // this to run code in place.
-async fn evaluate(Json(req): Json<EvaluateRequest>) -> Result<Json<EvaluateResponse>> {
-    with_coordinator(req, |c, req| c.execute(req).context(EvaluateSnafu).boxed())
-        .await
-        .map(Json)
+async fn evaluate(
+    Extension(db): Extension<Handle>,
+    Json(req): Json<EvaluateRequest>,
+) -> Result<Json<EvaluateResponse>> {
+    attempt_record_request(db, req, |req| async {
+        with_coordinator(req, |c, req| c.execute(req).context(EvaluateSnafu).boxed())
+            .await
+            .map(Json)
+    })
+    .await
 }
 
-async fn compile(Json(req): Json<CompileRequest>) -> Result<Json<CompileResponse>> {
-    with_coordinator(req, |c, req| c.compile(req).context(CompileSnafu).boxed())
-        .await
-        .map(Json)
+async fn compile(
+    Extension(db): Extension<Handle>,
+    Json(req): Json<CompileRequest>,
+) -> Result<Json<CompileResponse>> {
+    attempt_record_request(db, req, |req| async {
+        with_coordinator(req, |c, req| c.compile(req).context(CompileSnafu).boxed())
+            .await
+            .map(Json)
+    })
+    .await
 }
 
-async fn execute(Json(req): Json<ExecuteRequest>) -> Result<Json<ExecuteResponse>> {
-    with_coordinator(req, |c, req| c.execute(req).context(ExecuteSnafu).boxed())
-        .await
-        .map(Json)
+async fn execute(
+    Extension(db): Extension<Handle>,
+    Json(req): Json<ExecuteRequest>,
+) -> Result<Json<ExecuteResponse>> {
+    attempt_record_request(db, req, |req| async {
+        with_coordinator(req, |c, req| c.execute(req).context(ExecuteSnafu).boxed())
+            .await
+            .map(Json)
+    })
+    .await
 }
 
-async fn format(Json(req): Json<FormatRequest>) -> Result<Json<FormatResponse>> {
-    with_coordinator(req, |c, req| c.format(req).context(FormatSnafu).boxed())
-        .await
-        .map(Json)
+async fn format(
+    Extension(db): Extension<Handle>,
+    Json(req): Json<FormatRequest>,
+) -> Result<Json<FormatResponse>> {
+    attempt_record_request(db, req, |req| async {
+        with_coordinator(req, |c, req| c.format(req).context(FormatSnafu).boxed())
+            .await
+            .map(Json)
+    })
+    .await
 }
 
-async fn clippy(Json(req): Json<ClippyRequest>) -> Result<Json<ClippyResponse>> {
-    with_coordinator(req, |c, req| c.clippy(req).context(ClippySnafu).boxed())
-        .await
-        .map(Json)
+async fn clippy(
+    Extension(db): Extension<Handle>,
+    Json(req): Json<ClippyRequest>,
+) -> Result<Json<ClippyResponse>> {
+    attempt_record_request(db, req, |req| async {
+        with_coordinator(req, |c, req| c.clippy(req).context(ClippySnafu).boxed())
+            .await
+            .map(Json)
+    })
+    .await
 }
 
-async fn miri(Json(req): Json<MiriRequest>) -> Result<Json<MiriResponse>> {
-    with_coordinator(req, |c, req| c.miri(req).context(MiriSnafu).boxed())
-        .await
-        .map(Json)
+async fn miri(
+    Extension(db): Extension<Handle>,
+    Json(req): Json<MiriRequest>,
+) -> Result<Json<MiriResponse>> {
+    attempt_record_request(db, req, |req| async {
+        with_coordinator(req, |c, req| c.miri(req).context(MiriSnafu).boxed())
+            .await
+            .map(Json)
+    })
+    .await
 }
 
 async fn macro_expansion(
+    Extension(db): Extension<Handle>,
     Json(req): Json<MacroExpansionRequest>,
 ) -> Result<Json<MacroExpansionResponse>> {
-    with_coordinator(req, |c, req| {
-        c.macro_expansion(req).context(MacroExpansionSnafu).boxed()
+    attempt_record_request(db, req, |req| async {
+        with_coordinator(req, |c, req| {
+            c.macro_expansion(req).context(MacroExpansionSnafu).boxed()
+        })
+        .await
+        .map(Json)
     })
     .await
-    .map(Json)
 }
 
 pub(crate) trait HasEndpoint {
@@ -532,8 +595,9 @@ async fn metrics(_: MetricsAuthorization) -> Result<Vec<u8>, StatusCode> {
 async fn websocket(
     ws: WebSocketUpgrade,
     Extension(feature_flags): Extension<crate::FeatureFlags>,
+    Extension(db): Extension<Handle>,
 ) -> impl IntoResponse {
-    ws.on_upgrade(move |s| websocket::handle(s, feature_flags.into()))
+    ws.on_upgrade(move |s| websocket::handle(s, feature_flags.into(), db))
 }
 
 #[derive(Debug, serde::Deserialize)]
