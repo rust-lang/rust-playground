@@ -10,3 +10,13 @@
   padding: 1.25em 0;
   justify-content: space-between;
 }
+
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 1.25em;
+    display: block;
+  }
+  .left {
+    margin-bottom: 6px;
+  }
+}

@@ -85,3 +85,9 @@ body {
     color: #bf1b1b;
   }
 }
+
+@media screen and (max-width: 768px) {
+  body {
+    padding: 0;
+  }
+}
