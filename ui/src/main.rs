@@ -17,6 +17,7 @@ const DEFAULT_PORT: u16 = 5000;
 mod env;
 mod gist;
 mod metrics;
+mod request_database;
 mod sandbox;
 mod server_axum;
 
@@ -43,6 +44,7 @@ struct Config {
     gh_token: Option<String>,
     metrics_token: Option<String>,
     feature_flags: FeatureFlags,
+    request_db_path: Option<PathBuf>,
     port: u16,
     root: PathBuf,
 }
@@ -98,12 +100,15 @@ impl Config {
 
         let feature_flags = FeatureFlags {};
 
+        let request_db_path = env::var_os("PLAYGROUND_REQUEST_DATABASE").map(Into::into);
+
         Self {
             address,
             cors_enabled,
             gh_token,
             metrics_token,
             feature_flags,
+            request_db_path,
             port,
             root,
         }
@@ -127,6 +132,17 @@ impl Config {
 
     fn github_token(&self) -> GhToken {
         GhToken::new(&self.gh_token)
+    }
+
+    fn request_database(&self) -> request_database::Database {
+        use request_database::Database;
+
+        let request_db = match &self.request_db_path {
+            Some(path) => Database::initialize(path),
+            None => Database::initialize_memory(),
+        };
+
+        request_db.expect("Unable to open request log database")
     }
 
     fn server_socket_addr(&self) -> SocketAddr {
@@ -293,7 +309,7 @@ struct ErrorJson {
     error: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct CompileRequest {
     target: String,
     #[serde(rename = "assemblyFlavor")]
@@ -324,7 +340,7 @@ struct CompileResponse {
     stderr: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct ExecuteRequest {
     channel: String,
     mode: String,
@@ -347,7 +363,7 @@ struct ExecuteResponse {
     stderr: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct FormatRequest {
     #[serde(default)]
     channel: Option<String>,
@@ -366,7 +382,7 @@ struct FormatResponse {
     stderr: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct ClippyRequest {
     #[serde(default)]
     channel: Option<String>,
@@ -385,7 +401,7 @@ struct ClippyResponse {
     stderr: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct MiriRequest {
     code: String,
     #[serde(default)]
@@ -400,7 +416,7 @@ struct MiriResponse {
     stderr: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct MacroExpansionRequest {
     code: String,
     #[serde(default)]
@@ -462,7 +478,7 @@ struct MetaGistResponse {
     code: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct EvaluateRequest {
     version: String,
     optimize: String,
