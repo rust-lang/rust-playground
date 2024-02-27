@@ -407,7 +407,7 @@ where
     for<'f> F:
         FnOnce(&'f coordinator::Coordinator<DockerBackend>, Req) -> BoxFuture<'f, Result<Resp>>,
 {
-    let coordinator = orchestrator::coordinator::Coordinator::new_docker().await;
+    let coordinator = orchestrator::coordinator::Coordinator::new_docker();
 
     let job = async {
         let req = req.try_into()?;
@@ -675,7 +675,7 @@ struct SandboxCache {
 
 impl SandboxCache {
     async fn crates(&self) -> Result<Stamped<MetaCratesResponse>> {
-        let coordinator = Coordinator::new_docker().await;
+        let coordinator = Coordinator::new_docker();
 
         let c = self
             .crates
@@ -691,7 +691,7 @@ impl SandboxCache {
     }
 
     async fn versions(&self) -> Result<Stamped<MetaVersionsResponse>> {
-        let coordinator = Coordinator::new_docker().await;
+        let coordinator = Coordinator::new_docker();
 
         let v = self
             .versions
@@ -707,7 +707,7 @@ impl SandboxCache {
     }
 
     async fn raw_versions(&self) -> Result<Stamped<Arc<Versions>>> {
-        let coordinator = Coordinator::new_docker().await;
+        let coordinator = Coordinator::new_docker();
 
         let rv = self
             .raw_versions

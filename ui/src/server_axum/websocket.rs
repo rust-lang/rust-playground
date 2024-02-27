@@ -247,7 +247,7 @@ impl CoordinatorManager {
 
     async fn new() -> Self {
         Self {
-            coordinator: Arc::new(Coordinator::new_docker().await),
+            coordinator: Arc::new(Coordinator::new_docker()),
             tasks: Default::default(),
             semaphore: Arc::new(Semaphore::new(Self::N_PARALLEL)),
             abort_handles: Default::default(),

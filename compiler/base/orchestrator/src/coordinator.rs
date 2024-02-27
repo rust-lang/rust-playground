@@ -844,7 +844,7 @@ impl<B> Coordinator<B>
 where
     B: Backend,
 {
-    pub async fn new(backend: B) -> Self {
+    pub fn new(backend: B) -> Self {
         let token = CancellationToken::new();
 
         Self {
@@ -1090,8 +1090,8 @@ where
 }
 
 impl Coordinator<DockerBackend> {
-    pub async fn new_docker() -> Self {
-        Self::new(DockerBackend(())).await
+    pub fn new_docker() -> Self {
+        Self::new(DockerBackend(()))
     }
 }
 
@@ -2789,17 +2789,16 @@ mod tests {
     where
         T: Backend,
     {
-        async fn with<F, Fut>(f: F) -> Self
+        async fn with<F>(f: F) -> Self
         where
-            F: FnOnce() -> Fut,
-            Fut: Future<Output = Coordinator<T>>,
+            F: FnOnce() -> Coordinator<T>,
         {
             let semaphore = CONCURRENT_TEST_SEMAPHORE.clone();
             let permit = semaphore
                 .acquire_owned()
                 .await
                 .expect("Unable to acquire permit");
-            let coordinator = f().await;
+            let coordinator = f();
             Self {
                 _permit: permit,
                 coordinator,
