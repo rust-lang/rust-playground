@@ -2697,12 +2697,8 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
 #[cfg(test)]
 mod tests {
     use assertables::*;
-    use futures::{
-        future::{join, try_join_all},
-        Future, FutureExt,
-    };
-    use once_cell::sync::Lazy;
-    use std::{env, sync::Once, time::Duration};
+    use futures::future::{join, try_join_all};
+    use std::{env, sync::Once};
     use tempdir::TempDir;
     use tokio::sync::{OwnedSemaphorePermit, Semaphore};
 

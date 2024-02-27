@@ -816,7 +816,6 @@ pub enum ProcessError {
 
 #[cfg(target_os = "macos")]
 mod stats {
-    use libc;
     use mach2::mach_time::{mach_timebase_info, mach_timebase_info_data_t};
     use snafu::prelude::*;
     use std::mem::MaybeUninit;
@@ -1132,7 +1131,6 @@ pub enum Utf8BufReaderError {
 mod test {
     use std::{
         collections::VecDeque,
-        io,
         pin::Pin,
         task::{Context, Poll},
     };

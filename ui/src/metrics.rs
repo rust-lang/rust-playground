@@ -1,9 +1,8 @@
 use lazy_static::lazy_static;
 use orchestrator::coordinator::{self, Channel, CompileTarget, CrateType, Edition, Mode};
 use prometheus::{
-    self, register_histogram, register_histogram_vec, register_int_counter,
-    register_int_counter_vec, register_int_gauge, Histogram, HistogramVec, IntCounter,
-    IntCounterVec, IntGauge,
+    register_histogram, register_histogram_vec, register_int_counter, register_int_counter_vec,
+    register_int_gauge, Histogram, HistogramVec, IntCounter, IntCounterVec, IntGauge,
 };
 use std::{
     future::Future,
