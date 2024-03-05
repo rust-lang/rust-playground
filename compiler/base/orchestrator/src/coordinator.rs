@@ -2777,8 +2777,38 @@ mod tests {
             .unwrap_or(5)
     });
 
-    static CONCURRENT_TEST_SEMAPHORE: Lazy<Arc<Semaphore>> =
-        Lazy::new(|| Arc::new(Semaphore::new(*MAX_CONCURRENT_TESTS)));
+    struct CoordinatorFactory {
+        semaphore: Arc<Semaphore>,
+    }
+
+    impl CoordinatorFactory {
+        pub fn new(maximum: usize) -> Self {
+            Self {
+                semaphore: Arc::new(Semaphore::new(maximum)),
+            }
+        }
+
+        pub async fn build<B>(&self, backend: B) -> LimitedCoordinator<B>
+        where
+            B: Backend,
+        {
+            let semaphore = self.semaphore.clone();
+            let permit = semaphore
+                .acquire_owned()
+                .await
+                .expect("Unable to acquire permit");
+
+            let coordinator = Coordinator::new(backend);
+
+            LimitedCoordinator {
+                _permit: permit,
+                coordinator,
+            }
+        }
+    }
+
+    static TEST_COORDINATOR_FACTORY: Lazy<CoordinatorFactory> =
+        Lazy::new(|| CoordinatorFactory::new(*MAX_CONCURRENT_TESTS));
 
     struct LimitedCoordinator<T> {
         _permit: OwnedSemaphorePermit,
@@ -2789,22 +2819,6 @@ mod tests {
     where
         T: Backend,
     {
-        async fn with<F>(f: F) -> Self
-        where
-            F: FnOnce() -> Coordinator<T>,
-        {
-            let semaphore = CONCURRENT_TEST_SEMAPHORE.clone();
-            let permit = semaphore
-                .acquire_owned()
-                .await
-                .expect("Unable to acquire permit");
-            let coordinator = f();
-            Self {
-                _permit: permit,
-                coordinator,
-            }
-        }
-
         async fn shutdown(self) -> super::Result<T, super::Error> {
             self.coordinator.shutdown().await
         }
@@ -2825,11 +2839,11 @@ mod tests {
     }
 
     async fn new_coordinator_test() -> LimitedCoordinator<impl Backend> {
-        LimitedCoordinator::with(|| Coordinator::new(TestBackend::new())).await
+        TEST_COORDINATOR_FACTORY.build(TestBackend::new()).await
     }
 
     async fn new_coordinator_docker() -> LimitedCoordinator<impl Backend> {
-        LimitedCoordinator::with(|| Coordinator::new_docker()).await
+        TEST_COORDINATOR_FACTORY.build(DockerBackend(())).await
     }
 
     async fn new_coordinator() -> LimitedCoordinator<impl Backend> {
