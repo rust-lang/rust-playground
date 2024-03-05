@@ -20,7 +20,7 @@ use tokio::{
     join,
     process::{Child, ChildStdin, ChildStdout, Command},
     select,
-    sync::{mpsc, oneshot, OnceCell},
+    sync::{mpsc, oneshot, OnceCell, OwnedSemaphorePermit, Semaphore},
     task::{JoinHandle, JoinSet},
     time::{self, MissedTickBehavior},
 };
@@ -819,6 +819,66 @@ fn delete_previous_primary_file_request(crate_type: CrateType) -> DeleteFileRequ
 enum DemultiplexCommand {
     Listen(JobId, mpsc::Sender<WorkerMessage>),
     ListenOnce(JobId, oneshot::Sender<WorkerMessage>),
+}
+
+/// Enforces a limited number of concurrent `Coordinator`s.
+#[derive(Debug)]
+pub struct CoordinatorFactory {
+    semaphore: Arc<Semaphore>,
+}
+
+impl CoordinatorFactory {
+    pub fn new(maximum: usize) -> Self {
+        Self {
+            semaphore: Arc::new(Semaphore::new(maximum)),
+        }
+    }
+
+    pub async fn build<B>(&self, backend: B) -> LimitedCoordinator<B>
+    where
+        B: Backend,
+    {
+        let semaphore = self.semaphore.clone();
+        let permit = semaphore
+            .acquire_owned()
+            .await
+            .expect("Unable to acquire permit");
+
+        let coordinator = Coordinator::new(backend);
+
+        LimitedCoordinator {
+            coordinator,
+            _permit: permit,
+        }
+    }
+}
+
+pub struct LimitedCoordinator<T> {
+    coordinator: Coordinator<T>,
+    _permit: OwnedSemaphorePermit,
+}
+
+impl<T> LimitedCoordinator<T>
+where
+    T: Backend,
+{
+    pub async fn shutdown(self) -> Result<T> {
+        self.coordinator.shutdown().await
+    }
+}
+
+impl<T> ops::Deref for LimitedCoordinator<T> {
+    type Target = Coordinator<T>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.coordinator
+    }
+}
+
+impl<T> ops::DerefMut for LimitedCoordinator<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.coordinator
+    }
 }
 
 #[derive(Debug)]
@@ -2700,7 +2760,6 @@ mod tests {
     use futures::future::{join, try_join_all};
     use std::{env, sync::Once};
     use tempdir::TempDir;
-    use tokio::sync::{OwnedSemaphorePermit, Semaphore};
 
     use super::*;
 
@@ -2777,66 +2836,8 @@ mod tests {
             .unwrap_or(5)
     });
 
-    struct CoordinatorFactory {
-        semaphore: Arc<Semaphore>,
-    }
-
-    impl CoordinatorFactory {
-        pub fn new(maximum: usize) -> Self {
-            Self {
-                semaphore: Arc::new(Semaphore::new(maximum)),
-            }
-        }
-
-        pub async fn build<B>(&self, backend: B) -> LimitedCoordinator<B>
-        where
-            B: Backend,
-        {
-            let semaphore = self.semaphore.clone();
-            let permit = semaphore
-                .acquire_owned()
-                .await
-                .expect("Unable to acquire permit");
-
-            let coordinator = Coordinator::new(backend);
-
-            LimitedCoordinator {
-                _permit: permit,
-                coordinator,
-            }
-        }
-    }
-
     static TEST_COORDINATOR_FACTORY: Lazy<CoordinatorFactory> =
         Lazy::new(|| CoordinatorFactory::new(*MAX_CONCURRENT_TESTS));
-
-    struct LimitedCoordinator<T> {
-        _permit: OwnedSemaphorePermit,
-        coordinator: Coordinator<T>,
-    }
-
-    impl<T> LimitedCoordinator<T>
-    where
-        T: Backend,
-    {
-        async fn shutdown(self) -> super::Result<T, super::Error> {
-            self.coordinator.shutdown().await
-        }
-    }
-
-    impl<T> ops::Deref for LimitedCoordinator<T> {
-        type Target = Coordinator<T>;
-
-        fn deref(&self) -> &Self::Target {
-            &self.coordinator
-        }
-    }
-
-    impl<T> ops::DerefMut for LimitedCoordinator<T> {
-        fn deref_mut(&mut self) -> &mut Self::Target {
-            &mut self.coordinator
-        }
-    }
 
     async fn new_coordinator_test() -> LimitedCoordinator<impl Backend> {
         TEST_COORDINATOR_FACTORY.build(TestBackend::new()).await
