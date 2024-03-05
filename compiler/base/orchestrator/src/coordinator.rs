@@ -2780,12 +2780,12 @@ mod tests {
     static CONCURRENT_TEST_SEMAPHORE: Lazy<Arc<Semaphore>> =
         Lazy::new(|| Arc::new(Semaphore::new(*MAX_CONCURRENT_TESTS)));
 
-    struct RestrictedCoordinator<T> {
+    struct LimitedCoordinator<T> {
         _permit: OwnedSemaphorePermit,
         coordinator: Coordinator<T>,
     }
 
-    impl<T> RestrictedCoordinator<T>
+    impl<T> LimitedCoordinator<T>
     where
         T: Backend,
     {
@@ -2810,7 +2810,7 @@ mod tests {
         }
     }
 
-    impl<T> ops::Deref for RestrictedCoordinator<T> {
+    impl<T> ops::Deref for LimitedCoordinator<T> {
         type Target = Coordinator<T>;
 
         fn deref(&self) -> &Self::Target {
@@ -2818,21 +2818,21 @@ mod tests {
         }
     }
 
-    impl<T> ops::DerefMut for RestrictedCoordinator<T> {
+    impl<T> ops::DerefMut for LimitedCoordinator<T> {
         fn deref_mut(&mut self) -> &mut Self::Target {
             &mut self.coordinator
         }
     }
 
-    async fn new_coordinator_test() -> RestrictedCoordinator<impl Backend> {
-        RestrictedCoordinator::with(|| Coordinator::new(TestBackend::new())).await
+    async fn new_coordinator_test() -> LimitedCoordinator<impl Backend> {
+        LimitedCoordinator::with(|| Coordinator::new(TestBackend::new())).await
     }
 
-    async fn new_coordinator_docker() -> RestrictedCoordinator<impl Backend> {
-        RestrictedCoordinator::with(|| Coordinator::new_docker()).await
+    async fn new_coordinator_docker() -> LimitedCoordinator<impl Backend> {
+        LimitedCoordinator::with(|| Coordinator::new_docker()).await
     }
 
-    async fn new_coordinator() -> RestrictedCoordinator<impl Backend> {
+    async fn new_coordinator() -> LimitedCoordinator<impl Backend> {
         #[cfg(not(force_docker))]
         {
             new_coordinator_test().await
