@@ -3,7 +3,6 @@ use futures::{
     stream::BoxStream,
     Future, FutureExt, Stream, StreamExt,
 };
-use once_cell::sync::Lazy;
 use serde::Deserialize;
 use snafu::prelude::*;
 use std::{
@@ -821,28 +820,59 @@ enum DemultiplexCommand {
     ListenOnce(JobId, oneshot::Sender<WorkerMessage>),
 }
 
+#[derive(Debug, Copy, Clone)]
+pub struct CoordinatorId {
+    start: u64,
+    id: u64,
+}
+
 /// Enforces a limited number of concurrent `Coordinator`s.
 #[derive(Debug)]
 pub struct CoordinatorFactory {
     semaphore: Arc<Semaphore>,
+
+    start: u64,
+    id: AtomicU64,
 }
 
 impl CoordinatorFactory {
     pub fn new(maximum: usize) -> Self {
+        let semaphore = Arc::new(Semaphore::new(maximum));
+
+        let now = std::time::SystemTime::now();
+        let start = now
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+
+        let id = AtomicU64::new(0);
+
         Self {
-            semaphore: Arc::new(Semaphore::new(maximum)),
+            semaphore,
+            start,
+            id,
         }
     }
 
-    pub async fn build<B>(&self, backend: B) -> LimitedCoordinator<B>
+    fn next_id(&self) -> CoordinatorId {
+        let start = self.start;
+        let id = self.id.fetch_add(1, Ordering::SeqCst);
+
+        CoordinatorId { start, id }
+    }
+
+    pub async fn build<B>(&self) -> LimitedCoordinator<B>
     where
-        B: Backend,
+        B: Backend + From<CoordinatorId>,
     {
         let semaphore = self.semaphore.clone();
         let permit = semaphore
             .acquire_owned()
             .await
             .expect("Unable to acquire permit");
+
+        let id = self.next_id();
+        let backend = B::from(id);
 
         let coordinator = Coordinator::new(backend);
 
@@ -1146,12 +1176,6 @@ where
         container
             .get_or_try_init(|| Container::new(channel, self.token.clone(), &self.backend))
             .await
-    }
-}
-
-impl Coordinator<DockerBackend> {
-    pub fn new_docker() -> Self {
-        Self::new(DockerBackend(()))
     }
 }
 
@@ -2581,24 +2605,26 @@ fn basic_secure_docker_command() -> Command {
     )
 }
 
-static DOCKER_BACKEND_START: Lazy<u64> = Lazy::new(|| {
-    use std::time;
+pub struct DockerBackend {
+    id: CoordinatorId,
+    instance: AtomicU64,
+}
 
-    let now = time::SystemTime::now();
-    now.duration_since(time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs()
-});
-
-static DOCKER_BACKEND_ID: AtomicU64 = AtomicU64::new(0);
-
-pub struct DockerBackend(());
+impl From<CoordinatorId> for DockerBackend {
+    fn from(id: CoordinatorId) -> Self {
+        Self {
+            id,
+            instance: Default::default(),
+        }
+    }
+}
 
 impl DockerBackend {
     fn next_name(&self) -> String {
-        let start = *DOCKER_BACKEND_START;
-        let id = DOCKER_BACKEND_ID.fetch_add(1, Ordering::SeqCst);
-        format!("playground-{start}-{id}")
+        let CoordinatorId { start, id } = self.id;
+        let instance = self.instance.fetch_add(1, Ordering::SeqCst);
+
+        format!("playground-{start}-{id}-{instance}")
     }
 }
 
@@ -2758,6 +2784,7 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
 mod tests {
     use assertables::*;
     use futures::future::{join, try_join_all};
+    use once_cell::sync::Lazy;
     use std::{env, sync::Once};
     use tempdir::TempDir;
 
@@ -2781,8 +2808,8 @@ mod tests {
         project_dir: TempDir,
     }
 
-    impl TestBackend {
-        fn new() -> Self {
+    impl From<CoordinatorId> for TestBackend {
+        fn from(_id: CoordinatorId) -> Self {
             static COMPILE_WORKER_ONCE: Once = Once::new();
 
             COMPILE_WORKER_ONCE.call_once(|| {
@@ -2839,12 +2866,12 @@ mod tests {
     static TEST_COORDINATOR_FACTORY: Lazy<CoordinatorFactory> =
         Lazy::new(|| CoordinatorFactory::new(*MAX_CONCURRENT_TESTS));
 
-    async fn new_coordinator_test() -> LimitedCoordinator<impl Backend> {
-        TEST_COORDINATOR_FACTORY.build(TestBackend::new()).await
+    async fn new_coordinator_test() -> LimitedCoordinator<TestBackend> {
+        TEST_COORDINATOR_FACTORY.build().await
     }
 
-    async fn new_coordinator_docker() -> LimitedCoordinator<impl Backend> {
-        TEST_COORDINATOR_FACTORY.build(DockerBackend(())).await
+    async fn new_coordinator_docker() -> LimitedCoordinator<DockerBackend> {
+        TEST_COORDINATOR_FACTORY.build().await
     }
 
     async fn new_coordinator() -> LimitedCoordinator<impl Backend> {
