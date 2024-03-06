@@ -1,6 +1,7 @@
 #![deny(rust_2018_idioms)]
 
 use crate::env::{PLAYGROUND_GITHUB_TOKEN, PLAYGROUND_UI_ROOT};
+use orchestrator::coordinator::CoordinatorFactory;
 use serde::{Deserialize, Serialize};
 use snafu::prelude::*;
 use std::{
@@ -13,6 +14,8 @@ use tracing_subscriber::EnvFilter;
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
+const DEFAULT_COORDINATORS_ONE_OFF_LIMIT: usize = 10;
+const DEFAULT_COORDINATORS_WEBSOCKET_LIMIT: usize = 50;
 
 mod env;
 mod gist;
@@ -45,6 +48,8 @@ struct Config {
     metrics_token: Option<String>,
     feature_flags: FeatureFlags,
     request_db_path: Option<PathBuf>,
+    coordinators_one_off_limit: usize,
+    coordinators_websocket_limit: usize,
     port: u16,
     root: PathBuf,
 }
@@ -102,6 +107,16 @@ impl Config {
 
         let request_db_path = env::var_os("PLAYGROUND_REQUEST_DATABASE").map(Into::into);
 
+        let coordinators_one_off_limit = env::var("PLAYGROUND_COORDINATORS_ONE_OFF_LIMIT")
+            .ok()
+            .and_then(|l| l.parse().ok())
+            .unwrap_or(DEFAULT_COORDINATORS_ONE_OFF_LIMIT);
+
+        let coordinators_websocket_limit = env::var("PLAYGROUND_COORDINATORS_WEBSOCKET_LIMIT")
+            .ok()
+            .and_then(|l| l.parse().ok())
+            .unwrap_or(DEFAULT_COORDINATORS_WEBSOCKET_LIMIT);
+
         Self {
             address,
             cors_enabled,
@@ -109,6 +124,8 @@ impl Config {
             metrics_token,
             feature_flags,
             request_db_path,
+            coordinators_one_off_limit,
+            coordinators_websocket_limit,
             port,
             root,
         }
@@ -143,6 +160,14 @@ impl Config {
         };
 
         request_db.expect("Unable to open request log database")
+    }
+
+    fn coordinator_one_off_factory(&self) -> CoordinatorFactory {
+        CoordinatorFactory::new(self.coordinators_one_off_limit)
+    }
+
+    fn coordinator_websocket_factory(&self) -> CoordinatorFactory {
+        CoordinatorFactory::new(self.coordinators_websocket_limit)
     }
 
     fn server_socket_addr(&self) -> SocketAddr {

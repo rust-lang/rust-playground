@@ -33,7 +33,7 @@ use axum_extra::{
     TypedHeader,
 };
 use futures::{future::BoxFuture, FutureExt};
-use orchestrator::coordinator::{self, Coordinator, DockerBackend, Versions};
+use orchestrator::coordinator::{self, CoordinatorFactory, DockerBackend, Versions};
 use snafu::prelude::*;
 use std::{
     convert::TryInto,
@@ -66,8 +66,18 @@ mod websocket;
 pub use websocket::CoordinatorManagerError as WebsocketCoordinatorManagerError;
 pub(crate) use websocket::ExecuteError as WebsocketExecuteError;
 
+#[derive(Debug, Clone)]
+struct CoordinatorOneOffFactory(Arc<CoordinatorFactory>);
+
+#[derive(Debug, Clone)]
+struct CoordinatorWebsocketFactory(Arc<CoordinatorFactory>);
+
 #[tokio::main]
 pub(crate) async fn serve(config: Config) {
+    let one_off_factory = CoordinatorOneOffFactory(Arc::new(config.coordinator_one_off_factory()));
+    let websocket_factory =
+        CoordinatorWebsocketFactory(Arc::new(config.coordinator_websocket_factory()));
+
     let request_db = config.request_database();
     let (_db_task, db_handle) = request_db.spawn();
 
@@ -101,6 +111,8 @@ pub(crate) async fn serve(config: Config) {
         .route("/websocket", get(websocket))
         .route("/nowebsocket", post(nowebsocket))
         .route("/whynowebsocket", get(whynowebsocket))
+        .layer(Extension(one_off_factory))
+        .layer(Extension(websocket_factory))
         .layer(Extension(db_handle))
         .layer(Extension(Arc::new(SandboxCache::default())))
         .layer(Extension(config.github_token()))
@@ -211,83 +223,102 @@ where
 // This is a backwards compatibilty shim. The Rust documentation uses
 // this to run code in place.
 async fn evaluate(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<EvaluateRequest>,
 ) -> Result<Json<EvaluateResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(req, |c, req| c.execute(req).context(EvaluateSnafu).boxed())
-            .await
-            .map(Json)
+        with_coordinator(&factory.0, req, |c, req| {
+            c.execute(req).context(EvaluateSnafu).boxed()
+        })
+        .await
+        .map(Json)
     })
     .await
 }
 
 async fn compile(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<CompileRequest>,
 ) -> Result<Json<CompileResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(req, |c, req| c.compile(req).context(CompileSnafu).boxed())
-            .await
-            .map(Json)
+        with_coordinator(&factory.0, req, |c, req| {
+            c.compile(req).context(CompileSnafu).boxed()
+        })
+        .await
+        .map(Json)
     })
     .await
 }
 
 async fn execute(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<ExecuteRequest>,
 ) -> Result<Json<ExecuteResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(req, |c, req| c.execute(req).context(ExecuteSnafu).boxed())
-            .await
-            .map(Json)
+        with_coordinator(&factory.0, req, |c, req| {
+            c.execute(req).context(ExecuteSnafu).boxed()
+        })
+        .await
+        .map(Json)
     })
     .await
 }
 
 async fn format(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<FormatRequest>,
 ) -> Result<Json<FormatResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(req, |c, req| c.format(req).context(FormatSnafu).boxed())
-            .await
-            .map(Json)
+        with_coordinator(&factory.0, req, |c, req| {
+            c.format(req).context(FormatSnafu).boxed()
+        })
+        .await
+        .map(Json)
     })
     .await
 }
 
 async fn clippy(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<ClippyRequest>,
 ) -> Result<Json<ClippyResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(req, |c, req| c.clippy(req).context(ClippySnafu).boxed())
-            .await
-            .map(Json)
+        with_coordinator(&factory.0, req, |c, req| {
+            c.clippy(req).context(ClippySnafu).boxed()
+        })
+        .await
+        .map(Json)
     })
     .await
 }
 
 async fn miri(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<MiriRequest>,
 ) -> Result<Json<MiriResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(req, |c, req| c.miri(req).context(MiriSnafu).boxed())
-            .await
-            .map(Json)
+        with_coordinator(&factory.0, req, |c, req| {
+            c.miri(req).context(MiriSnafu).boxed()
+        })
+        .await
+        .map(Json)
     })
     .await
 }
 
 async fn macro_expansion(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<MacroExpansionRequest>,
 ) -> Result<Json<MacroExpansionResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(req, |c, req| {
+        with_coordinator(&factory.0, req, |c, req| {
             c.macro_expansion(req).context(MacroExpansionSnafu).boxed()
         })
         .await
@@ -396,7 +427,11 @@ impl Outcome {
     }
 }
 
-async fn with_coordinator<WebReq, WebResp, Req, Resp, F>(req: WebReq, f: F) -> Result<WebResp>
+async fn with_coordinator<WebReq, WebResp, Req, Resp, F>(
+    factory: &CoordinatorFactory,
+    req: WebReq,
+    f: F,
+) -> Result<WebResp>
 where
     WebReq: TryInto<Req>,
     WebReq: HasEndpoint,
@@ -407,7 +442,7 @@ where
     for<'f> F:
         FnOnce(&'f coordinator::Coordinator<DockerBackend>, Req) -> BoxFuture<'f, Result<Resp>>,
 {
-    let coordinator = orchestrator::coordinator::Coordinator::new_docker().await;
+    let coordinator = factory.build().await;
 
     let job = async {
         let req = req.try_into()?;
@@ -448,77 +483,94 @@ where
 }
 
 async fn meta_crates(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
-    let value = track_metric_no_request_async(Endpoint::MetaCrates, || cache.crates()).await?;
+    let value =
+        track_metric_no_request_async(Endpoint::MetaCrates, || cache.crates(&factory.0)).await?;
 
     apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_versions(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
-    let value = track_metric_no_request_async(Endpoint::MetaVersions, || cache.versions()).await?;
+    let value =
+        track_metric_no_request_async(Endpoint::MetaVersions, || cache.versions(&factory.0))
+            .await?;
     apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_stable(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
-    let value =
-        track_metric_no_request_async(Endpoint::MetaVersionStable, || cache.version_stable())
-            .await?;
+    let value = track_metric_no_request_async(Endpoint::MetaVersionStable, || {
+        cache.version_stable(&factory.0)
+    })
+    .await?;
     apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_beta(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
     let value =
-        track_metric_no_request_async(Endpoint::MetaVersionBeta, || cache.version_beta()).await?;
+        track_metric_no_request_async(Endpoint::MetaVersionBeta, || cache.version_beta(&factory.0))
+            .await?;
     apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_nightly(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
-    let value =
-        track_metric_no_request_async(Endpoint::MetaVersionNightly, || cache.version_nightly())
-            .await?;
+    let value = track_metric_no_request_async(Endpoint::MetaVersionNightly, || {
+        cache.version_nightly(&factory.0)
+    })
+    .await?;
     apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_rustfmt(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
-    let value =
-        track_metric_no_request_async(Endpoint::MetaVersionRustfmt, || cache.version_rustfmt())
-            .await?;
+    let value = track_metric_no_request_async(Endpoint::MetaVersionRustfmt, || {
+        cache.version_rustfmt(&factory.0)
+    })
+    .await?;
     apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_clippy(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
-    let value =
-        track_metric_no_request_async(Endpoint::MetaVersionClippy, || cache.version_clippy())
-            .await?;
+    let value = track_metric_no_request_async(Endpoint::MetaVersionClippy, || {
+        cache.version_clippy(&factory.0)
+    })
+    .await?;
     apply_timestamped_caching(value, if_none_match)
 }
 
 async fn meta_version_miri(
+    Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
     let value =
-        track_metric_no_request_async(Endpoint::MetaVersionMiri, || cache.version_miri()).await?;
+        track_metric_no_request_async(Endpoint::MetaVersionMiri, || cache.version_miri(&factory.0))
+            .await?;
     apply_timestamped_caching(value, if_none_match)
 }
 
@@ -594,10 +646,11 @@ async fn metrics(_: MetricsAuthorization) -> Result<Vec<u8>, StatusCode> {
 
 async fn websocket(
     ws: WebSocketUpgrade,
+    Extension(factory): Extension<CoordinatorWebsocketFactory>,
     Extension(feature_flags): Extension<crate::FeatureFlags>,
     Extension(db): Extension<Handle>,
 ) -> impl IntoResponse {
-    ws.on_upgrade(move |s| websocket::handle(s, feature_flags.into(), db))
+    ws.on_upgrade(move |s| websocket::handle(s, factory.0, feature_flags.into(), db))
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -674,8 +727,8 @@ struct SandboxCache {
 }
 
 impl SandboxCache {
-    async fn crates(&self) -> Result<Stamped<MetaCratesResponse>> {
-        let coordinator = Coordinator::new_docker().await;
+    async fn crates(&self, factory: &CoordinatorFactory) -> Result<Stamped<MetaCratesResponse>> {
+        let coordinator = factory.build::<DockerBackend>().await;
 
         let c = self
             .crates
@@ -690,8 +743,11 @@ impl SandboxCache {
         c
     }
 
-    async fn versions(&self) -> Result<Stamped<MetaVersionsResponse>> {
-        let coordinator = Coordinator::new_docker().await;
+    async fn versions(
+        &self,
+        factory: &CoordinatorFactory,
+    ) -> Result<Stamped<MetaVersionsResponse>> {
+        let coordinator = factory.build::<DockerBackend>().await;
 
         let v = self
             .versions
@@ -706,8 +762,8 @@ impl SandboxCache {
         v
     }
 
-    async fn raw_versions(&self) -> Result<Stamped<Arc<Versions>>> {
-        let coordinator = Coordinator::new_docker().await;
+    async fn raw_versions(&self, factory: &CoordinatorFactory) -> Result<Stamped<Arc<Versions>>> {
+        let coordinator = factory.build::<DockerBackend>().await;
 
         let rv = self
             .raw_versions
@@ -726,38 +782,56 @@ impl SandboxCache {
         rv
     }
 
-    async fn version_stable(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.raw_versions().await?;
+    async fn version_stable(
+        &self,
+        factory: &CoordinatorFactory,
+    ) -> Result<Stamped<MetaVersionResponse>> {
+        let (v, t) = self.raw_versions(factory).await?;
         let v = (&v.stable.rustc).into();
         Ok((v, t))
     }
 
-    async fn version_beta(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.raw_versions().await?;
+    async fn version_beta(
+        &self,
+        factory: &CoordinatorFactory,
+    ) -> Result<Stamped<MetaVersionResponse>> {
+        let (v, t) = self.raw_versions(factory).await?;
         let v = (&v.beta.rustc).into();
         Ok((v, t))
     }
 
-    async fn version_nightly(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.raw_versions().await?;
+    async fn version_nightly(
+        &self,
+        factory: &CoordinatorFactory,
+    ) -> Result<Stamped<MetaVersionResponse>> {
+        let (v, t) = self.raw_versions(factory).await?;
         let v = (&v.nightly.rustc).into();
         Ok((v, t))
     }
 
-    async fn version_rustfmt(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.raw_versions().await?;
+    async fn version_rustfmt(
+        &self,
+        factory: &CoordinatorFactory,
+    ) -> Result<Stamped<MetaVersionResponse>> {
+        let (v, t) = self.raw_versions(factory).await?;
         let v = (&v.nightly.rustfmt).into();
         Ok((v, t))
     }
 
-    async fn version_clippy(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.raw_versions().await?;
+    async fn version_clippy(
+        &self,
+        factory: &CoordinatorFactory,
+    ) -> Result<Stamped<MetaVersionResponse>> {
+        let (v, t) = self.raw_versions(factory).await?;
         let v = (&v.nightly.clippy).into();
         Ok((v, t))
     }
 
-    async fn version_miri(&self) -> Result<Stamped<MetaVersionResponse>> {
-        let (v, t) = self.raw_versions().await?;
+    async fn version_miri(
+        &self,
+        factory: &CoordinatorFactory,
+    ) -> Result<Stamped<MetaVersionResponse>> {
+        let (v, t) = self.raw_versions(factory).await?;
         let v = v.nightly.miri.as_ref().context(MiriVersionSnafu)?;
         let v = v.into();
         Ok((v, t))

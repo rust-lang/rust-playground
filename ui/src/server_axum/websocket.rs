@@ -9,7 +9,7 @@ use crate::{
 use axum::extract::ws::{Message, WebSocket};
 use futures::{future::Fuse, Future, FutureExt, StreamExt, TryFutureExt};
 use orchestrator::{
-    coordinator::{self, Coordinator, DockerBackend},
+    coordinator::{self, CoordinatorFactory, DockerBackend, LimitedCoordinator},
     DropErrorDetailsExt,
 };
 use snafu::prelude::*;
@@ -199,7 +199,12 @@ struct ExecuteResponse {
 }
 
 #[instrument(skip_all, fields(ws_id))]
-pub(crate) async fn handle(socket: WebSocket, feature_flags: FeatureFlags, db: Handle) {
+pub(crate) async fn handle(
+    socket: WebSocket,
+    factory: Arc<CoordinatorFactory>,
+    feature_flags: FeatureFlags,
+    db: Handle,
+) {
     static WEBSOCKET_ID: AtomicU64 = AtomicU64::new(0);
 
     metrics::LIVE_WS.inc();
@@ -208,7 +213,7 @@ pub(crate) async fn handle(socket: WebSocket, feature_flags: FeatureFlags, db: H
     let id = WEBSOCKET_ID.fetch_add(1, Ordering::SeqCst);
     tracing::Span::current().record("ws_id", &id);
 
-    handle_core(socket, feature_flags, db).await;
+    handle_core(socket, factory, feature_flags, db).await;
 
     metrics::LIVE_WS.dec();
     let elapsed = start.elapsed();
@@ -217,7 +222,7 @@ pub(crate) async fn handle(socket: WebSocket, feature_flags: FeatureFlags, db: H
 
 type TaggedError = (Error, Option<Meta>);
 type ResponseTx = mpsc::Sender<Result<MessageResponse, TaggedError>>;
-type SharedCoordinator = Arc<Coordinator<DockerBackend>>;
+type SharedCoordinator = Arc<LimitedCoordinator<DockerBackend>>;
 
 /// Manages a limited amount of access to the `Coordinator`.
 ///
@@ -245,9 +250,9 @@ impl CoordinatorManager {
     const N_KINDS: usize = 1;
     const KIND_EXECUTE: usize = 0;
 
-    async fn new() -> Self {
+    async fn new(factory: &CoordinatorFactory) -> Self {
         Self {
-            coordinator: Arc::new(Coordinator::new_docker().await),
+            coordinator: Arc::new(factory.build().await),
             tasks: Default::default(),
             semaphore: Arc::new(Semaphore::new(Self::N_PARALLEL)),
             abort_handles: Default::default(),
@@ -336,7 +341,12 @@ pub enum CoordinatorManagerError {
 
 type CoordinatorManagerResult<T, E = CoordinatorManagerError> = std::result::Result<T, E>;
 
-async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags, db: Handle) {
+async fn handle_core(
+    mut socket: WebSocket,
+    factory: Arc<CoordinatorFactory>,
+    feature_flags: FeatureFlags,
+    db: Handle,
+) {
     if !connect_handshake(&mut socket).await {
         return;
     }
@@ -352,7 +362,7 @@ async fn handle_core(mut socket: WebSocket, feature_flags: FeatureFlags, db: Han
         return;
     }
 
-    let mut manager = CoordinatorManager::new().await;
+    let mut manager = CoordinatorManager::new(&factory).await;
     let mut session_timeout = pin!(time::sleep(CoordinatorManager::SESSION_TIMEOUT));
     let mut idle_timeout = pin!(Fuse::terminated());
 

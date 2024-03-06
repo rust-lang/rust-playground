@@ -3,7 +3,6 @@ use futures::{
     stream::BoxStream,
     Future, FutureExt, Stream, StreamExt,
 };
-use once_cell::sync::Lazy;
 use serde::Deserialize;
 use snafu::prelude::*;
 use std::{
@@ -20,7 +19,7 @@ use tokio::{
     join,
     process::{Child, ChildStdin, ChildStdout, Command},
     select,
-    sync::{mpsc, oneshot, OnceCell},
+    sync::{mpsc, oneshot, OnceCell, OwnedSemaphorePermit, Semaphore},
     task::{JoinHandle, JoinSet},
     time::{self, MissedTickBehavior},
 };
@@ -821,6 +820,97 @@ enum DemultiplexCommand {
     ListenOnce(JobId, oneshot::Sender<WorkerMessage>),
 }
 
+#[derive(Debug, Copy, Clone)]
+pub struct CoordinatorId {
+    start: u64,
+    id: u64,
+}
+
+/// Enforces a limited number of concurrent `Coordinator`s.
+#[derive(Debug)]
+pub struct CoordinatorFactory {
+    semaphore: Arc<Semaphore>,
+
+    start: u64,
+    id: AtomicU64,
+}
+
+impl CoordinatorFactory {
+    pub fn new(maximum: usize) -> Self {
+        let semaphore = Arc::new(Semaphore::new(maximum));
+
+        let now = std::time::SystemTime::now();
+        let start = now
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+
+        let id = AtomicU64::new(0);
+
+        Self {
+            semaphore,
+            start,
+            id,
+        }
+    }
+
+    fn next_id(&self) -> CoordinatorId {
+        let start = self.start;
+        let id = self.id.fetch_add(1, Ordering::SeqCst);
+
+        CoordinatorId { start, id }
+    }
+
+    pub async fn build<B>(&self) -> LimitedCoordinator<B>
+    where
+        B: Backend + From<CoordinatorId>,
+    {
+        let semaphore = self.semaphore.clone();
+        let permit = semaphore
+            .acquire_owned()
+            .await
+            .expect("Unable to acquire permit");
+
+        let id = self.next_id();
+        let backend = B::from(id);
+
+        let coordinator = Coordinator::new(backend);
+
+        LimitedCoordinator {
+            coordinator,
+            _permit: permit,
+        }
+    }
+}
+
+pub struct LimitedCoordinator<T> {
+    coordinator: Coordinator<T>,
+    _permit: OwnedSemaphorePermit,
+}
+
+impl<T> LimitedCoordinator<T>
+where
+    T: Backend,
+{
+    pub async fn shutdown(self) -> Result<T> {
+        self.coordinator.shutdown().await
+    }
+}
+
+impl<T> ops::Deref for LimitedCoordinator<T> {
+    type Target = Coordinator<T>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.coordinator
+    }
+}
+
+impl<T> ops::DerefMut for LimitedCoordinator<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.coordinator
+    }
+}
+
 #[derive(Debug)]
 pub struct Coordinator<B> {
     backend: B,
@@ -844,7 +934,7 @@ impl<B> Coordinator<B>
 where
     B: Backend,
 {
-    pub async fn new(backend: B) -> Self {
+    pub fn new(backend: B) -> Self {
         let token = CancellationToken::new();
 
         Self {
@@ -1086,12 +1176,6 @@ where
         container
             .get_or_try_init(|| Container::new(channel, self.token.clone(), &self.backend))
             .await
-    }
-}
-
-impl Coordinator<DockerBackend> {
-    pub async fn new_docker() -> Self {
-        Self::new(DockerBackend(())).await
     }
 }
 
@@ -2521,24 +2605,26 @@ fn basic_secure_docker_command() -> Command {
     )
 }
 
-static DOCKER_BACKEND_START: Lazy<u64> = Lazy::new(|| {
-    use std::time;
+pub struct DockerBackend {
+    id: CoordinatorId,
+    instance: AtomicU64,
+}
 
-    let now = time::SystemTime::now();
-    now.duration_since(time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs()
-});
-
-static DOCKER_BACKEND_ID: AtomicU64 = AtomicU64::new(0);
-
-pub struct DockerBackend(());
+impl From<CoordinatorId> for DockerBackend {
+    fn from(id: CoordinatorId) -> Self {
+        Self {
+            id,
+            instance: Default::default(),
+        }
+    }
+}
 
 impl DockerBackend {
     fn next_name(&self) -> String {
-        let start = *DOCKER_BACKEND_START;
-        let id = DOCKER_BACKEND_ID.fetch_add(1, Ordering::SeqCst);
-        format!("playground-{start}-{id}")
+        let CoordinatorId { start, id } = self.id;
+        let instance = self.instance.fetch_add(1, Ordering::SeqCst);
+
+        format!("playground-{start}-{id}-{instance}")
     }
 }
 
@@ -2697,14 +2783,10 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
 #[cfg(test)]
 mod tests {
     use assertables::*;
-    use futures::{
-        future::{join, try_join_all},
-        Future, FutureExt,
-    };
+    use futures::future::{join, try_join_all};
     use once_cell::sync::Lazy;
-    use std::{env, sync::Once, time::Duration};
+    use std::{env, sync::Once};
     use tempdir::TempDir;
-    use tokio::sync::{OwnedSemaphorePermit, Semaphore};
 
     use super::*;
 
@@ -2726,8 +2808,8 @@ mod tests {
         project_dir: TempDir,
     }
 
-    impl TestBackend {
-        fn new() -> Self {
+    impl From<CoordinatorId> for TestBackend {
+        fn from(_id: CoordinatorId) -> Self {
             static COMPILE_WORKER_ONCE: Once = Once::new();
 
             COMPILE_WORKER_ONCE.call_once(|| {
@@ -2781,63 +2863,18 @@ mod tests {
             .unwrap_or(5)
     });
 
-    static CONCURRENT_TEST_SEMAPHORE: Lazy<Arc<Semaphore>> =
-        Lazy::new(|| Arc::new(Semaphore::new(*MAX_CONCURRENT_TESTS)));
+    static TEST_COORDINATOR_FACTORY: Lazy<CoordinatorFactory> =
+        Lazy::new(|| CoordinatorFactory::new(*MAX_CONCURRENT_TESTS));
 
-    struct RestrictedCoordinator<T> {
-        _permit: OwnedSemaphorePermit,
-        coordinator: Coordinator<T>,
+    async fn new_coordinator_test() -> LimitedCoordinator<TestBackend> {
+        TEST_COORDINATOR_FACTORY.build().await
     }
 
-    impl<T> RestrictedCoordinator<T>
-    where
-        T: Backend,
-    {
-        async fn with<F, Fut>(f: F) -> Self
-        where
-            F: FnOnce() -> Fut,
-            Fut: Future<Output = Coordinator<T>>,
-        {
-            let semaphore = CONCURRENT_TEST_SEMAPHORE.clone();
-            let permit = semaphore
-                .acquire_owned()
-                .await
-                .expect("Unable to acquire permit");
-            let coordinator = f().await;
-            Self {
-                _permit: permit,
-                coordinator,
-            }
-        }
-
-        async fn shutdown(self) -> super::Result<T, super::Error> {
-            self.coordinator.shutdown().await
-        }
+    async fn new_coordinator_docker() -> LimitedCoordinator<DockerBackend> {
+        TEST_COORDINATOR_FACTORY.build().await
     }
 
-    impl<T> ops::Deref for RestrictedCoordinator<T> {
-        type Target = Coordinator<T>;
-
-        fn deref(&self) -> &Self::Target {
-            &self.coordinator
-        }
-    }
-
-    impl<T> ops::DerefMut for RestrictedCoordinator<T> {
-        fn deref_mut(&mut self) -> &mut Self::Target {
-            &mut self.coordinator
-        }
-    }
-
-    async fn new_coordinator_test() -> RestrictedCoordinator<impl Backend> {
-        RestrictedCoordinator::with(|| Coordinator::new(TestBackend::new())).await
-    }
-
-    async fn new_coordinator_docker() -> RestrictedCoordinator<impl Backend> {
-        RestrictedCoordinator::with(|| Coordinator::new_docker()).await
-    }
-
-    async fn new_coordinator() -> RestrictedCoordinator<impl Backend> {
+    async fn new_coordinator() -> LimitedCoordinator<impl Backend> {
         #[cfg(not(force_docker))]
         {
             new_coordinator_test().await
