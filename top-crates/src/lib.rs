@@ -314,11 +314,15 @@ fn populate_initial_direct_dependencies(
         // Find the newest non-prelease version
         let summary = matches
             .into_iter()
-            .filter(|summary| !summary.version().is_prerelease())
-            .max_by_key(|summary| summary.version().clone())
+            .filter(|summary| !summary.as_summary().version().is_prerelease())
+            .max_by_key(|summary| summary.as_summary().version().clone())
             .unwrap_or_else(|| panic!("Registry has no viable versions of {}", name));
 
-        let package_id = PackageId::pure(name, summary.version().clone(), global.crates_io);
+        let package_id = PackageId::new(
+            name,
+            summary.as_summary().version().clone(),
+            global.crates_io,
+        );
         package_ids.push(package_id);
     }
 
@@ -372,14 +376,12 @@ fn extend_direct_dependencies(
     let replacements = [];
     let version_prefs = VersionPreferences::default();
     let warnings = None;
-    let check_public_visible_dependencies = true;
     let resolve = resolver::resolve(
         &summaries,
         &replacements,
         &mut global.registry,
         &version_prefs,
         warnings,
-        check_public_visible_dependencies,
     )
     .expect("Unable to resolve dependencies");
 
