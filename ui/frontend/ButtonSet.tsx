@@ -79,7 +79,7 @@ IconButton.displayName = 'IconButton';
 
 export const IconLink = React.forwardRef<HTMLAnchorElement, LinkProps>(
   ({ children, ...props }, ref) => (
-    <Link ref={ref} className={styles.icon} {...props}>
+    <Link ref={ref} className={`${styles.icon} ${styles.iconLink}`} {...props}>
       {children}
     </Link>
   ),
