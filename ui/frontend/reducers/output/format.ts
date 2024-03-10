@@ -21,6 +21,7 @@ interface FormatRequestBody {
   channel: string;
   edition: string;
   code: string;
+  cargoScript: boolean;
 }
 
 const FormatResponseBody = z.object({

@@ -83,6 +83,7 @@ export interface ExecuteRequestBody {
   code: string;
   edition: string;
   backtrace: boolean;
+  cargoScript: boolean;
 }
 
 const ExecuteResponseBody = z.object({
@@ -108,16 +109,16 @@ const prepareWithCurrentSequenceNumber = <P>(payload: P, sequenceNumber: number)
 
 const sequenceNumberMatches =
   <P>(whenMatch: (state: Draft<State>, payload: P) => void) =>
-  (state: Draft<State>, action: WsPayloadAction<P>) => {
-    const {
-      payload,
-      meta: { sequenceNumber },
-    } = action;
+    (state: Draft<State>, action: WsPayloadAction<P>) => {
+      const {
+        payload,
+        meta: { sequenceNumber },
+      } = action;
 
-    if (sequenceNumber === state.sequenceNumber) {
-      whenMatch(state, payload);
-    }
-  };
+      if (sequenceNumber === state.sequenceNumber) {
+        whenMatch(state, payload);
+      }
+    };
 
 const slice = createSlice({
   name: 'output/execute',
@@ -137,17 +138,17 @@ const slice = createSlice({
       }),
     },
     wsExecuteStdin: {
-      reducer: () => {},
+      reducer: () => { },
 
       prepare: prepareWithCurrentSequenceNumber,
     },
     wsExecuteStdinClose: {
-      reducer: () => {},
+      reducer: () => { },
 
       prepare: prepareWithCurrentSequenceNumber,
     },
     wsExecuteKill: {
-      reducer: () => {},
+      reducer: () => { },
 
       prepare: prepareWithCurrentSequenceNumber,
     },
@@ -231,28 +232,28 @@ export const { wsExecuteRequest, allowLongRun, wsExecuteKill } = slice.actions;
 
 export const performCommonExecute =
   (crateType: string, tests: boolean): ThunkAction =>
-  (dispatch, getState) => {
-    const state = getState();
-    const body = executeRequestPayloadSelector(state, { crateType, tests });
-    const useWebSocket = executeViaWebsocketSelector(state);
+    (dispatch, getState) => {
+      const state = getState();
+      const body = executeRequestPayloadSelector(state, { crateType, tests });
+      const useWebSocket = executeViaWebsocketSelector(state);
 
-    if (useWebSocket) {
-      dispatch(wsExecuteRequest(body));
-    } else {
-      dispatch(performExecute(body));
-    }
-  };
+      if (useWebSocket) {
+        dispatch(wsExecuteRequest(body));
+      } else {
+        dispatch(performExecute(body));
+      }
+    };
 
 const dispatchWhenSequenceNumber =
   <A extends UnknownAction>(cb: (sequenceNumber: number) => A): ThunkAction =>
-  (dispatch, getState) => {
-    const state = getState();
-    const sequenceNumber = currentExecutionSequenceNumberSelector(state);
-    if (sequenceNumber) {
-      const action = cb(sequenceNumber);
-      dispatch(action);
-    }
-  };
+    (dispatch, getState) => {
+      const state = getState();
+      const sequenceNumber = currentExecutionSequenceNumberSelector(state);
+      if (sequenceNumber) {
+        const action = cb(sequenceNumber);
+        dispatch(action);
+      }
+    };
 
 export const wsExecuteStdin = (payload: string): ThunkAction =>
   dispatchWhenSequenceNumber((sequenceNumber) =>
