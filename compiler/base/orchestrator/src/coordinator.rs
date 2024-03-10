@@ -375,7 +375,8 @@ impl ExecuteRequest {
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
-        let is_cargo_script_enabled = self.channel == Channel::Nightly && self.cargo_script;
+        let is_cargo_script_enabled =
+            self.channel == Channel::Nightly && self.cargo_script && self.crate_type.is_binary();
         let mut args = if is_cargo_script_enabled {
             vec!["-Zscript"]
         } else {
