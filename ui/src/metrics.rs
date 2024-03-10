@@ -82,6 +82,7 @@ pub(crate) struct LabelsCore {
     crate_type: Option<CrateType>,
     tests: Option<bool>,
     backtrace: Option<bool>,
+    cargo_script: Option<bool>,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -187,6 +188,7 @@ impl Labels {
             crate_type,
             tests,
             backtrace,
+            cargo_script,
         } = labels_core;
         Self {
             endpoint,
@@ -251,6 +253,7 @@ impl HasLabelsCore for coordinator::CompileRequest {
             tests,
             backtrace,
             code: _,
+            cargo_script,
         } = *self;
 
         LabelsCore {
@@ -261,6 +264,7 @@ impl HasLabelsCore for coordinator::CompileRequest {
             crate_type: Some(crate_type),
             tests: Some(tests),
             backtrace: Some(backtrace),
+            cargo_script: Some(cargo_script),
         }
     }
 }
@@ -275,6 +279,7 @@ impl HasLabelsCore for coordinator::ExecuteRequest {
             tests,
             backtrace,
             code: _,
+            cargo_script,
         } = *self;
 
         LabelsCore {
@@ -285,6 +290,7 @@ impl HasLabelsCore for coordinator::ExecuteRequest {
             crate_type: Some(crate_type),
             tests: Some(tests),
             backtrace: Some(backtrace),
+            cargo_script: Some(cargo_script),
         }
     }
 }
@@ -296,6 +302,7 @@ impl HasLabelsCore for coordinator::FormatRequest {
             crate_type,
             edition,
             code: _,
+            cargo_script,
         } = *self;
 
         LabelsCore {
@@ -306,6 +313,7 @@ impl HasLabelsCore for coordinator::FormatRequest {
             crate_type: Some(crate_type),
             tests: None,
             backtrace: None,
+            cargo_script: Some(cargo_script),
         }
     }
 }
@@ -317,6 +325,7 @@ impl HasLabelsCore for coordinator::ClippyRequest {
             crate_type,
             edition,
             code: _,
+            cargo_script,
         } = *self;
 
         LabelsCore {
@@ -327,6 +336,7 @@ impl HasLabelsCore for coordinator::ClippyRequest {
             crate_type: Some(crate_type),
             tests: None,
             backtrace: None,
+            cargo_script: Some(cargo_script),
         }
     }
 }
@@ -338,6 +348,7 @@ impl HasLabelsCore for coordinator::MiriRequest {
             crate_type,
             edition,
             code: _,
+            cargo_script,
         } = *self;
 
         LabelsCore {
@@ -348,6 +359,7 @@ impl HasLabelsCore for coordinator::MiriRequest {
             crate_type: Some(crate_type),
             tests: None,
             backtrace: None,
+            cargo_script: Some(cargo_script),
         }
     }
 }
@@ -359,6 +371,7 @@ impl HasLabelsCore for coordinator::MacroExpansionRequest {
             crate_type,
             edition,
             code: _,
+            cargo_script,
         } = *self;
 
         LabelsCore {
@@ -369,6 +382,7 @@ impl HasLabelsCore for coordinator::MacroExpansionRequest {
             crate_type: Some(crate_type),
             tests: None,
             backtrace: None,
+            cargo_script: Some(cargo_script),
         }
     }
 }

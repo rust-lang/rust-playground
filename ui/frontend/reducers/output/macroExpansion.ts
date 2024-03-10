@@ -21,6 +21,7 @@ interface State {
 interface MacroExpansionRequestBody {
   code: string;
   edition: string;
+  cargoScript: boolean;
 }
 
 const MacroExpansionResponseBody = z.object({

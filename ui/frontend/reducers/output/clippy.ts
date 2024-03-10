@@ -23,6 +23,7 @@ interface ClippyRequestBody {
   crateType: string;
   edition: string;
   code: string;
+  cargoScript: boolean;
 }
 
 const ClippyResponseBody = z.object({

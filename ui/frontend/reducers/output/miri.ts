@@ -21,6 +21,7 @@ interface State {
 interface MiriRequestBody {
   code: string;
   edition: string;
+  cargoScript: boolean;
 }
 
 const MiriResponseBody = z.object({

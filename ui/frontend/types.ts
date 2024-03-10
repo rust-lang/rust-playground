@@ -161,3 +161,8 @@ export enum Focus {
 export enum Notification {
   RustSurvey2023 = 'rust-survey-2023',
 }
+
+export enum CargoScript {
+  Enabled = 'enabled',
+  Disabled = 'disabled'
+}

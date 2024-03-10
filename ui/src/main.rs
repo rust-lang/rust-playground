@@ -335,24 +335,22 @@ struct ErrorJson {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct CompileRequest {
     target: String,
-    #[serde(rename = "assemblyFlavor")]
     assembly_flavor: Option<String>,
-    #[serde(rename = "demangleAssembly")]
     demangle_assembly: Option<String>,
-    #[serde(rename = "processAssembly")]
     process_assembly: Option<String>,
     channel: String,
     mode: String,
     #[serde(default)]
     edition: String,
-    #[serde(rename = "crateType")]
     crate_type: String,
     tests: bool,
     #[serde(default)]
     backtrace: bool,
     code: String,
+    cargo_script: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -366,6 +364,7 @@ struct CompileResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct ExecuteRequest {
     channel: String,
     mode: String,
@@ -377,6 +376,7 @@ struct ExecuteRequest {
     #[serde(default)]
     backtrace: bool,
     code: String,
+    cargo_script: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -389,12 +389,14 @@ struct ExecuteResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct FormatRequest {
     #[serde(default)]
     channel: Option<String>,
     #[serde(default)]
     edition: String,
     code: String,
+    cargo_script: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -408,14 +410,16 @@ struct FormatResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct ClippyRequest {
     #[serde(default)]
     channel: Option<String>,
-    #[serde(default = "default_crate_type", rename = "crateType")]
+    #[serde(default = "default_crate_type")]
     crate_type: String,
     #[serde(default)]
     edition: String,
     code: String,
+    cargo_script: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -427,10 +431,12 @@ struct ClippyResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct MiriRequest {
     code: String,
     #[serde(default)]
     edition: String,
+    cargo_script: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -442,10 +448,12 @@ struct MiriResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct MacroExpansionRequest {
     code: String,
     #[serde(default)]
     edition: String,
+    cargo_script: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -504,6 +512,7 @@ struct MetaGistResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct EvaluateRequest {
     version: String,
     optimize: String,
@@ -512,6 +521,7 @@ struct EvaluateRequest {
     edition: String,
     #[serde(default)]
     tests: bool,
+    cargo_script: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]

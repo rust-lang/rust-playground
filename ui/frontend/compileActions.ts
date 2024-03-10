@@ -17,6 +17,7 @@ interface CompileRequestBody {
   assemblyFlavor: string;
   demangleAssembly: string;
   processAssembly: string;
+  cargoScript: boolean;
 }
 
 const CompileResponseBody = z.object({
