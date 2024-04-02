@@ -2786,7 +2786,7 @@ mod tests {
     use futures::future::{join, try_join_all};
     use once_cell::sync::Lazy;
     use std::{env, sync::Once};
-    use tempdir::TempDir;
+    use tempfile::TempDir;
 
     use super::*;
 
@@ -2820,8 +2820,8 @@ mod tests {
                 assert!(output.status.success(), "Build failed");
             });
 
-            let project_dir =
-                TempDir::new("playground").expect("Failed to create temporary project directory");
+            let project_dir = TempDir::with_prefix("playground")
+                .expect("Failed to create temporary project directory");
 
             for channel in Channel::ALL {
                 let channel = channel.to_str();
