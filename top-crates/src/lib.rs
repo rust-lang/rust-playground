@@ -12,8 +12,7 @@ use cargo::{
         source::{QueryKind, Source, SourceMap},
         RegistrySource,
     },
-    util::{cache_lock::CacheLockMode, interning::InternedString, Config},
-    util_semver::VersionExt,
+    util::{cache_lock::CacheLockMode, interning::InternedString, Config, VersionExt},
 };
 use itertools::Itertools;
 use semver::Version;

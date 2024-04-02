@@ -7,16 +7,12 @@ channels_to_build="${CHANNELS_TO_BUILD-stable beta nightly}"
 repository=shepmaster
 
 for channel in $channels_to_build; do
-    cd "base"
-
     image_name="rust-${channel}"
     full_name="${repository}/${image_name}"
 
-    docker build -t "${full_name}" \
+    docker build \
+           -t "${image_name}" \
+           -t "${full_name}" \
            --build-arg channel="${channel}" \
-           .
-
-    docker tag "${full_name}" "${image_name}"
-
-    cd ..
+           base
 done

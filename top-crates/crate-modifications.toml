@@ -1,8 +1,20 @@
-exclusions = []
+exclusions = [
+    # https://github.com/advisories/GHSA-g98v-hv3f-hcfr
+    "atty",
+]
 
 additions = [
     # Crates that the compiler recommends
-    # rg 'https://crates.io/crates/[a-z_-]+' --glob '*.stderr' --only-matching --no-line-number --no-filename | sort | uniq | cut -d '/' -f 5
+    # rg 'https://crates.io/crates/[a-z_-]+' \
+    #   --glob '**/tests/**/*.stderr' \
+    #   --glob 'compiler/rustc_error_codes/**/*.md' \
+    #   --only-matching \
+    #   --no-line-number \
+    #   --no-filename \
+    #   | sort \
+    #   | uniq \
+    #   | cut -d '/' -f 5
     "async-trait",
-    "async-recursion",
+    "once_cell",
+    "sptr",
 ]

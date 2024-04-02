@@ -2786,7 +2786,7 @@ mod tests {
     use futures::future::{join, try_join_all};
     use once_cell::sync::Lazy;
     use std::{env, sync::Once};
-    use tempdir::TempDir;
+    use tempfile::TempDir;
 
     use super::*;
 
@@ -2820,8 +2820,8 @@ mod tests {
                 assert!(output.status.success(), "Build failed");
             });
 
-            let project_dir =
-                TempDir::new("playground").expect("Failed to create temporary project directory");
+            let project_dir = TempDir::with_prefix("playground")
+                .expect("Failed to create temporary project directory");
 
             for channel in Channel::ALL {
                 let channel = channel.to_str();
@@ -3857,8 +3857,7 @@ mod tests {
         let req = MiriRequest {
             code: r#"
                 fn main() {
-                    let mut a: [u8; 0] = [];
-                    unsafe { *a.get_unchecked_mut(1) = 1; }
+                    unsafe { core::mem::MaybeUninit::<u8>::uninit().assume_init() };
                 }
                 "#
             .into(),
@@ -3870,10 +3869,8 @@ mod tests {
         assert!(!response.success, "stderr: {}", response.stderr);
 
         assert_contains!(response.stderr, "Undefined Behavior");
-        assert_contains!(response.stderr, "pointer to 1 byte");
-        assert_contains!(response.stderr, "starting at offset 0");
-        assert_contains!(response.stderr, "is out-of-bounds");
-        assert_contains!(response.stderr, "has size 0");
+        assert_contains!(response.stderr, "using uninitialized data");
+        assert_contains!(response.stderr, "operation requires initialized memory");
 
         coordinator.shutdown().await?;
 
