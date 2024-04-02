@@ -110,10 +110,6 @@ package = "atomic"
 version = "=0.5.3"
 default-features = false
 
-[dependencies.atty]
-package = "atty"
-version = "=0.2.14"
-
 [dependencies.autocfg]
 package = "autocfg"
 version = "=1.2.0"
@@ -1709,10 +1705,6 @@ version = "=0.1.79"
 package = "atomic"
 version = "=0.5.3"
 default-features = false
-
-[build_dependencies.atty]
-package = "atty"
-version = "=0.2.14"
 
 [build_dependencies.autocfg]
 package = "autocfg"

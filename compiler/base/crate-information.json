@@ -95,11 +95,6 @@
     "id": "atomic"
   },
   {
-    "name": "atty",
-    "version": "0.2.14",
-    "id": "atty"
-  },
-  {
     "name": "autocfg",
     "version": "1.2.0",
     "id": "autocfg"

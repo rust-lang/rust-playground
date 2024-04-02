@@ -1,4 +1,7 @@
-exclusions = []
+exclusions = [
+    # https://github.com/advisories/GHSA-g98v-hv3f-hcfr
+    "atty",
+]
 
 additions = [
     # Crates that the compiler recommends
