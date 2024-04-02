@@ -97,10 +97,6 @@ package = "arrayvec"
 version = "=0.7.4"
 features = ["std"]
 
-[dependencies.async_recursion]
-package = "async-recursion"
-version = "=1.1.0"
-
 [dependencies.async_trait]
 package = "async-trait"
 version = "=0.1.79"
@@ -1259,6 +1255,10 @@ package = "spin"
 version = "=0.9.8"
 features = ["barrier", "lazy", "lock_api", "lock_api_crate", "mutex", "once", "rwlock", "spin_mutex"]
 
+[dependencies.sptr]
+package = "sptr"
+version = "=0.3.2"
+
 [dependencies.string_cache]
 package = "string_cache"
 version = "=0.8.7"
@@ -1692,10 +1692,6 @@ version = "=0.3.4"
 package = "arrayvec"
 version = "=0.7.4"
 features = ["std"]
-
-[build_dependencies.async_recursion]
-package = "async-recursion"
-version = "=1.1.0"
 
 [build_dependencies.async_trait]
 package = "async-trait"
@@ -2854,6 +2850,10 @@ features = ["all"]
 package = "spin"
 version = "=0.9.8"
 features = ["barrier", "lazy", "lock_api", "lock_api_crate", "mutex", "once", "rwlock", "spin_mutex"]
+
+[build_dependencies.sptr]
+package = "sptr"
+version = "=0.3.2"
 
 [build_dependencies.string_cache]
 package = "string_cache"

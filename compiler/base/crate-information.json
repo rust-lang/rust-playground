@@ -80,11 +80,6 @@
     "id": "arrayvec"
   },
   {
-    "name": "async-recursion",
-    "version": "1.1.0",
-    "id": "async_recursion"
-  },
-  {
     "name": "async-trait",
     "version": "0.1.79",
     "id": "async_trait"
@@ -1328,6 +1323,11 @@
     "name": "spin",
     "version": "0.9.8",
     "id": "spin"
+  },
+  {
+    "name": "sptr",
+    "version": "0.3.2",
+    "id": "sptr"
   },
   {
     "name": "string_cache",
