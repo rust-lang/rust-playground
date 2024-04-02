@@ -3857,8 +3857,7 @@ mod tests {
         let req = MiriRequest {
             code: r#"
                 fn main() {
-                    let mut a: [u8; 0] = [];
-                    unsafe { *a.get_unchecked_mut(1) = 1; }
+                    unsafe { core::mem::MaybeUninit::<u8>::uninit().assume_init() };
                 }
                 "#
             .into(),
@@ -3870,10 +3869,8 @@ mod tests {
         assert!(!response.success, "stderr: {}", response.stderr);
 
         assert_contains!(response.stderr, "Undefined Behavior");
-        assert_contains!(response.stderr, "pointer to 1 byte");
-        assert_contains!(response.stderr, "starting at offset 0");
-        assert_contains!(response.stderr, "is out-of-bounds");
-        assert_contains!(response.stderr, "has size 0");
+        assert_contains!(response.stderr, "using uninitialized data");
+        assert_contains!(response.stderr, "operation requires initialized memory");
 
         coordinator.shutdown().await?;
 
