@@ -88,7 +88,9 @@ perform tests on! Once fixed, you can choose to be credited here.
 cd ui/frontend
 pnpm install
 pnpm watch # Will rebuild and watch for changes
-```
+```cd ui/frontend
+pnpm install
+pnpm watch # Will rebuild and watch for changes
 
 If you don't need the backend running because you are only making
 basic HTML/CSS/JS changes, directly open in your browser the built
@@ -111,7 +113,8 @@ must be configured.
 cd compiler
 ./build.sh # If you want to test changes to the containers
 ./fetch.sh # If you just want the current playground
-```
+cd ui
+cargo run```
 
 ## Deployment
 
