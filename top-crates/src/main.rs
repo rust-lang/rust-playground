@@ -10,6 +10,7 @@ use std::{
 
 /// A Cargo.toml file.
 #[derive(Serialize)]
+#[serde(rename_all = "kebab-case")]
 struct TomlManifest {
     package: TomlPackage,
     profile: Profiles,
