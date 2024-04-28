@@ -47,7 +47,7 @@ features = ["std"]
 
 [dependencies.allocator_api2]
 package = "allocator-api2"
-version = "=0.2.16"
+version = "=0.2.18"
 features = ["alloc"]
 default-features = false
 
@@ -76,7 +76,7 @@ version = "=1.0.2"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.81"
+version = "=1.0.82"
 features = ["std"]
 
 [dependencies.approx]
@@ -99,7 +99,7 @@ features = ["std"]
 
 [dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.79"
+version = "=0.1.80"
 
 [dependencies.atomic]
 package = "atomic"
@@ -168,11 +168,11 @@ version = "=0.10.4"
 
 [dependencies.built]
 package = "built"
-version = "=0.7.1"
+version = "=0.7.2"
 
 [dependencies.bumpalo]
 package = "bumpalo"
-version = "=3.15.4"
+version = "=3.16.0"
 
 [dependencies.bytemuck]
 package = "bytemuck"
@@ -188,6 +188,11 @@ package = "byteorder"
 version = "=1.5.0"
 features = ["std"]
 
+[dependencies.byteorder_lite]
+package = "byteorder-lite"
+version = "=0.1.0"
+features = ["std"]
+
 [dependencies.bytes]
 package = "bytes"
 version = "=1.6.0"
@@ -199,8 +204,8 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.0.90"
-features = ["jobserver", "libc", "parallel"]
+version = "=1.0.95"
+features = ["jobserver", "libc", "once_cell", "parallel"]
 
 [dependencies.cfg_if]
 package = "cfg-if"
@@ -208,7 +213,7 @@ version = "=1.0.0"
 
 [dependencies.chrono]
 package = "chrono"
-version = "=0.4.37"
+version = "=0.4.38"
 features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now", "oldtime", "serde", "std", "wasm-bindgen", "wasmbind", "winapi", "windows-targets"]
 
 [dependencies.clap]
@@ -281,6 +286,7 @@ features = ["std"]
 package = "crossbeam-epoch"
 version = "=0.9.18"
 features = ["alloc", "std"]
+default-features = false
 
 [dependencies.crossbeam_queue]
 package = "crossbeam-queue"
@@ -336,12 +342,12 @@ features = ["alloc", "block-buffer", "core-api", "mac", "std", "subtle"]
 
 [dependencies.either]
 package = "either"
-version = "=1.10.0"
-features = ["use_std"]
+version = "=1.11.0"
+features = ["serde", "use_std"]
 
 [dependencies.encoding_rs]
 package = "encoding_rs"
-version = "=0.8.33"
+version = "=0.8.34"
 features = ["alloc"]
 
 [dependencies.env_filter]
@@ -395,7 +401,7 @@ default-features = false
 
 [dependencies.fastrand]
 package = "fastrand"
-version = "=2.0.2"
+version = "=2.1.0"
 features = ["alloc", "std"]
 
 [dependencies.fdeflate]
@@ -418,7 +424,7 @@ default-features = false
 
 [dependencies.flate2]
 package = "flate2"
-version = "=1.0.28"
+version = "=1.0.29"
 features = ["any_impl", "miniz_oxide", "rust_backend"]
 
 [dependencies.flume]
@@ -510,7 +516,7 @@ features = ["more_lengths"]
 
 [dependencies.getrandom]
 package = "getrandom"
-version = "=0.2.12"
+version = "=0.2.14"
 features = ["std"]
 
 [dependencies.gif]
@@ -530,11 +536,11 @@ version = "=0.3.1"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.4.3"
+version = "=0.4.4"
 
 [dependencies.half]
 package = "half"
-version = "=2.4.0"
+version = "=2.4.1"
 features = ["alloc", "std"]
 
 [dependencies.hashbrown]
@@ -597,7 +603,7 @@ version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=1.2.0"
+version = "=1.3.1"
 features = ["client", "full", "http1", "http2", "server"]
 
 [dependencies.hyper_tls]
@@ -630,7 +636,7 @@ features = ["avif", "bmp", "dds", "default-formats", "exr", "ff", "gif", "hdr", 
 
 [dependencies.image_webp]
 package = "image-webp"
-version = "=0.1.1"
+version = "=0.1.2"
 
 [dependencies.imgref]
 package = "imgref"
@@ -666,7 +672,7 @@ version = "=1.0.11"
 
 [dependencies.jobserver]
 package = "jobserver"
-version = "=0.1.28"
+version = "=0.1.31"
 
 [dependencies.jpeg_decoder]
 package = "jpeg-decoder"
@@ -703,8 +709,8 @@ default-features = false
 
 [dependencies.lock_api]
 package = "lock_api"
-version = "=0.4.11"
-features = ["atomic_usize"]
+version = "=0.4.12"
+features = ["arc_lock", "atomic_usize", "serde"]
 
 [dependencies.log]
 package = "log"
@@ -819,7 +825,7 @@ version = "=0.3.0"
 
 [dependencies.num]
 package = "num"
-version = "=0.4.1"
+version = "=0.4.2"
 features = ["num-bigint", "std"]
 
 [dependencies.num_bigint]
@@ -901,11 +907,13 @@ features = ["std"]
 
 [dependencies.parking_lot]
 package = "parking_lot"
-version = "=0.12.1"
+version = "=0.12.2"
+features = ["arc_lock", "deadlock_detection", "serde"]
 
 [dependencies.parking_lot_core]
 package = "parking_lot_core"
-version = "=0.9.9"
+version = "=0.9.10"
+features = ["backtrace", "deadlock_detection", "petgraph", "thread-id"]
 
 [dependencies.paste]
 package = "paste"
@@ -1010,7 +1018,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.79"
+version = "=1.0.81"
 features = ["proc-macro", "span-locations"]
 
 [dependencies.profiling]
@@ -1042,7 +1050,7 @@ version = "=2.0.1"
 
 [dependencies.quote]
 package = "quote"
-version = "=1.0.35"
+version = "=1.0.36"
 features = ["proc-macro"]
 
 [dependencies.rand]
@@ -1105,7 +1113,7 @@ features = ["std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "un
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.12.2"
+version = "=0.12.4"
 features = ["__tls", "blocking", "charset", "cookies", "default-tls", "futures-channel", "h2", "http2", "json", "macos-system-configuration", "multipart"]
 
 [dependencies.rgb]
@@ -1133,12 +1141,18 @@ version = "=0.4.0"
 
 [dependencies.rustix]
 package = "rustix"
-version = "=0.38.32"
-features = ["alloc", "fs", "std", "termios", "use-libc-auxv"]
+version = "=0.38.34"
+features = ["alloc", "fs", "libc-extra-traits", "std", "termios", "use-libc-auxv"]
 
 [dependencies.rustls_pemfile]
 package = "rustls-pemfile"
-version = "=1.0.4"
+version = "=2.1.2"
+features = ["std"]
+
+[dependencies.rustls_pki_types]
+package = "rustls-pki-types"
+version = "=1.5.0"
+features = ["alloc"]
 
 [dependencies.ryu]
 package = "ryu"
@@ -1169,16 +1183,16 @@ features = ["std"]
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.197"
+version = "=1.0.199"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.197"
+version = "=1.0.199"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.115"
+version = "=1.0.116"
 features = ["raw_value", "std"]
 
 [dependencies.serde_spanned]
@@ -1209,7 +1223,7 @@ features = ["std"]
 
 [dependencies.signal_hook_registry]
 package = "signal-hook-registry"
-version = "=1.4.1"
+version = "=1.4.2"
 
 [dependencies.simba]
 package = "simba"
@@ -1274,7 +1288,7 @@ version = "=0.1.4"
 
 [dependencies.strsim]
 package = "strsim"
-version = "=0.11.0"
+version = "=0.11.1"
 
 [dependencies.subtle]
 package = "subtle"
@@ -1283,7 +1297,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=2.0.57"
+version = "=2.0.60"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1323,11 +1337,11 @@ features = ["smawk", "unicode-linebreak", "unicode-width"]
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.58"
+version = "=1.0.59"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.58"
+version = "=1.0.59"
 
 [dependencies.thread_id]
 package = "thread-id"
@@ -1343,7 +1357,7 @@ version = "=0.9.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.3.34"
+version = "=0.3.36"
 features = ["alloc", "formatting", "macros", "parsing", "std"]
 
 [dependencies.time_core]
@@ -1352,7 +1366,7 @@ version = "=0.1.2"
 
 [dependencies.time_macros]
 package = "time-macros"
-version = "=0.2.17"
+version = "=0.2.18"
 features = ["formatting", "parsing"]
 
 [dependencies.tinyvec]
@@ -1403,7 +1417,7 @@ features = ["serde"]
 
 [dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.22.9"
+version = "=0.22.12"
 features = ["display", "parse", "serde"]
 default-features = false
 
@@ -1475,7 +1489,7 @@ version = "=1.11.0"
 
 [dependencies.unicode_width]
 package = "unicode-width"
-version = "=0.1.11"
+version = "=0.1.12"
 
 [dependencies.unicode_xid]
 package = "unicode-xid"
@@ -1567,13 +1581,13 @@ features = ["web", "web-sys"]
 
 [dependencies.wide]
 package = "wide"
-version = "=0.7.15"
+version = "=0.7.16"
 features = ["std"]
 default-features = false
 
 [dependencies.winnow]
 package = "winnow"
-version = "=0.6.5"
+version = "=0.6.7"
 features = ["alloc", "std"]
 
 [dependencies.xattr]
@@ -1616,1598 +1630,1612 @@ package = "zune-jpeg"
 version = "=0.4.11"
 features = ["neon", "std", "x86"]
 
-[build_dependencies.addr2line]
+[build-dependencies.addr2line]
 package = "addr2line"
 version = "=0.21.0"
 default-features = false
 
-[build_dependencies.adler]
+[build-dependencies.adler]
 package = "adler"
 version = "=1.0.2"
 default-features = false
 
-[build_dependencies.ahash]
+[build-dependencies.ahash]
 package = "ahash"
 version = "=0.8.11"
 features = ["getrandom", "runtime-rng", "std"]
 
-[build_dependencies.aho_corasick]
+[build-dependencies.aho_corasick]
 package = "aho-corasick"
 version = "=1.1.3"
 features = ["perf-literal", "std"]
 
-[build_dependencies.aligned_vec]
+[build-dependencies.aligned_vec]
 package = "aligned-vec"
 version = "=0.5.0"
 features = ["std"]
 
-[build_dependencies.allocator_api2]
+[build-dependencies.allocator_api2]
 package = "allocator-api2"
-version = "=0.2.16"
+version = "=0.2.18"
 features = ["alloc"]
 default-features = false
 
-[build_dependencies.ansi_term]
+[build-dependencies.ansi_term]
 package = "ansi_term"
 version = "=0.12.1"
 
-[build_dependencies.anstream]
+[build-dependencies.anstream]
 package = "anstream"
 version = "=0.6.13"
 features = ["auto", "wincon"]
 
-[build_dependencies.anstyle]
+[build-dependencies.anstyle]
 package = "anstyle"
 version = "=1.0.6"
 features = ["std"]
 
-[build_dependencies.anstyle_parse]
+[build-dependencies.anstyle_parse]
 package = "anstyle-parse"
 version = "=0.2.3"
 features = ["utf8"]
 
-[build_dependencies.anstyle_query]
+[build-dependencies.anstyle_query]
 package = "anstyle-query"
 version = "=1.0.2"
 
-[build_dependencies.anyhow]
+[build-dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.81"
+version = "=1.0.82"
 features = ["std"]
 
-[build_dependencies.approx]
+[build-dependencies.approx]
 package = "approx"
 version = "=0.5.1"
 features = ["std"]
 
-[build_dependencies.arc_swap]
+[build-dependencies.arc_swap]
 package = "arc-swap"
 version = "=1.7.1"
 
-[build_dependencies.arg_enum_proc_macro]
+[build-dependencies.arg_enum_proc_macro]
 package = "arg_enum_proc_macro"
 version = "=0.3.4"
 
-[build_dependencies.arrayvec]
+[build-dependencies.arrayvec]
 package = "arrayvec"
 version = "=0.7.4"
 features = ["std"]
 
-[build_dependencies.async_trait]
+[build-dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.79"
+version = "=0.1.80"
 
-[build_dependencies.atomic]
+[build-dependencies.atomic]
 package = "atomic"
 version = "=0.5.3"
 default-features = false
 
-[build_dependencies.autocfg]
+[build-dependencies.autocfg]
 package = "autocfg"
 version = "=1.2.0"
 
-[build_dependencies.av1_grain]
+[build-dependencies.av1_grain]
 package = "av1-grain"
 version = "=0.2.3"
 features = ["create", "diff", "estimate", "nom", "num-rational", "parse", "v_frame"]
 
-[build_dependencies.avif_serialize]
+[build-dependencies.avif_serialize]
 package = "avif-serialize"
 version = "=0.8.1"
 
-[build_dependencies.backtrace]
+[build-dependencies.backtrace]
 package = "backtrace"
 version = "=0.3.71"
 features = ["std"]
 
-[build_dependencies.base64]
+[build-dependencies.base64]
 package = "base64"
 version = "=0.22.0"
 features = ["alloc", "std"]
 
-[build_dependencies.base64_0_21_7]
+[build-dependencies.base64_0_21_7]
 package = "base64"
 version = "=0.21.7"
 features = ["alloc", "std"]
 
-[build_dependencies.bit_field]
+[build-dependencies.bit_field]
 package = "bit_field"
 version = "=0.10.2"
 
-[build_dependencies.bit_set]
+[build-dependencies.bit_set]
 package = "bit-set"
 version = "=0.5.3"
 features = ["std"]
 
-[build_dependencies.bit_vec]
+[build-dependencies.bit_vec]
 package = "bit-vec"
 version = "=0.6.3"
 features = ["std"]
 default-features = false
 
-[build_dependencies.bitflags]
+[build-dependencies.bitflags]
 package = "bitflags"
 version = "=2.5.0"
 features = ["std"]
 
-[build_dependencies.bitflags_1_3_2]
+[build-dependencies.bitflags_1_3_2]
 package = "bitflags"
 version = "=1.3.2"
 
-[build_dependencies.bitstream_io]
+[build-dependencies.bitstream_io]
 package = "bitstream-io"
 version = "=2.2.0"
 
-[build_dependencies.block_buffer]
+[build-dependencies.block_buffer]
 package = "block-buffer"
 version = "=0.10.4"
 
-[build_dependencies.built]
+[build-dependencies.built]
 package = "built"
-version = "=0.7.1"
+version = "=0.7.2"
 
-[build_dependencies.bumpalo]
+[build-dependencies.bumpalo]
 package = "bumpalo"
-version = "=3.15.4"
+version = "=3.16.0"
 
-[build_dependencies.bytemuck]
+[build-dependencies.bytemuck]
 package = "bytemuck"
 version = "=1.15.0"
 features = ["bytemuck_derive", "derive", "extern_crate_alloc", "extern_crate_std", "min_const_generics", "must_cast", "wasm_simd", "zeroable_atomics", "zeroable_maybe_uninit"]
 
-[build_dependencies.bytemuck_derive]
+[build-dependencies.bytemuck_derive]
 package = "bytemuck_derive"
 version = "=1.6.0"
 
-[build_dependencies.byteorder]
+[build-dependencies.byteorder]
 package = "byteorder"
 version = "=1.5.0"
 features = ["std"]
 
-[build_dependencies.bytes]
+[build-dependencies.byteorder_lite]
+package = "byteorder-lite"
+version = "=0.1.0"
+features = ["std"]
+
+[build-dependencies.bytes]
 package = "bytes"
 version = "=1.6.0"
 features = ["std"]
 
-[build_dependencies.bytes_0_4_12]
+[build-dependencies.bytes_0_4_12]
 package = "bytes"
 version = "=0.4.12"
 
-[build_dependencies.cc]
+[build-dependencies.cc]
 package = "cc"
-version = "=1.0.90"
-features = ["jobserver", "libc", "parallel"]
+version = "=1.0.95"
+features = ["jobserver", "libc", "once_cell", "parallel"]
 
-[build_dependencies.cfg_if]
+[build-dependencies.cfg_if]
 package = "cfg-if"
 version = "=1.0.0"
 
-[build_dependencies.chrono]
+[build-dependencies.chrono]
 package = "chrono"
-version = "=0.4.37"
+version = "=0.4.38"
 features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now", "oldtime", "serde", "std", "wasm-bindgen", "wasmbind", "winapi", "windows-targets"]
 
-[build_dependencies.clap]
+[build-dependencies.clap]
 package = "clap"
 version = "=4.5.4"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
-[build_dependencies.clap_builder]
+[build-dependencies.clap_builder]
 package = "clap_builder"
 version = "=4.5.2"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
 default-features = false
 
-[build_dependencies.clap_derive]
+[build-dependencies.clap_derive]
 package = "clap_derive"
 version = "=4.5.4"
 
-[build_dependencies.clap_lex]
+[build-dependencies.clap_lex]
 package = "clap_lex"
 version = "=0.7.0"
 
-[build_dependencies.color_quant]
+[build-dependencies.color_quant]
 package = "color_quant"
 version = "=1.1.0"
 
-[build_dependencies.colorchoice]
+[build-dependencies.colorchoice]
 package = "colorchoice"
 version = "=1.0.0"
 
-[build_dependencies.const_default]
+[build-dependencies.const_default]
 package = "const-default"
 version = "=1.0.0"
 default-features = false
 
-[build_dependencies.cookie]
+[build-dependencies.cookie]
 package = "cookie"
 version = "=0.17.0"
 features = ["percent-encode", "percent-encoding"]
 
-[build_dependencies.cookie_store]
+[build-dependencies.cookie_store]
 package = "cookie_store"
 version = "=0.20.0"
 features = ["public_suffix", "publicsuffix"]
 
-[build_dependencies.cpufeatures]
+[build-dependencies.cpufeatures]
 package = "cpufeatures"
 version = "=0.2.12"
 
-[build_dependencies.crc32fast]
+[build-dependencies.crc32fast]
 package = "crc32fast"
 version = "=1.4.0"
 features = ["std"]
 
-[build_dependencies.crossbeam]
+[build-dependencies.crossbeam]
 package = "crossbeam"
 version = "=0.8.4"
 features = ["alloc", "crossbeam-channel", "crossbeam-deque", "crossbeam-epoch", "crossbeam-queue", "std"]
 
-[build_dependencies.crossbeam_channel]
+[build-dependencies.crossbeam_channel]
 package = "crossbeam-channel"
 version = "=0.5.12"
 features = ["std"]
 
-[build_dependencies.crossbeam_deque]
+[build-dependencies.crossbeam_deque]
 package = "crossbeam-deque"
 version = "=0.8.5"
 features = ["std"]
 
-[build_dependencies.crossbeam_epoch]
+[build-dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
 version = "=0.9.18"
 features = ["alloc", "std"]
+default-features = false
 
-[build_dependencies.crossbeam_queue]
+[build-dependencies.crossbeam_queue]
 package = "crossbeam-queue"
 version = "=0.3.11"
 features = ["alloc", "std"]
 default-features = false
 
-[build_dependencies.crossbeam_utils]
+[build-dependencies.crossbeam_utils]
 package = "crossbeam-utils"
 version = "=0.8.19"
 features = ["std"]
 
-[build_dependencies.crypto_common]
+[build-dependencies.crypto_common]
 package = "crypto-common"
 version = "=0.1.6"
 features = ["std"]
 
-[build_dependencies.csv]
+[build-dependencies.csv]
 package = "csv"
 version = "=1.3.0"
 
-[build_dependencies.csv_core]
+[build-dependencies.csv_core]
 package = "csv-core"
 version = "=0.1.11"
 
-[build_dependencies.data_encoding]
+[build-dependencies.data_encoding]
 package = "data-encoding"
 version = "=2.5.0"
 features = ["alloc", "std"]
 
-[build_dependencies.debug_unreachable]
+[build-dependencies.debug_unreachable]
 package = "new_debug_unreachable"
 version = "=1.0.6"
 
-[build_dependencies.deranged]
+[build-dependencies.deranged]
 package = "deranged"
 version = "=0.3.11"
 features = ["alloc", "powerfmt", "std"]
 default-features = false
 
-[build_dependencies.derivative]
+[build-dependencies.derivative]
 package = "derivative"
 version = "=2.2.0"
 
-[build_dependencies.destructure_traitobject]
+[build-dependencies.destructure_traitobject]
 package = "destructure_traitobject"
 version = "=0.2.0"
 
-[build_dependencies.digest]
+[build-dependencies.digest]
 package = "digest"
 version = "=0.10.7"
 features = ["alloc", "block-buffer", "core-api", "mac", "std", "subtle"]
 
-[build_dependencies.either]
+[build-dependencies.either]
 package = "either"
-version = "=1.10.0"
-features = ["use_std"]
+version = "=1.11.0"
+features = ["serde", "use_std"]
 
-[build_dependencies.encoding_rs]
+[build-dependencies.encoding_rs]
 package = "encoding_rs"
-version = "=0.8.33"
+version = "=0.8.34"
 features = ["alloc"]
 
-[build_dependencies.env_filter]
+[build-dependencies.env_filter]
 package = "env_filter"
 version = "=0.1.0"
 features = ["regex"]
 default-features = false
 
-[build_dependencies.env_logger]
+[build-dependencies.env_logger]
 package = "env_logger"
 version = "=0.11.3"
 features = ["auto-color", "color", "humantime", "regex"]
 
-[build_dependencies.equivalent]
+[build-dependencies.equivalent]
 package = "equivalent"
 version = "=1.0.1"
 
-[build_dependencies.errno]
+[build-dependencies.errno]
 package = "errno"
 version = "=0.3.8"
 features = ["std"]
 default-features = false
 
-[build_dependencies.error_chain]
+[build-dependencies.error_chain]
 package = "error-chain"
 version = "=0.12.4"
 features = ["backtrace", "example_generated"]
 
-[build_dependencies.exr]
+[build-dependencies.exr]
 package = "exr"
 version = "=1.72.0"
 
-[build_dependencies.fallible_iterator]
+[build-dependencies.fallible_iterator]
 package = "fallible-iterator"
 version = "=0.3.0"
 features = ["alloc"]
 
-[build_dependencies.fallible_iterator_0_2_0]
+[build-dependencies.fallible_iterator_0_2_0]
 package = "fallible-iterator"
 version = "=0.2.0"
 features = ["std"]
 
-[build_dependencies.fallible_streaming_iterator]
+[build-dependencies.fallible_streaming_iterator]
 package = "fallible-streaming-iterator"
 version = "=0.1.9"
 
-[build_dependencies.faster_hex]
+[build-dependencies.faster_hex]
 package = "faster-hex"
 version = "=0.8.1"
 default-features = false
 
-[build_dependencies.fastrand]
+[build-dependencies.fastrand]
 package = "fastrand"
-version = "=2.0.2"
+version = "=2.1.0"
 features = ["alloc", "std"]
 
-[build_dependencies.fdeflate]
+[build-dependencies.fdeflate]
 package = "fdeflate"
 version = "=0.3.4"
 
-[build_dependencies.filetime]
+[build-dependencies.filetime]
 package = "filetime"
 version = "=0.2.23"
 
-[build_dependencies.finl_unicode]
+[build-dependencies.finl_unicode]
 package = "finl_unicode"
 version = "=1.2.0"
 features = ["categories", "grapheme_clusters"]
 
-[build_dependencies.fixedbitset]
+[build-dependencies.fixedbitset]
 package = "fixedbitset"
 version = "=0.4.2"
 default-features = false
 
-[build_dependencies.flate2]
+[build-dependencies.flate2]
 package = "flate2"
-version = "=1.0.28"
+version = "=1.0.29"
 features = ["any_impl", "miniz_oxide", "rust_backend"]
 
-[build_dependencies.flume]
+[build-dependencies.flume]
 package = "flume"
 version = "=0.11.0"
 default-features = false
 
-[build_dependencies.fnv]
+[build-dependencies.fnv]
 package = "fnv"
 version = "=1.0.7"
 features = ["std"]
 
-[build_dependencies.foreign_types]
+[build-dependencies.foreign_types]
 package = "foreign-types"
 version = "=0.3.2"
 
-[build_dependencies.foreign_types_shared]
+[build-dependencies.foreign_types_shared]
 package = "foreign-types-shared"
 version = "=0.1.1"
 
-[build_dependencies.form_urlencoded]
+[build-dependencies.form_urlencoded]
 package = "form_urlencoded"
 version = "=1.2.1"
 features = ["alloc", "std"]
 
-[build_dependencies.futf]
+[build-dependencies.futf]
 package = "futf"
 version = "=0.1.5"
 
-[build_dependencies.futures]
+[build-dependencies.futures]
 package = "futures"
 version = "=0.3.30"
 features = ["alloc", "async-await", "compat", "executor", "futures-executor", "io-compat", "std", "thread-pool"]
 
-[build_dependencies.futures_0_1_31]
+[build-dependencies.futures_0_1_31]
 package = "futures"
 version = "=0.1.31"
 features = ["use_std", "with-deprecated"]
 
-[build_dependencies.futures_channel]
+[build-dependencies.futures_channel]
 package = "futures-channel"
 version = "=0.3.30"
 features = ["alloc", "futures-sink", "sink", "std"]
 
-[build_dependencies.futures_core]
+[build-dependencies.futures_core]
 package = "futures-core"
 version = "=0.3.30"
 features = ["alloc", "std"]
 
-[build_dependencies.futures_executor]
+[build-dependencies.futures_executor]
 package = "futures-executor"
 version = "=0.3.30"
 features = ["num_cpus", "std", "thread-pool"]
 default-features = false
 
-[build_dependencies.futures_io]
+[build-dependencies.futures_io]
 package = "futures-io"
 version = "=0.3.30"
 features = ["std"]
 
-[build_dependencies.futures_macro]
+[build-dependencies.futures_macro]
 package = "futures-macro"
 version = "=0.3.30"
 
-[build_dependencies.futures_sink]
+[build-dependencies.futures_sink]
 package = "futures-sink"
 version = "=0.3.30"
 features = ["alloc", "std"]
 
-[build_dependencies.futures_task]
+[build-dependencies.futures_task]
 package = "futures-task"
 version = "=0.3.30"
 features = ["alloc", "std"]
 
-[build_dependencies.futures_util]
+[build-dependencies.futures_util]
 package = "futures-util"
 version = "=0.3.30"
 features = ["alloc", "async-await", "async-await-macro", "channel", "compat", "futures-channel", "futures-io", "futures-macro", "futures-sink", "futures_01", "io", "io-compat", "memchr", "sink", "slab", "std", "tokio-io"]
 
-[build_dependencies.generic_array]
+[build-dependencies.generic_array]
 package = "generic-array"
 version = "=1.0.0"
 features = ["alloc", "const-default", "faster-hex", "internals", "serde", "zeroize"]
 
-[build_dependencies.generic_array_0_14_7]
+[build-dependencies.generic_array_0_14_7]
 package = "generic-array"
 version = "=0.14.7"
 features = ["more_lengths"]
 
-[build_dependencies.getrandom]
+[build-dependencies.getrandom]
 package = "getrandom"
-version = "=0.2.12"
+version = "=0.2.14"
 features = ["std"]
 
-[build_dependencies.gif]
+[build-dependencies.gif]
 package = "gif"
 version = "=0.13.1"
 features = ["color_quant", "raii_no_panic", "std"]
 
-[build_dependencies.gimli]
+[build-dependencies.gimli]
 package = "gimli"
 version = "=0.28.1"
 features = ["read", "read-core"]
 default-features = false
 
-[build_dependencies.glob]
+[build-dependencies.glob]
 package = "glob"
 version = "=0.3.1"
 
-[build_dependencies.h2]
+[build-dependencies.h2]
 package = "h2"
-version = "=0.4.3"
+version = "=0.4.4"
 
-[build_dependencies.half]
+[build-dependencies.half]
 package = "half"
-version = "=2.4.0"
+version = "=2.4.1"
 features = ["alloc", "std"]
 
-[build_dependencies.hashbrown]
+[build-dependencies.hashbrown]
 package = "hashbrown"
 version = "=0.14.3"
 features = ["ahash", "allocator-api2", "inline-more", "raw"]
 
-[build_dependencies.hashbrown_0_12_3]
+[build-dependencies.hashbrown_0_12_3]
 package = "hashbrown"
 version = "=0.12.3"
 features = ["raw"]
 default-features = false
 
-[build_dependencies.hashlink]
+[build-dependencies.hashlink]
 package = "hashlink"
 version = "=0.9.0"
 
-[build_dependencies.hdrhistogram]
+[build-dependencies.hdrhistogram]
 package = "hdrhistogram"
 version = "=7.5.4"
 default-features = false
 
-[build_dependencies.heck]
+[build-dependencies.heck]
 package = "heck"
 version = "=0.5.0"
 
-[build_dependencies.hmac]
+[build-dependencies.hmac]
 package = "hmac"
 version = "=0.12.1"
 
-[build_dependencies.html5ever]
+[build-dependencies.html5ever]
 package = "html5ever"
 version = "=0.26.0"
 
-[build_dependencies.http]
+[build-dependencies.http]
 package = "http"
 version = "=1.1.0"
 features = ["std"]
 
-[build_dependencies.http_body]
+[build-dependencies.http_body]
 package = "http-body"
 version = "=1.0.0"
 
-[build_dependencies.http_body_util]
+[build-dependencies.http_body_util]
 package = "http-body-util"
 version = "=0.1.1"
 
-[build_dependencies.httparse]
+[build-dependencies.httparse]
 package = "httparse"
 version = "=1.8.0"
 features = ["std"]
 
-[build_dependencies.httpdate]
+[build-dependencies.httpdate]
 package = "httpdate"
 version = "=1.0.3"
 
-[build_dependencies.humantime]
+[build-dependencies.humantime]
 package = "humantime"
 version = "=2.1.0"
 
-[build_dependencies.hyper]
+[build-dependencies.hyper]
 package = "hyper"
-version = "=1.2.0"
+version = "=1.3.1"
 features = ["client", "full", "http1", "http2", "server"]
 
-[build_dependencies.hyper_tls]
+[build-dependencies.hyper_tls]
 package = "hyper-tls"
 version = "=0.6.0"
 
-[build_dependencies.hyper_util]
+[build-dependencies.hyper_util]
 package = "hyper-util"
 version = "=0.1.3"
 features = ["client", "client-legacy", "http1", "http2", "tokio"]
 
-[build_dependencies.iana_time_zone]
+[build-dependencies.iana_time_zone]
 package = "iana-time-zone"
 version = "=0.1.60"
 features = ["fallback"]
 
-[build_dependencies.idna]
+[build-dependencies.idna]
 package = "idna"
 version = "=0.5.0"
 features = ["alloc", "std"]
 
-[build_dependencies.idna_0_3_0]
+[build-dependencies.idna_0_3_0]
 package = "idna"
 version = "=0.3.0"
 
-[build_dependencies.image]
+[build-dependencies.image]
 package = "image"
 version = "=0.25.1"
 features = ["avif", "bmp", "dds", "default-formats", "exr", "ff", "gif", "hdr", "ico", "jpeg", "png", "pnm", "qoi", "rayon", "tga", "tiff", "webp"]
 
-[build_dependencies.image_webp]
+[build-dependencies.image_webp]
 package = "image-webp"
-version = "=0.1.1"
+version = "=0.1.2"
 
-[build_dependencies.imgref]
+[build-dependencies.imgref]
 package = "imgref"
 version = "=1.10.1"
 features = ["deprecated"]
 
-[build_dependencies.indexmap]
+[build-dependencies.indexmap]
 package = "indexmap"
 version = "=2.2.6"
 features = ["std"]
 
-[build_dependencies.indexmap_1_9_3]
+[build-dependencies.indexmap_1_9_3]
 package = "indexmap"
 version = "=1.9.3"
 
-[build_dependencies.iovec]
+[build-dependencies.iovec]
 package = "iovec"
 version = "=0.1.4"
 
-[build_dependencies.ipnet]
+[build-dependencies.ipnet]
 package = "ipnet"
 version = "=2.9.0"
 features = ["std"]
 
-[build_dependencies.itertools]
+[build-dependencies.itertools]
 package = "itertools"
 version = "=0.12.1"
 features = ["use_alloc", "use_std"]
 
-[build_dependencies.itoa]
+[build-dependencies.itoa]
 package = "itoa"
 version = "=1.0.11"
 
-[build_dependencies.jobserver]
+[build-dependencies.jobserver]
 package = "jobserver"
-version = "=0.1.28"
+version = "=0.1.31"
 
-[build_dependencies.jpeg_decoder]
+[build-dependencies.jpeg_decoder]
 package = "jpeg-decoder"
 version = "=0.3.1"
 default-features = false
 
-[build_dependencies.lazy_static]
+[build-dependencies.lazy_static]
 package = "lazy_static"
 version = "=1.4.0"
 
-[build_dependencies.lebe]
+[build-dependencies.lebe]
 package = "lebe"
 version = "=0.5.2"
 
-[build_dependencies.libc]
+[build-dependencies.libc]
 package = "libc"
 version = "=0.2.153"
 features = ["extra_traits", "std"]
 
-[build_dependencies.libm]
+[build-dependencies.libm]
 package = "libm"
 version = "=0.2.8"
 
-[build_dependencies.libsqlite3_sys]
+[build-dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
 version = "=0.28.0"
 features = ["bundled", "bundled_bindings", "cc", "min_sqlite_version_3_14_0", "pkg-config", "unlock_notify", "vcpkg"]
 
-[build_dependencies.linux_raw_sys]
+[build-dependencies.linux_raw_sys]
 package = "linux-raw-sys"
 version = "=0.4.13"
 features = ["elf", "errno", "general", "ioctl", "no_std", "std"]
 default-features = false
 
-[build_dependencies.lock_api]
+[build-dependencies.lock_api]
 package = "lock_api"
-version = "=0.4.11"
-features = ["atomic_usize"]
+version = "=0.4.12"
+features = ["arc_lock", "atomic_usize", "serde"]
 
-[build_dependencies.log]
+[build-dependencies.log]
 package = "log"
 version = "=0.4.21"
 features = ["serde", "std"]
 
-[build_dependencies.log4rs]
+[build-dependencies.log4rs]
 package = "log4rs"
 version = "=1.3.0"
 features = ["all_components", "ansi_writer", "chrono", "compound_policy", "config_parsing", "console_appender", "console_writer", "delete_roller", "file_appender", "fixed_window_roller", "humantime", "json_encoder", "libc", "log-mdc", "parking_lot", "pattern_encoder", "rand", "rolling_file_appender", "serde", "serde-value", "serde_json", "serde_yaml", "simple_writer", "size_trigger", "thread-id", "threshold_filter", "time_trigger", "typemap-ors", "winapi", "yaml_format"]
 
-[build_dependencies.log_mdc]
+[build-dependencies.log_mdc]
 package = "log-mdc"
 version = "=0.1.0"
 
-[build_dependencies.loop9]
+[build-dependencies.loop9]
 package = "loop9"
 version = "=0.1.5"
 
-[build_dependencies.mac]
+[build-dependencies.mac]
 package = "mac"
 version = "=0.1.1"
 
-[build_dependencies.markup5ever]
+[build-dependencies.markup5ever]
 package = "markup5ever"
 version = "=0.11.0"
 
-[build_dependencies.markup5ever_rcdom]
+[build-dependencies.markup5ever_rcdom]
 package = "markup5ever_rcdom"
 version = "=0.2.0"
 
-[build_dependencies.matrixmultiply]
+[build-dependencies.matrixmultiply]
 package = "matrixmultiply"
 version = "=0.3.8"
 features = ["cgemm", "std"]
 
-[build_dependencies.maybe_rayon]
+[build-dependencies.maybe_rayon]
 package = "maybe-rayon"
 version = "=0.1.1"
 features = ["rayon", "threads"]
 default-features = false
 
-[build_dependencies.md5]
+[build-dependencies.md5]
 package = "md-5"
 version = "=0.10.6"
 features = ["std"]
 
-[build_dependencies.memchr]
+[build-dependencies.memchr]
 package = "memchr"
 version = "=2.7.2"
 features = ["alloc", "std"]
 
-[build_dependencies.memmap]
+[build-dependencies.memmap]
 package = "memmap"
 version = "=0.7.0"
 
-[build_dependencies.memoffset]
+[build-dependencies.memoffset]
 package = "memoffset"
 version = "=0.9.1"
 
-[build_dependencies.mime]
+[build-dependencies.mime]
 package = "mime"
 version = "=0.3.17"
 
-[build_dependencies.mime_guess]
+[build-dependencies.mime_guess]
 package = "mime_guess"
 version = "=2.0.4"
 default-features = false
 
-[build_dependencies.minimal_lexical]
+[build-dependencies.minimal_lexical]
 package = "minimal-lexical"
 version = "=0.2.1"
 features = ["std"]
 default-features = false
 
-[build_dependencies.miniz_oxide]
+[build-dependencies.miniz_oxide]
 package = "miniz_oxide"
 version = "=0.7.2"
 features = ["simd", "simd-adler32", "with-alloc"]
 
-[build_dependencies.mio]
+[build-dependencies.mio]
 package = "mio"
 version = "=0.8.11"
 features = ["log", "net", "os-ext", "os-poll"]
 
-[build_dependencies.nalgebra]
+[build-dependencies.nalgebra]
 package = "nalgebra"
 version = "=0.32.5"
 features = ["macros", "matrixmultiply", "nalgebra-macros", "std"]
 
-[build_dependencies.nalgebra_macros]
+[build-dependencies.nalgebra_macros]
 package = "nalgebra-macros"
 version = "=0.2.1"
 
-[build_dependencies.native_tls]
+[build-dependencies.native_tls]
 package = "native-tls"
 version = "=0.2.11"
 
-[build_dependencies.ndarray]
+[build-dependencies.ndarray]
 package = "ndarray"
 version = "=0.15.6"
 features = ["std"]
 
-[build_dependencies.nom]
+[build-dependencies.nom]
 package = "nom"
 version = "=7.1.3"
 features = ["alloc", "std"]
 
-[build_dependencies.noop_proc_macro]
+[build-dependencies.noop_proc_macro]
 package = "noop_proc_macro"
 version = "=0.3.0"
 
-[build_dependencies.num]
+[build-dependencies.num]
 package = "num"
-version = "=0.4.1"
+version = "=0.4.2"
 features = ["num-bigint", "std"]
 
-[build_dependencies.num_bigint]
+[build-dependencies.num_bigint]
 package = "num-bigint"
 version = "=0.4.4"
 features = ["std"]
 default-features = false
 
-[build_dependencies.num_complex]
+[build-dependencies.num_complex]
 package = "num-complex"
 version = "=0.4.5"
 features = ["std"]
 default-features = false
 
-[build_dependencies.num_conv]
+[build-dependencies.num_conv]
 package = "num-conv"
 version = "=0.1.0"
 
-[build_dependencies.num_cpus]
+[build-dependencies.num_cpus]
 package = "num_cpus"
 version = "=1.16.0"
 
-[build_dependencies.num_derive]
+[build-dependencies.num_derive]
 package = "num-derive"
 version = "=0.4.2"
 
-[build_dependencies.num_integer]
+[build-dependencies.num_integer]
 package = "num-integer"
 version = "=0.1.46"
 features = ["i128", "std"]
 
-[build_dependencies.num_iter]
+[build-dependencies.num_iter]
 package = "num-iter"
 version = "=0.1.44"
 features = ["i128", "std"]
 default-features = false
 
-[build_dependencies.num_rational]
+[build-dependencies.num_rational]
 package = "num-rational"
 version = "=0.4.1"
 features = ["num-bigint", "num-bigint-std", "std"]
 
-[build_dependencies.num_traits]
+[build-dependencies.num_traits]
 package = "num-traits"
 version = "=0.2.18"
 features = ["i128", "libm", "std"]
 
-[build_dependencies.object]
+[build-dependencies.object]
 package = "object"
 version = "=0.32.2"
 features = ["archive", "coff", "elf", "macho", "pe", "read_core", "unaligned", "xcoff"]
 default-features = false
 
-[build_dependencies.once_cell]
+[build-dependencies.once_cell]
 package = "once_cell"
 version = "=1.19.0"
 features = ["alloc", "race", "std"]
 
-[build_dependencies.openssl]
+[build-dependencies.openssl]
 package = "openssl"
 version = "=0.10.64"
 
-[build_dependencies.openssl_macros]
+[build-dependencies.openssl_macros]
 package = "openssl-macros"
 version = "=0.1.1"
 
-[build_dependencies.openssl_probe]
+[build-dependencies.openssl_probe]
 package = "openssl-probe"
 version = "=0.1.5"
 
-[build_dependencies.openssl_sys]
+[build-dependencies.openssl_sys]
 package = "openssl-sys"
 version = "=0.9.102"
 
-[build_dependencies.ordered_float]
+[build-dependencies.ordered_float]
 package = "ordered-float"
 version = "=2.10.1"
 features = ["std"]
 
-[build_dependencies.parking_lot]
+[build-dependencies.parking_lot]
 package = "parking_lot"
-version = "=0.12.1"
+version = "=0.12.2"
+features = ["arc_lock", "deadlock_detection", "serde"]
 
-[build_dependencies.parking_lot_core]
+[build-dependencies.parking_lot_core]
 package = "parking_lot_core"
-version = "=0.9.9"
+version = "=0.9.10"
+features = ["backtrace", "deadlock_detection", "petgraph", "thread-id"]
 
-[build_dependencies.paste]
+[build-dependencies.paste]
 package = "paste"
 version = "=1.0.14"
 
-[build_dependencies.percent_encoding]
+[build-dependencies.percent_encoding]
 package = "percent-encoding"
 version = "=2.3.1"
 features = ["alloc", "std"]
 
-[build_dependencies.petgraph]
+[build-dependencies.petgraph]
 package = "petgraph"
 version = "=0.6.4"
 features = ["graphmap", "matrix_graph", "stable_graph"]
 
-[build_dependencies.phf]
+[build-dependencies.phf]
 package = "phf"
 version = "=0.11.2"
 features = ["macros", "phf_macros", "std"]
 
-[build_dependencies.phf_0_10_1]
+[build-dependencies.phf_0_10_1]
 package = "phf"
 version = "=0.10.1"
 features = ["std"]
 
-[build_dependencies.phf_codegen]
+[build-dependencies.phf_codegen]
 package = "phf_codegen"
 version = "=0.10.0"
 
-[build_dependencies.phf_generator]
+[build-dependencies.phf_generator]
 package = "phf_generator"
 version = "=0.11.2"
 
-[build_dependencies.phf_generator_0_10_0]
+[build-dependencies.phf_generator_0_10_0]
 package = "phf_generator"
 version = "=0.10.0"
 
-[build_dependencies.phf_macros]
+[build-dependencies.phf_macros]
 package = "phf_macros"
 version = "=0.11.2"
 
-[build_dependencies.phf_shared]
+[build-dependencies.phf_shared]
 package = "phf_shared"
 version = "=0.11.2"
 features = ["std"]
 default-features = false
 
-[build_dependencies.phf_shared_0_10_0]
+[build-dependencies.phf_shared_0_10_0]
 package = "phf_shared"
 version = "=0.10.0"
 features = ["std"]
 
-[build_dependencies.pin_project]
+[build-dependencies.pin_project]
 package = "pin-project"
 version = "=1.1.5"
 
-[build_dependencies.pin_project_internal]
+[build-dependencies.pin_project_internal]
 package = "pin-project-internal"
 version = "=1.1.5"
 
-[build_dependencies.pin_project_lite]
+[build-dependencies.pin_project_lite]
 package = "pin-project-lite"
 version = "=0.2.14"
 
-[build_dependencies.pin_utils]
+[build-dependencies.pin_utils]
 package = "pin-utils"
 version = "=0.1.0"
 
-[build_dependencies.pkg_config]
+[build-dependencies.pkg_config]
 package = "pkg-config"
 version = "=0.3.30"
 
-[build_dependencies.png]
+[build-dependencies.png]
 package = "png"
 version = "=0.17.13"
 
-[build_dependencies.postgres]
+[build-dependencies.postgres]
 package = "postgres"
 version = "=0.19.7"
 
-[build_dependencies.postgres_protocol]
+[build-dependencies.postgres_protocol]
 package = "postgres-protocol"
 version = "=0.6.6"
 
-[build_dependencies.postgres_types]
+[build-dependencies.postgres_types]
 package = "postgres-types"
 version = "=0.2.6"
 
-[build_dependencies.powerfmt]
+[build-dependencies.powerfmt]
 package = "powerfmt"
 version = "=0.2.0"
 default-features = false
 
-[build_dependencies.ppv_lite86]
+[build-dependencies.ppv_lite86]
 package = "ppv-lite86"
 version = "=0.2.17"
 features = ["simd", "std"]
 
-[build_dependencies.precomputed_hash]
+[build-dependencies.precomputed_hash]
 package = "precomputed-hash"
 version = "=0.1.1"
 
-[build_dependencies.proc_macro2]
+[build-dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.79"
+version = "=1.0.81"
 features = ["proc-macro", "span-locations"]
 
-[build_dependencies.profiling]
+[build-dependencies.profiling]
 package = "profiling"
 version = "=1.0.15"
 features = ["procmacros", "profiling-procmacros"]
 
-[build_dependencies.profiling_procmacros]
+[build-dependencies.profiling_procmacros]
 package = "profiling-procmacros"
 version = "=1.0.15"
 
-[build_dependencies.psl_types]
+[build-dependencies.psl_types]
 package = "psl-types"
 version = "=2.0.11"
 
-[build_dependencies.publicsuffix]
+[build-dependencies.publicsuffix]
 package = "publicsuffix"
 version = "=2.2.3"
 features = ["idna", "punycode"]
 
-[build_dependencies.qoi]
+[build-dependencies.qoi]
 package = "qoi"
 version = "=0.4.1"
 features = ["std"]
 
-[build_dependencies.quick_error]
+[build-dependencies.quick_error]
 package = "quick-error"
 version = "=2.0.1"
 
-[build_dependencies.quote]
+[build-dependencies.quote]
 package = "quote"
-version = "=1.0.35"
+version = "=1.0.36"
 features = ["proc-macro"]
 
-[build_dependencies.rand]
+[build-dependencies.rand]
 package = "rand"
 version = "=0.8.5"
 features = ["alloc", "getrandom", "libc", "rand_chacha", "serde", "serde1", "small_rng", "std", "std_rng"]
 
-[build_dependencies.rand_chacha]
+[build-dependencies.rand_chacha]
 package = "rand_chacha"
 version = "=0.3.1"
 features = ["std"]
 
-[build_dependencies.rand_core]
+[build-dependencies.rand_core]
 package = "rand_core"
 version = "=0.6.4"
 features = ["alloc", "getrandom", "serde", "serde1", "std"]
 
-[build_dependencies.rand_distr]
+[build-dependencies.rand_distr]
 package = "rand_distr"
 version = "=0.4.3"
 features = ["alloc", "std"]
 
-[build_dependencies.rav1e]
+[build-dependencies.rav1e]
 package = "rav1e"
 version = "=0.7.1"
 features = ["threading", "wasm", "wasm-bindgen"]
 default-features = false
 
-[build_dependencies.ravif]
+[build-dependencies.ravif]
 package = "ravif"
 version = "=0.11.5"
 default-features = false
 
-[build_dependencies.rawpointer]
+[build-dependencies.rawpointer]
 package = "rawpointer"
 version = "=0.2.1"
 
-[build_dependencies.rayon]
+[build-dependencies.rayon]
 package = "rayon"
 version = "=1.10.0"
 
-[build_dependencies.rayon_core]
+[build-dependencies.rayon_core]
 package = "rayon-core"
 version = "=1.12.1"
 
-[build_dependencies.regex]
+[build-dependencies.regex]
 package = "regex"
 version = "=1.10.4"
 features = ["perf", "perf-backtrack", "perf-cache", "perf-dfa", "perf-inline", "perf-literal", "perf-onepass", "std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
-[build_dependencies.regex_automata]
+[build-dependencies.regex_automata]
 package = "regex-automata"
 version = "=0.4.6"
 features = ["alloc", "dfa", "dfa-build", "dfa-onepass", "dfa-search", "hybrid", "meta", "nfa", "nfa-backtrack", "nfa-pikevm", "nfa-thompson", "perf", "perf-inline", "perf-literal", "perf-literal-multisubstring", "perf-literal-substring", "std", "syntax", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment", "unicode-word-boundary"]
 
-[build_dependencies.regex_syntax]
+[build-dependencies.regex_syntax]
 package = "regex-syntax"
 version = "=0.8.3"
 features = ["std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
-[build_dependencies.reqwest]
+[build-dependencies.reqwest]
 package = "reqwest"
-version = "=0.12.2"
+version = "=0.12.4"
 features = ["__tls", "blocking", "charset", "cookies", "default-tls", "futures-channel", "h2", "http2", "json", "macos-system-configuration", "multipart"]
 
-[build_dependencies.rgb]
+[build-dependencies.rgb]
 package = "rgb"
 version = "=0.8.37"
 features = ["as-bytes", "bytemuck"]
 
-[build_dependencies.ring]
+[build-dependencies.ring]
 package = "ring"
 version = "=0.17.8"
 features = ["alloc", "dev_urandom_fallback"]
 
-[build_dependencies.rusqlite]
+[build-dependencies.rusqlite]
 package = "rusqlite"
 version = "=0.31.0"
 features = ["array", "backup", "blob", "bundled", "bundled-full", "chrono", "collation", "column_decltype", "csv", "csvtab", "extra_check", "functions", "hooks", "i128_blob", "limits", "load_extension", "modern-full", "modern_sqlite", "serde_json", "series", "time", "trace", "unlock_notify", "url", "uuid", "vtab", "window"]
 
-[build_dependencies.rustc_demangle]
+[build-dependencies.rustc_demangle]
 package = "rustc-demangle"
 version = "=0.1.23"
 
-[build_dependencies.rustc_version]
+[build-dependencies.rustc_version]
 package = "rustc_version"
 version = "=0.4.0"
 
-[build_dependencies.rustix]
+[build-dependencies.rustix]
 package = "rustix"
-version = "=0.38.32"
-features = ["alloc", "fs", "std", "termios", "use-libc-auxv"]
+version = "=0.38.34"
+features = ["alloc", "fs", "libc-extra-traits", "std", "termios", "use-libc-auxv"]
 
-[build_dependencies.rustls_pemfile]
+[build-dependencies.rustls_pemfile]
 package = "rustls-pemfile"
-version = "=1.0.4"
+version = "=2.1.2"
+features = ["std"]
 
-[build_dependencies.ryu]
+[build-dependencies.rustls_pki_types]
+package = "rustls-pki-types"
+version = "=1.5.0"
+features = ["alloc"]
+
+[build-dependencies.ryu]
 package = "ryu"
 version = "=1.0.17"
 
-[build_dependencies.safe_arch]
+[build-dependencies.safe_arch]
 package = "safe_arch"
 version = "=0.7.1"
 features = ["bytemuck"]
 
-[build_dependencies.same_file]
+[build-dependencies.same_file]
 package = "same-file"
 version = "=1.0.6"
 
-[build_dependencies.scopeguard]
+[build-dependencies.scopeguard]
 package = "scopeguard"
 version = "=1.2.0"
 features = ["use_std"]
 
-[build_dependencies.select]
+[build-dependencies.select]
 package = "select"
 version = "=0.6.0"
 
-[build_dependencies.semver]
+[build-dependencies.semver]
 package = "semver"
 version = "=1.0.22"
 features = ["std"]
 
-[build_dependencies.serde]
+[build-dependencies.serde]
 package = "serde"
-version = "=1.0.197"
+version = "=1.0.199"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
-[build_dependencies.serde_derive]
+[build-dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.197"
+version = "=1.0.199"
 
-[build_dependencies.serde_json]
+[build-dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.115"
+version = "=1.0.116"
 features = ["raw_value", "std"]
 
-[build_dependencies.serde_spanned]
+[build-dependencies.serde_spanned]
 package = "serde_spanned"
 version = "=0.6.5"
 features = ["serde"]
 
-[build_dependencies.serde_urlencoded]
+[build-dependencies.serde_urlencoded]
 package = "serde_urlencoded"
 version = "=0.7.1"
 
-[build_dependencies.serde_value]
+[build-dependencies.serde_value]
 package = "serde-value"
 version = "=0.7.0"
 
-[build_dependencies.serde_yaml]
+[build-dependencies.serde_yaml]
 package = "serde_yaml"
 version = "=0.9.34"
 
-[build_dependencies.sha1_smol]
+[build-dependencies.sha1_smol]
 package = "sha1_smol"
 version = "=1.0.0"
 
-[build_dependencies.sha2]
+[build-dependencies.sha2]
 package = "sha2"
 version = "=0.10.8"
 features = ["std"]
 
-[build_dependencies.signal_hook_registry]
+[build-dependencies.signal_hook_registry]
 package = "signal-hook-registry"
-version = "=1.4.1"
+version = "=1.4.2"
 
-[build_dependencies.simba]
+[build-dependencies.simba]
 package = "simba"
 version = "=0.8.1"
 features = ["std", "wide"]
 default-features = false
 
-[build_dependencies.simd_adler32]
+[build-dependencies.simd_adler32]
 package = "simd-adler32"
 version = "=0.3.7"
 features = ["const-generics", "std"]
 
-[build_dependencies.simd_helpers]
+[build-dependencies.simd_helpers]
 package = "simd_helpers"
 version = "=0.1.0"
 
-[build_dependencies.siphasher]
+[build-dependencies.siphasher]
 package = "siphasher"
 version = "=0.3.11"
 features = ["std"]
 
-[build_dependencies.slab]
+[build-dependencies.slab]
 package = "slab"
 version = "=0.4.9"
 features = ["std"]
 
-[build_dependencies.smallvec]
+[build-dependencies.smallvec]
 package = "smallvec"
 version = "=1.13.2"
 features = ["const_generics", "const_new"]
 
-[build_dependencies.smawk]
+[build-dependencies.smawk]
 package = "smawk"
 version = "=0.3.2"
 
-[build_dependencies.socket2]
+[build-dependencies.socket2]
 package = "socket2"
 version = "=0.5.6"
 features = ["all"]
 
-[build_dependencies.spin]
+[build-dependencies.spin]
 package = "spin"
 version = "=0.9.8"
 features = ["barrier", "lazy", "lock_api", "lock_api_crate", "mutex", "once", "rwlock", "spin_mutex"]
 
-[build_dependencies.sptr]
+[build-dependencies.sptr]
 package = "sptr"
 version = "=0.3.2"
 
-[build_dependencies.string_cache]
+[build-dependencies.string_cache]
 package = "string_cache"
 version = "=0.8.7"
 features = ["serde", "serde_support"]
 
-[build_dependencies.string_cache_codegen]
+[build-dependencies.string_cache_codegen]
 package = "string_cache_codegen"
 version = "=0.5.2"
 
-[build_dependencies.stringprep]
+[build-dependencies.stringprep]
 package = "stringprep"
 version = "=0.1.4"
 
-[build_dependencies.strsim]
+[build-dependencies.strsim]
 package = "strsim"
-version = "=0.11.0"
+version = "=0.11.1"
 
-[build_dependencies.subtle]
+[build-dependencies.subtle]
 package = "subtle"
 version = "=2.5.0"
 default-features = false
 
-[build_dependencies.syn]
+[build-dependencies.syn]
 package = "syn"
-version = "=2.0.57"
+version = "=2.0.60"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
-[build_dependencies.syn_1_0_109]
+[build-dependencies.syn_1_0_109]
 package = "syn"
 version = "=1.0.109"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"]
 
-[build_dependencies.sync_wrapper]
+[build-dependencies.sync_wrapper]
 package = "sync_wrapper"
 version = "=0.1.2"
 
-[build_dependencies.tar]
+[build-dependencies.tar]
 package = "tar"
 version = "=0.4.40"
 features = ["xattr"]
 
-[build_dependencies.tempfile]
+[build-dependencies.tempfile]
 package = "tempfile"
 version = "=3.10.1"
 
-[build_dependencies.tendril]
+[build-dependencies.tendril]
 package = "tendril"
 version = "=0.4.3"
 
-[build_dependencies.termcolor]
+[build-dependencies.termcolor]
 package = "termcolor"
 version = "=1.4.1"
 
-[build_dependencies.terminal_size]
+[build-dependencies.terminal_size]
 package = "terminal_size"
 version = "=0.3.0"
 
-[build_dependencies.textwrap]
+[build-dependencies.textwrap]
 package = "textwrap"
 version = "=0.16.1"
 features = ["smawk", "unicode-linebreak", "unicode-width"]
 
-[build_dependencies.thiserror]
+[build-dependencies.thiserror]
 package = "thiserror"
-version = "=1.0.58"
+version = "=1.0.59"
 
-[build_dependencies.thiserror_impl]
+[build-dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=1.0.58"
+version = "=1.0.59"
 
-[build_dependencies.thread_id]
+[build-dependencies.thread_id]
 package = "thread-id"
 version = "=4.2.1"
 
-[build_dependencies.threadpool]
+[build-dependencies.threadpool]
 package = "threadpool"
 version = "=1.8.1"
 
-[build_dependencies.tiff]
+[build-dependencies.tiff]
 package = "tiff"
 version = "=0.9.1"
 
-[build_dependencies.time]
+[build-dependencies.time]
 package = "time"
-version = "=0.3.34"
+version = "=0.3.36"
 features = ["alloc", "formatting", "macros", "parsing", "std"]
 
-[build_dependencies.time_core]
+[build-dependencies.time_core]
 package = "time-core"
 version = "=0.1.2"
 
-[build_dependencies.time_macros]
+[build-dependencies.time_macros]
 package = "time-macros"
-version = "=0.2.17"
+version = "=0.2.18"
 features = ["formatting", "parsing"]
 
-[build_dependencies.tinyvec]
+[build-dependencies.tinyvec]
 package = "tinyvec"
 version = "=1.6.0"
 features = ["alloc", "grab_spare_slice", "rustc_1_40", "rustc_1_55", "serde", "std", "tinyvec_macros"]
 
-[build_dependencies.tinyvec_macros]
+[build-dependencies.tinyvec_macros]
 package = "tinyvec_macros"
 version = "=0.1.1"
 
-[build_dependencies.tokio]
+[build-dependencies.tokio]
 package = "tokio"
 version = "=1.37.0"
 features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "windows-sys"]
 
-[build_dependencies.tokio_io]
+[build-dependencies.tokio_io]
 package = "tokio-io"
 version = "=0.1.13"
 
-[build_dependencies.tokio_macros]
+[build-dependencies.tokio_macros]
 package = "tokio-macros"
 version = "=2.2.0"
 
-[build_dependencies.tokio_native_tls]
+[build-dependencies.tokio_native_tls]
 package = "tokio-native-tls"
 version = "=0.3.1"
 
-[build_dependencies.tokio_postgres]
+[build-dependencies.tokio_postgres]
 package = "tokio-postgres"
 version = "=0.7.10"
 features = ["runtime"]
 
-[build_dependencies.tokio_util]
+[build-dependencies.tokio_util]
 package = "tokio-util"
 version = "=0.7.10"
 features = ["codec", "io", "tracing"]
 
-[build_dependencies.toml]
+[build-dependencies.toml]
 package = "toml"
 version = "=0.8.12"
 features = ["display", "parse"]
 
-[build_dependencies.toml_datetime]
+[build-dependencies.toml_datetime]
 package = "toml_datetime"
 version = "=0.6.5"
 features = ["serde"]
 
-[build_dependencies.toml_edit]
+[build-dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.22.9"
+version = "=0.22.12"
 features = ["display", "parse", "serde"]
 default-features = false
 
-[build_dependencies.tower]
+[build-dependencies.tower]
 package = "tower"
 version = "=0.4.13"
 features = ["__common", "balance", "buffer", "discover", "filter", "full", "futures-core", "futures-util", "hdrhistogram", "hedge", "indexmap", "limit", "load", "load-shed", "log", "make", "pin-project", "pin-project-lite", "rand", "ready-cache", "reconnect", "retry", "slab", "spawn-ready", "steer", "timeout", "tokio", "tokio-util", "tracing", "util"]
 
-[build_dependencies.tower_layer]
+[build-dependencies.tower_layer]
 package = "tower-layer"
 version = "=0.3.2"
 
-[build_dependencies.tower_service]
+[build-dependencies.tower_service]
 package = "tower-service"
 version = "=0.3.2"
 
-[build_dependencies.tracing]
+[build-dependencies.tracing]
 package = "tracing"
 version = "=0.1.40"
 features = ["attributes", "log", "std", "tracing-attributes"]
 
-[build_dependencies.tracing_attributes]
+[build-dependencies.tracing_attributes]
 package = "tracing-attributes"
 version = "=0.1.27"
 
-[build_dependencies.tracing_core]
+[build-dependencies.tracing_core]
 package = "tracing-core"
 version = "=0.1.32"
 features = ["once_cell", "std", "valuable"]
 
-[build_dependencies.try_lock]
+[build-dependencies.try_lock]
 package = "try-lock"
 version = "=0.2.5"
 
-[build_dependencies.typemap_ors]
+[build-dependencies.typemap_ors]
 package = "typemap-ors"
 version = "=1.0.0"
 
-[build_dependencies.typenum]
+[build-dependencies.typenum]
 package = "typenum"
 version = "=1.17.0"
 features = ["const-generics", "i128"]
 
-[build_dependencies.unicase]
+[build-dependencies.unicase]
 package = "unicase"
 version = "=2.7.0"
 
-[build_dependencies.unicode_bidi]
+[build-dependencies.unicode_bidi]
 package = "unicode-bidi"
 version = "=0.3.15"
 features = ["hardcoded-data", "std"]
 
-[build_dependencies.unicode_ident]
+[build-dependencies.unicode_ident]
 package = "unicode-ident"
 version = "=1.0.12"
 
-[build_dependencies.unicode_linebreak]
+[build-dependencies.unicode_linebreak]
 package = "unicode-linebreak"
 version = "=0.1.5"
 
-[build_dependencies.unicode_normalization]
+[build-dependencies.unicode_normalization]
 package = "unicode-normalization"
 version = "=0.1.23"
 features = ["std"]
 
-[build_dependencies.unicode_segmentation]
+[build-dependencies.unicode_segmentation]
 package = "unicode-segmentation"
 version = "=1.11.0"
 
-[build_dependencies.unicode_width]
+[build-dependencies.unicode_width]
 package = "unicode-width"
-version = "=0.1.11"
+version = "=0.1.12"
 
-[build_dependencies.unicode_xid]
+[build-dependencies.unicode_xid]
 package = "unicode-xid"
 version = "=0.2.4"
 
-[build_dependencies.unsafe_any_ors]
+[build-dependencies.unsafe_any_ors]
 package = "unsafe-any-ors"
 version = "=1.0.0"
 
-[build_dependencies.unsafe_libyaml]
+[build-dependencies.unsafe_libyaml]
 package = "unsafe-libyaml"
 version = "=0.2.11"
 
-[build_dependencies.untrusted]
+[build-dependencies.untrusted]
 package = "untrusted"
 version = "=0.9.0"
 
-[build_dependencies.url]
+[build-dependencies.url]
 package = "url"
 version = "=2.5.0"
 features = ["serde"]
 
-[build_dependencies.utf8]
+[build-dependencies.utf8]
 package = "utf-8"
 version = "=0.7.6"
 
-[build_dependencies.utf8parse]
+[build-dependencies.utf8parse]
 package = "utf8parse"
 version = "=0.2.1"
 
-[build_dependencies.uuid]
+[build-dependencies.uuid]
 package = "uuid"
 version = "=1.8.0"
 features = ["atomic", "md5", "rng", "serde", "sha1", "std", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
-[build_dependencies.v_frame]
+[build-dependencies.v_frame]
 package = "v_frame"
 version = "=0.3.8"
 
-[build_dependencies.vcpkg]
+[build-dependencies.vcpkg]
 package = "vcpkg"
 version = "=0.2.15"
 
-[build_dependencies.version_check]
+[build-dependencies.version_check]
 package = "version_check"
 version = "=0.9.4"
 
-[build_dependencies.walkdir]
+[build-dependencies.walkdir]
 package = "walkdir"
 version = "=2.5.0"
 
-[build_dependencies.want]
+[build-dependencies.want]
 package = "want"
 version = "=0.3.1"
 
-[build_dependencies.wasm_bindgen]
+[build-dependencies.wasm_bindgen]
 package = "wasm-bindgen"
 version = "=0.2.92"
 features = ["spans", "std"]
 
-[build_dependencies.wasm_bindgen_backend]
+[build-dependencies.wasm_bindgen_backend]
 package = "wasm-bindgen-backend"
 version = "=0.2.92"
 features = ["spans"]
 
-[build_dependencies.wasm_bindgen_macro]
+[build-dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
 version = "=0.2.92"
 features = ["spans"]
 
-[build_dependencies.wasm_bindgen_macro_support]
+[build-dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
 version = "=0.2.92"
 features = ["spans"]
 
-[build_dependencies.wasm_bindgen_shared]
+[build-dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
 version = "=0.2.92"
 
-[build_dependencies.weezl]
+[build-dependencies.weezl]
 package = "weezl"
 version = "=0.1.8"
 features = ["alloc", "std"]
 
-[build_dependencies.whoami]
+[build-dependencies.whoami]
 package = "whoami"
 version = "=1.5.1"
 features = ["web", "web-sys"]
 
-[build_dependencies.wide]
+[build-dependencies.wide]
 package = "wide"
-version = "=0.7.15"
+version = "=0.7.16"
 features = ["std"]
 default-features = false
 
-[build_dependencies.winnow]
+[build-dependencies.winnow]
 package = "winnow"
-version = "=0.6.5"
+version = "=0.6.7"
 features = ["alloc", "std"]
 
-[build_dependencies.xattr]
+[build-dependencies.xattr]
 package = "xattr"
 version = "=1.3.1"
 features = ["unsupported"]
 
-[build_dependencies.xml5ever]
+[build-dependencies.xml5ever]
 package = "xml5ever"
 version = "=0.17.0"
 
-[build_dependencies.zerocopy]
+[build-dependencies.zerocopy]
 package = "zerocopy"
 version = "=0.7.32"
 features = ["__internal_use_only_features_that_work_on_stable", "alloc", "derive", "simd", "zerocopy-derive"]
 default-features = false
 
-[build_dependencies.zerocopy_derive]
+[build-dependencies.zerocopy_derive]
 package = "zerocopy-derive"
 version = "=0.7.32"
 
-[build_dependencies.zeroize]
+[build-dependencies.zeroize]
 package = "zeroize"
 version = "=1.7.0"
 default-features = false
 
-[build_dependencies.zune_core]
+[build-dependencies.zune_core]
 package = "zune-core"
 version = "=0.4.12"
 features = ["std"]
 
-[build_dependencies.zune_inflate]
+[build-dependencies.zune_inflate]
 package = "zune-inflate"
 version = "=0.2.54"
 features = ["simd-adler32", "zlib"]
 default-features = false
 
-[build_dependencies.zune_jpeg]
+[build-dependencies.zune_jpeg]
 package = "zune-jpeg"
 version = "=0.4.11"
 features = ["neon", "std", "x86"]
