@@ -6,13 +6,14 @@ use cargo::{
         package::PackageSet,
         registry::PackageRegistry,
         resolver::{self, features::RequestedFeatures, ResolveOpts, VersionPreferences},
-        Dependency, Package, PackageId, SourceId, Summary, Target,
+        Dependency, Package, PackageId, ResolveVersion, SourceId, Summary, Target,
     },
     sources::{
         source::{QueryKind, Source, SourceMap},
         RegistrySource,
     },
-    util::{cache_lock::CacheLockMode, interning::InternedString, Config, VersionExt},
+    util::{cache_lock::CacheLockMode, interning::InternedString, VersionExt},
+    GlobalContext,
 };
 use itertools::Itertools;
 use semver::Version;
@@ -28,7 +29,7 @@ use std::{
 const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
 
 struct GlobalState<'cfg> {
-    config: &'cfg Config,
+    config: &'cfg GlobalContext,
     target_info: TargetInfo,
     registry: PackageRegistry<'cfg>,
     crates_io: SourceId,
@@ -231,7 +232,7 @@ fn playground_metadata_features(pkg: &Package) -> Option<(BTreeSet<InternedStrin
 }
 
 fn make_global_state<'cfg>(
-    config: &'cfg Config,
+    config: &'cfg GlobalContext,
     modifications: &'cfg Modifications,
 ) -> GlobalState<'cfg> {
     // Information about the playground's target platform.
@@ -375,11 +376,13 @@ fn extend_direct_dependencies(
     let replacements = [];
     let version_prefs = VersionPreferences::default();
     let warnings = None;
+    let version = ResolveVersion::max_stable();
     let resolve = resolver::resolve(
         &summaries,
         &replacements,
         &mut global.registry,
         &version_prefs,
+        version,
         warnings,
     )
     .expect("Unable to resolve dependencies");
@@ -441,7 +444,7 @@ pub fn generate_info(
     modifications: &Modifications,
 ) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
     // Setup to interact with cargo.
-    let config = Config::default().expect("Unable to create default Cargo config");
+    let config = GlobalContext::default().expect("Unable to create default Cargo config");
     let _lock = config.acquire_package_cache_lock(CacheLockMode::DownloadExclusive);
     let mut global = make_global_state(&config, modifications);
 
