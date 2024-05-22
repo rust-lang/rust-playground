@@ -280,7 +280,7 @@ fn bulk_download(global: &mut GlobalState<'_>, package_ids: &[PackageId]) -> Vec
         .get_many(package_set.package_ids())
         .expect("Unable to download packages")
         .into_iter()
-        .map(Package::clone)
+        .cloned()
         .collect()
 }
 
