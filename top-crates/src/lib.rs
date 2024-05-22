@@ -474,7 +474,7 @@ fn generate_dependency_specs(
     });
 
     let mut dependencies = BTreeMap::new();
-    for (name, pkgs) in &crates.iter().group_by(|dep| dep.summary.name()) {
+    for (name, pkgs) in &crates.iter().chunk_by(|dep| dep.summary.name()) {
         let mut first = true;
 
         for dep in pkgs {
