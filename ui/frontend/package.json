@@ -82,8 +82,8 @@
     "webpack-cli": "^5.0.1"
   },
   "engines": {
-    "node": "^18.14",
-    "pnpm": "^8.9"
+    "node": "^22.2",
+    "pnpm": "^9.1"
   },
   "scripts": {
     "test": "jest",
