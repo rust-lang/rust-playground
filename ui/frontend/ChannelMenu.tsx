@@ -8,7 +8,7 @@ import * as selectors from './selectors';
 import { Channel } from './types';
 import { useAppDispatch, useAppSelector } from './hooks';
 
-import styles from './ChannelMenu.module.css';
+import * as styles from './ChannelMenu.module.css';
 
 interface ChannelMenuProps {
   close: () => void;

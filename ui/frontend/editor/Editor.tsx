@@ -11,7 +11,7 @@ import { codeSelector, positionSelector, selectionSelector } from '../selectors'
 import { editCode } from '../reducers/code';
 import { useAppSelector } from '../hooks';
 
-import styles from './Editor.module.css';
+import * as styles from './Editor.module.css';
 
 const editorMap = {
   [EditorType.Simple]: SimpleEditor,

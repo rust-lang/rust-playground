@@ -2,7 +2,7 @@ import React from 'react';
 
 import Header from './Header';
 
-import styles from './Section.module.css';
+import * as styles from './Section.module.css';
 
 interface SectionProps {
   children: React.ReactNode;

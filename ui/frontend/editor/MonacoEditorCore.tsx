@@ -4,7 +4,7 @@ import MonacoEditor, { EditorDidMount, EditorWillMount } from 'react-monaco-edit
 import { useAppSelector } from '../hooks';
 import { config, grammar, themeVsDarkPlus } from './rust_monaco_def';
 
-import styles from './Editor.module.css';
+import * as styles from './Editor.module.css';
 
 const MODE_ID = 'rust';
 

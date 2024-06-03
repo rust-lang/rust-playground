@@ -9,7 +9,7 @@ import * as selectors from './selectors';
 import { Orientation } from './types';
 import { useAppSelector } from './hooks';
 
-import styles from './Playground.module.css';
+import * as styles from './Playground.module.css';
 
 const TRACK_OPTION_NAME = {
   [Orientation.Horizontal]: 'rowGutters',

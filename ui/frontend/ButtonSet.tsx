@@ -2,7 +2,7 @@ import React from 'react';
 
 import Link, { LinkProps } from './uss-router/Link';
 
-import styles from './ButtonSet.module.css';
+import * as styles from './ButtonSet.module.css';
 
 interface ButtonSetProps {
   className?: string;

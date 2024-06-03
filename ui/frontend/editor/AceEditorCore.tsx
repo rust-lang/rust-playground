@@ -8,7 +8,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Crate, PairCharacters, Position, Selection } from '../types';
 
-import styles from './Editor.module.css';
+import * as styles from './Editor.module.css';
 
 // The keybinding and theme need to be loaded **after** the Ace
 // library because they use the global value it provides. Loading this

@@ -22,7 +22,7 @@ debug = false
 
 [dependencies.addr2line]
 package = "addr2line"
-version = "=0.21.0"
+version = "=0.22.0"
 default-features = false
 
 [dependencies.adler]
@@ -125,7 +125,7 @@ version = "=0.8.1"
 
 [dependencies.backtrace]
 package = "backtrace"
-version = "=0.3.71"
+version = "=0.3.72"
 features = ["std"]
 
 [dependencies.base64]
@@ -186,7 +186,7 @@ features = ["bytemuck_derive", "const_zeroed", "derive", "extern_crate_alloc", "
 
 [dependencies.bytemuck_derive]
 package = "bytemuck_derive"
-version = "=1.6.0"
+version = "=1.7.0"
 
 [dependencies.byteorder]
 package = "byteorder"
@@ -211,10 +211,6 @@ version = "=0.4.12"
 package = "cc"
 version = "=1.0.98"
 features = ["jobserver", "libc", "once_cell", "parallel"]
-
-[dependencies.cfg_aliases]
-package = "cfg_aliases"
-version = "=0.1.1"
 
 [dependencies.cfg_if]
 package = "cfg-if"
@@ -421,11 +417,6 @@ version = "=0.3.4"
 package = "filetime"
 version = "=0.2.23"
 
-[dependencies.finl_unicode]
-package = "finl_unicode"
-version = "=1.2.0"
-features = ["categories", "grapheme_clusters"]
-
 [dependencies.fixedbitset]
 package = "fixedbitset"
 version = "=0.4.2"
@@ -535,7 +526,7 @@ features = ["color_quant", "raii_no_panic", "std"]
 
 [dependencies.gimli]
 package = "gimli"
-version = "=0.28.1"
+version = "=0.29.0"
 features = ["read", "read-core"]
 default-features = false
 
@@ -621,7 +612,7 @@ version = "=0.6.0"
 
 [dependencies.hyper_util]
 package = "hyper-util"
-version = "=0.1.3"
+version = "=0.1.5"
 features = ["client", "client-legacy", "http1", "http2", "tokio"]
 
 [dependencies.iana_time_zone]
@@ -825,16 +816,12 @@ version = "=0.2.1"
 
 [dependencies.native_tls]
 package = "native-tls"
-version = "=0.2.11"
+version = "=0.2.12"
 
 [dependencies.ndarray]
 package = "ndarray"
 version = "=0.15.6"
 features = ["std"]
-
-[dependencies.nix]
-package = "nix"
-version = "=0.28.0"
 
 [dependencies.nom]
 package = "nom"
@@ -897,7 +884,7 @@ features = ["i128", "libm", "std"]
 
 [dependencies.object]
 package = "object"
-version = "=0.32.2"
+version = "=0.35.0"
 features = ["archive", "coff", "elf", "macho", "pe", "read_core", "unaligned", "xcoff"]
 default-features = false
 
@@ -929,7 +916,7 @@ features = ["std"]
 
 [dependencies.parking_lot]
 package = "parking_lot"
-version = "=0.12.2"
+version = "=0.12.3"
 features = ["arc_lock", "deadlock_detection", "serde"]
 
 [dependencies.parking_lot_core]
@@ -1040,7 +1027,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.83"
+version = "=1.0.85"
 features = ["proc-macro", "span-locations"]
 
 [dependencies.profiling]
@@ -1205,12 +1192,12 @@ features = ["std"]
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.202"
+version = "=1.0.203"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.202"
+version = "=1.0.203"
 
 [dependencies.serde_json]
 package = "serde_json"
@@ -1306,7 +1293,7 @@ version = "=0.5.2"
 
 [dependencies.stringprep]
 package = "stringprep"
-version = "=0.1.4"
+version = "=0.1.5"
 
 [dependencies.strsim]
 package = "strsim"
@@ -1319,7 +1306,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=2.0.65"
+version = "=2.0.66"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1402,7 +1389,7 @@ version = "=0.1.1"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.37.0"
+version = "=1.38.0"
 features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "windows-sys"]
 
 [dependencies.tokio_io]
@@ -1411,7 +1398,7 @@ version = "=0.1.13"
 
 [dependencies.tokio_macros]
 package = "tokio-macros"
-version = "=2.2.0"
+version = "=2.3.0"
 
 [dependencies.tokio_native_tls]
 package = "tokio-native-tls"
@@ -1429,7 +1416,7 @@ features = ["codec", "io"]
 
 [dependencies.toml]
 package = "toml"
-version = "=0.8.13"
+version = "=0.8.14"
 features = ["display", "parse"]
 
 [dependencies.toml_datetime]
@@ -1439,14 +1426,15 @@ features = ["serde"]
 
 [dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.22.13"
+version = "=0.22.14"
 features = ["display", "parse", "serde"]
 default-features = false
 
 [dependencies.tower]
 package = "tower"
 version = "=0.4.13"
-features = ["__common", "balance", "buffer", "discover", "filter", "full", "futures-core", "futures-util", "hdrhistogram", "hedge", "indexmap", "limit", "load", "load-shed", "log", "make", "pin-project", "pin-project-lite", "rand", "ready-cache", "reconnect", "retry", "slab", "spawn-ready", "steer", "timeout", "tokio", "tokio-util", "tracing", "util"]
+features = ["__common", "balance", "buffer", "discover", "filter", "full", "futures-core", "futures-util", "hdrhistogram", "hedge", "indexmap", "limit", "load", "load-shed", "make", "pin-project", "pin-project-lite", "rand", "ready-cache", "reconnect", "retry", "slab", "spawn-ready", "steer", "timeout", "tokio", "tokio-util", "tracing", "util"]
+default-features = false
 
 [dependencies.tower_layer]
 package = "tower-layer"
@@ -1459,7 +1447,7 @@ version = "=0.3.2"
 [dependencies.tracing]
 package = "tracing"
 version = "=0.1.40"
-features = ["attributes", "log", "std", "tracing-attributes"]
+features = ["attributes", "std", "tracing-attributes"]
 
 [dependencies.tracing_attributes]
 package = "tracing-attributes"
@@ -1504,6 +1492,11 @@ version = "=0.1.5"
 package = "unicode-normalization"
 version = "=0.1.23"
 features = ["std"]
+
+[dependencies.unicode_properties]
+package = "unicode-properties"
+version = "=0.1.1"
+features = ["emoji", "general-category"]
 
 [dependencies.unicode_segmentation]
 package = "unicode-segmentation"
@@ -1603,13 +1596,13 @@ features = ["web", "web-sys"]
 
 [dependencies.wide]
 package = "wide"
-version = "=0.7.20"
+version = "=0.7.22"
 features = ["std"]
 default-features = false
 
 [dependencies.winnow]
 package = "winnow"
-version = "=0.6.8"
+version = "=0.6.10"
 features = ["alloc", "std"]
 
 [dependencies.xattr]
@@ -1633,7 +1626,7 @@ version = "=0.7.34"
 
 [dependencies.zeroize]
 package = "zeroize"
-version = "=1.7.0"
+version = "=1.8.1"
 default-features = false
 
 [dependencies.zune_core]
@@ -1654,7 +1647,7 @@ features = ["neon", "std", "x86"]
 
 [build-dependencies.addr2line]
 package = "addr2line"
-version = "=0.21.0"
+version = "=0.22.0"
 default-features = false
 
 [build-dependencies.adler]
@@ -1757,7 +1750,7 @@ version = "=0.8.1"
 
 [build-dependencies.backtrace]
 package = "backtrace"
-version = "=0.3.71"
+version = "=0.3.72"
 features = ["std"]
 
 [build-dependencies.base64]
@@ -1818,7 +1811,7 @@ features = ["bytemuck_derive", "const_zeroed", "derive", "extern_crate_alloc", "
 
 [build-dependencies.bytemuck_derive]
 package = "bytemuck_derive"
-version = "=1.6.0"
+version = "=1.7.0"
 
 [build-dependencies.byteorder]
 package = "byteorder"
@@ -1843,10 +1836,6 @@ version = "=0.4.12"
 package = "cc"
 version = "=1.0.98"
 features = ["jobserver", "libc", "once_cell", "parallel"]
-
-[build-dependencies.cfg_aliases]
-package = "cfg_aliases"
-version = "=0.1.1"
 
 [build-dependencies.cfg_if]
 package = "cfg-if"
@@ -2053,11 +2042,6 @@ version = "=0.3.4"
 package = "filetime"
 version = "=0.2.23"
 
-[build-dependencies.finl_unicode]
-package = "finl_unicode"
-version = "=1.2.0"
-features = ["categories", "grapheme_clusters"]
-
 [build-dependencies.fixedbitset]
 package = "fixedbitset"
 version = "=0.4.2"
@@ -2167,7 +2151,7 @@ features = ["color_quant", "raii_no_panic", "std"]
 
 [build-dependencies.gimli]
 package = "gimli"
-version = "=0.28.1"
+version = "=0.29.0"
 features = ["read", "read-core"]
 default-features = false
 
@@ -2253,7 +2237,7 @@ version = "=0.6.0"
 
 [build-dependencies.hyper_util]
 package = "hyper-util"
-version = "=0.1.3"
+version = "=0.1.5"
 features = ["client", "client-legacy", "http1", "http2", "tokio"]
 
 [build-dependencies.iana_time_zone]
@@ -2457,16 +2441,12 @@ version = "=0.2.1"
 
 [build-dependencies.native_tls]
 package = "native-tls"
-version = "=0.2.11"
+version = "=0.2.12"
 
 [build-dependencies.ndarray]
 package = "ndarray"
 version = "=0.15.6"
 features = ["std"]
-
-[build-dependencies.nix]
-package = "nix"
-version = "=0.28.0"
 
 [build-dependencies.nom]
 package = "nom"
@@ -2529,7 +2509,7 @@ features = ["i128", "libm", "std"]
 
 [build-dependencies.object]
 package = "object"
-version = "=0.32.2"
+version = "=0.35.0"
 features = ["archive", "coff", "elf", "macho", "pe", "read_core", "unaligned", "xcoff"]
 default-features = false
 
@@ -2561,7 +2541,7 @@ features = ["std"]
 
 [build-dependencies.parking_lot]
 package = "parking_lot"
-version = "=0.12.2"
+version = "=0.12.3"
 features = ["arc_lock", "deadlock_detection", "serde"]
 
 [build-dependencies.parking_lot_core]
@@ -2672,7 +2652,7 @@ version = "=0.1.1"
 
 [build-dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.83"
+version = "=1.0.85"
 features = ["proc-macro", "span-locations"]
 
 [build-dependencies.profiling]
@@ -2837,12 +2817,12 @@ features = ["std"]
 
 [build-dependencies.serde]
 package = "serde"
-version = "=1.0.202"
+version = "=1.0.203"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [build-dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.202"
+version = "=1.0.203"
 
 [build-dependencies.serde_json]
 package = "serde_json"
@@ -2938,7 +2918,7 @@ version = "=0.5.2"
 
 [build-dependencies.stringprep]
 package = "stringprep"
-version = "=0.1.4"
+version = "=0.1.5"
 
 [build-dependencies.strsim]
 package = "strsim"
@@ -2951,7 +2931,7 @@ default-features = false
 
 [build-dependencies.syn]
 package = "syn"
-version = "=2.0.65"
+version = "=2.0.66"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [build-dependencies.syn_1_0_109]
@@ -3034,7 +3014,7 @@ version = "=0.1.1"
 
 [build-dependencies.tokio]
 package = "tokio"
-version = "=1.37.0"
+version = "=1.38.0"
 features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "mio", "net", "num_cpus", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "windows-sys"]
 
 [build-dependencies.tokio_io]
@@ -3043,7 +3023,7 @@ version = "=0.1.13"
 
 [build-dependencies.tokio_macros]
 package = "tokio-macros"
-version = "=2.2.0"
+version = "=2.3.0"
 
 [build-dependencies.tokio_native_tls]
 package = "tokio-native-tls"
@@ -3061,7 +3041,7 @@ features = ["codec", "io"]
 
 [build-dependencies.toml]
 package = "toml"
-version = "=0.8.13"
+version = "=0.8.14"
 features = ["display", "parse"]
 
 [build-dependencies.toml_datetime]
@@ -3071,14 +3051,15 @@ features = ["serde"]
 
 [build-dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.22.13"
+version = "=0.22.14"
 features = ["display", "parse", "serde"]
 default-features = false
 
 [build-dependencies.tower]
 package = "tower"
 version = "=0.4.13"
-features = ["__common", "balance", "buffer", "discover", "filter", "full", "futures-core", "futures-util", "hdrhistogram", "hedge", "indexmap", "limit", "load", "load-shed", "log", "make", "pin-project", "pin-project-lite", "rand", "ready-cache", "reconnect", "retry", "slab", "spawn-ready", "steer", "timeout", "tokio", "tokio-util", "tracing", "util"]
+features = ["__common", "balance", "buffer", "discover", "filter", "full", "futures-core", "futures-util", "hdrhistogram", "hedge", "indexmap", "limit", "load", "load-shed", "make", "pin-project", "pin-project-lite", "rand", "ready-cache", "reconnect", "retry", "slab", "spawn-ready", "steer", "timeout", "tokio", "tokio-util", "tracing", "util"]
+default-features = false
 
 [build-dependencies.tower_layer]
 package = "tower-layer"
@@ -3091,7 +3072,7 @@ version = "=0.3.2"
 [build-dependencies.tracing]
 package = "tracing"
 version = "=0.1.40"
-features = ["attributes", "log", "std", "tracing-attributes"]
+features = ["attributes", "std", "tracing-attributes"]
 
 [build-dependencies.tracing_attributes]
 package = "tracing-attributes"
@@ -3136,6 +3117,11 @@ version = "=0.1.5"
 package = "unicode-normalization"
 version = "=0.1.23"
 features = ["std"]
+
+[build-dependencies.unicode_properties]
+package = "unicode-properties"
+version = "=0.1.1"
+features = ["emoji", "general-category"]
 
 [build-dependencies.unicode_segmentation]
 package = "unicode-segmentation"
@@ -3235,13 +3221,13 @@ features = ["web", "web-sys"]
 
 [build-dependencies.wide]
 package = "wide"
-version = "=0.7.20"
+version = "=0.7.22"
 features = ["std"]
 default-features = false
 
 [build-dependencies.winnow]
 package = "winnow"
-version = "=0.6.8"
+version = "=0.6.10"
 features = ["alloc", "std"]
 
 [build-dependencies.xattr]
@@ -3265,7 +3251,7 @@ version = "=0.7.34"
 
 [build-dependencies.zeroize]
 package = "zeroize"
-version = "=1.7.0"
+version = "=1.8.1"
 default-features = false
 
 [build-dependencies.zune_core]
