@@ -10,7 +10,7 @@ import {
 } from './reducers/output/execute';
 import { enableStdinSelector } from './selectors';
 
-import styles from './Stdin.module.css';
+import * as styles from './Stdin.module.css';
 
 const Stdin: React.FC = () => {
   const dispatch = useAppDispatch();

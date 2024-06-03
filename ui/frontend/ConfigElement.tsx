@@ -2,7 +2,7 @@ import React from 'react';
 
 import MenuItem from './MenuItem';
 
-import styles from './ConfigElement.module.css';
+import * as styles from './ConfigElement.module.css';
 
 interface EitherProps<T extends string> extends ConfigElementProps {
   id: string;

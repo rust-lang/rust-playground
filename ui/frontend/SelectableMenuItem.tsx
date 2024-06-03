@@ -3,7 +3,7 @@ import React from 'react';
 import { CheckmarkIcon } from './Icon';
 import MenuItem from './MenuItem';
 
-import styles from './SelectableMenuItem.module.css';
+import * as styles from './SelectableMenuItem.module.css';
 
 type Button = JSX.IntrinsicElements['button'];
 

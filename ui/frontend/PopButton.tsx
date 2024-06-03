@@ -16,7 +16,7 @@ import {
 import React, { useCallback, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import styles from './PopButton.module.css';
+import * as styles from './PopButton.module.css';
 
 export interface ButtonProps {
   toggle: () => void;

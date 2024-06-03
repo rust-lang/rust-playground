@@ -3,7 +3,7 @@ import React from 'react';
 import Example from './HelpExample';
 import Link from './uss-router/Link';
 
-import styles from './Help.module.css';
+import * as styles from './Help.module.css';
 
 import integer32Logo from './assets/integer32-logo.svg';
 import { navigateToIndex } from './reducers/page';

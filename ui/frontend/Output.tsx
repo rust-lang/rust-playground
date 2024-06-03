@@ -11,7 +11,7 @@ import PaneWithMir from './Output/PaneWithMir';
 import * as selectors from './selectors';
 import { useAppDispatch, useAppSelector } from './hooks';
 
-import styles from './Output.module.css';
+import * as styles from './Output.module.css';
 import Stdin from './Stdin';
 
 const Tab: React.FC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {

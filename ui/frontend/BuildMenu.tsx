@@ -7,7 +7,7 @@ import * as actions from './actions';
 import { useAppDispatch, useAppSelector } from './hooks';
 import * as selectors from './selectors';
 
-import styles from './BuildMenu.module.css';
+import * as styles from './BuildMenu.module.css';
 
 interface BuildMenuProps {
   close: () => void;

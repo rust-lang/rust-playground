@@ -5,7 +5,7 @@ import Prism from './Prism';
 import * as actions from './actions';
 import { useAppDispatch } from './hooks';
 
-import styles from './HelpExample.module.css';
+import * as styles from './HelpExample.module.css';
 import prismTheme from 'prismjs/themes/prism-okaidia.css';
 
 export interface HelpExampleProps {

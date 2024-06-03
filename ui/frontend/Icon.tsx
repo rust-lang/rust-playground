@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-import styles from './Icon.module.css';
+import * as styles from './Icon.module.css';
 
 /* eslint-disable max-len */
 

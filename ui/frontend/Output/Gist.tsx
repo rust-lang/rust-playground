@@ -8,7 +8,7 @@ import { useAppSelector } from '../hooks';
 import Loader from './Loader';
 import Section from './Section';
 
-import styles from './Gist.module.css';
+import * as styles from './Gist.module.css';
 
 const Gist: React.FC = () => {
   const showLoader = useAppSelector(selectors.showGistLoaderSelector);

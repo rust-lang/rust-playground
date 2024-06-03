@@ -22,7 +22,7 @@ import { performGistSave } from './reducers/output/gist';
 import { navigateToHelp } from './reducers/page';
 import * as selectors from './selectors';
 
-import styles from './Header.module.css';
+import * as styles from './Header.module.css';
 
 const Header: React.FC = () => {
   const menuContainer = useRef<HTMLDivElement | null>(null);

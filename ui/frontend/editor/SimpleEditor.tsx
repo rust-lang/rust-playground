@@ -3,7 +3,7 @@ import React from 'react';
 
 import { CommonEditorProps, Position, Selection } from '../types';
 
-import styles from './Editor.module.css';
+import * as styles from './Editor.module.css';
 
 class CodeByteOffsets {
   readonly code: string;

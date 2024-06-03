@@ -7,7 +7,7 @@ import { seenRustSurvey2023 } from './reducers/notifications';
 import { allowLongRun, wsExecuteKillCurrent } from './reducers/output/execute';
 import * as selectors from './selectors';
 
-import styles from './Notifications.module.css';
+import * as styles from './Notifications.module.css';
 
 const SURVEY_URL = 'https://blog.rust-lang.org/2023/12/18/survey-launch.html';
 
