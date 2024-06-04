@@ -83,6 +83,7 @@ struct ExecuteRequest {
     tests: bool,
     code: String,
     backtrace: bool,
+    cargo_script: bool,
 }
 
 impl TryFrom<ExecuteRequest> for coordinator::ExecuteRequest {
@@ -97,6 +98,7 @@ impl TryFrom<ExecuteRequest> for coordinator::ExecuteRequest {
             tests,
             code,
             backtrace,
+            cargo_script,
         } = value;
 
         Ok(coordinator::ExecuteRequest {
@@ -107,6 +109,7 @@ impl TryFrom<ExecuteRequest> for coordinator::ExecuteRequest {
             tests,
             backtrace,
             code,
+            cargo_script,
         })
     }
 }

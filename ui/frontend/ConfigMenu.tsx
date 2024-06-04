@@ -9,12 +9,15 @@ import { useAppDispatch, useAppSelector } from './hooks';
 import * as config from './reducers/configuration';
 import {
   AssemblyFlavor,
+  CargoScript,
+  Channel,
   DemangleAssembly,
   Editor,
   Orientation,
   PairCharacters,
   ProcessAssembly,
 } from './types';
+import { shallowEqual } from 'react-redux';
 
 const MONACO_THEMES = [
   'vs', 'vs-dark', 'vscode-dark-plus',
@@ -30,6 +33,8 @@ const ConfigMenu: React.FC = () => {
   const assemblyFlavor = useAppSelector((state) => state.configuration.assemblyFlavor);
   const demangleAssembly = useAppSelector((state) => state.configuration.demangleAssembly);
   const processAssembly = useAppSelector((state) => state.configuration.processAssembly);
+  const cargoScript = useAppSelector((state) => state.configuration.cargoScript);
+  const isNightly = useAppSelector((state) => state.configuration.channel === Channel.Nightly, shallowEqual);
 
   const dispatch = useAppDispatch();
   const changeAceTheme = useCallback((t: string) => dispatch(config.changeAceTheme(t)), [dispatch]);
@@ -45,6 +50,8 @@ const ConfigMenu: React.FC = () => {
     useCallback((p: ProcessAssembly) => dispatch(config.changeProcessAssembly(p)), [dispatch]);
   const changeDemangleAssembly =
     useCallback((d: DemangleAssembly) => dispatch(config.changeDemangleAssembly(d)), [dispatch]);
+  const changeCargoScript =
+    useCallback((c: CargoScript) => dispatch(config.changeCargoScript(c)), [dispatch]);
 
   return (
     <Fragment>
@@ -142,6 +149,20 @@ const ConfigMenu: React.FC = () => {
           onChange={changeProcessAssembly}
         />
       </MenuGroup>
+
+      {isNightly && (
+        <MenuGroup title="Cargo">
+          <EitherConfig
+            id="cargo-script"
+            name="Cargo Script"
+            a={CargoScript.Enabled}
+            b={CargoScript.Disabled}
+            value={cargoScript}
+            onChange={changeCargoScript}
+          />
+
+        </MenuGroup>
+      )}
     </Fragment>
   );
 };

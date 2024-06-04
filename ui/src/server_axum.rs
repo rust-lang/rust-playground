@@ -1049,6 +1049,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 code,
                 edition,
                 tests,
+                cargo_script,
             } = other;
 
             let mode = if optimize != "0" {
@@ -1071,6 +1072,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 tests,
                 backtrace: false,
                 code,
+                cargo_script,
             })
         }
     }
@@ -1132,6 +1134,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 tests,
                 backtrace,
                 code,
+                cargo_script,
             } = other;
 
             Ok(Self {
@@ -1148,6 +1151,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 tests,
                 backtrace,
                 code,
+                cargo_script,
             })
         }
     }
@@ -1205,6 +1209,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 tests,
                 backtrace,
                 code,
+                cargo_script,
             } = other;
 
             Ok(Self {
@@ -1215,6 +1220,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 tests,
                 backtrace,
                 code,
+                cargo_script,
             })
         }
     }
@@ -1263,6 +1269,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 channel,
                 edition,
                 code,
+                cargo_script,
             } = other;
 
             let channel = match channel {
@@ -1275,6 +1282,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
                 code,
+                cargo_script,
             })
         }
     }
@@ -1320,6 +1328,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 crate_type,
                 edition,
                 code,
+                cargo_script,
             } = other;
 
             let channel = match channel {
@@ -1332,6 +1341,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 crate_type: parse_crate_type(&crate_type)?,
                 edition: parse_edition(&edition)?,
                 code,
+                cargo_script,
             })
         }
     }
@@ -1373,13 +1383,18 @@ pub(crate) mod api_orchestrator_integration_impls {
         type Error = ParseMiriRequestError;
 
         fn try_from(other: crate::MiriRequest) -> std::result::Result<Self, Self::Error> {
-            let crate::MiriRequest { code, edition } = other;
+            let crate::MiriRequest {
+                code,
+                edition,
+                cargo_script,
+            } = other;
 
             Ok(MiriRequest {
                 channel: Channel::Nightly,     // TODO: use what user has submitted
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
                 code,
+                cargo_script,
             })
         }
     }
@@ -1415,13 +1430,18 @@ pub(crate) mod api_orchestrator_integration_impls {
         type Error = ParseMacroExpansionRequestError;
 
         fn try_from(other: crate::MacroExpansionRequest) -> std::result::Result<Self, Self::Error> {
-            let crate::MacroExpansionRequest { code, edition } = other;
+            let crate::MacroExpansionRequest {
+                code,
+                edition,
+                cargo_script,
+            } = other;
 
             Ok(MacroExpansionRequest {
                 channel: Channel::Nightly,     // TODO: use what user has submitted
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
                 code,
+                cargo_script,
             })
         }
     }

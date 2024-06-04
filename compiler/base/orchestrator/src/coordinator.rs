@@ -362,6 +362,7 @@ pub struct ExecuteRequest {
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
+    pub cargo_script: bool,
 }
 
 impl ExecuteRequest {
@@ -374,7 +375,13 @@ impl ExecuteRequest {
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
-        let mut args = vec![];
+        let is_cargo_script_enabled =
+            self.channel == Channel::Nightly && self.cargo_script && self.crate_type.is_binary();
+        let mut args = if is_cargo_script_enabled {
+            vec!["-Zscript"]
+        } else {
+            vec![]
+        };
 
         let cmd = match (self.tests, self.crate_type.is_binary()) {
             (true, _) => "test",
@@ -385,6 +392,11 @@ impl ExecuteRequest {
 
         if let Mode::Release = self.mode {
             args.push("--release");
+        }
+
+        if is_cargo_script_enabled {
+            args.push("--manifest-path");
+            args.push("src/main.rs");
         }
 
         let mut envs = HashMap::new();
@@ -452,6 +464,7 @@ pub struct CompileRequest {
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
+    pub cargo_script: bool,
 }
 
 impl CompileRequest {
@@ -558,6 +571,7 @@ pub struct FormatRequest {
     pub crate_type: CrateType,
     pub edition: Edition,
     pub code: String,
+    pub cargo_script: bool,
 }
 
 impl FormatRequest {
@@ -607,6 +621,7 @@ pub struct ClippyRequest {
     pub crate_type: CrateType,
     pub edition: Edition,
     pub code: String,
+    pub cargo_script: bool,
 }
 
 impl ClippyRequest {
@@ -655,6 +670,7 @@ pub struct MiriRequest {
     pub crate_type: CrateType,
     pub edition: Edition,
     pub code: String,
+    pub cargo_script: bool,
 }
 
 impl MiriRequest {
@@ -703,6 +719,7 @@ pub struct MacroExpansionRequest {
     pub crate_type: CrateType,
     pub edition: Edition,
     pub code: String,
+    pub cargo_script: bool,
 }
 
 impl MacroExpansionRequest {
@@ -2592,8 +2609,6 @@ fn basic_secure_docker_command() -> Command {
         "--platform",
         DOCKER_ARCH,
         "--cap-drop=ALL",
-        "--net",
-        "none",
         "--memory",
         "512m",
         "--memory-swap",
@@ -2635,6 +2650,7 @@ impl Backend for DockerBackend {
         let mut command = basic_secure_docker_command();
         command
             .args(["--name", &name])
+            .args(["--network", "host"])
             .arg("-i")
             .args(["-a", "stdin", "-a", "stdout", "-a", "stderr"])
             .args(["-e", "PLAYGROUND_ORCHESTRATOR=1"])
@@ -2908,6 +2924,7 @@ mod tests {
         tests: false,
         backtrace: false,
         code: String::new(),
+        cargo_script: false,
     };
 
     fn new_execute_request() -> ExecuteRequest {
@@ -3357,6 +3374,7 @@ mod tests {
         tests: false,
         backtrace: false,
         code: String::new(),
+        cargo_script: false,
     };
 
     #[tokio::test]
@@ -3455,6 +3473,7 @@ mod tests {
         tests: false,
         backtrace: false,
         code: String::new(),
+        cargo_script: false,
     };
 
     const DEFAULT_ASSEMBLY_FLAVOR: AssemblyFlavor = AssemblyFlavor::Intel;
@@ -3601,6 +3620,7 @@ mod tests {
         tests: false,
         backtrace: false,
         code: String::new(),
+        cargo_script: false,
     };
 
     #[tokio::test]
@@ -3637,6 +3657,7 @@ mod tests {
             tests: false,
             backtrace: false,
             code: r#"pub fn mul(a: u8, b: u8) -> u8 { a * b }"#.into(),
+            cargo_script: false,
         };
 
         let response = coordinator.compile(req).with_timeout().await.unwrap();
@@ -3664,6 +3685,7 @@ mod tests {
             tests: false,
             backtrace: false,
             code: r#"#[export_name = "inc"] pub fn inc(a: u8) -> u8 { a + 1 }"#.into(),
+            cargo_script: false,
         };
 
         let response = coordinator.compile(req).with_timeout().await.unwrap();
@@ -3684,6 +3706,7 @@ mod tests {
         crate_type: CrateType::Binary,
         edition: Edition::Rust2015,
         code: String::new(),
+        cargo_script: false,
     };
 
     const ARBITRARY_FORMAT_INPUT: &str = "fn main(){1+1;}";
@@ -3772,6 +3795,7 @@ mod tests {
         crate_type: CrateType::Library(LibraryType::Rlib),
         edition: Edition::Rust2021,
         code: String::new(),
+        cargo_script: false,
     };
 
     #[tokio::test]
@@ -3846,6 +3870,7 @@ mod tests {
         crate_type: CrateType::Binary,
         edition: Edition::Rust2021,
         code: String::new(),
+        cargo_script: false,
     };
 
     #[tokio::test]
@@ -3882,6 +3907,7 @@ mod tests {
         crate_type: CrateType::Library(LibraryType::Cdylib),
         edition: Edition::Rust2018,
         code: String::new(),
+        cargo_script: false,
     };
 
     #[tokio::test]
@@ -3932,6 +3958,7 @@ mod tests {
             tests: false,
             backtrace: false,
             code: "pub fn alpha() {}".into(),
+            cargo_script: false,
         };
 
         let response = coordinator
@@ -3952,6 +3979,7 @@ mod tests {
             tests: req.tests,
             backtrace: req.backtrace,
             code: "pub fn beta() {}".into(),
+            cargo_script: false,
         };
 
         let response = coordinator
@@ -3982,6 +4010,7 @@ mod tests {
             tests: false,
             backtrace: false,
             code: r#"fn main() { println!("hello") }"#.into(),
+            cargo_script: false,
         };
 
         let res = coordinator.execute(req.clone()).await.unwrap();
@@ -4010,6 +4039,7 @@ mod tests {
             tests: false,
             backtrace: false,
             code: r#"fn main() { std::process::abort(); }"#.into(),
+            cargo_script: false,
         };
 
         let res = coordinator.execute(req.clone()).await.unwrap();
@@ -4031,6 +4061,7 @@ mod tests {
             tests: false,
             backtrace: false,
             code: Default::default(),
+            cargo_script: false,
         }
     }
 

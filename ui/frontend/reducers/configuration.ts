@@ -4,6 +4,7 @@ import { ThunkAction } from '../actions';
 import {
   AssemblyFlavor,
   Backtrace,
+  CargoScript,
   Channel,
   DemangleAssembly,
   Edition,
@@ -35,6 +36,7 @@ interface State {
   mode: Mode;
   edition: Edition;
   backtrace: Backtrace;
+  cargoScript: CargoScript
 }
 
 const initialState: State = {
@@ -56,6 +58,7 @@ const initialState: State = {
   mode: Mode.Debug,
   edition: Edition.Rust2021,
   backtrace: Backtrace.Disabled,
+  cargoScript: CargoScript.Enabled
 };
 
 const slice = createSlice({
@@ -117,6 +120,9 @@ const slice = createSlice({
     changeProcessAssembly: (state, action: PayloadAction<ProcessAssembly>) => {
       state.processAssembly = action.payload;
     },
+    changeCargoScript: (state, action: PayloadAction<CargoScript>) => {
+      state.cargoScript = action.payload;
+    },
   },
 });
 
@@ -135,16 +141,17 @@ export const {
   changePairCharacters,
   changePrimaryAction,
   changeProcessAssembly,
+  changeCargoScript
 } = slice.actions;
 
 export const changeEdition =
   (edition: Edition): ThunkAction =>
-  (dispatch) => {
-    if (edition === Edition.Rust2024) {
-      dispatch(changeChannel(Channel.Nightly));
-    }
+    (dispatch) => {
+      if (edition === Edition.Rust2024) {
+        dispatch(changeChannel(Channel.Nightly));
+      }
 
-    dispatch(changeEditionRaw(edition));
-  };
+      dispatch(changeEditionRaw(edition));
+    };
 
 export default slice.reducer;

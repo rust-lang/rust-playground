@@ -4,6 +4,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import { State } from '../reducers';
 import {
   Backtrace,
+  CargoScript,
   Channel,
   Edition,
   Focus,
@@ -16,6 +17,7 @@ import {
 export const codeSelector = (state: State) => state.code;
 export const positionSelector = (state: State) => state.position;
 export const selectionSelector = (state: State) => state.selection;
+export const cargoScriptSelector = (state: State) => state.configuration.cargoScript === CargoScript.Enabled
 
 const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
 export const hasTestsSelector = createSelector(codeSelector, code => !!code.match(HAS_TESTS_RE));
@@ -375,26 +377,30 @@ export const clippyRequestSelector = createSelector(
   getCrateType,
   editionSelector,
   codeSelector,
-  (channel, crateType, edition, code) => ({ channel, crateType, edition, code }),
+  cargoScriptSelector,
+  (channel, crateType, edition, code, cargoScript) => ({ channel, crateType, edition, code, cargoScript }),
 );
 
 export const formatRequestSelector = createSelector(
   channelSelector,
   editionSelector,
   codeSelector,
-  (channel, edition, code) => ({ channel, edition, code }),
+  cargoScriptSelector,
+  (channel, edition, code, cargoScript) => ({ channel, edition, code, cargoScript }),
 );
 
 export const miriRequestSelector = createSelector(
   editionSelector,
   codeSelector,
-  (edition, code) => ({ edition, code }),
+  cargoScriptSelector,
+  (edition, code, cargoScript) => ({ edition, code, cargoScript }),
 );
 
 export const macroExpansionRequestSelector = createSelector(
   editionSelector,
   codeSelector,
-  (edition, code) => ({ edition, code })
+  cargoScriptSelector,
+  (edition, code, cargoScript) => ({ edition, code, cargoScript })
 );
 
 const focus = (state: State) => state.output.meta.focus;
@@ -472,7 +478,8 @@ export const executeRequestPayloadSelector = createSelector(
   (state: State) => state.configuration,
   getBacktraceSet,
   (_state: State, { crateType, tests }: { crateType: string, tests: boolean }) => ({ crateType, tests }),
-  (code, channel, configuration, backtrace, { crateType, tests }) => ({
+  cargoScriptSelector,
+  (code, channel, configuration, backtrace, { crateType, tests }, cargoScript) => ({
     channel,
     mode: configuration.mode,
     edition: configuration.edition,
@@ -480,6 +487,7 @@ export const executeRequestPayloadSelector = createSelector(
     tests,
     code,
     backtrace,
+    cargoScript
   }),
 );
 
@@ -491,7 +499,8 @@ export const compileRequestPayloadSelector = createSelector(
   runAsTest,
   getBacktraceSet,
   (_state: State, { target }: { target: string }) => ({ target }),
-  (code, channel, configuration, crateType, tests, backtrace, { target }) => ({
+  cargoScriptSelector,
+  (code, channel, configuration, crateType, tests, backtrace, { target }, cargoScript) => ({
     channel,
     mode: configuration.mode,
     edition: configuration.edition,
@@ -503,5 +512,6 @@ export const compileRequestPayloadSelector = createSelector(
     demangleAssembly: configuration.demangleAssembly,
     processAssembly: configuration.processAssembly,
     backtrace,
+    cargoScript
   }),
 );
