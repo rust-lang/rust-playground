@@ -2,7 +2,7 @@ use crate::{
     gist,
     metrics::{
         record_metric, track_metric_no_request_async, Endpoint, HasLabelsCore, Outcome,
-        UNAVAILABLE_WS,
+        ONE_OFF_QUEUE_DEPTH, UNAVAILABLE_WS,
     },
     request_database::{Handle, How},
     sandbox::DOCKER_PROCESS_TIMEOUT_SOFT,
@@ -442,7 +442,9 @@ where
     for<'f> F:
         FnOnce(&'f coordinator::Coordinator<DockerBackend>, Req) -> BoxFuture<'f, Result<Resp>>,
 {
+    ONE_OFF_QUEUE_DEPTH.inc();
     let coordinator = factory.build().await;
+    ONE_OFF_QUEUE_DEPTH.dec();
 
     let job = async {
         let req = req.try_into()?;
