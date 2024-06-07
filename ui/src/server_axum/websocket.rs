@@ -9,7 +9,7 @@ use crate::{
 use axum::extract::ws::{Message, WebSocket};
 use futures::{future::Fuse, Future, FutureExt, StreamExt, TryFutureExt};
 use orchestrator::{
-    coordinator::{self, CoordinatorFactory, DockerBackend, LimitedCoordinator},
+    coordinator::{self, Coordinator, CoordinatorFactory, DockerBackend},
     DropErrorDetailsExt,
 };
 use snafu::prelude::*;
@@ -222,7 +222,7 @@ pub(crate) async fn handle(
 
 type TaggedError = (Error, Option<Meta>);
 type ResponseTx = mpsc::Sender<Result<MessageResponse, TaggedError>>;
-type SharedCoordinator = Arc<LimitedCoordinator<DockerBackend>>;
+type SharedCoordinator = Arc<Coordinator<DockerBackend>>;
 
 /// Manages a limited amount of access to the `Coordinator`.
 ///
