@@ -2,8 +2,6 @@ use crate::{
     metrics::{self, record_metric, Endpoint, HasLabelsCore, Outcome},
     request_database::{Handle, How},
     server_axum::api_orchestrator_integration_impls::*,
-    Error, Result, StreamingCoordinatorExecuteStdinSnafu, StreamingCoordinatorIdleSnafu,
-    StreamingCoordinatorSpawnSnafu, StreamingExecuteSnafu, WebSocketTaskPanicSnafu,
 };
 
 use axum::extract::ws::{Message, WebSocket};
@@ -31,6 +29,12 @@ use tokio::{
 };
 use tokio_util::sync::CancellationToken;
 use tracing::{error, instrument, warn, Instrument};
+
+use super::{
+    DeserializationSnafu, Error, Result, StreamingCoordinatorExecuteStdinSnafu,
+    StreamingCoordinatorIdleSnafu, StreamingCoordinatorSpawnSnafu, StreamingExecuteSnafu,
+    WebSocketTaskPanicSnafu,
+};
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -533,7 +537,7 @@ async fn handle_msg(
 ) {
     use WSMessageRequest::*;
 
-    let msg = serde_json::from_str(&txt).context(crate::DeserializationSnafu);
+    let msg = serde_json::from_str(&txt).context(DeserializationSnafu);
 
     match msg {
         Ok(ExecuteRequest { payload, meta }) => {

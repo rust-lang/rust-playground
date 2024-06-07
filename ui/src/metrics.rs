@@ -207,13 +207,13 @@ impl Labels {
     }
 }
 
-pub(crate) async fn track_metric_no_request_async<B, Fut, Resp>(
+pub(crate) async fn track_metric_no_request_async<B, Fut, Resp, E>(
     endpoint: Endpoint,
     body: B,
-) -> crate::Result<Resp>
+) -> Result<Resp, E>
 where
     B: FnOnce() -> Fut,
-    Fut: Future<Output = crate::Result<Resp>>,
+    Fut: Future<Output = Result<Resp, E>>,
 {
     let start = Instant::now();
     let response = body().await;

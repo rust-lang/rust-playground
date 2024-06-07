@@ -5,9 +5,7 @@ use crate::{
         ONE_OFF_QUEUE_DEPTH, UNAVAILABLE_WS,
     },
     request_database::{Handle, How},
-    ClippySnafu, CompileSnafu, Config, CratesSnafu, Error, EvaluateSnafu, ExecuteSnafu,
-    FormatSnafu, GhToken, GistCreationSnafu, GistLoadingSnafu, MacroExpansionSnafu, MetricsToken,
-    MiriSnafu, MiriVersionSnafu, Result, ShutdownCoordinatorSnafu, TimeoutSnafu, VersionsSnafu,
+    Config, GhToken, MetricsToken,
 };
 use async_trait::async_trait;
 use axum::{
@@ -48,7 +46,7 @@ use tower_http::{
 };
 use tracing::{error, error_span, field};
 
-use crate::public_http_api as api;
+use crate::{env::PLAYGROUND_GITHUB_TOKEN, public_http_api as api};
 
 const ONE_HOUR: Duration = Duration::from_secs(60 * 60);
 const CORS_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
@@ -608,11 +606,19 @@ where
     Ok((etag, cache_control, response))
 }
 
+fn must_get(token: &GhToken) -> Result<String> {
+    token
+        .0
+        .as_ref()
+        .map(|s| String::clone(s))
+        .context(NoGithubTokenSnafu)
+}
+
 async fn meta_gist_create(
     Extension(token): Extension<GhToken>,
     Json(req): Json<api::MetaGistCreateRequest>,
 ) -> Result<Json<api::MetaGistResponse>> {
-    let token = token.must_get()?;
+    let token = must_get(&token)?;
     gist::create_future(token, req.code)
         .await
         .map(Into::into)
@@ -624,7 +630,7 @@ async fn meta_gist_get(
     Extension(token): Extension<GhToken>,
     Path(id): Path<String>,
 ) -> Result<Json<api::MetaGistResponse>> {
-    let token = token.must_get()?;
+    let token = must_get(&token)?;
     gist::load_future(token, &id)
         .await
         .map(Into::into)
@@ -979,6 +985,135 @@ where
         axum::Json(self.0).into_response()
     }
 }
+
+#[derive(Debug, Snafu)]
+enum Error {
+    #[snafu(display("Gist creation failed"))]
+    GistCreation { source: octocrab::Error },
+
+    #[snafu(display("Gist loading failed"))]
+    GistLoading { source: octocrab::Error },
+
+    #[snafu(display("{PLAYGROUND_GITHUB_TOKEN} not set up for reading/writing gists"))]
+    NoGithubToken,
+
+    #[snafu(display("Unable to deserialize request"))]
+    Deserialization { source: serde_json::Error },
+
+    #[snafu(transparent)]
+    EvaluateRequest {
+        source: api_orchestrator_integration_impls::ParseEvaluateRequestError,
+    },
+
+    #[snafu(transparent)]
+    CompileRequest {
+        source: api_orchestrator_integration_impls::ParseCompileRequestError,
+    },
+
+    #[snafu(transparent)]
+    ExecuteRequest {
+        source: api_orchestrator_integration_impls::ParseExecuteRequestError,
+    },
+
+    #[snafu(transparent)]
+    FormatRequest {
+        source: api_orchestrator_integration_impls::ParseFormatRequestError,
+    },
+
+    #[snafu(transparent)]
+    ClippyRequest {
+        source: api_orchestrator_integration_impls::ParseClippyRequestError,
+    },
+
+    #[snafu(transparent)]
+    MiriRequest {
+        source: api_orchestrator_integration_impls::ParseMiriRequestError,
+    },
+
+    #[snafu(transparent)]
+    MacroExpansionRequest {
+        source: api_orchestrator_integration_impls::ParseMacroExpansionRequestError,
+    },
+
+    #[snafu(display("The WebSocket worker panicked: {}", text))]
+    WebSocketTaskPanic { text: String },
+
+    #[snafu(display("Unable to find the available crates"))]
+    Crates {
+        source: orchestrator::coordinator::CratesError,
+    },
+
+    #[snafu(display("Unable to find the available versions"))]
+    Versions {
+        source: orchestrator::coordinator::VersionsError,
+    },
+
+    #[snafu(display("The Miri version was missing"))]
+    MiriVersion,
+
+    #[snafu(display("Unable to shutdown the coordinator"))]
+    ShutdownCoordinator {
+        source: orchestrator::coordinator::Error,
+    },
+
+    #[snafu(display("Unable to process the evaluate request"))]
+    Evaluate {
+        source: orchestrator::coordinator::ExecuteError,
+    },
+
+    #[snafu(display("Unable to process the compile request"))]
+    Compile {
+        source: orchestrator::coordinator::CompileError,
+    },
+
+    #[snafu(display("Unable to process the execute request"))]
+    Execute {
+        source: orchestrator::coordinator::ExecuteError,
+    },
+
+    #[snafu(display("Unable to process the format request"))]
+    Format {
+        source: orchestrator::coordinator::FormatError,
+    },
+
+    #[snafu(display("Unable to process the Clippy request"))]
+    Clippy {
+        source: orchestrator::coordinator::ClippyError,
+    },
+
+    #[snafu(display("Unable to process the Miri request"))]
+    Miri {
+        source: orchestrator::coordinator::MiriError,
+    },
+
+    #[snafu(display("Unable to process the macro expansion request"))]
+    MacroExpansion {
+        source: orchestrator::coordinator::MacroExpansionError,
+    },
+
+    #[snafu(display("The operation timed out"))]
+    Timeout { source: tokio::time::error::Elapsed },
+
+    #[snafu(display("Unable to spawn a coordinator task"))]
+    StreamingCoordinatorSpawn {
+        source: WebsocketCoordinatorManagerError,
+    },
+
+    #[snafu(display("Unable to idle the coordinator"))]
+    StreamingCoordinatorIdle {
+        source: WebsocketCoordinatorManagerError,
+    },
+
+    #[snafu(display("Unable to perform a streaming execute"))]
+    StreamingExecute { source: WebsocketExecuteError },
+
+    #[snafu(display("Unable to pass stdin to the active execution"))]
+    StreamingCoordinatorExecuteStdin {
+        source: tokio::sync::mpsc::error::SendError<()>,
+    },
+}
+
+type Result<T, E = Error> = ::std::result::Result<T, E>;
 
 pub(crate) mod api_orchestrator_integration_impls {
     use orchestrator::coordinator::*;

@@ -1,7 +1,6 @@
 #![deny(rust_2018_idioms)]
 
 use orchestrator::coordinator::CoordinatorFactory;
-use snafu::prelude::*;
 use std::{
     net::SocketAddr,
     path::{Path, PathBuf},
@@ -183,13 +182,6 @@ impl GhToken {
     fn new(token: &Option<String>) -> Self {
         GhToken(token.clone().map(Arc::new))
     }
-
-    fn must_get(&self) -> Result<String> {
-        self.0
-            .as_ref()
-            .map(|s| String::clone(s))
-            .context(NoGithubTokenSnafu)
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -200,131 +192,3 @@ impl MetricsToken {
         MetricsToken(Arc::new(token.into()))
     }
 }
-
-#[derive(Debug, Snafu)]
-enum Error {
-    #[snafu(display("Gist creation failed: {}", source))]
-    GistCreation { source: octocrab::Error },
-    #[snafu(display("Gist loading failed: {}", source))]
-    GistLoading { source: octocrab::Error },
-    #[snafu(display("{PLAYGROUND_GITHUB_TOKEN} not set up for reading/writing gists"))]
-    NoGithubToken,
-    #[snafu(display("Unable to deserialize request: {}", source))]
-    Deserialization { source: serde_json::Error },
-
-    #[snafu(transparent)]
-    EvaluateRequest {
-        source: server_axum::api_orchestrator_integration_impls::ParseEvaluateRequestError,
-    },
-
-    #[snafu(transparent)]
-    CompileRequest {
-        source: server_axum::api_orchestrator_integration_impls::ParseCompileRequestError,
-    },
-
-    #[snafu(transparent)]
-    ExecuteRequest {
-        source: server_axum::api_orchestrator_integration_impls::ParseExecuteRequestError,
-    },
-
-    #[snafu(transparent)]
-    FormatRequest {
-        source: server_axum::api_orchestrator_integration_impls::ParseFormatRequestError,
-    },
-
-    #[snafu(transparent)]
-    ClippyRequest {
-        source: server_axum::api_orchestrator_integration_impls::ParseClippyRequestError,
-    },
-
-    #[snafu(transparent)]
-    MiriRequest {
-        source: server_axum::api_orchestrator_integration_impls::ParseMiriRequestError,
-    },
-
-    #[snafu(transparent)]
-    MacroExpansionRequest {
-        source: server_axum::api_orchestrator_integration_impls::ParseMacroExpansionRequestError,
-    },
-
-    #[snafu(display("The WebSocket worker panicked: {}", text))]
-    WebSocketTaskPanic { text: String },
-
-    #[snafu(display("Unable to find the available crates"))]
-    Crates {
-        source: orchestrator::coordinator::CratesError,
-    },
-
-    #[snafu(display("Unable to find the available versions"))]
-    Versions {
-        source: orchestrator::coordinator::VersionsError,
-    },
-
-    #[snafu(display("The Miri version was missing"))]
-    MiriVersion,
-
-    #[snafu(display("Unable to shutdown the coordinator"))]
-    ShutdownCoordinator {
-        source: orchestrator::coordinator::Error,
-    },
-
-    #[snafu(display("Unable to process the evaluate request"))]
-    Evaluate {
-        source: orchestrator::coordinator::ExecuteError,
-    },
-
-    #[snafu(display("Unable to process the compile request"))]
-    Compile {
-        source: orchestrator::coordinator::CompileError,
-    },
-
-    #[snafu(display("Unable to process the execute request"))]
-    Execute {
-        source: orchestrator::coordinator::ExecuteError,
-    },
-
-    #[snafu(display("Unable to process the format request"))]
-    Format {
-        source: orchestrator::coordinator::FormatError,
-    },
-
-    #[snafu(display("Unable to process the Clippy request"))]
-    Clippy {
-        source: orchestrator::coordinator::ClippyError,
-    },
-
-    #[snafu(display("Unable to process the Miri request"))]
-    Miri {
-        source: orchestrator::coordinator::MiriError,
-    },
-
-    #[snafu(display("Unable to process the macro expansion request"))]
-    MacroExpansion {
-        source: orchestrator::coordinator::MacroExpansionError,
-    },
-
-    #[snafu(display("The operation timed out"))]
-    Timeout { source: tokio::time::error::Elapsed },
-
-    #[snafu(display("Unable to spawn a coordinator task"))]
-    StreamingCoordinatorSpawn {
-        source: server_axum::WebsocketCoordinatorManagerError,
-    },
-
-    #[snafu(display("Unable to idle the coordinator"))]
-    StreamingCoordinatorIdle {
-        source: server_axum::WebsocketCoordinatorManagerError,
-    },
-
-    #[snafu(display("Unable to perform a streaming execute"))]
-    StreamingExecute {
-        source: server_axum::WebsocketExecuteError,
-    },
-
-    #[snafu(display("Unable to pass stdin to the active execution"))]
-    StreamingCoordinatorExecuteStdin {
-        source: tokio::sync::mpsc::error::SendError<()>,
-    },
-}
-
-type Result<T, E = Error> = ::std::result::Result<T, E>;
