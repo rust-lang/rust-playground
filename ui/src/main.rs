@@ -21,7 +21,6 @@ mod env;
 mod gist;
 mod metrics;
 mod request_database;
-mod sandbox;
 mod server_axum;
 
 fn main() {

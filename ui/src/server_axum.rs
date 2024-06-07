@@ -5,7 +5,6 @@ use crate::{
         ONE_OFF_QUEUE_DEPTH, UNAVAILABLE_WS,
     },
     request_database::{Handle, How},
-    sandbox::DOCKER_PROCESS_TIMEOUT_SOFT,
     ClippyRequest, ClippyResponse, ClippySnafu, CompileRequest, CompileResponse, CompileSnafu,
     Config, CratesSnafu, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu,
     ExecuteRequest, ExecuteResponse, ExecuteSnafu, FormatRequest, FormatResponse, FormatSnafu,
@@ -61,6 +60,8 @@ const SANDBOX_CACHE_TIME_TO_LIVE: Duration = TEN_MINUTES;
 
 const MAX_AGE_ONE_DAY: HeaderValue = HeaderValue::from_static("public, max-age=86400");
 const MAX_AGE_ONE_YEAR: HeaderValue = HeaderValue::from_static("public, max-age=31536000");
+
+const DOCKER_PROCESS_TIMEOUT_SOFT: Duration = Duration::from_secs(10);
 
 mod websocket;
 pub use websocket::CoordinatorManagerError as WebsocketCoordinatorManagerError;
