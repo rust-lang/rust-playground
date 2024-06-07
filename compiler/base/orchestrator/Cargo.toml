@@ -5,6 +5,9 @@ edition = "2021"
 
 [workspace]
 
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(force_docker)'] }
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 asm-cleanup = { path = "../asm-cleanup" }
