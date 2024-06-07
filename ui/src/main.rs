@@ -1,8 +1,6 @@
 #![deny(rust_2018_idioms)]
 
-use crate::env::{PLAYGROUND_GITHUB_TOKEN, PLAYGROUND_UI_ROOT};
 use orchestrator::coordinator::CoordinatorFactory;
-use serde::{Deserialize, Serialize};
 use snafu::prelude::*;
 use std::{
     net::SocketAddr,
@@ -20,8 +18,11 @@ const DEFAULT_COORDINATORS_WEBSOCKET_LIMIT: usize = 50;
 mod env;
 mod gist;
 mod metrics;
+mod public_http_api;
 mod request_database;
 mod server_axum;
+
+use env::{PLAYGROUND_GITHUB_TOKEN, PLAYGROUND_UI_ROOT};
 
 fn main() {
     // Dotenv may be unable to load environment variables, but that's ok in production
@@ -327,208 +328,3 @@ enum Error {
 }
 
 type Result<T, E = Error> = ::std::result::Result<T, E>;
-
-#[derive(Debug, Clone, Serialize)]
-struct ErrorJson {
-    error: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct CompileRequest {
-    target: String,
-    #[serde(rename = "assemblyFlavor")]
-    assembly_flavor: Option<String>,
-    #[serde(rename = "demangleAssembly")]
-    demangle_assembly: Option<String>,
-    #[serde(rename = "processAssembly")]
-    process_assembly: Option<String>,
-    channel: String,
-    mode: String,
-    #[serde(default)]
-    edition: String,
-    #[serde(rename = "crateType")]
-    crate_type: String,
-    tests: bool,
-    #[serde(default)]
-    backtrace: bool,
-    code: String,
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct CompileResponse {
-    success: bool,
-    #[serde(rename = "exitDetail")]
-    exit_detail: String,
-    code: String,
-    stdout: String,
-    stderr: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct ExecuteRequest {
-    channel: String,
-    mode: String,
-    #[serde(default)]
-    edition: String,
-    #[serde(rename = "crateType")]
-    crate_type: String,
-    tests: bool,
-    #[serde(default)]
-    backtrace: bool,
-    code: String,
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct ExecuteResponse {
-    success: bool,
-    #[serde(rename = "exitDetail")]
-    exit_detail: String,
-    stdout: String,
-    stderr: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct FormatRequest {
-    #[serde(default)]
-    channel: Option<String>,
-    #[serde(default)]
-    edition: String,
-    code: String,
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct FormatResponse {
-    success: bool,
-    #[serde(rename = "exitDetail")]
-    exit_detail: String,
-    code: String,
-    stdout: String,
-    stderr: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct ClippyRequest {
-    #[serde(default)]
-    channel: Option<String>,
-    #[serde(default = "default_crate_type", rename = "crateType")]
-    crate_type: String,
-    #[serde(default)]
-    edition: String,
-    code: String,
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct ClippyResponse {
-    success: bool,
-    exit_detail: String,
-    stdout: String,
-    stderr: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct MiriRequest {
-    code: String,
-    #[serde(default)]
-    edition: String,
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct MiriResponse {
-    success: bool,
-    exit_detail: String,
-    stdout: String,
-    stderr: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct MacroExpansionRequest {
-    code: String,
-    #[serde(default)]
-    edition: String,
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct MacroExpansionResponse {
-    success: bool,
-    exit_detail: String,
-    stdout: String,
-    stderr: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize)]
-struct CrateInformation {
-    name: String,
-    version: String,
-    id: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize)]
-struct MetaCratesResponse {
-    crates: Arc<[CrateInformation]>,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize)]
-struct MetaVersionsResponse {
-    stable: MetaChannelVersionResponse,
-    beta: MetaChannelVersionResponse,
-    nightly: MetaChannelVersionResponse,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize)]
-struct MetaChannelVersionResponse {
-    rustc: MetaVersionResponse,
-    rustfmt: MetaVersionResponse,
-    clippy: MetaVersionResponse,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    miri: Option<MetaVersionResponse>,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize)]
-struct MetaVersionResponse {
-    version: Arc<str>,
-    hash: Arc<str>,
-    date: Arc<str>,
-}
-
-#[derive(Debug, Clone, Deserialize)]
-struct MetaGistCreateRequest {
-    code: String,
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct MetaGistResponse {
-    id: String,
-    url: String,
-    code: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct EvaluateRequest {
-    version: String,
-    optimize: String,
-    code: String,
-    #[serde(default)]
-    edition: String,
-    #[serde(default)]
-    tests: bool,
-}
-
-#[derive(Debug, Clone, Serialize)]
-struct EvaluateResponse {
-    result: String,
-    error: Option<String>,
-}
-
-impl From<gist::Gist> for MetaGistResponse {
-    fn from(me: gist::Gist) -> Self {
-        MetaGistResponse {
-            id: me.id,
-            url: me.url,
-            code: me.code,
-        }
-    }
-}
-
-fn default_crate_type() -> String {
-    "bin".into()
-}
