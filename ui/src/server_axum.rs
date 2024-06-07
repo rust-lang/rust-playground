@@ -60,8 +60,6 @@ const MAX_AGE_ONE_YEAR: HeaderValue = HeaderValue::from_static("public, max-age=
 const DOCKER_PROCESS_TIMEOUT_SOFT: Duration = Duration::from_secs(10);
 
 mod websocket;
-pub use websocket::CoordinatorManagerError as WebsocketCoordinatorManagerError;
-pub(crate) use websocket::ExecuteError as WebsocketExecuteError;
 
 #[derive(Debug, Clone)]
 struct CoordinatorOneOffFactory(Arc<CoordinatorFactory>);
@@ -997,9 +995,6 @@ enum Error {
     #[snafu(display("{PLAYGROUND_GITHUB_TOKEN} not set up for reading/writing gists"))]
     NoGithubToken,
 
-    #[snafu(display("Unable to deserialize request"))]
-    Deserialization { source: serde_json::Error },
-
     #[snafu(transparent)]
     EvaluateRequest {
         source: api_orchestrator_integration_impls::ParseEvaluateRequestError,
@@ -1034,9 +1029,6 @@ enum Error {
     MacroExpansionRequest {
         source: api_orchestrator_integration_impls::ParseMacroExpansionRequestError,
     },
-
-    #[snafu(display("The WebSocket worker panicked: {}", text))]
-    WebSocketTaskPanic { text: String },
 
     #[snafu(display("Unable to find the available crates"))]
     Crates {
@@ -1093,24 +1085,6 @@ enum Error {
 
     #[snafu(display("The operation timed out"))]
     Timeout { source: tokio::time::error::Elapsed },
-
-    #[snafu(display("Unable to spawn a coordinator task"))]
-    StreamingCoordinatorSpawn {
-        source: WebsocketCoordinatorManagerError,
-    },
-
-    #[snafu(display("Unable to idle the coordinator"))]
-    StreamingCoordinatorIdle {
-        source: WebsocketCoordinatorManagerError,
-    },
-
-    #[snafu(display("Unable to perform a streaming execute"))]
-    StreamingExecute { source: WebsocketExecuteError },
-
-    #[snafu(display("Unable to pass stdin to the active execution"))]
-    StreamingCoordinatorExecuteStdin {
-        source: tokio::sync::mpsc::error::SendError<()>,
-    },
 }
 
 type Result<T, E = Error> = ::std::result::Result<T, E>;

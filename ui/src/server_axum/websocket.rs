@@ -30,12 +30,6 @@ use tokio::{
 use tokio_util::sync::CancellationToken;
 use tracing::{error, instrument, warn, Instrument};
 
-use super::{
-    DeserializationSnafu, Error, Result, StreamingCoordinatorExecuteStdinSnafu,
-    StreamingCoordinatorIdleSnafu, StreamingCoordinatorSpawnSnafu, StreamingExecuteSnafu,
-    WebSocketTaskPanicSnafu,
-};
-
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct MetaInner {
@@ -797,3 +791,26 @@ pub(crate) enum ExecuteError {
 }
 
 type ExecuteResult<T, E = ExecuteError> = std::result::Result<T, E>;
+
+#[derive(Debug, Snafu)]
+enum Error {
+    #[snafu(display("Unable to deserialize request"))]
+    Deserialization { source: serde_json::Error },
+
+    #[snafu(display("The WebSocket worker panicked: {}", text))]
+    WebSocketTaskPanic { text: String },
+
+    #[snafu(display("Unable to spawn a coordinator task"))]
+    StreamingCoordinatorSpawn { source: CoordinatorManagerError },
+
+    #[snafu(display("Unable to idle the coordinator"))]
+    StreamingCoordinatorIdle { source: CoordinatorManagerError },
+
+    #[snafu(display("Unable to perform a streaming execute"))]
+    StreamingExecute { source: ExecuteError },
+
+    #[snafu(display("Unable to pass stdin to the active execution"))]
+    StreamingCoordinatorExecuteStdin {
+        source: tokio::sync::mpsc::error::SendError<()>,
+    },
+}
