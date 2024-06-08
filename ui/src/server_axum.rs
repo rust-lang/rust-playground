@@ -2,7 +2,7 @@ use crate::{
     gist,
     metrics::{
         record_metric, track_metric_no_request_async, Endpoint, HasLabelsCore, Outcome,
-        ONE_OFF_QUEUE_DEPTH, UNAVAILABLE_WS,
+        UNAVAILABLE_WS,
     },
     request_database::{Handle, How},
     Config, GhToken, MetricsToken,
@@ -437,9 +437,7 @@ where
     for<'f> F:
         FnOnce(&'f coordinator::Coordinator<DockerBackend>, Req) -> BoxFuture<'f, Result<Resp>>,
 {
-    ONE_OFF_QUEUE_DEPTH.inc();
-    let coordinator = factory.build().await;
-    ONE_OFF_QUEUE_DEPTH.dec();
+    let coordinator = factory.build();
 
     let job = async {
         let req = req.try_into()?;
@@ -736,7 +734,7 @@ impl SandboxCache {
         &self,
         factory: &CoordinatorFactory,
     ) -> Result<Stamped<api::MetaCratesResponse>> {
-        let coordinator = factory.build::<DockerBackend>().await;
+        let coordinator = factory.build::<DockerBackend>();
 
         let c = self
             .crates
@@ -755,7 +753,7 @@ impl SandboxCache {
         &self,
         factory: &CoordinatorFactory,
     ) -> Result<Stamped<api::MetaVersionsResponse>> {
-        let coordinator = factory.build::<DockerBackend>().await;
+        let coordinator = factory.build::<DockerBackend>();
 
         let v = self
             .versions
@@ -771,7 +769,7 @@ impl SandboxCache {
     }
 
     async fn raw_versions(&self, factory: &CoordinatorFactory) -> Result<Stamped<Arc<Versions>>> {
-        let coordinator = factory.build::<DockerBackend>().await;
+        let coordinator = factory.build::<DockerBackend>();
 
         let rv = self
             .raw_versions

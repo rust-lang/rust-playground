@@ -17,11 +17,6 @@ lazy_static! {
         vec![0.1, 1.0, 2.5, 5.0, 10.0, 15.0]
     )
     .unwrap();
-    pub(crate) static ref ONE_OFF_QUEUE_DEPTH: IntGauge = register_int_gauge!(
-        "playground_one_off_coordinator_queue_depth",
-        "Number of clients waiting for a one-off coordinator"
-    )
-    .unwrap();
     pub(crate) static ref LIVE_WS: IntGauge = register_int_gauge!(
         "playground_active_websocket_connections_count",
         "Number of active WebSocket connections"
