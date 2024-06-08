@@ -861,7 +861,7 @@ impl CoordinatorFactory {
         CoordinatorId { start, id }
     }
 
-    pub async fn build<B>(&self) -> Coordinator<B>
+    pub fn build<B>(&self) -> Coordinator<B>
     where
         B: Backend + From<CoordinatorId>,
     {
@@ -2849,30 +2849,30 @@ mod tests {
     static TEST_COORDINATOR_FACTORY: Lazy<CoordinatorFactory> =
         Lazy::new(|| CoordinatorFactory::new(*MAX_CONCURRENT_TESTS));
 
-    async fn new_coordinator_test() -> Coordinator<TestBackend> {
-        TEST_COORDINATOR_FACTORY.build().await
+    fn new_coordinator_test() -> Coordinator<TestBackend> {
+        TEST_COORDINATOR_FACTORY.build()
     }
 
-    async fn new_coordinator_docker() -> Coordinator<DockerBackend> {
-        TEST_COORDINATOR_FACTORY.build().await
+    fn new_coordinator_docker() -> Coordinator<DockerBackend> {
+        TEST_COORDINATOR_FACTORY.build()
     }
 
-    async fn new_coordinator() -> Coordinator<impl Backend> {
+    fn new_coordinator() -> Coordinator<impl Backend> {
         #[cfg(not(force_docker))]
         {
-            new_coordinator_test().await
+            new_coordinator_test()
         }
 
         #[cfg(force_docker)]
         {
-            new_coordinator_docker().await
+            new_coordinator_docker()
         }
     }
 
     #[tokio::test]
     #[snafu::report]
     async fn versions() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let versions = coordinator.versions().with_timeout().await.unwrap();
 
@@ -2903,7 +2903,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn execute_response() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let response = coordinator
             .execute(new_execute_request())
@@ -2931,7 +2931,7 @@ mod tests {
         ];
 
         let tests = params.into_iter().map(|(mode, expected)| async move {
-            let coordinator = new_coordinator().await;
+            let coordinator = new_coordinator();
 
             let request = ExecuteRequest {
                 mode,
@@ -2971,7 +2971,7 @@ mod tests {
         let tests = params.into_iter().flat_map(|(code, works_in)| {
             Edition::ALL.into_iter().zip(works_in).map(
                 move |(edition, expected_to_work)| async move {
-                    let coordinator = new_coordinator().await;
+                    let coordinator = new_coordinator();
 
                     let request = ExecuteRequest {
                         code: code.into(),
@@ -3012,7 +3012,7 @@ mod tests {
         ];
 
         let tests = params.into_iter().map(|(crate_type, expected)| async move {
-            let coordinator = new_coordinator().await;
+            let coordinator = new_coordinator();
 
             let request = ExecuteRequest {
                 crate_type,
@@ -3045,7 +3045,7 @@ mod tests {
         let params = [(false, "Running `"), (true, "Running unittests")];
 
         let tests = params.into_iter().map(|(tests, expected)| async move {
-            let coordinator = new_coordinator().await;
+            let coordinator = new_coordinator();
 
             let request = ExecuteRequest {
                 code: code.into(),
@@ -3078,7 +3078,7 @@ mod tests {
         ];
 
         let tests = params.into_iter().map(|(backtrace, expected)| async move {
-            let coordinator = new_coordinator().await;
+            let coordinator = new_coordinator();
 
             let request = ExecuteRequest {
                 code: code.into(),
@@ -3107,7 +3107,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn execute_stdin() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let request = ExecuteRequest {
             code: r#"
@@ -3155,7 +3155,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn execute_stdin_close() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let request = ExecuteRequest {
             code: r#"
@@ -3213,7 +3213,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn execute_kill() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let request = ExecuteRequest {
             code: r#"
@@ -3272,7 +3272,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn execute_status() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let request = ExecuteRequest {
             code: r#"
@@ -3345,7 +3345,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn compile_response() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let req = CompileRequest {
             code: HELLO_WORLD_CODE.into(),
@@ -3366,7 +3366,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn compile_streaming() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let req = CompileRequest {
             code: HELLO_WORLD_CODE.into(),
@@ -3401,7 +3401,7 @@ mod tests {
     #[snafu::report]
     async fn compile_edition() -> Result<()> {
         for edition in Edition::ALL {
-            let coordinator = new_coordinator().await;
+            let coordinator = new_coordinator();
 
             let req = CompileRequest {
                 edition,
@@ -3447,7 +3447,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn compile_assembly() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let req = CompileRequest {
             code: ADD_CODE.into(),
@@ -3480,7 +3480,7 @@ mod tests {
         ];
 
         for (flavor, expected) in cases {
-            let coordinator = new_coordinator().await;
+            let coordinator = new_coordinator();
 
             let req = CompileRequest {
                 target: CompileTarget::Assembly(
@@ -3514,7 +3514,7 @@ mod tests {
         ];
 
         for (mangle, expected) in cases {
-            let coordinator = new_coordinator().await;
+            let coordinator = new_coordinator();
 
             let req = CompileRequest {
                 target: CompileTarget::Assembly(
@@ -3546,7 +3546,7 @@ mod tests {
         ];
 
         for (process, expected) in cases {
-            let coordinator = new_coordinator().await;
+            let coordinator = new_coordinator();
 
             let req = CompileRequest {
                 target: CompileTarget::Assembly(
@@ -3589,7 +3589,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn compile_hir() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let req = CompileRequest {
             code: SUBTRACT_CODE.into(),
@@ -3609,7 +3609,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn compile_llvm_ir() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let req = CompileRequest {
             target: CompileTarget::LlvmIr,
@@ -3636,7 +3636,7 @@ mod tests {
     #[snafu::report]
     async fn compile_wasm() -> Result<()> {
         // cargo-wasm only exists inside the container
-        let coordinator = new_coordinator_docker().await;
+        let coordinator = new_coordinator_docker();
 
         let req = CompileRequest {
             target: CompileTarget::Wasm,
@@ -3680,7 +3680,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn format() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let req = FormatRequest {
             code: ARBITRARY_FORMAT_INPUT.into(),
@@ -3702,7 +3702,7 @@ mod tests {
     #[snafu::report]
     async fn format_channel() -> Result<()> {
         for channel in Channel::ALL {
-            let coordinator = new_coordinator().await;
+            let coordinator = new_coordinator();
 
             let req = FormatRequest {
                 channel,
@@ -3731,7 +3731,7 @@ mod tests {
         ];
 
         for (code, works_in) in cases {
-            let coordinator = new_coordinator().await;
+            let coordinator = new_coordinator();
 
             for (edition, works) in Edition::ALL.into_iter().zip(works_in) {
                 let req = FormatRequest {
@@ -3760,7 +3760,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn clippy() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let req = ClippyRequest {
             code: r#"
@@ -3796,7 +3796,7 @@ mod tests {
         let tests = cases.into_iter().flat_map(|(code, expected_to_be_clean)| {
             Edition::ALL.into_iter().zip(expected_to_be_clean).map(
                 move |(edition, expected_to_be_clean)| async move {
-                    let coordinator = new_coordinator().await;
+                    let coordinator = new_coordinator();
 
                     let req = ClippyRequest {
                         edition,
@@ -3835,7 +3835,7 @@ mod tests {
     #[snafu::report]
     async fn miri() -> Result<()> {
         // cargo-miri-playground only exists inside the container
-        let coordinator = new_coordinator_docker().await;
+        let coordinator = new_coordinator_docker();
 
         let req = MiriRequest {
             code: r#"
@@ -3870,7 +3870,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn macro_expansion() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let req = MacroExpansionRequest {
             code: r#"
@@ -3904,7 +3904,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn compile_clears_old_main_rs() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         // Create a main.rs file
         let req = ExecuteRequest {
@@ -3955,7 +3955,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn still_usable_after_idle() -> Result<()> {
-        let mut coordinator = new_coordinator().await;
+        let mut coordinator = new_coordinator();
 
         let req = ExecuteRequest {
             channel: Channel::Stable,
@@ -3983,7 +3983,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn exit_due_to_signal_is_reported() -> Result<()> {
-        let coordinator = new_coordinator().await;
+        let coordinator = new_coordinator();
 
         let req = ExecuteRequest {
             channel: Channel::Stable,
@@ -4021,7 +4021,7 @@ mod tests {
     #[snafu::report]
     async fn network_connections_are_disabled() -> Result<()> {
         // The limits are only applied to the container
-        let coordinator = new_coordinator_docker().await;
+        let coordinator = new_coordinator_docker();
 
         let req = ExecuteRequest {
             code: r#"
@@ -4049,7 +4049,7 @@ mod tests {
     #[snafu::report]
     async fn memory_usage_is_limited() -> Result<()> {
         // The limits are only applied to the container
-        let coordinator = new_coordinator_docker().await;
+        let coordinator = new_coordinator_docker();
 
         let req = ExecuteRequest {
             code: r#"
@@ -4078,7 +4078,7 @@ mod tests {
     #[snafu::report]
     async fn number_of_pids_is_limited() -> Result<()> {
         // The limits are only applied to the container
-        let coordinator = new_coordinator_docker().await;
+        let coordinator = new_coordinator_docker();
 
         let req = ExecuteRequest {
             code: r##"
@@ -4109,7 +4109,7 @@ mod tests {
     #[snafu::report]
     async fn amount_of_output_is_limited() -> Result<()> {
         // The limits are only applied to the container
-        let coordinator = new_coordinator_docker().await;
+        let coordinator = new_coordinator_docker();
 
         let req = ExecuteRequest {
             code: r##"

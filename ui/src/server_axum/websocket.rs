@@ -2,8 +2,6 @@ use crate::{
     metrics::{self, record_metric, Endpoint, HasLabelsCore, Outcome},
     request_database::{Handle, How},
     server_axum::api_orchestrator_integration_impls::*,
-    Error, Result, StreamingCoordinatorExecuteStdinSnafu, StreamingCoordinatorIdleSnafu,
-    StreamingCoordinatorSpawnSnafu, StreamingExecuteSnafu, WebSocketTaskPanicSnafu,
 };
 
 use axum::extract::ws::{Message, WebSocket};
@@ -250,9 +248,9 @@ impl CoordinatorManager {
     const N_KINDS: usize = 1;
     const KIND_EXECUTE: usize = 0;
 
-    async fn new(factory: &CoordinatorFactory) -> Self {
+    fn new(factory: &CoordinatorFactory) -> Self {
         Self {
-            coordinator: Arc::new(factory.build().await),
+            coordinator: Arc::new(factory.build()),
             tasks: Default::default(),
             semaphore: Arc::new(Semaphore::new(Self::N_PARALLEL)),
             abort_handles: Default::default(),
@@ -362,7 +360,7 @@ async fn handle_core(
         return;
     }
 
-    let mut manager = CoordinatorManager::new(&factory).await;
+    let mut manager = CoordinatorManager::new(&factory);
     let mut session_timeout = pin!(time::sleep(CoordinatorManager::SESSION_TIMEOUT));
     let mut idle_timeout = pin!(Fuse::terminated());
 
@@ -533,7 +531,7 @@ async fn handle_msg(
 ) {
     use WSMessageRequest::*;
 
-    let msg = serde_json::from_str(&txt).context(crate::DeserializationSnafu);
+    let msg = serde_json::from_str(&txt).context(DeserializationSnafu);
 
     match msg {
         Ok(ExecuteRequest { payload, meta }) => {
@@ -793,3 +791,26 @@ pub(crate) enum ExecuteError {
 }
 
 type ExecuteResult<T, E = ExecuteError> = std::result::Result<T, E>;
+
+#[derive(Debug, Snafu)]
+enum Error {
+    #[snafu(display("Unable to deserialize request"))]
+    Deserialization { source: serde_json::Error },
+
+    #[snafu(display("The WebSocket worker panicked: {}", text))]
+    WebSocketTaskPanic { text: String },
+
+    #[snafu(display("Unable to spawn a coordinator task"))]
+    StreamingCoordinatorSpawn { source: CoordinatorManagerError },
+
+    #[snafu(display("Unable to idle the coordinator"))]
+    StreamingCoordinatorIdle { source: CoordinatorManagerError },
+
+    #[snafu(display("Unable to perform a streaming execute"))]
+    StreamingExecute { source: ExecuteError },
+
+    #[snafu(display("Unable to pass stdin to the active execution"))]
+    StreamingCoordinatorExecuteStdin {
+        source: tokio::sync::mpsc::error::SendError<()>,
+    },
+}

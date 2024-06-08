@@ -2,17 +2,10 @@ use crate::{
     gist,
     metrics::{
         record_metric, track_metric_no_request_async, Endpoint, HasLabelsCore, Outcome,
-        ONE_OFF_QUEUE_DEPTH, UNAVAILABLE_WS,
+        UNAVAILABLE_WS,
     },
     request_database::{Handle, How},
-    sandbox::DOCKER_PROCESS_TIMEOUT_SOFT,
-    ClippyRequest, ClippyResponse, ClippySnafu, CompileRequest, CompileResponse, CompileSnafu,
-    Config, CratesSnafu, Error, ErrorJson, EvaluateRequest, EvaluateResponse, EvaluateSnafu,
-    ExecuteRequest, ExecuteResponse, ExecuteSnafu, FormatRequest, FormatResponse, FormatSnafu,
-    GhToken, GistCreationSnafu, GistLoadingSnafu, MacroExpansionRequest, MacroExpansionResponse,
-    MacroExpansionSnafu, MetaCratesResponse, MetaGistCreateRequest, MetaGistResponse,
-    MetaVersionResponse, MetaVersionsResponse, MetricsToken, MiriRequest, MiriResponse, MiriSnafu,
-    MiriVersionSnafu, Result, ShutdownCoordinatorSnafu, TimeoutSnafu, VersionsSnafu,
+    Config, GhToken, MetricsToken,
 };
 use async_trait::async_trait;
 use axum::{
@@ -53,6 +46,8 @@ use tower_http::{
 };
 use tracing::{error, error_span, field};
 
+use crate::{env::PLAYGROUND_GITHUB_TOKEN, public_http_api as api};
+
 const ONE_HOUR: Duration = Duration::from_secs(60 * 60);
 const CORS_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
 
@@ -62,9 +57,9 @@ const SANDBOX_CACHE_TIME_TO_LIVE: Duration = TEN_MINUTES;
 const MAX_AGE_ONE_DAY: HeaderValue = HeaderValue::from_static("public, max-age=86400");
 const MAX_AGE_ONE_YEAR: HeaderValue = HeaderValue::from_static("public, max-age=31536000");
 
+const DOCKER_PROCESS_TIMEOUT_SOFT: Duration = Duration::from_secs(10);
+
 mod websocket;
-pub use websocket::CoordinatorManagerError as WebsocketCoordinatorManagerError;
-pub(crate) use websocket::ExecuteError as WebsocketExecuteError;
 
 #[derive(Debug, Clone)]
 struct CoordinatorOneOffFactory(Arc<CoordinatorFactory>);
@@ -225,8 +220,8 @@ where
 async fn evaluate(
     Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
-    Json(req): Json<EvaluateRequest>,
-) -> Result<Json<EvaluateResponse>> {
+    Json(req): Json<api::EvaluateRequest>,
+) -> Result<Json<api::EvaluateResponse>> {
     attempt_record_request(db, req, |req| async {
         with_coordinator(&factory.0, req, |c, req| {
             c.execute(req).context(EvaluateSnafu).boxed()
@@ -240,8 +235,8 @@ async fn evaluate(
 async fn compile(
     Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
-    Json(req): Json<CompileRequest>,
-) -> Result<Json<CompileResponse>> {
+    Json(req): Json<api::CompileRequest>,
+) -> Result<Json<api::CompileResponse>> {
     attempt_record_request(db, req, |req| async {
         with_coordinator(&factory.0, req, |c, req| {
             c.compile(req).context(CompileSnafu).boxed()
@@ -255,8 +250,8 @@ async fn compile(
 async fn execute(
     Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
-    Json(req): Json<ExecuteRequest>,
-) -> Result<Json<ExecuteResponse>> {
+    Json(req): Json<api::ExecuteRequest>,
+) -> Result<Json<api::ExecuteResponse>> {
     attempt_record_request(db, req, |req| async {
         with_coordinator(&factory.0, req, |c, req| {
             c.execute(req).context(ExecuteSnafu).boxed()
@@ -270,8 +265,8 @@ async fn execute(
 async fn format(
     Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
-    Json(req): Json<FormatRequest>,
-) -> Result<Json<FormatResponse>> {
+    Json(req): Json<api::FormatRequest>,
+) -> Result<Json<api::FormatResponse>> {
     attempt_record_request(db, req, |req| async {
         with_coordinator(&factory.0, req, |c, req| {
             c.format(req).context(FormatSnafu).boxed()
@@ -285,8 +280,8 @@ async fn format(
 async fn clippy(
     Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
-    Json(req): Json<ClippyRequest>,
-) -> Result<Json<ClippyResponse>> {
+    Json(req): Json<api::ClippyRequest>,
+) -> Result<Json<api::ClippyResponse>> {
     attempt_record_request(db, req, |req| async {
         with_coordinator(&factory.0, req, |c, req| {
             c.clippy(req).context(ClippySnafu).boxed()
@@ -300,8 +295,8 @@ async fn clippy(
 async fn miri(
     Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
-    Json(req): Json<MiriRequest>,
-) -> Result<Json<MiriResponse>> {
+    Json(req): Json<api::MiriRequest>,
+) -> Result<Json<api::MiriResponse>> {
     attempt_record_request(db, req, |req| async {
         with_coordinator(&factory.0, req, |c, req| {
             c.miri(req).context(MiriSnafu).boxed()
@@ -315,8 +310,8 @@ async fn miri(
 async fn macro_expansion(
     Extension(factory): Extension<CoordinatorOneOffFactory>,
     Extension(db): Extension<Handle>,
-    Json(req): Json<MacroExpansionRequest>,
-) -> Result<Json<MacroExpansionResponse>> {
+    Json(req): Json<api::MacroExpansionRequest>,
+) -> Result<Json<api::MacroExpansionResponse>> {
     attempt_record_request(db, req, |req| async {
         with_coordinator(&factory.0, req, |c, req| {
             c.macro_expansion(req).context(MacroExpansionSnafu).boxed()
@@ -331,31 +326,31 @@ pub(crate) trait HasEndpoint {
     const ENDPOINT: Endpoint;
 }
 
-impl HasEndpoint for EvaluateRequest {
+impl HasEndpoint for api::EvaluateRequest {
     const ENDPOINT: Endpoint = Endpoint::Evaluate;
 }
 
-impl HasEndpoint for CompileRequest {
+impl HasEndpoint for api::CompileRequest {
     const ENDPOINT: Endpoint = Endpoint::Compile;
 }
 
-impl HasEndpoint for ExecuteRequest {
+impl HasEndpoint for api::ExecuteRequest {
     const ENDPOINT: Endpoint = Endpoint::Execute;
 }
 
-impl HasEndpoint for FormatRequest {
+impl HasEndpoint for api::FormatRequest {
     const ENDPOINT: Endpoint = Endpoint::Format;
 }
 
-impl HasEndpoint for ClippyRequest {
+impl HasEndpoint for api::ClippyRequest {
     const ENDPOINT: Endpoint = Endpoint::Clippy;
 }
 
-impl HasEndpoint for MiriRequest {
+impl HasEndpoint for api::MiriRequest {
     const ENDPOINT: Endpoint = Endpoint::Miri;
 }
 
-impl HasEndpoint for MacroExpansionRequest {
+impl HasEndpoint for api::MacroExpansionRequest {
     const ENDPOINT: Endpoint = Endpoint::MacroExpansion;
 }
 
@@ -442,9 +437,7 @@ where
     for<'f> F:
         FnOnce(&'f coordinator::Coordinator<DockerBackend>, Req) -> BoxFuture<'f, Result<Resp>>,
 {
-    ONE_OFF_QUEUE_DEPTH.inc();
-    let coordinator = factory.build().await;
-    ONE_OFF_QUEUE_DEPTH.dec();
+    let coordinator = factory.build();
 
     let job = async {
         let req = req.try_into()?;
@@ -609,11 +602,19 @@ where
     Ok((etag, cache_control, response))
 }
 
+fn must_get(token: &GhToken) -> Result<String> {
+    token
+        .0
+        .as_ref()
+        .map(|s| String::clone(s))
+        .context(NoGithubTokenSnafu)
+}
+
 async fn meta_gist_create(
     Extension(token): Extension<GhToken>,
-    Json(req): Json<MetaGistCreateRequest>,
-) -> Result<Json<MetaGistResponse>> {
-    let token = token.must_get()?;
+    Json(req): Json<api::MetaGistCreateRequest>,
+) -> Result<Json<api::MetaGistResponse>> {
+    let token = must_get(&token)?;
     gist::create_future(token, req.code)
         .await
         .map(Into::into)
@@ -624,8 +625,8 @@ async fn meta_gist_create(
 async fn meta_gist_get(
     Extension(token): Extension<GhToken>,
     Path(id): Path<String>,
-) -> Result<Json<MetaGistResponse>> {
-    let token = token.must_get()?;
+) -> Result<Json<api::MetaGistResponse>> {
+    let token = must_get(&token)?;
     gist::load_future(token, &id)
         .await
         .map(Into::into)
@@ -723,14 +724,17 @@ type Stamped<T> = (T, SystemTime);
 
 #[derive(Debug, Default)]
 struct SandboxCache {
-    crates: CacheOne<MetaCratesResponse>,
-    versions: CacheOne<MetaVersionsResponse>,
+    crates: CacheOne<api::MetaCratesResponse>,
+    versions: CacheOne<api::MetaVersionsResponse>,
     raw_versions: CacheOne<Arc<Versions>>,
 }
 
 impl SandboxCache {
-    async fn crates(&self, factory: &CoordinatorFactory) -> Result<Stamped<MetaCratesResponse>> {
-        let coordinator = factory.build::<DockerBackend>().await;
+    async fn crates(
+        &self,
+        factory: &CoordinatorFactory,
+    ) -> Result<Stamped<api::MetaCratesResponse>> {
+        let coordinator = factory.build::<DockerBackend>();
 
         let c = self
             .crates
@@ -748,8 +752,8 @@ impl SandboxCache {
     async fn versions(
         &self,
         factory: &CoordinatorFactory,
-    ) -> Result<Stamped<MetaVersionsResponse>> {
-        let coordinator = factory.build::<DockerBackend>().await;
+    ) -> Result<Stamped<api::MetaVersionsResponse>> {
+        let coordinator = factory.build::<DockerBackend>();
 
         let v = self
             .versions
@@ -765,7 +769,7 @@ impl SandboxCache {
     }
 
     async fn raw_versions(&self, factory: &CoordinatorFactory) -> Result<Stamped<Arc<Versions>>> {
-        let coordinator = factory.build::<DockerBackend>().await;
+        let coordinator = factory.build::<DockerBackend>();
 
         let rv = self
             .raw_versions
@@ -787,7 +791,7 @@ impl SandboxCache {
     async fn version_stable(
         &self,
         factory: &CoordinatorFactory,
-    ) -> Result<Stamped<MetaVersionResponse>> {
+    ) -> Result<Stamped<api::MetaVersionResponse>> {
         let (v, t) = self.raw_versions(factory).await?;
         let v = (&v.stable.rustc).into();
         Ok((v, t))
@@ -796,7 +800,7 @@ impl SandboxCache {
     async fn version_beta(
         &self,
         factory: &CoordinatorFactory,
-    ) -> Result<Stamped<MetaVersionResponse>> {
+    ) -> Result<Stamped<api::MetaVersionResponse>> {
         let (v, t) = self.raw_versions(factory).await?;
         let v = (&v.beta.rustc).into();
         Ok((v, t))
@@ -805,7 +809,7 @@ impl SandboxCache {
     async fn version_nightly(
         &self,
         factory: &CoordinatorFactory,
-    ) -> Result<Stamped<MetaVersionResponse>> {
+    ) -> Result<Stamped<api::MetaVersionResponse>> {
         let (v, t) = self.raw_versions(factory).await?;
         let v = (&v.nightly.rustc).into();
         Ok((v, t))
@@ -814,7 +818,7 @@ impl SandboxCache {
     async fn version_rustfmt(
         &self,
         factory: &CoordinatorFactory,
-    ) -> Result<Stamped<MetaVersionResponse>> {
+    ) -> Result<Stamped<api::MetaVersionResponse>> {
         let (v, t) = self.raw_versions(factory).await?;
         let v = (&v.nightly.rustfmt).into();
         Ok((v, t))
@@ -823,7 +827,7 @@ impl SandboxCache {
     async fn version_clippy(
         &self,
         factory: &CoordinatorFactory,
-    ) -> Result<Stamped<MetaVersionResponse>> {
+    ) -> Result<Stamped<api::MetaVersionResponse>> {
         let (v, t) = self.raw_versions(factory).await?;
         let v = (&v.nightly.clippy).into();
         Ok((v, t))
@@ -832,7 +836,7 @@ impl SandboxCache {
     async fn version_miri(
         &self,
         factory: &CoordinatorFactory,
-    ) -> Result<Stamped<MetaVersionResponse>> {
+    ) -> Result<Stamped<api::MetaVersionResponse>> {
         let (v, t) = self.raw_versions(factory).await?;
         let v = v.nightly.miri.as_ref().context(MiriVersionSnafu)?;
         let v = v.into();
@@ -938,7 +942,7 @@ impl IntoResponse for Error {
             .reduce(|l, r| l + ": " + &r)
             .unwrap_or_default();
         error!(error, "Returning an error to the client");
-        let resp = Json(ErrorJson { error });
+        let resp = Json(api::ErrorJson { error });
         let resp = (StatusCode::INTERNAL_SERVER_ERROR, resp);
         resp.into_response()
     }
@@ -961,7 +965,7 @@ where
             Ok(v) => Ok(Self(v.0)),
             Err(e) => {
                 let error = format!("Unable to deserialize request: {e}");
-                let resp = axum::Json(ErrorJson { error });
+                let resp = axum::Json(api::ErrorJson { error });
                 let resp = (StatusCode::BAD_REQUEST, resp);
                 Err(resp.into_response())
             }
@@ -978,25 +982,133 @@ where
     }
 }
 
+#[derive(Debug, Snafu)]
+enum Error {
+    #[snafu(display("Gist creation failed"))]
+    GistCreation { source: octocrab::Error },
+
+    #[snafu(display("Gist loading failed"))]
+    GistLoading { source: octocrab::Error },
+
+    #[snafu(display("{PLAYGROUND_GITHUB_TOKEN} not set up for reading/writing gists"))]
+    NoGithubToken,
+
+    #[snafu(transparent)]
+    EvaluateRequest {
+        source: api_orchestrator_integration_impls::ParseEvaluateRequestError,
+    },
+
+    #[snafu(transparent)]
+    CompileRequest {
+        source: api_orchestrator_integration_impls::ParseCompileRequestError,
+    },
+
+    #[snafu(transparent)]
+    ExecuteRequest {
+        source: api_orchestrator_integration_impls::ParseExecuteRequestError,
+    },
+
+    #[snafu(transparent)]
+    FormatRequest {
+        source: api_orchestrator_integration_impls::ParseFormatRequestError,
+    },
+
+    #[snafu(transparent)]
+    ClippyRequest {
+        source: api_orchestrator_integration_impls::ParseClippyRequestError,
+    },
+
+    #[snafu(transparent)]
+    MiriRequest {
+        source: api_orchestrator_integration_impls::ParseMiriRequestError,
+    },
+
+    #[snafu(transparent)]
+    MacroExpansionRequest {
+        source: api_orchestrator_integration_impls::ParseMacroExpansionRequestError,
+    },
+
+    #[snafu(display("Unable to find the available crates"))]
+    Crates {
+        source: orchestrator::coordinator::CratesError,
+    },
+
+    #[snafu(display("Unable to find the available versions"))]
+    Versions {
+        source: orchestrator::coordinator::VersionsError,
+    },
+
+    #[snafu(display("The Miri version was missing"))]
+    MiriVersion,
+
+    #[snafu(display("Unable to shutdown the coordinator"))]
+    ShutdownCoordinator {
+        source: orchestrator::coordinator::Error,
+    },
+
+    #[snafu(display("Unable to process the evaluate request"))]
+    Evaluate {
+        source: orchestrator::coordinator::ExecuteError,
+    },
+
+    #[snafu(display("Unable to process the compile request"))]
+    Compile {
+        source: orchestrator::coordinator::CompileError,
+    },
+
+    #[snafu(display("Unable to process the execute request"))]
+    Execute {
+        source: orchestrator::coordinator::ExecuteError,
+    },
+
+    #[snafu(display("Unable to process the format request"))]
+    Format {
+        source: orchestrator::coordinator::FormatError,
+    },
+
+    #[snafu(display("Unable to process the Clippy request"))]
+    Clippy {
+        source: orchestrator::coordinator::ClippyError,
+    },
+
+    #[snafu(display("Unable to process the Miri request"))]
+    Miri {
+        source: orchestrator::coordinator::MiriError,
+    },
+
+    #[snafu(display("Unable to process the macro expansion request"))]
+    MacroExpansion {
+        source: orchestrator::coordinator::MacroExpansionError,
+    },
+
+    #[snafu(display("The operation timed out"))]
+    Timeout { source: tokio::time::error::Elapsed },
+}
+
+type Result<T, E = Error> = ::std::result::Result<T, E>;
+
 pub(crate) mod api_orchestrator_integration_impls {
     use orchestrator::coordinator::*;
     use snafu::prelude::*;
     use std::convert::TryFrom;
 
-    impl From<Vec<Crate>> for crate::MetaCratesResponse {
+    use crate::gist;
+    use crate::public_http_api as api;
+
+    impl From<Vec<Crate>> for api::MetaCratesResponse {
         fn from(other: Vec<Crate>) -> Self {
             let crates = other
                 .into_iter()
                 .map(|c| {
                     let Crate { name, version, id } = c;
-                    crate::CrateInformation { name, version, id }
+                    api::CrateInformation { name, version, id }
                 })
                 .collect();
             Self { crates }
         }
     }
 
-    impl From<Versions> for crate::MetaVersionsResponse {
+    impl From<Versions> for api::MetaVersionsResponse {
         fn from(other: Versions) -> Self {
             let Versions {
                 stable,
@@ -1012,7 +1124,7 @@ pub(crate) mod api_orchestrator_integration_impls {
         }
     }
 
-    impl From<ChannelVersions> for crate::MetaChannelVersionResponse {
+    impl From<ChannelVersions> for api::MetaChannelVersionResponse {
         fn from(other: ChannelVersions) -> Self {
             let ChannelVersions {
                 rustc,
@@ -1031,7 +1143,7 @@ pub(crate) mod api_orchestrator_integration_impls {
         }
     }
 
-    impl From<&Version> for crate::MetaVersionResponse {
+    impl From<&Version> for api::MetaVersionResponse {
         fn from(other: &Version) -> Self {
             Self {
                 version: (&*other.release).into(),
@@ -1041,11 +1153,11 @@ pub(crate) mod api_orchestrator_integration_impls {
         }
     }
 
-    impl TryFrom<crate::EvaluateRequest> for ExecuteRequest {
+    impl TryFrom<api::EvaluateRequest> for ExecuteRequest {
         type Error = ParseEvaluateRequestError;
 
-        fn try_from(other: crate::EvaluateRequest) -> Result<Self, Self::Error> {
-            let crate::EvaluateRequest {
+        fn try_from(other: api::EvaluateRequest) -> Result<Self, Self::Error> {
+            let api::EvaluateRequest {
                 version,
                 optimize,
                 code,
@@ -1086,7 +1198,7 @@ pub(crate) mod api_orchestrator_integration_impls {
         Edition { source: ParseEditionError },
     }
 
-    impl From<WithOutput<ExecuteResponse>> for crate::EvaluateResponse {
+    impl From<WithOutput<ExecuteResponse>> for api::EvaluateResponse {
         fn from(other: WithOutput<ExecuteResponse>) -> Self {
             let WithOutput {
                 response,
@@ -1100,7 +1212,7 @@ pub(crate) mod api_orchestrator_integration_impls {
             // the page, don't include the stderr unless an error
             // occurred.
             if response.success {
-                crate::EvaluateResponse {
+                api::EvaluateResponse {
                     result: stdout,
                     error: None,
                 }
@@ -1110,7 +1222,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 // the `result` field and then they string search for
                 // `error:` or `warning:`. Ew. We can put it in both.
                 let result = stderr + &stdout;
-                crate::EvaluateResponse {
+                api::EvaluateResponse {
                     result: result.clone(),
                     error: Some(result),
                 }
@@ -1118,11 +1230,11 @@ pub(crate) mod api_orchestrator_integration_impls {
         }
     }
 
-    impl TryFrom<crate::CompileRequest> for CompileRequest {
+    impl TryFrom<api::CompileRequest> for CompileRequest {
         type Error = ParseCompileRequestError;
 
-        fn try_from(other: crate::CompileRequest) -> Result<Self, Self::Error> {
-            let crate::CompileRequest {
+        fn try_from(other: api::CompileRequest) -> Result<Self, Self::Error> {
+            let api::CompileRequest {
                 target,
                 assembly_flavor,
                 demangle_assembly,
@@ -1172,7 +1284,7 @@ pub(crate) mod api_orchestrator_integration_impls {
         Edition { source: ParseEditionError },
     }
 
-    impl From<WithOutput<CompileResponse>> for crate::CompileResponse {
+    impl From<WithOutput<CompileResponse>> for api::CompileResponse {
         fn from(other: WithOutput<CompileResponse>) -> Self {
             let WithOutput {
                 response,
@@ -1195,11 +1307,11 @@ pub(crate) mod api_orchestrator_integration_impls {
         }
     }
 
-    impl TryFrom<crate::ExecuteRequest> for ExecuteRequest {
+    impl TryFrom<api::ExecuteRequest> for ExecuteRequest {
         type Error = ParseExecuteRequestError;
 
-        fn try_from(other: crate::ExecuteRequest) -> Result<Self, Self::Error> {
-            let crate::ExecuteRequest {
+        fn try_from(other: api::ExecuteRequest) -> Result<Self, Self::Error> {
+            let api::ExecuteRequest {
                 channel,
                 mode,
                 edition,
@@ -1236,7 +1348,7 @@ pub(crate) mod api_orchestrator_integration_impls {
         Edition { source: ParseEditionError },
     }
 
-    impl From<WithOutput<ExecuteResponse>> for crate::ExecuteResponse {
+    impl From<WithOutput<ExecuteResponse>> for api::ExecuteResponse {
         fn from(other: WithOutput<ExecuteResponse>) -> Self {
             let WithOutput {
                 response,
@@ -1257,11 +1369,11 @@ pub(crate) mod api_orchestrator_integration_impls {
         }
     }
 
-    impl TryFrom<crate::FormatRequest> for FormatRequest {
+    impl TryFrom<api::FormatRequest> for FormatRequest {
         type Error = ParseFormatRequestError;
 
-        fn try_from(other: crate::FormatRequest) -> std::result::Result<Self, Self::Error> {
-            let crate::FormatRequest {
+        fn try_from(other: api::FormatRequest) -> std::result::Result<Self, Self::Error> {
+            let api::FormatRequest {
                 channel,
                 edition,
                 code,
@@ -1290,7 +1402,7 @@ pub(crate) mod api_orchestrator_integration_impls {
         Edition { source: ParseEditionError },
     }
 
-    impl From<WithOutput<FormatResponse>> for crate::FormatResponse {
+    impl From<WithOutput<FormatResponse>> for api::FormatResponse {
         fn from(other: WithOutput<FormatResponse>) -> Self {
             let WithOutput {
                 response,
@@ -1313,11 +1425,11 @@ pub(crate) mod api_orchestrator_integration_impls {
         }
     }
 
-    impl TryFrom<crate::ClippyRequest> for ClippyRequest {
+    impl TryFrom<api::ClippyRequest> for ClippyRequest {
         type Error = ParseClippyRequestError;
 
-        fn try_from(other: crate::ClippyRequest) -> std::result::Result<Self, Self::Error> {
-            let crate::ClippyRequest {
+        fn try_from(other: api::ClippyRequest) -> std::result::Result<Self, Self::Error> {
+            let api::ClippyRequest {
                 channel,
                 crate_type,
                 edition,
@@ -1350,7 +1462,7 @@ pub(crate) mod api_orchestrator_integration_impls {
         Edition { source: ParseEditionError },
     }
 
-    impl From<WithOutput<ClippyResponse>> for crate::ClippyResponse {
+    impl From<WithOutput<ClippyResponse>> for api::ClippyResponse {
         fn from(other: WithOutput<ClippyResponse>) -> Self {
             let WithOutput {
                 response,
@@ -1371,11 +1483,11 @@ pub(crate) mod api_orchestrator_integration_impls {
         }
     }
 
-    impl TryFrom<crate::MiriRequest> for MiriRequest {
+    impl TryFrom<api::MiriRequest> for MiriRequest {
         type Error = ParseMiriRequestError;
 
-        fn try_from(other: crate::MiriRequest) -> std::result::Result<Self, Self::Error> {
-            let crate::MiriRequest { code, edition } = other;
+        fn try_from(other: api::MiriRequest) -> std::result::Result<Self, Self::Error> {
+            let api::MiriRequest { code, edition } = other;
 
             Ok(MiriRequest {
                 channel: Channel::Nightly,     // TODO: use what user has submitted
@@ -1392,7 +1504,7 @@ pub(crate) mod api_orchestrator_integration_impls {
         Edition { source: ParseEditionError },
     }
 
-    impl From<WithOutput<MiriResponse>> for crate::MiriResponse {
+    impl From<WithOutput<MiriResponse>> for api::MiriResponse {
         fn from(other: WithOutput<MiriResponse>) -> Self {
             let WithOutput {
                 response,
@@ -1413,11 +1525,11 @@ pub(crate) mod api_orchestrator_integration_impls {
         }
     }
 
-    impl TryFrom<crate::MacroExpansionRequest> for MacroExpansionRequest {
+    impl TryFrom<api::MacroExpansionRequest> for MacroExpansionRequest {
         type Error = ParseMacroExpansionRequestError;
 
-        fn try_from(other: crate::MacroExpansionRequest) -> std::result::Result<Self, Self::Error> {
-            let crate::MacroExpansionRequest { code, edition } = other;
+        fn try_from(other: api::MacroExpansionRequest) -> std::result::Result<Self, Self::Error> {
+            let api::MacroExpansionRequest { code, edition } = other;
 
             Ok(MacroExpansionRequest {
                 channel: Channel::Nightly,     // TODO: use what user has submitted
@@ -1434,7 +1546,7 @@ pub(crate) mod api_orchestrator_integration_impls {
         Edition { source: ParseEditionError },
     }
 
-    impl From<WithOutput<MacroExpansionResponse>> for crate::MacroExpansionResponse {
+    impl From<WithOutput<MacroExpansionResponse>> for api::MacroExpansionResponse {
         fn from(other: WithOutput<MacroExpansionResponse>) -> Self {
             let WithOutput {
                 response,
@@ -1609,5 +1721,15 @@ pub(crate) mod api_orchestrator_integration_impls {
     #[snafu(display("'{value}' is not a valid edition"))]
     pub(crate) struct ParseEditionError {
         value: String,
+    }
+
+    impl From<gist::Gist> for api::MetaGistResponse {
+        fn from(me: gist::Gist) -> Self {
+            api::MetaGistResponse {
+                id: me.id,
+                url: me.url,
+                code: me.code,
+            }
+        }
     }
 }

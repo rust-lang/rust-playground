@@ -17,11 +17,6 @@ lazy_static! {
         vec![0.1, 1.0, 2.5, 5.0, 10.0, 15.0]
     )
     .unwrap();
-    pub(crate) static ref ONE_OFF_QUEUE_DEPTH: IntGauge = register_int_gauge!(
-        "playground_one_off_coordinator_queue_depth",
-        "Number of clients waiting for a one-off coordinator"
-    )
-    .unwrap();
     pub(crate) static ref LIVE_WS: IntGauge = register_int_gauge!(
         "playground_active_websocket_connections_count",
         "Number of active WebSocket connections"
@@ -207,13 +202,13 @@ impl Labels {
     }
 }
 
-pub(crate) async fn track_metric_no_request_async<B, Fut, Resp>(
+pub(crate) async fn track_metric_no_request_async<B, Fut, Resp, E>(
     endpoint: Endpoint,
     body: B,
-) -> crate::Result<Resp>
+) -> Result<Resp, E>
 where
     B: FnOnce() -> Fut,
-    Fut: Future<Output = crate::Result<Resp>>,
+    Fut: Future<Output = Result<Resp, E>>,
 {
     let start = Instant::now();
     let response = body().await;
