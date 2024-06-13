@@ -1,6 +1,6 @@
 .container {
   display: flex;
-  color: var(--border-color);
+  color: var(--font-color);
   white-space: nowrap;
 
   &::before,

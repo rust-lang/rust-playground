@@ -1,6 +1,3 @@
-$fg-color: #222;
-$bg-color: white;
-$vertical-border-color: #cacaca;
 $arrow-height: 10px;
 $arrow-width: 20px;
 
@@ -19,8 +16,8 @@ $arrow-width: 20px;
     5px 5px 20px -3px rgb(0 0 0 / 25%),
     0 0 5px -2px rgb(0 0 0 / 90%);
   border-radius: var(--header-border-radius);
-  background: $bg-color;
-  color: $fg-color;
+  background: var(--background-color);
+  color: var(--font-color);
 }
 
 .contentBottom {

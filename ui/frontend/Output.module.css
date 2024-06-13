@@ -1,6 +1,3 @@
-$current-tab: #f9ffff;
-$background-tab: #fcfcfc; /* desaturate($current-tab, 100%); */
-
 .container {
   display: flex;
   flex-direction: column;
@@ -13,11 +10,12 @@ $background-tab: #fcfcfc; /* desaturate($current-tab, 100%); */
 }
 
 .tab {
+  color: var(--font-color);
   flex: 1 1 auto;
   cursor: pointer;
   border: var(--border);
   border-right: none;
-  background-color: $background-tab;
+  background-color: var(--output-background-tab);
   line-height: 1.5em;
 
   &:last-of-type {
@@ -29,7 +27,7 @@ $background-tab: #fcfcfc; /* desaturate($current-tab, 100%); */
   composes: tab;
   cursor: default;
   border-bottom: none;
-  background-color: $current-tab;
+  background-color: var(--output-current-tab);
 
   &:focus {
     outline: none;
@@ -44,7 +42,7 @@ $background-tab: #fcfcfc; /* desaturate($current-tab, 100%); */
 .body {
   border: var(--border);
   border-top: none;
-  background-color: $current-tab;
+  background-color: var(--output-current-tab);
   padding: 0.5em;
   height: 100%;
   overflow: scroll;
