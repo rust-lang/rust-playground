@@ -72,7 +72,7 @@ features = ["utf8"]
 
 [dependencies.anstyle_query]
 package = "anstyle-query"
-version = "=1.0.3"
+version = "=1.1.0"
 
 [dependencies.anyhow]
 package = "anyhow"
@@ -125,7 +125,7 @@ version = "=0.8.1"
 
 [dependencies.backtrace]
 package = "backtrace"
-version = "=0.3.72"
+version = "=0.3.73"
 features = ["std"]
 
 [dependencies.base64]
@@ -209,7 +209,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.0.98"
+version = "=1.0.99"
 features = ["jobserver", "libc", "once_cell", "parallel"]
 
 [dependencies.cfg_if]
@@ -223,22 +223,22 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [dependencies.clap]
 package = "clap"
-version = "=4.5.4"
+version = "=4.5.7"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.2"
+version = "=4.5.7"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
 default-features = false
 
 [dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.5.4"
+version = "=4.5.5"
 
 [dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.7.0"
+version = "=0.7.1"
 
 [dependencies.color_quant]
 package = "color_quant"
@@ -344,6 +344,11 @@ version = "=0.2.0"
 package = "digest"
 version = "=0.10.7"
 features = ["alloc", "block-buffer", "core-api", "mac", "std", "subtle"]
+
+[dependencies.displaydoc]
+package = "displaydoc"
+version = "=0.2.4"
+default-features = false
 
 [dependencies.either]
 package = "either"
@@ -586,11 +591,11 @@ version = "=1.0.0"
 
 [dependencies.http_body_util]
 package = "http-body-util"
-version = "=0.1.1"
+version = "=0.1.2"
 
 [dependencies.httparse]
 package = "httparse"
-version = "=1.8.0"
+version = "=1.9.3"
 features = ["std"]
 
 [dependencies.httpdate]
@@ -620,10 +625,56 @@ package = "iana-time-zone"
 version = "=0.1.60"
 features = ["fallback"]
 
+[dependencies.icu_collections]
+package = "icu_collections"
+version = "=1.5.0"
+
+[dependencies.icu_locid]
+package = "icu_locid"
+version = "=1.5.0"
+features = ["zerovec"]
+
+[dependencies.icu_locid_transform]
+package = "icu_locid_transform"
+version = "=1.5.0"
+features = ["compiled_data"]
+default-features = false
+
+[dependencies.icu_locid_transform_data]
+package = "icu_locid_transform_data"
+version = "=1.5.0"
+
+[dependencies.icu_normalizer]
+package = "icu_normalizer"
+version = "=1.5.0"
+features = ["compiled_data"]
+
+[dependencies.icu_normalizer_data]
+package = "icu_normalizer_data"
+version = "=1.5.0"
+
+[dependencies.icu_properties]
+package = "icu_properties"
+version = "=1.5.0"
+features = ["compiled_data"]
+
+[dependencies.icu_properties_data]
+package = "icu_properties_data"
+version = "=1.5.0"
+
+[dependencies.icu_provider]
+package = "icu_provider"
+version = "=1.5.0"
+features = ["macros"]
+
+[dependencies.icu_provider_macros]
+package = "icu_provider_macros"
+version = "=1.5.0"
+
 [dependencies.idna]
 package = "idna"
-version = "=0.5.0"
-features = ["alloc", "std"]
+version = "=1.0.0"
+features = ["alloc", "compiled_data", "std"]
 
 [dependencies.idna_0_3_0]
 package = "idna"
@@ -714,6 +765,12 @@ features = ["bundled", "bundled_bindings", "cc", "min_sqlite_version_3_14_0", "p
 package = "linux-raw-sys"
 version = "=0.4.14"
 features = ["elf", "errno", "general", "ioctl", "no_std", "std"]
+default-features = false
+
+[dependencies.litemap]
+package = "litemap"
+version = "=0.7.3"
+features = ["alloc"]
 default-features = false
 
 [dependencies.lock_api]
@@ -807,7 +864,7 @@ features = ["log", "net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
 package = "nalgebra"
-version = "=0.32.5"
+version = "=0.32.6"
 features = ["macros", "matrixmultiply", "nalgebra-macros", "std"]
 
 [dependencies.nalgebra_macros]
@@ -884,7 +941,7 @@ features = ["i128", "libm", "std"]
 
 [dependencies.object]
 package = "object"
-version = "=0.35.0"
+version = "=0.36.0"
 features = ["archive", "coff", "elf", "macho", "pe", "read_core", "unaligned", "xcoff"]
 default-features = false
 
@@ -1107,17 +1164,17 @@ version = "=1.12.1"
 
 [dependencies.regex]
 package = "regex"
-version = "=1.10.4"
+version = "=1.10.5"
 features = ["perf", "perf-backtrack", "perf-cache", "perf-dfa", "perf-inline", "perf-literal", "perf-onepass", "std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
 [dependencies.regex_automata]
 package = "regex-automata"
-version = "=0.4.6"
+version = "=0.4.7"
 features = ["alloc", "dfa", "dfa-build", "dfa-onepass", "dfa-search", "hybrid", "meta", "nfa", "nfa-backtrack", "nfa-pikevm", "nfa-thompson", "perf", "perf-inline", "perf-literal", "perf-literal-multisubstring", "perf-literal-substring", "std", "syntax", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment", "unicode-word-boundary"]
 
 [dependencies.regex_syntax]
 package = "regex-syntax"
-version = "=0.8.3"
+version = "=0.8.4"
 features = ["std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
 [dependencies.reqwest]
@@ -1282,6 +1339,12 @@ features = ["barrier", "lazy", "lock_api", "lock_api_crate", "mutex", "once", "r
 package = "sptr"
 version = "=0.3.2"
 
+[dependencies.stable_deref_trait]
+package = "stable_deref_trait"
+version = "=1.2.0"
+features = ["alloc"]
+default-features = false
+
 [dependencies.string_cache]
 package = "string_cache"
 version = "=0.8.7"
@@ -1318,9 +1381,14 @@ features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", 
 package = "sync_wrapper"
 version = "=0.1.2"
 
+[dependencies.synstructure]
+package = "synstructure"
+version = "=0.13.1"
+features = ["proc-macro"]
+
 [dependencies.tar]
 package = "tar"
-version = "=0.4.40"
+version = "=0.4.41"
 features = ["xattr"]
 
 [dependencies.tempfile]
@@ -1377,6 +1445,12 @@ version = "=0.1.2"
 package = "time-macros"
 version = "=0.2.18"
 features = ["formatting", "parsing"]
+
+[dependencies.tinystr]
+package = "tinystr"
+version = "=0.7.6"
+features = ["alloc", "zerovec"]
+default-features = false
 
 [dependencies.tinyvec]
 package = "tinyvec"
@@ -1504,7 +1578,7 @@ version = "=1.11.0"
 
 [dependencies.unicode_width]
 package = "unicode-width"
-version = "=0.1.12"
+version = "=0.1.13"
 
 [dependencies.unicode_xid]
 package = "unicode-xid"
@@ -1524,16 +1598,24 @@ version = "=0.9.0"
 
 [dependencies.url]
 package = "url"
-version = "=2.5.0"
+version = "=2.5.1"
 features = ["serde"]
+
+[dependencies.utf16_iter]
+package = "utf16_iter"
+version = "=1.0.5"
 
 [dependencies.utf8]
 package = "utf-8"
 version = "=0.7.6"
 
+[dependencies.utf8_iter]
+package = "utf8_iter"
+version = "=1.0.4"
+
 [dependencies.utf8parse]
 package = "utf8parse"
-version = "=0.2.1"
+version = "=0.2.2"
 
 [dependencies.uuid]
 package = "uuid"
@@ -1596,14 +1678,23 @@ features = ["web", "web-sys"]
 
 [dependencies.wide]
 package = "wide"
-version = "=0.7.22"
+version = "=0.7.24"
 features = ["std"]
 default-features = false
 
 [dependencies.winnow]
 package = "winnow"
-version = "=0.6.10"
+version = "=0.6.13"
 features = ["alloc", "std"]
+
+[dependencies.write16]
+package = "write16"
+version = "=1.0.0"
+features = ["alloc"]
+
+[dependencies.writeable]
+package = "writeable"
+version = "=0.5.5"
 
 [dependencies.xattr]
 package = "xattr"
@@ -1613,6 +1704,15 @@ features = ["unsupported"]
 [dependencies.xml5ever]
 package = "xml5ever"
 version = "=0.17.0"
+
+[dependencies.yoke]
+package = "yoke"
+version = "=0.7.4"
+features = ["alloc", "derive", "zerofrom"]
+
+[dependencies.yoke_derive]
+package = "yoke-derive"
+version = "=0.7.4"
 
 [dependencies.zerocopy]
 package = "zerocopy"
@@ -1624,10 +1724,29 @@ default-features = false
 package = "zerocopy-derive"
 version = "=0.7.34"
 
+[dependencies.zerofrom]
+package = "zerofrom"
+version = "=0.1.4"
+features = ["alloc", "derive"]
+default-features = false
+
+[dependencies.zerofrom_derive]
+package = "zerofrom-derive"
+version = "=0.1.4"
+
 [dependencies.zeroize]
 package = "zeroize"
 version = "=1.8.1"
 default-features = false
+
+[dependencies.zerovec]
+package = "zerovec"
+version = "=0.10.2"
+features = ["derive", "yoke"]
+
+[dependencies.zerovec_derive]
+package = "zerovec-derive"
+version = "=0.10.2"
 
 [dependencies.zune_core]
 package = "zune-core"
@@ -1697,7 +1816,7 @@ features = ["utf8"]
 
 [build-dependencies.anstyle_query]
 package = "anstyle-query"
-version = "=1.0.3"
+version = "=1.1.0"
 
 [build-dependencies.anyhow]
 package = "anyhow"
@@ -1750,7 +1869,7 @@ version = "=0.8.1"
 
 [build-dependencies.backtrace]
 package = "backtrace"
-version = "=0.3.72"
+version = "=0.3.73"
 features = ["std"]
 
 [build-dependencies.base64]
@@ -1834,7 +1953,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.0.98"
+version = "=1.0.99"
 features = ["jobserver", "libc", "once_cell", "parallel"]
 
 [build-dependencies.cfg_if]
@@ -1848,22 +1967,22 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [build-dependencies.clap]
 package = "clap"
-version = "=4.5.4"
+version = "=4.5.7"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build-dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.2"
+version = "=4.5.7"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
 default-features = false
 
 [build-dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.5.4"
+version = "=4.5.5"
 
 [build-dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.7.0"
+version = "=0.7.1"
 
 [build-dependencies.color_quant]
 package = "color_quant"
@@ -1969,6 +2088,11 @@ version = "=0.2.0"
 package = "digest"
 version = "=0.10.7"
 features = ["alloc", "block-buffer", "core-api", "mac", "std", "subtle"]
+
+[build-dependencies.displaydoc]
+package = "displaydoc"
+version = "=0.2.4"
+default-features = false
 
 [build-dependencies.either]
 package = "either"
@@ -2211,11 +2335,11 @@ version = "=1.0.0"
 
 [build-dependencies.http_body_util]
 package = "http-body-util"
-version = "=0.1.1"
+version = "=0.1.2"
 
 [build-dependencies.httparse]
 package = "httparse"
-version = "=1.8.0"
+version = "=1.9.3"
 features = ["std"]
 
 [build-dependencies.httpdate]
@@ -2245,10 +2369,56 @@ package = "iana-time-zone"
 version = "=0.1.60"
 features = ["fallback"]
 
+[build-dependencies.icu_collections]
+package = "icu_collections"
+version = "=1.5.0"
+
+[build-dependencies.icu_locid]
+package = "icu_locid"
+version = "=1.5.0"
+features = ["zerovec"]
+
+[build-dependencies.icu_locid_transform]
+package = "icu_locid_transform"
+version = "=1.5.0"
+features = ["compiled_data"]
+default-features = false
+
+[build-dependencies.icu_locid_transform_data]
+package = "icu_locid_transform_data"
+version = "=1.5.0"
+
+[build-dependencies.icu_normalizer]
+package = "icu_normalizer"
+version = "=1.5.0"
+features = ["compiled_data"]
+
+[build-dependencies.icu_normalizer_data]
+package = "icu_normalizer_data"
+version = "=1.5.0"
+
+[build-dependencies.icu_properties]
+package = "icu_properties"
+version = "=1.5.0"
+features = ["compiled_data"]
+
+[build-dependencies.icu_properties_data]
+package = "icu_properties_data"
+version = "=1.5.0"
+
+[build-dependencies.icu_provider]
+package = "icu_provider"
+version = "=1.5.0"
+features = ["macros"]
+
+[build-dependencies.icu_provider_macros]
+package = "icu_provider_macros"
+version = "=1.5.0"
+
 [build-dependencies.idna]
 package = "idna"
-version = "=0.5.0"
-features = ["alloc", "std"]
+version = "=1.0.0"
+features = ["alloc", "compiled_data", "std"]
 
 [build-dependencies.idna_0_3_0]
 package = "idna"
@@ -2339,6 +2509,12 @@ features = ["bundled", "bundled_bindings", "cc", "min_sqlite_version_3_14_0", "p
 package = "linux-raw-sys"
 version = "=0.4.14"
 features = ["elf", "errno", "general", "ioctl", "no_std", "std"]
+default-features = false
+
+[build-dependencies.litemap]
+package = "litemap"
+version = "=0.7.3"
+features = ["alloc"]
 default-features = false
 
 [build-dependencies.lock_api]
@@ -2432,7 +2608,7 @@ features = ["log", "net", "os-ext", "os-poll"]
 
 [build-dependencies.nalgebra]
 package = "nalgebra"
-version = "=0.32.5"
+version = "=0.32.6"
 features = ["macros", "matrixmultiply", "nalgebra-macros", "std"]
 
 [build-dependencies.nalgebra_macros]
@@ -2509,7 +2685,7 @@ features = ["i128", "libm", "std"]
 
 [build-dependencies.object]
 package = "object"
-version = "=0.35.0"
+version = "=0.36.0"
 features = ["archive", "coff", "elf", "macho", "pe", "read_core", "unaligned", "xcoff"]
 default-features = false
 
@@ -2732,17 +2908,17 @@ version = "=1.12.1"
 
 [build-dependencies.regex]
 package = "regex"
-version = "=1.10.4"
+version = "=1.10.5"
 features = ["perf", "perf-backtrack", "perf-cache", "perf-dfa", "perf-inline", "perf-literal", "perf-onepass", "std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
 [build-dependencies.regex_automata]
 package = "regex-automata"
-version = "=0.4.6"
+version = "=0.4.7"
 features = ["alloc", "dfa", "dfa-build", "dfa-onepass", "dfa-search", "hybrid", "meta", "nfa", "nfa-backtrack", "nfa-pikevm", "nfa-thompson", "perf", "perf-inline", "perf-literal", "perf-literal-multisubstring", "perf-literal-substring", "std", "syntax", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment", "unicode-word-boundary"]
 
 [build-dependencies.regex_syntax]
 package = "regex-syntax"
-version = "=0.8.3"
+version = "=0.8.4"
 features = ["std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
 [build-dependencies.reqwest]
@@ -2907,6 +3083,12 @@ features = ["barrier", "lazy", "lock_api", "lock_api_crate", "mutex", "once", "r
 package = "sptr"
 version = "=0.3.2"
 
+[build-dependencies.stable_deref_trait]
+package = "stable_deref_trait"
+version = "=1.2.0"
+features = ["alloc"]
+default-features = false
+
 [build-dependencies.string_cache]
 package = "string_cache"
 version = "=0.8.7"
@@ -2943,9 +3125,14 @@ features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", 
 package = "sync_wrapper"
 version = "=0.1.2"
 
+[build-dependencies.synstructure]
+package = "synstructure"
+version = "=0.13.1"
+features = ["proc-macro"]
+
 [build-dependencies.tar]
 package = "tar"
-version = "=0.4.40"
+version = "=0.4.41"
 features = ["xattr"]
 
 [build-dependencies.tempfile]
@@ -3002,6 +3189,12 @@ version = "=0.1.2"
 package = "time-macros"
 version = "=0.2.18"
 features = ["formatting", "parsing"]
+
+[build-dependencies.tinystr]
+package = "tinystr"
+version = "=0.7.6"
+features = ["alloc", "zerovec"]
+default-features = false
 
 [build-dependencies.tinyvec]
 package = "tinyvec"
@@ -3129,7 +3322,7 @@ version = "=1.11.0"
 
 [build-dependencies.unicode_width]
 package = "unicode-width"
-version = "=0.1.12"
+version = "=0.1.13"
 
 [build-dependencies.unicode_xid]
 package = "unicode-xid"
@@ -3149,16 +3342,24 @@ version = "=0.9.0"
 
 [build-dependencies.url]
 package = "url"
-version = "=2.5.0"
+version = "=2.5.1"
 features = ["serde"]
+
+[build-dependencies.utf16_iter]
+package = "utf16_iter"
+version = "=1.0.5"
 
 [build-dependencies.utf8]
 package = "utf-8"
 version = "=0.7.6"
 
+[build-dependencies.utf8_iter]
+package = "utf8_iter"
+version = "=1.0.4"
+
 [build-dependencies.utf8parse]
 package = "utf8parse"
-version = "=0.2.1"
+version = "=0.2.2"
 
 [build-dependencies.uuid]
 package = "uuid"
@@ -3221,14 +3422,23 @@ features = ["web", "web-sys"]
 
 [build-dependencies.wide]
 package = "wide"
-version = "=0.7.22"
+version = "=0.7.24"
 features = ["std"]
 default-features = false
 
 [build-dependencies.winnow]
 package = "winnow"
-version = "=0.6.10"
+version = "=0.6.13"
 features = ["alloc", "std"]
+
+[build-dependencies.write16]
+package = "write16"
+version = "=1.0.0"
+features = ["alloc"]
+
+[build-dependencies.writeable]
+package = "writeable"
+version = "=0.5.5"
 
 [build-dependencies.xattr]
 package = "xattr"
@@ -3238,6 +3448,15 @@ features = ["unsupported"]
 [build-dependencies.xml5ever]
 package = "xml5ever"
 version = "=0.17.0"
+
+[build-dependencies.yoke]
+package = "yoke"
+version = "=0.7.4"
+features = ["alloc", "derive", "zerofrom"]
+
+[build-dependencies.yoke_derive]
+package = "yoke-derive"
+version = "=0.7.4"
 
 [build-dependencies.zerocopy]
 package = "zerocopy"
@@ -3249,10 +3468,29 @@ default-features = false
 package = "zerocopy-derive"
 version = "=0.7.34"
 
+[build-dependencies.zerofrom]
+package = "zerofrom"
+version = "=0.1.4"
+features = ["alloc", "derive"]
+default-features = false
+
+[build-dependencies.zerofrom_derive]
+package = "zerofrom-derive"
+version = "=0.1.4"
+
 [build-dependencies.zeroize]
 package = "zeroize"
 version = "=1.8.1"
 default-features = false
+
+[build-dependencies.zerovec]
+package = "zerovec"
+version = "=0.10.2"
+features = ["derive", "yoke"]
+
+[build-dependencies.zerovec_derive]
+package = "zerovec-derive"
+version = "=0.10.2"
 
 [build-dependencies.zune_core]
 package = "zune-core"
