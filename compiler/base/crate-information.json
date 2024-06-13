@@ -51,7 +51,7 @@
   },
   {
     "name": "anstyle-query",
-    "version": "1.0.3",
+    "version": "1.1.0",
     "id": "anstyle_query"
   },
   {
@@ -111,7 +111,7 @@
   },
   {
     "name": "backtrace",
-    "version": "0.3.72",
+    "version": "0.3.73",
     "id": "backtrace"
   },
   {
@@ -201,7 +201,7 @@
   },
   {
     "name": "cc",
-    "version": "1.0.98",
+    "version": "1.0.99",
     "id": "cc"
   },
   {
@@ -216,22 +216,22 @@
   },
   {
     "name": "clap",
-    "version": "4.5.4",
+    "version": "4.5.7",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.5.2",
+    "version": "4.5.7",
     "id": "clap_builder"
   },
   {
     "name": "clap_derive",
-    "version": "4.5.4",
+    "version": "4.5.5",
     "id": "clap_derive"
   },
   {
     "name": "clap_lex",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "id": "clap_lex"
   },
   {
@@ -343,6 +343,11 @@
     "name": "digest",
     "version": "0.10.7",
     "id": "digest"
+  },
+  {
+    "name": "displaydoc",
+    "version": "0.2.4",
+    "id": "displaydoc"
   },
   {
     "name": "either",
@@ -596,12 +601,12 @@
   },
   {
     "name": "http-body-util",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "id": "http_body_util"
   },
   {
     "name": "httparse",
-    "version": "1.8.0",
+    "version": "1.9.3",
     "id": "httparse"
   },
   {
@@ -635,8 +640,58 @@
     "id": "iana_time_zone"
   },
   {
+    "name": "icu_collections",
+    "version": "1.5.0",
+    "id": "icu_collections"
+  },
+  {
+    "name": "icu_locid",
+    "version": "1.5.0",
+    "id": "icu_locid"
+  },
+  {
+    "name": "icu_locid_transform",
+    "version": "1.5.0",
+    "id": "icu_locid_transform"
+  },
+  {
+    "name": "icu_locid_transform_data",
+    "version": "1.5.0",
+    "id": "icu_locid_transform_data"
+  },
+  {
+    "name": "icu_normalizer",
+    "version": "1.5.0",
+    "id": "icu_normalizer"
+  },
+  {
+    "name": "icu_normalizer_data",
+    "version": "1.5.0",
+    "id": "icu_normalizer_data"
+  },
+  {
+    "name": "icu_properties",
+    "version": "1.5.0",
+    "id": "icu_properties"
+  },
+  {
+    "name": "icu_properties_data",
+    "version": "1.5.0",
+    "id": "icu_properties_data"
+  },
+  {
+    "name": "icu_provider",
+    "version": "1.5.0",
+    "id": "icu_provider"
+  },
+  {
+    "name": "icu_provider_macros",
+    "version": "1.5.0",
+    "id": "icu_provider_macros"
+  },
+  {
     "name": "idna",
-    "version": "0.5.0",
+    "version": "1.0.0",
     "id": "idna"
   },
   {
@@ -740,6 +795,11 @@
     "id": "linux_raw_sys"
   },
   {
+    "name": "litemap",
+    "version": "0.7.3",
+    "id": "litemap"
+  },
+  {
     "name": "lock_api",
     "version": "0.4.12",
     "id": "lock_api"
@@ -836,7 +896,7 @@
   },
   {
     "name": "nalgebra",
-    "version": "0.32.5",
+    "version": "0.32.6",
     "id": "nalgebra"
   },
   {
@@ -916,7 +976,7 @@
   },
   {
     "name": "object",
-    "version": "0.35.0",
+    "version": "0.36.0",
     "id": "object"
   },
   {
@@ -1161,17 +1221,17 @@
   },
   {
     "name": "regex",
-    "version": "1.10.4",
+    "version": "1.10.5",
     "id": "regex"
   },
   {
     "name": "regex-automata",
-    "version": "0.4.6",
+    "version": "0.4.7",
     "id": "regex_automata"
   },
   {
     "name": "regex-syntax",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "id": "regex_syntax"
   },
   {
@@ -1350,6 +1410,11 @@
     "id": "sptr"
   },
   {
+    "name": "stable_deref_trait",
+    "version": "1.2.0",
+    "id": "stable_deref_trait"
+  },
+  {
     "name": "string_cache",
     "version": "0.8.7",
     "id": "string_cache"
@@ -1390,8 +1455,13 @@
     "id": "sync_wrapper"
   },
   {
+    "name": "synstructure",
+    "version": "0.13.1",
+    "id": "synstructure"
+  },
+  {
     "name": "tar",
-    "version": "0.4.40",
+    "version": "0.4.41",
     "id": "tar"
   },
   {
@@ -1458,6 +1528,11 @@
     "name": "time-macros",
     "version": "0.2.18",
     "id": "time_macros"
+  },
+  {
+    "name": "tinystr",
+    "version": "0.7.6",
+    "id": "tinystr"
   },
   {
     "name": "tinyvec",
@@ -1596,7 +1671,7 @@
   },
   {
     "name": "unicode-width",
-    "version": "0.1.12",
+    "version": "0.1.13",
     "id": "unicode_width"
   },
   {
@@ -1621,8 +1696,13 @@
   },
   {
     "name": "url",
-    "version": "2.5.0",
+    "version": "2.5.1",
     "id": "url"
+  },
+  {
+    "name": "utf16_iter",
+    "version": "1.0.5",
+    "id": "utf16_iter"
   },
   {
     "name": "utf-8",
@@ -1630,8 +1710,13 @@
     "id": "utf8"
   },
   {
+    "name": "utf8_iter",
+    "version": "1.0.4",
+    "id": "utf8_iter"
+  },
+  {
     "name": "utf8parse",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "id": "utf8parse"
   },
   {
@@ -1701,13 +1786,23 @@
   },
   {
     "name": "wide",
-    "version": "0.7.22",
+    "version": "0.7.24",
     "id": "wide"
   },
   {
     "name": "winnow",
-    "version": "0.6.10",
+    "version": "0.6.13",
     "id": "winnow"
+  },
+  {
+    "name": "write16",
+    "version": "1.0.0",
+    "id": "write16"
+  },
+  {
+    "name": "writeable",
+    "version": "0.5.5",
+    "id": "writeable"
   },
   {
     "name": "xattr",
@@ -1720,6 +1815,16 @@
     "id": "xml5ever"
   },
   {
+    "name": "yoke",
+    "version": "0.7.4",
+    "id": "yoke"
+  },
+  {
+    "name": "yoke-derive",
+    "version": "0.7.4",
+    "id": "yoke_derive"
+  },
+  {
     "name": "zerocopy",
     "version": "0.7.34",
     "id": "zerocopy"
@@ -1730,9 +1835,29 @@
     "id": "zerocopy_derive"
   },
   {
+    "name": "zerofrom",
+    "version": "0.1.4",
+    "id": "zerofrom"
+  },
+  {
+    "name": "zerofrom-derive",
+    "version": "0.1.4",
+    "id": "zerofrom_derive"
+  },
+  {
     "name": "zeroize",
     "version": "1.8.1",
     "id": "zeroize"
+  },
+  {
+    "name": "zerovec",
+    "version": "0.10.2",
+    "id": "zerovec"
+  },
+  {
+    "name": "zerovec-derive",
+    "version": "0.10.2",
+    "id": "zerovec_derive"
   },
   {
     "name": "zune-core",
