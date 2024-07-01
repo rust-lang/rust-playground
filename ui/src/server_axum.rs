@@ -62,16 +62,11 @@ const DOCKER_PROCESS_TIMEOUT_SOFT: Duration = Duration::from_secs(10);
 mod websocket;
 
 #[derive(Debug, Clone)]
-struct CoordinatorOneOffFactory(Arc<CoordinatorFactory>);
-
-#[derive(Debug, Clone)]
-struct CoordinatorWebsocketFactory(Arc<CoordinatorFactory>);
+struct Factory(Arc<CoordinatorFactory>);
 
 #[tokio::main]
 pub(crate) async fn serve(config: Config) {
-    let one_off_factory = CoordinatorOneOffFactory(Arc::new(config.coordinator_one_off_factory()));
-    let websocket_factory =
-        CoordinatorWebsocketFactory(Arc::new(config.coordinator_websocket_factory()));
+    let factory = Factory(Arc::new(config.coordinator_factory()));
 
     let request_db = config.request_database();
     let (_db_task, db_handle) = request_db.spawn();
@@ -106,8 +101,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/websocket", get(websocket))
         .route("/nowebsocket", post(nowebsocket))
         .route("/whynowebsocket", get(whynowebsocket))
-        .layer(Extension(one_off_factory))
-        .layer(Extension(websocket_factory))
+        .layer(Extension(factory))
         .layer(Extension(db_handle))
         .layer(Extension(Arc::new(SandboxCache::default())))
         .layer(Extension(config.github_token()))
@@ -218,7 +212,7 @@ where
 // This is a backwards compatibilty shim. The Rust documentation uses
 // this to run code in place.
 async fn evaluate(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<api::EvaluateRequest>,
 ) -> Result<Json<api::EvaluateResponse>> {
@@ -233,7 +227,7 @@ async fn evaluate(
 }
 
 async fn compile(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<api::CompileRequest>,
 ) -> Result<Json<api::CompileResponse>> {
@@ -248,7 +242,7 @@ async fn compile(
 }
 
 async fn execute(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<api::ExecuteRequest>,
 ) -> Result<Json<api::ExecuteResponse>> {
@@ -263,7 +257,7 @@ async fn execute(
 }
 
 async fn format(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<api::FormatRequest>,
 ) -> Result<Json<api::FormatResponse>> {
@@ -278,7 +272,7 @@ async fn format(
 }
 
 async fn clippy(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<api::ClippyRequest>,
 ) -> Result<Json<api::ClippyResponse>> {
@@ -293,7 +287,7 @@ async fn clippy(
 }
 
 async fn miri(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<api::MiriRequest>,
 ) -> Result<Json<api::MiriResponse>> {
@@ -308,7 +302,7 @@ async fn miri(
 }
 
 async fn macro_expansion(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(db): Extension<Handle>,
     Json(req): Json<api::MacroExpansionRequest>,
 ) -> Result<Json<api::MacroExpansionResponse>> {
@@ -478,7 +472,7 @@ where
 }
 
 async fn meta_crates(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
@@ -489,7 +483,7 @@ async fn meta_crates(
 }
 
 async fn meta_versions(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
@@ -500,7 +494,7 @@ async fn meta_versions(
 }
 
 async fn meta_version_stable(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
@@ -512,7 +506,7 @@ async fn meta_version_stable(
 }
 
 async fn meta_version_beta(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
@@ -523,7 +517,7 @@ async fn meta_version_beta(
 }
 
 async fn meta_version_nightly(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
@@ -535,7 +529,7 @@ async fn meta_version_nightly(
 }
 
 async fn meta_version_rustfmt(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
@@ -547,7 +541,7 @@ async fn meta_version_rustfmt(
 }
 
 async fn meta_version_clippy(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
@@ -559,7 +553,7 @@ async fn meta_version_clippy(
 }
 
 async fn meta_version_miri(
-    Extension(factory): Extension<CoordinatorOneOffFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(cache): Extension<Arc<SandboxCache>>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> Result<impl IntoResponse> {
@@ -649,7 +643,7 @@ async fn metrics(_: MetricsAuthorization) -> Result<Vec<u8>, StatusCode> {
 
 async fn websocket(
     ws: WebSocketUpgrade,
-    Extension(factory): Extension<CoordinatorWebsocketFactory>,
+    Extension(factory): Extension<Factory>,
     Extension(feature_flags): Extension<crate::FeatureFlags>,
     Extension(db): Extension<Handle>,
 ) -> impl IntoResponse {

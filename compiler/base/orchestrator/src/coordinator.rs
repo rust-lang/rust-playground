@@ -820,25 +820,33 @@ enum DemultiplexCommand {
     ListenOnce(JobId, oneshot::Sender<WorkerMessage>),
 }
 
-#[derive(Debug, Copy, Clone)]
-pub struct CoordinatorId {
-    start: u64,
-    id: u64,
+/// The [`Coordinator`][] usually represents a mostly-global resource,
+/// such as a Docker container. To avoid conflicts, each container
+/// must have a unique name, but that uniqueness can only be
+/// guaranteed by whoever is creating [`Coordinator`][]s via the
+/// [`CoordinatorFactory`][].
+pub trait IdProvider: Send + Sync + fmt::Debug + 'static {
+    fn next(&self) -> String;
 }
 
-/// Enforces a limited number of concurrent `Coordinator`s.
+/// A reasonable choice when there's a single [`IdProvider`][] in the
+/// entire process.
+///
+/// This represents uniqueness via a combination of
+///
+/// 1. **process start time** — this helps avoid conflicts from other
+///    processes, assuming they were started at least one second apart.
+///
+/// 2. **instance counter** — this avoids conflicts from other
+///    [`Coordinator`][]s started inside this process.
 #[derive(Debug)]
-pub struct CoordinatorFactory {
-    semaphore: Arc<Semaphore>,
-
+pub struct GlobalIdProvider {
     start: u64,
     id: AtomicU64,
 }
 
-impl CoordinatorFactory {
-    pub fn new(maximum: usize) -> Self {
-        let semaphore = Arc::new(Semaphore::new(maximum));
-
+impl GlobalIdProvider {
+    pub fn new() -> Self {
         let now = std::time::SystemTime::now();
         let start = now
             .duration_since(std::time::UNIX_EPOCH)
@@ -847,28 +855,40 @@ impl CoordinatorFactory {
 
         let id = AtomicU64::new(0);
 
-        Self {
-            semaphore,
-            start,
-            id,
-        }
+        Self { start, id }
     }
+}
 
-    fn next_id(&self) -> CoordinatorId {
+impl IdProvider for GlobalIdProvider {
+    fn next(&self) -> String {
         let start = self.start;
         let id = self.id.fetch_add(1, Ordering::SeqCst);
 
-        CoordinatorId { start, id }
+        format!("{start}-{id}")
+    }
+}
+
+/// Enforces a limited number of concurrent `Coordinator`s.
+#[derive(Debug)]
+pub struct CoordinatorFactory {
+    semaphore: Arc<Semaphore>,
+    ids: Arc<dyn IdProvider>,
+}
+
+impl CoordinatorFactory {
+    pub fn new(ids: Arc<dyn IdProvider>, maximum: usize) -> Self {
+        let semaphore = Arc::new(Semaphore::new(maximum));
+
+        Self { semaphore, ids }
     }
 
     pub fn build<B>(&self) -> Coordinator<B>
     where
-        B: Backend + From<CoordinatorId>,
+        B: Backend + From<Arc<dyn IdProvider>>,
     {
         let semaphore = self.semaphore.clone();
 
-        let id = self.next_id();
-        let backend = B::from(id);
+        let backend = B::from(self.ids.clone());
 
         Coordinator::new(semaphore, backend)
     }
@@ -2586,25 +2606,20 @@ fn basic_secure_docker_command() -> Command {
 }
 
 pub struct DockerBackend {
-    id: CoordinatorId,
-    instance: AtomicU64,
+    ids: Arc<dyn IdProvider>,
 }
 
-impl From<CoordinatorId> for DockerBackend {
-    fn from(id: CoordinatorId) -> Self {
-        Self {
-            id,
-            instance: Default::default(),
-        }
+impl From<Arc<dyn IdProvider>> for DockerBackend {
+    fn from(ids: Arc<dyn IdProvider>) -> Self {
+        Self { ids }
     }
 }
 
 impl DockerBackend {
     fn next_name(&self) -> String {
-        let CoordinatorId { start, id } = self.id;
-        let instance = self.instance.fetch_add(1, Ordering::SeqCst);
+        let id = self.ids.next();
 
-        format!("playground-{start}-{id}-{instance}")
+        format!("playground-{id}")
     }
 }
 
@@ -2617,6 +2632,9 @@ impl Backend for DockerBackend {
             .args(["--name", &name])
             .arg("-i")
             .args(["-a", "stdin", "-a", "stdout", "-a", "stderr"])
+            // PLAYGROUND_ORCHESTRATOR is vestigial; I'm leaving it
+            // for a bit to allow new containers to get built and
+            // distributed.
             .args(["-e", "PLAYGROUND_ORCHESTRATOR=1"])
             .arg("--rm")
             .arg(channel.to_container_name())
@@ -2791,8 +2809,8 @@ mod tests {
         project_dir: TempDir,
     }
 
-    impl From<CoordinatorId> for TestBackend {
-        fn from(_id: CoordinatorId) -> Self {
+    impl From<Arc<dyn IdProvider>> for TestBackend {
+        fn from(_ids: Arc<dyn IdProvider>) -> Self {
             static COMPILE_WORKER_ONCE: Once = Once::new();
 
             COMPILE_WORKER_ONCE.call_once(|| {
@@ -2846,8 +2864,12 @@ mod tests {
             .unwrap_or(5)
     });
 
-    static TEST_COORDINATOR_FACTORY: Lazy<CoordinatorFactory> =
-        Lazy::new(|| CoordinatorFactory::new(*MAX_CONCURRENT_TESTS));
+    static TEST_COORDINATOR_ID_PROVIDER: Lazy<Arc<GlobalIdProvider>> =
+        Lazy::new(|| Arc::new(GlobalIdProvider::new()));
+
+    static TEST_COORDINATOR_FACTORY: Lazy<CoordinatorFactory> = Lazy::new(|| {
+        CoordinatorFactory::new(TEST_COORDINATOR_ID_PROVIDER.clone(), *MAX_CONCURRENT_TESTS)
+    });
 
     fn new_coordinator_test() -> Coordinator<TestBackend> {
         TEST_COORDINATOR_FACTORY.build()
