@@ -11,8 +11,7 @@ use tracing_subscriber::EnvFilter;
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
-const DEFAULT_COORDINATORS_ONE_OFF_LIMIT: usize = 10;
-const DEFAULT_COORDINATORS_WEBSOCKET_LIMIT: usize = 50;
+const DEFAULT_COORDINATORS_LIMIT: usize = 10;
 
 mod env;
 mod gist;
@@ -48,8 +47,7 @@ struct Config {
     feature_flags: FeatureFlags,
     request_db_path: Option<PathBuf>,
     id_provider: Arc<dyn IdProvider>,
-    coordinators_one_off_limit: usize,
-    coordinators_websocket_limit: usize,
+    coordinators_limit: usize,
     port: u16,
     root: PathBuf,
 }
@@ -109,15 +107,10 @@ impl Config {
 
         let id_provider = Arc::new(GlobalIdProvider::new());
 
-        let coordinators_one_off_limit = env::var("PLAYGROUND_COORDINATORS_ONE_OFF_LIMIT")
+        let coordinators_limit = env::var("PLAYGROUND_COORDINATORS_LIMIT")
             .ok()
             .and_then(|l| l.parse().ok())
-            .unwrap_or(DEFAULT_COORDINATORS_ONE_OFF_LIMIT);
-
-        let coordinators_websocket_limit = env::var("PLAYGROUND_COORDINATORS_WEBSOCKET_LIMIT")
-            .ok()
-            .and_then(|l| l.parse().ok())
-            .unwrap_or(DEFAULT_COORDINATORS_WEBSOCKET_LIMIT);
+            .unwrap_or(DEFAULT_COORDINATORS_LIMIT);
 
         Self {
             address,
@@ -127,8 +120,7 @@ impl Config {
             feature_flags,
             request_db_path,
             id_provider,
-            coordinators_one_off_limit,
-            coordinators_websocket_limit,
+            coordinators_limit,
             port,
             root,
         }
@@ -165,12 +157,8 @@ impl Config {
         request_db.expect("Unable to open request log database")
     }
 
-    fn coordinator_one_off_factory(&self) -> CoordinatorFactory {
-        CoordinatorFactory::new(self.id_provider.clone(), self.coordinators_one_off_limit)
-    }
-
-    fn coordinator_websocket_factory(&self) -> CoordinatorFactory {
-        CoordinatorFactory::new(self.id_provider.clone(), self.coordinators_websocket_limit)
+    fn coordinator_factory(&self) -> CoordinatorFactory {
+        CoordinatorFactory::new(self.id_provider.clone(), self.coordinators_limit)
     }
 
     fn server_socket_addr(&self) -> SocketAddr {
