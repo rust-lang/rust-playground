@@ -68,13 +68,6 @@ COPY --chown=playground Cargo.toml /playground/Cargo.toml
 COPY --chown=playground crate-information.json /playground/crate-information.json
 RUN cargo fetch
 
-# Build our tool for modifying Cargo.toml at runtime
-
-FROM toolchain as modify-cargo-toml
-
-COPY --chown=playground modify-cargo-toml /playground/modify-cargo-toml
-RUN cargo build --release --manifest-path=/playground/modify-cargo-toml/Cargo.toml
-
 # Set up cargo-chef for faster builds
 
 FROM toolchain as chef-available
@@ -116,7 +109,6 @@ RUN cargo clippy
 RUN if [ "${channel}" = 'nightly' ]; then cargo miri setup; cargo miri run; fi
 RUN rm src/*.rs
 
-COPY --from=modify-cargo-toml /playground/modify-cargo-toml/target/release/modify-cargo-toml /playground/.cargo/bin
 COPY --from=build-orchestrator /playground/.cargo/bin/worker /playground/.cargo/bin/worker
 COPY --from=wasm-tools /playground/.cargo/bin/wasm-tools /playground/.cargo/bin
 COPY --chown=playground cargo-wasm /playground/.cargo/bin
