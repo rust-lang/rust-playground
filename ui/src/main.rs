@@ -1,6 +1,6 @@
 #![deny(rust_2018_idioms)]
 
-use orchestrator::coordinator::CoordinatorFactory;
+use orchestrator::coordinator::{CoordinatorFactory, GlobalIdProvider, IdProvider};
 use std::{
     net::SocketAddr,
     path::{Path, PathBuf},
@@ -47,6 +47,7 @@ struct Config {
     metrics_token: Option<String>,
     feature_flags: FeatureFlags,
     request_db_path: Option<PathBuf>,
+    id_provider: Arc<dyn IdProvider>,
     coordinators_one_off_limit: usize,
     coordinators_websocket_limit: usize,
     port: u16,
@@ -106,6 +107,8 @@ impl Config {
 
         let request_db_path = env::var_os("PLAYGROUND_REQUEST_DATABASE").map(Into::into);
 
+        let id_provider = Arc::new(GlobalIdProvider::new());
+
         let coordinators_one_off_limit = env::var("PLAYGROUND_COORDINATORS_ONE_OFF_LIMIT")
             .ok()
             .and_then(|l| l.parse().ok())
@@ -123,6 +126,7 @@ impl Config {
             metrics_token,
             feature_flags,
             request_db_path,
+            id_provider,
             coordinators_one_off_limit,
             coordinators_websocket_limit,
             port,
@@ -162,11 +166,11 @@ impl Config {
     }
 
     fn coordinator_one_off_factory(&self) -> CoordinatorFactory {
-        CoordinatorFactory::new(self.coordinators_one_off_limit)
+        CoordinatorFactory::new(self.id_provider.clone(), self.coordinators_one_off_limit)
     }
 
     fn coordinator_websocket_factory(&self) -> CoordinatorFactory {
-        CoordinatorFactory::new(self.coordinators_websocket_limit)
+        CoordinatorFactory::new(self.id_provider.clone(), self.coordinators_websocket_limit)
     }
 
     fn server_socket_addr(&self) -> SocketAddr {
