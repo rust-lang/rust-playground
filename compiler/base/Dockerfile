@@ -56,7 +56,7 @@ COPY --chown=playground entrypoint.sh /playground/tools/
 
 FROM toolchain as wasm-tools
 
-RUN cargo install wasm-tools
+RUN cargo install --locked wasm-tools
 
 # Fetch all the crate source files
 
@@ -79,7 +79,7 @@ RUN cargo build --release --manifest-path=/playground/modify-cargo-toml/Cargo.to
 
 FROM toolchain as chef-available
 
-RUN cargo install cargo-chef
+RUN cargo install --locked cargo-chef
 
 WORKDIR /orchestrator
 
@@ -99,10 +99,10 @@ FROM chef-available as build-orchestrator
 COPY --chown=playground asm-cleanup /asm-cleanup
 COPY --chown=playground modify-cargo-toml /modify-cargo-toml
 COPY --chown=playground --from=prepare-orchestrator /orchestrator/recipe.json /orchestrator/recipe.json
-RUN cargo chef cook --release
+RUN cargo chef cook --locked --release
 
 COPY --chown=playground orchestrator /orchestrator
-RUN cargo install --path .
+RUN cargo install --locked --path .
 
 # Compiler and pre-compiled crates
 
