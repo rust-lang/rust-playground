@@ -662,6 +662,7 @@ async fn handle_execute_inner(
     use CompletedOrAbandoned::*;
 
     let coordinator::ActiveExecution {
+        permit: _permit,
         mut task,
         stdin_tx,
         mut stdout_rx,

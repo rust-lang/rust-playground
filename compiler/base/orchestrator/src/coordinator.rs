@@ -19,7 +19,7 @@ use tokio::{
     join,
     process::{Child, ChildStdin, ChildStdout, Command},
     select,
-    sync::{mpsc, oneshot, OnceCell, OwnedSemaphorePermit, Semaphore},
+    sync::{mpsc, oneshot, OnceCell},
     task::{JoinHandle, JoinSet},
     time::{self, MissedTickBehavior},
 };
@@ -36,6 +36,8 @@ use crate::{
     },
     DropErrorDetailsExt,
 };
+
+pub mod limits;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Versions {
@@ -820,83 +822,60 @@ enum DemultiplexCommand {
     ListenOnce(JobId, oneshot::Sender<WorkerMessage>),
 }
 
-/// The [`Coordinator`][] usually represents a mostly-global resource,
-/// such as a Docker container. To avoid conflicts, each container
-/// must have a unique name, but that uniqueness can only be
-/// guaranteed by whoever is creating [`Coordinator`][]s via the
-/// [`CoordinatorFactory`][].
-pub trait IdProvider: Send + Sync + fmt::Debug + 'static {
-    fn next(&self) -> String;
-}
+type ResourceError = Box<dyn snafu::Error + Send + Sync + 'static>;
+type ResourceResult<T, E = ResourceError> = std::result::Result<T, E>;
 
-/// A reasonable choice when there's a single [`IdProvider`][] in the
-/// entire process.
+/// Mediate resource limits and names for created objects.
 ///
-/// This represents uniqueness via a combination of
+/// The [`Coordinator`][] requires mostly-global resources, such as
+/// Docker containers or running processes. This trait covers two cases:
 ///
-/// 1. **process start time** — this helps avoid conflicts from other
-///    processes, assuming they were started at least one second apart.
+/// 1. To avoid conflicts, each container must have a unique name.
+/// 2. Containers and processes compete for CPU / memory.
 ///
-/// 2. **instance counter** — this avoids conflicts from other
-///    [`Coordinator`][]s started inside this process.
-#[derive(Debug)]
-pub struct GlobalIdProvider {
-    start: u64,
-    id: AtomicU64,
+/// Only a global view guarantees the unique names and resource
+/// allocation, so whoever creates [`Coordinator`][]s via the
+/// [`CoordinatorFactory`][] is responsible.
+pub trait ResourceLimits: Send + Sync + fmt::Debug + 'static {
+    /// Block until resources for a container are available.
+    fn next_container(&self) -> BoxFuture<'static, ResourceResult<Box<dyn ContainerPermit>>>;
 }
 
-impl GlobalIdProvider {
-    pub fn new() -> Self {
-        let now = std::time::SystemTime::now();
-        let start = now
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_secs();
-
-        let id = AtomicU64::new(0);
-
-        Self { start, id }
-    }
+/// Represents one allowed Docker container (or equivalent).
+pub trait ContainerPermit: Send + Sync + fmt::Debug + fmt::Display + 'static {
+    /// Block until resources for a process are available.
+    fn next_process(&self) -> BoxFuture<'static, ResourceResult<Box<dyn ProcessPermit>>>;
 }
 
-impl IdProvider for GlobalIdProvider {
-    fn next(&self) -> String {
-        let start = self.start;
-        let id = self.id.fetch_add(1, Ordering::SeqCst);
-
-        format!("{start}-{id}")
-    }
-}
+/// Represents one allowed process.
+pub trait ProcessPermit: Send + Sync + fmt::Debug + 'static {}
 
 /// Enforces a limited number of concurrent `Coordinator`s.
 #[derive(Debug)]
 pub struct CoordinatorFactory {
-    semaphore: Arc<Semaphore>,
-    ids: Arc<dyn IdProvider>,
+    limits: Arc<dyn ResourceLimits>,
 }
 
 impl CoordinatorFactory {
-    pub fn new(ids: Arc<dyn IdProvider>, maximum: usize) -> Self {
-        let semaphore = Arc::new(Semaphore::new(maximum));
-
-        Self { semaphore, ids }
+    pub fn new(limits: Arc<dyn ResourceLimits>) -> Self {
+        Self { limits }
     }
 
     pub fn build<B>(&self) -> Coordinator<B>
     where
-        B: Backend + From<Arc<dyn IdProvider>>,
+        B: Backend + Default,
     {
-        let semaphore = self.semaphore.clone();
+        let limits = self.limits.clone();
 
-        let backend = B::from(self.ids.clone());
+        let backend = B::default();
 
-        Coordinator::new(semaphore, backend)
+        Coordinator::new(limits, backend)
     }
 }
 
 #[derive(Debug)]
 pub struct Coordinator<B> {
-    semaphore: Arc<Semaphore>,
+    limits: Arc<dyn ResourceLimits>,
     backend: B,
     stable: OnceCell<Container>,
     beta: OnceCell<Container>,
@@ -917,11 +896,11 @@ impl<B> Coordinator<B>
 where
     B: Backend,
 {
-    pub fn new(semaphore: Arc<Semaphore>, backend: B) -> Self {
+    pub fn new(limits: Arc<dyn ResourceLimits>, backend: B) -> Self {
         let token = CancellationToken::new();
 
         Self {
-            semaphore,
+            limits,
             backend,
             stable: OnceCell::new(),
             beta: OnceCell::new(),
@@ -1159,9 +1138,9 @@ where
 
         container
             .get_or_try_init(|| {
-                let semaphore = self.semaphore.clone();
+                let limits = self.limits.clone();
                 let token = self.token.clone();
-                Container::new(channel, semaphore, token, &self.backend)
+                Container::new(channel, limits, token, &self.backend)
             })
             .await
     }
@@ -1169,7 +1148,7 @@ where
 
 #[derive(Debug)]
 struct Container {
-    permit: OwnedSemaphorePermit,
+    permit: Box<dyn ContainerPermit>,
     task: JoinHandle<Result<()>>,
     kill_child: Option<Command>,
     modify_cargo_toml: ModifyCargoToml,
@@ -1179,16 +1158,14 @@ struct Container {
 impl Container {
     async fn new(
         channel: Channel,
-        semaphore: Arc<Semaphore>,
+        limits: Arc<dyn ResourceLimits>,
         token: CancellationToken,
         backend: &impl Backend,
     ) -> Result<Self> {
-        let permit = semaphore
-            .acquire_owned()
-            .await
-            .context(AcquirePermitSnafu)?;
+        let permit = limits.next_container().await.context(AcquirePermitSnafu)?;
 
-        let (mut child, kill_child, stdin, stdout) = backend.run_worker_in_background(channel)?;
+        let (mut child, kill_child, stdin, stdout) =
+            backend.run_worker_in_background(channel, &permit)?;
         let IoQueue {
             mut tasks,
             to_worker_tx,
@@ -1289,6 +1266,7 @@ impl Container {
     ) -> Result<Option<String>, VersionError> {
         let v = self.spawn_cargo_task(token.clone(), cmd).await?;
         let SpawnCargo {
+            permit: _permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -1320,6 +1298,7 @@ impl Container {
         let token = Default::default();
 
         let ActiveExecution {
+            permit: _permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -1357,6 +1336,7 @@ impl Container {
         modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
 
         let SpawnCargo {
+            permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -1396,6 +1376,7 @@ impl Container {
             .boxed();
 
         Ok(ActiveExecution {
+            permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -1411,6 +1392,7 @@ impl Container {
         let token = Default::default();
 
         let ActiveCompilation {
+            permit: _permit,
             task,
             stdout_rx,
             stderr_rx,
@@ -1448,6 +1430,7 @@ impl Container {
         modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
 
         let SpawnCargo {
+            permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -1493,6 +1476,7 @@ impl Container {
         .boxed();
 
         Ok(ActiveCompilation {
+            permit,
             task,
             stdout_rx,
             stderr_rx,
@@ -1506,6 +1490,7 @@ impl Container {
         let token = Default::default();
 
         let ActiveFormatting {
+            permit: _permit,
             task,
             stdout_rx,
             stderr_rx,
@@ -1540,6 +1525,7 @@ impl Container {
         modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
 
         let SpawnCargo {
+            permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -1578,6 +1564,7 @@ impl Container {
         .boxed();
 
         Ok(ActiveFormatting {
+            permit,
             task,
             stdout_rx,
             stderr_rx,
@@ -1591,6 +1578,7 @@ impl Container {
         let token = Default::default();
 
         let ActiveClippy {
+            permit: _permit,
             task,
             stdout_rx,
             stderr_rx,
@@ -1622,6 +1610,7 @@ impl Container {
         modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
 
         let SpawnCargo {
+            permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -1652,6 +1641,7 @@ impl Container {
         .boxed();
 
         Ok(ActiveClippy {
+            permit,
             task,
             stdout_rx,
             stderr_rx,
@@ -1662,6 +1652,7 @@ impl Container {
         let token = Default::default();
 
         let ActiveMiri {
+            permit: _permit,
             task,
             stdout_rx,
             stderr_rx,
@@ -1693,6 +1684,7 @@ impl Container {
         modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
 
         let SpawnCargo {
+            permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -1723,6 +1715,7 @@ impl Container {
         .boxed();
 
         Ok(ActiveMiri {
+            permit,
             task,
             stdout_rx,
             stderr_rx,
@@ -1736,6 +1729,7 @@ impl Container {
         let token = Default::default();
 
         let ActiveMacroExpansion {
+            permit: _permit,
             task,
             stdout_rx,
             stderr_rx,
@@ -1767,6 +1761,7 @@ impl Container {
         modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
 
         let SpawnCargo {
+            permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -1797,6 +1792,7 @@ impl Container {
         .boxed();
 
         Ok(ActiveMacroExpansion {
+            permit,
             task,
             stdout_rx,
             stderr_rx,
@@ -1809,6 +1805,12 @@ impl Container {
         execute_cargo: ExecuteCommandRequest,
     ) -> Result<SpawnCargo, SpawnCargoError> {
         use spawn_cargo_error::*;
+
+        let permit = self
+            .permit
+            .next_process()
+            .await
+            .context(AcquirePermitSnafu)?;
 
         let (stdin_tx, mut stdin_rx) = mpsc::channel(8);
         let (stdout_tx, stdout_rx) = mpsc::channel(8);
@@ -1893,6 +1895,7 @@ impl Container {
         });
 
         Ok(SpawnCargo {
+            permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -1932,6 +1935,7 @@ impl Container {
 }
 
 pub struct ActiveExecution {
+    pub permit: Box<dyn ProcessPermit>,
     pub task: BoxFuture<'static, Result<ExecuteResponse, ExecuteError>>,
     pub stdin_tx: mpsc::Sender<String>,
     pub stdout_rx: mpsc::Receiver<String>,
@@ -1976,6 +1980,7 @@ pub enum ExecuteError {
 }
 
 pub struct ActiveCompilation {
+    pub permit: Box<dyn ProcessPermit>,
     pub task: BoxFuture<'static, Result<CompileResponse, CompileError>>,
     pub stdout_rx: mpsc::Receiver<String>,
     pub stderr_rx: mpsc::Receiver<String>,
@@ -2023,6 +2028,7 @@ pub enum CompileError {
 }
 
 pub struct ActiveFormatting {
+    pub permit: Box<dyn ProcessPermit>,
     pub task: BoxFuture<'static, Result<FormatResponse, FormatError>>,
     pub stdout_rx: mpsc::Receiver<String>,
     pub stderr_rx: mpsc::Receiver<String>,
@@ -2070,6 +2076,7 @@ pub enum FormatError {
 }
 
 pub struct ActiveClippy {
+    pub permit: Box<dyn ProcessPermit>,
     pub task: BoxFuture<'static, Result<ClippyResponse, ClippyError>>,
     pub stdout_rx: mpsc::Receiver<String>,
     pub stderr_rx: mpsc::Receiver<String>,
@@ -2111,6 +2118,7 @@ pub enum ClippyError {
 }
 
 pub struct ActiveMiri {
+    pub permit: Box<dyn ProcessPermit>,
     pub task: BoxFuture<'static, Result<MiriResponse, MiriError>>,
     pub stdout_rx: mpsc::Receiver<String>,
     pub stderr_rx: mpsc::Receiver<String>,
@@ -2152,6 +2160,7 @@ pub enum MiriError {
 }
 
 pub struct ActiveMacroExpansion {
+    pub permit: Box<dyn ProcessPermit>,
     pub task: BoxFuture<'static, Result<MacroExpansionResponse, MacroExpansionError>>,
     pub stdout_rx: mpsc::Receiver<String>,
     pub stderr_rx: mpsc::Receiver<String>,
@@ -2193,6 +2202,7 @@ pub enum MacroExpansionError {
 }
 
 struct SpawnCargo {
+    permit: Box<dyn ProcessPermit>,
     task: JoinHandle<Result<ExecuteCommandResponse, SpawnCargoError>>,
     stdin_tx: mpsc::Sender<String>,
     stdout_rx: mpsc::Receiver<String>,
@@ -2220,6 +2230,9 @@ pub enum SpawnCargoError {
 
     #[snafu(display("Unable to send kill message"))]
     Kill { source: MultiplexedSenderError },
+
+    #[snafu(display("Could not acquire a process permit"))]
+    AcquirePermit { source: ResourceError },
 }
 
 #[derive(Debug, Clone)]
@@ -2533,8 +2546,9 @@ pub trait Backend {
     fn run_worker_in_background(
         &self,
         channel: Channel,
+        id: impl fmt::Display,
     ) -> Result<(Child, Option<Command>, ChildStdin, ChildStdout)> {
-        let (mut start, kill) = self.prepare_worker_command(channel);
+        let (mut start, kill) = self.prepare_worker_command(channel, id);
 
         let mut child = start
             .stdin(Stdio::piped())
@@ -2547,15 +2561,23 @@ pub trait Backend {
         Ok((child, kill, stdin, stdout))
     }
 
-    fn prepare_worker_command(&self, channel: Channel) -> (Command, Option<Command>);
+    fn prepare_worker_command(
+        &self,
+        channel: Channel,
+        id: impl fmt::Display,
+    ) -> (Command, Option<Command>);
 }
 
 impl<B> Backend for &B
 where
     B: Backend,
 {
-    fn prepare_worker_command(&self, channel: Channel) -> (Command, Option<Command>) {
-        B::prepare_worker_command(self, channel)
+    fn prepare_worker_command(
+        &self,
+        channel: Channel,
+        id: impl fmt::Display,
+    ) -> (Command, Option<Command>) {
+        B::prepare_worker_command(self, channel, id)
     }
 }
 
@@ -2605,27 +2627,16 @@ fn basic_secure_docker_command() -> Command {
     )
 }
 
-pub struct DockerBackend {
-    ids: Arc<dyn IdProvider>,
-}
-
-impl From<Arc<dyn IdProvider>> for DockerBackend {
-    fn from(ids: Arc<dyn IdProvider>) -> Self {
-        Self { ids }
-    }
-}
-
-impl DockerBackend {
-    fn next_name(&self) -> String {
-        let id = self.ids.next();
-
-        format!("playground-{id}")
-    }
-}
+#[derive(Default)]
+pub struct DockerBackend(());
 
 impl Backend for DockerBackend {
-    fn prepare_worker_command(&self, channel: Channel) -> (Command, Option<Command>) {
-        let name = self.next_name();
+    fn prepare_worker_command(
+        &self,
+        channel: Channel,
+        id: impl fmt::Display,
+    ) -> (Command, Option<Command>) {
+        let name = format!("playground-{id}");
 
         let mut command = basic_secure_docker_command();
         command
@@ -2704,8 +2715,8 @@ pub enum Error {
     #[snafu(display("Unable to load original Cargo.toml"))]
     CouldNotLoadCargoToml { source: ModifyCargoTomlError },
 
-    #[snafu(display("Could not acquire a semaphore permit"))]
-    AcquirePermit { source: tokio::sync::AcquireError },
+    #[snafu(display("Could not acquire a container permit"))]
+    AcquirePermit { source: ResourceError },
 }
 
 struct IoQueue {
@@ -2809,8 +2820,8 @@ mod tests {
         project_dir: TempDir,
     }
 
-    impl From<Arc<dyn IdProvider>> for TestBackend {
-        fn from(_ids: Arc<dyn IdProvider>) -> Self {
+    impl Default for TestBackend {
+        fn default() -> Self {
             static COMPILE_WORKER_ONCE: Once = Once::new();
 
             COMPILE_WORKER_ONCE.call_once(|| {
@@ -2846,7 +2857,11 @@ mod tests {
     }
 
     impl Backend for TestBackend {
-        fn prepare_worker_command(&self, channel: Channel) -> (Command, Option<Command>) {
+        fn prepare_worker_command(
+            &self,
+            channel: Channel,
+            _id: impl fmt::Display,
+        ) -> (Command, Option<Command>) {
             let channel_dir = self.project_dir.path().join(channel.to_str());
 
             let mut command = Command::new("./target/debug/worker");
@@ -2864,12 +2879,11 @@ mod tests {
             .unwrap_or(5)
     });
 
-    static TEST_COORDINATOR_ID_PROVIDER: Lazy<Arc<GlobalIdProvider>> =
-        Lazy::new(|| Arc::new(GlobalIdProvider::new()));
+    static TEST_COORDINATOR_ID_PROVIDER: Lazy<Arc<limits::Global>> =
+        Lazy::new(|| Arc::new(limits::Global::new(100, *MAX_CONCURRENT_TESTS)));
 
-    static TEST_COORDINATOR_FACTORY: Lazy<CoordinatorFactory> = Lazy::new(|| {
-        CoordinatorFactory::new(TEST_COORDINATOR_ID_PROVIDER.clone(), *MAX_CONCURRENT_TESTS)
-    });
+    static TEST_COORDINATOR_FACTORY: Lazy<CoordinatorFactory> =
+        Lazy::new(|| CoordinatorFactory::new(TEST_COORDINATOR_ID_PROVIDER.clone()));
 
     fn new_coordinator_test() -> Coordinator<TestBackend> {
         TEST_COORDINATOR_FACTORY.build()
@@ -3146,6 +3160,7 @@ mod tests {
 
         let token = Default::default();
         let ActiveExecution {
+            permit: _permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -3198,6 +3213,7 @@ mod tests {
 
         let token = Default::default();
         let ActiveExecution {
+            permit: _permit,
             task,
             stdin_tx,
             stdout_rx,
@@ -3253,6 +3269,7 @@ mod tests {
 
         let token = CancellationToken::new();
         let ActiveExecution {
+            permit: _permit,
             task,
             stdin_tx: _,
             stdout_rx,
@@ -3316,6 +3333,7 @@ mod tests {
 
         let token = CancellationToken::new();
         let ActiveExecution {
+            permit: _permit,
             task,
             stdin_tx: _,
             stdout_rx,
@@ -3397,6 +3415,7 @@ mod tests {
 
         let token = Default::default();
         let ActiveCompilation {
+            permit: _permit,
             task,
             stdout_rx,
             stderr_rx,
