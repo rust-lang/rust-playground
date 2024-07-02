@@ -1,6 +1,9 @@
 #![deny(rust_2018_idioms)]
 
-use orchestrator::coordinator::{CoordinatorFactory, GlobalIdProvider, IdProvider};
+use orchestrator::coordinator::{
+    limits::{self, Acquisition},
+    CoordinatorFactory, ResourceLimits,
+};
 use std::{
     net::SocketAddr,
     path::{Path, PathBuf},
@@ -11,7 +14,8 @@ use tracing_subscriber::EnvFilter;
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
-const DEFAULT_COORDINATORS_LIMIT: usize = 10;
+const DEFAULT_COORDINATORS_LIMIT: usize = 25;
+const DEFAULT_PROCESSES_LIMIT: usize = 10;
 
 mod env;
 mod gist;
@@ -46,8 +50,7 @@ struct Config {
     metrics_token: Option<String>,
     feature_flags: FeatureFlags,
     request_db_path: Option<PathBuf>,
-    id_provider: Arc<dyn IdProvider>,
-    coordinators_limit: usize,
+    limits: Arc<dyn ResourceLimits>,
     port: u16,
     root: PathBuf,
 }
@@ -105,12 +108,21 @@ impl Config {
 
         let request_db_path = env::var_os("PLAYGROUND_REQUEST_DATABASE").map(Into::into);
 
-        let id_provider = Arc::new(GlobalIdProvider::new());
-
         let coordinators_limit = env::var("PLAYGROUND_COORDINATORS_LIMIT")
             .ok()
             .and_then(|l| l.parse().ok())
             .unwrap_or(DEFAULT_COORDINATORS_LIMIT);
+
+        let processes_limit = env::var("PLAYGROUND_PROCESSES_LIMIT")
+            .ok()
+            .and_then(|l| l.parse().ok())
+            .unwrap_or(DEFAULT_PROCESSES_LIMIT);
+
+        let limits = Arc::new(limits::Global::with_lifecycle(
+            coordinators_limit,
+            processes_limit,
+            LifecycleMetrics,
+        ));
 
         Self {
             address,
@@ -119,8 +131,7 @@ impl Config {
             metrics_token,
             feature_flags,
             request_db_path,
-            id_provider,
-            coordinators_limit,
+            limits,
             port,
             root,
         }
@@ -158,7 +169,7 @@ impl Config {
     }
 
     fn coordinator_factory(&self) -> CoordinatorFactory {
-        CoordinatorFactory::new(self.id_provider.clone(), self.coordinators_limit)
+        CoordinatorFactory::new(self.limits.clone())
     }
 
     fn server_socket_addr(&self) -> SocketAddr {
@@ -182,5 +193,42 @@ struct MetricsToken(Arc<String>);
 impl MetricsToken {
     fn new(token: impl Into<String>) -> Self {
         MetricsToken(Arc::new(token.into()))
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+struct LifecycleMetrics;
+
+impl limits::Lifecycle for LifecycleMetrics {
+    fn container_start(&self) {
+        metrics::CONTAINER_QUEUE.inc();
+    }
+
+    fn container_acquired(&self, how: limits::Acquisition) {
+        metrics::CONTAINER_QUEUE.dec();
+
+        if how == Acquisition::Acquired {
+            metrics::CONTAINER_ACTIVE.inc();
+        }
+    }
+
+    fn container_release(&self) {
+        metrics::CONTAINER_ACTIVE.dec();
+    }
+
+    fn process_start(&self) {
+        metrics::PROCESS_QUEUE.inc();
+    }
+
+    fn process_acquired(&self, how: limits::Acquisition) {
+        metrics::PROCESS_QUEUE.dec();
+
+        if how == Acquisition::Acquired {
+            metrics::PROCESS_ACTIVE.inc();
+        }
+    }
+
+    fn process_release(&self) {
+        metrics::PROCESS_ACTIVE.dec();
     }
 }

@@ -44,6 +44,20 @@ lazy_static! {
         &["success"],
     )
     .unwrap();
+    pub(crate) static ref CONTAINER_QUEUE: IntGauge = register_int_gauge!(
+        "playground_container_queue",
+        "Number of waiters for a container"
+    )
+    .unwrap();
+    pub(crate) static ref CONTAINER_ACTIVE: IntGauge =
+        register_int_gauge!("playground_container_active", "Number of active containers").unwrap();
+    pub(crate) static ref PROCESS_QUEUE: IntGauge = register_int_gauge!(
+        "playground_process_queue",
+        "Number of waiters for a process"
+    )
+    .unwrap();
+    pub(crate) static ref PROCESS_ACTIVE: IntGauge =
+        register_int_gauge!("playground_process_active", "Number of active processs").unwrap();
 }
 
 #[derive(Debug, Copy, Clone, strum::IntoStaticStr)]
