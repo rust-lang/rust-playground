@@ -484,7 +484,7 @@ impl CompileRequest {
                 // Enable extra assembly comments for nightly builds
                 if let Channel::Nightly = self.channel {
                     args.push("-Z");
-                    args.push("asm-comments");
+                    args.push("verbose-asm");
                 }
 
                 args.push("-C");
