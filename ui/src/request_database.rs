@@ -174,7 +174,7 @@ impl Handle {
         rx.await.context(RecvStartRequestSnafu)?.map_err(Into::into)
     }
 
-    pub async fn attempt_start_request(
+    async fn attempt_start_request(
         &self,
         category: impl Into<String>,
         payload: impl Into<String>,
@@ -200,10 +200,42 @@ impl Handle {
         rx.await.context(RecvEndRequestSnafu)?.map_err(Into::into)
     }
 
-    pub async fn attempt_end_request(&self, id: Id, how: How) {
+    async fn attempt_end_request(&self, id: Id, how: How) {
         if let Err(err) = self.end_request(id, how).await {
             warn!(?err, "Unable to record end request");
         }
+    }
+
+    pub async fn start_with_guard(
+        self,
+        category: impl Into<String>,
+        payload: impl Into<String>,
+    ) -> EndGuard {
+        let g = self
+            .attempt_start_request(category, payload)
+            .await
+            .map(|id| EndGuardInner(id, How::Abandoned, self));
+        EndGuard(g)
+    }
+}
+
+pub struct EndGuard(Option<EndGuardInner>);
+
+impl EndGuard {
+    pub fn complete_now(mut self) {
+        if let Some(mut inner) = self.0.take() {
+            inner.1 = How::Complete;
+            drop(inner);
+        }
+    }
+}
+
+struct EndGuardInner(Id, How, Handle);
+
+impl Drop for EndGuardInner {
+    fn drop(&mut self) {
+        let Self(id, how, ref handle) = *self;
+        futures::executor::block_on(handle.attempt_end_request(id, how))
     }
 }
 
