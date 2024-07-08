@@ -4,7 +4,7 @@ use crate::{
         record_metric, track_metric_no_request_async, Endpoint, HasLabelsCore, Outcome,
         UNAVAILABLE_WS,
     },
-    request_database::{Handle, How},
+    request_database::Handle,
     Config, GhToken, MetricsToken,
 };
 use async_trait::async_trait;
@@ -198,13 +198,11 @@ where
 {
     let category = format!("http.{}", <&str>::from(T::ENDPOINT));
     let payload = serde_json::to_string(&req).unwrap_or_else(|_| String::from("<invalid JSON>"));
-    let id = db.attempt_start_request(category, payload).await;
+    let guard = db.start_with_guard(category, payload).await;
 
     let r = f(req).await;
 
-    if let Some(id) = id {
-        db.attempt_end_request(id, How::Complete).await;
-    }
+    guard.complete_now();
 
     r
 }

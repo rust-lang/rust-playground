@@ -1,6 +1,6 @@
 use crate::{
     metrics::{self, record_metric, Endpoint, HasLabelsCore, Outcome},
-    request_database::{Handle, How},
+    request_database::Handle,
     server_axum::api_orchestrator_integration_impls::*,
 };
 
@@ -389,12 +389,6 @@ async fn handle_core(
             resp = rx.recv() => {
                 let resp = resp.expect("The rx should never close as we have a tx");
 
-                if let Ok(MessageResponse::ExecuteEnd { meta, .. }) = &resp {
-                    if let Some((_, _, Some(db_id))) = active_executions.get(&meta.sequence_number) {
-                         db.attempt_end_request(*db_id, How::Complete).await;
-                    }
-                }
-
                 let success = resp.is_ok();
                 let resp = resp.unwrap_or_else(error_to_response);
                 let resp = response_to_message(resp);
@@ -443,7 +437,7 @@ async fn handle_core(
             _ = active_execution_gc_interval.tick() => {
                 active_executions = mem::take(&mut active_executions)
                     .into_iter()
-                    .filter(|(_id, (_, tx, _))| tx.as_ref().map_or(false, |tx| !tx.is_closed()))
+                    .filter(|(_id, (_, tx))| tx.as_ref().map_or(false, |tx| !tx.is_closed()))
                     .collect();
             },
 
@@ -461,12 +455,6 @@ async fn handle_core(
             _ = &mut session_timeout => {
                 break;
             }
-        }
-    }
-
-    for (_, (_, _, db_id)) in active_executions {
-        if let Some(db_id) = db_id {
-            db.attempt_end_request(db_id, How::Abandoned).await;
         }
     }
 
@@ -516,11 +504,7 @@ fn response_to_message(response: MessageResponse) -> Message {
     Message::Text(resp)
 }
 
-type ActiveExecutionInfo = (
-    CancellationToken,
-    Option<mpsc::Sender<String>>,
-    Option<crate::request_database::Id>,
-);
+type ActiveExecutionInfo = (CancellationToken, Option<mpsc::Sender<String>>);
 
 async fn handle_msg(
     txt: String,
@@ -538,22 +522,31 @@ async fn handle_msg(
             let token = CancellationToken::new();
             let (execution_tx, execution_rx) = mpsc::channel(8);
 
-            let id = db.attempt_start_request("ws.Execute", &txt).await;
+            let guard = db.clone().start_with_guard("ws.Execute", &txt).await;
 
-            active_executions.insert(
-                meta.sequence_number,
-                (token.clone(), Some(execution_tx), id),
-            );
+            active_executions.insert(meta.sequence_number, (token.clone(), Some(execution_tx)));
 
             // TODO: Should a single execute / build / etc. session have a timeout of some kind?
             let spawned = manager
                 .spawn({
                     let tx = tx.clone();
                     let meta = meta.clone();
-                    |coordinator| {
-                        handle_execute(token, execution_rx, tx, coordinator, payload, meta.clone())
-                            .context(StreamingExecuteSnafu)
-                            .map_err(|e| (e, Some(meta)))
+                    |coordinator| async {
+                        let r = handle_execute(
+                            token,
+                            execution_rx,
+                            tx,
+                            coordinator,
+                            payload,
+                            meta.clone(),
+                        )
+                        .context(StreamingExecuteSnafu)
+                        .map_err(|e| (e, Some(meta)))
+                        .await;
+
+                        guard.complete_now();
+
+                        r
                     }
                 })
                 .await
@@ -565,8 +558,7 @@ async fn handle_msg(
         }
 
         Ok(ExecuteStdin { payload, meta }) => {
-            let Some((_, Some(execution_tx), _)) = active_executions.get(&meta.sequence_number)
-            else {
+            let Some((_, Some(execution_tx))) = active_executions.get(&meta.sequence_number) else {
                 warn!("Received stdin for an execution that is no longer active");
                 return;
             };
@@ -582,8 +574,7 @@ async fn handle_msg(
         }
 
         Ok(ExecuteStdinClose { meta }) => {
-            let Some((_, execution_tx, _)) = active_executions.get_mut(&meta.sequence_number)
-            else {
+            let Some((_, execution_tx)) = active_executions.get_mut(&meta.sequence_number) else {
                 warn!("Received stdin close for an execution that is no longer active");
                 return;
             };
@@ -592,7 +583,7 @@ async fn handle_msg(
         }
 
         Ok(ExecuteKill { meta }) => {
-            let Some((token, _, _)) = active_executions.get(&meta.sequence_number) else {
+            let Some((token, _)) = active_executions.get(&meta.sequence_number) else {
                 warn!("Received kill for an execution that is no longer active");
                 return;
             };
