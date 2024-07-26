@@ -544,9 +544,7 @@ async fn handle_msg(
                         .map_err(|e| (e, Some(meta)))
                         .await;
 
-                        guard.complete_now();
-
-                        r
+                        guard.complete_now(r)
                     }
                 })
                 .await
