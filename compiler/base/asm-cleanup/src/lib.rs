@@ -1,16 +1,14 @@
 // Thanks to Matt Godbolt for creating the amazing Compiler Explorer https://www.godbolt.org
 // This aims to provide similar assembly cleanup to what Godbolt does
 
-use lazy_static::lazy_static;
 use petgraph::prelude::*;
 use regex::{Captures, Regex};
 use rustc_demangle::demangle;
-use std::collections::HashSet;
+use std::{collections::HashSet, sync::LazyLock};
 
 pub fn demangle_asm(block: &str) -> String {
-    lazy_static! {
-        static ref DEMANGLE_REGEX: Regex = Regex::new(r"_[a-zA-Z0-9._$]*").unwrap();
-    }
+    static DEMANGLE_REGEX: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"_[a-zA-Z0-9._$]*").unwrap());
 
     DEMANGLE_REGEX
         .replace_all(block, |caps: &Captures<'_>| {
@@ -33,44 +31,45 @@ enum LineType<'a> {
 pub fn filter_asm(block: &str) -> String {
     use self::LineType::*;
 
-    lazy_static! {
-        // Example:    mov rax, rdx
-        // Always inlude in results
-        static ref OPCODE_REGEX: Regex = Regex::new(r"^\s+[a-zA-Z]+.*[^:]$").unwrap();
-    }
-    lazy_static! {
-        // Example:.Lfunc_end7:
-        // Finds label declarations
-        // Include in results only if it is referenced by an opcode, or is a function
-        static ref LABEL_DECL_REGEX: Regex = Regex::new(r"^([a-zA-Z_.<][a-zA-Z0-9$&_.,<>\[\]{}:' ]*):(\s+#.*)?$").unwrap();
-    }
-    lazy_static! {
-        // Example:    mov lea rdi, [rip + str.0] // str.0 is the referenced label
-        // Find labels used as operands for an opcode
-        static ref LABEL_REF_REGEX: Regex = Regex::new(r"([a-zA-Z_.][a-zA-Z0-9$_.]*)").unwrap();
-    }
-    lazy_static! {
-        // Example:    .string "Hello, world!"
-        // Note: this is a type of directive
-        // Include in results if it is part of a used label, may contain label references
-        static ref DATA_REGEX: Regex = Regex::new(r"^\s+\.(string|asciz|ascii|[1248]?byte|short|word|long|quad|value|zero)").unwrap();
-    }
-    lazy_static! {
-        // Example:    .type main,@function
-        // Note: this is a type of directive
-        // Never include in results, but is used to find and include functions
-        static ref FUNCTION_REGEX: Regex = Regex::new(r"^\s+\.type\s*(.*),@function$").unwrap();
-    }
-    lazy_static! {
-        // Example:    .p2align 4, 0x90
-        // Note: this will also match entries found by DATA_REGEX and FUNCTION_REGEX
-        // Never include in results
-        static ref DIRECTIVE_REGEX: Regex = Regex::new(r"^\s+\..*[^:]$").unwrap();
-    }
-    lazy_static! {
-        // Never include in results
-        static ref BLANK_REGEX: Regex = Regex::new(r"^\s*$").unwrap();
-    }
+    // Example:    mov rax, rdx
+    // Always inlude in results
+    static OPCODE_REGEX: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"^\s+[a-zA-Z]+.*[^:]$").unwrap());
+
+    // Example:.Lfunc_end7:
+    // Finds label declarations
+    // Include in results only if it is referenced by an opcode, or is a function
+    static LABEL_DECL_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r"^([a-zA-Z_.<][a-zA-Z0-9$&_.,<>\[\]{}:' ]*):(\s+#.*)?$").unwrap()
+    });
+
+    // Example:    mov lea rdi, [rip + str.0] // str.0 is the referenced label
+    // Find labels used as operands for an opcode
+    static LABEL_REF_REGEX: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"([a-zA-Z_.][a-zA-Z0-9$_.]*)").unwrap());
+
+    // Example:    .string "Hello, world!"
+    // Note: this is a type of directive
+    // Include in results if it is part of a used label, may contain label references
+    static DATA_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r"^\s+\.(string|asciz|ascii|[1248]?byte|short|word|long|quad|value|zero)")
+            .unwrap()
+    });
+
+    // Example:    .type main,@function
+    // Note: this is a type of directive
+    // Never include in results, but is used to find and include functions
+    static FUNCTION_REGEX: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"^\s+\.type\s*(.*),@function$").unwrap());
+
+    // Example:    .p2align 4, 0x90
+    // Note: this will also match entries found by DATA_REGEX and FUNCTION_REGEX
+    // Never include in results
+    static DIRECTIVE_REGEX: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"^\s+\..*[^:]$").unwrap());
+
+    // Never include in results
+    static BLANK_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s*$").unwrap());
 
     let mut current_label = "";
     let mut line_info = Vec::new();

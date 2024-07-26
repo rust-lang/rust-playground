@@ -30,7 +30,6 @@ dependencies = [
 name = "asm-cleanup"
 version = "0.1.0"
 dependencies = [
- "lazy_static",
  "petgraph",
  "regex",
  "rustc-demangle",
@@ -359,7 +358,6 @@ dependencies = [
  "libc",
  "mach2",
  "modify-cargo-toml",
- "once_cell",
  "procfs",
  "serde",
  "serde_json",
