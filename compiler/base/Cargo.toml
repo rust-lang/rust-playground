@@ -200,7 +200,7 @@ features = ["std"]
 
 [dependencies.bytes]
 package = "bytes"
-version = "=1.6.0"
+version = "=1.6.1"
 features = ["std"]
 
 [dependencies.bytes_0_4_12]
@@ -1979,7 +1979,7 @@ features = ["std"]
 
 [build-dependencies.bytes]
 package = "bytes"
-version = "=1.6.0"
+version = "=1.6.1"
 features = ["std"]
 
 [build-dependencies.bytes_0_4_12]
