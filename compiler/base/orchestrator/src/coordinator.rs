@@ -2796,8 +2796,10 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
 mod tests {
     use assertables::*;
     use futures::future::{join, try_join_all};
-    use once_cell::sync::Lazy;
-    use std::{env, sync::Once};
+    use std::{
+        env,
+        sync::{LazyLock, Once},
+    };
     use tempfile::TempDir;
 
     use super::*;
@@ -2872,18 +2874,18 @@ mod tests {
         }
     }
 
-    const MAX_CONCURRENT_TESTS: Lazy<usize> = Lazy::new(|| {
+    const MAX_CONCURRENT_TESTS: LazyLock<usize> = LazyLock::new(|| {
         env::var("TESTS_MAX_CONCURRENCY")
             .ok()
             .and_then(|v| v.parse().ok())
             .unwrap_or(5)
     });
 
-    static TEST_COORDINATOR_ID_PROVIDER: Lazy<Arc<limits::Global>> =
-        Lazy::new(|| Arc::new(limits::Global::new(100, *MAX_CONCURRENT_TESTS)));
+    static TEST_COORDINATOR_ID_PROVIDER: LazyLock<Arc<limits::Global>> =
+        LazyLock::new(|| Arc::new(limits::Global::new(100, *MAX_CONCURRENT_TESTS)));
 
-    static TEST_COORDINATOR_FACTORY: Lazy<CoordinatorFactory> =
-        Lazy::new(|| CoordinatorFactory::new(TEST_COORDINATOR_ID_PROVIDER.clone()));
+    static TEST_COORDINATOR_FACTORY: LazyLock<CoordinatorFactory> =
+        LazyLock::new(|| CoordinatorFactory::new(TEST_COORDINATOR_ID_PROVIDER.clone()));
 
     fn new_coordinator_test() -> Coordinator<TestBackend> {
         TEST_COORDINATOR_FACTORY.build()
@@ -4179,7 +4181,7 @@ mod tests {
         Ok(())
     }
 
-    static TIMEOUT: Lazy<Duration> = Lazy::new(|| {
+    static TIMEOUT: LazyLock<Duration> = LazyLock::new(|| {
         let millis = env::var("TESTS_TIMEOUT_MS")
             .ok()
             .and_then(|v| v.parse().ok())

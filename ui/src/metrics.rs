@@ -1,4 +1,3 @@
-use lazy_static::lazy_static;
 use orchestrator::coordinator::{self, Channel, CompileTarget, CrateType, Edition, Mode};
 use prometheus::{
     register_histogram, register_histogram_vec, register_int_counter, register_int_counter_vec,
@@ -6,59 +5,76 @@ use prometheus::{
 };
 use std::{
     future::Future,
+    sync::LazyLock,
     time::{Duration, Instant},
 };
 
-lazy_static! {
-    pub(crate) static ref REQUESTS: HistogramVec = register_histogram_vec!(
+pub(crate) static REQUESTS: LazyLock<HistogramVec> = LazyLock::new(|| {
+    register_histogram_vec!(
         "playground_request_duration_seconds",
         "Number of requests made",
         Labels::LABELS,
         vec![0.1, 1.0, 2.5, 5.0, 10.0, 15.0]
     )
-    .unwrap();
-    pub(crate) static ref LIVE_WS: IntGauge = register_int_gauge!(
+    .unwrap()
+});
+pub(crate) static LIVE_WS: LazyLock<IntGauge> = LazyLock::new(|| {
+    register_int_gauge!(
         "playground_active_websocket_connections_count",
         "Number of active WebSocket connections"
     )
-    .unwrap();
-    pub(crate) static ref DURATION_WS: Histogram = register_histogram!(
+    .unwrap()
+});
+pub(crate) static DURATION_WS: LazyLock<Histogram> = LazyLock::new(|| {
+    register_histogram!(
         "playground_websocket_duration_seconds",
         "WebSocket connection length",
         vec![15.0, 60.0, 300.0, 600.0, 1800.0, 3600.0, 7200.0]
     )
-    .unwrap();
-    pub(crate) static ref UNAVAILABLE_WS: IntCounter = register_int_counter!(
+    .unwrap()
+});
+pub(crate) static UNAVAILABLE_WS: LazyLock<IntCounter> = LazyLock::new(|| {
+    register_int_counter!(
         "playground_websocket_unavailability_count",
         "Number of failed WebSocket connections"
     )
-    .unwrap();
-    pub(crate) static ref WS_INCOMING: IntCounter = register_int_counter!(
+    .unwrap()
+});
+pub(crate) static WS_INCOMING: LazyLock<IntCounter> = LazyLock::new(|| {
+    register_int_counter!(
         "playground_websocket_incoming_messages_count",
         "Number of WebSocket messages received"
     )
-    .unwrap();
-    pub(crate) static ref WS_OUTGOING: IntCounterVec = register_int_counter_vec!(
+    .unwrap()
+});
+pub(crate) static WS_OUTGOING: LazyLock<IntCounterVec> = LazyLock::new(|| {
+    register_int_counter_vec!(
         "playground_websocket_outgoing_messages_count",
         "Number of WebSocket messages sent",
         &["success"],
     )
-    .unwrap();
-    pub(crate) static ref CONTAINER_QUEUE: IntGauge = register_int_gauge!(
+    .unwrap()
+});
+pub(crate) static CONTAINER_QUEUE: LazyLock<IntGauge> = LazyLock::new(|| {
+    register_int_gauge!(
         "playground_container_queue",
         "Number of waiters for a container"
     )
-    .unwrap();
-    pub(crate) static ref CONTAINER_ACTIVE: IntGauge =
-        register_int_gauge!("playground_container_active", "Number of active containers").unwrap();
-    pub(crate) static ref PROCESS_QUEUE: IntGauge = register_int_gauge!(
+    .unwrap()
+});
+pub(crate) static CONTAINER_ACTIVE: LazyLock<IntGauge> = LazyLock::new(|| {
+    register_int_gauge!("playground_container_active", "Number of active containers").unwrap()
+});
+pub(crate) static PROCESS_QUEUE: LazyLock<IntGauge> = LazyLock::new(|| {
+    register_int_gauge!(
         "playground_process_queue",
         "Number of waiters for a process"
     )
-    .unwrap();
-    pub(crate) static ref PROCESS_ACTIVE: IntGauge =
-        register_int_gauge!("playground_process_active", "Number of active processs").unwrap();
-}
+    .unwrap()
+});
+pub(crate) static PROCESS_ACTIVE: LazyLock<IntGauge> = LazyLock::new(|| {
+    register_int_gauge!("playground_process_active", "Number of active processs").unwrap()
+});
 
 #[derive(Debug, Copy, Clone, strum::IntoStaticStr)]
 pub(crate) enum Endpoint {

@@ -33,7 +33,7 @@ use std::{
     future::Future,
     mem, path,
     str::FromStr,
-    sync::Arc,
+    sync::{Arc, LazyLock},
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 use tokio::sync::Mutex;
@@ -662,9 +662,8 @@ async fn nowebsocket(Json(req): Json<NoWebSocketRequest>) {
     UNAVAILABLE_WS.inc();
 }
 
-lazy_static::lazy_static! {
-    static ref WS_ERRORS: std::sync::Mutex<std::collections::HashMap<String, usize>> = Default::default();
-}
+static WS_ERRORS: LazyLock<std::sync::Mutex<std::collections::HashMap<String, usize>>> =
+    LazyLock::new(|| Default::default());
 
 fn record_websocket_error(error: String) {
     *WS_ERRORS
