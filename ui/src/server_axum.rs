@@ -191,10 +191,14 @@ async fn rewrite_help_as_index(
     next.run(req).await
 }
 
-async fn attempt_record_request<T, RFut, R>(db: Handle, req: T, f: impl FnOnce(T) -> RFut) -> R
+async fn attempt_record_request<T, RFut, RT, RE>(
+    db: Handle,
+    req: T,
+    f: impl FnOnce(T) -> RFut,
+) -> Result<RT, RE>
 where
     T: HasEndpoint + serde::Serialize,
-    RFut: Future<Output = R>,
+    RFut: Future<Output = Result<RT, RE>>,
 {
     let category = format!("http.{}", <&str>::from(T::ENDPOINT));
     let payload = serde_json::to_string(&req).unwrap_or_else(|_| String::from("<invalid JSON>"));
@@ -202,9 +206,7 @@ where
 
     let r = f(req).await;
 
-    guard.complete_now();
-
-    r
+    guard.complete_now(r)
 }
 
 // This is a backwards compatibilty shim. The Rust documentation uses

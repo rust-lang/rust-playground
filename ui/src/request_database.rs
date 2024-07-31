@@ -20,6 +20,7 @@ pub struct Id(i64);
 pub enum How {
     Complete = 0,
     Abandoned = 1,
+    Error = 2,
 }
 
 impl Database {
@@ -222,11 +223,18 @@ impl Handle {
 pub struct EndGuard(Option<EndGuardInner>);
 
 impl EndGuard {
-    pub fn complete_now(mut self) {
+    pub fn complete_now<T, E>(mut self, result: Result<T, E>) -> Result<T, E> {
         if let Some(mut inner) = self.0.take() {
-            inner.1 = How::Complete;
+            inner.1 = if result.is_err() {
+                How::Error
+            } else {
+                How::Complete
+            };
+
             drop(inner);
         }
+
+        result
     }
 }
 
