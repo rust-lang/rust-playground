@@ -1480,12 +1480,13 @@ pub(crate) mod api_orchestrator_integration_impls {
         type Error = ParseMiriRequestError;
 
         fn try_from(other: api::MiriRequest) -> std::result::Result<Self, Self::Error> {
-            let api::MiriRequest { code, edition } = other;
+            let api::MiriRequest { code, edition, aliasing_model } = other;
 
             Ok(MiriRequest {
                 channel: Channel::Nightly,     // TODO: use what user has submitted
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
+                aliasing_model: parse_aliasing_model(&aliasing_model)?,
                 code,
             })
         }
@@ -1495,6 +1496,8 @@ pub(crate) mod api_orchestrator_integration_impls {
     pub(crate) enum ParseMiriRequestError {
         #[snafu(transparent)]
         Edition { source: ParseEditionError },
+        #[snafu(transparent)]
+        AliasingMode { source: ParseAliasingModelError },
     }
 
     impl From<WithOutput<MiriResponse>> for api::MiriResponse {
@@ -1710,9 +1713,23 @@ pub(crate) mod api_orchestrator_integration_impls {
         })
     }
 
+    pub(crate) fn parse_aliasing_model(s: &str) -> Result<AliasingModel, ParseAliasingModelError> {
+        Ok(match s {
+            "stacked" => AliasingModel::Stacked,
+            "tree" => AliasingModel::Tree,
+            value => return ParseAliasingModelSnafu { value }.fail(),
+        })
+    }
+
     #[derive(Debug, Snafu)]
     #[snafu(display("'{value}' is not a valid edition"))]
     pub(crate) struct ParseEditionError {
+        value: String,
+    }
+
+    #[derive(Debug, Snafu)]
+    #[snafu(display("'{value}' is not a valid aliasing model"))]
+    pub(crate) struct ParseAliasingModelError {
         value: String,
     }
 

@@ -6,6 +6,7 @@ import {
   Backtrace,
   Channel,
   Edition,
+  AliasingModel,
   Focus,
   Orientation,
   PrimaryActionAuto,
@@ -147,6 +148,7 @@ export const rustfmtVersionDetailsText = createSelector(getRustfmt, versionDetai
 export const miriVersionDetailsText = createSelector(getMiri, versionDetails);
 
 const editionSelector = (state: State) => state.configuration.edition;
+export const aliasingModelSelector = (state: State) => state.configuration.aliasingModel;
 
 export const isNightlyChannel = createSelector(
   channelSelector,
@@ -173,6 +175,11 @@ export const getChannelLabel = createSelector(channelSelector, (channel) => `${c
 export const isEditionDefault = createSelector(
   editionSelector,
   edition => edition == Edition.Rust2021,
+);
+
+export const isAliasingModelDefault = createSelector(
+  aliasingModelSelector,
+  aliasingModel => aliasingModel == AliasingModel.Stacked,
 );
 
 export const getBacktraceSet = (state: State) => (
@@ -388,7 +395,8 @@ export const formatRequestSelector = createSelector(
 export const miriRequestSelector = createSelector(
   editionSelector,
   codeSelector,
-  (edition, code) => ({ edition, code }),
+  aliasingModelSelector,
+  (edition, code, aliasingModel) => ({ edition, code, aliasingModel }),
 );
 
 export const macroExpansionRequestSelector = createSelector(

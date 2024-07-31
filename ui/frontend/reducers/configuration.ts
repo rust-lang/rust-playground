@@ -7,6 +7,7 @@ import {
   Channel,
   DemangleAssembly,
   Edition,
+  AliasingModel,
   Editor,
   Mode,
   Orientation,
@@ -35,6 +36,7 @@ interface State {
   mode: Mode;
   edition: Edition;
   backtrace: Backtrace;
+  aliasingModel: AliasingModel;
 }
 
 const initialState: State = {
@@ -56,6 +58,7 @@ const initialState: State = {
   mode: Mode.Debug,
   edition: Edition.Rust2021,
   backtrace: Backtrace.Disabled,
+  aliasingModel: AliasingModel.Stacked,
 };
 
 const slice = createSlice({
@@ -72,6 +75,10 @@ const slice = createSlice({
 
     changeBacktrace: (state, action: PayloadAction<Backtrace>) => {
       state.backtrace = action.payload;
+    },
+
+    changeAliasingModel: (state, action: PayloadAction<AliasingModel>) => {
+      state.aliasingModel = action.payload;
     },
 
     changeChannel: (state, action: PayloadAction<Channel>) => {
@@ -124,6 +131,7 @@ export const {
   changeAceTheme,
   changeAssemblyFlavor,
   changeBacktrace,
+  changeAliasingModel,
   changeChannel,
   changeDemangleAssembly,
   changeEditionRaw,

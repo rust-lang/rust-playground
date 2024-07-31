@@ -144,6 +144,11 @@ export enum Backtrace {
   Enabled = 'enabled',
 }
 
+export enum AliasingModel {
+  Stacked = 'stacked',
+  Tree = 'tree',
+}
+
 export enum Focus {
   Clippy = 'clippy',
   Miri = 'miri',
