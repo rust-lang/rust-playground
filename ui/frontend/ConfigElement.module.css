@@ -20,6 +20,15 @@
 
 .select {
   width: 100%;
+  background: var(--button-secondary-bg-color);
+  border-color: var(--button-secondary-border-color);
+  color: var(--button-secondary-color);
+
+  & option {
+    background-color: var(--button-secondary-bg-color-top);
+    border-color: var(--button-secondary-border-color);
+    color: var(--button-secondary-color);
+  }
 }
 
 .toggle {

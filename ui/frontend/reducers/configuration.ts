@@ -37,11 +37,15 @@ interface State {
   backtrace: Backtrace;
 }
 
+const prefersDarkTheme = window.matchMedia
+  ? window.matchMedia('(prefers-color-scheme: dark)').matches
+  : false;
+
 const initialState: State = {
   editor: Editor.Ace,
   ace: {
     keybinding: 'ace',
-    theme: 'github',
+    theme: prefersDarkTheme ? 'github_dark' : 'github',
     pairCharacters: PairCharacters.Enabled,
   },
   monaco: {
