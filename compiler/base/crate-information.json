@@ -186,7 +186,7 @@
   },
   {
     "name": "bytes",
-    "version": "1.7.0",
+    "version": "1.7.1",
     "id": "bytes"
   },
   {
@@ -216,17 +216,17 @@
   },
   {
     "name": "clap",
-    "version": "4.5.11",
+    "version": "4.5.13",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.5.11",
+    "version": "4.5.13",
     "id": "clap_builder"
   },
   {
     "name": "clap_derive",
-    "version": "4.5.11",
+    "version": "4.5.13",
     "id": "clap_derive"
   },
   {
@@ -431,7 +431,7 @@
   },
   {
     "name": "flate2",
-    "version": "1.0.30",
+    "version": "1.0.31",
     "id": "flate2"
   },
   {
@@ -636,7 +636,7 @@
   },
   {
     "name": "hyper-util",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "id": "hyper_util"
   },
   {
@@ -726,7 +726,7 @@
   },
   {
     "name": "indexmap",
-    "version": "2.2.6",
+    "version": "2.3.0",
     "id": "indexmap"
   },
   {
@@ -921,7 +921,7 @@
   },
   {
     "name": "ndarray",
-    "version": "0.15.6",
+    "version": "0.16.0",
     "id": "ndarray"
   },
   {
@@ -1141,7 +1141,7 @@
   },
   {
     "name": "ppv-lite86",
-    "version": "0.2.18",
+    "version": "0.2.20",
     "id": "ppv_lite86"
   },
   {
@@ -1236,7 +1236,7 @@
   },
   {
     "name": "regex",
-    "version": "1.10.5",
+    "version": "1.10.6",
     "id": "regex"
   },
   {
@@ -1256,7 +1256,7 @@
   },
   {
     "name": "rgb",
-    "version": "0.8.45",
+    "version": "0.8.47",
     "id": "rgb"
   },
   {
@@ -1291,12 +1291,12 @@
   },
   {
     "name": "rustls-pemfile",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "id": "rustls_pemfile"
   },
   {
     "name": "rustls-pki-types",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "id": "rustls_pki_types"
   },
   {
@@ -1341,7 +1341,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.121",
+    "version": "1.0.122",
     "id": "serde_json"
   },
   {
@@ -1486,7 +1486,7 @@
   },
   {
     "name": "tempfile",
-    "version": "3.10.1",
+    "version": "3.11.0",
     "id": "tempfile"
   },
   {
@@ -1595,13 +1595,18 @@
     "id": "tokio_rustls"
   },
   {
+    "name": "tokio-stream",
+    "version": "0.1.15",
+    "id": "tokio_stream"
+  },
+  {
     "name": "tokio-util",
     "version": "0.7.11",
     "id": "tokio_util"
   },
   {
     "name": "toml",
-    "version": "0.8.17",
+    "version": "0.8.19",
     "id": "toml"
   },
   {
@@ -1611,7 +1616,7 @@
   },
   {
     "name": "toml_edit",
-    "version": "0.22.18",
+    "version": "0.22.20",
     "id": "toml_edit"
   },
   {
@@ -1643,6 +1648,11 @@
     "name": "tracing-core",
     "version": "0.1.32",
     "id": "tracing_core"
+  },
+  {
+    "name": "trpl",
+    "version": "0.1.0",
+    "id": "trpl"
   },
   {
     "name": "try-lock",
@@ -1821,7 +1831,7 @@
   },
   {
     "name": "winnow",
-    "version": "0.6.16",
+    "version": "0.6.18",
     "id": "winnow"
   },
   {
@@ -1860,19 +1870,9 @@
     "id": "zerocopy"
   },
   {
-    "name": "zerocopy",
-    "version": "0.6.6",
-    "id": "zerocopy_0_6_6"
-  },
-  {
     "name": "zerocopy-derive",
     "version": "0.7.35",
     "id": "zerocopy_derive"
-  },
-  {
-    "name": "zerocopy-derive",
-    "version": "0.6.6",
-    "id": "zerocopy_derive_0_6_6"
   },
   {
     "name": "zerofrom",
