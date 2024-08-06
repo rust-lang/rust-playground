@@ -195,7 +195,7 @@ features = ["std"]
 
 [dependencies.bytes]
 package = "bytes"
-version = "=1.7.0"
+version = "=1.7.1"
 features = ["std"]
 
 [dependencies.bytes_0_4_12]
@@ -222,18 +222,18 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [dependencies.clap]
 package = "clap"
-version = "=4.5.11"
+version = "=4.5.13"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.11"
+version = "=4.5.13"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
 default-features = false
 
 [dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.5.11"
+version = "=4.5.13"
 
 [dependencies.clap_lex]
 package = "clap_lex"
@@ -428,7 +428,7 @@ default-features = false
 
 [dependencies.flate2]
 package = "flate2"
-version = "=1.0.30"
+version = "=1.0.31"
 features = ["any_impl", "miniz_oxide", "rust_backend"]
 
 [dependencies.flume]
@@ -622,7 +622,7 @@ version = "=0.6.0"
 
 [dependencies.hyper_util]
 package = "hyper-util"
-version = "=0.1.6"
+version = "=0.1.7"
 features = ["client", "client-legacy", "http1", "http2", "tokio"]
 
 [dependencies.iana_time_zone]
@@ -706,7 +706,7 @@ features = ["deprecated"]
 
 [dependencies.indexmap]
 package = "indexmap"
-version = "=2.2.6"
+version = "=2.3.0"
 features = ["std"]
 
 [dependencies.indexmap_1_9_3]
@@ -886,7 +886,7 @@ version = "=0.2.12"
 
 [dependencies.ndarray]
 package = "ndarray"
-version = "=0.15.6"
+version = "=0.16.0"
 features = ["std"]
 
 [dependencies.nix]
@@ -1088,7 +1088,7 @@ default-features = false
 
 [dependencies.ppv_lite86]
 package = "ppv-lite86"
-version = "=0.2.18"
+version = "=0.2.20"
 features = ["simd", "std"]
 
 [dependencies.precomputed_hash]
@@ -1177,7 +1177,7 @@ version = "=1.12.1"
 
 [dependencies.regex]
 package = "regex"
-version = "=1.10.5"
+version = "=1.10.6"
 features = ["perf", "perf-backtrack", "perf-cache", "perf-dfa", "perf-inline", "perf-literal", "perf-onepass", "std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
 [dependencies.regex_automata]
@@ -1197,7 +1197,7 @@ features = ["__tls", "blocking", "charset", "cookies", "default-tls", "h2", "htt
 
 [dependencies.rgb]
 package = "rgb"
-version = "=0.8.45"
+version = "=0.8.47"
 features = ["argb", "as-bytes", "bytemuck", "grb"]
 
 [dependencies.ring]
@@ -1231,12 +1231,12 @@ default-features = false
 
 [dependencies.rustls_pemfile]
 package = "rustls-pemfile"
-version = "=2.1.2"
+version = "=2.1.3"
 features = ["std"]
 
 [dependencies.rustls_pki_types]
 package = "rustls-pki-types"
-version = "=1.7.0"
+version = "=1.8.0"
 features = ["alloc", "std"]
 
 [dependencies.ryu]
@@ -1277,7 +1277,7 @@ version = "=1.0.204"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.121"
+version = "=1.0.122"
 features = ["raw_value", "std"]
 
 [dependencies.serde_spanned]
@@ -1412,7 +1412,7 @@ features = ["xattr"]
 
 [dependencies.tempfile]
 package = "tempfile"
-version = "=3.10.1"
+version = "=3.11.0"
 
 [dependencies.tendril]
 package = "tendril"
@@ -1508,6 +1508,11 @@ version = "=0.26.0"
 features = ["tls12"]
 default-features = false
 
+[dependencies.tokio_stream]
+package = "tokio-stream"
+version = "=0.1.15"
+features = ["time"]
+
 [dependencies.tokio_util]
 package = "tokio-util"
 version = "=0.7.11"
@@ -1515,7 +1520,7 @@ features = ["codec", "io"]
 
 [dependencies.toml]
 package = "toml"
-version = "=0.8.17"
+version = "=0.8.19"
 features = ["display", "parse"]
 
 [dependencies.toml_datetime]
@@ -1525,7 +1530,7 @@ features = ["serde"]
 
 [dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.22.18"
+version = "=0.22.20"
 features = ["display", "parse", "serde"]
 default-features = false
 
@@ -1556,6 +1561,10 @@ version = "=0.1.27"
 package = "tracing-core"
 version = "=0.1.32"
 features = ["once_cell", "std", "valuable"]
+
+[dependencies.trpl]
+package = "trpl"
+version = "=0.1.0"
 
 [dependencies.try_lock]
 package = "try-lock"
@@ -1715,7 +1724,7 @@ default-features = false
 
 [dependencies.winnow]
 package = "winnow"
-version = "=0.6.16"
+version = "=0.6.18"
 features = ["alloc", "std"]
 
 [dependencies.write16]
@@ -1748,21 +1757,11 @@ version = "=0.7.4"
 [dependencies.zerocopy]
 package = "zerocopy"
 version = "=0.7.35"
-features = ["__internal_use_only_features_that_work_on_stable", "alloc", "derive", "simd", "zerocopy-derive"]
-default-features = false
-
-[dependencies.zerocopy_0_6_6]
-package = "zerocopy"
-version = "=0.6.6"
-features = ["simd"]
+features = ["__internal_use_only_features_that_work_on_stable", "alloc", "byteorder", "derive", "simd", "zerocopy-derive"]
 
 [dependencies.zerocopy_derive]
 package = "zerocopy-derive"
 version = "=0.7.35"
-
-[dependencies.zerocopy_derive_0_6_6]
-package = "zerocopy-derive"
-version = "=0.6.6"
 
 [dependencies.zerofrom]
 package = "zerofrom"
@@ -1979,7 +1978,7 @@ features = ["std"]
 
 [build-dependencies.bytes]
 package = "bytes"
-version = "=1.7.0"
+version = "=1.7.1"
 features = ["std"]
 
 [build-dependencies.bytes_0_4_12]
@@ -2006,18 +2005,18 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [build-dependencies.clap]
 package = "clap"
-version = "=4.5.11"
+version = "=4.5.13"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build-dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.11"
+version = "=4.5.13"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "usage", "wrap_help"]
 default-features = false
 
 [build-dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.5.11"
+version = "=4.5.13"
 
 [build-dependencies.clap_lex]
 package = "clap_lex"
@@ -2212,7 +2211,7 @@ default-features = false
 
 [build-dependencies.flate2]
 package = "flate2"
-version = "=1.0.30"
+version = "=1.0.31"
 features = ["any_impl", "miniz_oxide", "rust_backend"]
 
 [build-dependencies.flume]
@@ -2406,7 +2405,7 @@ version = "=0.6.0"
 
 [build-dependencies.hyper_util]
 package = "hyper-util"
-version = "=0.1.6"
+version = "=0.1.7"
 features = ["client", "client-legacy", "http1", "http2", "tokio"]
 
 [build-dependencies.iana_time_zone]
@@ -2490,7 +2489,7 @@ features = ["deprecated"]
 
 [build-dependencies.indexmap]
 package = "indexmap"
-version = "=2.2.6"
+version = "=2.3.0"
 features = ["std"]
 
 [build-dependencies.indexmap_1_9_3]
@@ -2670,7 +2669,7 @@ version = "=0.2.12"
 
 [build-dependencies.ndarray]
 package = "ndarray"
-version = "=0.15.6"
+version = "=0.16.0"
 features = ["std"]
 
 [build-dependencies.nix]
@@ -2872,7 +2871,7 @@ default-features = false
 
 [build-dependencies.ppv_lite86]
 package = "ppv-lite86"
-version = "=0.2.18"
+version = "=0.2.20"
 features = ["simd", "std"]
 
 [build-dependencies.precomputed_hash]
@@ -2961,7 +2960,7 @@ version = "=1.12.1"
 
 [build-dependencies.regex]
 package = "regex"
-version = "=1.10.5"
+version = "=1.10.6"
 features = ["perf", "perf-backtrack", "perf-cache", "perf-dfa", "perf-inline", "perf-literal", "perf-onepass", "std", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
 
 [build-dependencies.regex_automata]
@@ -2981,7 +2980,7 @@ features = ["__tls", "blocking", "charset", "cookies", "default-tls", "h2", "htt
 
 [build-dependencies.rgb]
 package = "rgb"
-version = "=0.8.45"
+version = "=0.8.47"
 features = ["argb", "as-bytes", "bytemuck", "grb"]
 
 [build-dependencies.ring]
@@ -3015,12 +3014,12 @@ default-features = false
 
 [build-dependencies.rustls_pemfile]
 package = "rustls-pemfile"
-version = "=2.1.2"
+version = "=2.1.3"
 features = ["std"]
 
 [build-dependencies.rustls_pki_types]
 package = "rustls-pki-types"
-version = "=1.7.0"
+version = "=1.8.0"
 features = ["alloc", "std"]
 
 [build-dependencies.ryu]
@@ -3061,7 +3060,7 @@ version = "=1.0.204"
 
 [build-dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.121"
+version = "=1.0.122"
 features = ["raw_value", "std"]
 
 [build-dependencies.serde_spanned]
@@ -3196,7 +3195,7 @@ features = ["xattr"]
 
 [build-dependencies.tempfile]
 package = "tempfile"
-version = "=3.10.1"
+version = "=3.11.0"
 
 [build-dependencies.tendril]
 package = "tendril"
@@ -3292,6 +3291,11 @@ version = "=0.26.0"
 features = ["tls12"]
 default-features = false
 
+[build-dependencies.tokio_stream]
+package = "tokio-stream"
+version = "=0.1.15"
+features = ["time"]
+
 [build-dependencies.tokio_util]
 package = "tokio-util"
 version = "=0.7.11"
@@ -3299,7 +3303,7 @@ features = ["codec", "io"]
 
 [build-dependencies.toml]
 package = "toml"
-version = "=0.8.17"
+version = "=0.8.19"
 features = ["display", "parse"]
 
 [build-dependencies.toml_datetime]
@@ -3309,7 +3313,7 @@ features = ["serde"]
 
 [build-dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.22.18"
+version = "=0.22.20"
 features = ["display", "parse", "serde"]
 default-features = false
 
@@ -3340,6 +3344,10 @@ version = "=0.1.27"
 package = "tracing-core"
 version = "=0.1.32"
 features = ["once_cell", "std", "valuable"]
+
+[build-dependencies.trpl]
+package = "trpl"
+version = "=0.1.0"
 
 [build-dependencies.try_lock]
 package = "try-lock"
@@ -3499,7 +3507,7 @@ default-features = false
 
 [build-dependencies.winnow]
 package = "winnow"
-version = "=0.6.16"
+version = "=0.6.18"
 features = ["alloc", "std"]
 
 [build-dependencies.write16]
@@ -3532,21 +3540,11 @@ version = "=0.7.4"
 [build-dependencies.zerocopy]
 package = "zerocopy"
 version = "=0.7.35"
-features = ["__internal_use_only_features_that_work_on_stable", "alloc", "derive", "simd", "zerocopy-derive"]
-default-features = false
-
-[build-dependencies.zerocopy_0_6_6]
-package = "zerocopy"
-version = "=0.6.6"
-features = ["simd"]
+features = ["__internal_use_only_features_that_work_on_stable", "alloc", "byteorder", "derive", "simd", "zerocopy-derive"]
 
 [build-dependencies.zerocopy_derive]
 package = "zerocopy-derive"
 version = "=0.7.35"
-
-[build-dependencies.zerocopy_derive_0_6_6]
-package = "zerocopy-derive"
-version = "=0.6.6"
 
 [build-dependencies.zerofrom]
 package = "zerofrom"
