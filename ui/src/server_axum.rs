@@ -156,7 +156,10 @@ pub(crate) async fn serve(config: Config) {
         MakeRequestUuid::default(),
     ));
 
-    let listener = tokio::net::TcpListener::bind(config.server_socket_addr())
+    let server_socket_addr = config.server_socket_addr();
+    tracing::info!("Serving playground backend at http://{server_socket_addr}");
+
+    let listener = tokio::net::TcpListener::bind(server_socket_addr)
         .await
         .unwrap();
 
