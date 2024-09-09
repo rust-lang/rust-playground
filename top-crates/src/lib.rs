@@ -10,7 +10,7 @@ use cargo::{
     },
     sources::{
         source::{QueryKind, Source, SourceMap},
-        RegistrySource,
+        RegistrySource, SourceConfigMap,
     },
     util::{cache_lock::CacheLockMode, interning::InternedString, VersionExt},
     GlobalContext,
@@ -245,8 +245,11 @@ fn make_global_state<'cfg>(
     let target_info = TargetInfo::new(config, &[compile_kind], &rustc, compile_kind)
         .expect("Unable to create a TargetInfo");
 
+    let source_config = SourceConfigMap::empty(config).expect("Unable to create a SourceConfigMap");
+
     // Registry of known packages.
-    let mut registry = PackageRegistry::new(config).expect("Unable to create package registry");
+    let mut registry = PackageRegistry::new_with_source_config(config, source_config)
+        .expect("Unable to create package registry");
     registry.lock_patches();
 
     // Source for obtaining packages from the crates.io registry.
