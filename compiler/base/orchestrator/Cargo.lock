@@ -43,9 +43,9 @@ checksum = "9b34d609dfbaf33d6889b2b7106d3ca345eacad44200913df5ba02bfd31d2ba9"
 
 [[package]]
 name = "assertables"
-version = "7.0.1"
+version = "8.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c24e9d990669fbd16806bff449e4ac644fd9b1fca014760087732fe4102f131"
+checksum = "0de2cc69bb6ce4cc9b92d7daba4bba9a0fdc7ca46842b73003d1763bb7cf16d2"
 
 [[package]]
 name = "autocfg"
