@@ -41,10 +41,10 @@ RSpec.feature "Editor assistance for common code modifications", type: :feature,
     click_on("Build")
 
     within(:output, :stderr) do
-      click_on("use core::num::NonZeroU128;")
+      click_on("use std::num::NonZeroU128;")
     end
 
-    expect(editor).to have_line 'use core::num::NonZeroU128;'
+    expect(editor).to have_line 'use std::num::NonZeroU128;'
   end
 
   scenario "triggering a panic offers enabling backtraces" do
