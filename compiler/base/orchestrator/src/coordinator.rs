@@ -3,7 +3,7 @@ use futures::{
     stream::BoxStream,
     Future, FutureExt, Stream, StreamExt,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use snafu::prelude::*;
 use std::{
     collections::HashMap,
@@ -363,7 +363,14 @@ pub struct ExecuteRequest {
     pub crate_type: CrateType,
     pub tests: bool,
     pub backtrace: bool,
-    pub code: String,
+    pub code: Code,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Code {
+    main: String,
+    input: Option<String>,
+    output: Option<String>,
 }
 
 impl ExecuteRequest {
@@ -372,7 +379,9 @@ impl ExecuteRequest {
     }
 
     pub(crate) fn write_main_request(&self) -> WriteFileRequest {
-        write_primary_file_request(self.crate_type, &self.code)
+        let code =
+            serde_json::to_string(&self.code).expect("Failed to serialize code object for writing");
+        write_primary_file_request(self.crate_type, &code)
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -1129,6 +1138,7 @@ where
         Ok(self.backend)
     }
 
+    //TODO: CHANGE THIS TO SELECT TOOLCHAIN MAYBE????
     async fn select_channel(&self, channel: Channel) -> Result<&Container, Error> {
         let container = match channel {
             Channel::Stable => &self.stable,
@@ -1198,6 +1208,7 @@ impl Container {
             id: Default::default(),
         };
 
+        //Cargo
         let modify_cargo_toml = ModifyCargoToml::new(commander.clone())
             .await
             .context(CouldNotLoadCargoTomlSnafu)?;
@@ -1211,6 +1222,7 @@ impl Container {
         })
     }
 
+    //TODO: add to toolchain / Proof system version
     async fn versions(&self) -> Result<ChannelVersions, ContainerVersionsError> {
         use container_versions_error::*;
 
@@ -1238,6 +1250,7 @@ impl Container {
         })
     }
 
+    //TODO: add to toolchain / Proof system version
     async fn rustc_version(
         &self,
         token: CancellationToken,
@@ -2659,6 +2672,7 @@ impl Backend for DockerBackend {
     }
 }
 
+//Change to VM name
 impl Channel {
     fn to_container_name(self) -> &'static str {
         match self {

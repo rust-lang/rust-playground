@@ -48,7 +48,7 @@ pub(crate) struct ExecuteRequest {
     pub(crate) tests: bool,
     #[serde(default)]
     pub(crate) backtrace: bool,
-    pub(crate) code: String,
+    pub(crate) code: Code,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -194,4 +194,11 @@ pub(crate) struct EvaluateResponse {
 
 fn default_crate_type() -> String {
     "bin".into()
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub(crate) struct Code {
+    main: String,
+    input: Option<String>,
+    output: Option<String>,
 }
