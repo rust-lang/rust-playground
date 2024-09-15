@@ -151,11 +151,13 @@
   @mixin light-theme-vars;
 }
 
+/*
 @media (prefers-color-scheme: dark) {
   :root {
     @mixin dark-theme-vars;
   }
 }
+*/
 
 [data-theme='dark']:root {
   @mixin dark-theme-vars;
