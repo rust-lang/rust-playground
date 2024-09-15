@@ -72,7 +72,13 @@ const PopButton: React.FC<NewPopProps> = ({ Button, Menu, menuContainer }) => {
         }}
         {...getFloatingProps()}
       >
-        <FloatingArrow ref={arrowRef} context={context} height={10} width={20} fill="white" />
+        <FloatingArrow
+          ref={arrowRef}
+          context={context}
+          height={10}
+          width={20}
+          className={styles.arrow}
+        />
         <div className={containerClass}>
           <Menu close={close} />
         </div>

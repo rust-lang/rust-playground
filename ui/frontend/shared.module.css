@@ -15,6 +15,7 @@
 }
 
 .-buttonReset {
+  color: var(--font-color);
   border: none;
   background: inherit;
   background-color: transparent; /* IE 11 */
@@ -27,7 +28,7 @@
 .-buttonAsLink {
   composes: -buttonReset;
   cursor: pointer;
-  color: #00e;
+  color: var(--link-color);
   user-select: text;
   text-decoration: underline;
 }

@@ -8,9 +8,23 @@ import reducer from './reducers';
 import initializeSessionStorage from './session_storage';
 import { websocketMiddleware } from './websocketMiddleware';
 
+const editorDarkThemes = {
+  configuration: {
+    ace: {
+      theme: 'github_dark',
+    },
+    monaco: {
+      theme: 'vscode-dark-plus',
+    },
+  },
+};
+
 export default function configureStore(window: Window) {
   const baseUrl = new URL('/', window.location.href).href;
   const websocket = websocketMiddleware(window);
+
+  const prefersDarkTheme = false && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const initialThemes = prefersDarkTheme ? editorDarkThemes : {};
 
   const initialGlobalState = {
     globalConfiguration: {
@@ -26,6 +40,7 @@ export default function configureStore(window: Window) {
     merge(
       initialAppState,
       initialGlobalState,
+      initialThemes,
       localStorage.initialState,
       sessionStorage.initialState,
     ),

@@ -14,7 +14,9 @@ import {
   Orientation,
   PairCharacters,
   ProcessAssembly,
+  Theme,
 } from './types';
+import { showThemeSelector } from './selectors';
 
 const MONACO_THEMES = [
   'vs', 'vs-dark', 'vscode-dark-plus',
@@ -24,6 +26,7 @@ const ConfigMenu: React.FC = () => {
   const keybinding = useAppSelector((state) => state.configuration.ace.keybinding);
   const aceTheme = useAppSelector((state) => state.configuration.ace.theme);
   const monacoTheme = useAppSelector((state) => state.configuration.monaco.theme);
+  const theme = useAppSelector((state) => state.configuration.theme);
   const orientation = useAppSelector((state) => state.configuration.orientation);
   const editorStyle = useAppSelector((state) => state.configuration.editor);
   const pairCharacters = useAppSelector((state) => state.configuration.ace.pairCharacters);
@@ -31,10 +34,13 @@ const ConfigMenu: React.FC = () => {
   const demangleAssembly = useAppSelector((state) => state.configuration.demangleAssembly);
   const processAssembly = useAppSelector((state) => state.configuration.processAssembly);
 
+  const showTheme = useAppSelector(showThemeSelector);
+
   const dispatch = useAppDispatch();
   const changeAceTheme = useCallback((t: string) => dispatch(config.changeAceTheme(t)), [dispatch]);
   const changeMonacoTheme = useCallback((t: string) => dispatch(config.changeMonacoTheme(t)), [dispatch]);
   const changeKeybinding = useCallback((k: string) => dispatch(config.changeKeybinding(k)), [dispatch]);
+  const changeTheme = useCallback((t: Theme) => dispatch(config.changeTheme(t)), [dispatch]);
   const changeOrientation = useCallback((o: Orientation) => dispatch(config.changeOrientation(o)), [dispatch]);
   const changeEditorStyle = useCallback((e: Editor) => dispatch(config.changeEditor(e)), [dispatch]);
   const changeAssemblyFlavor =
@@ -98,6 +104,13 @@ const ConfigMenu: React.FC = () => {
       </MenuGroup>
 
       <MenuGroup title="UI">
+        {showTheme && (
+          <SelectConfig name="Theme" value={theme} onChange={changeTheme}>
+            { /* <option value={Theme.System}>System</option> */ }
+            <option value={Theme.Light}>Light</option>
+            <option value={Theme.Dark}>Dark</option>
+          </SelectConfig>
+        )}
         <SelectConfig
           name="Orientation"
           value={orientation}

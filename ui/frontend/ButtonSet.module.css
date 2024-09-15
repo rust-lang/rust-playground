@@ -76,11 +76,7 @@ $radius: 4px;
 
 .secondary {
   composes: -border -button;
-  background: linear-gradient(
-    to bottom,
-    var(--button-secondary-bg-color-top),
-    var(--button-secondary-bg-color-bottom)
-  );
+  background: var(--button-secondary-bg-color);
   border-color: var(--button-secondary-border-color);
   color: var(--button-secondary-color);
 
@@ -121,4 +117,9 @@ $radius: 4px;
   padding: 0;
   aspect-ratio: 1/1;
   justify-items: center;
+}
+
+a.iconLink svg,
+a.iconLink:visited svg {
+  fill: var(--font-color) !important;
 }

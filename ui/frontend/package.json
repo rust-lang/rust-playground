@@ -13,6 +13,7 @@
     "immer": "^10.0.3",
     "lodash-es": "^4.17.21",
     "monaco-editor": "^0.50.0",
+    "postcss-mixins": "^11.0.1",
     "prismjs": "^1.6.0",
     "qs": "^6.4.0",
     "react": "^18.2.0",
