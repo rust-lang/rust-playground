@@ -205,6 +205,7 @@ body {
   background-color: var(--background-color);
   padding: 0 1em;
   font-family: var(--primary-font);
+  font-size: 18px;
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
