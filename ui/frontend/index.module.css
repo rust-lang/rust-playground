@@ -103,6 +103,10 @@
   /* Output tabs */
   --output-background-tab: #fcfcfc;
   --output-current-tab: #f9ffff;
+
+  /* Output compiler highlighting */
+  --output-highlight-error-color: #bf1b1b;
+  --output-highlight-warning-color: #f79a06;
 }
 
 @define-mixin dark-theme-vars {
@@ -144,6 +148,12 @@
   /* Output tabs */
   --output-background-tab: #191b1c;
   --output-current-tab: #343434;
+
+  /* Output compiler highlighting */
+  --output-highlight-warning-color: #ffe800;
+  --output-highlight-warning-bg-color: #330;
+  --output-highlight-error-color: #f5f5f5;
+  --output-highlight-error-bg-color: #820000;
 }
 
 :root,
@@ -200,10 +210,12 @@ body {
 /* stylelint-disable-next-line selector-class-pattern */
 :global(.language-rust_errors) {
   & :global(.warning) {
-    color: #f79a06;
+    color: var(--output-highlight-warning-color);
+    background-color: var(--output-highlight-warning-bg-color);
   }
 
   & :global(.error) {
-    color: #bf1b1b;
+    color: var(--output-highlight-error-color);
+    background-color: var(--output-highlight-error-bg-color);
   }
 }
