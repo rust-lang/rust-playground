@@ -103,6 +103,10 @@
   /* Output tabs */
   --output-background-tab: #fcfcfc;
   --output-current-tab: #f9ffff;
+
+  /* Output compiler highlighting */
+  --output-highlight-error-color: #bf1b1b;
+  --output-highlight-warning-color: #f79a06;
 }
 
 @define-mixin dark-theme-vars {
@@ -110,22 +114,22 @@
   --negative-luminance: white;
 
   /* Fonts */
-  --font-color: #b4aea6;
+  --font-color: #dcdbd8;
   --font-color-high-contrast: #dcdbd8;
 
   /* Links */
-  --link-color: #308af2;
-  --link-color-visited: #9f5fe1;
+  --link-color: #b2dcff;
+  --link-color-visited: #eecaff;
 
   /* Background */
-  --background-color: #292c2e;
-  --background-color-high-contrast: #17191a;
+  --background-color: #444;
+  --background-color-high-contrast: #181818;
 
   /* Code */
   --code-background-color: #3c3c3c;
 
   /* Border */
-  --border-color: #404548;
+  --border-color: #5e5e5e;
 
   /* Header */
   --header-main-border: #363b3d;
@@ -133,17 +137,28 @@
 
   /* The big red button */
   --button-primary-color: #dcdbd8;
-  --button-primary-bg-color: #81331a;
+  --button-primary-bg-color: #5d2310;
   --button-primary-border-color: #612714;
 
   /* Not the big red button */
-  --button-secondary-color: #b4aea6;
+  --button-secondary-color: #dcdbd8;
   --button-secondary-bg-color-top: #17191a;
   --button-secondary-bg-color-bottom: #1a1c1d;
+  --button-secondary-border-color: color-mix(
+    in hsl,
+    var(--button-secondary-bg-color-bottom),
+    var(--negative-luminance) 40%
+  );
 
   /* Output tabs */
-  --output-background-tab: #191b1c;
-  --output-current-tab: #343434;
+  --output-background-tab: #343434;
+  --output-current-tab: #191b1c;
+
+  /* Output compiler highlighting */
+  --output-highlight-warning-color: #ffe800;
+  --output-highlight-warning-bg-color: #330;
+  --output-highlight-error-color: #f5f5f5;
+  --output-highlight-error-bg-color: #820000;
 }
 
 :root,
@@ -195,15 +210,18 @@ body {
   background-color: var(--background-color);
   padding: 0 1em;
   font-family: var(--primary-font);
+  font-size: 18px;
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 :global(.language-rust_errors) {
   & :global(.warning) {
-    color: #f79a06;
+    color: var(--output-highlight-warning-color);
+    background-color: var(--output-highlight-warning-bg-color);
   }
 
   & :global(.error) {
-    color: #bf1b1b;
+    color: var(--output-highlight-error-color);
+    background-color: var(--output-highlight-error-bg-color);
   }
 }
