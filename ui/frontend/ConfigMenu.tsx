@@ -16,7 +16,6 @@ import {
   ProcessAssembly,
   Theme,
 } from './types';
-import { showThemeSelector } from './selectors';
 
 const MONACO_THEMES = [
   'vs', 'vs-dark', 'vscode-dark-plus',
@@ -33,8 +32,6 @@ const ConfigMenu: React.FC = () => {
   const assemblyFlavor = useAppSelector((state) => state.configuration.assemblyFlavor);
   const demangleAssembly = useAppSelector((state) => state.configuration.demangleAssembly);
   const processAssembly = useAppSelector((state) => state.configuration.processAssembly);
-
-  const showTheme = useAppSelector(showThemeSelector);
 
   const dispatch = useAppDispatch();
   const changeAceTheme = useCallback((t: string) => dispatch(config.changeAceTheme(t)), [dispatch]);
@@ -104,13 +101,12 @@ const ConfigMenu: React.FC = () => {
       </MenuGroup>
 
       <MenuGroup title="UI">
-        {showTheme && (
-          <SelectConfig name="Theme" value={theme} onChange={changeTheme}>
-            { /* <option value={Theme.System}>System</option> */ }
-            <option value={Theme.Light}>Light</option>
-            <option value={Theme.Dark}>Dark</option>
-          </SelectConfig>
-        )}
+        <SelectConfig name="Theme" value={theme} onChange={changeTheme}>
+          <option value={Theme.System}>System</option>
+          <option value={Theme.Light}>Light</option>
+          <option value={Theme.Dark}>Dark</option>
+        </SelectConfig>
+
         <SelectConfig
           name="Orientation"
           value={orientation}

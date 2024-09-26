@@ -3,9 +3,11 @@ import { Portal } from 'react-portal';
 
 import { Close } from './Icon';
 import { useAppDispatch, useAppSelector } from './hooks';
-import { seenRustSurvey2023 } from './reducers/notifications';
+import { swapTheme } from './reducers/configuration';
+import { seenDarkMode, seenRustSurvey2023 } from './reducers/notifications';
 import { allowLongRun, wsExecuteKillCurrent } from './reducers/output/execute';
 import * as selectors from './selectors';
+import { Theme } from './types';
 
 import * as styles from './Notifications.module.css';
 
@@ -15,11 +17,61 @@ const Notifications: React.FC = () => {
   return (
     <Portal>
       <div className={styles.container}>
+        <DarkModeNotification />
         <RustSurvey2023Notification />
         <ExcessiveExecutionNotification />
       </div>
     </Portal>
   );
+};
+
+const DarkModeNotification: React.FC = () => {
+  const showIt = useAppSelector(selectors.showDarkModeSelector);
+
+  const dispatch = useAppDispatch();
+  const seenIt = useCallback(() => dispatch(seenDarkMode()), [dispatch]);
+  const swapToLight = useCallback(() => dispatch(swapTheme(Theme.Light)), [dispatch]);
+  const swapToDark = useCallback(() => dispatch(swapTheme(Theme.Dark)), [dispatch]);
+  const swapToSystem = useCallback(() => dispatch(swapTheme(Theme.System)), [dispatch]);
+
+  return showIt ? (
+    <Notification onClose={seenIt}>
+      <p>The playground now has a dark mode! Sample the themes here:</p>
+
+      <table>
+        <tr>
+          <th>
+            <button className={styles.swapTheme} onClick={swapToSystem}>
+              System
+            </button>
+          </th>
+          <td>Use your system&apos;s preference</td>
+        </tr>
+
+        <tr>
+          <th>
+            <button className={styles.swapTheme} onClick={swapToLight}>
+              Light
+            </button>
+          </th>
+          <td>The classic playground style</td>
+        </tr>
+
+        <tr>
+          <th>
+            <button className={styles.swapTheme} onClick={swapToDark}>
+              Dark
+            </button>
+          </th>
+          <td>Reduce the number of photons hitting your eyeballs</td>
+        </tr>
+      </table>
+
+      <p>
+        You can change the current UI theme (and the editor&apos;s theme) in the configuration menu.
+      </p>
+    </Notification>
+  ) : null;
 };
 
 const RustSurvey2023Notification: React.FC = () => {
@@ -69,7 +121,7 @@ interface NotificationProps {
 const Notification: React.FC<NotificationProps> = ({ onClose, children }) => (
   <div className={styles.notification} data-test-id="notification">
     <div className={styles.notificationContent}>{children}</div>
-    <button className={styles.close} onClick={onClose}>
+    <button className={styles.close} onClick={onClose} title="dismiss notification">
       <Close />
     </button>
   </div>
