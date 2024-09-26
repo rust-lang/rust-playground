@@ -357,6 +357,13 @@ const notificationsSelector = (state: State) => state.notifications;
 
 const NOW = new Date();
 
+const DARK_MODE_END = new Date('2024-10-15T00:00:00Z');
+const DARK_MODE_OPEN = NOW <= DARK_MODE_END;
+export const showDarkModeSelector = createSelector(
+  notificationsSelector,
+  notifications => DARK_MODE_OPEN && !notifications.seenDarkMode,
+);
+
 const RUST_SURVEY_2023_END = new Date('2024-01-15T00:00:00Z');
 const RUST_SURVEY_2023_OPEN = NOW <= RUST_SURVEY_2023_END;
 export const showRustSurvey2023Selector = createSelector(
@@ -365,6 +372,7 @@ export const showRustSurvey2023Selector = createSelector(
 );
 
 export const anyNotificationsToShowSelector = createSelector(
+  showDarkModeSelector,
   showRustSurvey2023Selector,
   excessiveExecutionSelector,
   (...allNotifications) => allNotifications.some(n => n),

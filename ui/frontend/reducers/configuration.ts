@@ -124,6 +124,22 @@ const slice = createSlice({
     changeProcessAssembly: (state, action: PayloadAction<ProcessAssembly>) => {
       state.processAssembly = action.payload;
     },
+
+    swapTheme: (state, action: PayloadAction<Theme>) => {
+      state.theme = action.payload;
+      switch (action.payload) {
+        case Theme.Light: {
+          state.ace.theme = 'github';
+          state.monaco.theme = 'vs';
+          break;
+        }
+        case Theme.Dark: {
+          state.ace.theme = 'github_dark';
+          state.monaco.theme = 'vscode-dark-plus';
+          break;
+        }
+      }
+    },
   },
 });
 
@@ -143,6 +159,7 @@ export const {
   changePairCharacters,
   changePrimaryAction,
   changeProcessAssembly,
+  swapTheme,
 } = slice.actions;
 
 export const changeEdition =

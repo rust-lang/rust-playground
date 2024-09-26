@@ -35,3 +35,7 @@ $space: 0.25em;
   padding-top: 0.5em;
   gap: 0.5em;
 }
+
+.swapTheme {
+  width: 100%;
+}
