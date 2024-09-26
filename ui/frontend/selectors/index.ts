@@ -444,13 +444,11 @@ const websocket = (state: State) => state.websocket;
 const clientFeatureFlagThreshold = createSelector(client, (c) => c.featureFlagThreshold);
 
 const showGemThreshold = createSelector(featureFlags, ff => ff.showGemThreshold);
-const showThemeThreshold = createSelector(featureFlags, ff => ff.showThemeThreshold);
 
 const createFeatureFlagSelector = (ff: (state: State) => number) =>
   createSelector(clientFeatureFlagThreshold, ff, (c, ff) => c <= ff);
 
 export const showGemSelector = createFeatureFlagSelector(showGemThreshold);
-export const showThemeSelector = createFeatureFlagSelector(showThemeThreshold);
 
 export const executeViaWebsocketSelector = createSelector(websocket, (ws) => ws.connected);
 
