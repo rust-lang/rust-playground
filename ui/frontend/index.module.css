@@ -105,8 +105,10 @@
   --output-current-tab: #f9ffff;
 
   /* Output compiler highlighting */
-  --output-highlight-error-color: #bf1b1b;
   --output-highlight-warning-color: #f79a06;
+  --output-highlight-warning-bg-color: inherit;
+  --output-highlight-error-color: #bf1b1b;
+  --output-highlight-error-bg-color: inherit;
 }
 
 @define-mixin dark-theme-vars {
