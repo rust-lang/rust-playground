@@ -185,6 +185,7 @@ optgroup,
 select,
 textarea {
   font-family: var(--primary-font);
+  font-optical-sizing: auto;
 }
 
 html {
@@ -210,6 +211,7 @@ body {
   background-color: var(--background-color);
   padding: 0 1em;
   font-family: var(--primary-font);
+  font-optical-sizing: auto;
   font-size: 18px;
 }
 
