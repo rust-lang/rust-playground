@@ -50,9 +50,6 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
-      react-monaco-editor:
-        specifier: ^0.56.0
-        version: 0.56.1(@types/react@18.3.10)(monaco-editor@0.50.0)(react@18.3.1)
       react-portal:
         specifier: ^4.1.4
         version: 4.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3265,13 +3262,6 @@ packages:
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
-
-  react-monaco-editor@0.56.1:
-    resolution: {integrity: sha512-L2/QjVK+C95zqvl19ACo5ftg3MWAL0ku4zaMzcgt8LO2mhH2gIDfHr1sIZYY7LaKdriWq4EUO6pIdnQDswZ9gA==}
-    peerDependencies:
-      '@types/react': '>=16 <= 18'
-      monaco-editor: ^0.50.0
-      react: '>=16 <= 18'
 
   react-portal@4.2.2:
     resolution: {integrity: sha512-vS18idTmevQxyQpnde0Td6ZcUlv+pD8GTyR42n3CHUQq9OHi1C4jDE4ZWEbEsrbrLRhSECYiao58cvocwMtP7Q==}
@@ -7632,13 +7622,6 @@ snapshots:
   react-is@16.13.1: {}
 
   react-is@18.3.1: {}
-
-  react-monaco-editor@0.56.1(@types/react@18.3.10)(monaco-editor@0.50.0)(react@18.3.1):
-    dependencies:
-      '@types/react': 18.3.10
-      monaco-editor: 0.50.0
-      prop-types: 15.8.1
-      react: 18.3.1
 
   react-portal@4.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
