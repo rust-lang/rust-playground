@@ -135,7 +135,7 @@ const slice = createSlice({
         }
         case Theme.Dark: {
           state.ace.theme = 'github_dark';
-          state.monaco.theme = 'vscode-dark-plus';
+          state.monaco.theme = 'vs-dark';
           break;
         }
       }
