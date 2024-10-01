@@ -55,10 +55,14 @@ const MonacoEditorCore: React.FC<CommonEditorProps> = (props) => {
       return;
     }
 
+    const nodeStyle = window.getComputedStyle(node);
+
     const editor = monaco.editor.create(node, {
       language: 'rust',
       value: initialCode.current,
       theme: initialTheme.current,
+      fontSize: parseInt(nodeStyle.fontSize, 10),
+      fontFamily: nodeStyle.fontFamily,
       automaticLayout: true,
       'semanticHighlighting.enabled': true,
     });
