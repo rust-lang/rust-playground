@@ -33,8 +33,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       monaco-editor:
-        specifier: ^0.50.0
-        version: 0.50.0
+        specifier: ^0.52.0
+        version: 0.52.0
       prismjs:
         specifier: ^1.6.0
         version: 1.29.0
@@ -176,7 +176,7 @@ importers:
         version: 2.9.1(webpack@5.95.0(webpack-cli@5.1.4))
       monaco-editor-webpack-plugin:
         specifier: ^7.0.1
-        version: 7.1.0(monaco-editor@0.50.0)(webpack@5.95.0(webpack-cli@5.1.4))
+        version: 7.1.0(monaco-editor@0.52.0)(webpack@5.95.0(webpack-cli@5.1.4))
       normalize.css:
         specifier: ^8.0.0
         version: 8.0.1
@@ -2887,8 +2887,8 @@ packages:
       monaco-editor: '>= 0.31.0'
       webpack: ^4.5.0 || 5.x
 
-  monaco-editor@0.50.0:
-    resolution: {integrity: sha512-8CclLCmrRRh+sul7C08BmPBP3P8wVWfBHomsTcndxg5NRCEPfu/mc2AGU8k37ajjDVXcXFc12ORAMUkmk+lkFA==}
+  monaco-editor@0.52.0:
+    resolution: {integrity: sha512-OeWhNpABLCeTqubfqLMXGsqf6OmPU6pHM85kF3dhy6kq5hnhuVS1p3VrEW/XhWHc71P2tHyS5JFySD8mgs1crw==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -7275,13 +7275,13 @@ snapshots:
 
   minipass@7.1.2: {}
 
-  monaco-editor-webpack-plugin@7.1.0(monaco-editor@0.50.0)(webpack@5.95.0(webpack-cli@5.1.4)):
+  monaco-editor-webpack-plugin@7.1.0(monaco-editor@0.52.0)(webpack@5.95.0(webpack-cli@5.1.4)):
     dependencies:
       loader-utils: 2.0.4
-      monaco-editor: 0.50.0
+      monaco-editor: 0.52.0
       webpack: 5.95.0(webpack-cli@5.1.4)
 
-  monaco-editor@0.50.0: {}
+  monaco-editor@0.52.0: {}
 
   ms@2.1.3: {}
 
