@@ -35,9 +35,6 @@ importers:
       monaco-editor:
         specifier: ^0.50.0
         version: 0.50.0
-      postcss-mixins:
-        specifier: ^11.0.1
-        version: 11.0.1(postcss@8.4.41)
       prismjs:
         specifier: ^1.6.0
         version: 1.29.0
@@ -192,6 +189,9 @@ importers:
       postcss-loader:
         specifier: ^8.1.0
         version: 8.1.1(postcss@8.4.41)(typescript@5.5.4)(webpack@5.93.0(webpack-cli@5.1.4))
+      postcss-mixins:
+        specifier: ^11.0.1
+        version: 11.0.1(postcss@8.4.41)
       postcss-nesting:
         specifier: ^13.0.0
         version: 13.0.0(postcss@8.4.41)
