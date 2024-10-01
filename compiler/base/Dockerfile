@@ -1,6 +1,6 @@
 #syntax=docker/dockerfile:1.5
 
-FROM ubuntu:20.04 as toolchain
+FROM ubuntu:24.04 as toolchain
 
 ARG channel
 
@@ -17,7 +17,6 @@ RUN apt-get update && apt-get install -y \
     git \
     libssl-dev \
     pkg-config \
-    python \
  && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m playground -d /playground

@@ -61,7 +61,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.88",
+    "version": "1.0.89",
     "id": "anyhow"
   },
   {
@@ -86,7 +86,7 @@
   },
   {
     "name": "async-trait",
-    "version": "0.1.82",
+    "version": "0.1.83",
     "id": "async_trait"
   },
   {
@@ -101,7 +101,7 @@
   },
   {
     "name": "autocfg",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "id": "autocfg"
   },
   {
@@ -191,7 +191,7 @@
   },
   {
     "name": "bytes",
-    "version": "1.7.1",
+    "version": "1.7.2",
     "id": "bytes"
   },
   {
@@ -201,7 +201,7 @@
   },
   {
     "name": "cc",
-    "version": "1.1.18",
+    "version": "1.1.24",
     "id": "cc"
   },
   {
@@ -216,17 +216,17 @@
   },
   {
     "name": "clap",
-    "version": "4.5.17",
+    "version": "4.5.18",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.5.17",
+    "version": "4.5.18",
     "id": "clap_builder"
   },
   {
     "name": "clap_derive",
-    "version": "4.5.13",
+    "version": "4.5.18",
     "id": "clap_derive"
   },
   {
@@ -305,6 +305,16 @@
     "id": "crypto_common"
   },
   {
+    "name": "cssparser",
+    "version": "0.31.2",
+    "id": "cssparser"
+  },
+  {
+    "name": "cssparser-macros",
+    "version": "0.6.1",
+    "id": "cssparser_macros"
+  },
+  {
     "name": "csv",
     "version": "1.3.0",
     "id": "csv"
@@ -335,6 +345,11 @@
     "id": "derivative"
   },
   {
+    "name": "derive_more",
+    "version": "0.99.18",
+    "id": "derive_more"
+  },
+  {
     "name": "destructure_traitobject",
     "version": "0.2.0",
     "id": "destructure_traitobject"
@@ -348,6 +363,21 @@
     "name": "displaydoc",
     "version": "0.2.5",
     "id": "displaydoc"
+  },
+  {
+    "name": "dtoa",
+    "version": "1.0.9",
+    "id": "dtoa"
+  },
+  {
+    "name": "dtoa-short",
+    "version": "0.3.5",
+    "id": "dtoa_short"
+  },
+  {
+    "name": "ego-tree",
+    "version": "0.6.3",
+    "id": "ego_tree"
   },
   {
     "name": "either",
@@ -416,7 +446,7 @@
   },
   {
     "name": "fdeflate",
-    "version": "0.3.4",
+    "version": "0.3.5",
     "id": "fdeflate"
   },
   {
@@ -431,7 +461,7 @@
   },
   {
     "name": "flate2",
-    "version": "1.0.33",
+    "version": "1.0.34",
     "id": "flate2"
   },
   {
@@ -515,6 +545,11 @@
     "id": "futures_util"
   },
   {
+    "name": "fxhash",
+    "version": "0.2.1",
+    "id": "fxhash"
+  },
+  {
     "name": "generic-array",
     "version": "1.1.0",
     "id": "generic_array"
@@ -523,6 +558,11 @@
     "name": "generic-array",
     "version": "0.14.7",
     "id": "generic_array_0_14_7"
+  },
+  {
+    "name": "getopts",
+    "version": "0.2.21",
+    "id": "getopts"
   },
   {
     "name": "getrandom",
@@ -560,19 +600,9 @@
     "id": "hashbrown"
   },
   {
-    "name": "hashbrown",
-    "version": "0.12.3",
-    "id": "hashbrown_0_12_3"
-  },
-  {
     "name": "hashlink",
     "version": "0.9.1",
     "id": "hashlink"
-  },
-  {
-    "name": "hdrhistogram",
-    "version": "7.5.4",
-    "id": "hdrhistogram"
   },
   {
     "name": "heck",
@@ -586,8 +616,13 @@
   },
   {
     "name": "html5ever",
-    "version": "0.26.0",
+    "version": "0.27.0",
     "id": "html5ever"
+  },
+  {
+    "name": "html5ever",
+    "version": "0.26.0",
+    "id": "html5ever_0_26_0"
   },
   {
     "name": "http",
@@ -606,7 +641,7 @@
   },
   {
     "name": "httparse",
-    "version": "1.9.4",
+    "version": "1.9.5",
     "id": "httparse"
   },
   {
@@ -636,12 +671,12 @@
   },
   {
     "name": "hyper-util",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "id": "hyper_util"
   },
   {
     "name": "iana-time-zone",
-    "version": "0.1.60",
+    "version": "0.1.61",
     "id": "iana_time_zone"
   },
   {
@@ -730,11 +765,6 @@
     "id": "indexmap"
   },
   {
-    "name": "indexmap",
-    "version": "1.9.3",
-    "id": "indexmap_1_9_3"
-  },
-  {
     "name": "iovec",
     "version": "0.1.4",
     "id": "iovec"
@@ -786,7 +816,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.158",
+    "version": "0.2.159",
     "id": "libc"
   },
   {
@@ -846,8 +876,13 @@
   },
   {
     "name": "markup5ever",
-    "version": "0.11.0",
+    "version": "0.12.1",
     "id": "markup5ever"
+  },
+  {
+    "name": "markup5ever",
+    "version": "0.11.0",
+    "id": "markup5ever_0_11_0"
   },
   {
     "name": "markup5ever_rcdom",
@@ -1001,7 +1036,7 @@
   },
   {
     "name": "once_cell",
-    "version": "1.19.0",
+    "version": "1.20.1",
     "id": "once_cell"
   },
   {
@@ -1066,8 +1101,13 @@
   },
   {
     "name": "phf_codegen",
-    "version": "0.10.0",
+    "version": "0.11.2",
     "id": "phf_codegen"
+  },
+  {
+    "name": "phf_codegen",
+    "version": "0.10.0",
+    "id": "phf_codegen_0_10_0"
   },
   {
     "name": "phf_generator",
@@ -1095,16 +1135,6 @@
     "id": "phf_shared_0_10_0"
   },
   {
-    "name": "pin-project",
-    "version": "1.1.5",
-    "id": "pin_project"
-  },
-  {
-    "name": "pin-project-internal",
-    "version": "1.1.5",
-    "id": "pin_project_internal"
-  },
-  {
     "name": "pin-project-lite",
     "version": "0.2.14",
     "id": "pin_project_lite"
@@ -1116,17 +1146,22 @@
   },
   {
     "name": "pkg-config",
-    "version": "0.3.30",
+    "version": "0.3.31",
     "id": "pkg_config"
   },
   {
     "name": "png",
-    "version": "0.17.13",
+    "version": "0.17.14",
     "id": "png"
   },
   {
+    "name": "portable-atomic",
+    "version": "1.9.0",
+    "id": "portable_atomic"
+  },
+  {
     "name": "postgres",
-    "version": "0.19.8",
+    "version": "0.19.9",
     "id": "postgres"
   },
   {
@@ -1136,7 +1171,7 @@
   },
   {
     "name": "postgres-types",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "id": "postgres_types"
   },
   {
@@ -1241,22 +1276,22 @@
   },
   {
     "name": "regex",
-    "version": "1.10.6",
+    "version": "1.11.0",
     "id": "regex"
   },
   {
     "name": "regex-automata",
-    "version": "0.4.7",
+    "version": "0.4.8",
     "id": "regex_automata"
   },
   {
     "name": "regex-syntax",
-    "version": "0.8.4",
+    "version": "0.8.5",
     "id": "regex_syntax"
   },
   {
     "name": "reqwest",
-    "version": "0.12.7",
+    "version": "0.12.8",
     "id": "reqwest"
   },
   {
@@ -1296,12 +1331,12 @@
   },
   {
     "name": "rustls-pemfile",
-    "version": "2.1.3",
+    "version": "2.2.0",
     "id": "rustls_pemfile"
   },
   {
     "name": "rustls-pki-types",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "id": "rustls_pki_types"
   },
   {
@@ -1325,9 +1360,19 @@
     "id": "scopeguard"
   },
   {
+    "name": "scraper",
+    "version": "0.20.0",
+    "id": "scraper"
+  },
+  {
     "name": "select",
     "version": "0.6.0",
     "id": "select"
+  },
+  {
+    "name": "selectors",
+    "version": "0.25.0",
+    "id": "selectors"
   },
   {
     "name": "semver",
@@ -1351,7 +1396,7 @@
   },
   {
     "name": "serde_spanned",
-    "version": "0.6.7",
+    "version": "0.6.8",
     "id": "serde_spanned"
   },
   {
@@ -1368,6 +1413,11 @@
     "name": "serde_yaml",
     "version": "0.9.34+deprecated",
     "id": "serde_yaml"
+  },
+  {
+    "name": "servo_arc",
+    "version": "0.3.0",
+    "id": "servo_arc"
   },
   {
     "name": "sha1_smol",
@@ -1471,7 +1521,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.77",
+    "version": "2.0.79",
     "id": "syn"
   },
   {
@@ -1491,23 +1541,18 @@
   },
   {
     "name": "tar",
-    "version": "0.4.41",
+    "version": "0.4.42",
     "id": "tar"
   },
   {
     "name": "tempfile",
-    "version": "3.12.0",
+    "version": "3.13.0",
     "id": "tempfile"
   },
   {
     "name": "tendril",
     "version": "0.4.3",
     "id": "tendril"
-  },
-  {
-    "name": "termcolor",
-    "version": "1.4.1",
-    "id": "termcolor"
   },
   {
     "name": "terminal_size",
@@ -1521,12 +1566,12 @@
   },
   {
     "name": "thiserror",
-    "version": "1.0.63",
+    "version": "1.0.64",
     "id": "thiserror"
   },
   {
     "name": "thiserror-impl",
-    "version": "1.0.63",
+    "version": "1.0.64",
     "id": "thiserror_impl"
   },
   {
@@ -1596,7 +1641,7 @@
   },
   {
     "name": "tokio-postgres",
-    "version": "0.7.11",
+    "version": "0.7.12",
     "id": "tokio_postgres"
   },
   {
@@ -1626,18 +1671,8 @@
   },
   {
     "name": "toml_edit",
-    "version": "0.22.20",
+    "version": "0.22.22",
     "id": "toml_edit"
-  },
-  {
-    "name": "tower",
-    "version": "0.4.13",
-    "id": "tower"
-  },
-  {
-    "name": "tower-layer",
-    "version": "0.3.3",
-    "id": "tower_layer"
   },
   {
     "name": "tower-service",
@@ -1661,7 +1696,7 @@
   },
   {
     "name": "trpl",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "id": "trpl"
   },
   {
@@ -1701,27 +1736,32 @@
   },
   {
     "name": "unicode-normalization",
-    "version": "0.1.23",
+    "version": "0.1.24",
     "id": "unicode_normalization"
   },
   {
     "name": "unicode-properties",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "id": "unicode_properties"
   },
   {
     "name": "unicode-segmentation",
-    "version": "1.11.0",
+    "version": "1.12.0",
     "id": "unicode_segmentation"
   },
   {
     "name": "unicode-width",
-    "version": "0.1.13",
+    "version": "0.2.0",
     "id": "unicode_width"
   },
   {
+    "name": "unicode-width",
+    "version": "0.1.14",
+    "id": "unicode_width_0_1_14"
+  },
+  {
     "name": "unicode-xid",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "id": "unicode_xid"
   },
   {
@@ -1840,8 +1880,13 @@
     "id": "wide"
   },
   {
+    "name": "windows_x86_64_msvc",
+    "version": "0.52.6",
+    "id": "windows_x86_64_msvc"
+  },
+  {
     "name": "winnow",
-    "version": "0.6.18",
+    "version": "0.6.20",
     "id": "winnow"
   },
   {
