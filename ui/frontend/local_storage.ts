@@ -94,7 +94,7 @@ function migrateV1(state: V1Configuration): CurrentConfiguration {
     configuration: {
       ...configuration,
       ace: { theme, keybinding, pairCharacters },
-      monaco: { theme: 'vscode-dark-plus' },
+      monaco: { theme: 'vs-dark' },
       theme: Theme.System,
       editor: editor === 'advanced' ? Editor.Ace : Editor.Simple,
     },

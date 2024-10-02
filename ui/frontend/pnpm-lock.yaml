@@ -33,8 +33,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       monaco-editor:
-        specifier: ^0.50.0
-        version: 0.50.0
+        specifier: ^0.52.0
+        version: 0.52.0
       prismjs:
         specifier: ^1.6.0
         version: 1.29.0
@@ -50,9 +50,6 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
-      react-monaco-editor:
-        specifier: ^0.56.0
-        version: 0.56.1(@types/react@18.3.10)(monaco-editor@0.50.0)(react@18.3.1)
       react-portal:
         specifier: ^4.1.4
         version: 4.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -179,7 +176,7 @@ importers:
         version: 2.9.1(webpack@5.95.0(webpack-cli@5.1.4))
       monaco-editor-webpack-plugin:
         specifier: ^7.0.1
-        version: 7.1.0(monaco-editor@0.50.0)(webpack@5.95.0(webpack-cli@5.1.4))
+        version: 7.1.0(monaco-editor@0.52.0)(webpack@5.95.0(webpack-cli@5.1.4))
       normalize.css:
         specifier: ^8.0.0
         version: 8.0.1
@@ -2890,8 +2887,8 @@ packages:
       monaco-editor: '>= 0.31.0'
       webpack: ^4.5.0 || 5.x
 
-  monaco-editor@0.50.0:
-    resolution: {integrity: sha512-8CclLCmrRRh+sul7C08BmPBP3P8wVWfBHomsTcndxg5NRCEPfu/mc2AGU8k37ajjDVXcXFc12ORAMUkmk+lkFA==}
+  monaco-editor@0.52.0:
+    resolution: {integrity: sha512-OeWhNpABLCeTqubfqLMXGsqf6OmPU6pHM85kF3dhy6kq5hnhuVS1p3VrEW/XhWHc71P2tHyS5JFySD8mgs1crw==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -3265,13 +3262,6 @@ packages:
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
-
-  react-monaco-editor@0.56.1:
-    resolution: {integrity: sha512-L2/QjVK+C95zqvl19ACo5ftg3MWAL0ku4zaMzcgt8LO2mhH2gIDfHr1sIZYY7LaKdriWq4EUO6pIdnQDswZ9gA==}
-    peerDependencies:
-      '@types/react': '>=16 <= 18'
-      monaco-editor: ^0.50.0
-      react: '>=16 <= 18'
 
   react-portal@4.2.2:
     resolution: {integrity: sha512-vS18idTmevQxyQpnde0Td6ZcUlv+pD8GTyR42n3CHUQq9OHi1C4jDE4ZWEbEsrbrLRhSECYiao58cvocwMtP7Q==}
@@ -7285,13 +7275,13 @@ snapshots:
 
   minipass@7.1.2: {}
 
-  monaco-editor-webpack-plugin@7.1.0(monaco-editor@0.50.0)(webpack@5.95.0(webpack-cli@5.1.4)):
+  monaco-editor-webpack-plugin@7.1.0(monaco-editor@0.52.0)(webpack@5.95.0(webpack-cli@5.1.4)):
     dependencies:
       loader-utils: 2.0.4
-      monaco-editor: 0.50.0
+      monaco-editor: 0.52.0
       webpack: 5.95.0(webpack-cli@5.1.4)
 
-  monaco-editor@0.50.0: {}
+  monaco-editor@0.52.0: {}
 
   ms@2.1.3: {}
 
@@ -7632,13 +7622,6 @@ snapshots:
   react-is@16.13.1: {}
 
   react-is@18.3.1: {}
-
-  react-monaco-editor@0.56.1(@types/react@18.3.10)(monaco-editor@0.50.0)(react@18.3.1):
-    dependencies:
-      '@types/react': 18.3.10
-      monaco-editor: 0.50.0
-      prop-types: 15.8.1
-      react: 18.3.1
 
   react-portal@4.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:

@@ -14,7 +14,7 @@ const editorDarkThemes = {
       theme: 'github_dark',
     },
     monaco: {
-      theme: 'vscode-dark-plus',
+      theme: 'vs-dark',
     },
   },
 };

@@ -92,10 +92,13 @@ module.exports = function(_, argv) {
         {
           test: /\.css$/,
           oneOf: [
+            // Prism styles as separate files for the shadow DOM
             {
-              test: /prismjs\/themes/,
+              test: [/prismjs\/themes/, /prismjs-overrides.css$/],
               type: 'asset/resource',
             },
+
+            // Our normal CSS
             {
               test: /\.module.css$/,
               exclude: /node_modules/,
@@ -112,6 +115,8 @@ module.exports = function(_, argv) {
                 "postcss-loader",
               ],
             },
+
+            // Everything else
             {
               include: /node_modules/,
               use: [
@@ -159,7 +164,7 @@ module.exports = function(_, argv) {
       }),
       new MonacoWebpackPlugin({
         filename: `${filenameTemplate}.worker.js`,
-        languages: [],
+        languages: ["rust"],
       }),
       ...(isProduction ? [new CompressionPlugin()] : []),
     ],

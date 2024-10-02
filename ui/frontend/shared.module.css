@@ -6,6 +6,7 @@
    * ACE uses Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
    */
   font-family: 'Source Code Pro', monospace;
+  font-optical-sizing: auto;
 }
 
 .-autoSize {

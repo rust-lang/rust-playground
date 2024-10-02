@@ -29,7 +29,9 @@ node_modules
 !compileActions.ts
 !configureStore.ts
 !editor/AceEditor.tsx
+!editor/MonacoEditorCore.tsx
 !editor/SimpleEditor.tsx
+!editor/rust_monaco_def.ts
 !hooks.ts
 !observer.ts
 !prism-shim.ts
