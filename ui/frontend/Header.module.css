@@ -6,7 +6,7 @@
 }
 
 .container {
-  font-size: 12px;
+  font-size: var(--secondary-font-size);
   padding: 1.25em 0;
   justify-content: space-between;
 }

@@ -2,6 +2,8 @@
 :root {
   /* Fonts */
   --primary-font: 'Open Sans', sans-serif;
+  --primary-font-size: 18px;
+  --secondary-font-size: calc(0.75 * var(--primary-font-size));
 
   /* Header */
   --header-transition: 0.2s ease-in-out;
@@ -212,7 +214,7 @@ body {
   padding: 0 1em;
   font-family: var(--primary-font);
   font-optical-sizing: auto;
-  font-size: 18px;
+  font-size: var(--primary-font-size);
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
