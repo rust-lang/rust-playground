@@ -1,7 +1,7 @@
 .form {
   display: flex;
   gap: 0.25em;
-  align-items: flex-start;
+  align-items: flex-end;
 }
 
 .multiLine {
@@ -27,7 +27,7 @@
 }
 
 .buttons {
-  font-size: 11px;
+  font-size: var(--secondary-font-size);
 }
 
 .menu {
