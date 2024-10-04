@@ -188,19 +188,22 @@ export const getAdvancedOptionsSet = createSelector(
 
 export const hasProperties = (obj: {}) => Object.values(obj).some(val => !!val);
 
-const getOutputs = (state: State) => [
-  state.output.assembly,
-  state.output.clippy,
-  state.output.execute,
-  state.output.format,
-  state.output.gist,
-  state.output.llvmIr,
-  state.output.mir,
-  state.output.hir,
-  state.output.miri,
-  state.output.macroExpansion,
-  state.output.wasm,
-];
+const getOutputs = createSelector(
+  (state: State) => state,
+  (state) => [
+    state.output.assembly,
+    state.output.clippy,
+    state.output.execute,
+    state.output.format,
+    state.output.gist,
+    state.output.llvmIr,
+    state.output.mir,
+    state.output.hir,
+    state.output.miri,
+    state.output.macroExpansion,
+    state.output.wasm,
+  ],
+);
 
 export const getSomethingToShow = createSelector(
   getOutputs,
@@ -479,7 +482,7 @@ export const executeRequestPayloadSelector = createSelector(
   channelSelector,
   (state: State) => state.configuration,
   getBacktraceSet,
-  (_state: State, { crateType, tests }: { crateType: string, tests: boolean }) => ({ crateType, tests }),
+  (_state: State, args: { crateType: string, tests: boolean }) => args,
   (code, channel, configuration, backtrace, { crateType, tests }) => ({
     channel,
     mode: configuration.mode,
@@ -498,7 +501,7 @@ export const compileRequestPayloadSelector = createSelector(
   getCrateType,
   runAsTest,
   getBacktraceSet,
-  (_state: State, { target }: { target: string }) => ({ target }),
+  (_state: State, args: { target: string }) => args,
   (code, channel, configuration, crateType, tests, backtrace, { target }) => ({
     channel,
     mode: configuration.mode,
