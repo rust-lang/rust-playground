@@ -2546,9 +2546,8 @@ impl TerminateContainer {
 
     async fn terminate_now(&mut self) -> Result<(), TerminateContainerError> {
         if let Some(mut kill_child) = self.take_command() {
-            // [ALREADY-DEAD] We don't care if the command itself
-            // succeeds or not; the container may already be dead!
-            let _ = kill_child.status().await?;
+            let o = kill_child.output().await?;
+            Self::report_failure(o);
         }
 
         Ok(())
@@ -2563,14 +2562,30 @@ impl TerminateContainer {
             kill_child
         })
     }
+
+    fn report_failure(s: std::process::Output) {
+        // We generally don't care if the command itself succeeds or
+        // not; the container may already be dead! However, let's log
+        // it in an attempt to debug cases where there are more
+        // containers running than we expect.
+
+        if !s.status.success() {
+            let code = s.status.code();
+            // FUTURE: use `_owned`
+            let stdout = String::from_utf8_lossy(&s.stdout);
+            let stderr = String::from_utf8_lossy(&s.stderr);
+
+            error!(?code, %stdout, %stderr, "Killing the container failed");
+        }
+    }
 }
 
 impl Drop for TerminateContainer {
     fn drop(&mut self) {
         if let Some(mut kill_child) = self.take_command() {
-            if let Err(e) = kill_child.as_std_mut().status() {
-                // See [ALREADY-DEAD]
-                error!("Unable to kill the container while dropping: {e}");
+            match kill_child.as_std_mut().output() {
+                Ok(o) => Self::report_failure(o),
+                Err(e) => error!("Unable to kill the container while dropping: {e}"),
             }
         }
     }
