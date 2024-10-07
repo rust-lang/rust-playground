@@ -22,7 +22,7 @@ debug = false
 
 [dependencies.addr2line]
 package = "addr2line"
-version = "=0.24.1"
+version = "=0.24.2"
 default-features = false
 
 [dependencies.adler]
@@ -186,7 +186,7 @@ features = ["aarch64_simd", "align_offset", "bytemuck_derive", "const_zeroed", "
 
 [dependencies.bytemuck_derive]
 package = "bytemuck_derive"
-version = "=1.7.1"
+version = "=1.8.0"
 
 [dependencies.byteorder]
 package = "byteorder"
@@ -209,7 +209,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.1.24"
+version = "=1.1.28"
 features = ["parallel"]
 
 [dependencies.cfg_if]
@@ -223,12 +223,12 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [dependencies.clap]
 package = "clap"
-version = "=4.5.18"
+version = "=4.5.19"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.18"
+version = "=4.5.19"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-ext", "usage", "wrap_help"]
 default-features = false
 
@@ -468,6 +468,11 @@ package = "fnv"
 version = "=1.0.7"
 features = ["std"]
 
+[dependencies.foldhash]
+package = "foldhash"
+version = "=0.1.3"
+default-features = false
+
 [dependencies.foreign_types]
 package = "foreign-types"
 version = "=0.3.2"
@@ -487,7 +492,7 @@ version = "=0.1.5"
 
 [dependencies.futures]
 package = "futures"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "async-await", "compat", "executor", "futures-executor", "io-compat", "std", "thread-pool"]
 
 [dependencies.futures_0_1_31]
@@ -497,42 +502,42 @@ features = ["use_std", "with-deprecated"]
 
 [dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "futures-sink", "sink", "std"]
 
 [dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "std"]
 
 [dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["num_cpus", "std", "thread-pool"]
 default-features = false
 
 [dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["std"]
 
 [dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.30"
+version = "=0.3.31"
 
 [dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "std"]
 
 [dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "std"]
 
 [dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "async-await", "async-await-macro", "channel", "compat", "futures-channel", "futures-io", "futures-macro", "futures-sink", "futures_01", "io", "io-compat", "memchr", "sink", "slab", "std", "tokio-io"]
 
 [dependencies.fxhash]
@@ -565,7 +570,7 @@ features = ["color_quant", "raii_no_panic", "std"]
 
 [dependencies.gimli]
 package = "gimli"
-version = "=0.31.0"
+version = "=0.31.1"
 features = ["read", "read-core"]
 default-features = false
 
@@ -584,8 +589,14 @@ features = ["alloc", "std"]
 
 [dependencies.hashbrown]
 package = "hashbrown"
+version = "=0.15.0"
+features = ["allocator-api2", "default-hasher", "equivalent", "inline-more", "raw-entry"]
+
+[dependencies.hashbrown_0_14_5]
+package = "hashbrown"
 version = "=0.14.5"
-features = ["ahash", "allocator-api2", "inline-more", "raw"]
+features = ["ahash", "inline-more"]
+default-features = false
 
 [dependencies.hashlink]
 package = "hashlink"
@@ -734,7 +745,7 @@ features = ["deprecated"]
 
 [dependencies.indexmap]
 package = "indexmap"
-version = "=2.5.0"
+version = "=2.6.0"
 features = ["std"]
 
 [dependencies.iovec]
@@ -743,7 +754,7 @@ version = "=0.1.4"
 
 [dependencies.ipnet]
 package = "ipnet"
-version = "=2.10.0"
+version = "=2.10.1"
 features = ["std"]
 
 [dependencies.is_terminal_polyfill]
@@ -988,13 +999,13 @@ features = ["i128", "libm", "std"]
 
 [dependencies.object]
 package = "object"
-version = "=0.36.4"
+version = "=0.36.5"
 features = ["archive", "coff", "elf", "macho", "pe", "read_core", "unaligned", "xcoff"]
 default-features = false
 
 [dependencies.once_cell]
 package = "once_cell"
-version = "=1.20.1"
+version = "=1.20.2"
 features = ["alloc", "race", "std"]
 
 [dependencies.openssl]
@@ -1098,11 +1109,6 @@ version = "=0.3.31"
 package = "png"
 version = "=0.17.14"
 
-[dependencies.portable_atomic]
-package = "portable-atomic"
-version = "=1.9.0"
-features = ["fallback", "require-cas"]
-
 [dependencies.postgres]
 package = "postgres"
 version = "=0.19.9"
@@ -1131,7 +1137,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.86"
+version = "=1.0.87"
 features = ["proc-macro", "span-locations"]
 
 [dependencies.profiling]
@@ -1259,7 +1265,7 @@ features = ["alloc", "fs", "libc-extra-traits", "std", "termios", "use-libc-auxv
 
 [dependencies.rustls]
 package = "rustls"
-version = "=0.23.13"
+version = "=0.23.14"
 features = ["std", "tls12"]
 default-features = false
 
@@ -1392,10 +1398,6 @@ package = "smallvec"
 version = "=1.13.2"
 features = ["const_generics", "const_new"]
 
-[dependencies.smawk]
-package = "smawk"
-version = "=0.3.2"
-
 [dependencies.socket2]
 package = "socket2"
 version = "=0.5.7"
@@ -1470,14 +1472,13 @@ version = "=3.13.0"
 package = "tendril"
 version = "=0.4.3"
 
+[dependencies.termcolor]
+package = "termcolor"
+version = "=1.4.1"
+
 [dependencies.terminal_size]
 package = "terminal_size"
-version = "=0.3.0"
-
-[dependencies.textwrap]
-package = "textwrap"
-version = "=0.16.1"
-features = ["smawk", "unicode-linebreak", "unicode-width"]
+version = "=0.4.0"
 
 [dependencies.thiserror]
 package = "thiserror"
@@ -1623,16 +1624,12 @@ version = "=2.7.0"
 
 [dependencies.unicode_bidi]
 package = "unicode-bidi"
-version = "=0.3.15"
+version = "=0.3.17"
 features = ["hardcoded-data", "std"]
 
 [dependencies.unicode_ident]
 package = "unicode-ident"
 version = "=1.0.13"
-
-[dependencies.unicode_linebreak]
-package = "unicode-linebreak"
-version = "=0.1.5"
 
 [dependencies.unicode_normalization]
 package = "unicode-normalization"
@@ -1853,7 +1850,7 @@ features = ["neon", "std", "x86"]
 
 [build-dependencies.addr2line]
 package = "addr2line"
-version = "=0.24.1"
+version = "=0.24.2"
 default-features = false
 
 [build-dependencies.adler]
@@ -2017,7 +2014,7 @@ features = ["aarch64_simd", "align_offset", "bytemuck_derive", "const_zeroed", "
 
 [build-dependencies.bytemuck_derive]
 package = "bytemuck_derive"
-version = "=1.7.1"
+version = "=1.8.0"
 
 [build-dependencies.byteorder]
 package = "byteorder"
@@ -2040,7 +2037,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.1.24"
+version = "=1.1.28"
 features = ["parallel"]
 
 [build-dependencies.cfg_if]
@@ -2054,12 +2051,12 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [build-dependencies.clap]
 package = "clap"
-version = "=4.5.18"
+version = "=4.5.19"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build-dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.18"
+version = "=4.5.19"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-ext", "usage", "wrap_help"]
 default-features = false
 
@@ -2299,6 +2296,11 @@ package = "fnv"
 version = "=1.0.7"
 features = ["std"]
 
+[build-dependencies.foldhash]
+package = "foldhash"
+version = "=0.1.3"
+default-features = false
+
 [build-dependencies.foreign_types]
 package = "foreign-types"
 version = "=0.3.2"
@@ -2318,7 +2320,7 @@ version = "=0.1.5"
 
 [build-dependencies.futures]
 package = "futures"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "async-await", "compat", "executor", "futures-executor", "io-compat", "std", "thread-pool"]
 
 [build-dependencies.futures_0_1_31]
@@ -2328,42 +2330,42 @@ features = ["use_std", "with-deprecated"]
 
 [build-dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "futures-sink", "sink", "std"]
 
 [build-dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "std"]
 
 [build-dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["num_cpus", "std", "thread-pool"]
 default-features = false
 
 [build-dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["std"]
 
 [build-dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.30"
+version = "=0.3.31"
 
 [build-dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "std"]
 
 [build-dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "std"]
 
 [build-dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.30"
+version = "=0.3.31"
 features = ["alloc", "async-await", "async-await-macro", "channel", "compat", "futures-channel", "futures-io", "futures-macro", "futures-sink", "futures_01", "io", "io-compat", "memchr", "sink", "slab", "std", "tokio-io"]
 
 [build-dependencies.fxhash]
@@ -2396,7 +2398,7 @@ features = ["color_quant", "raii_no_panic", "std"]
 
 [build-dependencies.gimli]
 package = "gimli"
-version = "=0.31.0"
+version = "=0.31.1"
 features = ["read", "read-core"]
 default-features = false
 
@@ -2415,8 +2417,14 @@ features = ["alloc", "std"]
 
 [build-dependencies.hashbrown]
 package = "hashbrown"
+version = "=0.15.0"
+features = ["allocator-api2", "default-hasher", "equivalent", "inline-more", "raw-entry"]
+
+[build-dependencies.hashbrown_0_14_5]
+package = "hashbrown"
 version = "=0.14.5"
-features = ["ahash", "allocator-api2", "inline-more", "raw"]
+features = ["ahash", "inline-more"]
+default-features = false
 
 [build-dependencies.hashlink]
 package = "hashlink"
@@ -2565,7 +2573,7 @@ features = ["deprecated"]
 
 [build-dependencies.indexmap]
 package = "indexmap"
-version = "=2.5.0"
+version = "=2.6.0"
 features = ["std"]
 
 [build-dependencies.iovec]
@@ -2574,7 +2582,7 @@ version = "=0.1.4"
 
 [build-dependencies.ipnet]
 package = "ipnet"
-version = "=2.10.0"
+version = "=2.10.1"
 features = ["std"]
 
 [build-dependencies.is_terminal_polyfill]
@@ -2819,13 +2827,13 @@ features = ["i128", "libm", "std"]
 
 [build-dependencies.object]
 package = "object"
-version = "=0.36.4"
+version = "=0.36.5"
 features = ["archive", "coff", "elf", "macho", "pe", "read_core", "unaligned", "xcoff"]
 default-features = false
 
 [build-dependencies.once_cell]
 package = "once_cell"
-version = "=1.20.1"
+version = "=1.20.2"
 features = ["alloc", "race", "std"]
 
 [build-dependencies.openssl]
@@ -2929,11 +2937,6 @@ version = "=0.3.31"
 package = "png"
 version = "=0.17.14"
 
-[build-dependencies.portable_atomic]
-package = "portable-atomic"
-version = "=1.9.0"
-features = ["fallback", "require-cas"]
-
 [build-dependencies.postgres]
 package = "postgres"
 version = "=0.19.9"
@@ -2962,7 +2965,7 @@ version = "=0.1.1"
 
 [build-dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.86"
+version = "=1.0.87"
 features = ["proc-macro", "span-locations"]
 
 [build-dependencies.profiling]
@@ -3090,7 +3093,7 @@ features = ["alloc", "fs", "libc-extra-traits", "std", "termios", "use-libc-auxv
 
 [build-dependencies.rustls]
 package = "rustls"
-version = "=0.23.13"
+version = "=0.23.14"
 features = ["std", "tls12"]
 default-features = false
 
@@ -3223,10 +3226,6 @@ package = "smallvec"
 version = "=1.13.2"
 features = ["const_generics", "const_new"]
 
-[build-dependencies.smawk]
-package = "smawk"
-version = "=0.3.2"
-
 [build-dependencies.socket2]
 package = "socket2"
 version = "=0.5.7"
@@ -3301,14 +3300,13 @@ version = "=3.13.0"
 package = "tendril"
 version = "=0.4.3"
 
+[build-dependencies.termcolor]
+package = "termcolor"
+version = "=1.4.1"
+
 [build-dependencies.terminal_size]
 package = "terminal_size"
-version = "=0.3.0"
-
-[build-dependencies.textwrap]
-package = "textwrap"
-version = "=0.16.1"
-features = ["smawk", "unicode-linebreak", "unicode-width"]
+version = "=0.4.0"
 
 [build-dependencies.thiserror]
 package = "thiserror"
@@ -3454,16 +3452,12 @@ version = "=2.7.0"
 
 [build-dependencies.unicode_bidi]
 package = "unicode-bidi"
-version = "=0.3.15"
+version = "=0.3.17"
 features = ["hardcoded-data", "std"]
 
 [build-dependencies.unicode_ident]
 package = "unicode-ident"
 version = "=1.0.13"
-
-[build-dependencies.unicode_linebreak]
-package = "unicode-linebreak"
-version = "=0.1.5"
 
 [build-dependencies.unicode_normalization]
 package = "unicode-normalization"
