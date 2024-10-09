@@ -8,6 +8,14 @@ import { themeVsDarkPlus } from './rust_monaco_def';
 
 import * as styles from './Editor.module.css';
 
+async function remeasureFontWhenReady(fonts: FontFaceSet, font: string) {
+  while (!fonts.check(font)) {
+    await fonts.ready;
+  }
+
+  monaco.editor.remeasureFonts();
+}
+
 function useEditorProp<T>(
   editor: monaco.editor.IStandaloneCodeEditor | null,
   prop: T,
@@ -67,6 +75,8 @@ const MonacoEditorCore: React.FC<CommonEditorProps> = (props) => {
       'semanticHighlighting.enabled': true,
     });
     setEditor(editor);
+
+    remeasureFontWhenReady(document.fonts, nodeStyle.font);
 
     editor.focus();
   }, []);
