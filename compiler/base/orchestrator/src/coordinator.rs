@@ -2533,11 +2533,11 @@ pub enum CommanderError {
 }
 
 #[derive(Debug)]
-pub struct TerminateContainer(Option<Command>);
+pub struct TerminateContainer(Option<(String, Command)>);
 
 impl TerminateContainer {
-    pub fn new(command: Command) -> Self {
-        Self(Some(command))
+    pub fn new(name: String, command: Command) -> Self {
+        Self(Some((name, command)))
     }
 
     pub fn none() -> Self {
@@ -2545,25 +2545,20 @@ impl TerminateContainer {
     }
 
     async fn terminate_now(&mut self) -> Result<(), TerminateContainerError> {
-        if let Some(mut kill_child) = self.take_command() {
-            let o = kill_child.output().await?;
-            Self::report_failure(o);
+        use terminate_container_error::*;
+
+        if let Some((name, mut kill_child)) = self.0.take() {
+            let o = kill_child
+                .output()
+                .await
+                .context(TerminateContainerSnafu { name: &name })?;
+            Self::report_failure(name, o);
         }
 
         Ok(())
     }
 
-    fn take_command(&mut self) -> Option<Command> {
-        self.0.take().map(|mut kill_child| {
-            kill_child
-                .stdin(Stdio::null())
-                .stdout(Stdio::null())
-                .stderr(Stdio::null());
-            kill_child
-        })
-    }
-
-    fn report_failure(s: std::process::Output) {
+    fn report_failure(name: String, s: std::process::Output) {
         // We generally don't care if the command itself succeeds or
         // not; the container may already be dead! However, let's log
         // it in an attempt to debug cases where there are more
@@ -2575,17 +2570,17 @@ impl TerminateContainer {
             let stdout = String::from_utf8_lossy(&s.stdout);
             let stderr = String::from_utf8_lossy(&s.stderr);
 
-            error!(?code, %stdout, %stderr, "Killing the container failed");
+            error!(?code, %stdout, %stderr, %name, "Killing the container failed");
         }
     }
 }
 
 impl Drop for TerminateContainer {
     fn drop(&mut self) {
-        if let Some(mut kill_child) = self.take_command() {
+        if let Some((name, mut kill_child)) = self.0.take() {
             match kill_child.as_std_mut().output() {
-                Ok(o) => Self::report_failure(o),
-                Err(e) => error!("Unable to kill the container while dropping: {e}"),
+                Ok(o) => Self::report_failure(name, o),
+                Err(e) => error!("Unable to kill container {name} while dropping: {e}"),
             }
         }
     }
@@ -2593,10 +2588,10 @@ impl Drop for TerminateContainer {
 
 #[derive(Debug, Snafu)]
 #[snafu(module)]
-pub enum TerminateContainerError {
-    #[snafu(display("Unable to kill the child process"))]
-    #[snafu(context(false))]
-    Execute { source: std::io::Error },
+#[snafu(display("Unable to kill the Docker container {name}"))]
+pub struct TerminateContainerError {
+    name: String,
+    source: std::io::Error,
 }
 
 pub trait Backend {
@@ -2710,8 +2705,8 @@ impl Backend for DockerBackend {
             .arg("/playground");
 
         let mut kill = Command::new("docker");
-        kill.arg("kill").args(["--signal", "KILL"]).arg(name);
-        let kill = TerminateContainer::new(kill);
+        kill.arg("kill").args(["--signal", "KILL"]).arg(&name);
+        let kill = TerminateContainer::new(name, kill);
 
         (command, kill)
     }
