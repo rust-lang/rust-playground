@@ -29,6 +29,14 @@ RUN \
     test_bin=$(find target/debug/deps/ -name "ui*" -type f -perm -a=x); \
     mv "${test_bin}" /output/unit_tests_ui;
 
+# Bake in debug information to debug deadlocks in production
+RUN mkdir .cargo
+RUN cat <<EOF >.cargo/config.toml
+[profile.release]
+debug = "full"
+split-debuginfo = "off"
+EOF
+
 RUN \
     cargo rustc --locked --release -- -C relocation-model=static; \
     mv target/release/ui /output/ui;
