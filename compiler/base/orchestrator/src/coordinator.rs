@@ -6,12 +6,12 @@ use futures::{
 use serde::Deserialize;
 use snafu::prelude::*;
 use std::{
-    collections::HashMap,
+    collections::{BTreeSet, HashMap},
     fmt, mem, ops,
     process::Stdio,
     sync::{
         atomic::{AtomicU64, Ordering},
-        Arc,
+        Arc, LazyLock, Mutex,
     },
     time::Duration,
 };
@@ -2532,11 +2532,23 @@ pub enum CommanderError {
     WorkerOperationFailed { source: SerializedError2 },
 }
 
+pub static TRACKED_CONTAINERS: LazyLock<Mutex<BTreeSet<Arc<str>>>> =
+    LazyLock::new(Default::default);
+
 #[derive(Debug)]
 pub struct TerminateContainer(Option<(String, Command)>);
 
 impl TerminateContainer {
     pub fn new(name: String, command: Command) -> Self {
+        let was_inserted = TRACKED_CONTAINERS
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .insert(name.clone().into());
+
+        if !was_inserted {
+            error!(%name, "This container was already tracked; duplicates are bad logic");
+        }
+
         Self(Some((name, command)))
     }
 
@@ -2548,6 +2560,7 @@ impl TerminateContainer {
         use terminate_container_error::*;
 
         if let Some((name, mut kill_child)) = self.0.take() {
+            Self::stop_tracking(&name);
             let o = kill_child
                 .output()
                 .await
@@ -2556,6 +2569,16 @@ impl TerminateContainer {
         }
 
         Ok(())
+    }
+
+    fn stop_tracking(name: &str) {
+        let was_tracked = TRACKED_CONTAINERS
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .remove(name);
+        if !was_tracked {
+            error!(%name, "Container was not in the tracking set");
+        }
     }
 
     fn report_failure(name: String, s: std::process::Output) {
@@ -2570,6 +2593,9 @@ impl TerminateContainer {
             let stdout = String::from_utf8_lossy(&s.stdout);
             let stderr = String::from_utf8_lossy(&s.stderr);
 
+            let stdout = stdout.trim();
+            let stderr = stderr.trim();
+
             error!(?code, %stdout, %stderr, %name, "Killing the container failed");
         }
     }
@@ -2578,6 +2604,7 @@ impl TerminateContainer {
 impl Drop for TerminateContainer {
     fn drop(&mut self) {
         if let Some((name, mut kill_child)) = self.0.take() {
+            Self::stop_tracking(&name);
             match kill_child.as_std_mut().output() {
                 Ok(o) => Self::report_failure(name, o),
                 Err(e) => error!("Unable to kill container {name} while dropping: {e}"),
