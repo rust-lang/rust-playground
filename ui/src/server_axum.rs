@@ -100,7 +100,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/metrics", get(metrics))
         .route("/websocket", get(websocket))
         .route("/nowebsocket", post(nowebsocket))
-        .route("/whynowebsocket", get(whynowebsocket))
+        .route("/internal/debug/whynowebsocket", get(whynowebsocket))
         .layer(Extension(factory))
         .layer(Extension(db_handle))
         .layer(Extension(Arc::new(SandboxCache::default())))
