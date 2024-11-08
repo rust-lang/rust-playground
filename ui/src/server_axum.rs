@@ -26,7 +26,9 @@ use axum_extra::{
     TypedHeader,
 };
 use futures::{future::BoxFuture, FutureExt};
-use orchestrator::coordinator::{self, CoordinatorFactory, DockerBackend, Versions};
+use orchestrator::coordinator::{
+    self, CoordinatorFactory, DockerBackend, Versions, TRACKED_CONTAINERS,
+};
 use snafu::prelude::*;
 use std::{
     convert::TryInto,
@@ -101,6 +103,10 @@ pub(crate) async fn serve(config: Config) {
         .route("/websocket", get(websocket))
         .route("/nowebsocket", post(nowebsocket))
         .route("/internal/debug/whynowebsocket", get(whynowebsocket))
+        .route(
+            "/internal/debug/tracked-containers",
+            get(tracked_containers),
+        )
         .layer(Extension(factory))
         .layer(Extension(db_handle))
         .layer(Extension(Arc::new(SandboxCache::default())))
@@ -678,6 +684,16 @@ fn record_websocket_error(error: String) {
 
 async fn whynowebsocket() -> String {
     format!("{:#?}", WS_ERRORS.lock().unwrap_or_else(|e| e.into_inner()))
+}
+
+async fn tracked_containers() -> String {
+    let tracked_containers = TRACKED_CONTAINERS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .clone();
+    tracked_containers
+        .iter()
+        .fold(String::new(), |a, s| a + s + "\n")
 }
 
 #[derive(Debug)]
