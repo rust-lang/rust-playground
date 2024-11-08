@@ -2570,6 +2570,9 @@ impl TerminateContainer {
             let stdout = String::from_utf8_lossy(&s.stdout);
             let stderr = String::from_utf8_lossy(&s.stderr);
 
+            let stdout = stdout.trim();
+            let stderr = stderr.trim();
+
             error!(?code, %stdout, %stderr, %name, "Killing the container failed");
         }
     }
