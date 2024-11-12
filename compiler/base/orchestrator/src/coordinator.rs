@@ -1,8 +1,4 @@
-use futures::{
-    future::{BoxFuture, OptionFuture},
-    stream::BoxStream,
-    Future, FutureExt, Stream, StreamExt,
-};
+use futures::{future::BoxFuture, stream::BoxStream, Future, FutureExt, Stream, StreamExt};
 use serde::Deserialize;
 use snafu::prelude::*;
 use std::{
@@ -16,12 +12,12 @@ use std::{
     time::Duration,
 };
 use tokio::{
-    join,
     process::{Child, ChildStdin, ChildStdout, Command},
     select,
     sync::{mpsc, oneshot, OnceCell},
     task::{JoinHandle, JoinSet},
     time::{self, MissedTickBehavior},
+    try_join,
 };
 use tokio_stream::wrappers::ReceiverStream;
 use tokio_util::{io::SyncIoBridge, sync::CancellationToken};
@@ -799,11 +795,10 @@ impl<T> WithOutput<T> {
     where
         F: Future<Output = Result<T, E>>,
     {
-        let stdout = stdout_rx.collect();
-        let stderr = stderr_rx.collect();
+        let stdout = stdout_rx.collect().map(Ok);
+        let stderr = stderr_rx.collect().map(Ok);
 
-        let (result, stdout, stderr) = join!(task, stdout, stderr);
-        let response = result?;
+        let (response, stdout, stderr) = try_join!(task, stdout, stderr)?;
 
         Ok(WithOutput {
             response,
@@ -936,11 +931,11 @@ where
                 c.versions().await.map_err(VersionsChannelError::from)
             });
 
-        let (stable, beta, nightly) = join!(stable, beta, nightly);
+        let stable = async { stable.await.context(StableSnafu) };
+        let beta = async { beta.await.context(BetaSnafu) };
+        let nightly = async { nightly.await.context(NightlySnafu) };
 
-        let stable = stable.context(StableSnafu)?;
-        let beta = beta.context(BetaSnafu)?;
-        let nightly = nightly.context(NightlySnafu)?;
+        let (stable, beta, nightly) = try_join!(stable, beta, nightly)?;
 
         Ok(Versions {
             stable,
@@ -1128,16 +1123,17 @@ where
         let token = mem::take(token);
         token.cancel();
 
-        let channels =
-            [stable, beta, nightly].map(|c| OptionFuture::from(c.take().map(|c| c.shutdown())));
+        let channels = [stable, beta, nightly].map(|c| async {
+            match c.take() {
+                Some(c) => c.shutdown().await,
+                _ => Ok(()),
+            }
+        });
 
         let [stable, beta, nightly] = channels;
 
-        let (stable, beta, nightly) = join!(stable, beta, nightly);
-
-        stable.transpose()?;
-        beta.transpose()?;
-        nightly.transpose()?;
+        let (stable, beta, nightly) = try_join!(stable, beta, nightly)?;
+        let _: [(); 3] = [stable, beta, nightly];
 
         Ok(())
     }
@@ -1196,14 +1192,28 @@ impl Container {
 
         let task = tokio::spawn(
             async move {
-                let (c, d, t) = join!(child.wait(), demultiplex_task, tasks.join_next());
+                let child = async {
+                    let _: std::process::ExitStatus =
+                        child.wait().await.context(JoinWorkerSnafu)?;
+                    Ok(())
+                };
 
-                c.context(JoinWorkerSnafu)?;
-                d.context(DemultiplexerTaskPanickedSnafu)?
-                    .context(DemultiplexerTaskFailedSnafu)?;
-                if let Some(t) = t {
-                    t.context(IoQueuePanickedSnafu)??;
-                }
+                let demultiplex_task = async {
+                    demultiplex_task
+                        .await
+                        .context(DemultiplexerTaskPanickedSnafu)?
+                        .context(DemultiplexerTaskFailedSnafu)
+                };
+
+                let task = async {
+                    if let Some(t) = tasks.join_next().await {
+                        t.context(IoQueuePanickedSnafu)??;
+                    }
+                    Ok(())
+                };
+
+                let (c, d, t) = try_join!(child, demultiplex_task, task)?;
+                let _: [(); 3] = [c, d, t];
 
                 Ok(())
             }
@@ -1234,19 +1244,41 @@ impl Container {
 
         let token = CancellationToken::new();
 
-        let rustc = self.rustc_version(token.clone());
-        let rustfmt = self.tool_version(token.clone(), "fmt");
-        let clippy = self.tool_version(token.clone(), "clippy");
-        let miri = self.tool_version(token, "miri");
+        let rustc = {
+            let token = token.clone();
+            async {
+                self.rustc_version(token)
+                    .await
+                    .context(RustcSnafu)?
+                    .context(RustcMissingSnafu)
+            }
+        };
+        let rustfmt = {
+            let token = token.clone();
+            async {
+                self.tool_version(token, "fmt")
+                    .await
+                    .context(RustfmtSnafu)?
+                    .context(RustfmtMissingSnafu)
+            }
+        };
+        let clippy = {
+            let token = token.clone();
+            async {
+                self.tool_version(token, "clippy")
+                    .await
+                    .context(ClippySnafu)?
+                    .context(ClippyMissingSnafu)
+            }
+        };
+        let miri = {
+            let token = token.clone();
+            async { self.tool_version(token, "miri").await.context(MiriSnafu) }
+        };
 
-        let (rustc, rustfmt, clippy, miri) = join!(rustc, rustfmt, clippy, miri);
+        let _token = token.drop_guard();
 
-        let rustc = rustc.context(RustcSnafu)?.context(RustcMissingSnafu)?;
-        let rustfmt = rustfmt
-            .context(RustfmtSnafu)?
-            .context(RustfmtMissingSnafu)?;
-        let clippy = clippy.context(ClippySnafu)?.context(ClippyMissingSnafu)?;
-        let miri = miri.context(MiriSnafu)?;
+        let (rustc, rustfmt, clippy, miri) = try_join!(rustc, rustfmt, clippy, miri)?;
 
         Ok(ChannelVersions {
             rustc,
@@ -1711,21 +1743,33 @@ impl Container {
     ) -> Result<SpawnCargo, DoRequestError> {
         use do_request_error::*;
 
-        let delete_previous_main = request.delete_previous_main_request();
-        let write_main = request.write_main_request();
+        let delete_previous_main = async {
+            self.commander
+                .one(request.delete_previous_main_request())
+                .await
+                .context(CouldNotDeletePreviousCodeSnafu)
+                .map(drop::<crate::message::DeleteFileResponse>)
+        };
+
+        let write_main = async {
+            self.commander
+                .one(request.write_main_request())
+                .await
+                .context(CouldNotWriteCodeSnafu)
+                .map(drop::<crate::message::WriteFileResponse>)
+        };
+
+        let modify_cargo_toml = async {
+            self.modify_cargo_toml
+                .modify_for(&request)
+                .await
+                .context(CouldNotModifyCargoTomlSnafu)
+        };
+
+        let (d, w, m) = try_join!(delete_previous_main, write_main, modify_cargo_toml)?;
+        let _: [(); 3] = [d, w, m];
+
         let execute_cargo = request.execute_cargo_request();
-
-        let delete_previous_main = self.commander.one(delete_previous_main);
-        let write_main = self.commander.one(write_main);
-        let modify_cargo_toml = self.modify_cargo_toml.modify_for(&request);
-
-        let (delete_previous_main, write_main, modify_cargo_toml) =
-            join!(delete_previous_main, write_main, modify_cargo_toml);
-
-        delete_previous_main.context(CouldNotDeletePreviousCodeSnafu)?;
-        write_main.context(CouldNotWriteCodeSnafu)?;
-        modify_cargo_toml.context(CouldNotModifyCargoTomlSnafu)?;
-
         self.spawn_cargo_task(token, execute_cargo)
             .await
             .context(CouldNotStartCargoSnafu)
