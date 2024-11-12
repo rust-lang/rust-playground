@@ -25,7 +25,7 @@ use tokio::{
 };
 use tokio_stream::wrappers::ReceiverStream;
 use tokio_util::{io::SyncIoBridge, sync::CancellationToken};
-use tracing::{error, info_span, instrument, trace, trace_span, warn, Instrument};
+use tracing::{error, info, info_span, instrument, trace, trace_span, warn, Instrument};
 
 use crate::{
     bincode_input_closed,
@@ -2540,14 +2540,7 @@ pub struct TerminateContainer(Option<(String, Command)>);
 
 impl TerminateContainer {
     pub fn new(name: String, command: Command) -> Self {
-        let was_inserted = TRACKED_CONTAINERS
-            .lock()
-            .unwrap_or_else(|e| e.into_inner())
-            .insert(name.clone().into());
-
-        if !was_inserted {
-            error!(%name, "This container was already tracked; duplicates are bad logic");
-        }
+        Self::start_tracking(&name);
 
         Self(Some((name, command)))
     }
@@ -2571,13 +2564,31 @@ impl TerminateContainer {
         Ok(())
     }
 
+    #[instrument]
+    fn start_tracking(name: &str) {
+        let was_inserted = TRACKED_CONTAINERS
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .insert(name.into());
+
+        if was_inserted {
+            info!(%name, "Started tracking container");
+        } else {
+            error!(%name, "Started tracking container, but it was already tracked");
+        }
+    }
+
+    #[instrument]
     fn stop_tracking(name: &str) {
         let was_tracked = TRACKED_CONTAINERS
             .lock()
             .unwrap_or_else(|e| e.into_inner())
             .remove(name);
-        if !was_tracked {
-            error!(%name, "Container was not in the tracking set");
+
+        if was_tracked {
+            info!(%name, "Stopped tracking container");
+        } else {
+            error!(%name, "Stopped tracking container, but it was not in the tracking set");
         }
     }
 
