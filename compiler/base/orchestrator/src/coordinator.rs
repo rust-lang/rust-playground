@@ -1314,7 +1314,6 @@ impl Container {
         token: CancellationToken,
         cmd: ExecuteCommandRequest,
     ) -> Result<Option<String>, VersionError> {
-        let v = self.spawn_cargo_task(token.clone(), cmd).await?;
         let SpawnCargo {
             permit: _permit,
             task,
@@ -1322,7 +1321,7 @@ impl Container {
             stdout_rx,
             stderr_rx,
             status_rx,
-        } = v;
+        } = self.spawn_cargo_task(token, cmd).await?;
 
         drop(stdin_tx);
         drop(status_rx);
