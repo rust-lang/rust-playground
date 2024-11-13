@@ -8,12 +8,17 @@ use std::{
     net::SocketAddr,
     path::{Path, PathBuf},
     sync::Arc,
+    time::Duration,
 };
 use tracing::{error, info, warn};
 use tracing_subscriber::EnvFilter;
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
+
+const DEFAULT_WEBSOCKET_IDLE_TIMEOUT: Duration = Duration::from_secs(60);
+const DEFAULT_WEBSOCKET_SESSION_TIMEOUT: Duration = Duration::from_secs(45 * 60);
+
 const DEFAULT_COORDINATORS_LIMIT: usize = 25;
 const DEFAULT_PROCESSES_LIMIT: usize = 10;
 
@@ -50,6 +55,7 @@ struct Config {
     metrics_token: Option<String>,
     feature_flags: FeatureFlags,
     request_db_path: Option<PathBuf>,
+    websocket_config: WebSocketConfig,
     limits: Arc<dyn ResourceLimits>,
     port: u16,
     root: PathBuf,
@@ -108,6 +114,23 @@ impl Config {
 
         let request_db_path = env::var_os("PLAYGROUND_REQUEST_DATABASE").map(Into::into);
 
+        let websocket_config = {
+            let idle_timeout = env::var("PLAYGROUND_WEBSOCKET_IDLE_TIMEOUT_S")
+                .ok()
+                .and_then(|l| l.parse().map(Duration::from_secs).ok())
+                .unwrap_or(DEFAULT_WEBSOCKET_IDLE_TIMEOUT);
+
+            let session_timeout = env::var("PLAYGROUND_WEBSOCKET_SESSION_TIMEOUT_S")
+                .ok()
+                .and_then(|l| l.parse().map(Duration::from_secs).ok())
+                .unwrap_or(DEFAULT_WEBSOCKET_SESSION_TIMEOUT);
+
+            WebSocketConfig {
+                idle_timeout,
+                session_timeout,
+            }
+        };
+
         let coordinators_limit = env::var("PLAYGROUND_COORDINATORS_LIMIT")
             .ok()
             .and_then(|l| l.parse().ok())
@@ -131,6 +154,7 @@ impl Config {
             metrics_token,
             feature_flags,
             request_db_path,
+            websocket_config,
             limits,
             port,
             root,
@@ -231,4 +255,10 @@ impl limits::Lifecycle for LifecycleMetrics {
     fn process_release(&self) {
         metrics::PROCESS_ACTIVE.dec();
     }
+}
+
+#[derive(Debug, Copy, Clone)]
+struct WebSocketConfig {
+    idle_timeout: Duration,
+    session_timeout: Duration,
 }

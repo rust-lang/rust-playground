@@ -5,7 +5,7 @@ use crate::{
         UNAVAILABLE_WS,
     },
     request_database::Handle,
-    Config, GhToken, MetricsToken,
+    Config, GhToken, MetricsToken, WebSocketConfig,
 };
 use async_trait::async_trait;
 use axum::{
@@ -111,7 +111,8 @@ pub(crate) async fn serve(config: Config) {
         .layer(Extension(db_handle))
         .layer(Extension(Arc::new(SandboxCache::default())))
         .layer(Extension(config.github_token()))
-        .layer(Extension(config.feature_flags));
+        .layer(Extension(config.feature_flags))
+        .layer(Extension(config.websocket_config));
 
     if let Some(token) = config.metrics_token() {
         app = app.layer(Extension(token))
@@ -652,11 +653,12 @@ async fn metrics(_: MetricsAuthorization) -> Result<Vec<u8>, StatusCode> {
 
 async fn websocket(
     ws: WebSocketUpgrade,
+    Extension(config): Extension<WebSocketConfig>,
     Extension(factory): Extension<Factory>,
     Extension(feature_flags): Extension<crate::FeatureFlags>,
     Extension(db): Extension<Handle>,
 ) -> impl IntoResponse {
-    ws.on_upgrade(move |s| websocket::handle(s, factory.0, feature_flags.into(), db))
+    ws.on_upgrade(move |s| websocket::handle(s, config, factory.0, feature_flags.into(), db))
 }
 
 #[derive(Debug, serde::Deserialize)]
