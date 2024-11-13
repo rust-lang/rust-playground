@@ -2558,9 +2558,9 @@ impl TerminateContainer {
             .insert(name.into());
 
         if was_inserted {
-            info!(%name, "Started tracking container");
+            info!("Started tracking container");
         } else {
-            error!(%name, "Started tracking container, but it was already tracked");
+            error!("Started tracking container, but it was already tracked");
         }
     }
 
@@ -2572,9 +2572,9 @@ impl TerminateContainer {
             .remove(name);
 
         if was_tracked {
-            info!(%name, "Stopped tracking container");
+            info!("Stopped tracking container");
         } else {
-            error!(%name, "Stopped tracking container, but it was not in the tracking set");
+            error!("Stopped tracking container, but it was not in the tracking set");
         }
     }
 
