@@ -2,6 +2,7 @@ use crate::{
     metrics::{self, record_metric, Endpoint, HasLabelsCore, Outcome},
     request_database::Handle,
     server_axum::api_orchestrator_integration_impls::*,
+    WebSocketConfig,
 };
 
 use axum::extract::ws::{Message, WebSocket};
@@ -28,7 +29,7 @@ use tokio::{
     time,
 };
 use tokio_util::sync::CancellationToken;
-use tracing::{error, instrument, warn, Instrument};
+use tracing::{error, info, instrument, warn, Instrument};
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -199,6 +200,7 @@ struct ExecuteResponse {
 #[instrument(skip_all, fields(ws_id))]
 pub(crate) async fn handle(
     socket: WebSocket,
+    config: WebSocketConfig,
     factory: Arc<CoordinatorFactory>,
     feature_flags: FeatureFlags,
     db: Handle,
@@ -210,9 +212,11 @@ pub(crate) async fn handle(
 
     let id = WEBSOCKET_ID.fetch_add(1, Ordering::SeqCst);
     tracing::Span::current().record("ws_id", &id);
+    info!("WebSocket started");
 
-    handle_core(socket, factory, feature_flags, db).await;
+    handle_core(socket, config, factory, feature_flags, db).await;
 
+    info!("WebSocket ending");
     metrics::LIVE_WS.dec();
     let elapsed = start.elapsed();
     metrics::DURATION_WS.observe(elapsed.as_secs_f64());
@@ -240,9 +244,6 @@ struct CoordinatorManager {
 }
 
 impl CoordinatorManager {
-    const IDLE_TIMEOUT: Duration = Duration::from_secs(60);
-    const SESSION_TIMEOUT: Duration = Duration::from_secs(45 * 60);
-
     const N_PARALLEL: usize = 2;
 
     const N_KINDS: usize = 1;
@@ -341,6 +342,7 @@ type CoordinatorManagerResult<T, E = CoordinatorManagerError> = std::result::Res
 
 async fn handle_core(
     mut socket: WebSocket,
+    config: WebSocketConfig,
     factory: Arc<CoordinatorFactory>,
     feature_flags: FeatureFlags,
     db: Handle,
@@ -361,7 +363,7 @@ async fn handle_core(
     }
 
     let mut manager = CoordinatorManager::new(&factory);
-    let mut session_timeout = pin!(time::sleep(CoordinatorManager::SESSION_TIMEOUT));
+    let mut session_timeout = pin!(time::sleep(config.session_timeout));
     let mut idle_timeout = pin!(Fuse::terminated());
 
     let mut active_executions = BTreeMap::new();
@@ -407,7 +409,7 @@ async fn handle_core(
                 // The last task has completed which means we are a
                 // candidate for idling in a little while.
                 if manager.is_empty() {
-                    idle_timeout.set(time::sleep(CoordinatorManager::IDLE_TIMEOUT).fuse());
+                    idle_timeout.set(time::sleep(config.idle_timeout).fuse());
                 }
 
                 let (error, meta) = match task {
