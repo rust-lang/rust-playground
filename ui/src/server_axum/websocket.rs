@@ -28,7 +28,7 @@ use tokio::{
     time,
 };
 use tokio_util::sync::CancellationToken;
-use tracing::{error, instrument, warn, Instrument};
+use tracing::{error, info, instrument, warn, Instrument};
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -210,9 +210,11 @@ pub(crate) async fn handle(
 
     let id = WEBSOCKET_ID.fetch_add(1, Ordering::SeqCst);
     tracing::Span::current().record("ws_id", &id);
+    info!("WebSocket started");
 
     handle_core(socket, factory, feature_flags, db).await;
 
+    info!("WebSocket ending");
     metrics::LIVE_WS.dec();
     let elapsed = start.elapsed();
     metrics::DURATION_WS.observe(elapsed.as_secs_f64());
