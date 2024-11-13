@@ -16,6 +16,7 @@ use std::{
     collections::BTreeMap,
     convert::TryFrom,
     mem,
+    ops::ControlFlow,
     pin::pin,
     sync::{
         atomic::{AtomicU64, Ordering},
@@ -444,13 +445,16 @@ async fn handle_core(
             },
 
             _ = &mut idle_timeout, if manager.is_empty() => {
-                let idled = manager.idle().await.context(StreamingCoordinatorIdleSnafu);
+                if handle_idle(&mut manager, &tx).await.is_break() {
+                    break
+                }
+            },
 
-                let Err(error) = idled else { continue };
+            _ = factory.container_requested(), if manager.is_empty() => {
+                info!("Container requested to idle");
 
-                if tx.send(Err((error, None))).await.is_err() {
-                    // We can't send a response
-                    break;
+                if handle_idle(&mut manager, &tx).await.is_break() {
+                    break
                 }
             },
 
@@ -504,6 +508,21 @@ fn response_to_message(response: MessageResponse) -> Message {
         r#"{ "type": "WEBSOCKET_ERROR", "error": "Unable to serialize JSON" }"#;
     let resp = serde_json::to_string(&response).unwrap_or_else(|_| LAST_CHANCE_ERROR.into());
     Message::Text(resp)
+}
+
+async fn handle_idle(manager: &mut CoordinatorManager, tx: &ResponseTx) -> ControlFlow<()> {
+    let idled = manager.idle().await.context(StreamingCoordinatorIdleSnafu);
+
+    let Err(error) = idled else {
+        return ControlFlow::Continue(());
+    };
+
+    if tx.send(Err((error, None))).await.is_err() {
+        // We can't send a response
+        return ControlFlow::Break(());
+    }
+
+    ControlFlow::Continue(())
 }
 
 type ActiveExecutionInfo = (CancellationToken, Option<mpsc::Sender<String>>);
