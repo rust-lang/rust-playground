@@ -893,7 +893,7 @@ pub struct Coordinator<B> {
     stable: OnceCell<Container>,
     beta: OnceCell<Container>,
     nightly: OnceCell<Container>,
-    token: CancellationToken,
+    token: CancelOnDrop,
 }
 
 /// Runs things.
@@ -910,7 +910,7 @@ where
     B: Backend,
 {
     pub fn new(limits: Arc<dyn ResourceLimits>, backend: B) -> Self {
-        let token = CancellationToken::new();
+        let token = CancelOnDrop(CancellationToken::new());
 
         Self {
             limits,
@@ -1153,10 +1153,25 @@ where
         container
             .get_or_try_init(|| {
                 let limits = self.limits.clone();
-                let token = self.token.clone();
+                let token = self.token.0.clone();
                 Container::new(channel, limits, token, &self.backend)
             })
             .await
+    }
+}
+
+#[derive(Debug, Default)]
+struct CancelOnDrop(CancellationToken);
+
+impl CancelOnDrop {
+    fn cancel(&self) {
+        self.0.cancel();
+    }
+}
+
+impl Drop for CancelOnDrop {
+    fn drop(&mut self) {
+        self.0.cancel();
     }
 }
 
