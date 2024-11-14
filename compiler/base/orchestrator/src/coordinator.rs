@@ -852,6 +852,9 @@ type ResourceResult<T, E = ResourceError> = std::result::Result<T, E>;
 pub trait ResourceLimits: Send + Sync + fmt::Debug + 'static {
     /// Block until resources for a container are available.
     fn next_container(&self) -> BoxFuture<'static, ResourceResult<Box<dyn ContainerPermit>>>;
+
+    /// Block until someone reqeusts that you return an in-use container.
+    fn container_requested(&self) -> BoxFuture<'static, ()>;
 }
 
 /// Represents one allowed Docker container (or equivalent).
@@ -883,6 +886,10 @@ impl CoordinatorFactory {
         let backend = B::default();
 
         Coordinator::new(limits, backend)
+    }
+
+    pub async fn container_requested(&self) {
+        self.limits.container_requested().await
     }
 }
 

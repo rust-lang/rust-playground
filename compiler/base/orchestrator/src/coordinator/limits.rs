@@ -94,6 +94,7 @@ pub struct Global<L = NoOpLifecycle> {
     lifecycle: L,
     container_semaphore: Arc<Semaphore>,
     process_semaphore: Arc<Semaphore>,
+    container_request_semaphore: Arc<Semaphore>,
     start: u64,
     id: AtomicU64,
 }
@@ -136,6 +137,7 @@ where
     pub fn with_lifecycle(container_limit: usize, process_limit: usize, lifecycle: L) -> Self {
         let container_semaphore = Arc::new(Semaphore::new(container_limit));
         let process_semaphore = Arc::new(Semaphore::new(process_limit));
+        let container_request_semaphore = Arc::new(Semaphore::new(0));
 
         let now = std::time::SystemTime::now();
         let start = now
@@ -149,6 +151,7 @@ where
             lifecycle,
             container_semaphore,
             process_semaphore,
+            container_request_semaphore,
             start,
             id,
         }
@@ -163,13 +166,44 @@ where
         let lifecycle = self.lifecycle.clone();
         let container_semaphore = self.container_semaphore.clone();
         let process_semaphore = self.process_semaphore.clone();
+        let container_request_semaphore = self.container_request_semaphore.clone();
         let start = self.start;
         let id = self.id.fetch_add(1, Ordering::SeqCst);
 
         async move {
             let guard = ContainerAcquireGuard::start(&lifecycle);
 
-            let container_permit = container_semaphore.acquire_owned().await;
+            // Attempt to acquire the container semaphore. If we don't
+            // immediately get it, notify the container request
+            // semaphore. Any idle-but-not-yet-exited connections
+            // should watch that semaphore to see if they should give
+            // up thier container to allow someone else in.
+            //
+            // There *is* a race here: a container might naturally
+            // exit after we attempt to acquire the first time. In
+            // that case, we'd spuriously notify the request semaphore
+            // and a container might exit earlier than it needed
+            // to. However, this should be a transient issue and only
+            // occur when we are already at the upper bounds of our
+            // limits. In those cases, freeing an extra container or
+            // two shouldn't be the worst thing.
+            let container_permit = {
+                let fallback = {
+                    let container_semaphore = container_semaphore.clone();
+                    async {
+                        container_request_semaphore.add_permits(1);
+                        container_semaphore.acquire_owned().await
+                    }
+                };
+
+                tokio::select! {
+                    biased;
+
+                    permit = container_semaphore.acquire_owned() => permit,
+                    permit = fallback => permit,
+                }
+            };
+
             let container_permit = guard.complete(container_permit)?;
 
             let token = TrackContainer {
@@ -180,6 +214,23 @@ where
                 id,
             };
             Ok(Box::new(token) as _)
+        }
+        .boxed()
+    }
+
+    fn container_requested(&self) -> BoxFuture<'static, ()> {
+        let container_request_semaphore = self.container_request_semaphore.clone();
+
+        async move {
+            let permit = container_request_semaphore
+                .acquire()
+                .await
+                .expect("The semaphore is never closed");
+
+            // We're now dealing with the request to return a
+            // container so we discard the permit to prevent anyone
+            // else from trying to handle it.
+            permit.forget();
         }
         .boxed()
     }
