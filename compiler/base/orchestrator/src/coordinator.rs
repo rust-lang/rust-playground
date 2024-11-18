@@ -2848,8 +2848,10 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
         let stdin = SyncIoBridge::new(stdin);
         let mut stdin = BufWriter::new(stdin);
 
+        let handle = tokio::runtime::Handle::current();
+
         loop {
-            let coordinator_msg = futures::executor::block_on(async {
+            let coordinator_msg = handle.block_on(async {
                 select! {
                     () = token.cancelled() => None,
                     msg = rx.recv() => msg,
