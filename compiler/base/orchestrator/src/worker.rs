@@ -450,7 +450,8 @@ impl ProcessState {
         let statistics_task = tokio::task::spawn_blocking({
             let child_id = child.id();
             let worker_msg_tx = worker_msg_tx.clone();
-            move || stream_command_statistics(child_id, worker_msg_tx)
+            let handle = tokio::runtime::Handle::current();
+            move || stream_command_statistics(child_id, worker_msg_tx, handle)
         });
 
         let task_set = stream_stdio(worker_msg_tx.clone(), stdin_rx, stdin, stdout, stderr);
@@ -943,6 +944,7 @@ mod stats {
 fn stream_command_statistics(
     child_id: Option<u32>,
     worker_msg_tx: MultiplexingSender,
+    handle: tokio::runtime::Handle,
 ) -> Result<(), CommandStatisticsError> {
     use command_statistics_error::*;
     use stats::*;
@@ -959,7 +961,7 @@ fn stream_command_statistics(
     let process = Process::new(process_id).context(InvalidProcessSnafu { process_id })?;
 
     while let Some(stats) = process.stats() {
-        let sent = futures::executor::block_on(worker_msg_tx.send_ok(stats));
+        let sent = handle.block_on(worker_msg_tx.send_ok(stats));
         if sent.is_err() {
             // No one listening anymore
             break;

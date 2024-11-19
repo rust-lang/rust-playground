@@ -215,7 +215,7 @@ impl Handle {
         let g = self
             .attempt_start_request(category, payload)
             .await
-            .map(|id| EndGuardInner(id, How::Abandoned, self));
+            .map(|id| EndGuardInner(id, How::Abandoned, Some(self)));
         EndGuard(g)
     }
 }
@@ -238,12 +238,16 @@ impl EndGuard {
     }
 }
 
-struct EndGuardInner(Id, How, Handle);
+struct EndGuardInner(Id, How, Option<Handle>);
 
 impl Drop for EndGuardInner {
     fn drop(&mut self) {
-        let Self(id, how, ref handle) = *self;
-        futures::executor::block_on(handle.attempt_end_request(id, how))
+        let Self(id, how, ref mut handle) = *self;
+        if let Ok(h) = tokio::runtime::Handle::try_current() {
+            if let Some(handle) = handle.take() {
+                h.spawn(async move { handle.attempt_end_request(id, how).await });
+            }
+        }
     }
 }
 

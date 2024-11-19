@@ -38,7 +38,7 @@ use std::{
     sync::{Arc, LazyLock},
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
-use tokio::sync::Mutex;
+use tokio::{select, sync::Mutex};
 use tower_http::{
     cors::{self, CorsLayer},
     request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer},
@@ -71,7 +71,7 @@ pub(crate) async fn serve(config: Config) {
     let factory = Factory(Arc::new(config.coordinator_factory()));
 
     let request_db = config.request_database();
-    let (_db_task, db_handle) = request_db.spawn();
+    let (db_task, db_handle) = request_db.spawn();
 
     let root_files = static_file_service(config.root_path(), MAX_AGE_ONE_DAY);
     let asset_files = static_file_service(config.asset_path(), MAX_AGE_ONE_YEAR);
@@ -170,9 +170,12 @@ pub(crate) async fn serve(config: Config) {
         .await
         .unwrap();
 
-    axum::serve(listener, app.into_make_service())
-        .await
-        .unwrap();
+    let server = axum::serve(listener, app.into_make_service());
+
+    select! {
+        v = server => v.unwrap(),
+        v = db_task => v.unwrap(),
+    }
 }
 
 fn get_or_post<T: 'static>(handler: impl Handler<T, ()> + Copy) -> MethodRouter {
