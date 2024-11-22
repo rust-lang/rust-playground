@@ -26,9 +26,7 @@ use axum_extra::{
     TypedHeader,
 };
 use futures::{future::BoxFuture, FutureExt};
-use orchestrator::coordinator::{
-    self, CoordinatorFactory, DockerBackend, Versions, TRACKED_CONTAINERS,
-};
+use orchestrator::coordinator::{self, CoordinatorFactory, DockerBackend, TRACKED_CONTAINERS};
 use snafu::prelude::*;
 use std::{
     convert::TryInto,
@@ -90,12 +88,6 @@ pub(crate) async fn serve(config: Config) {
         .route("/macro-expansion", post(macro_expansion))
         .route("/meta/crates", get_or_post(meta_crates))
         .route("/meta/versions", get(meta_versions))
-        .route("/meta/version/stable", get_or_post(meta_version_stable))
-        .route("/meta/version/beta", get_or_post(meta_version_beta))
-        .route("/meta/version/nightly", get_or_post(meta_version_nightly))
-        .route("/meta/version/rustfmt", get_or_post(meta_version_rustfmt))
-        .route("/meta/version/clippy", get_or_post(meta_version_clippy))
-        .route("/meta/version/miri", get_or_post(meta_version_miri))
         .route("/meta/gist", post(meta_gist_create))
         .route("/meta/gist/", post(meta_gist_create)) // compatibility with lax frontend code
         .route("/meta/gist/:id", get(meta_gist_get))
@@ -506,76 +498,6 @@ async fn meta_versions(
     apply_timestamped_caching(value, if_none_match)
 }
 
-async fn meta_version_stable(
-    Extension(factory): Extension<Factory>,
-    Extension(cache): Extension<Arc<SandboxCache>>,
-    if_none_match: Option<TypedHeader<IfNoneMatch>>,
-) -> Result<impl IntoResponse> {
-    let value = track_metric_no_request_async(Endpoint::MetaVersionStable, || {
-        cache.version_stable(&factory.0)
-    })
-    .await?;
-    apply_timestamped_caching(value, if_none_match)
-}
-
-async fn meta_version_beta(
-    Extension(factory): Extension<Factory>,
-    Extension(cache): Extension<Arc<SandboxCache>>,
-    if_none_match: Option<TypedHeader<IfNoneMatch>>,
-) -> Result<impl IntoResponse> {
-    let value =
-        track_metric_no_request_async(Endpoint::MetaVersionBeta, || cache.version_beta(&factory.0))
-            .await?;
-    apply_timestamped_caching(value, if_none_match)
-}
-
-async fn meta_version_nightly(
-    Extension(factory): Extension<Factory>,
-    Extension(cache): Extension<Arc<SandboxCache>>,
-    if_none_match: Option<TypedHeader<IfNoneMatch>>,
-) -> Result<impl IntoResponse> {
-    let value = track_metric_no_request_async(Endpoint::MetaVersionNightly, || {
-        cache.version_nightly(&factory.0)
-    })
-    .await?;
-    apply_timestamped_caching(value, if_none_match)
-}
-
-async fn meta_version_rustfmt(
-    Extension(factory): Extension<Factory>,
-    Extension(cache): Extension<Arc<SandboxCache>>,
-    if_none_match: Option<TypedHeader<IfNoneMatch>>,
-) -> Result<impl IntoResponse> {
-    let value = track_metric_no_request_async(Endpoint::MetaVersionRustfmt, || {
-        cache.version_rustfmt(&factory.0)
-    })
-    .await?;
-    apply_timestamped_caching(value, if_none_match)
-}
-
-async fn meta_version_clippy(
-    Extension(factory): Extension<Factory>,
-    Extension(cache): Extension<Arc<SandboxCache>>,
-    if_none_match: Option<TypedHeader<IfNoneMatch>>,
-) -> Result<impl IntoResponse> {
-    let value = track_metric_no_request_async(Endpoint::MetaVersionClippy, || {
-        cache.version_clippy(&factory.0)
-    })
-    .await?;
-    apply_timestamped_caching(value, if_none_match)
-}
-
-async fn meta_version_miri(
-    Extension(factory): Extension<Factory>,
-    Extension(cache): Extension<Arc<SandboxCache>>,
-    if_none_match: Option<TypedHeader<IfNoneMatch>>,
-) -> Result<impl IntoResponse> {
-    let value =
-        track_metric_no_request_async(Endpoint::MetaVersionMiri, || cache.version_miri(&factory.0))
-            .await?;
-    apply_timestamped_caching(value, if_none_match)
-}
-
 fn apply_timestamped_caching<T>(
     value: Stamped<T>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
@@ -751,7 +673,6 @@ type Stamped<T> = (T, SystemTime);
 struct SandboxCache {
     crates: CacheOne<api::MetaCratesResponse>,
     versions: CacheOne<api::MetaVersionsResponse>,
-    raw_versions: CacheOne<Arc<Versions>>,
 }
 
 impl SandboxCache {
@@ -791,81 +712,6 @@ impl SandboxCache {
             .context(ShutdownCoordinatorSnafu)?;
 
         v
-    }
-
-    async fn raw_versions(&self, factory: &CoordinatorFactory) -> Result<Stamped<Arc<Versions>>> {
-        let coordinator = factory.build::<DockerBackend>();
-
-        let rv = self
-            .raw_versions
-            .fetch(|| async {
-                Ok(Arc::new(
-                    coordinator.versions().await.context(VersionsSnafu)?,
-                ))
-            })
-            .await;
-
-        coordinator
-            .shutdown()
-            .await
-            .context(ShutdownCoordinatorSnafu)?;
-
-        rv
-    }
-
-    async fn version_stable(
-        &self,
-        factory: &CoordinatorFactory,
-    ) -> Result<Stamped<api::MetaVersionResponse>> {
-        let (v, t) = self.raw_versions(factory).await?;
-        let v = (&v.stable.rustc).into();
-        Ok((v, t))
-    }
-
-    async fn version_beta(
-        &self,
-        factory: &CoordinatorFactory,
-    ) -> Result<Stamped<api::MetaVersionResponse>> {
-        let (v, t) = self.raw_versions(factory).await?;
-        let v = (&v.beta.rustc).into();
-        Ok((v, t))
-    }
-
-    async fn version_nightly(
-        &self,
-        factory: &CoordinatorFactory,
-    ) -> Result<Stamped<api::MetaVersionResponse>> {
-        let (v, t) = self.raw_versions(factory).await?;
-        let v = (&v.nightly.rustc).into();
-        Ok((v, t))
-    }
-
-    async fn version_rustfmt(
-        &self,
-        factory: &CoordinatorFactory,
-    ) -> Result<Stamped<api::MetaVersionResponse>> {
-        let (v, t) = self.raw_versions(factory).await?;
-        let v = (&v.nightly.rustfmt).into();
-        Ok((v, t))
-    }
-
-    async fn version_clippy(
-        &self,
-        factory: &CoordinatorFactory,
-    ) -> Result<Stamped<api::MetaVersionResponse>> {
-        let (v, t) = self.raw_versions(factory).await?;
-        let v = (&v.nightly.clippy).into();
-        Ok((v, t))
-    }
-
-    async fn version_miri(
-        &self,
-        factory: &CoordinatorFactory,
-    ) -> Result<Stamped<api::MetaVersionResponse>> {
-        let (v, t) = self.raw_versions(factory).await?;
-        let v = v.nightly.miri.as_ref().context(MiriVersionSnafu)?;
-        let v = v.into();
-        Ok((v, t))
     }
 }
 
@@ -1062,9 +908,6 @@ enum Error {
     Versions {
         source: orchestrator::coordinator::VersionsError,
     },
-
-    #[snafu(display("The Miri version was missing"))]
-    MiriVersion,
 
     #[snafu(display("Unable to shutdown the coordinator"))]
     ShutdownCoordinator {
