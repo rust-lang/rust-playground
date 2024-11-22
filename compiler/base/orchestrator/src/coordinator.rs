@@ -2358,10 +2358,28 @@ impl Commander {
         gc_interval.set_missed_tick_behavior(MissedTickBehavior::Delay);
 
         loop {
-            select! {
-                command = command_rx.recv() => {
-                    let Some((ack_tx, command)) = command else { break };
+            enum Event {
+                Command(Option<(oneshot::Sender<()>, DemultiplexCommand)>),
 
+                FromWorker(Option<Multiplexed<WorkerMessage>>),
+
+                // Find any channels where the receivers have been
+                // dropped and clear out the sending halves.
+                Gc,
+            }
+            use Event::*;
+
+            let event = select! {
+                command = command_rx.recv() => Command(command),
+
+                msg = from_worker_rx.recv() => FromWorker(msg),
+
+                _ = gc_interval.tick() => Gc,
+            };
+
+            match event {
+                Command(None) => break,
+                Command(Some((ack_tx, command))) => {
                     match command {
                         DemultiplexCommand::Listen(job_id, waiter) => {
                             trace!("adding listener for {job_id:?}");
@@ -2377,11 +2395,10 @@ impl Commander {
                     }
 
                     ack_tx.send(()).ok(/* Don't care about it */);
-                },
+                }
 
-                msg = from_worker_rx.recv() => {
-                    let Some(Multiplexed(job_id, msg)) = msg else { break };
-
+                FromWorker(None) => break,
+                FromWorker(Some(Multiplexed(job_id, msg))) => {
                     if let Some(waiter) = waiting_once.remove(&job_id) {
                         trace!("notifying listener for {job_id:?}");
                         waiter.send(msg).ok(/* Don't care about it */);
@@ -2397,9 +2414,7 @@ impl Commander {
                     warn!("no listener for {job_id:?}");
                 }
 
-                // Find any channels where the receivers have been
-                // dropped and clear out the sending halves.
-                _ = gc_interval.tick() => {
+                Gc => {
                     waiting = mem::take(&mut waiting)
                         .into_iter()
                         .filter(|(_job_id, tx)| !tx.is_closed())
