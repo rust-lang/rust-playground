@@ -22,7 +22,7 @@ macro_rules! impl_narrow_to_broad {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Multiplexed<T>(pub JobId, pub T);
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, strum_macros::AsRefStr)]
 pub enum CoordinatorMessage {
     WriteFile(WriteFileRequest),
     DeleteFile(DeleteFileRequest),
