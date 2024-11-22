@@ -641,7 +641,7 @@ async fn meta_gist_get(
         .context(GistLoadingSnafu)
 }
 
-async fn metrics(_: MetricsAuthorization) -> Result<Vec<u8>, StatusCode> {
+async fn metrics(_: MetricsAuthorization) -> Result<impl IntoResponse, StatusCode> {
     use prometheus::{Encoder, TextEncoder};
 
     let metric_families = prometheus::gather();
@@ -650,7 +650,15 @@ async fn metrics(_: MetricsAuthorization) -> Result<Vec<u8>, StatusCode> {
 
     encoder
         .encode(&metric_families, &mut buffer)
-        .map(|_| buffer)
+        .map(|_| {
+            (
+                [(
+                    header::CONTENT_TYPE,
+                    "text/plain; version=0.0.4; charset=utf-8",
+                )],
+                buffer,
+            )
+        })
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
 
