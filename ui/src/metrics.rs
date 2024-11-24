@@ -86,12 +86,6 @@ pub(crate) enum Endpoint {
     MacroExpansion,
     MetaCrates,
     MetaVersions,
-    MetaVersionStable,
-    MetaVersionBeta,
-    MetaVersionNightly,
-    MetaVersionRustfmt,
-    MetaVersionClippy,
-    MetaVersionMiri,
     Evaluate,
 }
 

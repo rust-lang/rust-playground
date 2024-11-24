@@ -1831,7 +1831,7 @@ impl Container {
                             already_cancelled = true;
 
                             let msg = CoordinatorMessage::Kill;
-                            trace!("processing {msg:?}");
+                            trace!(msg_name = msg.as_ref(), "processing");
                             to_worker_tx.send(msg).await.context(KillSnafu)?;
                         },
 
@@ -1847,12 +1847,12 @@ impl Container {
                                 }
                             };
 
-                            trace!("processing {msg:?}");
+                            trace!(msg_name = msg.as_ref(), "processing");
                             to_worker_tx.send(msg).await.context(StdinSnafu)?;
                         },
 
                         Some(container_msg) = from_worker_rx.recv() => {
-                            trace!("processing {container_msg:?}");
+                            trace!(msg_name = container_msg.as_ref(), "processing");
 
                             match container_msg {
                                 WorkerMessage::ExecuteCommand(resp) => {
@@ -2358,48 +2358,63 @@ impl Commander {
         gc_interval.set_missed_tick_behavior(MissedTickBehavior::Delay);
 
         loop {
-            select! {
-                command = command_rx.recv() => {
-                    let Some((ack_tx, command)) = command else { break };
+            enum Event {
+                Command(Option<(oneshot::Sender<()>, DemultiplexCommand)>),
 
+                FromWorker(Option<Multiplexed<WorkerMessage>>),
+
+                // Find any channels where the receivers have been
+                // dropped and clear out the sending halves.
+                Gc,
+            }
+            use Event::*;
+
+            let event = select! {
+                command = command_rx.recv() => Command(command),
+
+                msg = from_worker_rx.recv() => FromWorker(msg),
+
+                _ = gc_interval.tick() => Gc,
+            };
+
+            match event {
+                Command(None) => break,
+                Command(Some((ack_tx, command))) => {
                     match command {
                         DemultiplexCommand::Listen(job_id, waiter) => {
-                            trace!("adding listener for {job_id:?}");
+                            trace!(job_id, "adding listener (many)");
                             let old = waiting.insert(job_id, waiter);
                             ensure!(old.is_none(), DuplicateDemultiplexerClientSnafu { job_id });
                         }
 
                         DemultiplexCommand::ListenOnce(job_id, waiter) => {
-                            trace!("adding listener for {job_id:?}");
+                            trace!(job_id, "adding listener (once)");
                             let old = waiting_once.insert(job_id, waiter);
                             ensure!(old.is_none(), DuplicateDemultiplexerClientSnafu { job_id });
                         }
                     }
 
                     ack_tx.send(()).ok(/* Don't care about it */);
-                },
+                }
 
-                msg = from_worker_rx.recv() => {
-                    let Some(Multiplexed(job_id, msg)) = msg else { break };
-
+                FromWorker(None) => break,
+                FromWorker(Some(Multiplexed(job_id, msg))) => {
                     if let Some(waiter) = waiting_once.remove(&job_id) {
-                        trace!("notifying listener for {job_id:?}");
+                        trace!(job_id, "notifying listener (once)");
                         waiter.send(msg).ok(/* Don't care about it */);
                         continue;
                     }
 
                     if let Some(waiter) = waiting.get(&job_id) {
-                        trace!("notifying listener for {job_id:?}");
+                        trace!(job_id, "notifying listener (many)");
                         waiter.send(msg).await.ok(/* Don't care about it */);
                         continue;
                     }
 
-                    warn!("no listener for {job_id:?}");
+                    warn!(job_id, "no listener to notify");
                 }
 
-                // Find any channels where the receivers have been
-                // dropped and clear out the sending halves.
-                _ = gc_interval.tick() => {
+                Gc => {
                     waiting = mem::take(&mut waiting)
                         .into_iter()
                         .filter(|(_job_id, tx)| !tx.is_closed())
