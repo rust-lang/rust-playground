@@ -47,7 +47,7 @@ features = ["std"]
 
 [dependencies.allocator_api2]
 package = "allocator-api2"
-version = "=0.2.18"
+version = "=0.2.20"
 features = ["alloc"]
 default-features = false
 
@@ -176,8 +176,8 @@ version = "=3.16.0"
 
 [dependencies.bytemuck]
 package = "bytemuck"
-version = "=1.19.0"
-features = ["aarch64_simd", "align_offset", "bytemuck_derive", "const_zeroed", "derive", "extern_crate_alloc", "extern_crate_std", "latest_stable_rust", "min_const_generics", "must_cast", "track_caller", "wasm_simd", "zeroable_atomics", "zeroable_maybe_uninit"]
+version = "=1.20.0"
+features = ["aarch64_simd", "align_offset", "alloc_uninit", "bytemuck_derive", "const_zeroed", "derive", "extern_crate_alloc", "extern_crate_std", "latest_stable_rust", "min_const_generics", "must_cast", "track_caller", "wasm_simd", "zeroable_atomics", "zeroable_maybe_uninit"]
 
 [dependencies.bytemuck_derive]
 package = "bytemuck_derive"
@@ -204,7 +204,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.1.37"
+version = "=1.2.1"
 features = ["parallel"]
 
 [dependencies.cfg_if]
@@ -218,12 +218,12 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [dependencies.clap]
 package = "clap"
-version = "=4.5.20"
+version = "=4.5.21"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.20"
+version = "=4.5.21"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-ext", "usage", "wrap_help"]
 default-features = false
 
@@ -233,7 +233,7 @@ version = "=4.5.18"
 
 [dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.7.2"
+version = "=0.7.3"
 
 [dependencies.color_quant]
 package = "color_quant"
@@ -255,12 +255,12 @@ features = ["percent-encode", "percent-encoding"]
 
 [dependencies.cookie_store]
 package = "cookie_store"
-version = "=0.21.0"
-features = ["public_suffix", "publicsuffix"]
+version = "=0.21.1"
+features = ["public_suffix", "serde", "serde_json"]
 
 [dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.2.14"
+version = "=0.2.16"
 
 [dependencies.crc32fast]
 package = "crc32fast"
@@ -314,7 +314,7 @@ version = "=0.6.1"
 
 [dependencies.csv]
 package = "csv"
-version = "=1.3.0"
+version = "=1.3.1"
 
 [dependencies.csv_core]
 package = "csv-core"
@@ -358,6 +358,10 @@ features = ["alloc", "block-buffer", "core-api", "mac", "std", "subtle"]
 package = "displaydoc"
 version = "=0.2.5"
 default-features = false
+
+[dependencies.document_features]
+package = "document-features"
+version = "=0.2.10"
 
 [dependencies.dtoa]
 package = "dtoa"
@@ -450,7 +454,7 @@ default-features = false
 
 [dependencies.flate2]
 package = "flate2"
-version = "=1.0.34"
+version = "=1.0.35"
 features = ["any_impl", "miniz_oxide", "rust_backend"]
 
 [dependencies.fnv]
@@ -570,7 +574,7 @@ version = "=0.3.1"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.4.6"
+version = "=0.4.7"
 
 [dependencies.half]
 package = "half"
@@ -636,7 +640,7 @@ version = "=2.1.0"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=1.5.0"
+version = "=1.5.1"
 features = ["client", "full", "http1", "http2", "server"]
 
 [dependencies.hyper_rustls]
@@ -710,15 +714,6 @@ package = "idna"
 version = "=1.0.3"
 features = ["alloc", "compiled_data", "std"]
 
-[dependencies.idna_0_3_0]
-package = "idna"
-version = "=0.3.0"
-
-[dependencies.idna_0_5_0]
-package = "idna"
-version = "=0.5.0"
-features = ["alloc", "std"]
-
 [dependencies.idna_adapter]
 package = "idna_adapter"
 version = "=1.2.0"
@@ -768,7 +763,7 @@ features = ["use_alloc", "use_std"]
 
 [dependencies.itoa]
 package = "itoa"
-version = "=1.0.11"
+version = "=1.0.13"
 
 [dependencies.jobserver]
 package = "jobserver"
@@ -789,7 +784,7 @@ version = "=0.5.2"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.162"
+version = "=0.2.164"
 features = ["extra_traits", "std"]
 
 [dependencies.libm]
@@ -814,8 +809,13 @@ default-features = false
 
 [dependencies.litemap]
 package = "litemap"
-version = "=0.7.3"
+version = "=0.7.4"
 features = ["alloc"]
+default-features = false
+
+[dependencies.litrs]
+package = "litrs"
+version = "=0.4.1"
 default-features = false
 
 [dependencies.lock_api]
@@ -1128,7 +1128,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.89"
+version = "=1.0.92"
 features = ["proc-macro", "span-locations"]
 
 [dependencies.profiling]
@@ -1146,7 +1146,7 @@ version = "=2.0.11"
 
 [dependencies.publicsuffix]
 package = "publicsuffix"
-version = "=2.2.3"
+version = "=2.3.0"
 features = ["idna", "punycode"]
 
 [dependencies.qoi]
@@ -1214,7 +1214,7 @@ features = ["perf", "perf-backtrack", "perf-cache", "perf-dfa", "perf-inline", "
 
 [dependencies.regex_automata]
 package = "regex-automata"
-version = "=0.4.8"
+version = "=0.4.9"
 features = ["alloc", "dfa", "dfa-build", "dfa-onepass", "dfa-search", "hybrid", "meta", "nfa", "nfa-backtrack", "nfa-pikevm", "nfa-thompson", "perf", "perf-inline", "perf-literal", "perf-literal-multisubstring", "perf-literal-substring", "std", "syntax", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment", "unicode-word-boundary"]
 
 [dependencies.regex_syntax]
@@ -1252,12 +1252,12 @@ version = "=0.4.1"
 
 [dependencies.rustix]
 package = "rustix"
-version = "=0.38.39"
+version = "=0.38.41"
 features = ["alloc", "fs", "libc-extra-traits", "std", "termios", "use-libc-auxv"]
 
 [dependencies.rustls]
 package = "rustls"
-version = "=0.23.16"
+version = "=0.23.18"
 features = ["std", "tls12"]
 default-features = false
 
@@ -1309,16 +1309,16 @@ features = ["std"]
 
 [dependencies.serde]
 package = "serde"
-version = "=1.0.214"
+version = "=1.0.215"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.214"
+version = "=1.0.215"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.132"
+version = "=1.0.133"
 features = ["raw_value", "std"]
 
 [dependencies.serde_spanned]
@@ -1433,7 +1433,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=2.0.87"
+version = "=2.0.89"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1443,7 +1443,7 @@ features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", 
 
 [dependencies.sync_wrapper]
 package = "sync_wrapper"
-version = "=1.0.1"
+version = "=1.0.2"
 features = ["futures", "futures-core"]
 
 [dependencies.synstructure]
@@ -1470,20 +1470,20 @@ version = "=0.4.0"
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=2.0.0"
+version = "=2.0.3"
 features = ["std"]
 
-[dependencies.thiserror_1_0_68]
+[dependencies.thiserror_1_0_69]
 package = "thiserror"
-version = "=1.0.68"
+version = "=1.0.69"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=2.0.0"
+version = "=2.0.3"
 
-[dependencies.thiserror_impl_1_0_68]
+[dependencies.thiserror_impl_1_0_69]
 package = "thiserror-impl"
-version = "=1.0.68"
+version = "=1.0.69"
 
 [dependencies.thread_id]
 package = "thread-id"
@@ -1626,7 +1626,7 @@ features = ["hardcoded-data", "std"]
 
 [dependencies.unicode_ident]
 package = "unicode-ident"
-version = "=1.0.13"
+version = "=1.0.14"
 
 [dependencies.unicode_normalization]
 package = "unicode-normalization"
@@ -1670,7 +1670,7 @@ version = "=0.9.0"
 
 [dependencies.url]
 package = "url"
-version = "=2.5.3"
+version = "=2.5.4"
 features = ["serde", "std"]
 
 [dependencies.utf16_iter]
@@ -1756,7 +1756,7 @@ features = ["web", "web-sys"]
 
 [dependencies.wide]
 package = "wide"
-version = "=0.7.28"
+version = "=0.7.30"
 features = ["std"]
 default-features = false
 
@@ -1802,12 +1802,12 @@ version = "=0.17.0"
 
 [dependencies.yoke]
 package = "yoke"
-version = "=0.7.4"
+version = "=0.7.5"
 features = ["alloc", "derive", "zerofrom"]
 
 [dependencies.yoke_derive]
 package = "yoke-derive"
-version = "=0.7.4"
+version = "=0.7.5"
 
 [dependencies.zerocopy]
 package = "zerocopy"
@@ -1820,13 +1820,13 @@ version = "=0.7.35"
 
 [dependencies.zerofrom]
 package = "zerofrom"
-version = "=0.1.4"
+version = "=0.1.5"
 features = ["alloc", "derive"]
 default-features = false
 
 [dependencies.zerofrom_derive]
 package = "zerofrom-derive"
-version = "=0.1.4"
+version = "=0.1.5"
 
 [dependencies.zeroize]
 package = "zeroize"
@@ -1885,7 +1885,7 @@ features = ["std"]
 
 [build-dependencies.allocator_api2]
 package = "allocator-api2"
-version = "=0.2.18"
+version = "=0.2.20"
 features = ["alloc"]
 default-features = false
 
@@ -2014,8 +2014,8 @@ version = "=3.16.0"
 
 [build-dependencies.bytemuck]
 package = "bytemuck"
-version = "=1.19.0"
-features = ["aarch64_simd", "align_offset", "bytemuck_derive", "const_zeroed", "derive", "extern_crate_alloc", "extern_crate_std", "latest_stable_rust", "min_const_generics", "must_cast", "track_caller", "wasm_simd", "zeroable_atomics", "zeroable_maybe_uninit"]
+version = "=1.20.0"
+features = ["aarch64_simd", "align_offset", "alloc_uninit", "bytemuck_derive", "const_zeroed", "derive", "extern_crate_alloc", "extern_crate_std", "latest_stable_rust", "min_const_generics", "must_cast", "track_caller", "wasm_simd", "zeroable_atomics", "zeroable_maybe_uninit"]
 
 [build-dependencies.bytemuck_derive]
 package = "bytemuck_derive"
@@ -2042,7 +2042,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.1.37"
+version = "=1.2.1"
 features = ["parallel"]
 
 [build-dependencies.cfg_if]
@@ -2056,12 +2056,12 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [build-dependencies.clap]
 package = "clap"
-version = "=4.5.20"
+version = "=4.5.21"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build-dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.20"
+version = "=4.5.21"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-ext", "usage", "wrap_help"]
 default-features = false
 
@@ -2071,7 +2071,7 @@ version = "=4.5.18"
 
 [build-dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.7.2"
+version = "=0.7.3"
 
 [build-dependencies.color_quant]
 package = "color_quant"
@@ -2093,12 +2093,12 @@ features = ["percent-encode", "percent-encoding"]
 
 [build-dependencies.cookie_store]
 package = "cookie_store"
-version = "=0.21.0"
-features = ["public_suffix", "publicsuffix"]
+version = "=0.21.1"
+features = ["public_suffix", "serde", "serde_json"]
 
 [build-dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.2.14"
+version = "=0.2.16"
 
 [build-dependencies.crc32fast]
 package = "crc32fast"
@@ -2152,7 +2152,7 @@ version = "=0.6.1"
 
 [build-dependencies.csv]
 package = "csv"
-version = "=1.3.0"
+version = "=1.3.1"
 
 [build-dependencies.csv_core]
 package = "csv-core"
@@ -2196,6 +2196,10 @@ features = ["alloc", "block-buffer", "core-api", "mac", "std", "subtle"]
 package = "displaydoc"
 version = "=0.2.5"
 default-features = false
+
+[build-dependencies.document_features]
+package = "document-features"
+version = "=0.2.10"
 
 [build-dependencies.dtoa]
 package = "dtoa"
@@ -2288,7 +2292,7 @@ default-features = false
 
 [build-dependencies.flate2]
 package = "flate2"
-version = "=1.0.34"
+version = "=1.0.35"
 features = ["any_impl", "miniz_oxide", "rust_backend"]
 
 [build-dependencies.fnv]
@@ -2408,7 +2412,7 @@ version = "=0.3.1"
 
 [build-dependencies.h2]
 package = "h2"
-version = "=0.4.6"
+version = "=0.4.7"
 
 [build-dependencies.half]
 package = "half"
@@ -2474,7 +2478,7 @@ version = "=2.1.0"
 
 [build-dependencies.hyper]
 package = "hyper"
-version = "=1.5.0"
+version = "=1.5.1"
 features = ["client", "full", "http1", "http2", "server"]
 
 [build-dependencies.hyper_rustls]
@@ -2548,15 +2552,6 @@ package = "idna"
 version = "=1.0.3"
 features = ["alloc", "compiled_data", "std"]
 
-[build-dependencies.idna_0_3_0]
-package = "idna"
-version = "=0.3.0"
-
-[build-dependencies.idna_0_5_0]
-package = "idna"
-version = "=0.5.0"
-features = ["alloc", "std"]
-
 [build-dependencies.idna_adapter]
 package = "idna_adapter"
 version = "=1.2.0"
@@ -2606,7 +2601,7 @@ features = ["use_alloc", "use_std"]
 
 [build-dependencies.itoa]
 package = "itoa"
-version = "=1.0.11"
+version = "=1.0.13"
 
 [build-dependencies.jobserver]
 package = "jobserver"
@@ -2627,7 +2622,7 @@ version = "=0.5.2"
 
 [build-dependencies.libc]
 package = "libc"
-version = "=0.2.162"
+version = "=0.2.164"
 features = ["extra_traits", "std"]
 
 [build-dependencies.libm]
@@ -2652,8 +2647,13 @@ default-features = false
 
 [build-dependencies.litemap]
 package = "litemap"
-version = "=0.7.3"
+version = "=0.7.4"
 features = ["alloc"]
+default-features = false
+
+[build-dependencies.litrs]
+package = "litrs"
+version = "=0.4.1"
 default-features = false
 
 [build-dependencies.lock_api]
@@ -2966,7 +2966,7 @@ version = "=0.1.1"
 
 [build-dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.89"
+version = "=1.0.92"
 features = ["proc-macro", "span-locations"]
 
 [build-dependencies.profiling]
@@ -2984,7 +2984,7 @@ version = "=2.0.11"
 
 [build-dependencies.publicsuffix]
 package = "publicsuffix"
-version = "=2.2.3"
+version = "=2.3.0"
 features = ["idna", "punycode"]
 
 [build-dependencies.qoi]
@@ -3052,7 +3052,7 @@ features = ["perf", "perf-backtrack", "perf-cache", "perf-dfa", "perf-inline", "
 
 [build-dependencies.regex_automata]
 package = "regex-automata"
-version = "=0.4.8"
+version = "=0.4.9"
 features = ["alloc", "dfa", "dfa-build", "dfa-onepass", "dfa-search", "hybrid", "meta", "nfa", "nfa-backtrack", "nfa-pikevm", "nfa-thompson", "perf", "perf-inline", "perf-literal", "perf-literal-multisubstring", "perf-literal-substring", "std", "syntax", "unicode", "unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment", "unicode-word-boundary"]
 
 [build-dependencies.regex_syntax]
@@ -3090,12 +3090,12 @@ version = "=0.4.1"
 
 [build-dependencies.rustix]
 package = "rustix"
-version = "=0.38.39"
+version = "=0.38.41"
 features = ["alloc", "fs", "libc-extra-traits", "std", "termios", "use-libc-auxv"]
 
 [build-dependencies.rustls]
 package = "rustls"
-version = "=0.23.16"
+version = "=0.23.18"
 features = ["std", "tls12"]
 default-features = false
 
@@ -3147,16 +3147,16 @@ features = ["std"]
 
 [build-dependencies.serde]
 package = "serde"
-version = "=1.0.214"
+version = "=1.0.215"
 features = ["alloc", "derive", "rc", "serde_derive", "std"]
 
 [build-dependencies.serde_derive]
 package = "serde_derive"
-version = "=1.0.214"
+version = "=1.0.215"
 
 [build-dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.132"
+version = "=1.0.133"
 features = ["raw_value", "std"]
 
 [build-dependencies.serde_spanned]
@@ -3271,7 +3271,7 @@ default-features = false
 
 [build-dependencies.syn]
 package = "syn"
-version = "=2.0.87"
+version = "=2.0.89"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [build-dependencies.syn_1_0_109]
@@ -3281,7 +3281,7 @@ features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", 
 
 [build-dependencies.sync_wrapper]
 package = "sync_wrapper"
-version = "=1.0.1"
+version = "=1.0.2"
 features = ["futures", "futures-core"]
 
 [build-dependencies.synstructure]
@@ -3308,20 +3308,20 @@ version = "=0.4.0"
 
 [build-dependencies.thiserror]
 package = "thiserror"
-version = "=2.0.0"
+version = "=2.0.3"
 features = ["std"]
 
-[build-dependencies.thiserror_1_0_68]
+[build-dependencies.thiserror_1_0_69]
 package = "thiserror"
-version = "=1.0.68"
+version = "=1.0.69"
 
 [build-dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=2.0.0"
+version = "=2.0.3"
 
-[build-dependencies.thiserror_impl_1_0_68]
+[build-dependencies.thiserror_impl_1_0_69]
 package = "thiserror-impl"
-version = "=1.0.68"
+version = "=1.0.69"
 
 [build-dependencies.thread_id]
 package = "thread-id"
@@ -3464,7 +3464,7 @@ features = ["hardcoded-data", "std"]
 
 [build-dependencies.unicode_ident]
 package = "unicode-ident"
-version = "=1.0.13"
+version = "=1.0.14"
 
 [build-dependencies.unicode_normalization]
 package = "unicode-normalization"
@@ -3508,7 +3508,7 @@ version = "=0.9.0"
 
 [build-dependencies.url]
 package = "url"
-version = "=2.5.3"
+version = "=2.5.4"
 features = ["serde", "std"]
 
 [build-dependencies.utf16_iter]
@@ -3594,7 +3594,7 @@ features = ["web", "web-sys"]
 
 [build-dependencies.wide]
 package = "wide"
-version = "=0.7.28"
+version = "=0.7.30"
 features = ["std"]
 default-features = false
 
@@ -3640,12 +3640,12 @@ version = "=0.17.0"
 
 [build-dependencies.yoke]
 package = "yoke"
-version = "=0.7.4"
+version = "=0.7.5"
 features = ["alloc", "derive", "zerofrom"]
 
 [build-dependencies.yoke_derive]
 package = "yoke-derive"
-version = "=0.7.4"
+version = "=0.7.5"
 
 [build-dependencies.zerocopy]
 package = "zerocopy"
@@ -3658,13 +3658,13 @@ version = "=0.7.35"
 
 [build-dependencies.zerofrom]
 package = "zerofrom"
-version = "=0.1.4"
+version = "=0.1.5"
 features = ["alloc", "derive"]
 default-features = false
 
 [build-dependencies.zerofrom_derive]
 package = "zerofrom-derive"
-version = "=0.1.4"
+version = "=0.1.5"
 
 [build-dependencies.zeroize]
 package = "zeroize"
