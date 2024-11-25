@@ -24,7 +24,7 @@ const Execute: React.FC = () => {
 };
 
 interface WarningProps {
-  addMainFunction: () => any;
+  addMainFunction: () => void;
 }
 
 const Warning: React.FC<WarningProps> = props => (

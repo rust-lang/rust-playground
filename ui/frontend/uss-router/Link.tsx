@@ -2,12 +2,13 @@ import React, { useContext, useCallback, MouseEventHandler } from 'react';
 
 import { Context } from './Router';
 import { useAppDispatch } from '../hooks';
+import { UnknownAction } from '@reduxjs/toolkit';
 
 type Anchor = JSX.IntrinsicElements['a'];
 type SlimAnchor = Omit<Anchor, 'action' | 'onClick'>;
 
 export interface LinkProps extends SlimAnchor {
-  action?: () => any;
+  action: () => UnknownAction;
   onClick?: () => void;
 }
 

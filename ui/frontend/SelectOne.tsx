@@ -7,7 +7,7 @@ interface SelectOneProps<T> {
   name: string;
   currentValue: T;
   thisValue: T;
-  changeValue: (_: T) => any;
+  changeValue: (_: T) => void;
 }
 
 export default class SelectOne<T> extends React.PureComponent<SelectOneProps<T>> {

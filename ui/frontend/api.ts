@@ -23,7 +23,9 @@ export function jsonGet(url: FetchArg): Promise<unknown> {
   });
 }
 
-export function jsonPost(url: FetchArg, body: Record<string, any>): Promise<unknown> {
+type ToJson = Parameters<typeof JSON.stringify>[0];
+
+export function jsonPost(url: FetchArg, body: ToJson): Promise<unknown> {
   return fetchJson(url, {
     method: 'post',
     body: JSON.stringify(body),

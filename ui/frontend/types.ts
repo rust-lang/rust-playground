@@ -44,8 +44,8 @@ export type ChannelVersion = z.infer<typeof ChannelVersion>;
 
 export interface CommonEditorProps {
   code: string;
-  execute: () => any;
-  onEditCode: (_: string) => any;
+  execute: () => void;
+  onEditCode: (_: string) => void;
   position: Position;
   selection: Selection;
   crates: Crate[];

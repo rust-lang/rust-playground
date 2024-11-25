@@ -11,7 +11,7 @@ interface EitherProps<T extends string> extends ConfigElementProps {
   aLabel?: string;
   bLabel?: string;
   value: T;
-  onChange: (_: T) => any;
+  onChange: (_: T) => void;
 }
 
 export const Either =
@@ -39,7 +39,7 @@ export const Either =
 interface SelectProps<T extends string> extends ConfigElementProps {
   children: React.ReactNode;
   value: T;
-  onChange: (_: T) => any;
+  onChange: (_: T) => void;
 }
 
 export const Select = <T extends string,>({ value, onChange, children, ...rest }: SelectProps<T>) => (

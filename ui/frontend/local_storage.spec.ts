@@ -1,7 +1,9 @@
 import { deserialize } from './local_storage';
 
+type ToJson = Parameters<typeof JSON.stringify>[0];
+
 describe('restoring saved state', () => {
-  const easyDeserialize = (state: any) => {
+  const easyDeserialize = (state: string | ToJson) => {
     if (typeof state === 'string' || state === undefined) {
       return deserialize(state);
     } else {
