@@ -31,7 +31,7 @@ interface TabProps {
   kind: Focus;
   focus?: Focus;
   label: string;
-  onClick: () => any;
+  onClick: () => void;
   tabProps: object;
 }
 

@@ -34,9 +34,11 @@ const slice = createSlice({
       switch (action.payload) {
         case Notification.DarkMode: {
           state.seenDarkMode = true;
+          break;
         }
         case Notification.RustSurvey2023: {
           state.seenRustSurvey2023 = true;
+          break;
         }
       }
     },

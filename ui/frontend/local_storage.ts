@@ -32,7 +32,7 @@ interface V2Configuration {
     processAssembly: ProcessAssembly;
   };
   code: string;
-  notifications: any;
+  notifications: object;
 }
 
 interface V1Configuration {
@@ -48,7 +48,7 @@ interface V1Configuration {
     processAssembly: ProcessAssembly;
   };
   code: string;
-  notifications: any;
+  notifications: object;
 }
 
 type CurrentConfiguration = V2Configuration;

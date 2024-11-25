@@ -1,8 +1,8 @@
 import React from 'react';
-import { UnknownAction } from '@reduxjs/toolkit';
+import { Reducer, UnknownAction } from '@reduxjs/toolkit';
 
 import { createBrowserHistory as createHistory, Path, Location } from 'history';
-import { createRouter, PlainOrThunk } from './uss-router';
+import { createRouter, PlainOrThunk, RouterObject, StoreArg } from './uss-router';
 import UssRouter from './uss-router/Router';
 
 import qs from 'qs';
@@ -82,7 +82,7 @@ const locationToAction = (location: Location): PlainOrThunk<State, UnknownAction
 };
 
 export default class Router extends React.Component<RouterProps> {
-  private router: any;
+  private router: RouterObject<UnknownAction>;
 
   public constructor(props: RouterProps) {
     super(props);
@@ -104,6 +104,6 @@ export default class Router extends React.Component<RouterProps> {
 
 interface RouterProps {
   children: React.ReactNode;
-  store: any;
-  reducer: any;
+  store: StoreArg<State, UnknownAction>;
+  reducer: Reducer<State>;
 }

@@ -64,7 +64,7 @@ const buildCrateAutocompleter = (autocompleteOnUse: boolean, crates: Crate[]): A
   },
 });
 
-function useRafDebouncedFunction<A extends any[]>(fn: (...args: A) => void, onCall?: (...args: A) => void) {
+function useRafDebouncedFunction<A extends unknown[]>(fn: (...args: A) => void, onCall?: (...args: A) => void) {
   const timeout = useRef<number>();
 
   return useCallback((...args: A): void => {
@@ -82,9 +82,9 @@ function useRafDebouncedFunction<A extends any[]>(fn: (...args: A) => void, onCa
 interface AceEditorProps {
   autocompleteOnUse: boolean;
   code: string;
-  execute: () => any;
+  execute: () => void;
   keybinding: string;
-  onEditCode: (_: string) => any;
+  onEditCode: (_: string) => void;
   position: Position;
   selection: Selection;
   theme: string;

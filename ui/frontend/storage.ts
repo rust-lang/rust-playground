@@ -65,7 +65,7 @@ function validateStorage(storageFactory: StorageFactory): SimpleStorage {
     storage.setItem(KEY, current || '');
     return storage;
 
-  } catch (e) {
+  } catch (_e) {
     console.warn('Unable to store configuration, falling back to non-persistent in-memory storage');
     return new InMemoryStorage();
   }

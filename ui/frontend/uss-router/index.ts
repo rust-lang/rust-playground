@@ -1,15 +1,19 @@
 import { isEqual } from 'lodash-es';
-import { configureStore, ThunkAction, Reducer, Store, Action } from '@reduxjs/toolkit';
+import { configureStore, ThunkAction, Reducer, Store, UnknownAction } from '@reduxjs/toolkit';
 import { BrowserHistory, Location, Path } from 'history';
 
-export type PlainOrThunk<St, A extends Action<any>> = A | ThunkAction<void, St, {}, A>;
+export type PlainOrThunk<St, A extends UnknownAction> = A | ThunkAction<void, St, unknown, A>;
+
+export type StoreArg<St, A extends UnknownAction> = Store<St, A> & {
+  dispatch: (a: PlainOrThunk<St, A>) => void;
+};
 
 // This is a... dense... attempt at saying "we accept any store with
 // any dispatch so long as it can handle the actions you create". It's
 // probably overly complicated, restrictive, and broad all at the same
 // time.
-interface CreateRouterArg<St, SubSt, A extends Action<any>> {
-  store: Store<St, A> & { dispatch: (a: PlainOrThunk<St, A>) => void }; //  |
+interface CreateRouterArg<St, SubSt, A extends UnknownAction> {
+  store: StoreArg<St, A>;
   reducer: Reducer<St>;
   history: BrowserHistory;
   stateSelector: (state: St) => SubSt;
@@ -17,18 +21,18 @@ interface CreateRouterArg<St, SubSt, A extends Action<any>> {
   locationToAction: (location: Location) => PlainOrThunk<St, A> | null;
 }
 
-export interface RouterObject {
-  provisionalLocation: any;
+export interface RouterObject<A extends UnknownAction> {
+  provisionalLocation: (makeAction: () => A) => Partial<Path>;
 }
 
-export function createRouter<St, SubSt, A extends Action<any>>({
+export function createRouter<St, SubSt, A extends UnknownAction>({
   store,
   reducer,
   history,
   stateSelector,
   stateToLocation,
   locationToAction,
-}: CreateRouterArg<St, SubSt, A>): RouterObject {
+}: CreateRouterArg<St, SubSt, A>): RouterObject<A> {
   let interestingPrevState: SubSt;
 
   // Watch changes to the Redux state

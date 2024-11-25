@@ -1,15 +1,16 @@
 import React, { createContext } from 'react';
+import { UnknownAction } from '@reduxjs/toolkit';
 
 import { RouterObject } from '.';
 
-export const Context = createContext<RouterObject | undefined>(undefined);
+export const Context = createContext<RouterObject<UnknownAction> | undefined>(undefined);
 
-interface RouterProps {
+interface RouterProps<A extends UnknownAction> {
   children: React.ReactNode;
-  router: RouterObject;
+  router: RouterObject<A>;
 }
 
-const Router: React.FC<RouterProps> = ({router, children}) => (
+const Router: React.FC<RouterProps<UnknownAction>> = ({router, children}) => (
   <Context.Provider value={router}>
     {children}
   </Context.Provider>

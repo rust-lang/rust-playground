@@ -23,7 +23,7 @@ export const hasTestsSelector = createSelector(codeSelector, code => !!code.matc
 // https://stackoverflow.com/a/34755045/155423
 const HAS_MAIN_FUNCTION_RE = new RegExp(
   [
-    /^([^\n\r\/]*;)?/,
+    /^([^\n\r/]*;)?/,
     /\s*(pub\s+)?\s*(const\s+)?\s*(async\s+)?\s*/,
     /fn\s+main\s*\(\s*(\/\*.*\*\/)?\s*\)/,
   ].map((r) => r.source).join(''),
@@ -186,7 +186,7 @@ export const getAdvancedOptionsSet = createSelector(
   ),
 );
 
-export const hasProperties = (obj: {}) => Object.values(obj).some(val => !!val);
+export const hasProperties = (obj: object) => Object.values(obj).some(val => !!val);
 
 const getOutputs = createSelector(
   (state: State) => state,

@@ -12,7 +12,6 @@ node_modules
 *.scss
 
 # Slowly migrate files that we've touched
-!.eslintrc.js
 !BuildMenu.tsx
 !ButtonSet.tsx
 !Header.tsx
@@ -32,6 +31,7 @@ node_modules
 !editor/MonacoEditorCore.tsx
 !editor/SimpleEditor.tsx
 !editor/rust_monaco_def.ts
+!eslint.config.mjs
 !hooks.ts
 !observer.ts
 !prism-shim.ts
