@@ -60,7 +60,6 @@ export default tseslint.config(
       ...reactHooksPlugin.configs.recommended.rules,
 
       // Disabled to upgrade to eslint 9
-      'no-useless-escape': 'off',
       'no-fallthrough': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
     },

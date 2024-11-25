@@ -47,7 +47,7 @@ export function configureRustErrors({
     'rust-errors-help': {
       pattern: /help:.*\n/,
       inside: {
-        'feature-gate': /add `#\!\[feature\(.+?\)\]`/,
+        'feature-gate': /add `#!\[feature\(.+?\)\]`/,
       },
     },
     'backtrace': {
@@ -60,7 +60,7 @@ export function configureRustErrors({
   };
 
   Prism.languages.rust_mir = {
-    'mir-source': /src\/[A-Za-z0-9_.\-]+\.rs:\d+:\d+: \d+:\d+/,
+    'mir-source': /src\/[A-Za-z0-9_.-]+\.rs:\d+:\d+: \d+:\d+/,
   }
 
   Prism.hooks.add('wrap', env => {
