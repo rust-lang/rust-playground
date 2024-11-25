@@ -172,8 +172,7 @@ const slice = createSlice({
         state.requestsInProgress -= 1;
       })
       .addCase(performExecute.rejected, (state, action) => {
-        if (action.payload) {
-        } else {
+        if (!action.payload) {
           state.error = action.error.message;
         }
         state.requestsInProgress -= 1;
