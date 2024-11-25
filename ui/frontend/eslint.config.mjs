@@ -58,9 +58,6 @@ export default tseslint.config(
       'react/jsx-boolean-value': ['error', 'never'],
 
       ...reactHooksPlugin.configs.recommended.rules,
-
-      // Disabled to upgrade to eslint 9
-      '@typescript-eslint/no-empty-object-type': 'off',
     },
   },
 );

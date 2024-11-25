@@ -186,7 +186,7 @@ export const getAdvancedOptionsSet = createSelector(
   ),
 );
 
-export const hasProperties = (obj: {}) => Object.values(obj).some(val => !!val);
+export const hasProperties = (obj: object) => Object.values(obj).some(val => !!val);
 
 const getOutputs = createSelector(
   (state: State) => state,

@@ -2,7 +2,7 @@ import { isEqual } from 'lodash-es';
 import { configureStore, ThunkAction, Reducer, Store, Action } from '@reduxjs/toolkit';
 import { BrowserHistory, Location, Path } from 'history';
 
-export type PlainOrThunk<St, A extends Action<any>> = A | ThunkAction<void, St, {}, A>;
+export type PlainOrThunk<St, A extends Action<any>> = A | ThunkAction<void, St, unknown, A>;
 
 // This is a... dense... attempt at saying "we accept any store with
 // any dispatch so long as it can handle the actions you create". It's

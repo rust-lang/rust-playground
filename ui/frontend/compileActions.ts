@@ -32,7 +32,7 @@ interface Props {
 }
 
 interface CompileActions {
-  action: AsyncThunk<CompileResponseBody, CompileRequestBody, {}>;
+  action: AsyncThunk<CompileResponseBody, CompileRequestBody, object>;
   performCompile: () => ThunkAction;
 }
 
