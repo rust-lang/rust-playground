@@ -165,6 +165,5 @@ export enum Focus {
 }
 
 export enum Notification {
-  DarkMode = 'dark-mode',
   RustSurvey2023 = 'rust-survey-2023',
 }
