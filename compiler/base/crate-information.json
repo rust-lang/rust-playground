@@ -26,7 +26,7 @@
   },
   {
     "name": "allocator-api2",
-    "version": "0.2.20",
+    "version": "0.2.21",
     "id": "allocator_api2"
   },
   {
@@ -56,7 +56,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.93",
+    "version": "1.0.94",
     "id": "anyhow"
   },
   {
@@ -186,7 +186,7 @@
   },
   {
     "name": "bytes",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "id": "bytes"
   },
   {
@@ -196,7 +196,7 @@
   },
   {
     "name": "cc",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "id": "cc"
   },
   {
@@ -211,12 +211,12 @@
   },
   {
     "name": "clap",
-    "version": "4.5.21",
+    "version": "4.5.22",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.5.21",
+    "version": "4.5.22",
     "id": "clap_builder"
   },
   {
@@ -406,13 +406,8 @@
   },
   {
     "name": "errno",
-    "version": "0.3.9",
+    "version": "0.3.10",
     "id": "errno"
-  },
-  {
-    "name": "error-chain",
-    "version": "0.12.4",
-    "id": "error_chain"
   },
   {
     "name": "exr",
@@ -436,7 +431,7 @@
   },
   {
     "name": "faster-hex",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "id": "faster_hex"
   },
   {
@@ -551,7 +546,7 @@
   },
   {
     "name": "generic-array",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "id": "generic_array"
   },
   {
@@ -595,8 +590,13 @@
     "id": "half"
   },
   {
+    "name": "hash32",
+    "version": "0.3.1",
+    "id": "hash32"
+  },
+  {
     "name": "hashbrown",
-    "version": "0.15.1",
+    "version": "0.15.2",
     "id": "hashbrown"
   },
   {
@@ -608,6 +608,11 @@
     "name": "hashlink",
     "version": "0.9.1",
     "id": "hashlink"
+  },
+  {
+    "name": "heapless",
+    "version": "0.8.0",
+    "id": "heapless"
   },
   {
     "name": "heck",
@@ -631,7 +636,7 @@
   },
   {
     "name": "http",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "id": "http"
   },
   {
@@ -761,7 +766,7 @@
   },
   {
     "name": "indexmap",
-    "version": "2.6.0",
+    "version": "2.7.0",
     "id": "indexmap"
   },
   {
@@ -791,7 +796,7 @@
   },
   {
     "name": "itoa",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "id": "itoa"
   },
   {
@@ -816,7 +821,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.164",
+    "version": "0.2.167",
     "id": "libc"
   },
   {
@@ -946,7 +951,7 @@
   },
   {
     "name": "mio",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "id": "mio"
   },
   {
@@ -1321,7 +1326,7 @@
   },
   {
     "name": "rustls",
-    "version": "0.23.18",
+    "version": "0.23.19",
     "id": "rustls"
   },
   {
@@ -1466,7 +1471,7 @@
   },
   {
     "name": "socket2",
-    "version": "0.5.7",
+    "version": "0.5.8",
     "id": "socket2"
   },
   {
@@ -1511,7 +1516,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.89",
+    "version": "2.0.90",
     "id": "syn"
   },
   {
@@ -1546,12 +1551,12 @@
   },
   {
     "name": "terminal_size",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "id": "terminal_size"
   },
   {
     "name": "thiserror",
-    "version": "2.0.3",
+    "version": "2.0.4",
     "id": "thiserror"
   },
   {
@@ -1561,7 +1566,7 @@
   },
   {
     "name": "thiserror-impl",
-    "version": "2.0.3",
+    "version": "2.0.4",
     "id": "thiserror_impl"
   },
   {
@@ -1586,7 +1591,7 @@
   },
   {
     "name": "time",
-    "version": "0.3.36",
+    "version": "0.3.37",
     "id": "time"
   },
   {
@@ -1596,7 +1601,7 @@
   },
   {
     "name": "time-macros",
-    "version": "0.2.18",
+    "version": "0.2.19",
     "id": "time_macros"
   },
   {
@@ -1616,7 +1621,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.41.1",
+    "version": "1.42.0",
     "id": "tokio"
   },
   {
@@ -1651,7 +1656,7 @@
   },
   {
     "name": "tokio-util",
-    "version": "0.7.12",
+    "version": "0.7.13",
     "id": "tokio_util"
   },
   {
@@ -1676,17 +1681,17 @@
   },
   {
     "name": "tracing",
-    "version": "0.1.40",
+    "version": "0.1.41",
     "id": "tracing"
   },
   {
     "name": "tracing-attributes",
-    "version": "0.1.27",
+    "version": "0.1.28",
     "id": "tracing_attributes"
   },
   {
     "name": "tracing-core",
-    "version": "0.1.32",
+    "version": "0.1.33",
     "id": "tracing_core"
   },
   {
@@ -1826,27 +1831,27 @@
   },
   {
     "name": "wasm-bindgen",
-    "version": "0.2.95",
+    "version": "0.2.97",
     "id": "wasm_bindgen"
   },
   {
     "name": "wasm-bindgen-backend",
-    "version": "0.2.95",
+    "version": "0.2.97",
     "id": "wasm_bindgen_backend"
   },
   {
     "name": "wasm-bindgen-macro",
-    "version": "0.2.95",
+    "version": "0.2.97",
     "id": "wasm_bindgen_macro"
   },
   {
     "name": "wasm-bindgen-macro-support",
-    "version": "0.2.95",
+    "version": "0.2.97",
     "id": "wasm_bindgen_macro_support"
   },
   {
     "name": "wasm-bindgen-shared",
-    "version": "0.2.95",
+    "version": "0.2.97",
     "id": "wasm_bindgen_shared"
   },
   {
