@@ -401,10 +401,6 @@ impl LowerRequest for ExecuteRequest {
 
 impl CargoTomlModifier for ExecuteRequest {
     fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
-        if self.edition == Edition::Rust2024 {
-            cargo_toml = modify_cargo_toml::set_feature_edition2024(cargo_toml);
-        }
-
         cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
 
         if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
@@ -534,10 +530,6 @@ impl LowerRequest for CompileRequest {
 
 impl CargoTomlModifier for CompileRequest {
     fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
-        if self.edition == Edition::Rust2024 {
-            cargo_toml = modify_cargo_toml::set_feature_edition2024(cargo_toml);
-        }
-
         cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
 
         if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
@@ -597,10 +589,6 @@ impl LowerRequest for FormatRequest {
 
 impl CargoTomlModifier for FormatRequest {
     fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
-        if self.edition == Edition::Rust2024 {
-            cargo_toml = modify_cargo_toml::set_feature_edition2024(cargo_toml);
-        }
-
         cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
 
         if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
@@ -646,10 +634,6 @@ impl LowerRequest for ClippyRequest {
 
 impl CargoTomlModifier for ClippyRequest {
     fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
-        if self.edition == Edition::Rust2024 {
-            cargo_toml = modify_cargo_toml::set_feature_edition2024(cargo_toml);
-        }
-
         cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
 
         if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
@@ -694,10 +678,6 @@ impl LowerRequest for MiriRequest {
 
 impl CargoTomlModifier for MiriRequest {
     fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
-        if self.edition == Edition::Rust2024 {
-            cargo_toml = modify_cargo_toml::set_feature_edition2024(cargo_toml);
-        }
-
         cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
 
         if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
@@ -744,10 +724,6 @@ impl LowerRequest for MacroExpansionRequest {
 
 impl CargoTomlModifier for MacroExpansionRequest {
     fn modify_cargo_toml(&self, mut cargo_toml: toml::Value) -> toml::Value {
-        if self.edition == Edition::Rust2024 {
-            cargo_toml = modify_cargo_toml::set_feature_edition2024(cargo_toml);
-        }
-
         cargo_toml = modify_cargo_toml::set_edition(cargo_toml, self.edition.to_cargo_toml_key());
 
         if let Some(crate_type) = self.crate_type.to_library_cargo_toml_key() {
