@@ -26,22 +26,6 @@ fn ensure_string_in_vec(values: &mut Vec<String>, val: &str) {
     }
 }
 
-pub fn set_feature_edition2024(cargo_toml: Value) -> Value {
-    #[derive(Debug, Serialize, Deserialize)]
-    #[serde(rename_all = "kebab-case")]
-    struct CargoToml {
-        #[serde(default)]
-        cargo_features: Vec<String>,
-        #[serde(flatten)]
-        other: Other,
-    }
-
-    modify(cargo_toml, |mut cargo_toml: CargoToml| {
-        ensure_string_in_vec(&mut cargo_toml.cargo_features, "edition2024");
-        cargo_toml
-    })
-}
-
 pub fn set_edition(cargo_toml: Value, edition: &str) -> Value {
     #[derive(Debug, Serialize, Deserialize)]
     #[serde(rename_all = "kebab-case")]
