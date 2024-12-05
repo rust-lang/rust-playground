@@ -47,7 +47,7 @@ features = ["std"]
 
 [dependencies.allocator_api2]
 package = "allocator-api2"
-version = "=0.2.20"
+version = "=0.2.21"
 features = ["alloc"]
 default-features = false
 
@@ -76,7 +76,7 @@ version = "=1.1.2"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.93"
+version = "=1.0.94"
 features = ["std"]
 
 [dependencies.approx]
@@ -195,7 +195,7 @@ features = ["std"]
 
 [dependencies.bytes]
 package = "bytes"
-version = "=1.8.0"
+version = "=1.9.0"
 features = ["std"]
 
 [dependencies.bytes_0_4_12]
@@ -204,7 +204,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.2.1"
+version = "=1.2.2"
 features = ["parallel"]
 
 [dependencies.cfg_if]
@@ -218,12 +218,12 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [dependencies.clap]
 package = "clap"
-version = "=4.5.21"
+version = "=4.5.22"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.21"
+version = "=4.5.22"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-ext", "usage", "wrap_help"]
 default-features = false
 
@@ -402,14 +402,9 @@ version = "=1.0.1"
 
 [dependencies.errno]
 package = "errno"
-version = "=0.3.9"
+version = "=0.3.10"
 features = ["std"]
 default-features = false
-
-[dependencies.error_chain]
-package = "error-chain"
-version = "=0.12.4"
-features = ["backtrace", "example_generated"]
 
 [dependencies.exr]
 package = "exr"
@@ -431,7 +426,7 @@ version = "=0.1.9"
 
 [dependencies.faster_hex]
 package = "faster-hex"
-version = "=0.9.0"
+version = "=0.10.0"
 default-features = false
 
 [dependencies.fastrand]
@@ -540,7 +535,7 @@ version = "=0.2.1"
 
 [dependencies.generic_array]
 package = "generic-array"
-version = "=1.1.0"
+version = "=1.1.1"
 features = ["alloc", "const-default", "faster-hex", "internals", "serde", "zeroize"]
 
 [dependencies.generic_array_0_14_7]
@@ -581,9 +576,13 @@ package = "half"
 version = "=2.4.1"
 features = ["alloc", "std"]
 
+[dependencies.hash32]
+package = "hash32"
+version = "=0.3.1"
+
 [dependencies.hashbrown]
 package = "hashbrown"
-version = "=0.15.1"
+version = "=0.15.2"
 features = ["allocator-api2", "default-hasher", "equivalent", "inline-more", "raw-entry"]
 
 [dependencies.hashbrown_0_14_5]
@@ -595,6 +594,10 @@ default-features = false
 [dependencies.hashlink]
 package = "hashlink"
 version = "=0.9.1"
+
+[dependencies.heapless]
+package = "heapless"
+version = "=0.8.0"
 
 [dependencies.heck]
 package = "heck"
@@ -614,7 +617,7 @@ version = "=0.26.0"
 
 [dependencies.http]
 package = "http"
-version = "=1.1.0"
+version = "=1.2.0"
 features = ["std"]
 
 [dependencies.http_body]
@@ -735,7 +738,7 @@ features = ["deprecated"]
 
 [dependencies.indexmap]
 package = "indexmap"
-version = "=2.6.0"
+version = "=2.7.0"
 features = ["std"]
 
 [dependencies.iovec]
@@ -763,7 +766,7 @@ features = ["use_alloc", "use_std"]
 
 [dependencies.itoa]
 package = "itoa"
-version = "=1.0.13"
+version = "=1.0.14"
 
 [dependencies.jobserver]
 package = "jobserver"
@@ -784,7 +787,7 @@ version = "=0.5.2"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.164"
+version = "=0.2.167"
 features = ["extra_traits", "std"]
 
 [dependencies.libm]
@@ -908,7 +911,7 @@ features = ["simd", "simd-adler32", "with-alloc"]
 
 [dependencies.mio]
 package = "mio"
-version = "=1.0.2"
+version = "=1.0.3"
 features = ["log", "net", "os-ext", "os-poll"]
 
 [dependencies.nalgebra]
@@ -1257,7 +1260,7 @@ features = ["alloc", "fs", "libc-extra-traits", "std", "termios", "use-libc-auxv
 
 [dependencies.rustls]
 package = "rustls"
-version = "=0.23.18"
+version = "=0.23.19"
 features = ["std", "tls12"]
 default-features = false
 
@@ -1392,7 +1395,7 @@ features = ["const_generics", "const_new"]
 
 [dependencies.socket2]
 package = "socket2"
-version = "=0.5.7"
+version = "=0.5.8"
 features = ["all"]
 
 [dependencies.spin]
@@ -1433,7 +1436,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=2.0.89"
+version = "=2.0.90"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1466,11 +1469,11 @@ version = "=0.4.3"
 
 [dependencies.terminal_size]
 package = "terminal_size"
-version = "=0.4.0"
+version = "=0.4.1"
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=2.0.3"
+version = "=2.0.4"
 features = ["std"]
 
 [dependencies.thiserror_1_0_69]
@@ -1479,7 +1482,7 @@ version = "=1.0.69"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=2.0.3"
+version = "=2.0.4"
 
 [dependencies.thiserror_impl_1_0_69]
 package = "thiserror-impl"
@@ -1499,7 +1502,7 @@ version = "=0.9.1"
 
 [dependencies.time]
 package = "time"
-version = "=0.3.36"
+version = "=0.3.37"
 features = ["alloc", "formatting", "macros", "parsing", "std"]
 
 [dependencies.time_core]
@@ -1508,7 +1511,7 @@ version = "=0.1.2"
 
 [dependencies.time_macros]
 package = "time-macros"
-version = "=0.2.18"
+version = "=0.2.19"
 features = ["formatting", "parsing"]
 
 [dependencies.tinystr]
@@ -1528,7 +1531,7 @@ version = "=0.1.1"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.41.1"
+version = "=1.42.0"
 features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "mio", "net", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "windows-sys"]
 
 [dependencies.tokio_io]
@@ -1561,7 +1564,7 @@ features = ["time"]
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.12"
+version = "=0.7.13"
 features = ["codec", "compat", "full", "futures-io", "futures-util", "hashbrown", "io", "io-util", "net", "rt", "slab", "time"]
 
 [dependencies.toml]
@@ -1586,17 +1589,17 @@ version = "=0.3.3"
 
 [dependencies.tracing]
 package = "tracing"
-version = "=0.1.40"
+version = "=0.1.41"
 features = ["attributes", "std", "tracing-attributes"]
 
 [dependencies.tracing_attributes]
 package = "tracing-attributes"
-version = "=0.1.27"
+version = "=0.1.28"
 
 [dependencies.tracing_core]
 package = "tracing-core"
-version = "=0.1.32"
-features = ["once_cell", "std", "valuable"]
+version = "=0.1.33"
+features = ["once_cell", "std"]
 
 [dependencies.trpl]
 package = "trpl"
@@ -1716,27 +1719,30 @@ version = "=0.3.1"
 
 [dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.95"
+version = "=0.2.97"
 features = ["spans", "std"]
 
 [dependencies.wasm_bindgen_backend]
 package = "wasm-bindgen-backend"
-version = "=0.2.95"
-features = ["spans"]
+version = "=0.2.97"
+features = ["atomics", "spans", "std"]
+default-features = false
 
 [dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.95"
-features = ["spans"]
+version = "=0.2.97"
+features = ["atomics", "spans", "std"]
+default-features = false
 
 [dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.95"
-features = ["spans"]
+version = "=0.2.97"
+features = ["atomics", "spans", "std"]
+default-features = false
 
 [dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.95"
+version = "=0.2.97"
 
 [dependencies.webpki]
 package = "rustls-webpki"
@@ -1763,7 +1769,7 @@ default-features = false
 [dependencies.windows_sys]
 package = "windows-sys"
 version = "=0.59.0"
-features = ["Win32", "Win32_Foundation", "Win32_Security", "Win32_Security_Authentication", "Win32_Security_Authentication_Identity", "Win32_Security_Credentials", "Win32_Security_Cryptography", "Win32_Storage", "Win32_Storage_FileSystem", "Win32_System", "Win32_System_Console", "Win32_System_LibraryLoader", "Win32_System_Memory", "Win32_System_SystemInformation"]
+features = ["Win32", "Win32_Foundation", "Win32_Security", "Win32_Security_Authentication", "Win32_Security_Authentication_Identity", "Win32_Security_Credentials", "Win32_Security_Cryptography", "Win32_Storage", "Win32_Storage_FileSystem", "Win32_System", "Win32_System_Console", "Win32_System_Diagnostics", "Win32_System_Diagnostics_Debug", "Win32_System_LibraryLoader", "Win32_System_Memory", "Win32_System_SystemInformation"]
 
 [dependencies.windows_targets]
 package = "windows-targets"
@@ -1885,7 +1891,7 @@ features = ["std"]
 
 [build-dependencies.allocator_api2]
 package = "allocator-api2"
-version = "=0.2.20"
+version = "=0.2.21"
 features = ["alloc"]
 default-features = false
 
@@ -1914,7 +1920,7 @@ version = "=1.1.2"
 
 [build-dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.93"
+version = "=1.0.94"
 features = ["std"]
 
 [build-dependencies.approx]
@@ -2033,7 +2039,7 @@ features = ["std"]
 
 [build-dependencies.bytes]
 package = "bytes"
-version = "=1.8.0"
+version = "=1.9.0"
 features = ["std"]
 
 [build-dependencies.bytes_0_4_12]
@@ -2042,7 +2048,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.2.1"
+version = "=1.2.2"
 features = ["parallel"]
 
 [build-dependencies.cfg_if]
@@ -2056,12 +2062,12 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [build-dependencies.clap]
 package = "clap"
-version = "=4.5.21"
+version = "=4.5.22"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build-dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.21"
+version = "=4.5.22"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-ext", "usage", "wrap_help"]
 default-features = false
 
@@ -2240,14 +2246,9 @@ version = "=1.0.1"
 
 [build-dependencies.errno]
 package = "errno"
-version = "=0.3.9"
+version = "=0.3.10"
 features = ["std"]
 default-features = false
-
-[build-dependencies.error_chain]
-package = "error-chain"
-version = "=0.12.4"
-features = ["backtrace", "example_generated"]
 
 [build-dependencies.exr]
 package = "exr"
@@ -2269,7 +2270,7 @@ version = "=0.1.9"
 
 [build-dependencies.faster_hex]
 package = "faster-hex"
-version = "=0.9.0"
+version = "=0.10.0"
 default-features = false
 
 [build-dependencies.fastrand]
@@ -2378,7 +2379,7 @@ version = "=0.2.1"
 
 [build-dependencies.generic_array]
 package = "generic-array"
-version = "=1.1.0"
+version = "=1.1.1"
 features = ["alloc", "const-default", "faster-hex", "internals", "serde", "zeroize"]
 
 [build-dependencies.generic_array_0_14_7]
@@ -2419,9 +2420,13 @@ package = "half"
 version = "=2.4.1"
 features = ["alloc", "std"]
 
+[build-dependencies.hash32]
+package = "hash32"
+version = "=0.3.1"
+
 [build-dependencies.hashbrown]
 package = "hashbrown"
-version = "=0.15.1"
+version = "=0.15.2"
 features = ["allocator-api2", "default-hasher", "equivalent", "inline-more", "raw-entry"]
 
 [build-dependencies.hashbrown_0_14_5]
@@ -2433,6 +2438,10 @@ default-features = false
 [build-dependencies.hashlink]
 package = "hashlink"
 version = "=0.9.1"
+
+[build-dependencies.heapless]
+package = "heapless"
+version = "=0.8.0"
 
 [build-dependencies.heck]
 package = "heck"
@@ -2452,7 +2461,7 @@ version = "=0.26.0"
 
 [build-dependencies.http]
 package = "http"
-version = "=1.1.0"
+version = "=1.2.0"
 features = ["std"]
 
 [build-dependencies.http_body]
@@ -2573,7 +2582,7 @@ features = ["deprecated"]
 
 [build-dependencies.indexmap]
 package = "indexmap"
-version = "=2.6.0"
+version = "=2.7.0"
 features = ["std"]
 
 [build-dependencies.iovec]
@@ -2601,7 +2610,7 @@ features = ["use_alloc", "use_std"]
 
 [build-dependencies.itoa]
 package = "itoa"
-version = "=1.0.13"
+version = "=1.0.14"
 
 [build-dependencies.jobserver]
 package = "jobserver"
@@ -2622,7 +2631,7 @@ version = "=0.5.2"
 
 [build-dependencies.libc]
 package = "libc"
-version = "=0.2.164"
+version = "=0.2.167"
 features = ["extra_traits", "std"]
 
 [build-dependencies.libm]
@@ -2746,7 +2755,7 @@ features = ["simd", "simd-adler32", "with-alloc"]
 
 [build-dependencies.mio]
 package = "mio"
-version = "=1.0.2"
+version = "=1.0.3"
 features = ["log", "net", "os-ext", "os-poll"]
 
 [build-dependencies.nalgebra]
@@ -3095,7 +3104,7 @@ features = ["alloc", "fs", "libc-extra-traits", "std", "termios", "use-libc-auxv
 
 [build-dependencies.rustls]
 package = "rustls"
-version = "=0.23.18"
+version = "=0.23.19"
 features = ["std", "tls12"]
 default-features = false
 
@@ -3230,7 +3239,7 @@ features = ["const_generics", "const_new"]
 
 [build-dependencies.socket2]
 package = "socket2"
-version = "=0.5.7"
+version = "=0.5.8"
 features = ["all"]
 
 [build-dependencies.spin]
@@ -3271,7 +3280,7 @@ default-features = false
 
 [build-dependencies.syn]
 package = "syn"
-version = "=2.0.89"
+version = "=2.0.90"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [build-dependencies.syn_1_0_109]
@@ -3304,11 +3313,11 @@ version = "=0.4.3"
 
 [build-dependencies.terminal_size]
 package = "terminal_size"
-version = "=0.4.0"
+version = "=0.4.1"
 
 [build-dependencies.thiserror]
 package = "thiserror"
-version = "=2.0.3"
+version = "=2.0.4"
 features = ["std"]
 
 [build-dependencies.thiserror_1_0_69]
@@ -3317,7 +3326,7 @@ version = "=1.0.69"
 
 [build-dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=2.0.3"
+version = "=2.0.4"
 
 [build-dependencies.thiserror_impl_1_0_69]
 package = "thiserror-impl"
@@ -3337,7 +3346,7 @@ version = "=0.9.1"
 
 [build-dependencies.time]
 package = "time"
-version = "=0.3.36"
+version = "=0.3.37"
 features = ["alloc", "formatting", "macros", "parsing", "std"]
 
 [build-dependencies.time_core]
@@ -3346,7 +3355,7 @@ version = "=0.1.2"
 
 [build-dependencies.time_macros]
 package = "time-macros"
-version = "=0.2.18"
+version = "=0.2.19"
 features = ["formatting", "parsing"]
 
 [build-dependencies.tinystr]
@@ -3366,7 +3375,7 @@ version = "=0.1.1"
 
 [build-dependencies.tokio]
 package = "tokio"
-version = "=1.41.1"
+version = "=1.42.0"
 features = ["bytes", "fs", "full", "io-std", "io-util", "libc", "macros", "mio", "net", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "socket2", "sync", "test-util", "time", "tokio-macros", "windows-sys"]
 
 [build-dependencies.tokio_io]
@@ -3399,7 +3408,7 @@ features = ["time"]
 
 [build-dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.12"
+version = "=0.7.13"
 features = ["codec", "compat", "full", "futures-io", "futures-util", "hashbrown", "io", "io-util", "net", "rt", "slab", "time"]
 
 [build-dependencies.toml]
@@ -3424,17 +3433,17 @@ version = "=0.3.3"
 
 [build-dependencies.tracing]
 package = "tracing"
-version = "=0.1.40"
+version = "=0.1.41"
 features = ["attributes", "std", "tracing-attributes"]
 
 [build-dependencies.tracing_attributes]
 package = "tracing-attributes"
-version = "=0.1.27"
+version = "=0.1.28"
 
 [build-dependencies.tracing_core]
 package = "tracing-core"
-version = "=0.1.32"
-features = ["once_cell", "std", "valuable"]
+version = "=0.1.33"
+features = ["once_cell", "std"]
 
 [build-dependencies.trpl]
 package = "trpl"
@@ -3554,27 +3563,30 @@ version = "=0.3.1"
 
 [build-dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.95"
+version = "=0.2.97"
 features = ["spans", "std"]
 
 [build-dependencies.wasm_bindgen_backend]
 package = "wasm-bindgen-backend"
-version = "=0.2.95"
-features = ["spans"]
+version = "=0.2.97"
+features = ["atomics", "spans", "std"]
+default-features = false
 
 [build-dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.95"
-features = ["spans"]
+version = "=0.2.97"
+features = ["atomics", "spans", "std"]
+default-features = false
 
 [build-dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.95"
-features = ["spans"]
+version = "=0.2.97"
+features = ["atomics", "spans", "std"]
+default-features = false
 
 [build-dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.95"
+version = "=0.2.97"
 
 [build-dependencies.webpki]
 package = "rustls-webpki"
@@ -3601,7 +3613,7 @@ default-features = false
 [build-dependencies.windows_sys]
 package = "windows-sys"
 version = "=0.59.0"
-features = ["Win32", "Win32_Foundation", "Win32_Security", "Win32_Security_Authentication", "Win32_Security_Authentication_Identity", "Win32_Security_Credentials", "Win32_Security_Cryptography", "Win32_Storage", "Win32_Storage_FileSystem", "Win32_System", "Win32_System_Console", "Win32_System_LibraryLoader", "Win32_System_Memory", "Win32_System_SystemInformation"]
+features = ["Win32", "Win32_Foundation", "Win32_Security", "Win32_Security_Authentication", "Win32_Security_Authentication_Identity", "Win32_Security_Credentials", "Win32_Security_Cryptography", "Win32_Storage", "Win32_Storage_FileSystem", "Win32_System", "Win32_System_Console", "Win32_System_Diagnostics", "Win32_System_Diagnostics_Debug", "Win32_System_LibraryLoader", "Win32_System_Memory", "Win32_System_SystemInformation"]
 
 [build-dependencies.windows_targets]
 package = "windows-targets"
