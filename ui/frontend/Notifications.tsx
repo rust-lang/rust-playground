@@ -3,88 +3,36 @@ import { Portal } from 'react-portal';
 
 import { Close } from './Icon';
 import { useAppDispatch, useAppSelector } from './hooks';
-import { swapTheme } from './reducers/configuration';
-import { seenDarkMode, seenRustSurvey2023 } from './reducers/notifications';
+import { seenRustSurvey2024 } from './reducers/notifications';
 import { allowLongRun, wsExecuteKillCurrent } from './reducers/output/execute';
 import * as selectors from './selectors';
-import { Theme } from './types';
 
 import * as styles from './Notifications.module.css';
 
-const SURVEY_URL = 'https://blog.rust-lang.org/2023/12/18/survey-launch.html';
+const SURVEY_URL = 'https://blog.rust-lang.org/2024/12/05/annual-survey-2024-launch.html';
 
 const Notifications: React.FC = () => {
   return (
     <Portal>
       <div className={styles.container}>
-        <DarkModeNotification />
-        <RustSurvey2023Notification />
+        <RustSurvey2024Notification />
         <ExcessiveExecutionNotification />
       </div>
     </Portal>
   );
 };
 
-const DarkModeNotification: React.FC = () => {
-  const showIt = useAppSelector(selectors.showDarkModeSelector);
+const RustSurvey2024Notification: React.FC = () => {
+  const showIt = useAppSelector(selectors.showRustSurvey2024Selector);
 
   const dispatch = useAppDispatch();
-  const seenIt = useCallback(() => dispatch(seenDarkMode()), [dispatch]);
-  const swapToLight = useCallback(() => dispatch(swapTheme(Theme.Light)), [dispatch]);
-  const swapToDark = useCallback(() => dispatch(swapTheme(Theme.Dark)), [dispatch]);
-  const swapToSystem = useCallback(() => dispatch(swapTheme(Theme.System)), [dispatch]);
-
-  return showIt ? (
-    <Notification onClose={seenIt}>
-      <p>The playground now has a dark mode! Sample the themes here:</p>
-
-      <table>
-        <tr>
-          <th>
-            <button className={styles.swapTheme} onClick={swapToSystem}>
-              System
-            </button>
-          </th>
-          <td>Use your system&apos;s preference</td>
-        </tr>
-
-        <tr>
-          <th>
-            <button className={styles.swapTheme} onClick={swapToLight}>
-              Light
-            </button>
-          </th>
-          <td>The classic playground style</td>
-        </tr>
-
-        <tr>
-          <th>
-            <button className={styles.swapTheme} onClick={swapToDark}>
-              Dark
-            </button>
-          </th>
-          <td>Reduce the number of photons hitting your eyeballs</td>
-        </tr>
-      </table>
-
-      <p>
-        You can change the current UI theme (and the editor&apos;s theme) in the configuration menu.
-      </p>
-    </Notification>
-  ) : null;
-};
-
-const RustSurvey2023Notification: React.FC = () => {
-  const showIt = useAppSelector(selectors.showRustSurvey2023Selector);
-
-  const dispatch = useAppDispatch();
-  const seenIt = useCallback(() => dispatch(seenRustSurvey2023()), [dispatch]);
+  const seenIt = useCallback(() => dispatch(seenRustSurvey2024()), [dispatch]);
 
   return showIt ? (
     <Notification onClose={seenIt}>
       Please help us take a look at who the Rust community is composed of, how the Rust project is
       doing, and how we can improve the Rust programming experience by completing the{' '}
-      <a href={SURVEY_URL}>2023 State of Rust Survey</a>. Whether or not you use Rust today, we want
+      <a href={SURVEY_URL}>2024 State of Rust Survey</a>. Whether or not you use Rust today, we want
       to know your opinions.
     </Notification>
   ) : null;

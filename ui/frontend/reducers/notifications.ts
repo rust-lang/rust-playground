@@ -10,8 +10,9 @@ interface State {
   seenRustSurvey2021: boolean; // expired
   seenMonacoEditorAvailable: boolean; // expired
   seenRustSurvey2022: boolean; // expired
-  seenRustSurvey2023: boolean;
-  seenDarkMode: boolean;
+  seenRustSurvey2023: boolean; // expired
+  seenDarkMode: boolean; // expired
+  seenRustSurvey2024: boolean;
 }
 
 const initialState: State = {
@@ -22,8 +23,9 @@ const initialState: State = {
   seenRustSurvey2021: true,
   seenMonacoEditorAvailable: true,
   seenRustSurvey2022: true,
-  seenRustSurvey2023: false,
-  seenDarkMode: false,
+  seenRustSurvey2023: true,
+  seenDarkMode: true,
+  seenRustSurvey2024: false,
 };
 
 const slice = createSlice({
@@ -32,12 +34,8 @@ const slice = createSlice({
   reducers: {
     notificationSeen: (state, action: PayloadAction<Notification>) => {
       switch (action.payload) {
-        case Notification.DarkMode: {
-          state.seenDarkMode = true;
-          break;
-        }
-        case Notification.RustSurvey2023: {
-          state.seenRustSurvey2023 = true;
+        case Notification.RustSurvey2024: {
+          state.seenRustSurvey2024 = true;
           break;
         }
       }
@@ -47,7 +45,6 @@ const slice = createSlice({
 
 const { notificationSeen } = slice.actions;
 
-export const seenDarkMode = () => notificationSeen(Notification.DarkMode);
-export const seenRustSurvey2023 = () => notificationSeen(Notification.RustSurvey2023);
+export const seenRustSurvey2024 = () => notificationSeen(Notification.RustSurvey2024);
 
 export default slice.reducer;
