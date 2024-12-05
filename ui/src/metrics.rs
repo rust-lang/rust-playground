@@ -361,6 +361,8 @@ impl HasLabelsCore for coordinator::MiriRequest {
             channel,
             crate_type,
             edition,
+            // REVIEW: should I add aliasing_model to `LabelsCore`?
+            aliasing_model: _,
             code: _,
         } = *self;
 
