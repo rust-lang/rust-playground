@@ -1817,12 +1817,12 @@ version = "=0.7.5"
 
 [dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.7.35"
+version = "=0.8.14"
 features = ["__internal_use_only_features_that_work_on_stable", "alloc", "byteorder", "derive", "simd", "zerocopy-derive"]
 
 [dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.7.35"
+version = "=0.8.14"
 
 [dependencies.zerofrom]
 package = "zerofrom"
