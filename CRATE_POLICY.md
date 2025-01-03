@@ -5,8 +5,15 @@ The playground selects a number of root crates to include:
 - The top 100 crates based on [all time downloads][]
 - Crates from the [Rust cookbook][]
 
-The latest stable version of these crates are available, as well as
-whatever dependencies these crates require.
+A recent non-[prerelease][] version of these crates are available, as
+well as whatever dependencies these crates require.
+
+Please do not open issues or pull requests about adding or updating
+crates available in the playground. This list is maintained
+semi-automatically and all crates are updated at once to reduce
+duplicate work. The update frequency is sporadic, but usually
+corresponds to when a new stable version of Rust is released: every
+six weeks.
 
 ## Why is there a policy?
 
@@ -17,7 +24,7 @@ project. It would be infeasible to provide every possible crate.
 This inclusion policy is used to avoid "playing favorites" for which
 crates are available. Hand-picking crates will lead to resentment
 about which crates were not included between the playground
-maintainers and crate authors or even the broader Rust community. 
+maintainers and crate authors or even the broader Rust community.
 Neither of these outcomes is desired.
 
 ## Exclusion policy
@@ -40,6 +47,7 @@ We are open to well-reasoned [alternate algorithms][], but be aware
 that any proposal would likely be expected to also provide the
 majority of implementation work.
 
+[prerelease]: https://semver.org/#spec-item-9
 [all time downloads]: https://crates.io/crates?sort=downloads
 [Rust cookbook]: https://rust-lang-nursery.github.io/rust-cookbook/
 [alternate algorithms]: https://github.com/rust-lang/rust-playground/issues/101
