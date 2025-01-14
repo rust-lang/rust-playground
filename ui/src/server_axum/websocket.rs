@@ -380,7 +380,7 @@ async fn handle_core(
                         // browser disconnected
                         break;
                     }
-                    Some(Ok(Message::Text(txt))) => handle_msg(txt, &tx, &mut manager, &mut active_executions, &db).await,
+                    Some(Ok(Message::Text(txt))) => handle_msg(&txt, &tx, &mut manager, &mut active_executions, &db).await,
                     Some(Ok(_)) => {
                         // unknown message type
                         continue;
@@ -507,7 +507,7 @@ fn response_to_message(response: MessageResponse) -> Message {
     const LAST_CHANCE_ERROR: &str =
         r#"{ "type": "WEBSOCKET_ERROR", "error": "Unable to serialize JSON" }"#;
     let resp = serde_json::to_string(&response).unwrap_or_else(|_| LAST_CHANCE_ERROR.into());
-    Message::Text(resp)
+    Message::Text(resp.into())
 }
 
 async fn handle_idle(manager: &mut CoordinatorManager, tx: &ResponseTx) -> ControlFlow<()> {
@@ -528,7 +528,7 @@ async fn handle_idle(manager: &mut CoordinatorManager, tx: &ResponseTx) -> Contr
 type ActiveExecutionInfo = (CancellationToken, Option<mpsc::Sender<String>>);
 
 async fn handle_msg(
-    txt: String,
+    txt: &str,
     tx: &ResponseTx,
     manager: &mut CoordinatorManager,
     active_executions: &mut BTreeMap<i64, ActiveExecutionInfo>,
@@ -536,14 +536,14 @@ async fn handle_msg(
 ) {
     use WSMessageRequest::*;
 
-    let msg = serde_json::from_str(&txt).context(DeserializationSnafu);
+    let msg = serde_json::from_str(txt).context(DeserializationSnafu);
 
     match msg {
         Ok(ExecuteRequest { payload, meta }) => {
             let token = CancellationToken::new();
             let (execution_tx, execution_rx) = mpsc::channel(8);
 
-            let guard = db.clone().start_with_guard("ws.Execute", &txt).await;
+            let guard = db.clone().start_with_guard("ws.Execute", txt).await;
 
             active_executions.insert(meta.sequence_number, (token.clone(), Some(execution_tx)));
 

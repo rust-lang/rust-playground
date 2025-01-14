@@ -7,7 +7,6 @@ use crate::{
     request_database::Handle,
     Config, GhToken, MetricsToken, WebSocketConfig,
 };
-use async_trait::async_trait;
 use axum::{
     body::Body,
     extract::{self, ws::WebSocketUpgrade, Extension, Path},
@@ -100,7 +99,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/meta/versions", get(meta_versions))
         .route("/meta/gist", post(meta_gist_create))
         .route("/meta/gist/", post(meta_gist_create)) // compatibility with lax frontend code
-        .route("/meta/gist/:id", get(meta_gist_get))
+        .route("/meta/gist/{id}", get(meta_gist_get))
         .route("/metrics", get(metrics))
         .route("/websocket", get(websocket))
         .route("/nowebsocket", post(nowebsocket))
@@ -712,7 +711,6 @@ enum CacheVersionsError {
     Shutdown { source: coordinator::Error },
 }
 
-#[async_trait]
 impl<S> extract::FromRequestParts<S> for MetricsAuthorization
 where
     S: Send + Sync,
@@ -756,7 +754,6 @@ impl IntoResponse for Error {
 /// error and format it using our expected JSON error object.
 struct Json<T>(T);
 
-#[async_trait]
 impl<T, S> extract::FromRequest<S> for Json<T>
 where
     T: serde::de::DeserializeOwned,
