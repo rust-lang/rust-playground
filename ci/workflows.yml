@@ -236,7 +236,7 @@ workflows:
           - name: "Configure Ruby"
             uses: ruby/setup-ruby@v1
             with:
-              ruby-version: '3.0.2'
+              ruby-version: '3.3.6'
 
           - name: "Cache bundler intermediate products"
             uses: actions/cache@v4
