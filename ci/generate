@@ -6,7 +6,7 @@ require 'psych'
 
 workflows_path = Pathname.new(__dir__).join('..', '.github', 'workflows')
 
-workflows = Psych.load_file("workflows.yml")
+workflows = Psych.load_file("workflows.yml", aliases: true)
 workflows['workflows'].each do |k, v|
   # Roundtrip through JSON to perform a deep clone of the value.
   # If we don't, then anchors are preserved from the input file
