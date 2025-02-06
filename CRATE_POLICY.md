@@ -47,7 +47,25 @@ We are open to well-reasoned [alternate algorithms][], but be aware
 that any proposal would likely be expected to also provide the
 majority of implementation work.
 
+## I am a crate author and I want to control which features are available
+
+When a crate is included in the playground, its Cargo.toml is
+inspected for special metadata, similar to the [docs.rs
+metadata][]. This will control what features we enable in addition to
+the features needed by dependencies.
+
+```toml
+[package]
+name = "test"
+
+[package.metadata.playground]
+default-features = true
+features = ["std", "extra-traits"]
+all-features = false
+```
+
 [prerelease]: https://semver.org/#spec-item-9
 [all time downloads]: https://crates.io/crates?sort=downloads
 [Rust cookbook]: https://rust-lang-nursery.github.io/rust-cookbook/
 [alternate algorithms]: https://github.com/rust-lang/rust-playground/issues/101
+[docs.rs metadata]: https://docs.rs/about/metadata

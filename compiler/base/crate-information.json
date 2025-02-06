@@ -81,7 +81,7 @@
   },
   {
     "name": "async-trait",
-    "version": "0.1.85",
+    "version": "0.1.86",
     "id": "async_trait"
   },
   {
@@ -111,12 +111,12 @@
   },
   {
     "name": "aws-lc-rs",
-    "version": "1.12.0",
+    "version": "1.12.2",
     "id": "aws_lc_rs"
   },
   {
     "name": "aws-lc-sys",
-    "version": "0.24.1",
+    "version": "0.25.1",
     "id": "aws_lc_sys"
   },
   {
@@ -146,7 +146,7 @@
   },
   {
     "name": "bitflags",
-    "version": "2.7.0",
+    "version": "2.8.0",
     "id": "bitflags"
   },
   {
@@ -171,7 +171,7 @@
   },
   {
     "name": "bumpalo",
-    "version": "3.16.0",
+    "version": "3.17.0",
     "id": "bumpalo"
   },
   {
@@ -196,7 +196,7 @@
   },
   {
     "name": "bytes",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "id": "bytes"
   },
   {
@@ -206,7 +206,7 @@
   },
   {
     "name": "cc",
-    "version": "1.2.9",
+    "version": "1.2.12",
     "id": "cc"
   },
   {
@@ -221,17 +221,17 @@
   },
   {
     "name": "clap",
-    "version": "4.5.26",
+    "version": "4.5.28",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.5.26",
+    "version": "4.5.27",
     "id": "clap_builder"
   },
   {
     "name": "clap_derive",
-    "version": "4.5.24",
+    "version": "4.5.28",
     "id": "clap_derive"
   },
   {
@@ -241,7 +241,7 @@
   },
   {
     "name": "cmake",
-    "version": "0.1.52",
+    "version": "0.1.53",
     "id": "cmake"
   },
   {
@@ -271,7 +271,7 @@
   },
   {
     "name": "cpufeatures",
-    "version": "0.2.16",
+    "version": "0.2.17",
     "id": "cpufeatures"
   },
   {
@@ -336,7 +336,7 @@
   },
   {
     "name": "data-encoding",
-    "version": "2.6.0",
+    "version": "2.7.0",
     "id": "data_encoding"
   },
   {
@@ -353,11 +353,6 @@
     "name": "derivative",
     "version": "2.2.0",
     "id": "derivative"
-  },
-  {
-    "name": "derive_more",
-    "version": "0.99.18",
-    "id": "derive_more"
   },
   {
     "name": "destructure_traitobject",
@@ -591,8 +586,13 @@
   },
   {
     "name": "getrandom",
-    "version": "0.2.15",
+    "version": "0.3.1",
     "id": "getrandom"
+  },
+  {
+    "name": "getrandom",
+    "version": "0.2.15",
+    "id": "getrandom_0_2_15"
   },
   {
     "name": "gif",
@@ -630,13 +630,8 @@
     "id": "hashbrown"
   },
   {
-    "name": "hashbrown",
-    "version": "0.14.5",
-    "id": "hashbrown_0_14_5"
-  },
-  {
     "name": "hashlink",
-    "version": "0.9.1",
+    "version": "0.10.0",
     "id": "hashlink"
   },
   {
@@ -686,7 +681,7 @@
   },
   {
     "name": "httparse",
-    "version": "1.9.5",
+    "version": "1.10.0",
     "id": "httparse"
   },
   {
@@ -701,7 +696,7 @@
   },
   {
     "name": "hyper",
-    "version": "1.5.2",
+    "version": "1.6.0",
     "id": "hyper"
   },
   {
@@ -801,7 +796,7 @@
   },
   {
     "name": "indexmap",
-    "version": "2.7.0",
+    "version": "2.7.1",
     "id": "indexmap"
   },
   {
@@ -811,7 +806,7 @@
   },
   {
     "name": "ipnet",
-    "version": "2.10.1",
+    "version": "2.11.0",
     "id": "ipnet"
   },
   {
@@ -833,6 +828,11 @@
     "name": "itoa",
     "version": "1.0.14",
     "id": "itoa"
+  },
+  {
+    "name": "jiff",
+    "version": "0.1.29",
+    "id": "jiff"
   },
   {
     "name": "jobserver",
@@ -866,7 +866,7 @@
   },
   {
     "name": "libsqlite3-sys",
-    "version": "0.30.1",
+    "version": "0.31.0",
     "id": "libsqlite3_sys"
   },
   {
@@ -1001,7 +1001,7 @@
   },
   {
     "name": "native-tls",
-    "version": "0.2.12",
+    "version": "0.2.13",
     "id": "native_tls"
   },
   {
@@ -1081,7 +1081,7 @@
   },
   {
     "name": "openssl",
-    "version": "0.10.68",
+    "version": "0.10.70",
     "id": "openssl"
   },
   {
@@ -1091,12 +1091,12 @@
   },
   {
     "name": "openssl-probe",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "id": "openssl_probe"
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.104",
+    "version": "0.9.105",
     "id": "openssl_sys"
   },
   {
@@ -1201,17 +1201,17 @@
   },
   {
     "name": "postgres",
-    "version": "0.19.9",
+    "version": "0.19.10",
     "id": "postgres"
   },
   {
     "name": "postgres-protocol",
-    "version": "0.6.7",
+    "version": "0.6.8",
     "id": "postgres_protocol"
   },
   {
     "name": "postgres-types",
-    "version": "0.2.8",
+    "version": "0.2.9",
     "id": "postgres_types"
   },
   {
@@ -1271,22 +1271,37 @@
   },
   {
     "name": "rand",
-    "version": "0.8.5",
+    "version": "0.9.0",
     "id": "rand"
+  },
+  {
+    "name": "rand",
+    "version": "0.8.5",
+    "id": "rand_0_8_5"
+  },
+  {
+    "name": "rand_chacha",
+    "version": "0.9.0",
+    "id": "rand_chacha"
   },
   {
     "name": "rand_chacha",
     "version": "0.3.1",
-    "id": "rand_chacha"
+    "id": "rand_chacha_0_3_1"
+  },
+  {
+    "name": "rand_core",
+    "version": "0.9.0",
+    "id": "rand_core"
   },
   {
     "name": "rand_core",
     "version": "0.6.4",
-    "id": "rand_core"
+    "id": "rand_core_0_6_4"
   },
   {
     "name": "rand_distr",
-    "version": "0.4.3",
+    "version": "0.5.0",
     "id": "rand_distr"
   },
   {
@@ -1346,7 +1361,7 @@
   },
   {
     "name": "rusqlite",
-    "version": "0.32.1",
+    "version": "0.33.0",
     "id": "rusqlite"
   },
   {
@@ -1361,12 +1376,12 @@
   },
   {
     "name": "rustix",
-    "version": "0.38.43",
+    "version": "0.38.44",
     "id": "rustix"
   },
   {
     "name": "rustls",
-    "version": "0.23.21",
+    "version": "0.23.22",
     "id": "rustls"
   },
   {
@@ -1376,7 +1391,7 @@
   },
   {
     "name": "rustls-pki-types",
-    "version": "1.10.1",
+    "version": "1.11.0",
     "id": "rustls_pki_types"
   },
   {
@@ -1386,7 +1401,7 @@
   },
   {
     "name": "ryu",
-    "version": "1.0.18",
+    "version": "1.0.19",
     "id": "ryu"
   },
   {
@@ -1421,7 +1436,7 @@
   },
   {
     "name": "semver",
-    "version": "1.0.24",
+    "version": "1.0.25",
     "id": "semver"
   },
   {
@@ -1436,7 +1451,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.135",
+    "version": "1.0.138",
     "id": "serde_json"
   },
   {
@@ -1541,12 +1556,12 @@
   },
   {
     "name": "string_cache",
-    "version": "0.8.7",
+    "version": "0.8.8",
     "id": "string_cache"
   },
   {
     "name": "string_cache_codegen",
-    "version": "0.5.2",
+    "version": "0.5.3",
     "id": "string_cache_codegen"
   },
   {
@@ -1566,7 +1581,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.96",
+    "version": "2.0.98",
     "id": "syn"
   },
   {
@@ -1591,7 +1606,7 @@
   },
   {
     "name": "tempfile",
-    "version": "3.15.0",
+    "version": "3.16.0",
     "id": "tempfile"
   },
   {
@@ -1691,7 +1706,7 @@
   },
   {
     "name": "tokio-postgres",
-    "version": "0.7.12",
+    "version": "0.7.13",
     "id": "tokio_postgres"
   },
   {
@@ -1711,7 +1726,7 @@
   },
   {
     "name": "toml",
-    "version": "0.8.19",
+    "version": "0.8.20",
     "id": "toml"
   },
   {
@@ -1721,7 +1736,7 @@
   },
   {
     "name": "toml_edit",
-    "version": "0.22.22",
+    "version": "0.22.23",
     "id": "toml_edit"
   },
   {
@@ -1786,7 +1801,7 @@
   },
   {
     "name": "unicode-ident",
-    "version": "1.0.14",
+    "version": "1.0.16",
     "id": "unicode_ident"
   },
   {
@@ -1861,7 +1876,7 @@
   },
   {
     "name": "uuid",
-    "version": "1.12.0",
+    "version": "1.13.1",
     "id": "uuid"
   },
   {
@@ -1946,8 +1961,13 @@
   },
   {
     "name": "windows_x86_64_gnu",
-    "version": "0.52.6",
+    "version": "0.53.0",
     "id": "windows_x86_64_gnu"
+  },
+  {
+    "name": "windows_x86_64_gnu",
+    "version": "0.52.6",
+    "id": "windows_x86_64_gnu_0_52_6"
   },
   {
     "name": "windows_x86_64_msvc",
@@ -1956,7 +1976,7 @@
   },
   {
     "name": "winnow",
-    "version": "0.6.24",
+    "version": "0.7.1",
     "id": "winnow"
   },
   {
@@ -1991,13 +2011,23 @@
   },
   {
     "name": "zerocopy",
-    "version": "0.7.35",
+    "version": "0.8.16",
     "id": "zerocopy"
+  },
+  {
+    "name": "zerocopy",
+    "version": "0.7.35",
+    "id": "zerocopy_0_7_35"
+  },
+  {
+    "name": "zerocopy-derive",
+    "version": "0.8.16",
+    "id": "zerocopy_derive"
   },
   {
     "name": "zerocopy-derive",
     "version": "0.7.35",
-    "id": "zerocopy_derive"
+    "id": "zerocopy_derive_0_7_35"
   },
   {
     "name": "zerofrom",
