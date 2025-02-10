@@ -81,93 +81,113 @@ const MonacoEditorCore: React.FC<CommonEditorProps> = (props) => {
     editor.focus();
   }, []);
 
-  useEditorProp(editor, props.onEditCode, (_editor, model, onEditCode) => {
-    model.onDidChangeContent(() => {
-      onEditCode(model.getValue());
-    });
-  });
+  useEditorProp(
+    editor,
+    props.onEditCode,
+    useCallback((_editor, model, onEditCode) => {
+      model.onDidChangeContent(() => {
+        onEditCode(model.getValue());
+      });
+    }, []),
+  );
 
-  useEditorProp(editor, props.execute, (editor, _model, execute) => {
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-      execute();
-    });
-    // Ace's Vim mode runs code with :w, so let's do the same
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-      execute();
-    });
-  });
+  useEditorProp(
+    editor,
+    props.execute,
+    useCallback((editor, _model, execute) => {
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+        execute();
+      });
+      // Ace's Vim mode runs code with :w, so let's do the same
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+        execute();
+      });
+    }, []),
+  );
 
-  useEditorProp(editor, props.code, (editor, model, code) => {
-    // Short-circuit if nothing interesting to change.
-    if (code === model.getValue()) {
-      return;
-    }
+  useEditorProp(
+    editor,
+    props.code,
+    useCallback((editor, model, code) => {
+      // Short-circuit if nothing interesting to change.
+      if (code === model.getValue()) {
+        return;
+      }
 
-    editor.executeEdits('redux', [
-      {
-        text: code,
-        range: model.getFullModelRange(),
-      },
-    ]);
-  });
+      editor.executeEdits('redux', [
+        {
+          text: code,
+          range: model.getFullModelRange(),
+        },
+      ]);
+    }, []),
+  );
 
-  useEditorProp(editor, theme, (editor, _model, theme) => {
-    editor.updateOptions({ theme });
-  });
+  useEditorProp(
+    editor,
+    theme,
+    useCallback((editor, _model, theme) => {
+      editor.updateOptions({ theme });
+    }, []),
+  );
 
   const autocompleteProps = useMemo(
     () => ({ autocompleteOnUse, crates: props.crates }),
     [autocompleteOnUse, props.crates],
   );
 
-  useEditorProp(editor, autocompleteProps, (_editor, _model, { autocompleteOnUse, crates }) => {
-    completionProvider.current = monaco.languages.registerCompletionItemProvider('rust', {
-      triggerCharacters: [' '],
+  useEditorProp(
+    editor,
+    autocompleteProps,
+    useCallback((_editor, _model, { autocompleteOnUse, crates }) => {
+      completionProvider.current = monaco.languages.registerCompletionItemProvider('rust', {
+        triggerCharacters: [' '],
 
-      provideCompletionItems(model, position, _context, _token) {
-        const word = model.getWordUntilPosition(position);
+        provideCompletionItems(model, position, _context, _token) {
+          const word = model.getWordUntilPosition(position);
 
-        function wordBefore(
-          word: monaco.editor.IWordAtPosition,
-        ): monaco.editor.IWordAtPosition | null {
-          const prevPos = { lineNumber: position.lineNumber, column: word.startColumn - 1 };
-          return model.getWordAtPosition(prevPos);
-        }
+          function wordBefore(
+            word: monaco.editor.IWordAtPosition,
+          ): monaco.editor.IWordAtPosition | null {
+            const prevPos = { lineNumber: position.lineNumber, column: word.startColumn - 1 };
+            return model.getWordAtPosition(prevPos);
+          }
 
-        const preWord = wordBefore(word);
-        const prePreWord = preWord && wordBefore(preWord);
+          const preWord = wordBefore(word);
+          const prePreWord = preWord && wordBefore(preWord);
 
-        const oldStyle = prePreWord?.word === 'extern' && preWord?.word === 'crate';
-        const newStyle = autocompleteOnUse && preWord?.word === 'use';
+          const oldStyle = prePreWord?.word === 'extern' && preWord?.word === 'crate';
+          const newStyle = autocompleteOnUse && preWord?.word === 'use';
 
-        const triggerPrefix = oldStyle || newStyle;
+          const triggerPrefix = oldStyle || newStyle;
 
-        if (!triggerPrefix) {
-          return { suggestions: [] };
-        }
+          if (!triggerPrefix) {
+            return { suggestions: [] };
+          }
 
-        const range = {
-          startLineNumber: position.lineNumber,
-          endLineNumber: position.lineNumber,
-          startColumn: word.startColumn,
-          endColumn: word.endColumn,
-        };
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: word.startColumn,
+            endColumn: word.endColumn,
+          };
 
-        const suggestions = crates.map(({ name, version, id }) => ({
-          kind: monaco.languages.CompletionItemKind.Module,
-          label: `${name} (${version})`,
-          insertText: `${id}; // ${version}`,
-          range,
-        }));
+          const suggestions = crates.map(({ name, version, id }) => ({
+            kind: monaco.languages.CompletionItemKind.Module,
+            label: `${name} (${version})`,
+            insertText: `${id}; // ${version}`,
+            range,
+          }));
 
-        return { suggestions };
-      },
-    });
+          return { suggestions };
+        },
+      });
 
-    return () => {
-      completionProvider.current?.dispose();
-    };
-  });
+      return () => {
+        completionProvider.current?.dispose();
+      };
+    }, []),
+  );
 
   return <div className={styles.monaco} ref={child} />;
 };
