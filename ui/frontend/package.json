@@ -33,6 +33,7 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@eslint/compat": "^1.2.3",
+    "@eslint/js": "^9.15.0",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/common-tags": "^1.8.1",
     "@types/jest": "^29.2.5",
@@ -81,7 +82,7 @@
   },
   "engines": {
     "node": "^22.2",
-    "pnpm": "^9.1"
+    "pnpm": "^10.1"
   },
   "scripts": {
     "test": "jest",
