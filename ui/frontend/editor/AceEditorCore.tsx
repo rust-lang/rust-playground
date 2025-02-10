@@ -159,6 +159,7 @@ const AceEditor: React.FC<AceEditorProps> = props => {
   // open the autocomplete. This should help people understand that
   // there are crates available.
   useEditorProp(editor, autocompleteProps, useCallback((editor, { autocompleteOnUse, crates }) => {
+    // @ts-expect-error https://github.com/ajaxorg/ace/issues/5742
     editor.commands.on('afterExec', ({ editor, command }) => {
       if (!(command.name === 'backspace' || command.name === 'insertstring')) {
         return;
@@ -257,6 +258,7 @@ const AceEditor: React.FC<AceEditorProps> = props => {
     editor.setOption('keyboardHandler', handler);
 
     if (keybinding === 'vim') {
+      // @ts-expect-error https://github.com/ajaxorg/ace/issues/5743
       const { CodeMirror: { Vim } }: VimKeybindings = ace.require('ace/keyboard/vim');
       Vim.defineEx('write', 'w', (cm) => {
         cm.ace.execCommand('executeCode');
