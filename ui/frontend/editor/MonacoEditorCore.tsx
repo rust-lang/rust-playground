@@ -73,6 +73,7 @@ const MonacoEditorCore: React.FC<CommonEditorProps> = (props) => {
       fontFamily: nodeStyle.fontFamily,
       automaticLayout: true,
       'semanticHighlighting.enabled': true,
+      autoClosingOvertype: 'always',
     });
     setEditor(editor);
 
