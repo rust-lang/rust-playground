@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, MouseEventHandler } from 'react';
+import React, { useContext, useCallback, MouseEventHandler, type JSX } from 'react';
 
 import { Context } from './Router';
 import { useAppDispatch } from '../hooks';

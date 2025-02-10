@@ -29,7 +29,7 @@ export interface MenuProps {
 interface NewPopProps {
   Button: React.ComponentType<ButtonProps & React.RefAttributes<HTMLButtonElement>>;
   Menu: React.ComponentType<MenuProps>;
-  menuContainer?: React.RefObject<HTMLDivElement>;
+  menuContainer?: React.RefObject<HTMLDivElement | null>;
 }
 
 const CONTAINER_STYLE: { [key in Placement]?: string } = {

@@ -65,7 +65,7 @@ const buildCrateAutocompleter = (autocompleteOnUse: boolean, crates: Crate[]): A
 });
 
 function useRafDebouncedFunction<A extends unknown[]>(fn: (...args: A) => void, onCall?: (...args: A) => void) {
-  const timeout = useRef<number>();
+  const timeout = useRef<number>(undefined);
 
   return useCallback((...args: A): void => {
     if (timeout.current) {

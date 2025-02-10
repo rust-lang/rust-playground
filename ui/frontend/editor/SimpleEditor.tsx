@@ -50,8 +50,9 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
 
   private onChange: React.ChangeEventHandler<HTMLTextAreaElement> = (e) =>
     this.props.onEditCode(e.target.value);
-  private trackEditor: React.RefCallback<HTMLTextAreaElement> = (component) =>
-    (this._editor = component);
+  private trackEditor: React.RefCallback<HTMLTextAreaElement> = (component) => {
+    this._editor = component;
+  };
   private onKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       this.props.execute();
