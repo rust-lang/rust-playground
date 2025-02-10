@@ -1,4 +1,3 @@
-import { isEqual } from 'lodash-es';
 import React from 'react';
 
 import { CommonEditorProps, Position, Selection } from '../types';
@@ -16,11 +15,9 @@ class CodeByteOffsets {
 
   public lineToOffsets(line: number) {
     const precedingBytes = this.bytesBeforeLine(line);
+    const nextPrecedingBytes = this.bytesBeforeLine(line + 1);
 
-    const highlightedLine = this.lines[line];
-    const highlightedBytes = highlightedLine.length;
-
-    return [precedingBytes, precedingBytes + highlightedBytes];
+    return [precedingBytes, nextPrecedingBytes];
   }
 
   public rangeToOffsets(start: Position, end: Position) {
@@ -41,7 +38,7 @@ class CodeByteOffsets {
     const precedingLines = this.lines.slice(0, line);
 
     // Add one to account for the newline we split on and removed
-    return precedingLines.map((l) => l.length + 1).reduce((a, b) => a + b);
+    return precedingLines.map((l) => l.length + 1).reduce((a, b) => a + b, 0);
   }
 }
 
@@ -87,7 +84,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
     if (!newPosition || !editor) {
       return;
     }
-    if (isEqual(newPosition, oldPosition)) {
+    if (newPosition === oldPosition) {
       return;
     }
 
@@ -104,7 +101,7 @@ class SimpleEditor extends React.PureComponent<CommonEditorProps> {
     if (!newSelection || !newSelection.start || !newSelection.end || !editor) {
       return;
     }
-    if (isEqual(newSelection, oldSelection)) {
+    if (newSelection === oldSelection) {
       return;
     }
 
