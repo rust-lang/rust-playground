@@ -189,6 +189,15 @@ const MonacoEditorCore: React.FC<CommonEditorProps> = (props) => {
     }, []),
   );
 
+  useEditorProp(
+    editor,
+    props.position,
+    useCallback((editor, _model, { line, column }) => {
+      editor.setPosition({ lineNumber: line, column });
+      editor.focus();
+    }, []),
+  );
+
   return <div className={styles.monaco} ref={child} />;
 };
 
