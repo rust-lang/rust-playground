@@ -70,7 +70,7 @@ const Header: React.FC = () => {
 };
 
 interface PortalProps {
-  menuContainer: RefObject<HTMLDivElement>;
+  menuContainer: RefObject<HTMLDivElement | null>;
 }
 
 const ExecuteButton: React.FC = () => {

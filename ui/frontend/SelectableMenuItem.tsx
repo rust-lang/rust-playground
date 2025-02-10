@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 
 import { CheckmarkIcon } from './Icon';
 import MenuItem from './MenuItem';

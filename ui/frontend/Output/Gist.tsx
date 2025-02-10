@@ -1,5 +1,4 @@
-import React, { Fragment } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import React, { Fragment, useCallback, useState } from 'react';
 
 import { ClipboardIcon } from '../Icon';
 import * as selectors from '../selectors';
@@ -34,33 +33,27 @@ interface CopiedProps {
   href: string;
 }
 
-interface CopiedState {
-  copied: boolean;
-}
+const Copied: React.FC<CopiedProps> = ({ children, href }) => {
+  const [copied, setCopied] = useState(false);
 
-class Copied extends React.PureComponent<CopiedProps, CopiedState> {
-  public constructor(props: CopiedProps) {
-    super(props);
-    this.state = { copied: false };
-  }
+  const startCopy = useCallback(() => {
+    setCopied(true);
 
-  public render() {
-    return (
-      <p className={this.state.copied ? styles.active : styles.container}>
-        <a href={this.props.href}>{this.props.children}</a>
-        <CopyToClipboard text={this.props.href} onCopy={this.copied}>
-          <button className={styles.button}><ClipboardIcon /></button>
-        </CopyToClipboard>
-        <span className={styles.text}>Copied!</span>
-      </p>
-    );
-  }
+    setTimeout(() => {
+      setCopied(false);
+    }, 1000);
+  }, []);
 
-  private copied = () => {
-    this.setState({ copied: true });
-    setTimeout(() => { this.setState({ copied: false }); }, 1000);
-  }
-}
+  return (
+    <p className={copied ? styles.active : styles.container}>
+      <a href={href}>{children}</a>
+      <button className={styles.button} onClick={startCopy}>
+        <ClipboardIcon />
+      </button>
+      <span className={styles.text}>Copied!</span>
+    </p>
+  );
+};
 
 const Links: React.FC = () => {
   const codeUrl = useAppSelector(selectors.codeUrlSelector);
