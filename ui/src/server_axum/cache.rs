@@ -2,7 +2,7 @@ use futures::{
     future::{Fuse, FusedFuture as _},
     FutureExt as _,
 };
-use orchestrator::DropErrorDetailsExt as _;
+use orchestrator::{DropErrorDetailsExt as _, TaskAbortExt as _};
 use snafu::prelude::*;
 use std::{
     future::Future,
@@ -13,9 +13,9 @@ use std::{
 use tokio::{
     select,
     sync::{mpsc, oneshot},
-    task::JoinHandle,
     time,
 };
+use tokio_util::task::AbortOnDropHandle;
 use tracing::warn;
 
 const ONE_HUNDRED_MILLISECONDS: Duration = Duration::from_millis(100);
@@ -48,12 +48,12 @@ where
 {
     pub fn spawn<Fut>(
         f: impl FnOnce(mpsc::Receiver<CacheTaskItem<T, E>>) -> Fut,
-    ) -> (JoinHandle<()>, Self)
+    ) -> (AbortOnDropHandle<()>, Self)
     where
         Fut: Future<Output = ()> + Send + 'static,
     {
         let (tx, rx) = mpsc::channel(8);
-        let task = tokio::spawn(f(rx));
+        let task = tokio::spawn(f(rx)).abort_on_drop();
         let cache_tx = CacheTx(tx);
         (task, cache_tx)
     }
@@ -148,7 +148,8 @@ where
                         let new_value = generator().await.map_err(CacheError::from);
                         CacheInfo::build(new_value)
                     }
-                });
+                })
+                .abort_on_drop();
 
                 new_value.set(new_value_task.fuse());
             }
