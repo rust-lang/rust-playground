@@ -2842,14 +2842,9 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
         let handle = tokio::runtime::Handle::current();
 
         loop {
-            let coordinator_msg = handle.block_on(async {
-                select! {
-                    () = token.cancelled() => None,
-                    msg = rx.recv() => msg,
-                }
-            });
+            let coordinator_msg = handle.block_on(token.run_until_cancelled(rx.recv()));
 
-            let Some(coordinator_msg) = coordinator_msg else {
+            let Some(Some(coordinator_msg)) = coordinator_msg else {
                 break;
             };
 
