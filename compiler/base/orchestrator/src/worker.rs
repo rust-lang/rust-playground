@@ -55,7 +55,7 @@ use crate::{
         ExecuteCommandResponse, JobId, Multiplexed, ReadFileRequest, ReadFileResponse,
         SerializedError2, WorkerMessage, WriteFileRequest, WriteFileResponse,
     },
-    DropErrorDetailsExt,
+    DropErrorDetailsExt as _, TaskAbortExt as _,
 };
 
 pub async fn listen(project_dir: impl Into<PathBuf>) -> Result<(), Error> {
@@ -66,14 +66,16 @@ pub async fn listen(project_dir: impl Into<PathBuf>) -> Result<(), Error> {
     let mut io_tasks = spawn_io_queue(coordinator_msg_tx, worker_msg_rx);
 
     let (process_tx, process_rx) = mpsc::channel(8);
-    let process_task = tokio::spawn(manage_processes(process_rx, project_dir.clone()));
+    let process_task =
+        tokio::spawn(manage_processes(process_rx, project_dir.clone())).abort_on_drop();
 
     let handler_task = tokio::spawn(handle_coordinator_message(
         coordinator_msg_rx,
         worker_msg_tx,
         project_dir,
         process_tx,
-    ));
+    ))
+    .abort_on_drop();
 
     select! {
         Some(io_task) = io_tasks.join_next() => {
