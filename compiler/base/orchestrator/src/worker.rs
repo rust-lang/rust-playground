@@ -46,7 +46,7 @@ use tokio::{
     sync::mpsc,
     task::JoinSet,
 };
-use tokio_util::sync::CancellationToken;
+use tokio_util::sync::{CancellationToken, DropGuard};
 
 use crate::{
     bincode_input_closed,
@@ -405,7 +405,7 @@ struct ProcessState {
     processes: JoinSet<Result<(), ProcessError>>,
     stdin_senders: HashMap<JobId, mpsc::Sender<String>>,
     stdin_shutdown_tx: mpsc::Sender<JobId>,
-    kill_tokens: HashMap<JobId, CancellationToken>,
+    kill_tokens: HashMap<JobId, DropGuard>,
 }
 
 impl ProcessState {
@@ -458,7 +458,7 @@ impl ProcessState {
 
         let task_set = stream_stdio(worker_msg_tx.clone(), stdin_rx, stdin, stdout, stderr);
 
-        self.kill_tokens.insert(job_id, token.clone());
+        self.kill_tokens.insert(job_id, token.clone().drop_guard());
 
         self.processes.spawn({
             let stdin_shutdown_tx = self.stdin_shutdown_tx.clone();
@@ -510,8 +510,8 @@ impl ProcessState {
     }
 
     fn kill(&mut self, job_id: JobId) {
-        if let Some(token) = self.kill_tokens.get(&job_id) {
-            token.cancel();
+        if let Some(token) = self.kill_tokens.remove(&job_id) {
+            drop(token);
         }
     }
 }
