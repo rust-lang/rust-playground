@@ -29,7 +29,7 @@ use tokio::{
     task::{AbortHandle, JoinSet},
     time,
 };
-use tokio_util::sync::CancellationToken;
+use tokio_util::sync::{CancellationToken, DropGuard};
 use tracing::{error, info, instrument, warn, Instrument};
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -525,7 +525,7 @@ async fn handle_idle(manager: &mut CoordinatorManager, tx: &ResponseTx) -> Contr
     ControlFlow::Continue(())
 }
 
-type ActiveExecutionInfo = (CancellationToken, Option<mpsc::Sender<String>>);
+type ActiveExecutionInfo = (DropGuard, Option<mpsc::Sender<String>>);
 
 async fn handle_msg(
     txt: &str,
@@ -545,7 +545,10 @@ async fn handle_msg(
 
             let guard = db.clone().start_with_guard("ws.Execute", txt).await;
 
-            active_executions.insert(meta.sequence_number, (token.clone(), Some(execution_tx)));
+            active_executions.insert(
+                meta.sequence_number,
+                (token.clone().drop_guard(), Some(execution_tx)),
+            );
 
             // TODO: Should a single execute / build / etc. session have a timeout of some kind?
             let spawned = manager
@@ -602,11 +605,11 @@ async fn handle_msg(
         }
 
         Ok(ExecuteKill { meta }) => {
-            let Some((token, _)) = active_executions.get(&meta.sequence_number) else {
+            let Some((token, _)) = active_executions.remove(&meta.sequence_number) else {
                 warn!("Received kill for an execution that is no longer active");
                 return;
             };
-            token.cancel();
+            drop(token);
         }
 
         Err(e) => {

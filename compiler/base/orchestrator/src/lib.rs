@@ -4,6 +4,16 @@ pub mod coordinator;
 mod message;
 pub mod worker;
 
+pub trait TaskAbortExt<T>: Sized {
+    fn abort_on_drop(self) -> tokio_util::task::AbortOnDropHandle<T>;
+}
+
+impl<T> TaskAbortExt<T> for tokio::task::JoinHandle<T> {
+    fn abort_on_drop(self) -> tokio_util::task::AbortOnDropHandle<T> {
+        tokio_util::task::AbortOnDropHandle::new(self)
+    }
+}
+
 pub trait DropErrorDetailsExt<T> {
     fn drop_error_details(self) -> Result<T, tokio::sync::mpsc::error::SendError<()>>;
 }

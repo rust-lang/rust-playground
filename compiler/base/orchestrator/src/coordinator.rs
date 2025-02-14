@@ -15,12 +15,12 @@ use tokio::{
     process::{Child, ChildStdin, ChildStdout, Command},
     select,
     sync::{mpsc, oneshot, OnceCell},
-    task::{JoinHandle, JoinSet},
+    task::JoinSet,
     time::{self, MissedTickBehavior},
     try_join,
 };
 use tokio_stream::wrappers::ReceiverStream;
-use tokio_util::{io::SyncIoBridge, sync::CancellationToken};
+use tokio_util::{io::SyncIoBridge, sync::CancellationToken, task::AbortOnDropHandle};
 use tracing::{error, info, info_span, instrument, trace, trace_span, warn, Instrument};
 
 use crate::{
@@ -30,7 +30,7 @@ use crate::{
         ExecuteCommandResponse, JobId, Multiplexed, OneToOneResponse, ReadFileRequest,
         ReadFileResponse, SerializedError2, WorkerMessage, WriteFileRequest,
     },
-    DropErrorDetailsExt,
+    DropErrorDetailsExt, TaskAbortExt as _,
 };
 
 pub mod limits;
@@ -1161,7 +1161,7 @@ impl Drop for CancelOnDrop {
 #[derive(Debug)]
 struct Container {
     permit: Box<dyn ContainerPermit>,
-    task: JoinHandle<Result<()>>,
+    task: AbortOnDropHandle<Result<()>>,
     kill_child: TerminateContainer,
     modify_cargo_toml: ModifyCargoToml,
     commander: Commander,
@@ -1186,7 +1186,8 @@ impl Container {
 
         let (command_tx, command_rx) = mpsc::channel(8);
         let demultiplex_task =
-            tokio::spawn(Commander::demultiplex(command_rx, from_worker_rx).in_current_span());
+            tokio::spawn(Commander::demultiplex(command_rx, from_worker_rx).in_current_span())
+                .abort_on_drop();
 
         let task = tokio::spawn(
             async move {
@@ -1216,7 +1217,8 @@ impl Container {
                 Ok(())
             }
             .in_current_span(),
-        );
+        )
+        .abort_on_drop();
 
         let commander = Commander {
             to_worker_tx,
@@ -1865,7 +1867,8 @@ impl Container {
                 }
             }
             .instrument(trace_span!("cargo task").or_current())
-        });
+        })
+        .abort_on_drop();
 
         Ok(SpawnCargo {
             permit,
@@ -2128,7 +2131,7 @@ pub enum DoRequestError {
 
 struct SpawnCargo {
     permit: Box<dyn ProcessPermit>,
-    task: JoinHandle<Result<ExecuteCommandResponse, SpawnCargoError>>,
+    task: AbortOnDropHandle<Result<ExecuteCommandResponse, SpawnCargoError>>,
     stdin_tx: mpsc::Sender<String>,
     stdout_rx: mpsc::Receiver<String>,
     stderr_rx: mpsc::Receiver<String>,
@@ -2842,14 +2845,9 @@ fn spawn_io_queue(stdin: ChildStdin, stdout: ChildStdout, token: CancellationTok
         let handle = tokio::runtime::Handle::current();
 
         loop {
-            let coordinator_msg = handle.block_on(async {
-                select! {
-                    () = token.cancelled() => None,
-                    msg = rx.recv() => msg,
-                }
-            });
+            let coordinator_msg = handle.block_on(token.run_until_cancelled(rx.recv()));
 
-            let Some(coordinator_msg) = coordinator_msg else {
+            let Some(Some(coordinator_msg)) = coordinator_msg else {
                 break;
             };
 

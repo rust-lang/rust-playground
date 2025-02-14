@@ -46,7 +46,7 @@ use tokio::{
     sync::mpsc,
     task::JoinSet,
 };
-use tokio_util::sync::CancellationToken;
+use tokio_util::sync::{CancellationToken, DropGuard};
 
 use crate::{
     bincode_input_closed,
@@ -55,7 +55,7 @@ use crate::{
         ExecuteCommandResponse, JobId, Multiplexed, ReadFileRequest, ReadFileResponse,
         SerializedError2, WorkerMessage, WriteFileRequest, WriteFileResponse,
     },
-    DropErrorDetailsExt,
+    DropErrorDetailsExt as _, TaskAbortExt as _,
 };
 
 pub async fn listen(project_dir: impl Into<PathBuf>) -> Result<(), Error> {
@@ -66,14 +66,16 @@ pub async fn listen(project_dir: impl Into<PathBuf>) -> Result<(), Error> {
     let mut io_tasks = spawn_io_queue(coordinator_msg_tx, worker_msg_rx);
 
     let (process_tx, process_rx) = mpsc::channel(8);
-    let process_task = tokio::spawn(manage_processes(process_rx, project_dir.clone()));
+    let process_task =
+        tokio::spawn(manage_processes(process_rx, project_dir.clone())).abort_on_drop();
 
     let handler_task = tokio::spawn(handle_coordinator_message(
         coordinator_msg_rx,
         worker_msg_tx,
         project_dir,
         process_tx,
-    ));
+    ))
+    .abort_on_drop();
 
     select! {
         Some(io_task) = io_tasks.join_next() => {
@@ -403,7 +405,7 @@ struct ProcessState {
     processes: JoinSet<Result<(), ProcessError>>,
     stdin_senders: HashMap<JobId, mpsc::Sender<String>>,
     stdin_shutdown_tx: mpsc::Sender<JobId>,
-    kill_tokens: HashMap<JobId, CancellationToken>,
+    kill_tokens: HashMap<JobId, DropGuard>,
 }
 
 impl ProcessState {
@@ -456,7 +458,7 @@ impl ProcessState {
 
         let task_set = stream_stdio(worker_msg_tx.clone(), stdin_rx, stdin, stdout, stderr);
 
-        self.kill_tokens.insert(job_id, token.clone());
+        self.kill_tokens.insert(job_id, token.clone().drop_guard());
 
         self.processes.spawn({
             let stdin_shutdown_tx = self.stdin_shutdown_tx.clone();
@@ -508,8 +510,8 @@ impl ProcessState {
     }
 
     fn kill(&mut self, job_id: JobId) {
-        if let Some(token) = self.kill_tokens.get(&job_id) {
-            token.cancel();
+        if let Some(token) = self.kill_tokens.remove(&job_id) {
+            drop(token);
         }
     }
 }
