@@ -103,6 +103,8 @@ pub(crate) struct MiriRequest {
     pub(crate) code: String,
     #[serde(default)]
     pub(crate) edition: String,
+    #[serde(default, rename = "aliasingModel")]
+    pub(crate) aliasing_model: String,
 }
 
 #[derive(Debug, Clone, Serialize)]

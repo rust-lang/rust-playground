@@ -239,6 +239,12 @@ pub enum Channel {
     Nightly,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum AliasingModel {
+    Stacked,
+    Tree,
+}
+
 impl Channel {
     #[cfg(test)]
     pub(crate) const ALL: [Self; 3] = [Self::Stable, Self::Beta, Self::Nightly];
@@ -654,6 +660,7 @@ pub struct MiriRequest {
     pub channel: Channel,
     pub crate_type: CrateType,
     pub edition: Edition,
+    pub aliasing_model: AliasingModel,
     pub code: String,
 }
 
@@ -670,7 +677,12 @@ impl LowerRequest for MiriRequest {
         ExecuteCommandRequest {
             cmd: "cargo".to_owned(),
             args: vec!["miri-playground".to_owned()],
-            envs: Default::default(),
+            envs: match self.aliasing_model {
+                AliasingModel::Stacked => Default::default(),
+                AliasingModel::Tree => [("MIRIFLAGS".to_owned(), "-Zmiri-tree-borrows".to_owned())]
+                    .into_iter()
+                    .collect(),
+            },
             cwd: None,
         }
     }
@@ -3946,6 +3958,7 @@ mod tests {
         channel: Channel::Nightly,
         crate_type: CrateType::Binary,
         edition: Edition::Rust2021,
+        aliasing_model: AliasingModel::Stacked,
         code: String::new(),
     };
 
