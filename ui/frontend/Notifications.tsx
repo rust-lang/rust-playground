@@ -3,41 +3,23 @@ import { Portal } from 'react-portal';
 
 import { Close } from './Icon';
 import { useAppDispatch, useAppSelector } from './hooks';
-import { seenRust2024IsDefault, seenRustSurvey2024 } from './reducers/notifications';
+import { seenRust2024IsDefault } from './reducers/notifications';
 import { allowLongRun, wsExecuteKillCurrent } from './reducers/output/execute';
 import * as selectors from './selectors';
 
 import * as styles from './Notifications.module.css';
 
-const SURVEY_URL = 'https://blog.rust-lang.org/2024/12/05/annual-survey-2024-launch.html';
 const EDITION_URL = 'https://doc.rust-lang.org/edition-guide/';
 
 const Notifications: React.FC = () => {
   return (
     <Portal>
       <div className={styles.container}>
-        <RustSurvey2024Notification />
         <Rust2024IsDefaultNotification />
         <ExcessiveExecutionNotification />
       </div>
     </Portal>
   );
-};
-
-const RustSurvey2024Notification: React.FC = () => {
-  const showIt = useAppSelector(selectors.showRustSurvey2024Selector);
-
-  const dispatch = useAppDispatch();
-  const seenIt = useCallback(() => dispatch(seenRustSurvey2024()), [dispatch]);
-
-  return showIt ? (
-    <Notification onClose={seenIt}>
-      Please help us take a look at who the Rust community is composed of, how the Rust project is
-      doing, and how we can improve the Rust programming experience by completing the{' '}
-      <a href={SURVEY_URL}>2024 State of Rust Survey</a>. Whether or not you use Rust today, we want
-      to know your opinions.
-    </Notification>
-  ) : null;
 };
 
 const Rust2024IsDefaultNotification: React.FC = () => {
