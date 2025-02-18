@@ -367,8 +367,16 @@ export const showRustSurvey2024Selector = createSelector(
   notifications => RUST_SURVEY_2024_OPEN && !notifications.seenRustSurvey2024,
 );
 
+const RUST_2024_IS_DEFAULT_END = new Date('2025-04-03T00:00:00Z');
+const RUST_2024_IS_DEFAULT_OPEN = NOW <= RUST_2024_IS_DEFAULT_END;
+export const showRust2024IsDefaultSelector = createSelector(
+  notificationsSelector,
+  notifications => RUST_2024_IS_DEFAULT_OPEN && !notifications.seenRust2024IsDefault,
+);
+
 export const anyNotificationsToShowSelector = createSelector(
   showRustSurvey2024Selector,
+  showRust2024IsDefaultSelector,
   excessiveExecutionSelector,
   (...allNotifications) => allNotifications.some(n => n),
 );

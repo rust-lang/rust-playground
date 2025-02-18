@@ -13,6 +13,7 @@ interface State {
   seenRustSurvey2023: boolean; // expired
   seenDarkMode: boolean; // expired
   seenRustSurvey2024: boolean;
+  seenRust2024IsDefault: boolean;
 }
 
 const initialState: State = {
@@ -26,6 +27,7 @@ const initialState: State = {
   seenRustSurvey2023: true,
   seenDarkMode: true,
   seenRustSurvey2024: false,
+  seenRust2024IsDefault: false,
 };
 
 const slice = createSlice({
@@ -38,6 +40,10 @@ const slice = createSlice({
           state.seenRustSurvey2024 = true;
           break;
         }
+        case Notification.Rust2024IsDefault: {
+          state.seenRust2024IsDefault = true;
+          break;
+        }
       }
     },
   },
@@ -46,5 +52,7 @@ const slice = createSlice({
 const { notificationSeen } = slice.actions;
 
 export const seenRustSurvey2024 = () => notificationSeen(Notification.RustSurvey2024);
+
+export const seenRust2024IsDefault = () => notificationSeen(Notification.Rust2024IsDefault);
 
 export default slice.reducer;
