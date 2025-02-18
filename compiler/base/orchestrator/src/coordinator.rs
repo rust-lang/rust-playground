@@ -4265,14 +4265,10 @@ mod tests {
     });
 
     trait TimeoutExt: Future + Sized {
-        #[allow(clippy::type_complexity)]
-        fn with_timeout(
-            self,
-        ) -> futures::future::Map<
-            tokio::time::Timeout<Self>,
-            fn(Result<Self::Output, tokio::time::error::Elapsed>) -> Self::Output,
-        > {
-            tokio::time::timeout(*TIMEOUT, self).map(|v| v.expect("The operation timed out"))
+        async fn with_timeout(self) -> Self::Output {
+            tokio::time::timeout(*TIMEOUT, self)
+                .await
+                .expect("The operation timed out")
         }
     }
 
