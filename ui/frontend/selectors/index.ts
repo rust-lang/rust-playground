@@ -172,7 +172,7 @@ export const getChannelLabel = createSelector(channelSelector, (channel) => `${c
 
 export const isEditionDefault = createSelector(
   editionSelector,
-  edition => edition == Edition.Rust2021,
+  edition => edition == Edition.Rust2024,
 );
 
 export const getBacktraceSet = (state: State) => (
