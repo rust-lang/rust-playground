@@ -519,6 +519,8 @@ impl LowerRequest for CompileRequest {
             envs.insert("RUST_BACKTRACE".to_owned(), "1".to_owned());
         }
 
+        envs.insert("CARGO_TERM_COLOR".to_owned(), "always".to_owned());
+
         ExecuteCommandRequest {
             cmd: "cargo".to_owned(),
             args: args.into_iter().map(|s| s.to_owned()).collect(),
