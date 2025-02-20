@@ -1,6 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import { ThunkAction } from '../actions';
 import {
   AssemblyFlavor,
   Backtrace,
@@ -57,7 +56,7 @@ const initialState: State = {
   primaryAction: PrimaryActionAuto.Auto,
   channel: Channel.Stable,
   mode: Mode.Debug,
-  edition: Edition.Rust2021,
+  edition: Edition.Rust2024,
   backtrace: Backtrace.Disabled,
 };
 
@@ -85,7 +84,7 @@ const slice = createSlice({
       state.demangleAssembly = action.payload;
     },
 
-    changeEditionRaw: (state, action: PayloadAction<Edition>) => {
+    changeEdition: (state, action: PayloadAction<Edition>) => {
       state.edition = action.payload;
     },
 
@@ -149,7 +148,7 @@ export const {
   changeBacktrace,
   changeChannel,
   changeDemangleAssembly,
-  changeEditionRaw,
+  changeEdition,
   changeEditor,
   changeKeybinding,
   changeMode,
@@ -161,15 +160,5 @@ export const {
   changeProcessAssembly,
   swapTheme,
 } = slice.actions;
-
-export const changeEdition =
-  (edition: Edition): ThunkAction =>
-  (dispatch) => {
-    if (edition === Edition.Rust2024) {
-      dispatch(changeChannel(Channel.Nightly));
-    }
-
-    dispatch(changeEditionRaw(edition));
-  };
 
 export default slice.reducer;

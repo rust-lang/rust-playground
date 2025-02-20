@@ -172,7 +172,7 @@ export const getChannelLabel = createSelector(channelSelector, (channel) => `${c
 
 export const isEditionDefault = createSelector(
   editionSelector,
-  edition => edition == Edition.Rust2021,
+  edition => edition == Edition.Rust2024,
 );
 
 export const getBacktraceSet = (state: State) => (
@@ -360,15 +360,15 @@ const notificationsSelector = (state: State) => state.notifications;
 
 const NOW = new Date();
 
-const RUST_SURVEY_2024_END = new Date('2024-12-23T00:00:00Z');
-const RUST_SURVEY_2024_OPEN = NOW <= RUST_SURVEY_2024_END;
-export const showRustSurvey2024Selector = createSelector(
+const RUST_2024_IS_DEFAULT_END = new Date('2025-04-03T00:00:00Z');
+const RUST_2024_IS_DEFAULT_OPEN = NOW <= RUST_2024_IS_DEFAULT_END;
+export const showRust2024IsDefaultSelector = createSelector(
   notificationsSelector,
-  notifications => RUST_SURVEY_2024_OPEN && !notifications.seenRustSurvey2024,
+  notifications => RUST_2024_IS_DEFAULT_OPEN && !notifications.seenRust2024IsDefault,
 );
 
 export const anyNotificationsToShowSelector = createSelector(
-  showRustSurvey2024Selector,
+  showRust2024IsDefaultSelector,
   excessiveExecutionSelector,
   (...allNotifications) => allNotifications.some(n => n),
 );

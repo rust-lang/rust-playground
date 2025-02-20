@@ -5,7 +5,7 @@ import { addCrateType, editCode } from './reducers/code';
 import {
   changeBacktrace,
   changeChannel,
-  changeEditionRaw,
+  changeEdition,
   changeMode,
   changePrimaryAction,
 } from './reducers/configuration';
@@ -153,7 +153,7 @@ export function indexPageLoad({
       }
     }
 
-    const edition = maybeEdition || Edition.Rust2021;
+    const edition = maybeEdition || Edition.Rust2024;
 
     if (code) {
       dispatch(editCode(code));
@@ -163,7 +163,7 @@ export function indexPageLoad({
 
     dispatch(changeChannel(channel));
     dispatch(changeMode(mode));
-    dispatch(changeEditionRaw(edition));
+    dispatch(changeEdition(edition));
   };
 }
 

@@ -3074,11 +3074,7 @@ mod tests {
                 r#"fn x() { u16::try_from(1u8); }"#,
                 [false, false, true, true],
             ),
-            (
-                r#"#![feature(gen_blocks)]
-                   fn x() { gen { yield 1u8 }; }"#,
-                [false, false, false, true],
-            ),
+            (r#"fn x() { let gen = true; }"#, [true, true, true, false]),
         ];
 
         let tests = params.into_iter().flat_map(|(code, works_in)| {
@@ -3090,7 +3086,6 @@ mod tests {
                         code: code.into(),
                         edition,
                         crate_type: CrateType::Library(LibraryType::Lib),
-                        channel: Channel::Nightly, // To allow 2024 while it is unstable
                         ..ARBITRARY_EXECUTE_REQUEST
                     };
                     let response = coordinator.execute(request).await.unwrap();
@@ -3524,7 +3519,6 @@ mod tests {
             let req = CompileRequest {
                 edition,
                 code: SUBTRACT_CODE.into(),
-                channel: Channel::Nightly, // To allow 2024 while it is unstable
                 ..ARBITRARY_HIR_REQUEST
             };
 
@@ -3855,7 +3849,6 @@ mod tests {
                 let req = FormatRequest {
                     edition,
                     code: code.into(),
-                    channel: Channel::Nightly, // To allow 2024 while it is unstable
                     ..ARBITRARY_FORMAT_REQUEST
                 };
 
@@ -4265,14 +4258,10 @@ mod tests {
     });
 
     trait TimeoutExt: Future + Sized {
-        #[allow(clippy::type_complexity)]
-        fn with_timeout(
-            self,
-        ) -> futures::future::Map<
-            tokio::time::Timeout<Self>,
-            fn(Result<Self::Output, tokio::time::error::Elapsed>) -> Self::Output,
-        > {
-            tokio::time::timeout(*TIMEOUT, self).map(|v| v.expect("The operation timed out"))
+        async fn with_timeout(self) -> Self::Output {
+            tokio::time::timeout(*TIMEOUT, self)
+                .await
+                .expect("The operation timed out")
         }
     }
 

@@ -39,13 +39,8 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
 
   scenario "using the 2024 edition" do
     editor.set <<-EOF
-      #![feature(gen_blocks)]
-
       fn main() {
-          let mut x = gen { yield 1 };
-
-          eprintln!("{:?}", x.next());
-          eprintln!("{:?}", x.next());
+          let gen = 1;
       }
     EOF
 
@@ -53,8 +48,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
     click_on("Run")
 
     within(:output, :stderr) do
-      expect(page).to have_content 'Some(1)'
-      expect(page).to have_content 'None'
+      expect(page).to have_content 'found reserved keyword `gen`'
     end
   end
 

@@ -4,7 +4,7 @@ import * as config from './reducers/configuration';
 import { Either as EitherConfig, Select as SelectConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
 import * as selectors from './selectors';
-import { Backtrace, Channel, Edition } from './types';
+import { Backtrace, Edition } from './types';
 import { useAppDispatch, useAppSelector } from './hooks';
 
 const AdvancedOptionsMenu: React.FC = () => {
@@ -18,9 +18,6 @@ const AdvancedOptionsMenu: React.FC = () => {
   const changeEdition = useCallback((e: Edition) => dispatch(config.changeEdition(e)), [dispatch]);
   const changeBacktrace = useCallback((b: Backtrace) => dispatch(config.changeBacktrace(b)), [dispatch]);
 
-  const channel  = useAppSelector((state) => state.configuration.channel);
-  const switchText = (channel !== Channel.Nightly) ? ' (will select nightly Rust)' : '';
-
   return (
     <MenuGroup title="Advanced options">
       <SelectConfig
@@ -32,7 +29,7 @@ const AdvancedOptionsMenu: React.FC = () => {
         <option value={Edition.Rust2015}>2015</option>
         <option value={Edition.Rust2018}>2018</option>
         <option value={Edition.Rust2021}>2021</option>
-        <option value={Edition.Rust2024}>2024{switchText}</option>
+        <option value={Edition.Rust2024}>2024</option>
       </SelectConfig>
 
       <EitherConfig
