@@ -38,6 +38,7 @@ const Copied: React.FC<CopiedProps> = ({ children, href }) => {
 
   const startCopy = useCallback(() => {
     setCopied(true);
+    window.navigator.clipboard.writeText(href);
 
     setTimeout(() => {
       setCopied(false);
