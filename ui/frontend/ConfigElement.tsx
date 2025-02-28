@@ -70,16 +70,21 @@ export const Select = <T extends string>({
 interface ConfigElementProps {
   children?: React.ReactNode;
   name: string;
-  isNotDefault?: boolean;
+  isDefault?: boolean;
   aside?: JSX.Element;
 }
 
-const ConfigElement: React.FC<ConfigElementProps> = ({ name, isNotDefault, aside, children }) => (
-  <MenuItem>
-    <div className={styles.container}>
-      <span className={isNotDefault ? styles.notDefault : styles.name}>{name}</span>
-      <div className={styles.value}>{children}</div>
-    </div>
-    {aside}
-  </MenuItem>
-);
+const ConfigElement: React.FC<ConfigElementProps> = ({ name, isDefault, aside, children }) => {
+  const actuallyDefault = isDefault ?? true;
+  const defaultStyle = actuallyDefault ? styles.name : styles.notDefault;
+
+  return (
+    <MenuItem>
+      <div className={styles.container}>
+        <span className={defaultStyle}>{name}</span>
+        <div className={styles.value}>{children}</div>
+      </div>
+      {aside}
+    </MenuItem>
+  );
+};

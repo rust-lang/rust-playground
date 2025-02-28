@@ -26,7 +26,7 @@ const AdvancedOptionsMenu: React.FC = () => {
       <SelectConfig
         name="Edition"
         value={edition}
-        isNotDefault={!isEditionDefault}
+        isDefault={isEditionDefault}
         onChange={changeEdition}
       >
         <option value={Edition.Rust2015}>2015</option>
@@ -41,7 +41,7 @@ const AdvancedOptionsMenu: React.FC = () => {
         a={Backtrace.Disabled}
         b={Backtrace.Enabled}
         value={backtrace}
-        isNotDefault={!isBacktraceDefault}
+        isDefault={isBacktraceDefault}
         onChange={changeBacktrace}
       />
     </MenuGroup>
