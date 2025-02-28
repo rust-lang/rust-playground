@@ -10,7 +10,7 @@ import { Backtrace, Edition } from './types';
 const AdvancedOptionsMenu: React.FC = () => {
   const isEditionDefault = useAppSelector(selectors.isEditionDefault);
   const edition = useAppSelector((state) => state.configuration.edition);
-  const isBacktraceSet = useAppSelector(selectors.getBacktraceSet);
+  const isBacktraceDefault = useAppSelector(selectors.isBacktraceDefault);
   const backtrace = useAppSelector((state) => state.configuration.backtrace);
 
   const dispatch = useAppDispatch();
@@ -41,7 +41,7 @@ const AdvancedOptionsMenu: React.FC = () => {
         a={Backtrace.Disabled}
         b={Backtrace.Enabled}
         value={backtrace}
-        isNotDefault={isBacktraceSet}
+        isNotDefault={!isBacktraceDefault}
         onChange={changeBacktrace}
       />
     </MenuGroup>
