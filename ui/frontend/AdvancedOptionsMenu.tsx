@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 
-import * as config from './reducers/configuration';
 import { Either as EitherConfig, Select as SelectConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
+import { useAppDispatch, useAppSelector } from './hooks';
+import * as config from './reducers/configuration';
 import * as selectors from './selectors';
 import { Backtrace, Edition } from './types';
-import { useAppDispatch, useAppSelector } from './hooks';
 
 const AdvancedOptionsMenu: React.FC = () => {
   const isEditionDefault = useAppSelector(selectors.isEditionDefault);
@@ -16,7 +16,10 @@ const AdvancedOptionsMenu: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const changeEdition = useCallback((e: Edition) => dispatch(config.changeEdition(e)), [dispatch]);
-  const changeBacktrace = useCallback((b: Backtrace) => dispatch(config.changeBacktrace(b)), [dispatch]);
+  const changeBacktrace = useCallback(
+    (b: Backtrace) => dispatch(config.changeBacktrace(b)),
+    [dispatch],
+  );
 
   return (
     <MenuGroup title="Advanced options">
@@ -39,7 +42,8 @@ const AdvancedOptionsMenu: React.FC = () => {
         b={Backtrace.Enabled}
         value={backtrace}
         isNotDefault={isBacktraceSet}
-        onChange={changeBacktrace} />
+        onChange={changeBacktrace}
+      />
     </MenuGroup>
   );
 };
