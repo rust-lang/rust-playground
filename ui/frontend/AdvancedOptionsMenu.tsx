@@ -38,8 +38,10 @@ const AdvancedOptionsMenu: React.FC = () => {
       <EitherConfig
         id="backtrace"
         name="Backtrace"
-        a={Backtrace.Disabled}
-        b={Backtrace.Enabled}
+        a={Backtrace.Enabled}
+        b={Backtrace.Disabled}
+        aLabel="On"
+        bLabel="Off"
         value={backtrace}
         isDefault={isBacktraceDefault}
         onChange={changeBacktrace}
