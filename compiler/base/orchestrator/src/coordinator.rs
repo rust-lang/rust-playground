@@ -33,6 +33,14 @@ use crate::{
     DropErrorDetailsExt, TaskAbortExt as _,
 };
 
+macro_rules! kvs {
+    ($($k:expr => $v:expr),+$(,)?) => {
+        [
+            $((Into::into($k), Into::into($v)),)+
+        ].into_iter()
+    };
+}
+
 pub mod limits;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -393,7 +401,7 @@ impl LowerRequest for ExecuteRequest {
 
         let mut envs = HashMap::new();
         if self.backtrace {
-            envs.insert("RUST_BACKTRACE".to_owned(), "1".to_owned());
+            envs.extend(kvs!("RUST_BACKTRACE" => "1"));
         }
 
         ExecuteCommandRequest {
@@ -522,7 +530,7 @@ impl LowerRequest for CompileRequest {
         }
         let mut envs = HashMap::new();
         if self.backtrace {
-            envs.insert("RUST_BACKTRACE".to_owned(), "1".to_owned());
+            envs.extend(kvs!("RUST_BACKTRACE" => "1"));
         }
 
         ExecuteCommandRequest {
@@ -660,6 +668,7 @@ pub struct MiriRequest {
     pub channel: Channel,
     pub crate_type: CrateType,
     pub edition: Edition,
+    pub tests: bool,
     pub aliasing_model: AliasingModel,
     pub code: String,
 }
@@ -680,12 +689,25 @@ impl LowerRequest for MiriRequest {
             miriflags.push("-Zmiri-tree-borrows");
         }
 
+        miriflags.push("-Zmiri-disable-isolation");
+
         let miriflags = miriflags.join(" ");
+
+        let subcommand = if self.tests { "test" } else { "run" };
 
         ExecuteCommandRequest {
             cmd: "cargo".to_owned(),
-            args: vec!["miri-playground".to_owned()],
-            envs: HashMap::from_iter([("MIRIFLAGS".to_owned(), miriflags)]),
+            args: ["miri", subcommand].map(Into::into).into(),
+            envs: kvs! {
+                "MIRIFLAGS" => miriflags,
+                // Be sure that `cargo miri` will not build a new
+                // sysroot. Creating a sysroot takes a while and Miri
+                // will build one by default if it's missing. If
+                // `MIRI_SYSROOT` is set and the sysroot is missing,
+                // it will error instead.
+                "MIRI_SYSROOT" => "/playground/.cache/miri",
+            }
+            .collect(),
             cwd: None,
         }
     }
@@ -1801,6 +1823,8 @@ impl Container {
             .next_process()
             .await
             .context(AcquirePermitSnafu)?;
+
+        trace!(?execute_cargo, "starting cargo task");
 
         let (stdin_tx, mut stdin_rx) = mpsc::channel(8);
         let (stdout_tx, stdout_rx) = mpsc::channel(8);
@@ -3954,6 +3978,7 @@ mod tests {
         channel: Channel::Nightly,
         crate_type: CrateType::Binary,
         edition: Edition::Rust2021,
+        tests: false,
         aliasing_model: AliasingModel::Stacked,
         code: String::new(),
     };
@@ -3961,12 +3986,41 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn miri() -> Result<()> {
-        // cargo-miri-playground only exists inside the container
-        let coordinator = new_coordinator_docker();
+        let coordinator = new_coordinator();
 
         let req = MiriRequest {
             code: r#"
                 fn main() {
+                    unsafe { core::mem::MaybeUninit::<u8>::uninit().assume_init() };
+                }
+                "#
+            .into(),
+            ..ARBITRARY_MIRI_REQUEST
+        };
+
+        let response = coordinator.miri(req).with_timeout().await.unwrap();
+
+        assert!(!response.success, "stderr: {}", response.stderr);
+
+        assert_contains!(response.stderr, "Undefined Behavior");
+        assert_contains!(response.stderr, "using uninitialized data");
+        assert_contains!(response.stderr, "operation requires initialized memory");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn miri_tests() -> Result<()> {
+        let coordinator = new_coordinator();
+
+        let req = MiriRequest {
+            tests: true,
+            code: r#"
+                #[test]
+                fn oops() {
                     unsafe { core::mem::MaybeUninit::<u8>::uninit().assume_init() };
                 }
                 "#

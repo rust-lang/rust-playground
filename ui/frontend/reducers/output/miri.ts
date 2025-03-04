@@ -22,6 +22,7 @@ interface State {
 interface MiriRequestBody {
   code: string;
   edition: string;
+  tests: boolean;
   aliasingModel: AliasingModel;
 }
 

@@ -397,9 +397,10 @@ export const formatRequestSelector = createSelector(
 
 export const miriRequestSelector = createSelector(
   editionSelector,
-  codeSelector,
+  runAsTest,
   aliasingModelSelector,
-  (edition, code, aliasingModel) => ({ edition, code, aliasingModel }),
+  codeSelector,
+  (edition, tests, aliasingModel, code, ) => ({ edition, tests, aliasingModel, code }),
 );
 
 export const macroExpansionRequestSelector = createSelector(

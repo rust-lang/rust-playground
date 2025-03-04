@@ -1288,6 +1288,7 @@ pub(crate) mod api_orchestrator_integration_impls {
             let api::MiriRequest {
                 code,
                 edition,
+                tests,
                 aliasing_model,
             } = other;
 
@@ -1300,6 +1301,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 channel: Channel::Nightly,     // TODO: use what user has submitted
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
+                tests,
                 aliasing_model,
                 code,
             })
