@@ -33,6 +33,14 @@ use crate::{
     DropErrorDetailsExt, TaskAbortExt as _,
 };
 
+macro_rules! kvs {
+    ($($k:expr => $v:expr),+$(,)?) => {
+        [
+            $((Into::into($k), Into::into($v)),)+
+        ].into_iter()
+    };
+}
+
 pub mod limits;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -393,7 +401,7 @@ impl LowerRequest for ExecuteRequest {
 
         let mut envs = HashMap::new();
         if self.backtrace {
-            envs.insert("RUST_BACKTRACE".to_owned(), "1".to_owned());
+            envs.extend(kvs!("RUST_BACKTRACE" => "1"));
         }
 
         ExecuteCommandRequest {
@@ -522,7 +530,7 @@ impl LowerRequest for CompileRequest {
         }
         let mut envs = HashMap::new();
         if self.backtrace {
-            envs.insert("RUST_BACKTRACE".to_owned(), "1".to_owned());
+            envs.extend(kvs!("RUST_BACKTRACE" => "1"));
         }
 
         ExecuteCommandRequest {
@@ -685,7 +693,7 @@ impl LowerRequest for MiriRequest {
         ExecuteCommandRequest {
             cmd: "cargo".to_owned(),
             args: vec!["miri-playground".to_owned()],
-            envs: HashMap::from_iter([("MIRIFLAGS".to_owned(), miriflags)]),
+            envs: kvs!("MIRIFLAGS" => miriflags).collect(),
             cwd: None,
         }
     }
