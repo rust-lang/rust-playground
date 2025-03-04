@@ -111,6 +111,7 @@ RUN rm src/*.rs
 COPY --from=build-orchestrator /playground/.cargo/bin/worker /playground/.cargo/bin/worker
 COPY --from=wasm-tools /playground/.cargo/bin/wasm-tools /playground/.cargo/bin
 COPY --chown=playground cargo-wasm /playground/.cargo/bin
+# `cargo-miri-playground` is vestigial and can be removed after a while
 COPY --chown=playground cargo-miri-playground /playground/.cargo/bin
 
 ENTRYPOINT ["/playground/tools/entrypoint.sh"]

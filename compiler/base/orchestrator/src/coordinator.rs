@@ -688,12 +688,23 @@ impl LowerRequest for MiriRequest {
             miriflags.push("-Zmiri-tree-borrows");
         }
 
+        miriflags.push("-Zmiri-disable-isolation");
+
         let miriflags = miriflags.join(" ");
 
         ExecuteCommandRequest {
             cmd: "cargo".to_owned(),
-            args: vec!["miri-playground".to_owned()],
-            envs: kvs!("MIRIFLAGS" => miriflags).collect(),
+            args: ["miri", "run"].map(Into::into).into(),
+            envs: kvs! {
+                "MIRIFLAGS" => miriflags,
+                // Be sure that `cargo miri` will not build a new
+                // sysroot. Creating a sysroot takes a while and Miri
+                // will build one by default if it's missing. If
+                // `MIRI_SYSROOT` is set and the sysroot is missing,
+                // it will error instead.
+                "MIRI_SYSROOT" => "/playground/.cache/miri",
+            }
+            .collect(),
             cwd: None,
         }
     }
@@ -3971,8 +3982,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn miri() -> Result<()> {
-        // cargo-miri-playground only exists inside the container
-        let coordinator = new_coordinator_docker();
+        let coordinator = new_coordinator();
 
         let req = MiriRequest {
             code: r#"
