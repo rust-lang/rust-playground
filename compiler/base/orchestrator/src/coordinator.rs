@@ -1802,6 +1802,8 @@ impl Container {
             .await
             .context(AcquirePermitSnafu)?;
 
+        trace!(?execute_cargo, "starting cargo task");
+
         let (stdin_tx, mut stdin_rx) = mpsc::channel(8);
         let (stdout_tx, stdout_rx) = mpsc::channel(8);
         let (stderr_tx, stderr_rx) = mpsc::channel(8);
