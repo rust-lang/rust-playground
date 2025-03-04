@@ -1300,6 +1300,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 channel: Channel::Nightly,     // TODO: use what user has submitted
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
+                tests: false,
                 aliasing_model,
                 code,
             })

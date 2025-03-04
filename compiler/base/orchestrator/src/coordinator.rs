@@ -668,6 +668,7 @@ pub struct MiriRequest {
     pub channel: Channel,
     pub crate_type: CrateType,
     pub edition: Edition,
+    pub tests: bool,
     pub aliasing_model: AliasingModel,
     pub code: String,
 }
@@ -692,9 +693,11 @@ impl LowerRequest for MiriRequest {
 
         let miriflags = miriflags.join(" ");
 
+        let subcommand = if self.tests { "test" } else { "run" };
+
         ExecuteCommandRequest {
             cmd: "cargo".to_owned(),
-            args: ["miri", "run"].map(Into::into).into(),
+            args: ["miri", subcommand].map(Into::into).into(),
             envs: kvs! {
                 "MIRIFLAGS" => miriflags,
                 // Be sure that `cargo miri` will not build a new
@@ -3975,6 +3978,7 @@ mod tests {
         channel: Channel::Nightly,
         crate_type: CrateType::Binary,
         edition: Edition::Rust2021,
+        tests: false,
         aliasing_model: AliasingModel::Stacked,
         code: String::new(),
     };
@@ -3987,6 +3991,36 @@ mod tests {
         let req = MiriRequest {
             code: r#"
                 fn main() {
+                    unsafe { core::mem::MaybeUninit::<u8>::uninit().assume_init() };
+                }
+                "#
+            .into(),
+            ..ARBITRARY_MIRI_REQUEST
+        };
+
+        let response = coordinator.miri(req).with_timeout().await.unwrap();
+
+        assert!(!response.success, "stderr: {}", response.stderr);
+
+        assert_contains!(response.stderr, "Undefined Behavior");
+        assert_contains!(response.stderr, "using uninitialized data");
+        assert_contains!(response.stderr, "operation requires initialized memory");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn miri_tests() -> Result<()> {
+        let coordinator = new_coordinator();
+
+        let req = MiriRequest {
+            tests: true,
+            code: r#"
+                #[test]
+                fn oops() {
                     unsafe { core::mem::MaybeUninit::<u8>::uninit().assume_init() };
                 }
                 "#
