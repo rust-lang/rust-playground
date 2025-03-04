@@ -12,7 +12,7 @@ RSpec.feature "A backtrace is shown for certain errors", type: :feature, js: tru
 
   context "backtraces are enabled" do
     before do
-      in_advanced_options_menu { choose 'enabled' }
+      in_advanced_options_menu { within(:config_option, 'Backtrace') { choose 'On' } }
       within(:header) { click_on("Run") }
     end
 

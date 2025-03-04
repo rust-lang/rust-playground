@@ -6,6 +6,7 @@ import {
   Backtrace,
   Channel,
   Edition,
+  AliasingModel,
   Focus,
   Orientation,
   PrimaryActionAuto,
@@ -147,6 +148,7 @@ export const rustfmtVersionDetailsText = createSelector(getRustfmt, versionDetai
 export const miriVersionDetailsText = createSelector(getMiri, versionDetails);
 
 const editionSelector = (state: State) => state.configuration.edition;
+export const aliasingModelSelector = (state: State) => state.configuration.aliasingModel;
 
 export const isNightlyChannel = createSelector(
   channelSelector,
@@ -172,18 +174,23 @@ export const getChannelLabel = createSelector(channelSelector, (channel) => `${c
 
 export const isEditionDefault = createSelector(
   editionSelector,
-  edition => edition == Edition.Rust2024,
+  edition => edition === Edition.Rust2024,
 );
 
-export const getBacktraceSet = (state: State) => (
-  state.configuration.backtrace !== Backtrace.Disabled
+export const isBacktraceDefault = (state: State) => (
+  state.configuration.backtrace === Backtrace.Disabled
+);
+
+export const getBacktraceSet = createSelector(isBacktraceDefault, (b) => !b);
+
+export const isAliasingModelDefault = createSelector(
+  aliasingModelSelector,
+  aliasingModel => aliasingModel == AliasingModel.Stacked,
 );
 
 export const getAdvancedOptionsSet = createSelector(
-  isEditionDefault, getBacktraceSet,
-  (editionDefault, backtraceSet) => (
-    !editionDefault || backtraceSet
-  ),
+  isEditionDefault, isBacktraceDefault, isAliasingModelDefault,
+  (...areDefault) => !areDefault.every(n => n),
 );
 
 export const hasProperties = (obj: object) => Object.values(obj).some(val => !!val);
@@ -391,7 +398,8 @@ export const formatRequestSelector = createSelector(
 export const miriRequestSelector = createSelector(
   editionSelector,
   codeSelector,
-  (edition, code) => ({ edition, code }),
+  aliasingModelSelector,
+  (edition, code, aliasingModel) => ({ edition, code, aliasingModel }),
 );
 
 export const macroExpansionRequestSelector = createSelector(

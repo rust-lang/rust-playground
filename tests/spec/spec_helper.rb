@@ -88,6 +88,12 @@ Capybara.add_selector(:notification) do
   css { '[data-test-id = "notification"]' }
 end
 
+Capybara.add_selector(:config_option) do
+  xpath do |label|
+    ".//div[span[contains(., '#{label}')]]"
+  end
+end
+
 RSpec.configure do |config|
   config.after(:example, :js) do
     page.execute_script <<~JS

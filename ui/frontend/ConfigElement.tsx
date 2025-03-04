@@ -14,27 +14,39 @@ interface EitherProps<T extends string> extends ConfigElementProps {
   onChange: (_: T) => void;
 }
 
-export const Either =
-  <T extends string,>({ id, a, b, aLabel = a, bLabel = b, value, onChange, ...rest }: EitherProps<T>) => (
-    <ConfigElement {...rest}>
-      <div className={styles.toggle}>
-        <input id={`${id}-a`}
-          name={id}
-          value={a}
-          type="radio"
-          checked={value === a}
-          onChange={() => onChange(a as T)} />
-        <label htmlFor={`${id}-a`}>{aLabel}</label>
-        <input id={`${id}-b`}
-          name={id}
-          value={b}
-          type="radio"
-          checked={value === b}
-          onChange={() => onChange(b as T)} />
-        <label htmlFor={`${id}-b`}>{bLabel}</label>
-      </div>
-    </ConfigElement>
-  );
+export const Either = <T extends string>({
+  id,
+  a,
+  b,
+  aLabel = a,
+  bLabel = b,
+  value,
+  onChange,
+  ...rest
+}: EitherProps<T>) => (
+  <ConfigElement {...rest}>
+    <div className={styles.toggle}>
+      <input
+        id={`${id}-a`}
+        name={id}
+        value={a}
+        type="radio"
+        checked={value === a}
+        onChange={() => onChange(a as T)}
+      />
+      <label htmlFor={`${id}-a`}>{aLabel}</label>
+      <input
+        id={`${id}-b`}
+        name={id}
+        value={b}
+        type="radio"
+        checked={value === b}
+        onChange={() => onChange(b as T)}
+      />
+      <label htmlFor={`${id}-b`}>{bLabel}</label>
+    </div>
+  </ConfigElement>
+);
 
 interface SelectProps<T extends string> extends ConfigElementProps {
   children: React.ReactNode;
@@ -42,9 +54,14 @@ interface SelectProps<T extends string> extends ConfigElementProps {
   onChange: (_: T) => void;
 }
 
-export const Select = <T extends string,>({ value, onChange, children, ...rest }: SelectProps<T>) => (
+export const Select = <T extends string>({
+  value,
+  onChange,
+  children,
+  ...rest
+}: SelectProps<T>) => (
   <ConfigElement {...rest}>
-    <select className={styles.select} value={value} onChange={e => onChange(e.target.value as T)}>
+    <select className={styles.select} value={value} onChange={(e) => onChange(e.target.value as T)}>
       {children}
     </select>
   </ConfigElement>
@@ -53,18 +70,21 @@ export const Select = <T extends string,>({ value, onChange, children, ...rest }
 interface ConfigElementProps {
   children?: React.ReactNode;
   name: string;
-  isNotDefault?: boolean;
-  aside?: JSX.Element,
+  isDefault?: boolean;
+  aside?: JSX.Element;
 }
 
-const ConfigElement: React.FC<ConfigElementProps> = ({ name, isNotDefault, aside, children }) => (
-  <MenuItem>
-    <div className={styles.container}>
-      <span className={isNotDefault ? styles.notDefault : styles.name}>{name}</span>
-      <div className={styles.value}>
-        {children}
+const ConfigElement: React.FC<ConfigElementProps> = ({ name, isDefault, aside, children }) => {
+  const actuallyDefault = isDefault ?? true;
+  const defaultStyle = actuallyDefault ? styles.name : styles.notDefault;
+
+  return (
+    <MenuItem>
+      <div className={styles.container}>
+        <span className={defaultStyle}>{name}</span>
+        <div className={styles.value}>{children}</div>
       </div>
-    </div>
-    {aside}
-  </MenuItem>
-);
+      {aside}
+    </MenuItem>
+  );
+};
