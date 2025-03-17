@@ -43,7 +43,7 @@ const Copied: React.FC<CopiedProps> = ({ children, href }) => {
     setTimeout(() => {
       setCopied(false);
     }, 1000);
-  }, []);
+  }, [href]);
 
   return (
     <p className={copied ? styles.active : styles.container}>
