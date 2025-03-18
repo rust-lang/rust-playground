@@ -6,6 +6,7 @@ import {
   Backtrace,
   Channel,
   Edition,
+  AliasingModel,
   Focus,
   Orientation,
   PrimaryActionAuto,
@@ -147,6 +148,7 @@ export const rustfmtVersionDetailsText = createSelector(getRustfmt, versionDetai
 export const miriVersionDetailsText = createSelector(getMiri, versionDetails);
 
 const editionSelector = (state: State) => state.configuration.edition;
+export const aliasingModelSelector = (state: State) => state.configuration.aliasingModel;
 
 export const isNightlyChannel = createSelector(
   channelSelector,
@@ -172,18 +174,23 @@ export const getChannelLabel = createSelector(channelSelector, (channel) => `${c
 
 export const isEditionDefault = createSelector(
   editionSelector,
-  edition => edition == Edition.Rust2021,
+  edition => edition === Edition.Rust2024,
 );
 
-export const getBacktraceSet = (state: State) => (
-  state.configuration.backtrace !== Backtrace.Disabled
+export const isBacktraceDefault = (state: State) => (
+  state.configuration.backtrace === Backtrace.Disabled
+);
+
+export const getBacktraceSet = createSelector(isBacktraceDefault, (b) => !b);
+
+export const isAliasingModelDefault = createSelector(
+  aliasingModelSelector,
+  aliasingModel => aliasingModel == AliasingModel.Stacked,
 );
 
 export const getAdvancedOptionsSet = createSelector(
-  isEditionDefault, getBacktraceSet,
-  (editionDefault, backtraceSet) => (
-    !editionDefault || backtraceSet
-  ),
+  isEditionDefault, isBacktraceDefault, isAliasingModelDefault,
+  (...areDefault) => !areDefault.every(n => n),
 );
 
 export const hasProperties = (obj: object) => Object.values(obj).some(val => !!val);
@@ -360,15 +367,15 @@ const notificationsSelector = (state: State) => state.notifications;
 
 const NOW = new Date();
 
-const RUST_SURVEY_2024_END = new Date('2024-12-23T00:00:00Z');
-const RUST_SURVEY_2024_OPEN = NOW <= RUST_SURVEY_2024_END;
-export const showRustSurvey2024Selector = createSelector(
+const RUST_2024_IS_DEFAULT_END = new Date('2025-04-03T00:00:00Z');
+const RUST_2024_IS_DEFAULT_OPEN = NOW <= RUST_2024_IS_DEFAULT_END;
+export const showRust2024IsDefaultSelector = createSelector(
   notificationsSelector,
-  notifications => RUST_SURVEY_2024_OPEN && !notifications.seenRustSurvey2024,
+  notifications => RUST_2024_IS_DEFAULT_OPEN && !notifications.seenRust2024IsDefault,
 );
 
 export const anyNotificationsToShowSelector = createSelector(
-  showRustSurvey2024Selector,
+  showRust2024IsDefaultSelector,
   excessiveExecutionSelector,
   (...allNotifications) => allNotifications.some(n => n),
 );
@@ -390,8 +397,10 @@ export const formatRequestSelector = createSelector(
 
 export const miriRequestSelector = createSelector(
   editionSelector,
+  runAsTest,
+  aliasingModelSelector,
   codeSelector,
-  (edition, code) => ({ edition, code }),
+  (edition, tests, aliasingModel, code, ) => ({ edition, tests, aliasingModel, code }),
 );
 
 export const macroExpansionRequestSelector = createSelector(

@@ -119,7 +119,7 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
 
   scenario "compiling a library to WebAssembly" do
     editor.set <<~EOF
-      #[no_mangle]
+      #[unsafe(no_mangle)]
       pub fn calculator(a: u8) -> u8 { a + 42 }
     EOF
 

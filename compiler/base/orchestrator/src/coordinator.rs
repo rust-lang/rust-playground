@@ -33,6 +33,14 @@ use crate::{
     DropErrorDetailsExt, TaskAbortExt as _,
 };
 
+macro_rules! kvs {
+    ($($k:expr => $v:expr),+$(,)?) => {
+        [
+            $((Into::into($k), Into::into($v)),)+
+        ].into_iter()
+    };
+}
+
 pub mod limits;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -239,6 +247,12 @@ pub enum Channel {
     Nightly,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum AliasingModel {
+    Stacked,
+    Tree,
+}
+
 impl Channel {
     #[cfg(test)]
     pub(crate) const ALL: [Self; 3] = [Self::Stable, Self::Beta, Self::Nightly];
@@ -387,7 +401,7 @@ impl LowerRequest for ExecuteRequest {
 
         let mut envs = HashMap::new();
         if self.backtrace {
-            envs.insert("RUST_BACKTRACE".to_owned(), "1".to_owned());
+            envs.extend(kvs!("RUST_BACKTRACE" => "1"));
         }
 
         ExecuteCommandRequest {
@@ -516,7 +530,7 @@ impl LowerRequest for CompileRequest {
         }
         let mut envs = HashMap::new();
         if self.backtrace {
-            envs.insert("RUST_BACKTRACE".to_owned(), "1".to_owned());
+            envs.extend(kvs!("RUST_BACKTRACE" => "1"));
         }
 
         envs.insert("CARGO_TERM_COLOR".to_owned(), "always".to_owned());
@@ -656,6 +670,8 @@ pub struct MiriRequest {
     pub channel: Channel,
     pub crate_type: CrateType,
     pub edition: Edition,
+    pub tests: bool,
+    pub aliasing_model: AliasingModel,
     pub code: String,
 }
 
@@ -669,10 +685,31 @@ impl LowerRequest for MiriRequest {
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
+        let mut miriflags = Vec::new();
+
+        if matches!(self.aliasing_model, AliasingModel::Tree) {
+            miriflags.push("-Zmiri-tree-borrows");
+        }
+
+        miriflags.push("-Zmiri-disable-isolation");
+
+        let miriflags = miriflags.join(" ");
+
+        let subcommand = if self.tests { "test" } else { "run" };
+
         ExecuteCommandRequest {
             cmd: "cargo".to_owned(),
-            args: vec!["miri-playground".to_owned()],
-            envs: Default::default(),
+            args: ["miri", subcommand].map(Into::into).into(),
+            envs: kvs! {
+                "MIRIFLAGS" => miriflags,
+                // Be sure that `cargo miri` will not build a new
+                // sysroot. Creating a sysroot takes a while and Miri
+                // will build one by default if it's missing. If
+                // `MIRI_SYSROOT` is set and the sysroot is missing,
+                // it will error instead.
+                "MIRI_SYSROOT" => "/playground/.cache/miri",
+            }
+            .collect(),
             cwd: None,
         }
     }
@@ -1788,6 +1825,8 @@ impl Container {
             .next_process()
             .await
             .context(AcquirePermitSnafu)?;
+
+        trace!(?execute_cargo, "starting cargo task");
 
         let (stdin_tx, mut stdin_rx) = mpsc::channel(8);
         let (stdout_tx, stdout_rx) = mpsc::channel(8);
@@ -3076,11 +3115,7 @@ mod tests {
                 r#"fn x() { u16::try_from(1u8); }"#,
                 [false, false, true, true],
             ),
-            (
-                r#"#![feature(gen_blocks)]
-                   fn x() { gen { yield 1u8 }; }"#,
-                [false, false, false, true],
-            ),
+            (r#"fn x() { let gen = true; }"#, [true, true, true, false]),
         ];
 
         let tests = params.into_iter().flat_map(|(code, works_in)| {
@@ -3092,7 +3127,6 @@ mod tests {
                         code: code.into(),
                         edition,
                         crate_type: CrateType::Library(LibraryType::Lib),
-                        channel: Channel::Nightly, // To allow 2024 while it is unstable
                         ..ARBITRARY_EXECUTE_REQUEST
                     };
                     let response = coordinator.execute(request).await.unwrap();
@@ -3526,7 +3560,6 @@ mod tests {
             let req = CompileRequest {
                 edition,
                 code: SUBTRACT_CODE.into(),
-                channel: Channel::Nightly, // To allow 2024 while it is unstable
                 ..ARBITRARY_HIR_REQUEST
             };
 
@@ -3857,7 +3890,6 @@ mod tests {
                 let req = FormatRequest {
                     edition,
                     code: code.into(),
-                    channel: Channel::Nightly, // To allow 2024 while it is unstable
                     ..ARBITRARY_FORMAT_REQUEST
                 };
 
@@ -3948,18 +3980,49 @@ mod tests {
         channel: Channel::Nightly,
         crate_type: CrateType::Binary,
         edition: Edition::Rust2021,
+        tests: false,
+        aliasing_model: AliasingModel::Stacked,
         code: String::new(),
     };
 
     #[tokio::test]
     #[snafu::report]
     async fn miri() -> Result<()> {
-        // cargo-miri-playground only exists inside the container
-        let coordinator = new_coordinator_docker();
+        let coordinator = new_coordinator();
 
         let req = MiriRequest {
             code: r#"
                 fn main() {
+                    unsafe { core::mem::MaybeUninit::<u8>::uninit().assume_init() };
+                }
+                "#
+            .into(),
+            ..ARBITRARY_MIRI_REQUEST
+        };
+
+        let response = coordinator.miri(req).with_timeout().await.unwrap();
+
+        assert!(!response.success, "stderr: {}", response.stderr);
+
+        assert_contains!(response.stderr, "Undefined Behavior");
+        assert_contains!(response.stderr, "using uninitialized data");
+        assert_contains!(response.stderr, "operation requires initialized memory");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn miri_tests() -> Result<()> {
+        let coordinator = new_coordinator();
+
+        let req = MiriRequest {
+            tests: true,
+            code: r#"
+                #[test]
+                fn oops() {
                     unsafe { core::mem::MaybeUninit::<u8>::uninit().assume_init() };
                 }
                 "#
@@ -4267,14 +4330,10 @@ mod tests {
     });
 
     trait TimeoutExt: Future + Sized {
-        #[allow(clippy::type_complexity)]
-        fn with_timeout(
-            self,
-        ) -> futures::future::Map<
-            tokio::time::Timeout<Self>,
-            fn(Result<Self::Output, tokio::time::error::Elapsed>) -> Self::Output,
-        > {
-            tokio::time::timeout(*TIMEOUT, self).map(|v| v.expect("The operation timed out"))
+        async fn with_timeout(self) -> Self::Output {
+            tokio::time::timeout(*TIMEOUT, self)
+                .await
+                .expect("The operation timed out")
         }
     }
 

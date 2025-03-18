@@ -26,6 +26,9 @@ const ToolsMenu: React.FC<ToolsMenuProps> = props => {
   const nightlyVersion = useAppSelector(selectors.nightlyVersionText);
   const nightlyVersionDetails = useAppSelector(selectors.nightlyVersionDetailsText);
 
+  const miriRunningTests = useAppSelector(selectors.runAsTest);
+  const miriText = miriRunningTests ? "these tests" : "this program";
+
   const dispatch = useAppDispatch();
   const clippy = useCallback(() => {
     dispatch(performClippy());
@@ -62,7 +65,7 @@ const ToolsMenu: React.FC<ToolsMenuProps> = props => {
         name="Miri"
         onClick={miri}>
         <div>
-          Execute this program in the Miri interpreter to detect certain
+          Execute {miriText} in the Miri interpreter to detect certain
           cases of undefined behavior (like out-of-bounds memory access).
         </div>
         <MenuAside>{miriVersion} ({miriVersionDetails})</MenuAside>

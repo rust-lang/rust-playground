@@ -12,8 +12,10 @@ node_modules
 *.scss
 
 # Slowly migrate files that we've touched
+!AdvancedOptionsMenu.tsx
 !BuildMenu.tsx
 !ButtonSet.tsx
+!ConfigElement.tsx
 !Header.tsx
 !HelpExample.tsx
 !Notifications.tsx

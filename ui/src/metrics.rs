@@ -361,6 +361,8 @@ impl HasLabelsCore for coordinator::MiriRequest {
             channel,
             crate_type,
             edition,
+            tests,
+            aliasing_model: _,
             code: _,
         } = *self;
 
@@ -370,7 +372,7 @@ impl HasLabelsCore for coordinator::MiriRequest {
             mode: None,
             edition: Some(Some(edition)),
             crate_type: Some(crate_type),
-            tests: None,
+            tests: Some(tests),
             backtrace: None,
         }
     }

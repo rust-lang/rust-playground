@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import { ThunkAction } from '../actions';
 import {
+  AliasingModel,
   AssemblyFlavor,
   Backtrace,
   Channel,
@@ -37,6 +37,7 @@ interface State {
   mode: Mode;
   edition: Edition;
   backtrace: Backtrace;
+  aliasingModel: AliasingModel;
 }
 
 const initialState: State = {
@@ -57,8 +58,9 @@ const initialState: State = {
   primaryAction: PrimaryActionAuto.Auto,
   channel: Channel.Stable,
   mode: Mode.Debug,
-  edition: Edition.Rust2021,
+  edition: Edition.Rust2024,
   backtrace: Backtrace.Disabled,
+  aliasingModel: AliasingModel.Stacked,
 };
 
 const slice = createSlice({
@@ -77,6 +79,10 @@ const slice = createSlice({
       state.backtrace = action.payload;
     },
 
+    changeAliasingModel: (state, action: PayloadAction<AliasingModel>) => {
+      state.aliasingModel = action.payload;
+    },
+
     changeChannel: (state, action: PayloadAction<Channel>) => {
       state.channel = action.payload;
     },
@@ -85,7 +91,7 @@ const slice = createSlice({
       state.demangleAssembly = action.payload;
     },
 
-    changeEditionRaw: (state, action: PayloadAction<Edition>) => {
+    changeEdition: (state, action: PayloadAction<Edition>) => {
       state.edition = action.payload;
     },
 
@@ -147,9 +153,10 @@ export const {
   changeAceTheme,
   changeAssemblyFlavor,
   changeBacktrace,
+  changeAliasingModel,
   changeChannel,
   changeDemangleAssembly,
-  changeEditionRaw,
+  changeEdition,
   changeEditor,
   changeKeybinding,
   changeMode,
@@ -161,15 +168,5 @@ export const {
   changeProcessAssembly,
   swapTheme,
 } = slice.actions;
-
-export const changeEdition =
-  (edition: Edition): ThunkAction =>
-  (dispatch) => {
-    if (edition === Edition.Rust2024) {
-      dispatch(changeChannel(Channel.Nightly));
-    }
-
-    dispatch(changeEditionRaw(edition));
-  };
 
 export default slice.reducer;

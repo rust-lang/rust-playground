@@ -150,6 +150,11 @@ export enum Backtrace {
   Enabled = 'enabled',
 }
 
+export enum AliasingModel {
+  Stacked = 'stacked',
+  Tree = 'tree',
+}
+
 export enum Focus {
   Clippy = 'clippy',
   Miri = 'miri',
@@ -165,5 +170,5 @@ export enum Focus {
 }
 
 export enum Notification {
-  RustSurvey2024 = 'rust-survey-2024',
+  Rust2024IsDefault = 'rust-2024-is-default',
 }
