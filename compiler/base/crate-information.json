@@ -111,12 +111,12 @@
   },
   {
     "name": "aws-lc-rs",
-    "version": "1.12.6",
+    "version": "1.13.0",
     "id": "aws_lc_rs"
   },
   {
     "name": "aws-lc-sys",
-    "version": "0.27.1",
+    "version": "0.28.0",
     "id": "aws_lc_sys"
   },
   {
@@ -166,7 +166,7 @@
   },
   {
     "name": "borsh",
-    "version": "1.5.5",
+    "version": "1.5.7",
     "id": "borsh"
   },
   {
@@ -186,7 +186,7 @@
   },
   {
     "name": "bytemuck_derive",
-    "version": "1.8.1",
+    "version": "1.9.3",
     "id": "bytemuck_derive"
   },
   {
@@ -211,7 +211,7 @@
   },
   {
     "name": "cc",
-    "version": "1.2.16",
+    "version": "1.2.18",
     "id": "cc"
   },
   {
@@ -231,12 +231,12 @@
   },
   {
     "name": "clap",
-    "version": "4.5.32",
+    "version": "4.5.35",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.5.32",
+    "version": "4.5.35",
     "id": "clap_builder"
   },
   {
@@ -356,7 +356,7 @@
   },
   {
     "name": "deranged",
-    "version": "0.3.11",
+    "version": "0.4.0",
     "id": "deranged"
   },
   {
@@ -421,7 +421,7 @@
   },
   {
     "name": "env_logger",
-    "version": "0.11.7",
+    "version": "0.11.8",
     "id": "env_logger"
   },
   {
@@ -431,7 +431,7 @@
   },
   {
     "name": "errno",
-    "version": "0.3.10",
+    "version": "0.3.11",
     "id": "errno"
   },
   {
@@ -486,7 +486,7 @@
   },
   {
     "name": "flate2",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "id": "flate2"
   },
   {
@@ -596,7 +596,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "id": "getrandom"
   },
   {
@@ -721,12 +721,12 @@
   },
   {
     "name": "hyper-util",
-    "version": "0.1.10",
+    "version": "0.1.11",
     "id": "hyper_util"
   },
   {
     "name": "iana-time-zone",
-    "version": "0.1.61",
+    "version": "0.1.63",
     "id": "iana_time_zone"
   },
   {
@@ -746,7 +746,7 @@
   },
   {
     "name": "icu_locid_transform_data",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "id": "icu_locid_transform_data"
   },
   {
@@ -756,7 +756,7 @@
   },
   {
     "name": "icu_normalizer_data",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "id": "icu_normalizer_data"
   },
   {
@@ -766,7 +766,7 @@
   },
   {
     "name": "icu_properties_data",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "id": "icu_properties_data"
   },
   {
@@ -791,7 +791,7 @@
   },
   {
     "name": "image",
-    "version": "0.25.5",
+    "version": "0.25.6",
     "id": "image"
   },
   {
@@ -806,7 +806,7 @@
   },
   {
     "name": "indexmap",
-    "version": "2.8.0",
+    "version": "2.9.0",
     "id": "indexmap"
   },
   {
@@ -841,12 +841,12 @@
   },
   {
     "name": "jiff",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "id": "jiff"
   },
   {
     "name": "jobserver",
-    "version": "0.1.32",
+    "version": "0.1.33",
     "id": "jobserver"
   },
   {
@@ -901,7 +901,7 @@
   },
   {
     "name": "log",
-    "version": "0.4.26",
+    "version": "0.4.27",
     "id": "log"
   },
   {
@@ -986,7 +986,7 @@
   },
   {
     "name": "miniz_oxide",
-    "version": "0.8.5",
+    "version": "0.8.7",
     "id": "miniz_oxide"
   },
   {
@@ -1081,12 +1081,12 @@
   },
   {
     "name": "once_cell",
-    "version": "1.21.1",
+    "version": "1.21.3",
     "id": "once_cell"
   },
   {
     "name": "openssl",
-    "version": "0.10.71",
+    "version": "0.10.72",
     "id": "openssl"
   },
   {
@@ -1101,7 +1101,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.106",
+    "version": "0.9.107",
     "id": "openssl_sys"
   },
   {
@@ -1131,7 +1131,7 @@
   },
   {
     "name": "petgraph",
-    "version": "0.7.1",
+    "version": "0.8.1",
     "id": "petgraph"
   },
   {
@@ -1351,7 +1351,7 @@
   },
   {
     "name": "reqwest",
-    "version": "0.12.14",
+    "version": "0.12.15",
     "id": "reqwest"
   },
   {
@@ -1381,12 +1381,12 @@
   },
   {
     "name": "rustix",
-    "version": "1.0.2",
+    "version": "1.0.5",
     "id": "rustix"
   },
   {
     "name": "rustls",
-    "version": "0.23.24",
+    "version": "0.23.25",
     "id": "rustls"
   },
   {
@@ -1431,7 +1431,7 @@
   },
   {
     "name": "select",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "id": "select"
   },
   {
@@ -1536,17 +1536,17 @@
   },
   {
     "name": "smallvec",
-    "version": "1.14.0",
+    "version": "1.15.0",
     "id": "smallvec"
   },
   {
     "name": "socket2",
-    "version": "0.5.8",
+    "version": "0.5.9",
     "id": "socket2"
   },
   {
     "name": "spin",
-    "version": "0.9.8",
+    "version": "0.10.0",
     "id": "spin"
   },
   {
@@ -1561,7 +1561,7 @@
   },
   {
     "name": "string_cache",
-    "version": "0.8.8",
+    "version": "0.8.9",
     "id": "string_cache"
   },
   {
@@ -1611,7 +1611,7 @@
   },
   {
     "name": "tempfile",
-    "version": "3.19.0",
+    "version": "3.19.1",
     "id": "tempfile"
   },
   {
@@ -1661,17 +1661,17 @@
   },
   {
     "name": "time",
-    "version": "0.3.39",
+    "version": "0.3.41",
     "id": "time"
   },
   {
     "name": "time-core",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "id": "time_core"
   },
   {
     "name": "time-macros",
-    "version": "0.2.20",
+    "version": "0.2.22",
     "id": "time_macros"
   },
   {
@@ -1691,7 +1691,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.44.1",
+    "version": "1.44.2",
     "id": "tokio"
   },
   {
@@ -1936,7 +1936,7 @@
   },
   {
     "name": "rustls-webpki",
-    "version": "0.103.0",
+    "version": "0.103.1",
     "id": "webpki"
   },
   {
@@ -1946,13 +1946,18 @@
   },
   {
     "name": "whoami",
-    "version": "1.5.2",
+    "version": "1.6.0",
     "id": "whoami"
   },
   {
     "name": "wide",
     "version": "0.7.32",
     "id": "wide"
+  },
+  {
+    "name": "windows_i686_msvc",
+    "version": "0.53.0",
+    "id": "windows_i686_msvc"
   },
   {
     "name": "windows-sys",
@@ -2016,7 +2021,7 @@
   },
   {
     "name": "zerocopy",
-    "version": "0.8.23",
+    "version": "0.8.24",
     "id": "zerocopy"
   },
   {
@@ -2026,7 +2031,7 @@
   },
   {
     "name": "zerocopy-derive",
-    "version": "0.8.23",
+    "version": "0.8.24",
     "id": "zerocopy_derive"
   },
   {

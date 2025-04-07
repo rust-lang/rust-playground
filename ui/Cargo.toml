@@ -14,10 +14,10 @@ axum = { version = "0.8", features = ["ws"] }
 axum-extra = { version = "0.10", features = ["typed-header"] }
 dotenv = "0.15.0"
 futures = "0.3.21"
-octocrab = "0.43"
+octocrab = "0.44"
 openssl-probe = "0.1.2"
 orchestrator = { path = "../compiler/base/orchestrator" }
-prometheus = "0.13.0"
+prometheus = { version = "0.14.0", default-features = false }
 regex = "1.0.0"
 rusqlite = { version = "0.34.0", default-features = false, features = ["bundled"] }
 serde = { version = "1.0", features = ["rc"] }

@@ -75,7 +75,7 @@ pub fn filter_asm(block: &str) -> String {
     let mut line_info = Vec::new();
     let mut labels = HashSet::new();
     let mut opcode_operands = HashSet::new();
-    let mut label_graph = DiGraphMap::new();
+    let mut label_graph: DiGraphMap<_, _> = Default::default();
 
     // Note the type of data held on each line of the block
     for line in block.lines() {
