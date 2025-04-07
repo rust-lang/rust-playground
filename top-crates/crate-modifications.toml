@@ -1,6 +1,8 @@
 exclusions = [
     # https://github.com/advisories/GHSA-g98v-hv3f-hcfr
     "atty",
+    # https://github.com/JelteF/derive_more/issues/447
+    "derive_more",
 ]
 
 additions = [
