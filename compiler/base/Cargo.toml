@@ -80,7 +80,7 @@ version = "=1.1.2"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.97"
+version = "=1.0.98"
 features = ["std"]
 
 [dependencies.approx]
@@ -135,7 +135,7 @@ default-features = false
 
 [dependencies.aws_lc_sys]
 package = "aws-lc-sys"
-version = "=0.28.0"
+version = "=0.28.2"
 features = ["prebuilt-nasm"]
 
 [dependencies.backtrace]
@@ -224,7 +224,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.2.18"
+version = "=1.2.19"
 features = ["parallel"]
 
 [dependencies.cfg_aliases]
@@ -242,12 +242,12 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [dependencies.clap]
 package = "clap"
-version = "=4.5.35"
+version = "=4.5.37"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.35"
+version = "=4.5.37"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-ext", "usage", "wrap_help"]
 default-features = false
 
@@ -302,7 +302,7 @@ features = ["alloc", "crossbeam-channel", "crossbeam-deque", "crossbeam-epoch", 
 
 [dependencies.crossbeam_channel]
 package = "crossbeam-channel"
-version = "=0.5.14"
+version = "=0.5.15"
 features = ["std"]
 
 [dependencies.crossbeam_deque]
@@ -350,7 +350,7 @@ version = "=0.1.12"
 
 [dependencies.data_encoding]
 package = "data-encoding"
-version = "=2.8.0"
+version = "=2.9.0"
 features = ["alloc", "std"]
 
 [dependencies.debug_unreachable]
@@ -366,6 +366,12 @@ default-features = false
 [dependencies.derivative]
 package = "derivative"
 version = "=2.2.0"
+
+[dependencies.derive_more]
+package = "derive_more"
+version = "=0.99.20"
+features = ["add", "add_assign"]
+default-features = false
 
 [dependencies.destructure_traitobject]
 package = "destructure_traitobject"
@@ -587,9 +593,9 @@ package = "getrandom"
 version = "=0.3.2"
 features = ["std"]
 
-[dependencies.getrandom_0_2_15]
+[dependencies.getrandom_0_2_16]
 package = "getrandom"
-version = "=0.2.15"
+version = "=0.2.16"
 features = ["std"]
 
 [dependencies.gif]
@@ -609,11 +615,11 @@ version = "=0.3.2"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.4.8"
+version = "=0.4.9"
 
 [dependencies.half]
 package = "half"
-version = "=2.5.0"
+version = "=2.6.0"
 features = ["alloc", "std"]
 
 [dependencies.hash32]
@@ -809,7 +815,7 @@ version = "=1.0.15"
 
 [dependencies.jiff]
 package = "jiff"
-version = "=0.2.5"
+version = "=0.2.10"
 features = ["alloc", "std"]
 default-features = false
 
@@ -832,21 +838,22 @@ version = "=0.5.2"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.171"
+version = "=0.2.172"
 features = ["extra_traits", "std"]
 
 [dependencies.libm]
 package = "libm"
-version = "=0.2.11"
+version = "=0.2.13"
+features = ["arch"]
 
 [dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.32.0"
-features = ["bundled", "bundled_bindings", "cc", "min_sqlite_version_3_14_0", "pkg-config", "unlock_notify", "vcpkg"]
+version = "=0.33.0"
+features = ["bundled", "bundled_bindings", "cc", "column_metadata", "min_sqlite_version_3_14_0", "pkg-config", "unlock_notify", "vcpkg"]
 
 [dependencies.linux_raw_sys]
 package = "linux-raw-sys"
-version = "=0.9.3"
+version = "=0.9.4"
 features = ["elf", "errno", "general", "ioctl", "no_std", "std"]
 
 [dependencies.litemap]
@@ -945,7 +952,7 @@ default-features = false
 
 [dependencies.miniz_oxide]
 package = "miniz_oxide"
-version = "=0.8.7"
+version = "=0.8.8"
 features = ["simd", "simd-adler32", "with-alloc"]
 
 [dependencies.mio]
@@ -1175,7 +1182,7 @@ version = "=0.1.1"
 
 [dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.94"
+version = "=1.0.95"
 features = ["proc-macro", "span-locations"]
 
 [dependencies.profiling]
@@ -1212,7 +1219,7 @@ features = ["proc-macro"]
 
 [dependencies.rand]
 package = "rand"
-version = "=0.9.0"
+version = "=0.9.1"
 features = ["alloc", "os_rng", "serde", "small_rng", "std", "std_rng", "thread_rng"]
 
 [dependencies.rand_0_8_5]
@@ -1253,7 +1260,7 @@ default-features = false
 
 [dependencies.ravif]
 package = "ravif"
-version = "=0.11.11"
+version = "=0.11.12"
 features = ["threading"]
 default-features = false
 
@@ -1301,8 +1308,8 @@ features = ["alloc", "dev_urandom_fallback"]
 
 [dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.34.0"
-features = ["array", "backup", "blob", "bundled", "bundled-full", "chrono", "collation", "column_decltype", "csv", "csvtab", "extra_check", "functions", "hooks", "i128_blob", "jiff", "limits", "load_extension", "modern-full", "modern_sqlite", "serde_json", "serialize", "series", "time", "trace", "unlock_notify", "url", "uuid", "vtab", "window"]
+version = "=0.35.0"
+features = ["array", "backup", "blob", "bundled", "bundled-full", "chrono", "collation", "column_decltype", "column_metadata", "csv", "csvtab", "extra_check", "functions", "hooks", "i128_blob", "jiff", "limits", "load_extension", "modern-full", "modern_sqlite", "serde_json", "serialize", "series", "time", "trace", "unlock_notify", "url", "uuid", "vtab", "window"]
 
 [dependencies.rustc_demangle]
 package = "rustc-demangle"
@@ -1319,7 +1326,7 @@ features = ["alloc", "fs", "std", "termios"]
 
 [dependencies.rustls]
 package = "rustls"
-version = "=0.23.25"
+version = "=0.23.26"
 features = ["aws-lc-rs", "aws_lc_rs", "log", "logging", "std", "tls12"]
 
 [dependencies.rustls_pemfile]
@@ -1423,7 +1430,7 @@ features = ["std"]
 
 [dependencies.signal_hook_registry]
 package = "signal-hook-registry"
-version = "=1.4.2"
+version = "=1.4.5"
 
 [dependencies.simba]
 package = "simba"
@@ -1632,7 +1639,7 @@ features = ["time"]
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.14"
+version = "=0.7.15"
 features = ["codec", "compat", "full", "futures-io", "futures-util", "hashbrown", "io", "io-util", "net", "rt", "slab", "time"]
 
 [dependencies.toml]
@@ -1731,10 +1738,6 @@ features = ["cjk"]
 package = "unicode-width"
 version = "=0.1.14"
 features = ["cjk"]
-
-[dependencies.unicode_xid]
-package = "unicode-xid"
-version = "=0.2.6"
 
 [dependencies.unsafe_any_ors]
 package = "unsafe-any-ors"
@@ -1837,6 +1840,14 @@ version = "=0.7.32"
 features = ["std"]
 default-features = false
 
+[dependencies.windows_aarch64_msvc]
+package = "windows_aarch64_msvc"
+version = "=0.53.0"
+
+[dependencies.windows_i686_gnu]
+package = "windows_i686_gnu"
+version = "=0.53.0"
+
 [dependencies.windows_i686_msvc]
 package = "windows_i686_msvc"
 version = "=0.53.0"
@@ -1864,7 +1875,7 @@ version = "=0.53.0"
 
 [dependencies.winnow]
 package = "winnow"
-version = "=0.7.4"
+version = "=0.7.7"
 features = ["alloc", "std"]
 
 [dependencies.write16]
@@ -2009,7 +2020,7 @@ version = "=1.1.2"
 
 [build-dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.97"
+version = "=1.0.98"
 features = ["std"]
 
 [build-dependencies.approx]
@@ -2064,7 +2075,7 @@ default-features = false
 
 [build-dependencies.aws_lc_sys]
 package = "aws-lc-sys"
-version = "=0.28.0"
+version = "=0.28.2"
 features = ["prebuilt-nasm"]
 
 [build-dependencies.backtrace]
@@ -2153,7 +2164,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.2.18"
+version = "=1.2.19"
 features = ["parallel"]
 
 [build-dependencies.cfg_aliases]
@@ -2171,12 +2182,12 @@ features = ["alloc", "android-tzdata", "clock", "iana-time-zone", "js-sys", "now
 
 [build-dependencies.clap]
 package = "clap"
-version = "=4.5.35"
+version = "=4.5.37"
 features = ["color", "derive", "error-context", "help", "std", "suggestions", "unstable-doc", "usage"]
 
 [build-dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.35"
+version = "=4.5.37"
 features = ["cargo", "color", "env", "error-context", "help", "std", "string", "suggestions", "unicode", "unstable-doc", "unstable-ext", "usage", "wrap_help"]
 default-features = false
 
@@ -2231,7 +2242,7 @@ features = ["alloc", "crossbeam-channel", "crossbeam-deque", "crossbeam-epoch", 
 
 [build-dependencies.crossbeam_channel]
 package = "crossbeam-channel"
-version = "=0.5.14"
+version = "=0.5.15"
 features = ["std"]
 
 [build-dependencies.crossbeam_deque]
@@ -2279,7 +2290,7 @@ version = "=0.1.12"
 
 [build-dependencies.data_encoding]
 package = "data-encoding"
-version = "=2.8.0"
+version = "=2.9.0"
 features = ["alloc", "std"]
 
 [build-dependencies.debug_unreachable]
@@ -2295,6 +2306,12 @@ default-features = false
 [build-dependencies.derivative]
 package = "derivative"
 version = "=2.2.0"
+
+[build-dependencies.derive_more]
+package = "derive_more"
+version = "=0.99.20"
+features = ["add", "add_assign"]
+default-features = false
 
 [build-dependencies.destructure_traitobject]
 package = "destructure_traitobject"
@@ -2516,9 +2533,9 @@ package = "getrandom"
 version = "=0.3.2"
 features = ["std"]
 
-[build-dependencies.getrandom_0_2_15]
+[build-dependencies.getrandom_0_2_16]
 package = "getrandom"
-version = "=0.2.15"
+version = "=0.2.16"
 features = ["std"]
 
 [build-dependencies.gif]
@@ -2538,11 +2555,11 @@ version = "=0.3.2"
 
 [build-dependencies.h2]
 package = "h2"
-version = "=0.4.8"
+version = "=0.4.9"
 
 [build-dependencies.half]
 package = "half"
-version = "=2.5.0"
+version = "=2.6.0"
 features = ["alloc", "std"]
 
 [build-dependencies.hash32]
@@ -2738,7 +2755,7 @@ version = "=1.0.15"
 
 [build-dependencies.jiff]
 package = "jiff"
-version = "=0.2.5"
+version = "=0.2.10"
 features = ["alloc", "std"]
 default-features = false
 
@@ -2761,21 +2778,22 @@ version = "=0.5.2"
 
 [build-dependencies.libc]
 package = "libc"
-version = "=0.2.171"
+version = "=0.2.172"
 features = ["extra_traits", "std"]
 
 [build-dependencies.libm]
 package = "libm"
-version = "=0.2.11"
+version = "=0.2.13"
+features = ["arch"]
 
 [build-dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.32.0"
-features = ["bundled", "bundled_bindings", "cc", "min_sqlite_version_3_14_0", "pkg-config", "unlock_notify", "vcpkg"]
+version = "=0.33.0"
+features = ["bundled", "bundled_bindings", "cc", "column_metadata", "min_sqlite_version_3_14_0", "pkg-config", "unlock_notify", "vcpkg"]
 
 [build-dependencies.linux_raw_sys]
 package = "linux-raw-sys"
-version = "=0.9.3"
+version = "=0.9.4"
 features = ["elf", "errno", "general", "ioctl", "no_std", "std"]
 
 [build-dependencies.litemap]
@@ -2874,7 +2892,7 @@ default-features = false
 
 [build-dependencies.miniz_oxide]
 package = "miniz_oxide"
-version = "=0.8.7"
+version = "=0.8.8"
 features = ["simd", "simd-adler32", "with-alloc"]
 
 [build-dependencies.mio]
@@ -3104,7 +3122,7 @@ version = "=0.1.1"
 
 [build-dependencies.proc_macro2]
 package = "proc-macro2"
-version = "=1.0.94"
+version = "=1.0.95"
 features = ["proc-macro", "span-locations"]
 
 [build-dependencies.profiling]
@@ -3141,7 +3159,7 @@ features = ["proc-macro"]
 
 [build-dependencies.rand]
 package = "rand"
-version = "=0.9.0"
+version = "=0.9.1"
 features = ["alloc", "os_rng", "serde", "small_rng", "std", "std_rng", "thread_rng"]
 
 [build-dependencies.rand_0_8_5]
@@ -3182,7 +3200,7 @@ default-features = false
 
 [build-dependencies.ravif]
 package = "ravif"
-version = "=0.11.11"
+version = "=0.11.12"
 features = ["threading"]
 default-features = false
 
@@ -3230,8 +3248,8 @@ features = ["alloc", "dev_urandom_fallback"]
 
 [build-dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.34.0"
-features = ["array", "backup", "blob", "bundled", "bundled-full", "chrono", "collation", "column_decltype", "csv", "csvtab", "extra_check", "functions", "hooks", "i128_blob", "jiff", "limits", "load_extension", "modern-full", "modern_sqlite", "serde_json", "serialize", "series", "time", "trace", "unlock_notify", "url", "uuid", "vtab", "window"]
+version = "=0.35.0"
+features = ["array", "backup", "blob", "bundled", "bundled-full", "chrono", "collation", "column_decltype", "column_metadata", "csv", "csvtab", "extra_check", "functions", "hooks", "i128_blob", "jiff", "limits", "load_extension", "modern-full", "modern_sqlite", "serde_json", "serialize", "series", "time", "trace", "unlock_notify", "url", "uuid", "vtab", "window"]
 
 [build-dependencies.rustc_demangle]
 package = "rustc-demangle"
@@ -3248,7 +3266,7 @@ features = ["alloc", "fs", "std", "termios"]
 
 [build-dependencies.rustls]
 package = "rustls"
-version = "=0.23.25"
+version = "=0.23.26"
 features = ["aws-lc-rs", "aws_lc_rs", "log", "logging", "std", "tls12"]
 
 [build-dependencies.rustls_pemfile]
@@ -3352,7 +3370,7 @@ features = ["std"]
 
 [build-dependencies.signal_hook_registry]
 package = "signal-hook-registry"
-version = "=1.4.2"
+version = "=1.4.5"
 
 [build-dependencies.simba]
 package = "simba"
@@ -3561,7 +3579,7 @@ features = ["time"]
 
 [build-dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.14"
+version = "=0.7.15"
 features = ["codec", "compat", "full", "futures-io", "futures-util", "hashbrown", "io", "io-util", "net", "rt", "slab", "time"]
 
 [build-dependencies.toml]
@@ -3660,10 +3678,6 @@ features = ["cjk"]
 package = "unicode-width"
 version = "=0.1.14"
 features = ["cjk"]
-
-[build-dependencies.unicode_xid]
-package = "unicode-xid"
-version = "=0.2.6"
 
 [build-dependencies.unsafe_any_ors]
 package = "unsafe-any-ors"
@@ -3766,6 +3780,14 @@ version = "=0.7.32"
 features = ["std"]
 default-features = false
 
+[build-dependencies.windows_aarch64_msvc]
+package = "windows_aarch64_msvc"
+version = "=0.53.0"
+
+[build-dependencies.windows_i686_gnu]
+package = "windows_i686_gnu"
+version = "=0.53.0"
+
 [build-dependencies.windows_i686_msvc]
 package = "windows_i686_msvc"
 version = "=0.53.0"
@@ -3793,7 +3815,7 @@ version = "=0.53.0"
 
 [build-dependencies.winnow]
 package = "winnow"
-version = "=0.7.4"
+version = "=0.7.7"
 features = ["alloc", "std"]
 
 [build-dependencies.write16]
