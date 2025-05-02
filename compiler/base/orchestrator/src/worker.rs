@@ -463,18 +463,18 @@ impl ProcessState {
         self.processes.spawn({
             let stdin_shutdown_tx = self.stdin_shutdown_tx.clone();
             async move {
+                let message = process_end(
+                    token,
+                    child,
+                    task_set,
+                    statistics_task,
+                    stdin_shutdown_tx,
+                    job_id,
+                )
+                .await;
+
                 worker_msg_tx
-                    .send(
-                        process_end(
-                            token,
-                            child,
-                            task_set,
-                            statistics_task,
-                            stdin_shutdown_tx,
-                            job_id,
-                        )
-                        .await,
-                    )
+                    .send(message)
                     .await
                     .context(UnableToSendExecuteCommandResponseSnafu)
             }
