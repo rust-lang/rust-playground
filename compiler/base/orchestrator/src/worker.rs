@@ -31,11 +31,13 @@
 //!   - [`tokio::process::ChildStderr`][]
 //!
 
+use futures::FutureExt as _;
 use snafu::prelude::*;
 use std::{
     collections::HashMap,
     io,
     path::{Path, PathBuf},
+    pin::pin,
     process::{ExitStatus, Stdio},
 };
 use tokio::{
@@ -463,18 +465,18 @@ impl ProcessState {
         self.processes.spawn({
             let stdin_shutdown_tx = self.stdin_shutdown_tx.clone();
             async move {
+                let message = process_end(
+                    token,
+                    child,
+                    task_set,
+                    statistics_task,
+                    stdin_shutdown_tx,
+                    job_id,
+                )
+                .await;
+
                 worker_msg_tx
-                    .send(
-                        process_end(
-                            token,
-                            child,
-                            task_set,
-                            statistics_task,
-                            stdin_shutdown_tx,
-                            job_id,
-                        )
-                        .await,
-                    )
+                    .send(message)
                     .await
                     .context(UnableToSendExecuteCommandResponseSnafu)
             }
@@ -615,14 +617,13 @@ async fn process_end(
 ) -> Result<ExecuteCommandResponse, ProcessError> {
     use process_error::*;
 
-    let mut killed = false;
+    let mut cancelled = pin!(token.cancelled().fuse());
 
     let status = loop {
         select! {
             // The user requested that the process be killed
-            () = token.cancelled(), if !killed => {
+            () = &mut cancelled => {
                 child.kill().await.context(KillChildSnafu)?;
-                killed = true;
             },
 
             // The process exited normally

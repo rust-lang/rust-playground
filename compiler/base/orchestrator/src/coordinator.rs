@@ -4,6 +4,7 @@ use snafu::prelude::*;
 use std::{
     collections::{BTreeSet, HashMap},
     fmt, mem, ops,
+    pin::pin,
     process::Stdio,
     sync::{
         atomic::{AtomicU64, Ordering},
@@ -1839,14 +1840,12 @@ impl Container {
 
         let task = tokio::spawn({
             async move {
-                let mut already_cancelled = false;
+                let mut cancelled = pin!(token.cancelled().fuse());
                 let mut stdin_open = true;
 
                 loop {
                     select! {
-                        () = token.cancelled(), if !already_cancelled => {
-                            already_cancelled = true;
-
+                        () = &mut cancelled => {
                             let msg = CoordinatorMessage::Kill;
                             trace!(msg_name = msg.as_ref(), "processing");
                             to_worker_tx.send(msg).await.context(KillSnafu)?;
