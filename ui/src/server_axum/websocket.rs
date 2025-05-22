@@ -212,7 +212,7 @@ pub(crate) async fn handle(
     let start = Instant::now();
 
     let id = WEBSOCKET_ID.fetch_add(1, Ordering::SeqCst);
-    tracing::Span::current().record("ws_id", &id);
+    tracing::Span::current().record("ws_id", id);
     info!("WebSocket started");
 
     handle_core(socket, config, factory, feature_flags, db).await;
@@ -440,7 +440,7 @@ async fn handle_core(
             _ = active_execution_gc_interval.tick() => {
                 active_executions = mem::take(&mut active_executions)
                     .into_iter()
-                    .filter(|(_id, (_, tx))| tx.as_ref().map_or(false, |tx| !tx.is_closed()))
+                    .filter(|(_id, (_, tx))| tx.as_ref().is_some_and(|tx| !tx.is_closed()))
                     .collect();
             },
 

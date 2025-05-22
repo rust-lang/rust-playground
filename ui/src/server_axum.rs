@@ -162,7 +162,7 @@ pub(crate) async fn serve(config: Config) {
 
     app = app.layer(SetRequestIdLayer::new(
         x_request_id.clone(),
-        MakeRequestUuid::default(),
+        MakeRequestUuid,
     ));
 
     let server_socket_addr = config.server_socket_addr();
@@ -525,9 +525,8 @@ where
         .with_max_age(SANDBOX_CACHE_TIME_TO_LIVE)
         .with_public();
 
-    let use_fresh = if_none_match.map_or(true, |if_none_match| {
-        if_none_match.0.precondition_passes(&etag)
-    });
+    let use_fresh =
+        if_none_match.is_none_or(|if_none_match| if_none_match.0.precondition_passes(&etag));
 
     let etag = TypedHeader(etag);
     let cache_control = TypedHeader(cache_control);
@@ -617,7 +616,7 @@ async fn nowebsocket(Json(req): Json<NoWebSocketRequest>) {
 }
 
 static WS_ERRORS: LazyLock<std::sync::Mutex<std::collections::HashMap<String, usize>>> =
-    LazyLock::new(|| Default::default());
+    LazyLock::new(Default::default);
 
 fn record_websocket_error(error: String) {
     *WS_ERRORS
