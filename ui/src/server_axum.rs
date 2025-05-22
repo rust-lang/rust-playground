@@ -29,7 +29,6 @@ use orchestrator::coordinator::{self, CoordinatorFactory, DockerBackend, TRACKED
 use snafu::prelude::*;
 use std::{
     convert::TryInto,
-    future::Future,
     mem, path,
     str::FromStr,
     sync::{Arc, LazyLock},
@@ -207,16 +206,15 @@ async fn rewrite_help_as_index(
     next.run(req).await
 }
 
-async fn attempt_record_request<T, RFut, RT, RE>(
+async fn attempt_record_request<R, T, E>(
     db: Handle,
-    req: T,
-    f: impl FnOnce(T) -> RFut,
-) -> Result<RT, RE>
+    req: R,
+    f: impl AsyncFnOnce(R) -> Result<T, E>,
+) -> Result<T, E>
 where
-    T: HasEndpoint + serde::Serialize,
-    RFut: Future<Output = Result<RT, RE>>,
+    R: HasEndpoint + serde::Serialize,
 {
-    let category = format!("http.{}", <&str>::from(T::ENDPOINT));
+    let category = format!("http.{}", <&str>::from(R::ENDPOINT));
     let payload = serde_json::to_string(&req).unwrap_or_else(|_| String::from("<invalid JSON>"));
     let guard = db.start_with_guard(category, payload).await;
 
