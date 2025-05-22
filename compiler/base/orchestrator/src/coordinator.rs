@@ -2985,7 +2985,7 @@ mod tests {
         }
     }
 
-    const MAX_CONCURRENT_TESTS: LazyLock<usize> = LazyLock::new(|| {
+    static MAX_CONCURRENT_TESTS: LazyLock<usize> = LazyLock::new(|| {
         env::var("TESTS_MAX_CONCURRENCY")
             .ok()
             .and_then(|v| v.parse().ok())
@@ -3538,7 +3538,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert!(response.success, "stderr: {}", stderr);
+        assert!(response.success, "stderr: {stderr}");
         assert_contains!(stderr, "Compiling");
         assert_contains!(stderr, "Finished");
 
