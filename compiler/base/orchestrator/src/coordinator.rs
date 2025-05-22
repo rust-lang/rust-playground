@@ -947,7 +947,7 @@ where
         use versions_error::*;
 
         let [stable, beta, nightly] =
-            [Channel::Stable, Channel::Beta, Channel::Nightly].map(|c| async move {
+            [Channel::Stable, Channel::Beta, Channel::Nightly].map(async |c| {
                 let c = self.select_channel(c).await?;
                 c.versions().await.map_err(VersionsChannelError::from)
             });
@@ -1144,11 +1144,9 @@ where
         let token = mem::take(token);
         token.cancel();
 
-        let channels = [stable, beta, nightly].map(|c| async {
-            match c.take() {
-                Some(c) => c.shutdown().await,
-                _ => Ok(()),
-            }
+        let channels = [stable, beta, nightly].map(async |c| match c.take() {
+            Some(c) => c.shutdown().await,
+            _ => Ok(()),
         });
 
         let [stable, beta, nightly] = channels;
@@ -3081,7 +3079,7 @@ mod tests {
             (Mode::Release, "[optimized]"),
         ];
 
-        let tests = params.into_iter().map(|(mode, expected)| async move {
+        let tests = params.into_iter().map(async |(mode, expected)| {
             let coordinator = new_coordinator();
 
             let request = ExecuteRequest {
@@ -3116,8 +3114,10 @@ mod tests {
         ];
 
         let tests = params.into_iter().flat_map(|(code, works_in)| {
-            Edition::ALL.into_iter().zip(works_in).map(
-                move |(edition, expected_to_work)| async move {
+            Edition::ALL
+                .into_iter()
+                .zip(works_in)
+                .map(async |(edition, expected_to_work)| {
                     let coordinator = new_coordinator();
 
                     let request = ExecuteRequest {
@@ -3137,8 +3137,7 @@ mod tests {
                     coordinator.shutdown().await?;
 
                     Ok::<_, Error>(())
-                },
-            )
+                })
         });
 
         try_join_all(tests).with_timeout().await?;
@@ -3157,7 +3156,7 @@ mod tests {
             ),
         ];
 
-        let tests = params.into_iter().map(|(crate_type, expected)| async move {
+        let tests = params.into_iter().map(async |(crate_type, expected)| {
             let coordinator = new_coordinator();
 
             let request = ExecuteRequest {
@@ -3190,7 +3189,7 @@ mod tests {
 
         let params = [(false, "Running `"), (true, "Running unittests")];
 
-        let tests = params.into_iter().map(|(tests, expected)| async move {
+        let tests = params.into_iter().map(async |(tests, expected)| {
             let coordinator = new_coordinator();
 
             let request = ExecuteRequest {
@@ -3223,7 +3222,7 @@ mod tests {
             (true, "stack backtrace:"),
         ];
 
-        let tests = params.into_iter().map(|(backtrace, expected)| async move {
+        let tests = params.into_iter().map(async |(backtrace, expected)| {
             let coordinator = new_coordinator();
 
             let request = ExecuteRequest {

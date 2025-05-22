@@ -568,7 +568,7 @@ async fn handle_msg(
                 .spawn({
                     let tx = tx.clone();
                     let meta = meta.clone();
-                    |coordinator| async {
+                    async |coordinator| {
                         let r = handle_execute(
                             token,
                             execution_rx,
@@ -706,13 +706,13 @@ async fn handle_execute_inner(
 
     let mut stdin_tx = Some(stdin_tx);
 
-    let send_stdout = |payload| async {
+    let send_stdout = async |payload| {
         let meta = meta.clone();
         tx.send(Ok(MessageResponse::ExecuteStdout { payload, meta }))
             .await
     };
 
-    let send_stderr = |payload| async {
+    let send_stderr = async |payload| {
         let meta = meta.clone();
         tx.send(Ok(MessageResponse::ExecuteStderr { payload, meta }))
             .await

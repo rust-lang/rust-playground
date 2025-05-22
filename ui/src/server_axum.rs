@@ -230,7 +230,7 @@ async fn evaluate(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::EvaluateRequest>,
 ) -> Result<Json<api::EvaluateResponse>> {
-    attempt_record_request(db, req, |req| async {
+    attempt_record_request(db, req, async |req| {
         with_coordinator(&factory.0, req, async |c, req| {
             c.execute(req).context(EvaluateSnafu).await
         })
@@ -245,7 +245,7 @@ async fn compile(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::CompileRequest>,
 ) -> Result<Json<api::CompileResponse>> {
-    attempt_record_request(db, req, |req| async {
+    attempt_record_request(db, req, async |req| {
         with_coordinator(&factory.0, req, async |c, req| {
             c.compile(req).context(CompileSnafu).await
         })
@@ -260,7 +260,7 @@ async fn execute(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::ExecuteRequest>,
 ) -> Result<Json<api::ExecuteResponse>> {
-    attempt_record_request(db, req, |req| async {
+    attempt_record_request(db, req, async |req| {
         with_coordinator(&factory.0, req, async |c, req| {
             c.execute(req).context(ExecuteSnafu).await
         })
@@ -275,7 +275,7 @@ async fn format(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::FormatRequest>,
 ) -> Result<Json<api::FormatResponse>> {
-    attempt_record_request(db, req, |req| async {
+    attempt_record_request(db, req, async |req| {
         with_coordinator(&factory.0, req, async |c, req| {
             c.format(req).context(FormatSnafu).await
         })
@@ -290,7 +290,7 @@ async fn clippy(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::ClippyRequest>,
 ) -> Result<Json<api::ClippyResponse>> {
-    attempt_record_request(db, req, |req| async {
+    attempt_record_request(db, req, async |req| {
         with_coordinator(&factory.0, req, async |c, req| {
             c.clippy(req).context(ClippySnafu).await
         })
@@ -305,7 +305,7 @@ async fn miri(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::MiriRequest>,
 ) -> Result<Json<api::MiriResponse>> {
-    attempt_record_request(db, req, |req| async {
+    attempt_record_request(db, req, async |req| {
         with_coordinator(&factory.0, req, async |c, req| {
             c.miri(req).context(MiriSnafu).await
         })
@@ -320,7 +320,7 @@ async fn macro_expansion(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::MacroExpansionRequest>,
 ) -> Result<Json<api::MacroExpansionResponse>> {
-    attempt_record_request(db, req, |req| async {
+    attempt_record_request(db, req, async |req| {
         with_coordinator(&factory.0, req, async |c, req| {
             c.macro_expansion(req).context(MacroExpansionSnafu).await
         })
