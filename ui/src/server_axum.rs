@@ -24,7 +24,7 @@ use axum_extra::{
     headers::{authorization::Bearer, Authorization, CacheControl, ETag, IfNoneMatch},
     TypedHeader,
 };
-use futures::{future::BoxFuture, FutureExt, TryFutureExt};
+use futures::{FutureExt, TryFutureExt};
 use orchestrator::coordinator::{self, CoordinatorFactory, DockerBackend, TRACKED_CONTAINERS};
 use snafu::prelude::*;
 use std::{
@@ -231,8 +231,8 @@ async fn evaluate(
     Json(req): Json<api::EvaluateRequest>,
 ) -> Result<Json<api::EvaluateResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.execute(req).context(EvaluateSnafu).boxed()
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.execute(req).context(EvaluateSnafu).await
         })
         .await
         .map(Json)
@@ -246,8 +246,8 @@ async fn compile(
     Json(req): Json<api::CompileRequest>,
 ) -> Result<Json<api::CompileResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.compile(req).context(CompileSnafu).boxed()
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.compile(req).context(CompileSnafu).await
         })
         .await
         .map(Json)
@@ -261,8 +261,8 @@ async fn execute(
     Json(req): Json<api::ExecuteRequest>,
 ) -> Result<Json<api::ExecuteResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.execute(req).context(ExecuteSnafu).boxed()
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.execute(req).context(ExecuteSnafu).await
         })
         .await
         .map(Json)
@@ -276,8 +276,8 @@ async fn format(
     Json(req): Json<api::FormatRequest>,
 ) -> Result<Json<api::FormatResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.format(req).context(FormatSnafu).boxed()
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.format(req).context(FormatSnafu).await
         })
         .await
         .map(Json)
@@ -291,8 +291,8 @@ async fn clippy(
     Json(req): Json<api::ClippyRequest>,
 ) -> Result<Json<api::ClippyResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.clippy(req).context(ClippySnafu).boxed()
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.clippy(req).context(ClippySnafu).await
         })
         .await
         .map(Json)
@@ -306,8 +306,8 @@ async fn miri(
     Json(req): Json<api::MiriRequest>,
 ) -> Result<Json<api::MiriResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.miri(req).context(MiriSnafu).boxed()
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.miri(req).context(MiriSnafu).await
         })
         .await
         .map(Json)
@@ -321,8 +321,8 @@ async fn macro_expansion(
     Json(req): Json<api::MacroExpansionRequest>,
 ) -> Result<Json<api::MacroExpansionResponse>> {
     attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.macro_expansion(req).context(MacroExpansionSnafu).boxed()
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.macro_expansion(req).context(MacroExpansionSnafu).await
         })
         .await
         .map(Json)
@@ -430,10 +430,10 @@ impl Outcome {
     }
 }
 
-async fn with_coordinator<WebReq, WebResp, Req, Resp, F>(
+async fn with_coordinator<WebReq, WebResp, Req, Resp>(
     factory: &CoordinatorFactory,
     req: WebReq,
-    f: F,
+    f: impl AsyncFnOnce(&coordinator::Coordinator<DockerBackend>, Req) -> Result<Resp>,
 ) -> Result<WebResp>
 where
     WebReq: TryInto<Req>,
@@ -442,8 +442,6 @@ where
     Req: HasLabelsCore,
     Resp: Into<WebResp>,
     Resp: IsSuccess,
-    for<'f> F:
-        FnOnce(&'f coordinator::Coordinator<DockerBackend>, Req) -> BoxFuture<'f, Result<Resp>>,
 {
     let coordinator = factory.build();
 
