@@ -134,7 +134,8 @@ pub(crate) async fn serve(config: Config) {
     let x_request_id = HeaderName::from_static("x-request-id");
 
     // Basic access logging
-    app = app.layer(
+    app = app.layer({
+        let x_request_id = x_request_id.clone();
         TraceLayer::new_for_http().make_span_with(move |req: &Request<_>| {
             const REQUEST_ID: &str = "request_id";
 
@@ -152,10 +153,8 @@ pub(crate) async fn serve(config: Config) {
             }
 
             span
-        }),
-    );
-
-    let x_request_id = HeaderName::from_static("x-request-id");
+        })
+    });
 
     // propagate `x-request-id` headers from request to response
     app = app.layer(PropagateRequestIdLayer::new(x_request_id.clone()));
