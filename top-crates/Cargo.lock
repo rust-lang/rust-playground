@@ -234,16 +234,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d71b6127be86fdcfddb610f7182ac57211d4b18a3e9c82eb2d17662f2227ad6a"
 
 [[package]]
-name = "bytesize"
-version = "1.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2e93abca9e28e0a1b9877922aacb20576e05d4679ffa78c3d6dc22a26a216659"
-
-[[package]]
 name = "cargo"
-version = "0.87.1"
+version = "0.88.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef4b637c88d53b77bddb38e89b78bea0908a4dbd05c242894a6d683a33dce90b"
+checksum = "e3266d7f10870d970f22fd244b5d4bb017f723247e6743f2283f6fe63a4f6084"
 dependencies = [
  "annotate-snippets",
  "anstream",
@@ -251,7 +245,6 @@ dependencies = [
  "anyhow",
  "base64",
  "blake3",
- "bytesize",
  "cargo-credential",
  "cargo-credential-libsecret",
  "cargo-credential-macos-keychain",
@@ -275,11 +268,11 @@ dependencies = [
  "hmac",
  "home",
  "http-auth",
- "humantime",
  "ignore",
  "im-rc",
  "indexmap",
  "itertools",
+ "jiff",
  "jobserver",
  "lazycell",
  "libc",
@@ -1978,12 +1971,6 @@ name = "httparse"
 version = "1.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6dbf3de79e51f3d586ab4cb9d5c3e2c14aa28ed23d180cf89b4df0454a69cc87"
-
-[[package]]
-name = "humantime"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b112acc8b3adf4b107a8ec20977da0273a8c386765a3ec0229bd500a1443f9f"
 
 [[package]]
 name = "hyper"
