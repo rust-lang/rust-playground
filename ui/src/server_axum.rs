@@ -24,12 +24,11 @@ use axum_extra::{
     headers::{authorization::Bearer, Authorization, CacheControl, ETag, IfNoneMatch},
     TypedHeader,
 };
-use futures::{future::BoxFuture, FutureExt, TryFutureExt};
+use futures::{FutureExt, TryFutureExt};
 use orchestrator::coordinator::{self, CoordinatorFactory, DockerBackend, TRACKED_CONTAINERS};
 use snafu::prelude::*;
 use std::{
     convert::TryInto,
-    future::Future,
     mem, path,
     str::FromStr,
     sync::{Arc, LazyLock},
@@ -134,7 +133,8 @@ pub(crate) async fn serve(config: Config) {
     let x_request_id = HeaderName::from_static("x-request-id");
 
     // Basic access logging
-    app = app.layer(
+    app = app.layer({
+        let x_request_id = x_request_id.clone();
         TraceLayer::new_for_http().make_span_with(move |req: &Request<_>| {
             const REQUEST_ID: &str = "request_id";
 
@@ -152,17 +152,15 @@ pub(crate) async fn serve(config: Config) {
             }
 
             span
-        }),
-    );
-
-    let x_request_id = HeaderName::from_static("x-request-id");
+        })
+    });
 
     // propagate `x-request-id` headers from request to response
     app = app.layer(PropagateRequestIdLayer::new(x_request_id.clone()));
 
     app = app.layer(SetRequestIdLayer::new(
         x_request_id.clone(),
-        MakeRequestUuid::default(),
+        MakeRequestUuid,
     ));
 
     let server_socket_addr = config.server_socket_addr();
@@ -208,16 +206,15 @@ async fn rewrite_help_as_index(
     next.run(req).await
 }
 
-async fn attempt_record_request<T, RFut, RT, RE>(
+async fn attempt_record_request<R, T, E>(
     db: Handle,
-    req: T,
-    f: impl FnOnce(T) -> RFut,
-) -> Result<RT, RE>
+    req: R,
+    f: impl AsyncFnOnce(R) -> Result<T, E>,
+) -> Result<T, E>
 where
-    T: HasEndpoint + serde::Serialize,
-    RFut: Future<Output = Result<RT, RE>>,
+    R: HasEndpoint + serde::Serialize,
 {
-    let category = format!("http.{}", <&str>::from(T::ENDPOINT));
+    let category = format!("http.{}", <&str>::from(R::ENDPOINT));
     let payload = serde_json::to_string(&req).unwrap_or_else(|_| String::from("<invalid JSON>"));
     let guard = db.start_with_guard(category, payload).await;
 
@@ -233,9 +230,9 @@ async fn evaluate(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::EvaluateRequest>,
 ) -> Result<Json<api::EvaluateResponse>> {
-    attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.execute(req).context(EvaluateSnafu).boxed()
+    attempt_record_request(db, req, async |req| {
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.execute(req).context(EvaluateSnafu).await
         })
         .await
         .map(Json)
@@ -248,9 +245,9 @@ async fn compile(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::CompileRequest>,
 ) -> Result<Json<api::CompileResponse>> {
-    attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.compile(req).context(CompileSnafu).boxed()
+    attempt_record_request(db, req, async |req| {
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.compile(req).context(CompileSnafu).await
         })
         .await
         .map(Json)
@@ -263,9 +260,9 @@ async fn execute(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::ExecuteRequest>,
 ) -> Result<Json<api::ExecuteResponse>> {
-    attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.execute(req).context(ExecuteSnafu).boxed()
+    attempt_record_request(db, req, async |req| {
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.execute(req).context(ExecuteSnafu).await
         })
         .await
         .map(Json)
@@ -278,9 +275,9 @@ async fn format(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::FormatRequest>,
 ) -> Result<Json<api::FormatResponse>> {
-    attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.format(req).context(FormatSnafu).boxed()
+    attempt_record_request(db, req, async |req| {
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.format(req).context(FormatSnafu).await
         })
         .await
         .map(Json)
@@ -293,9 +290,9 @@ async fn clippy(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::ClippyRequest>,
 ) -> Result<Json<api::ClippyResponse>> {
-    attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.clippy(req).context(ClippySnafu).boxed()
+    attempt_record_request(db, req, async |req| {
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.clippy(req).context(ClippySnafu).await
         })
         .await
         .map(Json)
@@ -308,9 +305,9 @@ async fn miri(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::MiriRequest>,
 ) -> Result<Json<api::MiriResponse>> {
-    attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.miri(req).context(MiriSnafu).boxed()
+    attempt_record_request(db, req, async |req| {
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.miri(req).context(MiriSnafu).await
         })
         .await
         .map(Json)
@@ -323,9 +320,9 @@ async fn macro_expansion(
     Extension(db): Extension<Handle>,
     Json(req): Json<api::MacroExpansionRequest>,
 ) -> Result<Json<api::MacroExpansionResponse>> {
-    attempt_record_request(db, req, |req| async {
-        with_coordinator(&factory.0, req, |c, req| {
-            c.macro_expansion(req).context(MacroExpansionSnafu).boxed()
+    attempt_record_request(db, req, async |req| {
+        with_coordinator(&factory.0, req, async |c, req| {
+            c.macro_expansion(req).context(MacroExpansionSnafu).await
         })
         .await
         .map(Json)
@@ -433,10 +430,10 @@ impl Outcome {
     }
 }
 
-async fn with_coordinator<WebReq, WebResp, Req, Resp, F>(
+async fn with_coordinator<WebReq, WebResp, Req, Resp>(
     factory: &CoordinatorFactory,
     req: WebReq,
-    f: F,
+    f: impl AsyncFnOnce(&coordinator::Coordinator<DockerBackend>, Req) -> Result<Resp>,
 ) -> Result<WebResp>
 where
     WebReq: TryInto<Req>,
@@ -445,8 +442,6 @@ where
     Req: HasLabelsCore,
     Resp: Into<WebResp>,
     Resp: IsSuccess,
-    for<'f> F:
-        FnOnce(&'f coordinator::Coordinator<DockerBackend>, Req) -> BoxFuture<'f, Result<Resp>>,
 {
     let coordinator = factory.build();
 
@@ -525,9 +520,8 @@ where
         .with_max_age(SANDBOX_CACHE_TIME_TO_LIVE)
         .with_public();
 
-    let use_fresh = if_none_match.map_or(true, |if_none_match| {
-        if_none_match.0.precondition_passes(&etag)
-    });
+    let use_fresh =
+        if_none_match.is_none_or(|if_none_match| if_none_match.0.precondition_passes(&etag));
 
     let etag = TypedHeader(etag);
     let cache_control = TypedHeader(cache_control);
@@ -617,7 +611,7 @@ async fn nowebsocket(Json(req): Json<NoWebSocketRequest>) {
 }
 
 static WS_ERRORS: LazyLock<std::sync::Mutex<std::collections::HashMap<String, usize>>> =
-    LazyLock::new(|| Default::default());
+    LazyLock::new(Default::default);
 
 fn record_websocket_error(error: String) {
     *WS_ERRORS

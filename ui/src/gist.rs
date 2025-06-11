@@ -23,7 +23,7 @@ impl From<octocrab::models::gists::Gist> for Gist {
             0 | 1 => files.into_iter().map(|(_, content)| content).collect(),
             _ => files
                 .into_iter()
-                .map(|(name, content)| format!("// {}\n{}\n\n", name, content))
+                .map(|(name, content)| format!("// {name}\n{content}\n\n"))
                 .collect(),
         };
 

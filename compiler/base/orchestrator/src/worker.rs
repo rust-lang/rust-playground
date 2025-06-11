@@ -1172,7 +1172,7 @@ mod test {
             let next_result = this.0.pop_front().expect("FixedAsyncRead ran out of input");
 
             if let Ok(v) = &next_result {
-                buf.put_slice(&v);
+                buf.put_slice(v);
             }
 
             Poll::Ready(next_result.map(drop))

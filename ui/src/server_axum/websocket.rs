@@ -16,7 +16,6 @@ use std::{
     collections::BTreeMap,
     convert::TryFrom,
     mem,
-    ops::ControlFlow,
     pin::pin,
     sync::{
         atomic::{AtomicU64, Ordering},
@@ -212,7 +211,7 @@ pub(crate) async fn handle(
     let start = Instant::now();
 
     let id = WEBSOCKET_ID.fetch_add(1, Ordering::SeqCst);
-    tracing::Span::current().record("ws_id", &id);
+    tracing::Span::current().record("ws_id", id);
     info!("WebSocket started");
 
     handle_core(socket, config, factory, feature_flags, db).await;
@@ -371,25 +370,55 @@ async fn handle_core(
     let mut active_execution_gc_interval = time::interval(Duration::from_secs(30));
 
     loop {
-        tokio::select! {
-            request = socket.recv() => {
+        use Event::*;
+
+        enum Event {
+            Request(Option<Result<Message, axum::Error>>),
+            Response(Option<Result<MessageResponse, TaggedError>>),
+            Task(Result<Result<(), TaggedError>, tokio::task::JoinError>),
+            GarbageCollection,
+            IdleTimeout,
+            IdleRequest,
+            SessionTimeout,
+        }
+
+        let event = tokio::select! {
+            request = socket.recv() => Request(request),
+
+            resp = rx.recv() => Response(resp),
+
+            // We don't care if there are no running tasks
+            Some(task) = manager.join_next() => Task(task),
+
+            _ = active_execution_gc_interval.tick() => GarbageCollection,
+
+            _ = &mut idle_timeout, if manager.is_empty() => IdleTimeout,
+
+            _ = factory.container_requested(), if manager.is_empty() => IdleRequest,
+
+            _ = &mut session_timeout => SessionTimeout,
+        };
+
+        match event {
+            Request(request) => {
                 metrics::WS_INCOMING.inc();
 
                 match request {
-                    None => {
-                        // browser disconnected
-                        break;
+                    // browser disconnected
+                    None => break,
+
+                    Some(Ok(Message::Text(txt))) => {
+                        handle_msg(&txt, &tx, &mut manager, &mut active_executions, &db).await
                     }
-                    Some(Ok(Message::Text(txt))) => handle_msg(&txt, &tx, &mut manager, &mut active_executions, &db).await,
-                    Some(Ok(_)) => {
-                        // unknown message type
-                        continue;
-                    }
+
+                    // unknown message type
+                    Some(Ok(_)) => continue,
+
                     Some(Err(e)) => super::record_websocket_error(e.to_string()),
                 }
-            },
+            }
 
-            resp = rx.recv() => {
+            Response(resp) => {
                 let resp = resp.expect("The rx should never close as we have a tx");
 
                 let success = resp.is_ok();
@@ -403,10 +432,9 @@ async fn handle_core(
 
                 let success = if success { "true" } else { "false" };
                 metrics::WS_OUTGOING.with_label_values(&[success]).inc();
-            },
+            }
 
-            // We don't care if there are no running tasks
-            Some(task) = manager.join_next() => {
+            Task(task) => {
                 // The last task has completed which means we are a
                 // candidate for idling in a little while.
                 if manager.is_empty() {
@@ -415,17 +443,21 @@ async fn handle_core(
 
                 let (error, meta) = match task {
                     Ok(Ok(())) => continue,
+
                     Ok(Err(error)) => error,
+
                     Err(error) => {
                         // The task was cancelled; no need to report
-                        let Ok(panic) = error.try_into_panic() else { continue };
+                        let Ok(panic) = error.try_into_panic() else {
+                            continue;
+                        };
 
                         let text = match panic.downcast::<String>() {
                             Ok(text) => *text,
                             Err(panic) => match panic.downcast::<&str>() {
                                 Ok(text) => text.to_string(),
                                 _ => "An unknown panic occurred".into(),
-                            }
+                            },
                         };
                         (WebSocketTaskPanicSnafu { text }.build(), None)
                     }
@@ -435,32 +467,30 @@ async fn handle_core(
                     // We can't send a response
                     break;
                 }
-            },
+            }
 
-            _ = active_execution_gc_interval.tick() => {
+            GarbageCollection => {
                 active_executions = mem::take(&mut active_executions)
                     .into_iter()
-                    .filter(|(_id, (_, tx))| tx.as_ref().map_or(false, |tx| !tx.is_closed()))
+                    .filter(|(_id, (_, tx))| tx.as_ref().is_some_and(|tx| !tx.is_closed()))
                     .collect();
-            },
-
-            _ = &mut idle_timeout, if manager.is_empty() => {
-                if handle_idle(&mut manager, &tx).await.is_break() {
-                    break
-                }
-            },
-
-            _ = factory.container_requested(), if manager.is_empty() => {
-                info!("Container requested to idle");
-
-                if handle_idle(&mut manager, &tx).await.is_break() {
-                    break
-                }
-            },
-
-            _ = &mut session_timeout => {
-                break;
             }
+
+            IdleTimeout | IdleRequest => {
+                if let IdleRequest = event {
+                    info!("Container requested to idle");
+                }
+
+                let idled = manager.idle().await.context(StreamingCoordinatorIdleSnafu);
+                let Err(error) = idled else { continue };
+
+                if tx.send(Err((error, None))).await.is_err() {
+                    // We can't send a response
+                    break;
+                }
+            }
+
+            SessionTimeout => break,
         }
     }
 
@@ -474,9 +504,7 @@ async fn connect_handshake(socket: &mut WebSocket) -> bool {
     let Some(Ok(Message::Text(txt))) = socket.recv().await else {
         return false;
     };
-    let Ok(HandshakeMessage::Connected { payload, .. }) =
-        serde_json::from_str::<HandshakeMessage>(&txt)
-    else {
+    let Ok(HandshakeMessage::Connected { payload, .. }) = serde_json::from_str(&txt) else {
         return false;
     };
     if !payload.i_accept_this_is_an_unsupported_api {
@@ -510,21 +538,6 @@ fn response_to_message(response: MessageResponse) -> Message {
     Message::Text(resp.into())
 }
 
-async fn handle_idle(manager: &mut CoordinatorManager, tx: &ResponseTx) -> ControlFlow<()> {
-    let idled = manager.idle().await.context(StreamingCoordinatorIdleSnafu);
-
-    let Err(error) = idled else {
-        return ControlFlow::Continue(());
-    };
-
-    if tx.send(Err((error, None))).await.is_err() {
-        // We can't send a response
-        return ControlFlow::Break(());
-    }
-
-    ControlFlow::Continue(())
-}
-
 type ActiveExecutionInfo = (DropGuard, Option<mpsc::Sender<String>>);
 
 async fn handle_msg(
@@ -555,7 +568,7 @@ async fn handle_msg(
                 .spawn({
                     let tx = tx.clone();
                     let meta = meta.clone();
-                    |coordinator| async {
+                    async |coordinator| {
                         let r = handle_execute(
                             token,
                             execution_rx,
@@ -693,13 +706,13 @@ async fn handle_execute_inner(
 
     let mut stdin_tx = Some(stdin_tx);
 
-    let send_stdout = |payload| async {
+    let send_stdout = async |payload| {
         let meta = meta.clone();
         tx.send(Ok(MessageResponse::ExecuteStdout { payload, meta }))
             .await
     };
 
-    let send_stderr = |payload| async {
+    let send_stderr = async |payload| {
         let meta = meta.clone();
         tx.send(Ok(MessageResponse::ExecuteStderr { payload, meta }))
             .await
