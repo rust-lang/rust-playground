@@ -1996,23 +1996,18 @@
   },
   {
     "name": "windows-sys",
-    "version": "0.59.0",
+    "version": "0.60.1",
     "id": "windows_sys"
   },
   {
     "name": "windows-targets",
-    "version": "0.52.6",
+    "version": "0.53.1",
     "id": "windows_targets"
   },
   {
     "name": "windows_x86_64_gnu",
     "version": "0.53.0",
     "id": "windows_x86_64_gnu"
-  },
-  {
-    "name": "windows_x86_64_gnu",
-    "version": "0.52.6",
-    "id": "windows_x86_64_gnu_0_52_6"
   },
   {
     "name": "windows_x86_64_msvc",
