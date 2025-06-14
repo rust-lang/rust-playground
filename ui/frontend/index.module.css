@@ -229,3 +229,9 @@ body {
     background-color: var(--output-highlight-error-bg-color);
   }
 }
+
+@media screen and (max-width: 768px) {
+  body {
+    padding: 0;
+  }
+}
