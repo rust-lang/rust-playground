@@ -111,7 +111,7 @@ features = ["std"]
 
 [dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.24"
+version = "=0.4.25"
 features = ["brotli", "flate2", "gzip", "libzstd", "tokio", "zlib", "zstd", "zstd-safe"]
 
 [dependencies.async_trait]
@@ -120,7 +120,7 @@ version = "=0.1.88"
 
 [dependencies.atomic]
 package = "atomic"
-version = "=0.6.0"
+version = "=0.6.1"
 default-features = false
 
 [dependencies.atomic_waker]
@@ -129,7 +129,7 @@ version = "=1.1.2"
 
 [dependencies.autocfg]
 package = "autocfg"
-version = "=1.4.0"
+version = "=1.5.0"
 
 [dependencies.av1_grain]
 package = "av1-grain"
@@ -248,7 +248,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.2.26"
+version = "=1.2.27"
 features = ["parallel"]
 
 [dependencies.cfg_aliases]
@@ -466,7 +466,7 @@ version = "=1.0.2"
 
 [dependencies.errno]
 package = "errno"
-version = "=0.3.12"
+version = "=0.3.13"
 features = ["std"]
 default-features = false
 
@@ -632,7 +632,7 @@ features = ["std"]
 
 [dependencies.gif]
 package = "gif"
-version = "=0.13.1"
+version = "=0.13.3"
 features = ["color_quant", "raii_no_panic", "std"]
 
 [dependencies.gimli]
@@ -798,7 +798,7 @@ features = ["avif", "bmp", "dds", "default-formats", "exr", "ff", "gif", "hdr", 
 
 [dependencies.image_webp]
 package = "image-webp"
-version = "=0.2.2"
+version = "=0.2.3"
 
 [dependencies.imgref]
 package = "imgref"
@@ -844,7 +844,7 @@ version = "=1.0.15"
 
 [dependencies.jiff]
 package = "jiff"
-version = "=0.2.14"
+version = "=0.2.15"
 features = ["alloc", "std"]
 default-features = false
 
@@ -854,7 +854,7 @@ version = "=0.1.33"
 
 [dependencies.jpeg_decoder]
 package = "jpeg-decoder"
-version = "=0.3.1"
+version = "=0.3.2"
 default-features = false
 
 [dependencies.lazy_static]
@@ -867,7 +867,7 @@ version = "=0.5.2"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.172"
+version = "=0.2.174"
 features = ["extra_traits", "std"]
 
 [dependencies.libm]
@@ -1221,12 +1221,12 @@ features = ["proc-macro", "span-locations"]
 
 [dependencies.profiling]
 package = "profiling"
-version = "=1.0.16"
+version = "=1.0.17"
 features = ["procmacros", "profiling-procmacros"]
 
 [dependencies.profiling_procmacros]
 package = "profiling-procmacros"
-version = "=1.0.16"
+version = "=1.0.17"
 
 [dependencies.psl_types]
 package = "psl-types"
@@ -1294,7 +1294,7 @@ default-features = false
 
 [dependencies.ravif]
 package = "ravif"
-version = "=0.11.12"
+version = "=0.11.20"
 features = ["threading"]
 default-features = false
 
@@ -1356,7 +1356,7 @@ features = ["alloc", "fs", "std", "termios"]
 
 [dependencies.rustls]
 package = "rustls"
-version = "=0.23.27"
+version = "=0.23.28"
 features = ["aws-lc-rs", "aws_lc_rs", "log", "logging", "prefer-post-quantum", "std", "tls12"]
 
 [dependencies.rustls_pki_types]
@@ -1484,7 +1484,7 @@ features = ["std"]
 
 [dependencies.slab]
 package = "slab"
-version = "=0.4.9"
+version = "=0.4.10"
 features = ["std"]
 
 [dependencies.smallvec]
@@ -1535,7 +1535,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=2.0.102"
+version = "=2.0.104"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1714,7 +1714,7 @@ features = ["attributes", "std", "tracing-attributes"]
 
 [dependencies.tracing_attributes]
 package = "tracing-attributes"
-version = "=0.1.29"
+version = "=0.1.30"
 
 [dependencies.tracing_core]
 package = "tracing-core"
@@ -1863,7 +1863,7 @@ features = ["web", "web-sys"]
 
 [dependencies.wide]
 package = "wide"
-version = "=0.7.32"
+version = "=0.7.33"
 features = ["std"]
 default-features = false
 
@@ -1881,11 +1881,12 @@ version = "=0.53.0"
 
 [dependencies.windows_sys]
 package = "windows-sys"
-version = "=0.60.1"
+version = "=0.60.2"
+features = ["Win32", "Win32_Foundation", "Win32_System", "Win32_System_Diagnostics", "Win32_System_Diagnostics_Debug"]
 
 [dependencies.windows_targets]
 package = "windows-targets"
-version = "=0.53.1"
+version = "=0.53.2"
 
 [dependencies.windows_x86_64_gnu]
 package = "windows_x86_64_gnu"
@@ -1925,12 +1926,12 @@ version = "=0.8.0"
 
 [dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.25"
+version = "=0.8.26"
 features = ["__internal_use_only_features_that_work_on_stable", "alloc", "derive", "simd", "std", "zerocopy-derive"]
 
 [dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.25"
+version = "=0.8.26"
 
 [dependencies.zerofrom]
 package = "zerofrom"
@@ -1992,7 +1993,7 @@ default-features = false
 
 [dependencies.zune_jpeg]
 package = "zune-jpeg"
-version = "=0.4.17"
+version = "=0.4.18"
 features = ["neon", "std", "x86"]
 
 [build-dependencies.addr2line]
@@ -2082,7 +2083,7 @@ features = ["std"]
 
 [build-dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.24"
+version = "=0.4.25"
 features = ["brotli", "flate2", "gzip", "libzstd", "tokio", "zlib", "zstd", "zstd-safe"]
 
 [build-dependencies.async_trait]
@@ -2091,7 +2092,7 @@ version = "=0.1.88"
 
 [build-dependencies.atomic]
 package = "atomic"
-version = "=0.6.0"
+version = "=0.6.1"
 default-features = false
 
 [build-dependencies.atomic_waker]
@@ -2100,7 +2101,7 @@ version = "=1.1.2"
 
 [build-dependencies.autocfg]
 package = "autocfg"
-version = "=1.4.0"
+version = "=1.5.0"
 
 [build-dependencies.av1_grain]
 package = "av1-grain"
@@ -2219,7 +2220,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.2.26"
+version = "=1.2.27"
 features = ["parallel"]
 
 [build-dependencies.cfg_aliases]
@@ -2437,7 +2438,7 @@ version = "=1.0.2"
 
 [build-dependencies.errno]
 package = "errno"
-version = "=0.3.12"
+version = "=0.3.13"
 features = ["std"]
 default-features = false
 
@@ -2603,7 +2604,7 @@ features = ["std"]
 
 [build-dependencies.gif]
 package = "gif"
-version = "=0.13.1"
+version = "=0.13.3"
 features = ["color_quant", "raii_no_panic", "std"]
 
 [build-dependencies.gimli]
@@ -2769,7 +2770,7 @@ features = ["avif", "bmp", "dds", "default-formats", "exr", "ff", "gif", "hdr", 
 
 [build-dependencies.image_webp]
 package = "image-webp"
-version = "=0.2.2"
+version = "=0.2.3"
 
 [build-dependencies.imgref]
 package = "imgref"
@@ -2815,7 +2816,7 @@ version = "=1.0.15"
 
 [build-dependencies.jiff]
 package = "jiff"
-version = "=0.2.14"
+version = "=0.2.15"
 features = ["alloc", "std"]
 default-features = false
 
@@ -2825,7 +2826,7 @@ version = "=0.1.33"
 
 [build-dependencies.jpeg_decoder]
 package = "jpeg-decoder"
-version = "=0.3.1"
+version = "=0.3.2"
 default-features = false
 
 [build-dependencies.lazy_static]
@@ -2838,7 +2839,7 @@ version = "=0.5.2"
 
 [build-dependencies.libc]
 package = "libc"
-version = "=0.2.172"
+version = "=0.2.174"
 features = ["extra_traits", "std"]
 
 [build-dependencies.libm]
@@ -3192,12 +3193,12 @@ features = ["proc-macro", "span-locations"]
 
 [build-dependencies.profiling]
 package = "profiling"
-version = "=1.0.16"
+version = "=1.0.17"
 features = ["procmacros", "profiling-procmacros"]
 
 [build-dependencies.profiling_procmacros]
 package = "profiling-procmacros"
-version = "=1.0.16"
+version = "=1.0.17"
 
 [build-dependencies.psl_types]
 package = "psl-types"
@@ -3265,7 +3266,7 @@ default-features = false
 
 [build-dependencies.ravif]
 package = "ravif"
-version = "=0.11.12"
+version = "=0.11.20"
 features = ["threading"]
 default-features = false
 
@@ -3327,7 +3328,7 @@ features = ["alloc", "fs", "std", "termios"]
 
 [build-dependencies.rustls]
 package = "rustls"
-version = "=0.23.27"
+version = "=0.23.28"
 features = ["aws-lc-rs", "aws_lc_rs", "log", "logging", "prefer-post-quantum", "std", "tls12"]
 
 [build-dependencies.rustls_pki_types]
@@ -3455,7 +3456,7 @@ features = ["std"]
 
 [build-dependencies.slab]
 package = "slab"
-version = "=0.4.9"
+version = "=0.4.10"
 features = ["std"]
 
 [build-dependencies.smallvec]
@@ -3506,7 +3507,7 @@ default-features = false
 
 [build-dependencies.syn]
 package = "syn"
-version = "=2.0.102"
+version = "=2.0.104"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [build-dependencies.syn_1_0_109]
@@ -3685,7 +3686,7 @@ features = ["attributes", "std", "tracing-attributes"]
 
 [build-dependencies.tracing_attributes]
 package = "tracing-attributes"
-version = "=0.1.29"
+version = "=0.1.30"
 
 [build-dependencies.tracing_core]
 package = "tracing-core"
@@ -3834,7 +3835,7 @@ features = ["web", "web-sys"]
 
 [build-dependencies.wide]
 package = "wide"
-version = "=0.7.32"
+version = "=0.7.33"
 features = ["std"]
 default-features = false
 
@@ -3852,11 +3853,12 @@ version = "=0.53.0"
 
 [build-dependencies.windows_sys]
 package = "windows-sys"
-version = "=0.60.1"
+version = "=0.60.2"
+features = ["Win32", "Win32_Foundation", "Win32_System", "Win32_System_Diagnostics", "Win32_System_Diagnostics_Debug"]
 
 [build-dependencies.windows_targets]
 package = "windows-targets"
-version = "=0.53.1"
+version = "=0.53.2"
 
 [build-dependencies.windows_x86_64_gnu]
 package = "windows_x86_64_gnu"
@@ -3896,12 +3898,12 @@ version = "=0.8.0"
 
 [build-dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.25"
+version = "=0.8.26"
 features = ["__internal_use_only_features_that_work_on_stable", "alloc", "derive", "simd", "std", "zerocopy-derive"]
 
 [build-dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.25"
+version = "=0.8.26"
 
 [build-dependencies.zerofrom]
 package = "zerofrom"
@@ -3963,5 +3965,5 @@ default-features = false
 
 [build-dependencies.zune_jpeg]
 package = "zune-jpeg"
-version = "=0.4.17"
+version = "=0.4.18"
 features = ["neon", "std", "x86"]

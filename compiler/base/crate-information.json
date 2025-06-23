@@ -91,7 +91,7 @@
   },
   {
     "name": "async-compression",
-    "version": "0.4.24",
+    "version": "0.4.25",
     "id": "async_compression"
   },
   {
@@ -101,7 +101,7 @@
   },
   {
     "name": "atomic",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "id": "atomic"
   },
   {
@@ -111,7 +111,7 @@
   },
   {
     "name": "autocfg",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "id": "autocfg"
   },
   {
@@ -236,7 +236,7 @@
   },
   {
     "name": "cc",
-    "version": "1.2.26",
+    "version": "1.2.27",
     "id": "cc"
   },
   {
@@ -471,7 +471,7 @@
   },
   {
     "name": "errno",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "id": "errno"
   },
   {
@@ -646,7 +646,7 @@
   },
   {
     "name": "gif",
-    "version": "0.13.1",
+    "version": "0.13.3",
     "id": "gif"
   },
   {
@@ -826,7 +826,7 @@
   },
   {
     "name": "image-webp",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "id": "image_webp"
   },
   {
@@ -876,7 +876,7 @@
   },
   {
     "name": "jiff",
-    "version": "0.2.14",
+    "version": "0.2.15",
     "id": "jiff"
   },
   {
@@ -886,7 +886,7 @@
   },
   {
     "name": "jpeg-decoder",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "id": "jpeg_decoder"
   },
   {
@@ -901,7 +901,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.172",
+    "version": "0.2.174",
     "id": "libc"
   },
   {
@@ -1281,12 +1281,12 @@
   },
   {
     "name": "profiling",
-    "version": "1.0.16",
+    "version": "1.0.17",
     "id": "profiling"
   },
   {
     "name": "profiling-procmacros",
-    "version": "1.0.16",
+    "version": "1.0.17",
     "id": "profiling_procmacros"
   },
   {
@@ -1356,7 +1356,7 @@
   },
   {
     "name": "ravif",
-    "version": "0.11.12",
+    "version": "0.11.20",
     "id": "ravif"
   },
   {
@@ -1421,7 +1421,7 @@
   },
   {
     "name": "rustls",
-    "version": "0.23.27",
+    "version": "0.23.28",
     "id": "rustls"
   },
   {
@@ -1561,7 +1561,7 @@
   },
   {
     "name": "slab",
-    "version": "0.4.9",
+    "version": "0.4.10",
     "id": "slab"
   },
   {
@@ -1616,7 +1616,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.102",
+    "version": "2.0.104",
     "id": "syn"
   },
   {
@@ -1806,7 +1806,7 @@
   },
   {
     "name": "tracing-attributes",
-    "version": "0.1.29",
+    "version": "0.1.30",
     "id": "tracing_attributes"
   },
   {
@@ -1976,7 +1976,7 @@
   },
   {
     "name": "wide",
-    "version": "0.7.32",
+    "version": "0.7.33",
     "id": "wide"
   },
   {
@@ -1996,12 +1996,12 @@
   },
   {
     "name": "windows-sys",
-    "version": "0.60.1",
+    "version": "0.60.2",
     "id": "windows_sys"
   },
   {
     "name": "windows-targets",
-    "version": "0.53.1",
+    "version": "0.53.2",
     "id": "windows_targets"
   },
   {
@@ -2046,12 +2046,12 @@
   },
   {
     "name": "zerocopy",
-    "version": "0.8.25",
+    "version": "0.8.26",
     "id": "zerocopy"
   },
   {
     "name": "zerocopy-derive",
-    "version": "0.8.25",
+    "version": "0.8.26",
     "id": "zerocopy_derive"
   },
   {
@@ -2111,7 +2111,7 @@
   },
   {
     "name": "zune-jpeg",
-    "version": "0.4.17",
+    "version": "0.4.18",
     "id": "zune_jpeg"
   }
 ]
