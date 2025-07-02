@@ -1842,18 +1842,33 @@ impl Container {
                 let mut stdin_open = true;
 
                 loop {
-                    select! {
-                        () = &mut cancelled => {
+                    enum Event {
+                        Cancelled,
+                        Stdin(Option<String>),
+                        FromWorker(WorkerMessage),
+                    }
+                    use Event::*;
+
+                    let event = select! {
+                        () = &mut cancelled => Cancelled,
+
+                        stdin = stdin_rx.recv(), if stdin_open => Stdin(stdin),
+
+                        Some(container_msg) = from_worker_rx.recv() => FromWorker(container_msg),
+
+                        else => return UnexpectedEndOfMessagesSnafu.fail(),
+                    };
+
+                    match event {
+                        Cancelled => {
                             let msg = CoordinatorMessage::Kill;
                             trace!(msg_name = msg.as_ref(), "processing");
                             to_worker_tx.send(msg).await.context(KillSnafu)?;
-                        },
+                        }
 
-                        stdin = stdin_rx.recv(), if stdin_open => {
+                        Stdin(stdin) => {
                             let msg = match stdin {
-                                Some(stdin) => {
-                                    CoordinatorMessage::StdinPacket(stdin)
-                                }
+                                Some(stdin) => CoordinatorMessage::StdinPacket(stdin),
 
                                 None => {
                                     stdin_open = false;
@@ -1863,9 +1878,9 @@ impl Container {
 
                             trace!(msg_name = msg.as_ref(), "processing");
                             to_worker_tx.send(msg).await.context(StdinSnafu)?;
-                        },
+                        }
 
-                        Some(container_msg) = from_worker_rx.recv() => {
+                        FromWorker(container_msg) => {
                             trace!(msg_name = container_msg.as_ref(), "processing");
 
                             match container_msg {
@@ -1885,20 +1900,18 @@ impl Container {
                                     status_tx.send(stats).await.ok(/* Receiver gone, that's OK */);
                                 }
 
-                                WorkerMessage::Error(e) =>
-                                    return Err(SerializedError2::adapt(e)).context(WorkerSnafu),
+                                WorkerMessage::Error(e) => {
+                                    return Err(SerializedError2::adapt(e)).context(WorkerSnafu);
+                                }
 
-                                WorkerMessage::Error2(e) =>
-                                    return Err(e).context(WorkerSnafu),
+                                WorkerMessage::Error2(e) => return Err(e).context(WorkerSnafu),
 
                                 _ => {
                                     let message = container_msg.as_ref();
-                                    return UnexpectedMessageSnafu { message }.fail()
-                                },
+                                    return UnexpectedMessageSnafu { message }.fail();
+                                }
                             }
-                        },
-
-                        else => return UnexpectedEndOfMessagesSnafu.fail(),
+                        }
                     }
                 }
             }
