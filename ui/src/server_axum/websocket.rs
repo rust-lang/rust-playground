@@ -718,38 +718,52 @@ async fn handle_execute_inner(
     let mut reported = false;
 
     let status = loop {
-        tokio::select! {
-            status = &mut task => break status,
+        enum Event {
+            Stdin(Option<String>),
+            Stdout(String),
+            Stderr(String),
+            Status(coordinator::ExecuteStatus),
+        }
+        use Event::*;
 
-            stdin = rx.recv(), if stdin_tx.is_some() => {
-                match stdin {
-                    Some(stdin) => {
-                        stdin_tx
-                            .as_ref()
-                            .unwrap(/* This is a precondition */)
-                            .send(stdin)
-                            .await
-                            .drop_error_details()
-                            .context(StdinSnafu)?;
-                    }
-                    None => {
-                        let stdin_tx = stdin_tx.take();
-                        drop(stdin_tx); // Signal closed
-                    }
-                }
+        let event = tokio::select! {
+            response = &mut task => break response,
+
+            stdin = rx.recv(), if stdin_tx.is_some() => Stdin(stdin),
+
+            Some(stdout) = stdout_rx.recv() => Stdout(stdout),
+
+            Some(stderr) = stderr_rx.recv() => Stderr(stderr),
+
+            Some(status) = status_rx.next() => Status(status)
+        };
+
+        match event {
+            Stdin(Some(stdin)) => {
+                stdin_tx
+                    .as_ref()
+                    .unwrap(/* This is a precondition */)
+                    .send(stdin)
+                    .await
+                    .drop_error_details()
+                    .context(StdinSnafu)?;
+            }
+            Stdin(None) => {
+                let stdin_tx = stdin_tx.take();
+                drop(stdin_tx); // Signal closed
             }
 
-            Some(stdout) = stdout_rx.recv() => {
+            Stdout(stdout) => {
                 let sent = send_stdout(stdout).await;
                 abandon_if_closed!(sent);
-            },
+            }
 
-            Some(stderr) = stderr_rx.recv() => {
+            Stderr(stderr) => {
                 let sent = send_stderr(stderr).await;
                 abandon_if_closed!(sent);
-            },
+            }
 
-            Some(status) = status_rx.next() => {
+            Status(status) => {
                 if !reported && status.total_time_secs > 60.0 {
                     error!("Request consumed more than 60s of CPU time: {req:?}");
                     reported = true;
@@ -757,7 +771,9 @@ async fn handle_execute_inner(
 
                 let payload = status.into();
                 let meta = meta.clone();
-                let sent = tx.send(Ok(MessageResponse::ExecuteStatus { payload, meta })).await;
+                let sent = tx
+                    .send(Ok(MessageResponse::ExecuteStatus { payload, meta }))
+                    .await;
                 abandon_if_closed!(sent);
             }
         }
