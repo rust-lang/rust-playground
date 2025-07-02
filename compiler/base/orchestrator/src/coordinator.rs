@@ -2756,10 +2756,6 @@ impl Backend for DockerBackend {
             .args(["--name", &name])
             .arg("-i")
             .args(["-a", "stdin", "-a", "stdout", "-a", "stderr"])
-            // PLAYGROUND_ORCHESTRATOR is vestigial; I'm leaving it
-            // for a bit to allow new containers to get built and
-            // distributed.
-            .args(["-e", "PLAYGROUND_ORCHESTRATOR=1"])
             .arg("--rm")
             .arg(channel.to_container_name())
             .arg("worker")
