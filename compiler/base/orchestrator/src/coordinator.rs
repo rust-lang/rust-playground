@@ -930,7 +930,7 @@ impl<B> Coordinator<B>
 where
     B: Backend,
 {
-    pub fn new(limits: Arc<dyn ResourceLimits>, backend: B) -> Self {
+    fn new(limits: Arc<dyn ResourceLimits>, backend: B) -> Self {
         let token = CancelOnDrop(CancellationToken::new());
 
         Self {
