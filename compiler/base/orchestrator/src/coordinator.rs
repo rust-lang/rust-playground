@@ -1221,9 +1221,8 @@ impl Container {
         } = spawn_io_queue(stdin, stdout, token);
 
         let (command_tx, command_rx) = mpsc::channel(8);
-        let demultiplex_task =
-            tokio::spawn(Commander::demultiplex(command_rx, from_worker_rx).in_current_span())
-                .abort_on_drop();
+        let demultiplex = Commander::demultiplex(command_rx, from_worker_rx);
+        let demultiplex_task = tokio::spawn(demultiplex.in_current_span()).abort_on_drop();
 
         let task = tokio::spawn(
             async move {
