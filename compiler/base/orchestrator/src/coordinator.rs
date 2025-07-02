@@ -2430,15 +2430,8 @@ impl Commander {
                 }
 
                 Gc => {
-                    waiting = mem::take(&mut waiting)
-                        .into_iter()
-                        .filter(|(_job_id, tx)| !tx.is_closed())
-                        .collect();
-
-                    waiting_once = mem::take(&mut waiting_once)
-                        .into_iter()
-                        .filter(|(_job_id, tx)| !tx.is_closed())
-                        .collect();
+                    waiting.retain(|_job_id, tx| !tx.is_closed());
+                    waiting_once.retain(|_job_id, tx| !tx.is_closed());
                 }
             }
         }

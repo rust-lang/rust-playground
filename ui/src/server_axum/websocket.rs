@@ -15,7 +15,6 @@ use snafu::prelude::*;
 use std::{
     collections::BTreeMap,
     convert::TryFrom,
-    mem,
     pin::pin,
     sync::{
         atomic::{AtomicU64, Ordering},
@@ -470,10 +469,8 @@ async fn handle_core(
             }
 
             GarbageCollection => {
-                active_executions = mem::take(&mut active_executions)
-                    .into_iter()
-                    .filter(|(_id, (_, tx))| tx.as_ref().is_some_and(|tx| !tx.is_closed()))
-                    .collect();
+                active_executions
+                    .retain(|_id, (_, tx)| tx.as_ref().is_some_and(|tx| !tx.is_closed()));
             }
 
             IdleTimeout | IdleRequest => {
