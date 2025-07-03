@@ -474,7 +474,7 @@ async fn handle_core(
             }
 
             IdleTimeout | IdleRequest => {
-                if let IdleRequest = event {
+                if matches!(event, IdleRequest) {
                     info!("Container requested to idle");
                 }
 
