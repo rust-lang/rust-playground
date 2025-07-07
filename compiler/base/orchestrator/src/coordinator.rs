@@ -2438,7 +2438,7 @@ impl Commander {
                         continue;
                     }
 
-                    warn!(job_id, "no listener to notify");
+                    warn!(job_id, msg_name = msg.as_ref(), "no listener to notify");
                 }
 
                 Gc => {
