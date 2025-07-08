@@ -930,7 +930,7 @@ impl<B> Coordinator<B>
 where
     B: Backend,
 {
-    pub fn new(limits: Arc<dyn ResourceLimits>, backend: B) -> Self {
+    fn new(limits: Arc<dyn ResourceLimits>, backend: B) -> Self {
         let token = CancelOnDrop(CancellationToken::new());
 
         Self {
@@ -1221,9 +1221,8 @@ impl Container {
         } = spawn_io_queue(stdin, stdout, token);
 
         let (command_tx, command_rx) = mpsc::channel(8);
-        let demultiplex_task =
-            tokio::spawn(Commander::demultiplex(command_rx, from_worker_rx).in_current_span())
-                .abort_on_drop();
+        let demultiplex = Commander::demultiplex(command_rx, from_worker_rx);
+        let demultiplex_task = tokio::spawn(demultiplex.in_current_span()).abort_on_drop();
 
         let task = tokio::spawn(
             async move {
@@ -1842,18 +1841,33 @@ impl Container {
                 let mut stdin_open = true;
 
                 loop {
-                    select! {
-                        () = &mut cancelled => {
+                    enum Event {
+                        Cancelled,
+                        Stdin(Option<String>),
+                        FromWorker(WorkerMessage),
+                    }
+                    use Event::*;
+
+                    let event = select! {
+                        () = &mut cancelled => Cancelled,
+
+                        stdin = stdin_rx.recv(), if stdin_open => Stdin(stdin),
+
+                        Some(container_msg) = from_worker_rx.recv() => FromWorker(container_msg),
+
+                        else => return UnexpectedEndOfMessagesSnafu.fail(),
+                    };
+
+                    match event {
+                        Cancelled => {
                             let msg = CoordinatorMessage::Kill;
                             trace!(msg_name = msg.as_ref(), "processing");
                             to_worker_tx.send(msg).await.context(KillSnafu)?;
-                        },
+                        }
 
-                        stdin = stdin_rx.recv(), if stdin_open => {
+                        Stdin(stdin) => {
                             let msg = match stdin {
-                                Some(stdin) => {
-                                    CoordinatorMessage::StdinPacket(stdin)
-                                }
+                                Some(stdin) => CoordinatorMessage::StdinPacket(stdin),
 
                                 None => {
                                     stdin_open = false;
@@ -1863,9 +1877,9 @@ impl Container {
 
                             trace!(msg_name = msg.as_ref(), "processing");
                             to_worker_tx.send(msg).await.context(StdinSnafu)?;
-                        },
+                        }
 
-                        Some(container_msg) = from_worker_rx.recv() => {
+                        FromWorker(container_msg) => {
                             trace!(msg_name = container_msg.as_ref(), "processing");
 
                             match container_msg {
@@ -1885,20 +1899,18 @@ impl Container {
                                     status_tx.send(stats).await.ok(/* Receiver gone, that's OK */);
                                 }
 
-                                WorkerMessage::Error(e) =>
-                                    return Err(SerializedError2::adapt(e)).context(WorkerSnafu),
+                                WorkerMessage::Error(e) => {
+                                    return Err(SerializedError2::adapt(e)).context(WorkerSnafu);
+                                }
 
-                                WorkerMessage::Error2(e) =>
-                                    return Err(e).context(WorkerSnafu),
+                                WorkerMessage::Error2(e) => return Err(e).context(WorkerSnafu),
 
                                 _ => {
                                     let message = container_msg.as_ref();
-                                    return UnexpectedMessageSnafu { message }.fail()
-                                },
+                                    return UnexpectedMessageSnafu { message }.fail();
+                                }
                             }
-                        },
-
-                        else => return UnexpectedEndOfMessagesSnafu.fail(),
+                        }
                     }
                 }
             }
@@ -2426,19 +2438,12 @@ impl Commander {
                         continue;
                     }
 
-                    warn!(job_id, "no listener to notify");
+                    warn!(job_id, msg_name = msg.as_ref(), "no listener to notify");
                 }
 
                 Gc => {
-                    waiting = mem::take(&mut waiting)
-                        .into_iter()
-                        .filter(|(_job_id, tx)| !tx.is_closed())
-                        .collect();
-
-                    waiting_once = mem::take(&mut waiting_once)
-                        .into_iter()
-                        .filter(|(_job_id, tx)| !tx.is_closed())
-                        .collect();
+                    waiting.retain(|_job_id, tx| !tx.is_closed());
+                    waiting_once.retain(|_job_id, tx| !tx.is_closed());
                 }
             }
         }
@@ -2756,10 +2761,6 @@ impl Backend for DockerBackend {
             .args(["--name", &name])
             .arg("-i")
             .args(["-a", "stdin", "-a", "stdout", "-a", "stderr"])
-            // PLAYGROUND_ORCHESTRATOR is vestigial; I'm leaving it
-            // for a bit to allow new containers to get built and
-            // distributed.
-            .args(["-e", "PLAYGROUND_ORCHESTRATOR=1"])
             .arg("--rm")
             .arg(channel.to_container_name())
             .arg("worker")

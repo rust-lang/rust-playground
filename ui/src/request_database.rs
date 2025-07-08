@@ -6,7 +6,7 @@ use tokio::{
     sync::{mpsc, oneshot},
     task,
 };
-use tracing::warn;
+use tracing::{info, warn, Instrument as _};
 
 pub struct Database {
     db: Connection,
@@ -172,7 +172,11 @@ impl Handle {
             .drop_error_details()
             .context(SendStartRequestSnafu)?;
 
-        rx.await.context(RecvStartRequestSnafu)?.map_err(Into::into)
+        let id = rx.await.context(RecvStartRequestSnafu)??;
+
+        info!(request_id = id.0, "Started request");
+
+        Ok(id)
     }
 
     async fn attempt_start_request(
@@ -198,7 +202,11 @@ impl Handle {
             .drop_error_details()
             .context(SendEndRequestSnafu)?;
 
-        rx.await.context(RecvEndRequestSnafu)?.map_err(Into::into)
+        rx.await.context(RecvEndRequestSnafu)??;
+
+        info!(request_id = id.0, "Ended request");
+
+        Ok(())
     }
 
     async fn attempt_end_request(&self, id: Id, how: How) {
@@ -245,7 +253,7 @@ impl Drop for EndGuardInner {
         let Self(id, how, ref mut handle) = *self;
         if let Ok(h) = tokio::runtime::Handle::try_current() {
             if let Some(handle) = handle.take() {
-                h.spawn(async move { handle.attempt_end_request(id, how).await });
+                h.spawn(async move { handle.attempt_end_request(id, how).await }.in_current_span());
             }
         }
     }
