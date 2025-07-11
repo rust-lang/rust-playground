@@ -6,9 +6,9 @@ use std::{
         Arc,
     },
 };
-use tokio::sync::{OwnedSemaphorePermit, Semaphore};
+use tokio::sync::{OwnedSemaphorePermit, Semaphore, TryAcquireError};
 
-use super::{ContainerPermit, ProcessPermit, ResourceLimits, ResourceResult};
+use super::{ContainerPermit, ProcessPermit, ResourceError, ResourceLimits, ResourceResult};
 
 /// Describe how the resource was (or was not) acquired.
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -187,21 +187,17 @@ where
             // occur when we are already at the upper bounds of our
             // limits. In those cases, freeing an extra container or
             // two shouldn't be the worst thing.
-            let container_permit = {
-                let fallback = {
-                    let container_semaphore = container_semaphore.clone();
-                    async {
-                        container_request_semaphore.add_permits(1);
-                        container_semaphore.acquire_owned().await
-                    }
-                };
 
-                tokio::select! {
-                    biased;
-
-                    permit = container_semaphore.acquire_owned() => permit,
-                    permit = fallback => permit,
+            let container_permit = match container_semaphore.clone().try_acquire_owned() {
+                Ok(permit) => Ok(permit),
+                Err(TryAcquireError::NoPermits) => {
+                    container_request_semaphore.add_permits(1);
+                    container_semaphore
+                        .acquire_owned()
+                        .await
+                        .map_err(ResourceError::from)
                 }
+                Err(e) => Err(e.into()),
             };
 
             let container_permit = guard.complete(container_permit)?;
