@@ -150,7 +150,7 @@ impl TopCrates {
             .expect("could not read cookbook manifest");
 
         let manifest = content
-            .parse::<toml::Value>()
+            .parse::<toml::Table>()
             .expect("could not parse cookbook manifest");
 
         let dependencies = manifest["dependencies"]
