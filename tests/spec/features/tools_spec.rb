@@ -42,7 +42,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     in_tools_menu { click_on("Miri") }
 
     within(:output, :stderr) do
-      expect(page).to have_content %r{using uninitialized data, but this operation requires initialized memory}, wait: 10
+      expect(page).to have_content %r{reading memory at alloc.*, but memory is uninitialized at .*, and this operation requires initialized memory}, wait: 10
     end
   end
 
