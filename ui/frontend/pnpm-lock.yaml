@@ -178,8 +178,8 @@ importers:
         specifier: ^8.1.0
         version: 8.1.1(postcss@8.5.6)(typescript@5.8.3)(webpack@5.101.0)
       postcss-mixins:
-        specifier: ^11.0.1
-        version: 11.0.3(postcss@8.5.6)
+        specifier: ^12.1.2
+        version: 12.1.2(postcss@8.5.6)
       postcss-nesting:
         specifier: ^13.0.0
         version: 13.0.2(postcss@8.5.6)
@@ -3336,9 +3336,9 @@ packages:
   postcss-media-query-parser@0.2.3:
     resolution: {integrity: sha512-3sOlxmbKcSHMjlUXQZKQ06jOswE7oVkXPxmZdoB1r5l0q6gTFTQSHxNxOrCccElbW7dxNytifNEo8qidX2Vsig==}
 
-  postcss-mixins@11.0.3:
-    resolution: {integrity: sha512-HZa6DHlN7uCkp7GTFNvhpyK/Gi9+vrVG7FPl2oQdj+sXUuYo4ri9OsWBseTnvnLfWxRWOq8/VwcHcixtZPrRRg==}
-    engines: {node: ^18.0 || ^ 20.0 || >= 22.0}
+  postcss-mixins@12.1.2:
+    resolution: {integrity: sha512-90pSxmZVfbX9e5xCv7tI5RV1mnjdf16y89CJKbf/hD7GyOz1FCxcYMl8ZYA8Hc56dbApTKKmU9HfvgfWdCxlwg==}
+    engines: {node: ^20.0 || ^22.0 || >=24.0}
     peerDependencies:
       postcss: ^8.2.14
 
@@ -3814,9 +3814,9 @@ packages:
     resolution: {integrity: sha512-v3YCf31atbwJQIMtPNX8hcQ+okD4NQaTuKGUWfII8eaqn+3otrbttGL1zSMZAAtiPsBztQnujVBugg/cXFUpyg==}
     hasBin: true
 
-  sugarss@4.0.1:
-    resolution: {integrity: sha512-WCjS5NfuVJjkQzK10s8WOBY+hhDxxNt/N6ZaGwxFZ+wN3/lKKFSaaKUNecULcTTvE4urLcKaZFQD8vO0mOZujw==}
-    engines: {node: '>=12.0'}
+  sugarss@5.0.1:
+    resolution: {integrity: sha512-ctS5RYCBVvPoZAnzIaX5QSShK8ZiZxD5HUqSxlusvEMC+QZQIPCPOIJg6aceFX+K2rf4+SH89eu++h1Zmsr2nw==}
+    engines: {node: '>=18.0'}
     peerDependencies:
       postcss: ^8.3.3
 
@@ -7822,12 +7822,12 @@ snapshots:
   postcss-media-query-parser@0.2.3:
     optional: true
 
-  postcss-mixins@11.0.3(postcss@8.5.6):
+  postcss-mixins@12.1.2(postcss@8.5.6):
     dependencies:
       postcss: 8.5.6
       postcss-js: 4.0.1(postcss@8.5.6)
       postcss-simple-vars: 7.0.1(postcss@8.5.6)
-      sugarss: 4.0.1(postcss@8.5.6)
+      sugarss: 5.0.1(postcss@8.5.6)
       tinyglobby: 0.2.14
 
   postcss-modules-extract-imports@3.1.0(postcss@8.5.6):
@@ -8385,7 +8385,7 @@ snapshots:
       - supports-color
     optional: true
 
-  sugarss@4.0.1(postcss@8.5.6):
+  sugarss@5.0.1(postcss@8.5.6):
     dependencies:
       postcss: 8.5.6
 
