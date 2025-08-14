@@ -4,13 +4,12 @@ use cargo::{
     core::{
         compiler::{CompileKind, CompileTarget, TargetInfo},
         package::PackageSet,
-        registry::PackageRegistry,
-        resolver::{self, features::RequestedFeatures, ResolveOpts, VersionPreferences},
-        Dependency, Package, PackageId, ResolveVersion, SourceId, Summary, Target,
+        resolver::{self},
+        Dependency, Package, PackageId, SourceId, Summary, Target,
     },
     sources::{
         source::{QueryKind, Source, SourceMap},
-        RegistrySource, SourceConfigMap,
+        RegistrySource,
     },
     util::{cache_lock::CacheLockMode, interning::InternedString, VersionExt},
     GlobalContext,
@@ -21,8 +20,6 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet, HashSet},
     io::Read,
-    mem,
-    rc::Rc,
     task::Poll,
 };
 
@@ -30,8 +27,8 @@ const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
 
 struct GlobalState<'cfg> {
     config: &'cfg GlobalContext,
+    compile_kind: CompileKind,
     target_info: TargetInfo,
-    registry: PackageRegistry<'cfg>,
     crates_io: SourceId,
     source: RegistrySource<'cfg>,
     modifications: &'cfg Modifications,
@@ -245,13 +242,6 @@ fn make_global_state<'cfg>(
     let target_info = TargetInfo::new(config, &[compile_kind], &rustc, compile_kind)
         .expect("Unable to create a TargetInfo");
 
-    let source_config = SourceConfigMap::empty(config).expect("Unable to create a SourceConfigMap");
-
-    // Registry of known packages.
-    let mut registry = PackageRegistry::new_with_source_config(config, source_config)
-        .expect("Unable to create package registry");
-    registry.lock_patches();
-
     // Source for obtaining packages from the crates.io registry.
     let crates_io = SourceId::crates_io(config).expect("Unable to create crates.io source ID");
     let yanked_whitelist = HashSet::new();
@@ -264,8 +254,8 @@ fn make_global_state<'cfg>(
 
     GlobalState {
         config,
+        compile_kind,
         target_info,
-        registry,
         crates_io,
         source,
         modifications,
@@ -354,72 +344,178 @@ fn populate_initial_direct_dependencies(
     initial_direct_dependencies
 }
 
+fn write_scratch_cargo_toml(
+    package_name: &str,
+    crates: &BTreeMap<PackageId, ResolvedDep>,
+) -> (tempfile::TempDir, std::path::PathBuf) {
+    use cargo_util_schemas::manifest::{
+        InheritableDependency, PackageName, TomlDependency, TomlDetailedDependency, TomlManifest,
+    };
+    use std::fs;
+
+    let scratch_dir = tempfile::tempdir().expect("Could not create scratch directory");
+    let o = std::process::Command::new("cargo")
+        .arg("init")
+        .arg("--vcs=none")
+        .args(["--name", package_name])
+        .arg(scratch_dir.path())
+        .output()
+        .expect("Could not initialize scratch project");
+    assert!(o.status.success(), "{}", String::from_utf8_lossy(&o.stderr));
+
+    let manifest_path = scratch_dir.path().join("Cargo.toml");
+
+    let manifest_content = fs::read(&manifest_path).expect("Could not read manifest");
+    let mut manifest = ::toml::from_slice::<TomlManifest>(&manifest_content)
+        .expect("Could not deserialize manifest");
+
+    let deps = manifest.dependencies.get_or_insert_default();
+    for (pkg_id, details) in crates {
+        let name = pkg_id.name();
+        let version = pkg_id.version();
+
+        let name = PackageName::new(name.to_string()).expect("Package name invalid");
+
+        let dep = TomlDetailedDependency {
+            version: Some(version.to_string()),
+            features: Some(details.features.iter().map(|s| s.to_string()).collect()),
+            default_features: Some(details.uses_default_features),
+
+            ..Default::default()
+        };
+
+        let version = InheritableDependency::Value(TomlDependency::Detailed(dep));
+        deps.insert(name, version);
+    }
+    let manifest_content = ::toml::to_string(&manifest).expect("Could not serialize manifest");
+    fs::write(&manifest_path, manifest_content).expect("Could not write manifest");
+
+    (scratch_dir, manifest_path)
+}
+
+fn load_workspace<'ctx>(
+    global: &GlobalState<'ctx>,
+    manifest_path: &std::path::Path,
+) -> cargo::core::Workspace<'ctx> {
+    let manifest = cargo::util::toml::read_manifest(manifest_path, global.crates_io, global.config)
+        .expect("Could not read the manifest");
+    let cargo::core::EitherManifest::Real(manifest) = manifest else {
+        panic!("Only real manifests are supported")
+    };
+
+    let package = Package::new(manifest, manifest_path);
+    let target_dir = None;
+    let require_optional_deps = false;
+    cargo::core::Workspace::ephemeral(package, global.config, target_dir, require_optional_deps)
+        .expect("Could not construct a workspace")
+}
+
+fn resolve_dependencies(
+    global: &GlobalState<'_>,
+    scratch_package_name: String,
+    ws: &cargo::core::Workspace<'_>,
+) -> (resolver::Resolve, resolver::features::ResolvedFeatures) {
+    let dry_run = true;
+    let (pkg_set, resolve) =
+        cargo::ops::resolve_ws(ws, dry_run).expect("Could not resolve the workspace");
+
+    let requested_kinds = &[global.compile_kind];
+    let mut target_data = cargo::core::compiler::RustcTargetData::new(ws, requested_kinds)
+        .expect("Could not construct target data");
+    let cli_features = resolver::CliFeatures {
+        features: Default::default(),
+        all_features: false,
+        uses_default_features: true,
+    };
+    let spec = cargo::core::PackageIdSpec::new(scratch_package_name);
+    let specs = &[spec];
+    let requested_targets = &[];
+    let opts = resolver::features::FeatureOpts::default();
+
+    let feature_resolve = resolver::features::FeatureResolver::resolve(
+        ws,
+        &mut target_data,
+        &resolve,
+        &pkg_set,
+        &cli_features,
+        specs,
+        requested_targets,
+        opts,
+    )
+    .expect("Could not resolve features");
+
+    (resolve, feature_resolve)
+}
+
 fn extend_direct_dependencies(
     global: &mut GlobalState<'_>,
     crates: &mut BTreeMap<PackageId, ResolvedDep>,
 ) {
-    // Add a direct dependency on each starting crate.
-    let mut summaries = Vec::new();
-    let mut valid_for_our_platform = BTreeSet::new();
-    for dep in mem::take(crates).into_values() {
-        valid_for_our_platform.insert(dep.summary.package_id());
-        summaries.push((
-            dep.summary,
-            ResolveOpts {
-                dev_deps: false,
-                features: RequestedFeatures::DepFeatures {
-                    features: Rc::new(dep.features),
-                    uses_default_features: dep.uses_default_features,
-                },
-            },
-        ));
-    }
+    let scratch_package_name = "top-crates-scratch-space".to_owned();
+
+    // Adds a direct dependency on each starting crate.
+    let (_scratch_dir, manifest_path) = write_scratch_cargo_toml(&scratch_package_name, crates);
+
+    let ws = load_workspace(global, &manifest_path);
 
     // Resolve transitive dependencies.
-    let replacements = [];
-    let version_prefs = VersionPreferences::default();
-    let warnings = None;
-    let version = ResolveVersion::max_stable();
-    let resolve = resolver::resolve(
-        &summaries,
-        &replacements,
-        &mut global.registry,
-        &version_prefs,
-        version,
-        warnings,
-    )
-    .expect("Unable to resolve dependencies");
+    let (resolve, feature_resolve) = resolve_dependencies(global, scratch_package_name, &ws);
 
-    // Find transitive deps compatible with the playground's platform.
-    let mut to_visit = valid_for_our_platform.clone();
+    let root_package_names = ws
+        .members()
+        .flat_map(|member| member.dependencies().iter().map(|d| d.package_name()))
+        .collect::<BTreeSet<_>>();
+
+    let root_package_ids = resolve
+        .iter()
+        .filter(|pkg_id| root_package_names.contains(&pkg_id.name()))
+        .collect::<BTreeSet<_>>();
+
+    let mut visited = root_package_ids.clone();
+    let mut to_visit = root_package_ids;
+
+    // Find all transitive dependencies that are compatible with the
+    // playground's platform and are activated (if optional).
     while !to_visit.is_empty() {
-        let mut visit_next = BTreeSet::new();
+        let mut next_to_visit = BTreeSet::new();
 
-        for package_id in to_visit {
-            for (dep_pkg, deps) in resolve.deps(package_id) {
-                let for_this_platform = deps.iter().any(|dep| {
-                    dep.platform().map_or(true, |platform| {
+        for pkg_id in to_visit {
+            for (dep_pkg_id, deps) in resolve.deps(pkg_id) {
+                // Don't add excluded packages
+                if global.modifications.excluded(&dep_pkg_id.name()) {
+                    continue;
+                }
+
+                let include_dependency = deps.iter().any(|dep| {
+                    let dep_name = dep.name_in_toml();
+
+                    let active = if dep.is_optional() {
+                        feature_resolve.is_dep_activated(
+                            pkg_id,
+                            resolver::features::FeaturesFor::default(),
+                            dep_name,
+                        )
+                    } else {
+                        true
+                    };
+
+                    let for_our_platform = dep.platform().is_none_or(|platform| {
                         platform.matches(PLAYGROUND_TARGET_PLATFORM, global.target_info.cfg())
-                    })
+                    });
+
+                    active && for_our_platform
                 });
 
-                if for_this_platform {
-                    valid_for_our_platform.insert(dep_pkg);
-                    visit_next.insert(dep_pkg);
+                if include_dependency && visited.insert(dep_pkg_id) {
+                    next_to_visit.insert(dep_pkg_id);
                 }
             }
         }
 
-        to_visit = visit_next;
+        to_visit = next_to_visit;
     }
 
-    // Remove invalid and excluded packages that have been added due to resolution
-    let package_ids = resolve
-        .iter()
-        .filter(|pkg| valid_for_our_platform.contains(pkg))
-        .filter(|pkg| !global.modifications.excluded(pkg.name().as_str()))
-        .collect_vec();
-
+    let package_ids = visited.into_iter().collect::<Vec<_>>();
     let packages = bulk_download(global, &package_ids);
 
     for download in packages {
@@ -456,7 +552,8 @@ pub fn generate_info(
     loop {
         let num_crates_before = resolved_crates.len();
         extend_direct_dependencies(&mut global, &mut resolved_crates);
-        if num_crates_before == resolved_crates.len() {
+        let num_crates_after = resolved_crates.len();
+        if num_crates_before == num_crates_after {
             break;
         }
     }
