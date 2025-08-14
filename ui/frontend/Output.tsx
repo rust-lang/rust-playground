@@ -5,9 +5,9 @@ import { Focus } from './types';
 
 import Execute from './Output/Execute';
 import Gist from './Output/Gist';
-import Section from './Output/Section';
-import SimplePane, { SimplePaneProps } from './Output/SimplePane';
+import SimplePane from './Output/SimplePane';
 import PaneWithMir from './Output/PaneWithMir';
+import PaneWithCode from './Output/PaneWithCode';
 import * as selectors from './selectors';
 import { useAppDispatch, useAppSelector } from './hooks';
 
@@ -33,16 +33,6 @@ interface TabProps {
   label: string;
   onClick: () => void;
   tabProps: object;
-}
-
-const PaneWithCode: React.FC<PaneWithCodeProps> = ({ code, ...rest }) => (
-  <SimplePane {...rest}>
-    <Section kind="code" label="Result">{code}</Section>
-  </SimplePane>
-);
-
-interface PaneWithCodeProps extends SimplePaneProps {
-  code?: string;
 }
 
 const Output: React.FC = () => {

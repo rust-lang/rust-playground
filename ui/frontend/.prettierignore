@@ -20,6 +20,7 @@ node_modules
 !HelpExample.tsx
 !Notifications.tsx
 !Output/OutputPrism.tsx
+!Output/PaneWithCode.tsx
 !Output/PaneWithMir.tsx
 !Output/SimplePane.tsx
 !PopButton.tsx
