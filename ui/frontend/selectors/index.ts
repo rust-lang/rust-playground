@@ -518,6 +518,18 @@ export const compileRequestPayloadSelector = createSelector(
   }),
 );
 
+export const isAssemblyInProgressSelector = createSelector(
+  (state: State) => state.output.assembly,
+  asm => asm.requestsInProgress > 0,
+);
+
+const ASSEMBLY_SYMBOLS_RE = /^[_a-zA-Z0-9<>, ]+:/m;
+
+export const hasAssemblySymbolsSelector = createSelector(
+  (state: State) => state.output.assembly,
+  asm => !!asm.code?.match(ASSEMBLY_SYMBOLS_RE),
+);
+
 export const themeSelector = createSelector(
   (state: State) => state,
   (state) => state.configuration.theme,

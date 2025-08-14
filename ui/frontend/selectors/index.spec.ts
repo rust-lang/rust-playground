@@ -1,6 +1,6 @@
 import reducer from '../reducers';
 import { editCode } from '../reducers/code';
-import { hasMainFunctionSelector } from './index';
+import { hasAssemblySymbolsSelector, hasMainFunctionSelector } from './index';
 
 const buildState = (code: string) => reducer(undefined, editCode(code));
 
@@ -62,5 +62,53 @@ describe('checking for a main function', () => {
 
   test('a main function with a block comment in the argument list', () => {
     expect(doMainFunctionSelector('fn main(/* comment */) {')).toBe(true);
+  });
+});
+
+const doHasAssemblySymbolSelector = (code: string) => {
+  const state = reducer(
+    { output: { assembly: { code, requestsInProgress: 0 } } },
+    { type: 'test' },
+  );
+  return hasAssemblySymbolsSelector(state);
+};
+
+describe('checking for symbols in assembly output', () => {
+  test('empty code has no symbols', () => {
+    expect(doHasAssemblySymbolSelector('')).toBe(false);
+  });
+
+  test('instructions are not symbols', () => {
+    // x86_64
+    expect(doHasAssemblySymbolSelector('    	movl	%edi, 4(%rsp)')).toBe(false);
+    // arm
+    expect(doHasAssemblySymbolSelector('	sub	sp, sp, #32')).toBe(false);
+  });
+
+  test('mangled symbols are symbols', () => {
+    expect(doHasAssemblySymbolSelector('_ZN10playground3add17h903bea7e047dfb9fE:')).toBe(true);
+  });
+
+  test('unmangled symbols are symbols', () => {
+    expect(doHasAssemblySymbolSelector('playground::add:')).toBe(true);
+  });
+
+  test('unmangled symbols from traits are symbols', () => {
+    expect(
+      doHasAssemblySymbolSelector(
+        '<rand::rngs::reseeding::ReseedingCore<R,Rsdr> as rand_core::block::BlockRngCore>::generate:',
+      ),
+    ).toBe(true);
+  });
+
+  test('symbols with comments are symbols', () => {
+    // x86_64
+    expect(doHasAssemblySymbolSelector('add:                                    # @add')).toBe(
+      true,
+    );
+    // arm
+    expect(doHasAssemblySymbolSelector('add:                                    // @add')).toBe(
+      true,
+    );
   });
 });

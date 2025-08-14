@@ -4,6 +4,7 @@ import { changeFocus } from './reducers/output/meta';
 import { Focus } from './types';
 
 import Execute from './Output/Execute';
+import Assembly from './Output/Assembly';
 import Gist from './Output/Gist';
 import SimplePane from './Output/SimplePane';
 import PaneWithMir from './Output/PaneWithMir';
@@ -73,7 +74,7 @@ const Output: React.FC = () => {
           {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
           {focus === Focus.Miri && <SimplePane {...miri} kind="miri" />}
           {focus === Focus.MacroExpansion && <SimplePane {...macroExpansion} kind="macro-expansion" />}
-          {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
+          {focus === Focus.Asm && <Assembly />}
           {focus === Focus.LlvmIr && <PaneWithCode {...llvmIr} kind="llvm-ir" />}
           {focus === Focus.Mir && <PaneWithMir {...mir} kind="mir" />}
           {focus === Focus.Hir && <PaneWithMir {...hir} kind="hir" />}

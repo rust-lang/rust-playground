@@ -19,6 +19,7 @@ node_modules
 !Header.tsx
 !HelpExample.tsx
 !Notifications.tsx
+!Output/Assembly.tsx
 !Output/OutputPrism.tsx
 !Output/PaneWithCode.tsx
 !Output/PaneWithMir.tsx
