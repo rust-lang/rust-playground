@@ -28,7 +28,7 @@ const UNFOCUSED_GRID_STYLE = {
 
 const HANDLE_STYLES = {
   [Orientation.Horizontal]: [styles.splitRowsGutter, styles.splitRowsGutterHandle],
-  [Orientation.Vertical]: [styles.splitColumnsGutter, ''],
+  [Orientation.Vertical]: [styles.splitColumnsGutter, styles.splitColumnsGutterHandle],
 }
 
 // We drop down to lower-level split-grid code and use some hooks
@@ -72,7 +72,7 @@ const ResizableArea: React.FC = () => {
       <div className={styles.editor}><Editor /></div>
       { isFocused &&
         <div ref={dragHandle} className={handleOuterStyle}>
-          <span className={handleInnerStyle}>⣿</span>
+          <span className={handleInnerStyle}></span>
         </div>
       }
       { somethingToShow && <div className={styles.output}><Output /></div>}

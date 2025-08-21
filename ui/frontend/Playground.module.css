@@ -43,7 +43,27 @@
 
 .splitRowsGutterHandle {
   transform: rotate(90deg);
+}
+
+.splitColumnsGutterHandle, .splitRowsGutterHandle {
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.splitColumnsGutterHandle::before, .splitRowsGutterHandle::before {
+  content: "";
+  width: 2px;
+  height: 12px;
+  border-left: dotted 2px currentColor;
+}
+
+.splitColumnsGutterHandle::after, .splitRowsGutterHandle::after {
+  content: "";
+  width: 2px;
+  height: 16px;
+  border-right: dotted 2px currentColor;
 }
 
 .splitColumnsGutter {
