@@ -79,6 +79,10 @@ WORKDIR /orchestrator
 
 FROM chef-available as prepare-orchestrator
 
+USER root
+RUN chown playground:playground /orchestrator
+USER playground
+
 COPY --chown=playground asm-cleanup /asm-cleanup
 COPY --chown=playground modify-cargo-toml /modify-cargo-toml
 COPY --chown=playground orchestrator /orchestrator
@@ -88,9 +92,16 @@ RUN cargo chef prepare
 
 FROM chef-available as build-orchestrator
 
+USER root
+RUN chown playground:playground /orchestrator
+USER playground
+
 COPY --chown=playground asm-cleanup /asm-cleanup
 COPY --chown=playground modify-cargo-toml /modify-cargo-toml
 COPY --chown=playground --from=prepare-orchestrator /orchestrator/recipe.json /orchestrator/recipe.json
+
+COPY --chown=playground orchestrator/Cargo.toml /orchestrator/Cargo.toml
+
 RUN cargo chef cook --locked --release
 
 COPY --chown=playground orchestrator /orchestrator
