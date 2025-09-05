@@ -91,12 +91,12 @@
   },
   {
     "name": "async-compression",
-    "version": "0.4.27",
+    "version": "0.4.30",
     "id": "async_compression"
   },
   {
     "name": "async-trait",
-    "version": "0.1.88",
+    "version": "0.1.89",
     "id": "async_trait"
   },
   {
@@ -121,7 +121,7 @@
   },
   {
     "name": "avif-serialize",
-    "version": "0.8.5",
+    "version": "0.8.6",
     "id": "avif_serialize"
   },
   {
@@ -146,7 +146,7 @@
   },
   {
     "name": "bit_field",
-    "version": "0.10.2",
+    "version": "0.10.3",
     "id": "bit_field"
   },
   {
@@ -161,13 +161,8 @@
   },
   {
     "name": "bitflags",
-    "version": "2.9.1",
+    "version": "2.9.4",
     "id": "bitflags"
-  },
-  {
-    "name": "bitflags",
-    "version": "1.3.2",
-    "id": "bitflags_1_3_2"
   },
   {
     "name": "bitstream-io",
@@ -186,7 +181,7 @@
   },
   {
     "name": "brotli",
-    "version": "8.0.1",
+    "version": "8.0.2",
     "id": "brotli"
   },
   {
@@ -236,7 +231,7 @@
   },
   {
     "name": "cc",
-    "version": "1.2.32",
+    "version": "1.2.36",
     "id": "cc"
   },
   {
@@ -246,7 +241,7 @@
   },
   {
     "name": "cfg-if",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "id": "cfg_if"
   },
   {
@@ -256,17 +251,17 @@
   },
   {
     "name": "clap",
-    "version": "4.5.45",
+    "version": "4.5.47",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.5.44",
+    "version": "4.5.47",
     "id": "clap_builder"
   },
   {
     "name": "clap_derive",
-    "version": "4.5.45",
+    "version": "4.5.47",
     "id": "clap_derive"
   },
   {
@@ -288,6 +283,16 @@
     "name": "colorchoice",
     "version": "1.0.4",
     "id": "colorchoice"
+  },
+  {
+    "name": "compression-codecs",
+    "version": "0.4.30",
+    "id": "compression_codecs"
+  },
+  {
+    "name": "compression-core",
+    "version": "0.4.29",
+    "id": "compression_core"
   },
   {
     "name": "const-default",
@@ -381,7 +386,7 @@
   },
   {
     "name": "deranged",
-    "version": "0.4.0",
+    "version": "0.5.3",
     "id": "deranged"
   },
   {
@@ -500,14 +505,29 @@
     "id": "fastrand"
   },
   {
+    "name": "fax",
+    "version": "0.2.6",
+    "id": "fax"
+  },
+  {
+    "name": "fax_derive",
+    "version": "0.2.0",
+    "id": "fax_derive"
+  },
+  {
     "name": "fdeflate",
     "version": "0.3.7",
     "id": "fdeflate"
   },
   {
     "name": "filetime",
-    "version": "0.2.25",
+    "version": "0.2.26",
     "id": "filetime"
+  },
+  {
+    "name": "find-msvc-tools",
+    "version": "0.1.1",
+    "id": "find_msvc_tools"
   },
   {
     "name": "fixedbitset",
@@ -531,8 +551,13 @@
   },
   {
     "name": "foldhash",
-    "version": "0.1.5",
+    "version": "0.2.0",
     "id": "foldhash"
+  },
+  {
+    "name": "foldhash",
+    "version": "0.1.5",
+    "id": "foldhash_0_1_5"
   },
   {
     "name": "foreign-types",
@@ -546,7 +571,7 @@
   },
   {
     "name": "form_urlencoded",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "id": "form_urlencoded"
   },
   {
@@ -626,7 +651,7 @@
   },
   {
     "name": "getopts",
-    "version": "0.2.23",
+    "version": "0.2.24",
     "id": "getopts"
   },
   {
@@ -671,8 +696,13 @@
   },
   {
     "name": "hashbrown",
-    "version": "0.15.5",
+    "version": "0.16.0",
     "id": "hashbrown"
+  },
+  {
+    "name": "hashbrown",
+    "version": "0.15.5",
+    "id": "hashbrown_0_15_5"
   },
   {
     "name": "hashlink",
@@ -746,7 +776,7 @@
   },
   {
     "name": "hyper",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "id": "hyper"
   },
   {
@@ -801,7 +831,7 @@
   },
   {
     "name": "idna",
-    "version": "1.0.3",
+    "version": "1.1.0",
     "id": "idna"
   },
   {
@@ -811,12 +841,12 @@
   },
   {
     "name": "image",
-    "version": "0.25.6",
+    "version": "0.25.8",
     "id": "image"
   },
   {
     "name": "image-webp",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "id": "image_webp"
   },
   {
@@ -826,7 +856,7 @@
   },
   {
     "name": "indexmap",
-    "version": "2.10.0",
+    "version": "2.11.0",
     "id": "indexmap"
   },
   {
@@ -871,13 +901,8 @@
   },
   {
     "name": "jobserver",
-    "version": "0.1.33",
+    "version": "0.1.34",
     "id": "jobserver"
-  },
-  {
-    "name": "jpeg-decoder",
-    "version": "0.3.2",
-    "id": "jpeg_decoder"
   },
   {
     "name": "lazy_static",
@@ -936,7 +961,7 @@
   },
   {
     "name": "log",
-    "version": "0.4.27",
+    "version": "0.4.28",
     "id": "log"
   },
   {
@@ -1028,6 +1053,11 @@
     "name": "mio",
     "version": "1.0.4",
     "id": "mio"
+  },
+  {
+    "name": "moxcms",
+    "version": "0.7.5",
+    "id": "moxcms"
   },
   {
     "name": "nalgebra",
@@ -1161,7 +1191,7 @@
   },
   {
     "name": "percent-encoding",
-    "version": "2.3.1",
+    "version": "2.3.2",
     "id": "percent_encoding"
   },
   {
@@ -1236,7 +1266,7 @@
   },
   {
     "name": "png",
-    "version": "0.17.16",
+    "version": "0.18.0",
     "id": "png"
   },
   {
@@ -1256,7 +1286,7 @@
   },
   {
     "name": "potential_utf",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "id": "potential_utf"
   },
   {
@@ -1276,7 +1306,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.97",
+    "version": "1.0.101",
     "id": "proc_macro2"
   },
   {
@@ -1298,6 +1328,11 @@
     "name": "publicsuffix",
     "version": "2.3.0",
     "id": "publicsuffix"
+  },
+  {
+    "name": "pxfm",
+    "version": "0.1.22",
+    "id": "pxfm"
   },
   {
     "name": "qoi",
@@ -1376,17 +1411,17 @@
   },
   {
     "name": "regex",
-    "version": "1.11.1",
+    "version": "1.11.2",
     "id": "regex"
   },
   {
     "name": "regex-automata",
-    "version": "0.4.9",
+    "version": "0.4.10",
     "id": "regex_automata"
   },
   {
     "name": "regex-syntax",
-    "version": "0.8.5",
+    "version": "0.8.6",
     "id": "regex_syntax"
   },
   {
@@ -1491,7 +1526,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.142",
+    "version": "1.0.143",
     "id": "serde_json"
   },
   {
@@ -1626,7 +1661,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.105",
+    "version": "2.0.106",
     "id": "syn"
   },
   {
@@ -1651,7 +1686,7 @@
   },
   {
     "name": "tempfile",
-    "version": "3.20.0",
+    "version": "3.21.0",
     "id": "tempfile"
   },
   {
@@ -1666,7 +1701,7 @@
   },
   {
     "name": "thiserror",
-    "version": "2.0.14",
+    "version": "2.0.16",
     "id": "thiserror"
   },
   {
@@ -1676,7 +1711,7 @@
   },
   {
     "name": "thiserror-impl",
-    "version": "2.0.14",
+    "version": "2.0.16",
     "id": "thiserror_impl"
   },
   {
@@ -1696,22 +1731,22 @@
   },
   {
     "name": "tiff",
-    "version": "0.9.1",
+    "version": "0.10.3",
     "id": "tiff"
   },
   {
     "name": "time",
-    "version": "0.3.41",
+    "version": "0.3.43",
     "id": "time"
   },
   {
     "name": "time-core",
-    "version": "0.1.4",
+    "version": "0.1.6",
     "id": "time_core"
   },
   {
     "name": "time-macros",
-    "version": "0.2.22",
+    "version": "0.2.24",
     "id": "time_macros"
   },
   {
@@ -1721,7 +1756,7 @@
   },
   {
     "name": "tinyvec",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "id": "tinyvec"
   },
   {
@@ -1906,7 +1941,7 @@
   },
   {
     "name": "url",
-    "version": "2.5.4",
+    "version": "2.5.7",
     "id": "url"
   },
   {
@@ -1926,7 +1961,7 @@
   },
   {
     "name": "uuid",
-    "version": "1.18.0",
+    "version": "1.18.1",
     "id": "uuid"
   },
   {
@@ -1956,27 +1991,27 @@
   },
   {
     "name": "wasm-bindgen",
-    "version": "0.2.100",
+    "version": "0.2.101",
     "id": "wasm_bindgen"
   },
   {
     "name": "wasm-bindgen-backend",
-    "version": "0.2.100",
+    "version": "0.2.101",
     "id": "wasm_bindgen_backend"
   },
   {
     "name": "wasm-bindgen-macro",
-    "version": "0.2.100",
+    "version": "0.2.101",
     "id": "wasm_bindgen_macro"
   },
   {
     "name": "wasm-bindgen-macro-support",
-    "version": "0.2.100",
+    "version": "0.2.101",
     "id": "wasm_bindgen_macro_support"
   },
   {
     "name": "wasm-bindgen-shared",
-    "version": "0.2.100",
+    "version": "0.2.101",
     "id": "wasm_bindgen_shared"
   },
   {
@@ -2030,8 +2065,18 @@
     "id": "windows_i686_msvc_0_52_6"
   },
   {
+    "name": "windows-link",
+    "version": "0.2.0",
+    "id": "windows_link"
+  },
+  {
+    "name": "windows-link",
+    "version": "0.1.3",
+    "id": "windows_link_0_1_3"
+  },
+  {
     "name": "windows-sys",
-    "version": "0.60.2",
+    "version": "0.61.0",
     "id": "windows_sys"
   },
   {
@@ -2043,6 +2088,11 @@
     "name": "windows-sys",
     "version": "0.59.0",
     "id": "windows_sys_0_59_0"
+  },
+  {
+    "name": "windows-sys",
+    "version": "0.60.2",
+    "id": "windows_sys_0_60_2"
   },
   {
     "name": "windows-targets",
@@ -2076,7 +2126,7 @@
   },
   {
     "name": "winnow",
-    "version": "0.7.12",
+    "version": "0.7.13",
     "id": "winnow"
   },
   {
@@ -2156,7 +2206,7 @@
   },
   {
     "name": "zstd-sys",
-    "version": "2.0.15+zstd.1.5.7",
+    "version": "2.0.16+zstd.1.5.7",
     "id": "zstd_sys"
   },
   {
