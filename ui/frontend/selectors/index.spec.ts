@@ -1,6 +1,10 @@
 import reducer from '../reducers';
 import { editCode } from '../reducers/code';
-import { hasAssemblySymbolsSelector, hasMainFunctionSelector } from './index';
+import {
+  hasAssemblySymbolsSelector,
+  hasLlvmIrSymbolsSelector,
+  hasMainFunctionSelector,
+} from './index';
 
 const buildState = (code: string) => reducer(undefined, editCode(code));
 
@@ -110,5 +114,32 @@ describe('checking for symbols in assembly output', () => {
     expect(doHasAssemblySymbolSelector('add:                                    // @add')).toBe(
       true,
     );
+  });
+});
+
+const doHasLlvmIrSymbolsSelector = (code: string) => {
+  const state = reducer({ output: { llvmIr: { code, requestsInProgress: 0 } } }, { type: 'test' });
+  return hasLlvmIrSymbolsSelector(state);
+};
+
+describe('checking for symbols in LLVM IR output', () => {
+  test('empty code has no symbols', () => {
+    expect(doHasLlvmIrSymbolsSelector('')).toBe(false);
+  });
+
+  test('metadata is not a symbol', () => {
+    expect(
+      doHasLlvmIrSymbolsSelector('source_filename = "playground.d1ee58e2761c15fe-cgu.0"'),
+    ).toBe(false);
+    expect(doHasLlvmIrSymbolsSelector('!llvm.ident = !{!1}')).toBe(false);
+    expect(
+      doHasLlvmIrSymbolsSelector('!1 = !{!"rustc version 1.90.0-nightly (3048886e5 2025-07-30)"}'),
+    ).toBe(false);
+  });
+
+  test('a symbol is a symbol', () => {
+    expect(
+      doHasLlvmIrSymbolsSelector('define noundef i32 @add(i32 noundef %v) unnamed_addr #0 {'),
+    ).toBe(true);
   });
 });

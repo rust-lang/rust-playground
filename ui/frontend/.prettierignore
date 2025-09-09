@@ -20,10 +20,12 @@ node_modules
 !HelpExample.tsx
 !Notifications.tsx
 !Output/Assembly.tsx
+!Output/LlvmIr.tsx
 !Output/OutputPrism.tsx
 !Output/PaneWithCode.tsx
 !Output/PaneWithMir.tsx
 !Output/SimplePane.tsx
+!Output/WarnAboutNoSymbols.tsx
 !PopButton.tsx
 !Prism.tsx
 !Stdin.tsx

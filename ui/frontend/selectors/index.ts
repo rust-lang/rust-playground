@@ -530,6 +530,18 @@ export const hasAssemblySymbolsSelector = createSelector(
   asm => !!asm.code?.match(ASSEMBLY_SYMBOLS_RE),
 );
 
+export const isLlvmIrInProgressSelector = createSelector(
+  (state: State) => state.output.llvmIr,
+  llvmIr => llvmIr.requestsInProgress > 0,
+);
+
+const LLVMIR_SYMBOLS_RE = /^define.*@.*{/m;
+
+export const hasLlvmIrSymbolsSelector = createSelector(
+  (state: State) => state.output.llvmIr,
+  llvmIr => !!llvmIr.code?.match(LLVMIR_SYMBOLS_RE),
+);
+
 export const themeSelector = createSelector(
   (state: State) => state,
   (state) => state.configuration.theme,
