@@ -4,15 +4,17 @@ import { changeFocus } from './reducers/output/meta';
 import { Focus } from './types';
 
 import Execute from './Output/Execute';
+import Assembly from './Output/Assembly';
 import Gist from './Output/Gist';
-import Section from './Output/Section';
-import SimplePane, { SimplePaneProps } from './Output/SimplePane';
+import SimplePane from './Output/SimplePane';
 import PaneWithMir from './Output/PaneWithMir';
+import PaneWithCode from './Output/PaneWithCode';
 import * as selectors from './selectors';
 import { useAppDispatch, useAppSelector } from './hooks';
 
 import * as styles from './Output.module.css';
 import Stdin from './Stdin';
+import LlvmIr from './Output/LlvmIr';
 
 const Tab: React.FC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
   if (selectors.hasProperties(tabProps)) {
@@ -33,16 +35,6 @@ interface TabProps {
   label: string;
   onClick: () => void;
   tabProps: object;
-}
-
-const PaneWithCode: React.FC<PaneWithCodeProps> = ({ code, ...rest }) => (
-  <SimplePane {...rest}>
-    <Section kind="code" label="Result">{code}</Section>
-  </SimplePane>
-);
-
-interface PaneWithCodeProps extends SimplePaneProps {
-  code?: string;
 }
 
 const Output: React.FC = () => {
@@ -83,8 +75,8 @@ const Output: React.FC = () => {
           {focus === Focus.Clippy && <SimplePane {...clippy} kind="clippy" />}
           {focus === Focus.Miri && <SimplePane {...miri} kind="miri" />}
           {focus === Focus.MacroExpansion && <SimplePane {...macroExpansion} kind="macro-expansion" />}
-          {focus === Focus.Asm && <PaneWithCode {...assembly} kind="asm" />}
-          {focus === Focus.LlvmIr && <PaneWithCode {...llvmIr} kind="llvm-ir" />}
+          {focus === Focus.Asm && <Assembly />}
+          {focus === Focus.LlvmIr && <LlvmIr />}
           {focus === Focus.Mir && <PaneWithMir {...mir} kind="mir" />}
           {focus === Focus.Hir && <PaneWithMir {...hir} kind="hir" />}
           {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
