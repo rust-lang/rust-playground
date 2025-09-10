@@ -3985,7 +3985,9 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn miri() -> Result<()> {
-        let coordinator = new_coordinator();
+        // We set the `MIRI_SYSROOT` variable to something that's only
+        // valid on Linux.
+        let coordinator = new_coordinator_docker();
 
         let req = MiriRequest {
             code: r#"
@@ -4013,7 +4015,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn miri_tests() -> Result<()> {
-        let coordinator = new_coordinator();
+        let coordinator = new_coordinator_docker();
 
         let req = MiriRequest {
             tests: true,
