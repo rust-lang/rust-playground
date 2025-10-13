@@ -14,7 +14,7 @@ axum = { version = "0.8", features = ["ws"] }
 axum-extra = { version = "0.10", features = ["typed-header"] }
 dotenv = "0.15.0"
 futures = "0.3.21"
-octocrab = "0.44"
+octocrab = "0.47"
 openssl-probe = "0.1.2"
 orchestrator = { path = "../compiler/base/orchestrator" }
 prometheus = { version = "0.14.0", default-features = false }
