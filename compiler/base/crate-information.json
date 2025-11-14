@@ -16,8 +16,13 @@
   },
   {
     "name": "aho-corasick",
-    "version": "1.1.3",
+    "version": "1.1.4",
     "id": "aho_corasick"
+  },
+  {
+    "name": "aligned",
+    "version": "0.4.2",
+    "id": "aligned"
   },
   {
     "name": "aligned-vec",
@@ -61,7 +66,7 @@
   },
   {
     "name": "anstyle-query",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "id": "anstyle_query"
   },
   {
@@ -90,8 +95,13 @@
     "id": "arrayvec"
   },
   {
+    "name": "as-slice",
+    "version": "0.2.1",
+    "id": "as_slice"
+  },
+  {
     "name": "async-compression",
-    "version": "0.4.32",
+    "version": "0.4.33",
     "id": "async_compression"
   },
   {
@@ -116,8 +126,13 @@
   },
   {
     "name": "av1-grain",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "id": "av1_grain"
+  },
+  {
+    "name": "av-scenechange",
+    "version": "0.14.1",
+    "id": "av_scenechange"
   },
   {
     "name": "avif-serialize",
@@ -126,12 +141,12 @@
   },
   {
     "name": "aws-lc-rs",
-    "version": "1.14.1",
+    "version": "1.15.0",
     "id": "aws_lc_rs"
   },
   {
     "name": "aws-lc-sys",
-    "version": "0.32.3",
+    "version": "0.33.0",
     "id": "aws_lc_sys"
   },
   {
@@ -161,18 +176,23 @@
   },
   {
     "name": "bitflags",
-    "version": "2.9.4",
+    "version": "2.10.0",
     "id": "bitflags"
   },
   {
     "name": "bitstream-io",
-    "version": "2.6.0",
+    "version": "4.9.0",
     "id": "bitstream_io"
   },
   {
     "name": "block-buffer",
-    "version": "0.10.4",
+    "version": "0.11.0",
     "id": "block_buffer"
+  },
+  {
+    "name": "block-buffer",
+    "version": "0.10.4",
+    "id": "block_buffer_0_10_4"
   },
   {
     "name": "borsh",
@@ -191,7 +211,7 @@
   },
   {
     "name": "built",
-    "version": "0.7.7",
+    "version": "0.8.0",
     "id": "built"
   },
   {
@@ -221,7 +241,7 @@
   },
   {
     "name": "bytes",
-    "version": "1.10.1",
+    "version": "1.11.0",
     "id": "bytes"
   },
   {
@@ -231,7 +251,7 @@
   },
   {
     "name": "cc",
-    "version": "1.2.41",
+    "version": "1.2.46",
     "id": "cc"
   },
   {
@@ -251,12 +271,12 @@
   },
   {
     "name": "clap",
-    "version": "4.5.49",
+    "version": "4.5.51",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.5.49",
+    "version": "4.5.51",
     "id": "clap_builder"
   },
   {
@@ -286,12 +306,12 @@
   },
   {
     "name": "compression-codecs",
-    "version": "0.4.31",
+    "version": "0.4.32",
     "id": "compression_codecs"
   },
   {
     "name": "compression-core",
-    "version": "0.4.29",
+    "version": "0.4.30",
     "id": "compression_core"
   },
   {
@@ -313,6 +333,11 @@
     "name": "cookie_store",
     "version": "0.21.1",
     "id": "cookie_store"
+  },
+  {
+    "name": "core2",
+    "version": "0.4.0",
+    "id": "core2"
   },
   {
     "name": "cpufeatures",
@@ -356,7 +381,7 @@
   },
   {
     "name": "crypto-common",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "id": "crypto_common"
   },
   {
@@ -371,12 +396,12 @@
   },
   {
     "name": "csv",
-    "version": "1.3.1",
+    "version": "1.4.0",
     "id": "csv"
   },
   {
     "name": "csv-core",
-    "version": "0.1.12",
+    "version": "0.1.13",
     "id": "csv_core"
   },
   {
@@ -391,7 +416,7 @@
   },
   {
     "name": "deranged",
-    "version": "0.5.4",
+    "version": "0.5.5",
     "id": "deranged"
   },
   {
@@ -426,7 +451,7 @@
   },
   {
     "name": "document-features",
-    "version": "0.2.11",
+    "version": "0.2.12",
     "id": "document_features"
   },
   {
@@ -486,7 +511,7 @@
   },
   {
     "name": "exr",
-    "version": "1.73.0",
+    "version": "1.74.0",
     "id": "exr"
   },
   {
@@ -536,7 +561,7 @@
   },
   {
     "name": "find-msvc-tools",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "id": "find_msvc_tools"
   },
   {
@@ -551,7 +576,7 @@
   },
   {
     "name": "flate2",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "id": "flate2"
   },
   {
@@ -651,13 +676,13 @@
   },
   {
     "name": "generic-array",
-    "version": "1.3.3",
+    "version": "1.3.5",
     "id": "generic_array"
   },
   {
     "name": "generic-array",
-    "version": "0.14.9",
-    "id": "generic_array_0_14_9"
+    "version": "0.14.7",
+    "id": "generic_array_0_14_7"
   },
   {
     "name": "getopts",
@@ -676,7 +701,7 @@
   },
   {
     "name": "gif",
-    "version": "0.13.3",
+    "version": "0.14.0",
     "id": "gif"
   },
   {
@@ -785,8 +810,13 @@
     "id": "humantime"
   },
   {
+    "name": "hybrid-array",
+    "version": "0.4.5",
+    "id": "hybrid_array"
+  },
+  {
     "name": "hyper",
-    "version": "1.7.0",
+    "version": "1.8.1",
     "id": "hyper"
   },
   {
@@ -801,7 +831,7 @@
   },
   {
     "name": "hyper-util",
-    "version": "0.1.17",
+    "version": "0.1.18",
     "id": "hyper_util"
   },
   {
@@ -811,37 +841,37 @@
   },
   {
     "name": "icu_collections",
-    "version": "2.0.0",
+    "version": "2.1.1",
     "id": "icu_collections"
   },
   {
     "name": "icu_locale_core",
-    "version": "2.0.0",
+    "version": "2.1.1",
     "id": "icu_locale_core"
   },
   {
     "name": "icu_normalizer",
-    "version": "2.0.0",
+    "version": "2.1.1",
     "id": "icu_normalizer"
   },
   {
     "name": "icu_normalizer_data",
-    "version": "2.0.0",
+    "version": "2.1.1",
     "id": "icu_normalizer_data"
   },
   {
     "name": "icu_properties",
-    "version": "2.0.1",
+    "version": "2.1.1",
     "id": "icu_properties"
   },
   {
     "name": "icu_properties_data",
-    "version": "2.0.1",
+    "version": "2.1.1",
     "id": "icu_properties_data"
   },
   {
     "name": "icu_provider",
-    "version": "2.0.0",
+    "version": "2.1.1",
     "id": "icu_provider"
   },
   {
@@ -856,7 +886,7 @@
   },
   {
     "name": "image",
-    "version": "0.25.8",
+    "version": "0.25.9",
     "id": "image"
   },
   {
@@ -871,7 +901,7 @@
   },
   {
     "name": "indexmap",
-    "version": "2.11.4",
+    "version": "2.12.0",
     "id": "indexmap"
   },
   {
@@ -886,23 +916,18 @@
   },
   {
     "name": "iri-string",
-    "version": "0.7.8",
+    "version": "0.7.9",
     "id": "iri_string"
   },
   {
     "name": "is_terminal_polyfill",
-    "version": "1.70.1",
+    "version": "1.70.2",
     "id": "is_terminal_polyfill"
   },
   {
     "name": "itertools",
     "version": "0.14.0",
     "id": "itertools"
-  },
-  {
-    "name": "itertools",
-    "version": "0.12.1",
-    "id": "itertools_0_12_1"
   },
   {
     "name": "itertools",
@@ -916,7 +941,7 @@
   },
   {
     "name": "jiff",
-    "version": "0.2.15",
+    "version": "0.2.16",
     "id": "jiff"
   },
   {
@@ -951,17 +976,22 @@
   },
   {
     "name": "linux-raw-sys",
-    "version": "0.11.0",
+    "version": "0.12.0",
     "id": "linux_raw_sys"
   },
   {
+    "name": "linux-raw-sys",
+    "version": "0.11.0",
+    "id": "linux_raw_sys_0_11_0"
+  },
+  {
     "name": "litemap",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "id": "litemap"
   },
   {
     "name": "litrs",
-    "version": "0.4.2",
+    "version": "1.0.0",
     "id": "litrs"
   },
   {
@@ -1061,7 +1091,7 @@
   },
   {
     "name": "mio",
-    "version": "1.0.4",
+    "version": "1.1.0",
     "id": "mio"
   },
   {
@@ -1071,7 +1101,7 @@
   },
   {
     "name": "moxcms",
-    "version": "0.7.7",
+    "version": "0.7.9",
     "id": "moxcms"
   },
   {
@@ -1091,13 +1121,18 @@
   },
   {
     "name": "ndarray",
-    "version": "0.16.1",
+    "version": "0.17.1",
     "id": "ndarray"
   },
   {
     "name": "nom",
-    "version": "7.1.3",
+    "version": "8.0.0",
     "id": "nom"
+  },
+  {
+    "name": "nom",
+    "version": "7.1.3",
+    "id": "nom_7_1_3"
   },
   {
     "name": "noop_proc_macro",
@@ -1166,7 +1201,7 @@
   },
   {
     "name": "openssl",
-    "version": "0.10.74",
+    "version": "0.10.75",
     "id": "openssl"
   },
   {
@@ -1181,7 +1216,7 @@
   },
   {
     "name": "openssl-sys",
-    "version": "0.9.110",
+    "version": "0.9.111",
     "id": "openssl_sys"
   },
   {
@@ -1203,6 +1238,11 @@
     "name": "paste",
     "version": "1.0.15",
     "id": "paste"
+  },
+  {
+    "name": "pastey",
+    "version": "0.1.1",
+    "id": "pastey"
   },
   {
     "name": "percent-encoding",
@@ -1321,7 +1361,7 @@
   },
   {
     "name": "potential_utf",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "id": "potential_utf"
   },
   {
@@ -1341,7 +1381,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.101",
+    "version": "1.0.103",
     "id": "proc_macro2"
   },
   {
@@ -1381,7 +1421,7 @@
   },
   {
     "name": "quote",
-    "version": "1.0.41",
+    "version": "1.0.42",
     "id": "quote"
   },
   {
@@ -1421,12 +1461,12 @@
   },
   {
     "name": "rav1e",
-    "version": "0.7.1",
+    "version": "0.8.1",
     "id": "rav1e"
   },
   {
     "name": "ravif",
-    "version": "0.11.20",
+    "version": "0.12.0",
     "id": "ravif"
   },
   {
@@ -1491,12 +1531,12 @@
   },
   {
     "name": "rustls",
-    "version": "0.23.32",
+    "version": "0.23.35",
     "id": "rustls"
   },
   {
     "name": "rustls-pki-types",
-    "version": "1.12.0",
+    "version": "1.13.0",
     "id": "rustls_pki_types"
   },
   {
@@ -1568,11 +1608,6 @@
     "name": "serde_spanned",
     "version": "1.0.3",
     "id": "serde_spanned"
-  },
-  {
-    "name": "serde_spanned",
-    "version": "0.6.9",
-    "id": "serde_spanned_0_6_9"
   },
   {
     "name": "serde_urlencoded",
@@ -1691,7 +1726,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.106",
+    "version": "2.0.110",
     "id": "syn"
   },
   {
@@ -1735,19 +1770,9 @@
     "id": "thiserror"
   },
   {
-    "name": "thiserror",
-    "version": "1.0.69",
-    "id": "thiserror_1_0_69"
-  },
-  {
     "name": "thiserror-impl",
     "version": "2.0.17",
     "id": "thiserror_impl"
-  },
-  {
-    "name": "thiserror-impl",
-    "version": "1.0.69",
-    "id": "thiserror_impl_1_0_69"
   },
   {
     "name": "thread-id",
@@ -1781,7 +1806,7 @@
   },
   {
     "name": "tinystr",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "id": "tinystr"
   },
   {
@@ -1831,7 +1856,7 @@
   },
   {
     "name": "tokio-util",
-    "version": "0.7.16",
+    "version": "0.7.17",
     "id": "tokio_util"
   },
   {
@@ -1840,24 +1865,9 @@
     "id": "toml"
   },
   {
-    "name": "toml",
-    "version": "0.8.23",
-    "id": "toml_0_8_23"
-  },
-  {
     "name": "toml_datetime",
     "version": "0.7.3",
     "id": "toml_datetime"
-  },
-  {
-    "name": "toml_datetime",
-    "version": "0.6.11",
-    "id": "toml_datetime_0_6_11"
-  },
-  {
-    "name": "toml_edit",
-    "version": "0.22.27",
-    "id": "toml_edit"
   },
   {
     "name": "toml_parser",
@@ -1936,17 +1946,17 @@
   },
   {
     "name": "unicode-ident",
-    "version": "1.0.19",
+    "version": "1.0.22",
     "id": "unicode_ident"
   },
   {
     "name": "unicode-normalization",
-    "version": "0.1.24",
+    "version": "0.1.25",
     "id": "unicode_normalization"
   },
   {
     "name": "unicode-properties",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "id": "unicode_properties"
   },
   {
@@ -2031,42 +2041,37 @@
   },
   {
     "name": "wasm-bindgen",
-    "version": "0.2.104",
+    "version": "0.2.105",
     "id": "wasm_bindgen"
   },
   {
-    "name": "wasm-bindgen-backend",
-    "version": "0.2.104",
-    "id": "wasm_bindgen_backend"
-  },
-  {
     "name": "wasm-bindgen-macro",
-    "version": "0.2.104",
+    "version": "0.2.105",
     "id": "wasm_bindgen_macro"
   },
   {
     "name": "wasm-bindgen-macro-support",
-    "version": "0.2.104",
+    "version": "0.2.105",
     "id": "wasm_bindgen_macro_support"
   },
   {
     "name": "wasm-bindgen-shared",
-    "version": "0.2.104",
+    "version": "0.2.105",
     "id": "wasm_bindgen_shared"
   },
   {
     "name": "rustls-webpki",
-    "version": "0.103.7",
+    "version": "0.103.8",
     "id": "webpki"
   },
   {
     "name": "webpki-roots",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "id": "webpki_roots"
   },
   {
     "name": "weezl",
-    "version": "0.1.10",
+    "version": "0.1.12",
     "id": "weezl"
   },
   {
@@ -2123,11 +2128,6 @@
     "name": "windows-link",
     "version": "0.2.1",
     "id": "windows_link"
-  },
-  {
-    "name": "windows-link",
-    "version": "0.1.3",
-    "id": "windows_link_0_1_3"
   },
   {
     "name": "windows-sys",
@@ -2196,7 +2196,7 @@
   },
   {
     "name": "writeable",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "id": "writeable"
   },
   {
@@ -2210,13 +2210,18 @@
     "id": "xml5ever"
   },
   {
-    "name": "yoke",
+    "name": "y4m",
     "version": "0.8.0",
+    "id": "y4m"
+  },
+  {
+    "name": "yoke",
+    "version": "0.8.1",
     "id": "yoke"
   },
   {
     "name": "yoke-derive",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "id": "yoke_derive"
   },
   {
@@ -2246,17 +2251,17 @@
   },
   {
     "name": "zerotrie",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "id": "zerotrie"
   },
   {
     "name": "zerovec",
-    "version": "0.11.4",
+    "version": "0.11.5",
     "id": "zerovec"
   },
   {
     "name": "zerovec-derive",
-    "version": "0.11.1",
+    "version": "0.11.2",
     "id": "zerovec_derive"
   },
   {
@@ -2276,8 +2281,13 @@
   },
   {
     "name": "zune-core",
-    "version": "0.4.12",
+    "version": "0.5.0",
     "id": "zune_core"
+  },
+  {
+    "name": "zune-core",
+    "version": "0.4.12",
+    "id": "zune_core_0_4_12"
   },
   {
     "name": "zune-inflate",
@@ -2286,7 +2296,12 @@
   },
   {
     "name": "zune-jpeg",
-    "version": "0.4.21",
+    "version": "0.5.5",
     "id": "zune_jpeg"
+  },
+  {
+    "name": "zune-jpeg",
+    "version": "0.4.21",
+    "id": "zune_jpeg_0_4_21"
   }
 ]
