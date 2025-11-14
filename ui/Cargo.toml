@@ -11,7 +11,7 @@ fork-bomb-prevention = []
 [dependencies]
 asm-cleanup = { path = "../compiler/base/asm-cleanup" }
 axum = { version = "0.8", features = ["ws"] }
-axum-extra = { version = "0.10", features = ["typed-header"] }
+axum-extra = { version = "0.12", features = ["typed-header"] }
 dotenv = "0.15.0"
 futures = "0.3.21"
 octocrab = "0.47"
