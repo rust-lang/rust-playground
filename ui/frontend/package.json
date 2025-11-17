@@ -31,7 +31,7 @@
     "@babel/core": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
-    "@eslint/compat": "^1.2.3",
+    "@eslint/compat": "^2.0.0",
     "@eslint/js": "^9.15.0",
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/common-tags": "^1.8.1",
