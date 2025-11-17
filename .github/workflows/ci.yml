@@ -220,6 +220,8 @@ jobs:
       with:
         username: "${{ env.DOCKER_HUB_USERNAME }}"
         password: "${{ secrets.DOCKER_HUB_TOKEN }}"
+    - name: Recover disk space
+      run: sudo rm -rf /usr/local/lib/android
     - name: Pull containers
       run: echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull
     - name: Rename containers
