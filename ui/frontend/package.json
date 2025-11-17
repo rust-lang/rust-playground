@@ -33,7 +33,7 @@
     "@babel/preset-react": "^7.0.0",
     "@eslint/compat": "^1.2.3",
     "@eslint/js": "^9.15.0",
-    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/common-tags": "^1.8.1",
     "@types/jest": "^30.0.0",
     "@types/lodash-es": "^4.17.6",
