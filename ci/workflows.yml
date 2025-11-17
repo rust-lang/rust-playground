@@ -230,6 +230,10 @@ workflows:
         steps:
           - *checkout_pr
 
+          - name: Recover disk space
+            run: |-
+              sudo rm -rf /usr/local/lib/android
+
           - name: "Configure Ruby"
             uses: ruby/setup-ruby@v1
             with:
