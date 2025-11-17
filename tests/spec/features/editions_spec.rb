@@ -24,7 +24,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
     click_on("Run")
 
     within(:output, :stderr) do
-      expect(page).to have_content "thread 'main' panicked at src/main.rs:3:5"
+      expect(page).to have_content %r{thread 'main' \(\d+\) panicked at src/main.rs:3:5}
     end
   end
 
@@ -58,7 +58,7 @@ RSpec.feature "Multiple Rust editions", type: :feature, js: true do
 
   def rust_edition_code
     <<~EOF
-    #![allow(non_fmt_panic)]
+    #![allow(non_fmt_panics)]
     fn main() {
         panic!(async {})
     }
