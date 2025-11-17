@@ -17,6 +17,11 @@ components:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
+  - recover_disk_space: &recover_disk_space
+      name: Recover disk space
+      run: |-
+        sudo rm -rf /usr/local/lib/android
+
   - docker_buildx: &docker_buildx
       name: "Set up Docker Buildx"
       uses: docker/setup-buildx-action@v3
@@ -230,9 +235,7 @@ workflows:
         steps:
           - *checkout_pr
 
-          - name: Recover disk space
-            run: |-
-              sudo rm -rf /usr/local/lib/android
+          - *recover_disk_space
 
           - name: "Configure Ruby"
             uses: ruby/setup-ruby@v1
@@ -309,6 +312,8 @@ workflows:
         steps:
           - *login_ghcr
           - *login_docker_hub
+
+          - *recover_disk_space
 
           - *pull_containers
           - *rename_all_containers
