@@ -13,7 +13,8 @@ interface State {
   seenRustSurvey2023: boolean; // expired
   seenDarkMode: boolean; // expired
   seenRustSurvey2024: boolean; // expired
-  seenRust2024IsDefault: boolean;
+  seenRust2024IsDefault: boolean; // expired
+  seenRustSurvey2025: boolean;
 }
 
 const initialState: State = {
@@ -27,7 +28,8 @@ const initialState: State = {
   seenRustSurvey2023: true,
   seenDarkMode: true,
   seenRustSurvey2024: true,
-  seenRust2024IsDefault: false,
+  seenRust2024IsDefault: true,
+  seenRustSurvey2025: false,
 };
 
 const slice = createSlice({
@@ -36,8 +38,8 @@ const slice = createSlice({
   reducers: {
     notificationSeen: (state, action: PayloadAction<Notification>) => {
       switch (action.payload) {
-        case Notification.Rust2024IsDefault: {
-          state.seenRust2024IsDefault = true;
+        case Notification.RustSurvey2025: {
+          state.seenRustSurvey2025 = true;
           break;
         }
       }
@@ -47,6 +49,6 @@ const slice = createSlice({
 
 const { notificationSeen } = slice.actions;
 
-export const seenRust2024IsDefault = () => notificationSeen(Notification.Rust2024IsDefault);
+export const seenRustSurvey2025 = () => notificationSeen(Notification.RustSurvey2025);
 
 export default slice.reducer;
