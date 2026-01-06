@@ -80,8 +80,8 @@
     "webpack-cli": "^6.0.1"
   },
   "engines": {
-    "node": "^22.2",
-    "pnpm": "^10.1"
+    "node": "^24.12",
+    "pnpm": "^10.27"
   },
   "scripts": {
     "test": "jest",
