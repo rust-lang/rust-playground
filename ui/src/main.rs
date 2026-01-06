@@ -36,7 +36,7 @@ fn main() {
     let _ = dotenv::dotenv();
     // SAFETY: We have not started any other threads yet.
     unsafe {
-        openssl_probe::init_openssl_env_vars();
+        openssl_probe::try_init_openssl_env_vars();
     }
 
     // Info-level logging is enabled by default.
