@@ -249,9 +249,9 @@ checksum = "b35204fbdc0b3f4446b89fc1ac2cf84a8a68971995d0bf2e925ec7cd960f9cb3"
 
 [[package]]
 name = "cargo"
-version = "0.92.0"
+version = "0.93.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "89389877f508bae1d45a48b4e76cb0dac5e41a6ac5103752e44d29be0c69c394"
+checksum = "2a9eb357bdc58680a9d65ec020f0ec258d89a70c96d491b39606fb86a42c0dd5"
 dependencies = [
  "annotate-snippets",
  "anstream",
@@ -326,7 +326,7 @@ dependencies = [
  "unicode-xid",
  "url",
  "walkdir",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
  "winnow",
 ]
 
