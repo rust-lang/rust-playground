@@ -6,22 +6,22 @@ const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-const { globSync } = require('glob');
-const basename = require('basename');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const thisPackage = require('./package.json');
 const devDependencies = Object.keys(thisPackage.devDependencies);
 
 const allKeybindingNames =
-      globSync('./node_modules/ace-builds/src-noconflict/keybinding-*.js')
-      .map(basename)
-      .map(n => n.replace(/^keybinding-/, ''));
+      fs.globSync('./node_modules/ace-builds/src-noconflict/keybinding-*.js')
+      .map(n => path.basename(n))
+      .map(n => n.replace(/^keybinding-/, ''))
+      .map(n => n.replace(/.js$/, ''));
 const allThemeNames =
-      globSync('./node_modules/ace-builds/src-noconflict/theme-*.js')
-      .map(basename)
-      .filter(n => !n.endsWith('-css'))
-      .map(n => n.replace(/^theme-/, ''));
-
+      fs.globSync('./node_modules/ace-builds/src-noconflict/theme-*.js')
+      .map(n => path.basename(n))
+      .map(n => n.replace(/^theme-/, ''))
+      .map(n => n.replace(/.js$/, ''));
 // There's a builtin/default keybinding that we call `ace`.
 const allKeybindings = allKeybindingNames.concat(['ace']).sort();
 const allThemes = allThemeNames;
