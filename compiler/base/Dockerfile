@@ -61,8 +61,7 @@ RUN cargo install --locked wasm-tools
 
 FROM toolchain as sources
 
-RUN cargo init /playground
-
+RUN mkdir /playground/src && echo 'fn main() {}' > /playground/src/main.rs
 COPY --chown=playground Cargo.toml /playground/Cargo.toml
 COPY --chown=playground crate-information.json /playground/crate-information.json
 RUN cargo fetch
