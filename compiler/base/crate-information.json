@@ -101,7 +101,7 @@
   },
   {
     "name": "async-compression",
-    "version": "0.4.36",
+    "version": "0.4.37",
     "id": "async_compression"
   },
   {
@@ -141,12 +141,12 @@
   },
   {
     "name": "aws-lc-rs",
-    "version": "1.15.2",
+    "version": "1.15.4",
     "id": "aws_lc_rs"
   },
   {
     "name": "aws-lc-sys",
-    "version": "0.35.0",
+    "version": "0.37.0",
     "id": "aws_lc_sys"
   },
   {
@@ -221,7 +221,7 @@
   },
   {
     "name": "bytemuck",
-    "version": "1.24.0",
+    "version": "1.25.0",
     "id": "bytemuck"
   },
   {
@@ -251,7 +251,7 @@
   },
   {
     "name": "cc",
-    "version": "1.2.51",
+    "version": "1.2.55",
     "id": "cc"
   },
   {
@@ -266,27 +266,27 @@
   },
   {
     "name": "chrono",
-    "version": "0.4.42",
+    "version": "0.4.43",
     "id": "chrono"
   },
   {
     "name": "clap",
-    "version": "4.5.54",
+    "version": "4.5.56",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.5.54",
+    "version": "4.5.56",
     "id": "clap_builder"
   },
   {
     "name": "clap_derive",
-    "version": "4.5.49",
+    "version": "4.5.55",
     "id": "clap_derive"
   },
   {
     "name": "clap_lex",
-    "version": "0.7.6",
+    "version": "0.7.7",
     "id": "clap_lex"
   },
   {
@@ -306,7 +306,7 @@
   },
   {
     "name": "compression-codecs",
-    "version": "0.4.35",
+    "version": "0.4.36",
     "id": "compression_codecs"
   },
   {
@@ -406,7 +406,7 @@
   },
   {
     "name": "data-encoding",
-    "version": "2.9.0",
+    "version": "2.10.0",
     "id": "data_encoding"
   },
   {
@@ -561,12 +561,12 @@
   },
   {
     "name": "filetime",
-    "version": "0.2.26",
+    "version": "0.2.27",
     "id": "filetime"
   },
   {
     "name": "find-msvc-tools",
-    "version": "0.1.6",
+    "version": "0.1.9",
     "id": "find_msvc_tools"
   },
   {
@@ -581,7 +581,7 @@
   },
   {
     "name": "flate2",
-    "version": "1.1.5",
+    "version": "1.1.8",
     "id": "flate2"
   },
   {
@@ -686,13 +686,18 @@
   },
   {
     "name": "getrandom",
-    "version": "0.3.4",
+    "version": "0.4.0",
     "id": "getrandom"
   },
   {
     "name": "getrandom",
-    "version": "0.2.16",
-    "id": "getrandom_0_2_16"
+    "version": "0.2.17",
+    "id": "getrandom_0_2_17"
+  },
+  {
+    "name": "getrandom",
+    "version": "0.3.4",
+    "id": "getrandom_0_3_4"
   },
   {
     "name": "gif",
@@ -806,7 +811,7 @@
   },
   {
     "name": "hybrid-array",
-    "version": "0.4.5",
+    "version": "0.4.6",
     "id": "hybrid_array"
   },
   {
@@ -826,7 +831,7 @@
   },
   {
     "name": "iana-time-zone",
-    "version": "0.1.64",
+    "version": "0.1.65",
     "id": "iana_time_zone"
   },
   {
@@ -891,7 +896,7 @@
   },
   {
     "name": "indexmap",
-    "version": "2.12.1",
+    "version": "2.13.0",
     "id": "indexmap"
   },
   {
@@ -946,12 +951,12 @@
   },
   {
     "name": "libc",
-    "version": "0.2.179",
+    "version": "0.2.180",
     "id": "libc"
   },
   {
     "name": "libm",
-    "version": "0.2.15",
+    "version": "0.2.16",
     "id": "libm"
   },
   {
@@ -1066,8 +1071,13 @@
   },
   {
     "name": "miniz_oxide",
-    "version": "0.8.9",
+    "version": "0.9.0",
     "id": "miniz_oxide"
+  },
+  {
+    "name": "miniz_oxide",
+    "version": "0.8.9",
+    "id": "miniz_oxide_0_8_9"
   },
   {
     "name": "mio",
@@ -1096,7 +1106,7 @@
   },
   {
     "name": "ndarray",
-    "version": "0.17.1",
+    "version": "0.17.2",
     "id": "ndarray"
   },
   {
@@ -1126,7 +1136,7 @@
   },
   {
     "name": "num-conv",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "id": "num_conv"
   },
   {
@@ -1171,7 +1181,7 @@
   },
   {
     "name": "openssl-probe",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "id": "openssl_probe"
   },
   {
@@ -1306,12 +1316,12 @@
   },
   {
     "name": "postgres-protocol",
-    "version": "0.6.9",
+    "version": "0.6.10",
     "id": "postgres_protocol"
   },
   {
     "name": "postgres-types",
-    "version": "0.2.11",
+    "version": "0.2.12",
     "id": "postgres_types"
   },
   {
@@ -1336,7 +1346,7 @@
   },
   {
     "name": "proc-macro2",
-    "version": "1.0.105",
+    "version": "1.0.106",
     "id": "proc_macro2"
   },
   {
@@ -1376,7 +1386,7 @@
   },
   {
     "name": "quote",
-    "version": "1.0.43",
+    "version": "1.0.44",
     "id": "quote"
   },
   {
@@ -1391,7 +1401,7 @@
   },
   {
     "name": "rand_chacha",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "id": "rand_chacha"
   },
   {
@@ -1400,14 +1410,24 @@
     "id": "rand_chacha_0_3_1"
   },
   {
+    "name": "rand_chacha",
+    "version": "0.9.0",
+    "id": "rand_chacha_0_9_0"
+  },
+  {
     "name": "rand_core",
-    "version": "0.9.3",
+    "version": "0.10.0",
     "id": "rand_core"
   },
   {
     "name": "rand_core",
     "version": "0.6.4",
     "id": "rand_core_0_6_4"
+  },
+  {
+    "name": "rand_core",
+    "version": "0.9.5",
+    "id": "rand_core_0_9_5"
   },
   {
     "name": "rand_distr",
@@ -1481,7 +1501,7 @@
   },
   {
     "name": "rustc-demangle",
-    "version": "0.1.26",
+    "version": "0.1.27",
     "id": "rustc_demangle"
   },
   {
@@ -1506,7 +1526,7 @@
   },
   {
     "name": "rustls-pki-types",
-    "version": "1.13.2",
+    "version": "1.14.0",
     "id": "rustls_pki_types"
   },
   {
@@ -1576,7 +1596,7 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.148",
+    "version": "1.0.149",
     "id": "serde_json"
   },
   {
@@ -1641,7 +1661,7 @@
   },
   {
     "name": "siphasher",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "id": "siphasher"
   },
   {
@@ -1651,7 +1671,7 @@
   },
   {
     "name": "slab",
-    "version": "0.4.11",
+    "version": "0.4.12",
     "id": "slab"
   },
   {
@@ -1661,7 +1681,7 @@
   },
   {
     "name": "socket2",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "id": "socket2"
   },
   {
@@ -1701,7 +1721,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.113",
+    "version": "2.0.114",
     "id": "syn"
   },
   {
@@ -1741,7 +1761,7 @@
   },
   {
     "name": "thiserror",
-    "version": "2.0.17",
+    "version": "2.0.18",
     "id": "thiserror"
   },
   {
@@ -1751,7 +1771,7 @@
   },
   {
     "name": "thiserror-impl",
-    "version": "2.0.17",
+    "version": "2.0.18",
     "id": "thiserror_impl"
   },
   {
@@ -1761,7 +1781,7 @@
   },
   {
     "name": "thread-id",
-    "version": "5.0.0",
+    "version": "5.1.0",
     "id": "thread_id"
   },
   {
@@ -1776,17 +1796,17 @@
   },
   {
     "name": "time",
-    "version": "0.3.44",
+    "version": "0.3.46",
     "id": "time"
   },
   {
     "name": "time-core",
-    "version": "0.1.6",
+    "version": "0.1.8",
     "id": "time_core"
   },
   {
     "name": "time-macros",
-    "version": "0.2.24",
+    "version": "0.2.26",
     "id": "time_macros"
   },
   {
@@ -1821,7 +1841,7 @@
   },
   {
     "name": "tokio-postgres",
-    "version": "0.7.15",
+    "version": "0.7.16",
     "id": "tokio_postgres"
   },
   {
@@ -1841,7 +1861,7 @@
   },
   {
     "name": "toml",
-    "version": "0.9.10+spec-1.1.0",
+    "version": "0.9.11+spec-1.1.0",
     "id": "toml"
   },
   {
@@ -1861,7 +1881,7 @@
   },
   {
     "name": "tower",
-    "version": "0.5.2",
+    "version": "0.5.3",
     "id": "tower"
   },
   {
@@ -1916,7 +1936,7 @@
   },
   {
     "name": "unicase",
-    "version": "2.8.1",
+    "version": "2.9.0",
     "id": "unicase"
   },
   {
@@ -1991,7 +2011,7 @@
   },
   {
     "name": "uuid",
-    "version": "1.19.0",
+    "version": "1.20.0",
     "id": "uuid"
   },
   {
@@ -2021,27 +2041,27 @@
   },
   {
     "name": "wasm-bindgen",
-    "version": "0.2.106",
+    "version": "0.2.108",
     "id": "wasm_bindgen"
   },
   {
     "name": "wasm-bindgen-macro",
-    "version": "0.2.106",
+    "version": "0.2.108",
     "id": "wasm_bindgen_macro"
   },
   {
     "name": "wasm-bindgen-macro-support",
-    "version": "0.2.106",
+    "version": "0.2.108",
     "id": "wasm_bindgen_macro_support"
   },
   {
     "name": "wasm-bindgen-shared",
-    "version": "0.2.106",
+    "version": "0.2.108",
     "id": "wasm_bindgen_shared"
   },
   {
     "name": "rustls-webpki",
-    "version": "0.103.8",
+    "version": "0.103.9",
     "id": "webpki"
   },
   {
@@ -2056,7 +2076,7 @@
   },
   {
     "name": "whoami",
-    "version": "1.6.1",
+    "version": "2.1.0",
     "id": "whoami"
   },
   {
@@ -2143,11 +2163,6 @@
     "name": "windows-sys",
     "version": "0.52.0",
     "id": "windows_sys_0_52_0"
-  },
-  {
-    "name": "windows-sys",
-    "version": "0.59.0",
-    "id": "windows_sys_0_59_0"
   },
   {
     "name": "windows-sys",
@@ -2251,12 +2266,12 @@
   },
   {
     "name": "zerocopy",
-    "version": "0.8.31",
+    "version": "0.8.37",
     "id": "zerocopy"
   },
   {
     "name": "zerocopy-derive",
-    "version": "0.8.31",
+    "version": "0.8.37",
     "id": "zerocopy_derive"
   },
   {
@@ -2291,7 +2306,7 @@
   },
   {
     "name": "zmij",
-    "version": "1.0.12",
+    "version": "1.0.19",
     "id": "zmij"
   },
   {
@@ -2311,7 +2326,7 @@
   },
   {
     "name": "zune-core",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "id": "zune_core"
   },
   {
@@ -2326,7 +2341,7 @@
   },
   {
     "name": "zune-jpeg",
-    "version": "0.5.8",
+    "version": "0.5.12",
     "id": "zune_jpeg"
   },
   {
