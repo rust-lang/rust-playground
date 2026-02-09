@@ -1780,11 +1780,6 @@
     "id": "thiserror"
   },
   {
-    "name": "thiserror",
-    "version": "1.0.69",
-    "id": "thiserror_1_0_69"
-  },
-  {
     "name": "thiserror-impl",
     "version": "2.0.18",
     "id": "thiserror_impl"
@@ -2105,29 +2100,9 @@
     "id": "windows_aarch64_gnullvm"
   },
   {
-    "name": "windows_aarch64_gnullvm",
-    "version": "0.42.2",
-    "id": "windows_aarch64_gnullvm_0_42_2"
-  },
-  {
-    "name": "windows_aarch64_gnullvm",
-    "version": "0.52.6",
-    "id": "windows_aarch64_gnullvm_0_52_6"
-  },
-  {
     "name": "windows_aarch64_msvc",
     "version": "0.53.1",
     "id": "windows_aarch64_msvc"
-  },
-  {
-    "name": "windows_aarch64_msvc",
-    "version": "0.42.2",
-    "id": "windows_aarch64_msvc_0_42_2"
-  },
-  {
-    "name": "windows_aarch64_msvc",
-    "version": "0.52.6",
-    "id": "windows_aarch64_msvc_0_52_6"
   },
   {
     "name": "windows_i686_gnu",
@@ -2135,29 +2110,9 @@
     "id": "windows_i686_gnu"
   },
   {
-    "name": "windows_i686_gnu",
-    "version": "0.42.2",
-    "id": "windows_i686_gnu_0_42_2"
-  },
-  {
-    "name": "windows_i686_gnu",
-    "version": "0.52.6",
-    "id": "windows_i686_gnu_0_52_6"
-  },
-  {
     "name": "windows_i686_msvc",
     "version": "0.53.1",
     "id": "windows_i686_msvc"
-  },
-  {
-    "name": "windows_i686_msvc",
-    "version": "0.42.2",
-    "id": "windows_i686_msvc_0_42_2"
-  },
-  {
-    "name": "windows_i686_msvc",
-    "version": "0.52.6",
-    "id": "windows_i686_msvc_0_52_6"
   },
   {
     "name": "windows-link",
@@ -2168,21 +2123,6 @@
     "name": "windows-sys",
     "version": "0.61.2",
     "id": "windows_sys"
-  },
-  {
-    "name": "windows-sys",
-    "version": "0.45.0",
-    "id": "windows_sys_0_45_0"
-  },
-  {
-    "name": "windows-sys",
-    "version": "0.52.0",
-    "id": "windows_sys_0_52_0"
-  },
-  {
-    "name": "windows-sys",
-    "version": "0.60.2",
-    "id": "windows_sys_0_60_2"
   },
   {
     "name": "windows-targets",
@@ -2206,11 +2146,6 @@
   },
   {
     "name": "windows_x86_64_gnu",
-    "version": "0.42.2",
-    "id": "windows_x86_64_gnu_0_42_2"
-  },
-  {
-    "name": "windows_x86_64_gnu",
     "version": "0.52.6",
     "id": "windows_x86_64_gnu_0_52_6"
   },
@@ -2220,29 +2155,9 @@
     "id": "windows_x86_64_gnullvm"
   },
   {
-    "name": "windows_x86_64_gnullvm",
-    "version": "0.42.2",
-    "id": "windows_x86_64_gnullvm_0_42_2"
-  },
-  {
-    "name": "windows_x86_64_gnullvm",
-    "version": "0.52.6",
-    "id": "windows_x86_64_gnullvm_0_52_6"
-  },
-  {
     "name": "windows_x86_64_msvc",
     "version": "0.53.1",
     "id": "windows_x86_64_msvc"
-  },
-  {
-    "name": "windows_x86_64_msvc",
-    "version": "0.42.2",
-    "id": "windows_x86_64_msvc_0_42_2"
-  },
-  {
-    "name": "windows_x86_64_msvc",
-    "version": "0.52.6",
-    "id": "windows_x86_64_msvc_0_52_6"
   },
   {
     "name": "winnow",
