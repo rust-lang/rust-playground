@@ -71,7 +71,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.100",
+    "version": "1.0.101",
     "id": "anyhow"
   },
   {
@@ -81,7 +81,7 @@
   },
   {
     "name": "arc-swap",
-    "version": "1.8.0",
+    "version": "1.8.1",
     "id": "arc_swap"
   },
   {
@@ -101,7 +101,7 @@
   },
   {
     "name": "async-compression",
-    "version": "0.4.37",
+    "version": "0.4.39",
     "id": "async_compression"
   },
   {
@@ -241,7 +241,7 @@
   },
   {
     "name": "bytes",
-    "version": "1.11.0",
+    "version": "1.11.1",
     "id": "bytes"
   },
   {
@@ -265,18 +265,23 @@
     "id": "cfg_if"
   },
   {
+    "name": "chacha20",
+    "version": "0.10.0",
+    "id": "chacha20"
+  },
+  {
     "name": "chrono",
     "version": "0.4.43",
     "id": "chrono"
   },
   {
     "name": "clap",
-    "version": "4.5.56",
+    "version": "4.5.57",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.5.56",
+    "version": "4.5.57",
     "id": "clap_builder"
   },
   {
@@ -341,8 +346,13 @@
   },
   {
     "name": "cpufeatures",
-    "version": "0.2.17",
+    "version": "0.3.0",
     "id": "cpufeatures"
+  },
+  {
+    "name": "cpufeatures",
+    "version": "0.2.17",
+    "id": "cpufeatures_0_2_17"
   },
   {
     "name": "crc32fast",
@@ -581,7 +591,7 @@
   },
   {
     "name": "flate2",
-    "version": "1.1.8",
+    "version": "1.1.9",
     "id": "flate2"
   },
   {
@@ -686,7 +696,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "id": "getrandom"
   },
   {
@@ -811,7 +821,7 @@
   },
   {
     "name": "hybrid-array",
-    "version": "0.4.6",
+    "version": "0.4.7",
     "id": "hybrid_array"
   },
   {
@@ -826,7 +836,7 @@
   },
   {
     "name": "hyper-util",
-    "version": "0.1.19",
+    "version": "0.1.20",
     "id": "hyper_util"
   },
   {
@@ -931,7 +941,7 @@
   },
   {
     "name": "jiff",
-    "version": "0.2.18",
+    "version": "0.2.19",
     "id": "jiff"
   },
   {
@@ -1046,7 +1056,7 @@
   },
   {
     "name": "memchr",
-    "version": "2.7.6",
+    "version": "2.8.0",
     "id": "memchr"
   },
   {
@@ -1391,13 +1401,18 @@
   },
   {
     "name": "rand",
-    "version": "0.9.2",
+    "version": "0.10.0",
     "id": "rand"
   },
   {
     "name": "rand",
     "version": "0.8.5",
     "id": "rand_0_8_5"
+  },
+  {
+    "name": "rand",
+    "version": "0.9.2",
+    "id": "rand_0_9_2"
   },
   {
     "name": "rand_chacha",
@@ -1461,22 +1476,22 @@
   },
   {
     "name": "regex",
-    "version": "1.12.2",
+    "version": "1.12.3",
     "id": "regex"
   },
   {
     "name": "regex-automata",
-    "version": "0.4.13",
+    "version": "0.4.14",
     "id": "regex_automata"
   },
   {
     "name": "regex-syntax",
-    "version": "0.8.8",
+    "version": "0.8.9",
     "id": "regex_syntax"
   },
   {
     "name": "reqwest",
-    "version": "0.13.1",
+    "version": "0.13.2",
     "id": "reqwest"
   },
   {
@@ -1541,7 +1556,7 @@
   },
   {
     "name": "ryu",
-    "version": "1.0.22",
+    "version": "1.0.23",
     "id": "ryu"
   },
   {
@@ -1796,7 +1811,7 @@
   },
   {
     "name": "time",
-    "version": "0.3.46",
+    "version": "0.3.47",
     "id": "time"
   },
   {
@@ -1806,7 +1821,7 @@
   },
   {
     "name": "time-macros",
-    "version": "0.2.26",
+    "version": "0.2.27",
     "id": "time_macros"
   },
   {
@@ -1946,7 +1961,7 @@
   },
   {
     "name": "unicode-ident",
-    "version": "1.0.22",
+    "version": "1.0.23",
     "id": "unicode_ident"
   },
   {
@@ -2066,7 +2081,7 @@
   },
   {
     "name": "webpki-roots",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "id": "webpki_roots"
   },
   {
@@ -2266,12 +2281,12 @@
   },
   {
     "name": "zerocopy",
-    "version": "0.8.37",
+    "version": "0.8.39",
     "id": "zerocopy"
   },
   {
     "name": "zerocopy-derive",
-    "version": "0.8.37",
+    "version": "0.8.39",
     "id": "zerocopy_derive"
   },
   {
@@ -2306,7 +2321,7 @@
   },
   {
     "name": "zmij",
-    "version": "1.0.19",
+    "version": "1.0.20",
     "id": "zmij"
   },
   {
