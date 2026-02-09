@@ -18,7 +18,7 @@ use itertools::Itertools;
 use semver::Version;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::{BTreeMap, BTreeSet, HashSet},
+    collections::{btree_map::Entry, BTreeMap, BTreeSet, HashSet},
     io::Read,
     task::Poll,
 };
@@ -81,8 +81,50 @@ pub struct DependencySpec {
 struct ResolvedDep {
     summary: Summary,
     lib_target: Target,
+    features: FeaturesLite,
+}
+
+#[derive(Debug)]
+struct FeaturesLite {
     features: BTreeSet<InternedString>,
     uses_default_features: bool,
+}
+
+impl Default for FeaturesLite {
+    fn default() -> Self {
+        Self {
+            features: Default::default(),
+            uses_default_features: true,
+        }
+    }
+}
+
+impl FeaturesLite {
+    fn merge(&mut self, other: FeaturesLite) -> &mut Self {
+        self.features.extend(other.features);
+        self.uses_default_features = self.uses_default_features || other.uses_default_features;
+        self
+    }
+
+    fn finalize(&self) -> Self {
+        let mut features = self.features.clone();
+        let mut uses_default_features = self.uses_default_features;
+
+        // This is probably not needed, but keeping it for
+        // belt-and-suspenders.
+        if features.remove("default") {
+            uses_default_features = true;
+        }
+
+        Self {
+            features,
+            uses_default_features,
+        }
+    }
+
+    fn feature_strings(&self) -> Vec<String> {
+        self.features.iter().map(|s| s.to_string()).collect()
+    }
 }
 
 fn exact_version<S>(version: &Version, serializer: S) -> Result<S::Ok, S::Error>
@@ -182,7 +224,7 @@ impl TopCrates {
 ///     all-features = false
 ///
 /// All fields are optional.
-fn playground_metadata_features(pkg: &Package) -> Option<(BTreeSet<InternedString>, bool)> {
+fn playground_metadata_features(pkg: &Package) -> Option<FeaturesLite> {
     let custom_metadata = pkg.manifest().custom_metadata()?;
     let playground_metadata = custom_metadata.get("playground")?;
 
@@ -225,7 +267,10 @@ fn playground_metadata_features(pkg: &Package) -> Option<(BTreeSet<InternedStrin
         metadata.features
     };
 
-    Some((enabled_features, metadata.default_features))
+    Some(FeaturesLite {
+        features: enabled_features,
+        uses_default_features: metadata.default_features,
+    })
 }
 
 fn make_global_state<'cfg>(
@@ -328,16 +373,15 @@ fn populate_initial_direct_dependencies(
             .library()
             .unwrap_or_else(|| panic!("{} did not have a library", id))
             .clone();
-        let mut dep = ResolvedDep {
+
+        let features = playground_metadata_features(&download).unwrap_or_default();
+
+        let dep = ResolvedDep {
             summary: download.summary().clone(),
             lib_target,
-            features: BTreeSet::new(),
-            uses_default_features: true,
+            features,
         };
-        if let Some((features, default_features)) = playground_metadata_features(&download) {
-            dep.features = features;
-            dep.uses_default_features = default_features;
-        }
+
         initial_direct_dependencies.insert(id, dep);
     }
 
@@ -378,8 +422,8 @@ fn write_scratch_cargo_toml(
 
         let dep = TomlDetailedDependency {
             version: Some(version.to_string()),
-            features: Some(details.features.iter().map(|s| s.to_string()).collect()),
-            default_features: Some(details.uses_default_features),
+            features: Some(details.features.feature_strings()),
+            default_features: Some(details.features.uses_default_features),
 
             ..Default::default()
         };
@@ -471,7 +515,7 @@ fn extend_direct_dependencies(
         .filter(|pkg_id| root_package_names.contains(&pkg_id.name()))
         .collect::<BTreeSet<_>>();
 
-    let mut visited = root_package_ids.clone();
+    let mut visited = BTreeMap::new();
     let mut to_visit = root_package_ids;
 
     // Find all transitive dependencies that are compatible with the
@@ -486,7 +530,18 @@ fn extend_direct_dependencies(
                     continue;
                 }
 
-                let include_dependency = deps.iter().any(|dep| {
+                // A package may depend on the same dependency
+                // multiple times. A key case for this is
+                // platform-specific dependencies. For example:
+                //
+                // ```toml
+                // [dependencies]
+                // jiff = { version = "0.2", optional = true, default-features = false, features = [ "std" ] }
+                //
+                // [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
+                // jiff = { version = "0.2", optional = true, default-features = false, features = ["js"] }
+                // ```
+                for dep in deps {
                     let dep_name = dep.name_in_toml();
 
                     let active = if dep.is_optional() {
@@ -499,14 +554,28 @@ fn extend_direct_dependencies(
                         true
                     };
 
+                    if !active {
+                        continue;
+                    }
+
                     let for_our_platform = dep.platform().is_none_or(|platform| {
                         platform.matches(PLAYGROUND_TARGET_PLATFORM, global.target_info.cfg())
                     });
 
-                    active && for_our_platform
-                });
+                    if !for_our_platform {
+                        continue;
+                    }
 
-                if include_dependency && visited.insert(dep_pkg_id) {
+                    let features = FeaturesLite {
+                        features: dep.features().iter().cloned().collect(),
+                        uses_default_features: dep.uses_default_features(),
+                    };
+
+                    match visited.entry(dep_pkg_id) {
+                        Entry::Vacant(entry) => entry.insert(features),
+                        Entry::Occupied(mut entry) => entry.get_mut().merge(features),
+                    };
+
                     next_to_visit.insert(dep_pkg_id);
                 }
             }
@@ -515,7 +584,7 @@ fn extend_direct_dependencies(
         to_visit = next_to_visit;
     }
 
-    let package_ids = visited.into_iter().collect::<Vec<_>>();
+    let package_ids = visited.keys().cloned().collect::<Vec<_>>();
     let packages = bulk_download(global, &package_ids);
 
     for download in packages {
@@ -524,17 +593,21 @@ fn extend_direct_dependencies(
             .library()
             .unwrap_or_else(|| panic!("{} did not have a library", id))
             .clone();
-        let mut dep = ResolvedDep {
+
+        let mut features = visited.remove(&id).unwrap_or_else(|| {
+            unreachable!("Downloaded a crate that we didn't visit");
+        });
+
+        if let Some(metadata_features) = playground_metadata_features(&download) {
+            features.merge(metadata_features);
+        }
+
+        let dep = ResolvedDep {
             summary: download.summary().clone(),
             lib_target,
-            features: resolve.features(id).iter().copied().collect(),
-            // If enabled, all default features are already included in
-            // `features` by the resolver.
-            uses_default_features: false,
+            features,
         };
-        if let Some((features, _default_features)) = playground_metadata_features(&download) {
-            dep.features.extend(features);
-        }
+
         crates.insert(id, dep);
     }
 }
@@ -597,20 +670,15 @@ fn generate_dependency_specs(
                 )
             };
 
-            let mut features = dep.features.clone();
-            let mut default_features = dep.uses_default_features;
-            if features.contains("default") || summary.features().get("default").is_none() {
-                features.remove("default");
-                default_features = true;
-            }
+            let features = dep.features.finalize();
 
             dependencies.insert(
                 exposed_name,
                 DependencySpec {
                     package: name.to_string(),
                     version: version.clone(),
-                    features,
-                    default_features,
+                    features: features.features,
+                    default_features: features.uses_default_features,
                 },
             );
 
