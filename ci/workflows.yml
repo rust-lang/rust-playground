@@ -149,7 +149,7 @@ workflows:
             run: ./ci/build-backend.sh
 
           - name: "Save backend artifact"
-            uses: actions/upload-artifact@v4
+            uses: actions/upload-artifact@v6
             with:
               name: backend
               path: |
@@ -214,7 +214,7 @@ workflows:
               pnpm --dir ui/frontend/ run build:production
 
           - name: "Save frontend artifact"
-            uses: actions/upload-artifact@v4
+            uses: actions/upload-artifact@v6
             with:
               name: frontend
               path: ui/frontend/build
@@ -260,13 +260,13 @@ workflows:
           - *rename_all_containers
 
           - name: "Download backend"
-            uses: actions/download-artifact@v4
+            uses: actions/download-artifact@v7
             with:
               name: backend
               path: tests/server/
 
           - name: "Download frontend"
-            uses: actions/download-artifact@v4
+            uses: actions/download-artifact@v7
             with:
               name: frontend
               path: tests/server/build/
@@ -294,7 +294,7 @@ workflows:
 
           - name: "Preserve screenshots"
             if: ${{ failure() }}
-            uses: actions/upload-artifact@v4
+            uses: actions/upload-artifact@v6
             with:
               name: test-failures
               path: tests/test-failures
@@ -326,13 +326,13 @@ workflows:
               done
 
           - name: "Download backend"
-            uses: actions/download-artifact@v4
+            uses: actions/download-artifact@v7
             with:
               name: backend
               path: server/
 
           - name: "Download frontend"
-            uses: actions/download-artifact@v4
+            uses: actions/download-artifact@v7
             with:
               name: frontend
               path: server/build/

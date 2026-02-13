@@ -70,7 +70,7 @@ jobs:
     - name: Build backend
       run: "./ci/build-backend.sh"
     - name: Save backend artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: backend
         path: |
@@ -121,7 +121,7 @@ jobs:
     - name: Build frontend
       run: pnpm --dir ui/frontend/ run build:production
     - name: Save frontend artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: frontend
         path: ui/frontend/build
@@ -168,12 +168,12 @@ jobs:
           docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} rust-$c
         done
     - name: Download backend
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: backend
         path: tests/server/
     - name: Download frontend
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: frontend
         path: tests/server/build/
@@ -195,7 +195,7 @@ jobs:
         bundle exec rspec
     - name: Preserve screenshots
       if: "${{ failure() }}"
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: test-failures
         path: tests/test-failures
@@ -238,12 +238,12 @@ jobs:
           docker push --platform linux/amd64 shepmaster/rust-$c
         done
     - name: Download backend
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: backend
         path: server/
     - name: Download frontend
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: frontend
         path: server/build/
