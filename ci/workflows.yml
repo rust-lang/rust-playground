@@ -186,7 +186,7 @@ workflows:
               echo "dir=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
           - name: "Cache pnpm intermediate products"
-            uses: actions/cache@v4
+            uses: actions/cache@v5
             with:
               path: ${{ steps.pnpm-cache-dir-path.outputs.dir }}
               key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -243,7 +243,7 @@ workflows:
               ruby-version: '3.3.6'
 
           - name: "Cache bundler intermediate products"
-            uses: actions/cache@v4
+            uses: actions/cache@v5
             with:
               path: tests/vendor/bundle
               key: ${{ runner.os }}-gems-${{ hashFiles('tests/**/Gemfile.lock') }}
