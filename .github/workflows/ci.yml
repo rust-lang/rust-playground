@@ -89,7 +89,7 @@ jobs:
     - name: Configure node
       uses: actions/setup-node@v4
       with:
-        node-version: 22.2
+        node-version: 24.12
     - name: Get pnpm version from package.json
       id: pnpm-version
       run: 'echo "pnpm_version=$(node -p ''require(`./ui/frontend/package.json`).engines.pnpm'')" >> $GITHUB_OUTPUT
