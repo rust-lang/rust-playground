@@ -7,13 +7,13 @@ components:
 
   - checkout: &checkout
       name: "Checkout code"
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
   # This should only be used when we know that the code being tested
   # doesn't make use of our secrets or elevated GitHub token.
   - checkout_pr: &checkout_pr
       name: "Checkout code"
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
@@ -69,7 +69,7 @@ components:
   - pull_containers: &pull_containers
       name: "Pull containers"
       run: |-
-        echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull
+        echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull --platform linux/amd64
 
   - rename_all_containers: &rename_all_containers
       name: "Rename containers"
@@ -83,7 +83,7 @@ components:
   - pull_current_container: &pull_current_container
       name: "Pull container"
       run: |-
-        docker pull ${{ env.IMAGE_NAME }}:${{ github.run_id }}
+        docker pull --platform linux/amd64 ${{ env.IMAGE_NAME }}:${{ github.run_id }}
 
   - rename_current_container: &rename_current_container
       name: "Rename container"
@@ -94,8 +94,8 @@ components:
   - push_current_container: &push_current_container
       name: "Push container"
       run: |-
-        docker push ${{ env.IMAGE_NAME }}
-        docker push ${{ env.DOCKER_HUB_IMAGE_NAME }}
+        docker push --platform linux/amd64 ${{ env.IMAGE_NAME }}
+        docker push --platform linux/amd64 ${{ env.DOCKER_HUB_IMAGE_NAME }}
 
 workflows:
   ci:
@@ -149,7 +149,7 @@ workflows:
             run: ./ci/build-backend.sh
 
           - name: "Save backend artifact"
-            uses: actions/upload-artifact@v4
+            uses: actions/upload-artifact@v6
             with:
               name: backend
               path: |
@@ -166,7 +166,7 @@ workflows:
           - *checkout_pr
 
           - name: "Configure node"
-            uses: actions/setup-node@v4
+            uses: actions/setup-node@v6
             with:
               node-version: 24.12
 
@@ -176,7 +176,7 @@ workflows:
               echo "pnpm_version=$(node -p 'require(`./ui/frontend/package.json`).engines.pnpm')" >> $GITHUB_OUTPUT
 
           - name: "Install pnpm"
-            uses: pnpm/action-setup@v3
+            uses: pnpm/action-setup@v4
             with:
               version: ${{ steps.pnpm-version.outputs.pnpm_version }}
 
@@ -186,7 +186,7 @@ workflows:
               echo "dir=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
           - name: "Cache pnpm intermediate products"
-            uses: actions/cache@v4
+            uses: actions/cache@v5
             with:
               path: ${{ steps.pnpm-cache-dir-path.outputs.dir }}
               key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -214,7 +214,7 @@ workflows:
               pnpm --dir ui/frontend/ run build:production
 
           - name: "Save frontend artifact"
-            uses: actions/upload-artifact@v4
+            uses: actions/upload-artifact@v6
             with:
               name: frontend
               path: ui/frontend/build
@@ -243,7 +243,7 @@ workflows:
               ruby-version: '3.3.6'
 
           - name: "Cache bundler intermediate products"
-            uses: actions/cache@v4
+            uses: actions/cache@v5
             with:
               path: tests/vendor/bundle
               key: ${{ runner.os }}-gems-${{ hashFiles('tests/**/Gemfile.lock') }}
@@ -260,13 +260,13 @@ workflows:
           - *rename_all_containers
 
           - name: "Download backend"
-            uses: actions/download-artifact@v4
+            uses: actions/download-artifact@v7
             with:
               name: backend
               path: tests/server/
 
           - name: "Download frontend"
-            uses: actions/download-artifact@v4
+            uses: actions/download-artifact@v7
             with:
               name: frontend
               path: tests/server/build/
@@ -294,7 +294,7 @@ workflows:
 
           - name: "Preserve screenshots"
             if: ${{ failure() }}
-            uses: actions/upload-artifact@v4
+            uses: actions/upload-artifact@v6
             with:
               name: test-failures
               path: tests/test-failures
@@ -321,24 +321,24 @@ workflows:
           - name: "Push containers"
             run: |-
               for c in stable beta nightly; do
-                docker push ghcr.io/integer32llc/rust-playground-ci-rust-$c
-                docker push shepmaster/rust-$c
+                docker push --platform linux/amd64 ghcr.io/integer32llc/rust-playground-ci-rust-$c
+                docker push --platform linux/amd64 shepmaster/rust-$c
               done
 
           - name: "Download backend"
-            uses: actions/download-artifact@v4
+            uses: actions/download-artifact@v7
             with:
               name: backend
               path: server/
 
           - name: "Download frontend"
-            uses: actions/download-artifact@v4
+            uses: actions/download-artifact@v7
             with:
               name: frontend
               path: server/build/
 
           - name: "Configure AWS credentials (i32)"
-            uses: aws-actions/configure-aws-credentials@v4
+            uses: aws-actions/configure-aws-credentials@v6
             with:
               aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
               aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -353,7 +353,7 @@ workflows:
               aws s3 sync server/build/ s3://playground-artifacts-i32/build
 
           - name: "Configure AWS credentials (rust-lang)"
-            uses: aws-actions/configure-aws-credentials@v4
+            uses: aws-actions/configure-aws-credentials@v6
             with:
               role-skip-session-tagging: true
               role-to-assume: arn:aws:iam::890664054962:role/upload-playground-artifacts
