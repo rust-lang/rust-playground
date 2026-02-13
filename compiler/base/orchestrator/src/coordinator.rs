@@ -2581,12 +2581,14 @@ impl TerminateContainer {
         use terminate_container_error::*;
 
         if let Some((name, mut kill_child)) = self.0.take() {
-            Self::stop_tracking(&name);
+            Self::stop_tracking(&name, false);
             let o = kill_child
                 .output()
                 .await
                 .context(TerminateContainerSnafu { name: &name })?;
             Self::report_failure(name, o);
+        } else {
+            warn!("Would have stopped tracking in `terminate_now`, but found `None`");
         }
 
         Ok(())
@@ -2607,14 +2609,14 @@ impl TerminateContainer {
     }
 
     #[instrument]
-    fn stop_tracking(name: &str) {
+    fn stop_tracking(name: &str, from_drop: bool) {
         let was_tracked = TRACKED_CONTAINERS
             .lock()
             .unwrap_or_else(|e| e.into_inner())
             .remove(name);
 
         if was_tracked {
-            info!("Stopped tracking container");
+            info!(from_drop, "Stopped tracking container");
         } else {
             error!("Stopped tracking container, but it was not in the tracking set");
         }
@@ -2643,7 +2645,7 @@ impl TerminateContainer {
 impl Drop for TerminateContainer {
     fn drop(&mut self) {
         if let Some((name, mut kill_child)) = self.0.take() {
-            Self::stop_tracking(&name);
+            Self::stop_tracking(&name, true);
             match kill_child.as_std_mut().output() {
                 Ok(o) => Self::report_failure(name, o),
                 Err(e) => error!("Unable to kill container {name} while dropping: {e}"),
