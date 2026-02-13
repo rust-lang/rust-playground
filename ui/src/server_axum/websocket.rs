@@ -204,21 +204,42 @@ pub(crate) async fn handle(
     feature_flags: FeatureFlags,
     db: Handle,
 ) {
-    static WEBSOCKET_ID: AtomicU64 = AtomicU64::new(0);
+    struct MetricGuard {
+        clean: bool,
+        start: Instant,
+    }
 
-    metrics::LIVE_WS.inc();
-    let start = Instant::now();
+    impl MetricGuard {
+        fn new() -> Self {
+            static WEBSOCKET_ID: AtomicU64 = AtomicU64::new(0);
 
-    let id = WEBSOCKET_ID.fetch_add(1, Ordering::SeqCst);
-    tracing::Span::current().record("ws_id", id);
-    info!("WebSocket started");
+            metrics::LIVE_WS.inc();
+            let start = Instant::now();
+
+            let id = WEBSOCKET_ID.fetch_add(1, Ordering::SeqCst);
+            tracing::Span::current().record("ws_id", id);
+            info!("WebSocket started");
+
+            Self {
+                clean: false,
+                start,
+            }
+        }
+    }
+
+    impl Drop for MetricGuard {
+        fn drop(&mut self) {
+            info!(clean = self.clean, "WebSocket ending");
+            metrics::LIVE_WS.dec();
+            let elapsed = self.start.elapsed();
+            metrics::DURATION_WS.observe(elapsed.as_secs_f64());
+        }
+    }
+
+    let mut mg = MetricGuard::new();
 
     handle_core(socket, config, factory, feature_flags, db).await;
-
-    info!("WebSocket ending");
-    metrics::LIVE_WS.dec();
-    let elapsed = start.elapsed();
-    metrics::DURATION_WS.observe(elapsed.as_secs_f64());
+    mg.clean = true;
 }
 
 type TaggedError = (Error, Option<Meta>);
