@@ -50,12 +50,12 @@ jobs:
         cache-from: type=gha,scope=${{ matrix.channel }}
         cache-to: type=gha,scope=${{ matrix.channel }},mode=max
     - name: Pull container
-      run: docker pull ${{ env.IMAGE_NAME }}:${{ github.run_id }}
+      run: docker pull --platform linux/amd64 ${{ env.IMAGE_NAME }}:${{ github.run_id }}
     - name: Rename container
       run: |-
         docker tag ${{ env.IMAGE_NAME }}:${{ github.run_id }} ${{ env.IMAGE_NAME }}
         docker tag ${{ env.IMAGE_NAME }}:${{ github.run_id }} ${{ env.DOCKER_HUB_IMAGE_NAME }}
     - name: Push container
       run: |-
-        docker push ${{ env.IMAGE_NAME }}
-        docker push ${{ env.DOCKER_HUB_IMAGE_NAME }}
+        docker push --platform linux/amd64 ${{ env.IMAGE_NAME }}
+        docker push --platform linux/amd64 ${{ env.DOCKER_HUB_IMAGE_NAME }}

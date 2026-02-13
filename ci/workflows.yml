@@ -69,7 +69,7 @@ components:
   - pull_containers: &pull_containers
       name: "Pull containers"
       run: |-
-        echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull
+        echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull --platform linux/amd64
 
   - rename_all_containers: &rename_all_containers
       name: "Rename containers"
@@ -83,7 +83,7 @@ components:
   - pull_current_container: &pull_current_container
       name: "Pull container"
       run: |-
-        docker pull ${{ env.IMAGE_NAME }}:${{ github.run_id }}
+        docker pull --platform linux/amd64 ${{ env.IMAGE_NAME }}:${{ github.run_id }}
 
   - rename_current_container: &rename_current_container
       name: "Rename container"
@@ -94,8 +94,8 @@ components:
   - push_current_container: &push_current_container
       name: "Push container"
       run: |-
-        docker push ${{ env.IMAGE_NAME }}
-        docker push ${{ env.DOCKER_HUB_IMAGE_NAME }}
+        docker push --platform linux/amd64 ${{ env.IMAGE_NAME }}
+        docker push --platform linux/amd64 ${{ env.DOCKER_HUB_IMAGE_NAME }}
 
 workflows:
   ci:
@@ -321,8 +321,8 @@ workflows:
           - name: "Push containers"
             run: |-
               for c in stable beta nightly; do
-                docker push ghcr.io/integer32llc/rust-playground-ci-rust-$c
-                docker push shepmaster/rust-$c
+                docker push --platform linux/amd64 ghcr.io/integer32llc/rust-playground-ci-rust-$c
+                docker push --platform linux/amd64 shepmaster/rust-$c
               done
 
           - name: "Download backend"

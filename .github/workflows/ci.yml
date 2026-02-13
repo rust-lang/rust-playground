@@ -159,7 +159,7 @@ jobs:
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
     - name: Pull containers
-      run: echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull
+      run: echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull --platform linux/amd64
     - name: Rename containers
       run: |-
         for c in stable beta nightly; do
@@ -223,7 +223,7 @@ jobs:
     - name: Recover disk space
       run: sudo rm -rf /usr/local/lib/android
     - name: Pull containers
-      run: echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull
+      run: echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull --platform linux/amd64
     - name: Rename containers
       run: |-
         for c in stable beta nightly; do
@@ -234,8 +234,8 @@ jobs:
     - name: Push containers
       run: |-
         for c in stable beta nightly; do
-          docker push ghcr.io/integer32llc/rust-playground-ci-rust-$c
-          docker push shepmaster/rust-$c
+          docker push --platform linux/amd64 ghcr.io/integer32llc/rust-playground-ci-rust-$c
+          docker push --platform linux/amd64 shepmaster/rust-$c
         done
     - name: Download backend
       uses: actions/download-artifact@v4
