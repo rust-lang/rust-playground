@@ -100,6 +100,7 @@ pub(crate) async fn serve(config: Config) {
         .route("/meta/gist/", post(meta_gist_create)) // compatibility with lax frontend code
         .route("/meta/gist/{id}", get(meta_gist_get))
         .route("/metrics", get(metrics))
+        .route("/tokio-metrics", get(tokio_metrics))
         .route("/websocket", get(websocket))
         .route("/nowebsocket", post(nowebsocket))
         .route("/internal/debug/whynowebsocket", get(whynowebsocket))
@@ -586,6 +587,41 @@ async fn metrics(_: MetricsAuthorization) -> Result<impl IntoResponse, StatusCod
             )
         })
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+}
+
+async fn tokio_metrics(_: MetricsAuthorization) -> Result<impl IntoResponse, StatusCode> {
+    use std::fmt::Write;
+    use tokio::runtime::Handle;
+
+    let handle = Handle::try_current().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let metrics = handle.metrics();
+
+    let mut output = String::new();
+
+    macro_rules! name_value_pairs {
+        [$($name:ident),* $(,)?] => {
+            [$((
+                concat!("playground_tokio_", stringify!($name), "_gauge"),
+                metrics.$name(),
+            ),)*]
+        }
+    }
+
+    let pairs = name_value_pairs![num_workers, num_alive_tasks, global_queue_depth];
+
+    for (name, value) in pairs {
+        writeln!(output, "# TYPE {name} gauge").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        writeln!(output, "{name} {value}").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    }
+
+    writeln!(output, "# EOF").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let headers = [(
+        header::CONTENT_TYPE,
+        "application/openmetrics-text; version=1.0.0; charset=utf-8",
+    )];
+
+    Ok((headers, output))
 }
 
 async fn websocket(
