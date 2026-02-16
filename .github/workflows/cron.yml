@@ -10,8 +10,8 @@ env:
   GH_CONTAINER_REGISTRY_USERNAME: shepmaster
   AWS_ACCESS_KEY_ID: AKIAWESVHZ3JQAY5NM5K
 jobs:
-  build_compiler_containers:
-    name: Build ${{ matrix.channel }} compiler container
+  build_compiler_images:
+    name: Release ${{ matrix.channel }} image
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -20,7 +20,7 @@ jobs:
         - beta
         - nightly
     env:
-      IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
+      GHCR_IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
       DOCKER_HUB_IMAGE_NAME: shepmaster/rust-${{ matrix.channel }}
     continue-on-error: true
     steps:
@@ -39,23 +39,10 @@ jobs:
       with:
         username: "${{ env.DOCKER_HUB_USERNAME }}"
         password: "${{ secrets.DOCKER_HUB_TOKEN }}"
-    - name: Build and push container
-      uses: docker/build-push-action@v6
+    - name: Release ${{ matrix.channel }} image
+      uses: "./.github/actions/build-and-push-image"
       with:
-        context: compiler/base/
-        file: compiler/base/Dockerfile
-        build-args: channel=${{ matrix.channel }}
-        push: true
-        tags: "${{ env.IMAGE_NAME }}:${{ github.run_id }}"
-        cache-from: type=gha,scope=${{ matrix.channel }}
-        cache-to: type=gha,scope=${{ matrix.channel }},mode=max
-    - name: Pull container
-      run: docker pull --platform linux/amd64 ${{ env.IMAGE_NAME }}:${{ github.run_id }}
-    - name: Rename container
-      run: |-
-        docker tag ${{ env.IMAGE_NAME }}:${{ github.run_id }} ${{ env.IMAGE_NAME }}
-        docker tag ${{ env.IMAGE_NAME }}:${{ github.run_id }} ${{ env.DOCKER_HUB_IMAGE_NAME }}
-    - name: Push container
-      run: |-
-        docker push --platform linux/amd64 ${{ env.IMAGE_NAME }}
-        docker push --platform linux/amd64 ${{ env.DOCKER_HUB_IMAGE_NAME }}
+        channel: "${{ matrix.channel }}"
+        tags: |-
+          ${{ env.GHCR_IMAGE_NAME }}
+          ${{ env.DOCKER_HUB_IMAGE_NAME }}

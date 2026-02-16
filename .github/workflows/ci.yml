@@ -13,8 +13,8 @@ env:
   GH_CONTAINER_REGISTRY_USERNAME: shepmaster
   AWS_ACCESS_KEY_ID: AKIAWESVHZ3JQAY5NM5K
 jobs:
-  build_compiler_containers:
-    name: Build ${{ matrix.channel }} compiler container
+  build_compiler_images:
+    name: Build provisional ${{ matrix.channel }} image
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,7 +24,8 @@ jobs:
         - nightly
     if: 'github.event_name == ''push'' || contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     env:
-      IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
+      GHCR_IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
+      DOCKER_HUB_IMAGE_NAME: shepmaster/rust-${{ matrix.channel }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
@@ -38,16 +39,11 @@ jobs:
         registry: ghcr.io
         username: "${{ env.GH_CONTAINER_REGISTRY_USERNAME }}"
         password: "${{ secrets.GH_CONTAINER_REGISTRY_TOKEN }}"
-    - name: Build and push container
-      uses: docker/build-push-action@v6
+    - name: Build provisional ${{ matrix.channel }} image
+      uses: "./.github/actions/build-and-push-image"
       with:
-        context: compiler/base/
-        file: compiler/base/Dockerfile
-        build-args: channel=${{ matrix.channel }}
-        push: true
-        tags: "${{ env.IMAGE_NAME }}:${{ github.run_id }}"
-        cache-from: type=gha,scope=${{ matrix.channel }}
-        cache-to: type=gha,scope=${{ matrix.channel }},mode=max
+        channel: "${{ matrix.channel }}"
+        tags: "${{ env.GHCR_IMAGE_NAME }}:${{ github.run_id }}"
   build_backend:
     name: Build backend
     runs-on: ubuntu-latest
@@ -130,7 +126,7 @@ jobs:
     runs-on: ubuntu-latest
     if: 'github.event_name == ''push'' || contains(github.event.pull_request.labels.*.name, ''CI: approved'')'
     needs:
-    - build_compiler_containers
+    - build_compiler_images
     - build_backend
     - build_frontend
     defaults:
@@ -158,13 +154,11 @@ jobs:
         gem install bundler
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
-    - name: Pull containers
+    - name: Pull images
       run: echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull --platform linux/amd64
-    - name: Rename containers
+    - name: Rename images
       run: |-
         for c in stable beta nightly; do
-          docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} ghcr.io/integer32llc/rust-playground-ci-rust-$c
-          docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} shepmaster/rust-$c
           docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} rust-$c
         done
     - name: Download backend
@@ -209,34 +203,6 @@ jobs:
       contents: read
       id-token: write
     steps:
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: "${{ env.GH_CONTAINER_REGISTRY_USERNAME }}"
-        password: "${{ secrets.GH_CONTAINER_REGISTRY_TOKEN }}"
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: "${{ env.DOCKER_HUB_USERNAME }}"
-        password: "${{ secrets.DOCKER_HUB_TOKEN }}"
-    - name: Recover disk space
-      run: sudo rm -rf /usr/local/lib/android
-    - name: Pull containers
-      run: echo ghcr.io/integer32llc/rust-playground-ci-rust-{stable,beta,nightly}:${{ github.run_id }} | xargs -n1 docker pull --platform linux/amd64
-    - name: Rename containers
-      run: |-
-        for c in stable beta nightly; do
-          docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} ghcr.io/integer32llc/rust-playground-ci-rust-$c
-          docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} shepmaster/rust-$c
-          docker tag ghcr.io/integer32llc/rust-playground-ci-rust-$c:${{ github.run_id }} rust-$c
-        done
-    - name: Push containers
-      run: |-
-        for c in stable beta nightly; do
-          docker push --platform linux/amd64 ghcr.io/integer32llc/rust-playground-ci-rust-$c
-          docker push --platform linux/amd64 shepmaster/rust-$c
-        done
     - name: Download backend
       uses: actions/download-artifact@v7
       with:
@@ -267,3 +233,37 @@ jobs:
       run: aws s3 cp server/ui s3://rust-playground-artifacts
     - name: Push frontend (rust-lang)
       run: aws s3 sync server/build/ s3://rust-playground-artifacts/build
+  release_docker_artifacts:
+    name: Release ${{ matrix.channel }} image
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        channel:
+        - stable
+        - beta
+        - nightly
+    needs:
+    - run_integration_tests
+    env:
+      GHCR_IMAGE_NAME: ghcr.io/integer32llc/rust-playground-ci-rust-${{ matrix.channel }}
+      DOCKER_HUB_IMAGE_NAME: shepmaster/rust-${{ matrix.channel }}
+    if: github.event_name == 'push' && github.event.ref == 'refs/heads/main'
+    steps:
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: "${{ env.GH_CONTAINER_REGISTRY_USERNAME }}"
+        password: "${{ secrets.GH_CONTAINER_REGISTRY_TOKEN }}"
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: "${{ env.DOCKER_HUB_USERNAME }}"
+        password: "${{ secrets.DOCKER_HUB_TOKEN }}"
+    - name: Release ${{ matrix.channel }} image
+      uses: "./.github/actions/build-and-push-image"
+      with:
+        channel: "${{ matrix.channel }}"
+        tags: |-
+          ${{ env.GHCR_IMAGE_NAME }}
+          ${{ env.DOCKER_HUB_IMAGE_NAME }}
