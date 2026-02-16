@@ -331,6 +331,7 @@ workflows:
         if: github.event_name == 'push' && github.event.ref == 'refs/heads/main'
 
         steps:
+          - *checkout_pr
           - *login_ghcr
           - *login_docker_hub
 
