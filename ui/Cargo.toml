@@ -27,7 +27,7 @@ snafu = "0.8.0"
 strum = { version = "0.27.1", features = ["derive"] }
 tempfile = "3"
 tokio = { version = "1.9", features = ["macros", "time", "process", "rt-multi-thread"] }
-tokio-util = "0.7.9"
+tokio-util = { version = "0.7.9", default-features = false, features = ["time"] }
 tower-http = { version = "0.6", features = ["cors", "fs", "request-id", "set-header", "trace"] }
 tracing = { version = "0.1.37", features = ["attributes"] }
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }

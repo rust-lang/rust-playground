@@ -16,8 +16,11 @@ use tracing_subscriber::EnvFilter;
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 5000;
 
+const DEFAULT_WEBSOCKET_HANDSHAKE_TIMEOUT: Duration = Duration::from_secs(5);
 const DEFAULT_WEBSOCKET_IDLE_TIMEOUT: Duration = Duration::from_secs(60);
+const DEFAULT_WEBSOCKET_IDLE_SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(5);
 const DEFAULT_WEBSOCKET_SESSION_TIMEOUT: Duration = Duration::from_secs(45 * 60);
+const DEFAULT_WEBSOCKET_SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(5);
 
 const DEFAULT_COORDINATORS_LIMIT: usize = 25;
 const DEFAULT_PROCESSES_LIMIT: usize = 10;
@@ -118,19 +121,37 @@ impl Config {
         let request_db_path = env::var_os("PLAYGROUND_REQUEST_DATABASE").map(Into::into);
 
         let websocket_config = {
+            let handshake_timeout = env::var("PLAYGROUND_WEBSOCKET_HANDSHAKE_TIMEOUT_S")
+                .ok()
+                .and_then(|l| l.parse().map(Duration::from_secs).ok())
+                .unwrap_or(DEFAULT_WEBSOCKET_HANDSHAKE_TIMEOUT);
+
             let idle_timeout = env::var("PLAYGROUND_WEBSOCKET_IDLE_TIMEOUT_S")
                 .ok()
                 .and_then(|l| l.parse().map(Duration::from_secs).ok())
                 .unwrap_or(DEFAULT_WEBSOCKET_IDLE_TIMEOUT);
+
+            let idle_shutdown_timeout = env::var("PLAYGROUND_WEBSOCKET_IDLE_SHUTDOWN_TIMEOUT_S")
+                .ok()
+                .and_then(|l| l.parse().map(Duration::from_secs).ok())
+                .unwrap_or(DEFAULT_WEBSOCKET_IDLE_SHUTDOWN_TIMEOUT);
 
             let session_timeout = env::var("PLAYGROUND_WEBSOCKET_SESSION_TIMEOUT_S")
                 .ok()
                 .and_then(|l| l.parse().map(Duration::from_secs).ok())
                 .unwrap_or(DEFAULT_WEBSOCKET_SESSION_TIMEOUT);
 
+            let shutdown_timeout = env::var("PLAYGROUND_WEBSOCKET_SHUTDOWN_TIMEOUT_S")
+                .ok()
+                .and_then(|l| l.parse().map(Duration::from_secs).ok())
+                .unwrap_or(DEFAULT_WEBSOCKET_SHUTDOWN_TIMEOUT);
+
             WebSocketConfig {
+                handshake_timeout,
                 idle_timeout,
+                idle_shutdown_timeout,
                 session_timeout,
+                shutdown_timeout,
             }
         };
 
@@ -262,6 +283,22 @@ impl limits::Lifecycle for LifecycleMetrics {
 
 #[derive(Debug, Copy, Clone)]
 struct WebSocketConfig {
+    /// How long the handshake may take before we cancel it
+    handshake_timeout: Duration,
+    /// How long a container has to be unused before we shut it down
     idle_timeout: Duration,
+    /// How long we attempt to idle the container before we error
+    idle_shutdown_timeout: Duration,
+    /// How long the user can be connected to the WebSocket
     session_timeout: Duration,
+    /// How long we attempt to shut down the container before we error
+    shutdown_timeout: Duration,
+}
+
+impl WebSocketConfig {
+    fn overall_timeout(&self) -> Duration {
+        const WIGGLE_ROOM: Duration = Duration::from_secs(15);
+
+        self.handshake_timeout + self.session_timeout + WIGGLE_ROOM
+    }
 }
