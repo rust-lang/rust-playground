@@ -741,7 +741,7 @@ async fn handle_execute_inner(
         mut stderr_rx,
         mut status_rx,
     } = coordinator
-        .begin_execute(token.clone(), req.clone())
+        .begin_execute(token, req.clone())
         .await
         .context(BeginSnafu)?;
 
