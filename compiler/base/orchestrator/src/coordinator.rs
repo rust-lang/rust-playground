@@ -931,15 +931,13 @@ where
     B: Backend,
 {
     fn new(limits: Arc<dyn ResourceLimits>, backend: B) -> Self {
-        let token = CancelOnDrop(CancellationToken::new());
-
         Self {
             limits,
             backend,
             stable: OnceCell::new(),
             beta: OnceCell::new(),
             nightly: OnceCell::new(),
-            token,
+            token: CancelOnDrop::default(),
         }
     }
 
