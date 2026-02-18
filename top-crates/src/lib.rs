@@ -9,7 +9,7 @@ use cargo::{
     },
     sources::{
         source::{QueryKind, Source, SourceMap},
-        RegistrySource,
+        SourceConfigMap,
     },
     util::{cache_lock::CacheLockMode, interning::InternedString, VersionExt},
     GlobalContext,
@@ -30,7 +30,7 @@ struct GlobalState<'cfg> {
     compile_kind: CompileKind,
     target_info: TargetInfo,
     crates_io: SourceId,
-    source: RegistrySource<'cfg>,
+    source: Box<dyn Source + 'cfg>,
     modifications: &'cfg Modifications,
 }
 
@@ -289,10 +289,13 @@ fn make_global_state<'cfg>(
 
     // Source for obtaining packages from the crates.io registry.
     let crates_io = SourceId::crates_io(config).expect("Unable to create crates.io source ID");
+
+    let source_config_map = SourceConfigMap::new(config).unwrap();
     let yanked_whitelist = HashSet::new();
-    let mut source = RegistrySource::remote(crates_io, &yanked_whitelist, config)
+    let mut source = source_config_map
+        .load(crates_io, &yanked_whitelist)
         .expect("Unable to create registry source");
-    source.invalidate_cache();
+
     source
         .block_until_ready()
         .expect("Unable to wait for registry to be ready");
@@ -343,10 +346,15 @@ fn populate_initial_direct_dependencies(
         let dep = Dependency::parse(name, version, global.crates_io)
             .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
-        let matches = match global.source.query_vec(&dep, QueryKind::Exact) {
-            Poll::Ready(Ok(v)) => v,
-            Poll::Ready(Err(e)) => panic!("Unable to query registry for {}: {}", name, e),
-            Poll::Pending => panic!("Registry not ready to query"),
+        let matches = loop {
+            match global.source.query_vec(&dep, QueryKind::Exact) {
+                Poll::Ready(Ok(v)) => break v,
+                Poll::Ready(Err(e)) => panic!("Unable to query registry for {}: {}", name, e),
+                Poll::Pending => global
+                    .source
+                    .block_until_ready()
+                    .expect("Unable to wait for registry to be ready"),
+            }
         };
 
         // Find the newest non-prelease version
