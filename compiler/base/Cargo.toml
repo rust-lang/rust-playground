@@ -97,7 +97,7 @@ default-features = false
 
 [dependencies.arc_swap]
 package = "arc-swap"
-version = "=1.8.1"
+version = "=1.8.2"
 
 [dependencies.arg_enum_proc_macro]
 package = "arg_enum_proc_macro"
@@ -113,7 +113,7 @@ version = "=0.2.1"
 
 [dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.39"
+version = "=0.4.40"
 features = ["tokio"]
 
 [dependencies.async_trait]
@@ -144,16 +144,16 @@ default-features = false
 
 [dependencies.avif_serialize]
 package = "avif-serialize"
-version = "=0.8.6"
+version = "=0.8.8"
 
 [dependencies.aws_lc_rs]
 package = "aws-lc-rs"
-version = "=1.15.4"
+version = "=1.16.0"
 default-features = false
 
 [dependencies.aws_lc_sys]
 package = "aws-lc-sys"
-version = "=0.37.0"
+version = "=0.37.1"
 default-features = false
 
 [dependencies.backtrace]
@@ -179,7 +179,7 @@ default-features = false
 
 [dependencies.bitflags]
 package = "bitflags"
-version = "=2.10.0"
+version = "=2.11.0"
 
 [dependencies.bitstream_io]
 package = "bitstream-io"
@@ -242,7 +242,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.2.55"
+version = "=1.2.56"
 features = ["parallel"]
 
 [dependencies.cfg_aliases]
@@ -266,12 +266,12 @@ features = ["clock", "serde"]
 
 [dependencies.clap]
 package = "clap"
-version = "=4.5.57"
+version = "=4.5.59"
 features = ["unstable-doc"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.57"
+version = "=4.5.59"
 features = ["unstable-doc"]
 
 [dependencies.clap_derive]
@@ -280,7 +280,7 @@ version = "=4.5.55"
 
 [dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.7.7"
+version = "=1.0.0"
 
 [dependencies.cmake]
 package = "cmake"
@@ -296,7 +296,7 @@ version = "=1.0.4"
 
 [dependencies.compression_codecs]
 package = "compression-codecs"
-version = "=0.4.36"
+version = "=0.4.37"
 
 [dependencies.compression_core]
 package = "compression-core"
@@ -318,7 +318,7 @@ features = ["percent-encode"]
 
 [dependencies.cookie_store]
 package = "cookie_store"
-version = "=0.22.0"
+version = "=0.22.1"
 
 [dependencies.core2]
 package = "core2"
@@ -366,6 +366,10 @@ version = "=0.8.21"
 
 [dependencies.crypto_common]
 package = "crypto-common"
+version = "=0.2.0"
+
+[dependencies.crypto_common_0_1_7]
+package = "crypto-common"
 version = "=0.1.7"
 
 [dependencies.cssparser]
@@ -394,7 +398,7 @@ version = "=1.0.6"
 
 [dependencies.deranged]
 package = "deranged"
-version = "=0.5.5"
+version = "=0.5.6"
 features = ["powerfmt"]
 
 [dependencies.derive_more]
@@ -417,6 +421,10 @@ package = "destructure_traitobject"
 version = "=0.2.0"
 
 [dependencies.digest]
+package = "digest"
+version = "=0.11.0"
+
+[dependencies.digest_0_10_7]
 package = "digest"
 version = "=0.10.7"
 features = ["mac"]
@@ -457,12 +465,12 @@ version = "=0.8.35"
 
 [dependencies.env_filter]
 package = "env_filter"
-version = "=0.1.4"
+version = "=1.0.0"
 default-features = false
 
 [dependencies.env_logger]
 package = "env_logger"
-version = "=0.11.8"
+version = "=0.11.9"
 
 [dependencies.equator]
 package = "equator"
@@ -570,7 +578,7 @@ version = "=0.1.5"
 
 [dependencies.futures]
 package = "futures"
-version = "=0.3.31"
+version = "=0.3.32"
 features = ["async-await", "compat", "executor", "io-compat", "std", "thread-pool"]
 
 [dependencies.futures_0_1_31]
@@ -579,40 +587,40 @@ version = "=0.1.31"
 
 [dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.31"
+version = "=0.3.32"
 features = ["sink", "std"]
 
 [dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.31"
+version = "=0.3.32"
 
 [dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.31"
+version = "=0.3.32"
 default-features = false
 
 [dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.31"
+version = "=0.3.32"
 features = ["std"]
 
 [dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.31"
+version = "=0.3.32"
 default-features = false
 
 [dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.31"
+version = "=0.3.32"
 
 [dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.31"
+version = "=0.3.32"
 default-features = false
 
 [dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.31"
+version = "=0.3.32"
 features = ["alloc", "sink"]
 
 [dependencies.fxhash]
@@ -853,9 +861,16 @@ version = "=1.0.17"
 
 [dependencies.jiff]
 package = "jiff"
-version = "=0.2.19"
-features = ["std"]
-default-features = false
+version = "=0.2.20"
+features = ["logging", "serde", "static", "std", "tzdb-bundle-always"]
+
+[dependencies.jiff_static]
+package = "jiff-static"
+version = "=0.2.20"
+
+[dependencies.jiff_tzdb]
+package = "jiff-tzdb"
+version = "=0.1.5"
 
 [dependencies.jobserver]
 package = "jobserver"
@@ -872,7 +887,7 @@ version = "=0.5.3"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.180"
+version = "=0.2.182"
 
 [dependencies.libm]
 package = "libm"
@@ -1014,6 +1029,10 @@ version = "=8.0.0"
 [dependencies.noop_proc_macro]
 package = "noop_proc_macro"
 version = "=0.3.0"
+
+[dependencies.nu_ansi_term]
+package = "nu-ansi-term"
+version = "=0.50.3"
 
 [dependencies.num]
 package = "num"
@@ -1180,7 +1199,7 @@ version = "=0.3.32"
 
 [dependencies.png]
 package = "png"
-version = "=0.18.0"
+version = "=0.18.1"
 
 [dependencies.postgres]
 package = "postgres"
@@ -1298,7 +1317,7 @@ features = ["os_rng", "serde", "std"]
 
 [dependencies.rand_distr]
 package = "rand_distr"
-version = "=0.5.1"
+version = "=0.6.0"
 
 [dependencies.rav1e]
 package = "rav1e"
@@ -1484,6 +1503,10 @@ default-features = false
 package = "sha2"
 version = "=0.10.9"
 
+[dependencies.sharded_slab]
+package = "sharded-slab"
+version = "=0.1.7"
+
 [dependencies.shlex]
 package = "shlex"
 version = "=1.3.0"
@@ -1558,7 +1581,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=2.0.114"
+version = "=2.0.116"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1581,7 +1604,7 @@ version = "=0.4.44"
 
 [dependencies.tempfile]
 package = "tempfile"
-version = "=3.24.0"
+version = "=3.25.0"
 
 [dependencies.tendril]
 package = "tendril"
@@ -1606,6 +1629,10 @@ version = "=1.0.69"
 [dependencies.thread_id]
 package = "thread-id"
 version = "=5.1.0"
+
+[dependencies.thread_local]
+package = "thread_local"
+version = "=1.1.9"
 
 [dependencies.threadpool]
 package = "threadpool"
@@ -1676,17 +1703,17 @@ features = ["codec", "full", "io"]
 
 [dependencies.toml]
 package = "toml"
-version = "=0.9.11"
+version = "=1.0.2"
 
 [dependencies.toml_datetime]
 package = "toml_datetime"
-version = "=0.7.5"
+version = "=1.0.0"
 features = ["alloc"]
 default-features = false
 
 [dependencies.toml_parser]
 package = "toml_parser"
-version = "=1.0.6"
+version = "=1.0.9"
 features = ["alloc"]
 default-features = false
 
@@ -1727,7 +1754,16 @@ version = "=0.1.31"
 [dependencies.tracing_core]
 package = "tracing-core"
 version = "=0.1.36"
+
+[dependencies.tracing_log]
+package = "tracing-log"
+version = "=0.2.0"
+features = ["log-tracer", "std"]
 default-features = false
+
+[dependencies.tracing_subscriber]
+package = "tracing-subscriber"
+version = "=0.3.22"
 
 [dependencies.trpl]
 package = "trpl"
@@ -1756,7 +1792,7 @@ version = "=0.3.18"
 
 [dependencies.unicode_ident]
 package = "unicode-ident"
-version = "=1.0.23"
+version = "=1.0.24"
 
 [dependencies.unicode_normalization]
 package = "unicode-normalization"
@@ -1809,7 +1845,7 @@ version = "=0.2.2"
 
 [dependencies.uuid]
 package = "uuid"
-version = "=1.20.0"
+version = "=1.21.0"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [dependencies.v_frame]
@@ -1864,7 +1900,7 @@ version = "=0.1.12"
 
 [dependencies.whoami]
 package = "whoami"
-version = "=2.1.0"
+version = "=2.1.1"
 
 [dependencies.wide]
 package = "wide"
@@ -2001,7 +2037,7 @@ default-features = false
 
 [dependencies.zmij]
 package = "zmij"
-version = "=1.0.20"
+version = "=1.0.21"
 
 [dependencies.zstd]
 package = "zstd"
@@ -2114,7 +2150,7 @@ default-features = false
 
 [build-dependencies.arc_swap]
 package = "arc-swap"
-version = "=1.8.1"
+version = "=1.8.2"
 
 [build-dependencies.arg_enum_proc_macro]
 package = "arg_enum_proc_macro"
@@ -2130,7 +2166,7 @@ version = "=0.2.1"
 
 [build-dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.39"
+version = "=0.4.40"
 features = ["tokio"]
 
 [build-dependencies.async_trait]
@@ -2161,16 +2197,16 @@ default-features = false
 
 [build-dependencies.avif_serialize]
 package = "avif-serialize"
-version = "=0.8.6"
+version = "=0.8.8"
 
 [build-dependencies.aws_lc_rs]
 package = "aws-lc-rs"
-version = "=1.15.4"
+version = "=1.16.0"
 default-features = false
 
 [build-dependencies.aws_lc_sys]
 package = "aws-lc-sys"
-version = "=0.37.0"
+version = "=0.37.1"
 default-features = false
 
 [build-dependencies.backtrace]
@@ -2196,7 +2232,7 @@ default-features = false
 
 [build-dependencies.bitflags]
 package = "bitflags"
-version = "=2.10.0"
+version = "=2.11.0"
 
 [build-dependencies.bitstream_io]
 package = "bitstream-io"
@@ -2259,7 +2295,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.2.55"
+version = "=1.2.56"
 features = ["parallel"]
 
 [build-dependencies.cfg_aliases]
@@ -2283,12 +2319,12 @@ features = ["clock", "serde"]
 
 [build-dependencies.clap]
 package = "clap"
-version = "=4.5.57"
+version = "=4.5.59"
 features = ["unstable-doc"]
 
 [build-dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.57"
+version = "=4.5.59"
 features = ["unstable-doc"]
 
 [build-dependencies.clap_derive]
@@ -2297,7 +2333,7 @@ version = "=4.5.55"
 
 [build-dependencies.clap_lex]
 package = "clap_lex"
-version = "=0.7.7"
+version = "=1.0.0"
 
 [build-dependencies.cmake]
 package = "cmake"
@@ -2313,7 +2349,7 @@ version = "=1.0.4"
 
 [build-dependencies.compression_codecs]
 package = "compression-codecs"
-version = "=0.4.36"
+version = "=0.4.37"
 
 [build-dependencies.compression_core]
 package = "compression-core"
@@ -2335,7 +2371,7 @@ features = ["percent-encode"]
 
 [build-dependencies.cookie_store]
 package = "cookie_store"
-version = "=0.22.0"
+version = "=0.22.1"
 
 [build-dependencies.core2]
 package = "core2"
@@ -2383,6 +2419,10 @@ version = "=0.8.21"
 
 [build-dependencies.crypto_common]
 package = "crypto-common"
+version = "=0.2.0"
+
+[build-dependencies.crypto_common_0_1_7]
+package = "crypto-common"
 version = "=0.1.7"
 
 [build-dependencies.cssparser]
@@ -2411,7 +2451,7 @@ version = "=1.0.6"
 
 [build-dependencies.deranged]
 package = "deranged"
-version = "=0.5.5"
+version = "=0.5.6"
 features = ["powerfmt"]
 
 [build-dependencies.derive_more]
@@ -2434,6 +2474,10 @@ package = "destructure_traitobject"
 version = "=0.2.0"
 
 [build-dependencies.digest]
+package = "digest"
+version = "=0.11.0"
+
+[build-dependencies.digest_0_10_7]
 package = "digest"
 version = "=0.10.7"
 features = ["mac"]
@@ -2474,12 +2518,12 @@ version = "=0.8.35"
 
 [build-dependencies.env_filter]
 package = "env_filter"
-version = "=0.1.4"
+version = "=1.0.0"
 default-features = false
 
 [build-dependencies.env_logger]
 package = "env_logger"
-version = "=0.11.8"
+version = "=0.11.9"
 
 [build-dependencies.equator]
 package = "equator"
@@ -2587,7 +2631,7 @@ version = "=0.1.5"
 
 [build-dependencies.futures]
 package = "futures"
-version = "=0.3.31"
+version = "=0.3.32"
 features = ["async-await", "compat", "executor", "io-compat", "std", "thread-pool"]
 
 [build-dependencies.futures_0_1_31]
@@ -2596,40 +2640,40 @@ version = "=0.1.31"
 
 [build-dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.31"
+version = "=0.3.32"
 features = ["sink", "std"]
 
 [build-dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.31"
+version = "=0.3.32"
 
 [build-dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.31"
+version = "=0.3.32"
 default-features = false
 
 [build-dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.31"
+version = "=0.3.32"
 features = ["std"]
 
 [build-dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.31"
+version = "=0.3.32"
 default-features = false
 
 [build-dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.31"
+version = "=0.3.32"
 
 [build-dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.31"
+version = "=0.3.32"
 default-features = false
 
 [build-dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.31"
+version = "=0.3.32"
 features = ["alloc", "sink"]
 
 [build-dependencies.fxhash]
@@ -2870,9 +2914,16 @@ version = "=1.0.17"
 
 [build-dependencies.jiff]
 package = "jiff"
-version = "=0.2.19"
-features = ["std"]
-default-features = false
+version = "=0.2.20"
+features = ["logging", "serde", "static", "std", "tzdb-bundle-always"]
+
+[build-dependencies.jiff_static]
+package = "jiff-static"
+version = "=0.2.20"
+
+[build-dependencies.jiff_tzdb]
+package = "jiff-tzdb"
+version = "=0.1.5"
 
 [build-dependencies.jobserver]
 package = "jobserver"
@@ -2889,7 +2940,7 @@ version = "=0.5.3"
 
 [build-dependencies.libc]
 package = "libc"
-version = "=0.2.180"
+version = "=0.2.182"
 
 [build-dependencies.libm]
 package = "libm"
@@ -3031,6 +3082,10 @@ version = "=8.0.0"
 [build-dependencies.noop_proc_macro]
 package = "noop_proc_macro"
 version = "=0.3.0"
+
+[build-dependencies.nu_ansi_term]
+package = "nu-ansi-term"
+version = "=0.50.3"
 
 [build-dependencies.num]
 package = "num"
@@ -3197,7 +3252,7 @@ version = "=0.3.32"
 
 [build-dependencies.png]
 package = "png"
-version = "=0.18.0"
+version = "=0.18.1"
 
 [build-dependencies.postgres]
 package = "postgres"
@@ -3315,7 +3370,7 @@ features = ["os_rng", "serde", "std"]
 
 [build-dependencies.rand_distr]
 package = "rand_distr"
-version = "=0.5.1"
+version = "=0.6.0"
 
 [build-dependencies.rav1e]
 package = "rav1e"
@@ -3501,6 +3556,10 @@ default-features = false
 package = "sha2"
 version = "=0.10.9"
 
+[build-dependencies.sharded_slab]
+package = "sharded-slab"
+version = "=0.1.7"
+
 [build-dependencies.shlex]
 package = "shlex"
 version = "=1.3.0"
@@ -3575,7 +3634,7 @@ default-features = false
 
 [build-dependencies.syn]
 package = "syn"
-version = "=2.0.114"
+version = "=2.0.116"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [build-dependencies.syn_1_0_109]
@@ -3598,7 +3657,7 @@ version = "=0.4.44"
 
 [build-dependencies.tempfile]
 package = "tempfile"
-version = "=3.24.0"
+version = "=3.25.0"
 
 [build-dependencies.tendril]
 package = "tendril"
@@ -3623,6 +3682,10 @@ version = "=1.0.69"
 [build-dependencies.thread_id]
 package = "thread-id"
 version = "=5.1.0"
+
+[build-dependencies.thread_local]
+package = "thread_local"
+version = "=1.1.9"
 
 [build-dependencies.threadpool]
 package = "threadpool"
@@ -3693,17 +3756,17 @@ features = ["codec", "full", "io"]
 
 [build-dependencies.toml]
 package = "toml"
-version = "=0.9.11"
+version = "=1.0.2"
 
 [build-dependencies.toml_datetime]
 package = "toml_datetime"
-version = "=0.7.5"
+version = "=1.0.0"
 features = ["alloc"]
 default-features = false
 
 [build-dependencies.toml_parser]
 package = "toml_parser"
-version = "=1.0.6"
+version = "=1.0.9"
 features = ["alloc"]
 default-features = false
 
@@ -3744,7 +3807,16 @@ version = "=0.1.31"
 [build-dependencies.tracing_core]
 package = "tracing-core"
 version = "=0.1.36"
+
+[build-dependencies.tracing_log]
+package = "tracing-log"
+version = "=0.2.0"
+features = ["log-tracer", "std"]
 default-features = false
+
+[build-dependencies.tracing_subscriber]
+package = "tracing-subscriber"
+version = "=0.3.22"
 
 [build-dependencies.trpl]
 package = "trpl"
@@ -3773,7 +3845,7 @@ version = "=0.3.18"
 
 [build-dependencies.unicode_ident]
 package = "unicode-ident"
-version = "=1.0.23"
+version = "=1.0.24"
 
 [build-dependencies.unicode_normalization]
 package = "unicode-normalization"
@@ -3826,7 +3898,7 @@ version = "=0.2.2"
 
 [build-dependencies.uuid]
 package = "uuid"
-version = "=1.20.0"
+version = "=1.21.0"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [build-dependencies.v_frame]
@@ -3881,7 +3953,7 @@ version = "=0.1.12"
 
 [build-dependencies.whoami]
 package = "whoami"
-version = "=2.1.0"
+version = "=2.1.1"
 
 [build-dependencies.wide]
 package = "wide"
@@ -4018,7 +4090,7 @@ default-features = false
 
 [build-dependencies.zmij]
 package = "zmij"
-version = "=1.0.20"
+version = "=1.0.21"
 
 [build-dependencies.zstd]
 package = "zstd"
