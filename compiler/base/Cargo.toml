@@ -88,7 +88,7 @@ version = "=1.1.5"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.101"
+version = "=1.0.102"
 
 [dependencies.approx]
 package = "approx"
@@ -113,7 +113,7 @@ version = "=0.2.1"
 
 [dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.40"
+version = "=0.4.41"
 features = ["tokio"]
 
 [dependencies.async_trait]
@@ -187,7 +187,7 @@ version = "=4.9.0"
 
 [dependencies.block_buffer]
 package = "block-buffer"
-version = "=0.11.0"
+version = "=0.12.0"
 
 [dependencies.block_buffer_0_10_4]
 package = "block-buffer"
@@ -213,7 +213,7 @@ version = "=0.8.0"
 
 [dependencies.bumpalo]
 package = "bumpalo"
-version = "=3.19.1"
+version = "=3.20.2"
 
 [dependencies.bytemuck]
 package = "bytemuck"
@@ -261,17 +261,17 @@ default-features = false
 
 [dependencies.chrono]
 package = "chrono"
-version = "=0.4.43"
+version = "=0.4.44"
 features = ["clock", "serde"]
 
 [dependencies.clap]
 package = "clap"
-version = "=4.5.59"
+version = "=4.5.60"
 features = ["unstable-doc"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.59"
+version = "=4.5.60"
 features = ["unstable-doc"]
 
 [dependencies.clap_derive]
@@ -366,7 +366,7 @@ version = "=0.8.21"
 
 [dependencies.crypto_common]
 package = "crypto-common"
-version = "=0.2.0"
+version = "=0.2.1"
 
 [dependencies.crypto_common_0_1_7]
 package = "crypto-common"
@@ -398,7 +398,7 @@ version = "=1.0.6"
 
 [dependencies.deranged]
 package = "deranged"
-version = "=0.5.6"
+version = "=0.5.8"
 features = ["powerfmt"]
 
 [dependencies.derive_more]
@@ -422,7 +422,7 @@ version = "=0.2.0"
 
 [dependencies.digest]
 package = "digest"
-version = "=0.11.0"
+version = "=0.11.1"
 
 [dependencies.digest_0_10_7]
 package = "digest"
@@ -861,12 +861,12 @@ version = "=1.0.17"
 
 [dependencies.jiff]
 package = "jiff"
-version = "=0.2.20"
+version = "=0.2.22"
 features = ["logging", "serde", "static", "std", "tzdb-bundle-always"]
 
 [dependencies.jiff_static]
 package = "jiff-static"
-version = "=0.2.20"
+version = "=0.2.22"
 
 [dependencies.jiff_tzdb]
 package = "jiff-tzdb"
@@ -888,6 +888,7 @@ version = "=0.5.3"
 [dependencies.libc]
 package = "libc"
 version = "=0.2.182"
+features = ["extra_traits"]
 
 [dependencies.libm]
 package = "libm"
@@ -900,10 +901,6 @@ version = "=0.36.0"
 [dependencies.linux_raw_sys]
 package = "linux-raw-sys"
 version = "=0.12.1"
-
-[dependencies.linux_raw_sys_0_11_0]
-package = "linux-raw-sys"
-version = "=0.11.0"
 features = ["auxvec", "elf", "errno", "general", "ioctl", "no_std"]
 default-features = false
 
@@ -1021,6 +1018,10 @@ version = "=0.3.0"
 [dependencies.ndarray]
 package = "ndarray"
 version = "=0.17.2"
+
+[dependencies.nix]
+package = "nix"
+version = "=0.31.2"
 
 [dependencies.nom]
 package = "nom"
@@ -1187,7 +1188,7 @@ version = "=0.11.3"
 
 [dependencies.pin_project_lite]
 package = "pin-project-lite"
-version = "=0.2.16"
+version = "=0.2.17"
 
 [dependencies.pin_utils]
 package = "pin-utils"
@@ -1257,7 +1258,7 @@ version = "=2.3.0"
 
 [dependencies.pxfm]
 package = "pxfm"
-version = "=0.1.27"
+version = "=0.1.28"
 
 [dependencies.qoi]
 package = "qoi"
@@ -1355,7 +1356,7 @@ default-features = false
 
 [dependencies.regex_syntax]
 package = "regex-syntax"
-version = "=0.8.9"
+version = "=0.8.10"
 default-features = false
 
 [dependencies.reqwest]
@@ -1370,7 +1371,7 @@ features = ["blocking", "cookies", "json", "multipart", "rustls-tls"]
 
 [dependencies.rgb]
 package = "rgb"
-version = "=0.8.52"
+version = "=0.8.53"
 default-features = false
 
 [dependencies.ring]
@@ -1392,12 +1393,12 @@ version = "=0.4.1"
 
 [dependencies.rustix]
 package = "rustix"
-version = "=1.1.3"
+version = "=1.1.4"
 features = ["fs", "std", "termios"]
 
 [dependencies.rustls]
 package = "rustls"
-version = "=0.23.36"
+version = "=0.23.37"
 features = ["std", "tls12"]
 default-features = false
 
@@ -1581,7 +1582,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=2.0.116"
+version = "=2.0.117"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1604,7 +1605,7 @@ version = "=0.4.44"
 
 [dependencies.tempfile]
 package = "tempfile"
-version = "=3.25.0"
+version = "=3.26.0"
 
 [dependencies.tendril]
 package = "tendril"
@@ -1703,7 +1704,7 @@ features = ["codec", "full", "io"]
 
 [dependencies.toml]
 package = "toml"
-version = "=1.0.2"
+version = "=1.0.3"
 
 [dependencies.toml_datetime]
 package = "toml_datetime"
@@ -1870,19 +1871,19 @@ version = "=0.3.1"
 
 [dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.108"
+version = "=0.2.114"
 
 [dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.108"
+version = "=0.2.114"
 
 [dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.108"
+version = "=0.2.114"
 
 [dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.108"
+version = "=0.2.114"
 
 [dependencies.webpki]
 package = "rustls-webpki"
@@ -1996,12 +1997,12 @@ default-features = false
 
 [dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.39"
+version = "=0.8.40"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.39"
+version = "=0.8.40"
 
 [dependencies.zerofrom]
 package = "zerofrom"
@@ -2141,7 +2142,7 @@ version = "=1.1.5"
 
 [build-dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.101"
+version = "=1.0.102"
 
 [build-dependencies.approx]
 package = "approx"
@@ -2166,7 +2167,7 @@ version = "=0.2.1"
 
 [build-dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.40"
+version = "=0.4.41"
 features = ["tokio"]
 
 [build-dependencies.async_trait]
@@ -2240,7 +2241,7 @@ version = "=4.9.0"
 
 [build-dependencies.block_buffer]
 package = "block-buffer"
-version = "=0.11.0"
+version = "=0.12.0"
 
 [build-dependencies.block_buffer_0_10_4]
 package = "block-buffer"
@@ -2266,7 +2267,7 @@ version = "=0.8.0"
 
 [build-dependencies.bumpalo]
 package = "bumpalo"
-version = "=3.19.1"
+version = "=3.20.2"
 
 [build-dependencies.bytemuck]
 package = "bytemuck"
@@ -2314,17 +2315,17 @@ default-features = false
 
 [build-dependencies.chrono]
 package = "chrono"
-version = "=0.4.43"
+version = "=0.4.44"
 features = ["clock", "serde"]
 
 [build-dependencies.clap]
 package = "clap"
-version = "=4.5.59"
+version = "=4.5.60"
 features = ["unstable-doc"]
 
 [build-dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.5.59"
+version = "=4.5.60"
 features = ["unstable-doc"]
 
 [build-dependencies.clap_derive]
@@ -2419,7 +2420,7 @@ version = "=0.8.21"
 
 [build-dependencies.crypto_common]
 package = "crypto-common"
-version = "=0.2.0"
+version = "=0.2.1"
 
 [build-dependencies.crypto_common_0_1_7]
 package = "crypto-common"
@@ -2451,7 +2452,7 @@ version = "=1.0.6"
 
 [build-dependencies.deranged]
 package = "deranged"
-version = "=0.5.6"
+version = "=0.5.8"
 features = ["powerfmt"]
 
 [build-dependencies.derive_more]
@@ -2475,7 +2476,7 @@ version = "=0.2.0"
 
 [build-dependencies.digest]
 package = "digest"
-version = "=0.11.0"
+version = "=0.11.1"
 
 [build-dependencies.digest_0_10_7]
 package = "digest"
@@ -2914,12 +2915,12 @@ version = "=1.0.17"
 
 [build-dependencies.jiff]
 package = "jiff"
-version = "=0.2.20"
+version = "=0.2.22"
 features = ["logging", "serde", "static", "std", "tzdb-bundle-always"]
 
 [build-dependencies.jiff_static]
 package = "jiff-static"
-version = "=0.2.20"
+version = "=0.2.22"
 
 [build-dependencies.jiff_tzdb]
 package = "jiff-tzdb"
@@ -2941,6 +2942,7 @@ version = "=0.5.3"
 [build-dependencies.libc]
 package = "libc"
 version = "=0.2.182"
+features = ["extra_traits"]
 
 [build-dependencies.libm]
 package = "libm"
@@ -2953,10 +2955,6 @@ version = "=0.36.0"
 [build-dependencies.linux_raw_sys]
 package = "linux-raw-sys"
 version = "=0.12.1"
-
-[build-dependencies.linux_raw_sys_0_11_0]
-package = "linux-raw-sys"
-version = "=0.11.0"
 features = ["auxvec", "elf", "errno", "general", "ioctl", "no_std"]
 default-features = false
 
@@ -3074,6 +3072,10 @@ version = "=0.3.0"
 [build-dependencies.ndarray]
 package = "ndarray"
 version = "=0.17.2"
+
+[build-dependencies.nix]
+package = "nix"
+version = "=0.31.2"
 
 [build-dependencies.nom]
 package = "nom"
@@ -3240,7 +3242,7 @@ version = "=0.11.3"
 
 [build-dependencies.pin_project_lite]
 package = "pin-project-lite"
-version = "=0.2.16"
+version = "=0.2.17"
 
 [build-dependencies.pin_utils]
 package = "pin-utils"
@@ -3310,7 +3312,7 @@ version = "=2.3.0"
 
 [build-dependencies.pxfm]
 package = "pxfm"
-version = "=0.1.27"
+version = "=0.1.28"
 
 [build-dependencies.qoi]
 package = "qoi"
@@ -3408,7 +3410,7 @@ default-features = false
 
 [build-dependencies.regex_syntax]
 package = "regex-syntax"
-version = "=0.8.9"
+version = "=0.8.10"
 default-features = false
 
 [build-dependencies.reqwest]
@@ -3423,7 +3425,7 @@ features = ["blocking", "cookies", "json", "multipart", "rustls-tls"]
 
 [build-dependencies.rgb]
 package = "rgb"
-version = "=0.8.52"
+version = "=0.8.53"
 default-features = false
 
 [build-dependencies.ring]
@@ -3445,12 +3447,12 @@ version = "=0.4.1"
 
 [build-dependencies.rustix]
 package = "rustix"
-version = "=1.1.3"
+version = "=1.1.4"
 features = ["fs", "std", "termios"]
 
 [build-dependencies.rustls]
 package = "rustls"
-version = "=0.23.36"
+version = "=0.23.37"
 features = ["std", "tls12"]
 default-features = false
 
@@ -3634,7 +3636,7 @@ default-features = false
 
 [build-dependencies.syn]
 package = "syn"
-version = "=2.0.116"
+version = "=2.0.117"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [build-dependencies.syn_1_0_109]
@@ -3657,7 +3659,7 @@ version = "=0.4.44"
 
 [build-dependencies.tempfile]
 package = "tempfile"
-version = "=3.25.0"
+version = "=3.26.0"
 
 [build-dependencies.tendril]
 package = "tendril"
@@ -3756,7 +3758,7 @@ features = ["codec", "full", "io"]
 
 [build-dependencies.toml]
 package = "toml"
-version = "=1.0.2"
+version = "=1.0.3"
 
 [build-dependencies.toml_datetime]
 package = "toml_datetime"
@@ -3923,19 +3925,19 @@ version = "=0.3.1"
 
 [build-dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.108"
+version = "=0.2.114"
 
 [build-dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.108"
+version = "=0.2.114"
 
 [build-dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.108"
+version = "=0.2.114"
 
 [build-dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.108"
+version = "=0.2.114"
 
 [build-dependencies.webpki]
 package = "rustls-webpki"
@@ -4049,12 +4051,12 @@ default-features = false
 
 [build-dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.39"
+version = "=0.8.40"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [build-dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.39"
+version = "=0.8.40"
 
 [build-dependencies.zerofrom]
 package = "zerofrom"
