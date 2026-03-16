@@ -23,11 +23,11 @@ const RUSTFMT_URL = 'https://github.com/rust-lang/rustfmt';
 const SHEPMASTER_URL = 'https://github.com/shepmaster/';
 const RUST_EDITION_2018_URL = 'https://doc.rust-lang.org/edition-guide/rust-2018/index.html';
 
-const CRATE_EXAMPLE = `use rand::Rng;
+const CRATE_EXAMPLE = `use rand::prelude::*;
 
 fn main() {
-    let mut rng = rand::thread_rng();
-    println!("{}", rng.gen::<u8>());
+    let mut rng = rand::rng();
+    println!("{}", rng.random::<u8>());
 }`;
 
 const CLIPPY_EXAMPLE = `fn main() {
