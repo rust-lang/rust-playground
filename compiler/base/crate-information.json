@@ -51,18 +51,28 @@
   },
   {
     "name": "anstream",
-    "version": "0.6.21",
+    "version": "1.0.0",
     "id": "anstream"
   },
   {
+    "name": "anstream",
+    "version": "0.6.21",
+    "id": "anstream_0_6_21"
+  },
+  {
     "name": "anstyle",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "id": "anstyle"
   },
   {
     "name": "anstyle-parse",
-    "version": "0.2.7",
+    "version": "1.0.0",
     "id": "anstyle_parse"
+  },
+  {
+    "name": "anstyle-parse",
+    "version": "0.2.7",
+    "id": "anstyle_parse_0_2_7"
   },
   {
     "name": "anstyle-query",
@@ -141,12 +151,12 @@
   },
   {
     "name": "aws-lc-rs",
-    "version": "1.16.0",
+    "version": "1.16.1",
     "id": "aws_lc_rs"
   },
   {
     "name": "aws-lc-sys",
-    "version": "0.37.1",
+    "version": "0.38.0",
     "id": "aws_lc_sys"
   },
   {
@@ -251,7 +261,7 @@
   },
   {
     "name": "cc",
-    "version": "1.2.56",
+    "version": "1.2.57",
     "id": "cc"
   },
   {
@@ -276,22 +286,22 @@
   },
   {
     "name": "clap",
-    "version": "4.5.60",
+    "version": "4.6.0",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.5.60",
+    "version": "4.6.0",
     "id": "clap_builder"
   },
   {
     "name": "clap_derive",
-    "version": "4.5.55",
+    "version": "4.6.0",
     "id": "clap_derive"
   },
   {
     "name": "clap_lex",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "id": "clap_lex"
   },
   {
@@ -306,7 +316,7 @@
   },
   {
     "name": "colorchoice",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "id": "colorchoice"
   },
   {
@@ -456,7 +466,7 @@
   },
   {
     "name": "digest",
-    "version": "0.11.1",
+    "version": "0.11.2",
     "id": "digest"
   },
   {
@@ -706,7 +716,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "id": "getrandom"
   },
   {
@@ -831,7 +841,7 @@
   },
   {
     "name": "hybrid-array",
-    "version": "0.4.7",
+    "version": "0.4.8",
     "id": "hybrid_array"
   },
   {
@@ -926,7 +936,7 @@
   },
   {
     "name": "ipnet",
-    "version": "2.11.0",
+    "version": "2.12.0",
     "id": "ipnet"
   },
   {
@@ -951,17 +961,17 @@
   },
   {
     "name": "jiff",
-    "version": "0.2.22",
+    "version": "0.2.23",
     "id": "jiff"
   },
   {
     "name": "jiff-static",
-    "version": "0.2.22",
+    "version": "0.2.23",
     "id": "jiff_static"
   },
   {
     "name": "jiff-tzdb",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "id": "jiff_tzdb"
   },
   {
@@ -981,7 +991,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.182",
+    "version": "0.2.183",
     "id": "libc"
   },
   {
@@ -991,7 +1001,7 @@
   },
   {
     "name": "libsqlite3-sys",
-    "version": "0.36.0",
+    "version": "0.37.0",
     "id": "libsqlite3_sys"
   },
   {
@@ -1096,7 +1106,7 @@
   },
   {
     "name": "miniz_oxide",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "id": "miniz_oxide"
   },
   {
@@ -1116,7 +1126,7 @@
   },
   {
     "name": "moxcms",
-    "version": "0.7.11",
+    "version": "0.8.1",
     "id": "moxcms"
   },
   {
@@ -1211,7 +1221,7 @@
   },
   {
     "name": "once_cell",
-    "version": "1.21.3",
+    "version": "1.21.4",
     "id": "once_cell"
   },
   {
@@ -1421,7 +1431,7 @@
   },
   {
     "name": "quote",
-    "version": "1.0.44",
+    "version": "1.0.45",
     "id": "quote"
   },
   {
@@ -1481,7 +1491,7 @@
   },
   {
     "name": "ravif",
-    "version": "0.12.0",
+    "version": "0.13.0",
     "id": "ravif"
   },
   {
@@ -1536,7 +1546,7 @@
   },
   {
     "name": "rusqlite",
-    "version": "0.38.0",
+    "version": "0.39.0",
     "id": "rusqlite"
   },
   {
@@ -1726,7 +1736,7 @@
   },
   {
     "name": "socket2",
-    "version": "0.6.2",
+    "version": "0.6.3",
     "id": "socket2"
   },
   {
@@ -1791,7 +1801,7 @@
   },
   {
     "name": "tempfile",
-    "version": "3.26.0",
+    "version": "3.27.0",
     "id": "tempfile"
   },
   {
@@ -1836,7 +1846,7 @@
   },
   {
     "name": "tiff",
-    "version": "0.10.3",
+    "version": "0.11.3",
     "id": "tiff"
   },
   {
@@ -1861,7 +1871,7 @@
   },
   {
     "name": "tinyvec",
-    "version": "1.10.0",
+    "version": "1.11.0",
     "id": "tinyvec"
   },
   {
@@ -1871,7 +1881,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.49.0",
+    "version": "1.50.0",
     "id": "tokio"
   },
   {
@@ -1881,7 +1891,7 @@
   },
   {
     "name": "tokio-macros",
-    "version": "2.6.0",
+    "version": "2.6.1",
     "id": "tokio_macros"
   },
   {
@@ -1906,7 +1916,7 @@
   },
   {
     "name": "toml",
-    "version": "1.0.3+spec-1.1.0",
+    "version": "1.0.6+spec-1.1.0",
     "id": "toml"
   },
   {
@@ -1966,7 +1976,7 @@
   },
   {
     "name": "tracing-subscriber",
-    "version": "0.3.22",
+    "version": "0.3.23",
     "id": "tracing_subscriber"
   },
   {
@@ -2066,7 +2076,7 @@
   },
   {
     "name": "uuid",
-    "version": "1.21.0",
+    "version": "1.22.0",
     "id": "uuid"
   },
   {
@@ -2206,7 +2216,7 @@
   },
   {
     "name": "winnow",
-    "version": "0.7.14",
+    "version": "0.7.15",
     "id": "winnow"
   },
   {
@@ -2241,12 +2251,12 @@
   },
   {
     "name": "zerocopy",
-    "version": "0.8.40",
+    "version": "0.8.42",
     "id": "zerocopy"
   },
   {
     "name": "zerocopy-derive",
-    "version": "0.8.40",
+    "version": "0.8.42",
     "id": "zerocopy_derive"
   },
   {
@@ -2305,23 +2315,13 @@
     "id": "zune_core"
   },
   {
-    "name": "zune-core",
-    "version": "0.4.12",
-    "id": "zune_core_0_4_12"
-  },
-  {
     "name": "zune-inflate",
     "version": "0.2.54",
     "id": "zune_inflate"
   },
   {
     "name": "zune-jpeg",
-    "version": "0.5.12",
+    "version": "0.5.13",
     "id": "zune_jpeg"
-  },
-  {
-    "name": "zune-jpeg",
-    "version": "0.4.21",
-    "id": "zune_jpeg_0_4_21"
   }
 ]
