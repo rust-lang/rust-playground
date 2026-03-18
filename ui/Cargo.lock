@@ -2590,7 +2590,6 @@ dependencies = [
  "dotenv",
  "futures",
  "octocrab",
- "openssl-probe",
  "orchestrator",
  "prometheus",
  "regex",

@@ -37,10 +37,6 @@ use env::{PLAYGROUND_GITHUB_TOKEN, PLAYGROUND_UI_ROOT};
 fn main() {
     // Dotenv may be unable to load environment variables, but that's ok in production
     let _ = dotenv::dotenv();
-    // SAFETY: We have not started any other threads yet.
-    unsafe {
-        openssl_probe::try_init_openssl_env_vars();
-    }
 
     // Info-level logging is enabled by default.
     tracing_subscriber::fmt()
