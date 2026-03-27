@@ -7,6 +7,8 @@ import * as styles from './Help.module.css';
 
 import integer32Logo from './assets/integer32-logo.svg';
 import { navigateToIndex } from './reducers/page';
+import { useAppSelector } from './hooks';
+import { baseUrlSelector } from './selectors';
 
 const ACE_URL = 'https://github.com/ajaxorg/ace';
 const CLIPPY_URL = 'https://github.com/rust-lang/rust-clippy';
@@ -49,7 +51,7 @@ fn main ()
 { struct Foo { a: u8, b: String, }
 match 4 {2=>{},_=>{}} }`;
 
-const LINK_EXAMPLE = 'https://play.integer32.com/?code=fn main() { println!("hello world!"); }';
+const LINK_EXAMPLE_CODE = 'fn main() { println!("hello world!"); }';
 
 const TEST_EXAMPLE = `#[test]
 fn test_something() {
@@ -76,6 +78,13 @@ fn main() {
 }`;
 
 const Help: React.FC = () => {
+  const baseUrl = useAppSelector(baseUrlSelector);
+
+  // Deliberately **not** using normal tools that would escape
+  // characters. The example code we use is fine for URLs, and
+  // skipping the escaping makes the docs prettier.
+  const linkExample = `${baseUrl}?code=${LINK_EXAMPLE_CODE}`;
+
   return (
     <section className={styles.container}>
       <h1>The Rust Playground</h1>
@@ -184,7 +193,7 @@ const Help: React.FC = () => {
                                         limitations on the maximum length.
           </p>
 
-          <pre className={styles.code}><code>{LINK_EXAMPLE}</code></pre>
+          <pre className={styles.code}><code>{linkExample}</code></pre>
         </LinkableSection>
 
         <LinkableSection id="features-tests" header="Executing tests" level="h3">
