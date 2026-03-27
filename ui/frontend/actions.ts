@@ -172,6 +172,9 @@ export const helpPageLoad = navigateToHelp;
 export function showExample(code: string): ThunkAction {
   return function (dispatch) {
     dispatch(navigateToIndex());
+    dispatch(changeChannel(Channel.Stable));
+    dispatch(changeMode(Mode.Debug));
+    dispatch(changeEdition(Edition.Rust2024));
     dispatch(editCode(code));
   };
 }
