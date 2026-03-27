@@ -11,6 +11,7 @@ import { useAppSelector } from './hooks';
 import { baseUrlSelector } from './selectors';
 
 const ACE_URL = 'https://github.com/ajaxorg/ace';
+const MONACO_URL = 'https://microsoft.github.io/monaco-editor/';
 const CLIPPY_URL = 'https://github.com/rust-lang/rust-clippy';
 const MIRI_URL = 'https://github.com/rust-lang/miri';
 const CRATES_IO_URL = 'https://crates.io/';
@@ -269,7 +270,13 @@ const Help: React.FC = () => {
           </p>
 
           <p>
-            You may also disable Ace completely, falling back to a
+            You may choose to use the <a href={MONACO_URL}>Monaco</a> editor instead.
+            This editor is used in VS Code and may be more familiar to people who
+            use VS Code.
+          </p>
+
+          <p>
+            You may also disable Ace and Monaco completely, falling back to a
             simple HTML text area.
           </p>
 
