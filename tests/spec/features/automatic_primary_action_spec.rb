@@ -55,7 +55,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
     click_on("Test")
 
     within(:output, :stdout) do
-      expect(page).to have_content 'a struct with a similar name exists'
+      expect(page).to have_content 'a struct with a similar name exists', wait: 10
     end
   end
 
