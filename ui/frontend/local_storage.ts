@@ -14,7 +14,8 @@ interface V2Configuration {
   client: {
     id: string;
     featureFlagThreshold: number;
-  },
+    visitedAt?: string;
+  };
   configuration: {
     editor: Editor;
     ace: {
@@ -60,6 +61,7 @@ export function serialize(state: State): string {
     client: {
       id: state.client.id,
       featureFlagThreshold: state.client.featureFlagThreshold,
+      visitedAt: state.client.visitedAt,
     },
     configuration: {
       editor: state.configuration.editor,
@@ -83,6 +85,8 @@ export function serialize(state: State): string {
   return JSON.stringify(conf);
 }
 
+const MIGRATION_TIMESTAMP = '2021-08-21T21:51:05.000Z';
+
 function migrateV1(state: V1Configuration): CurrentConfiguration {
   const { editor, theme, keybinding, pairCharacters, ...configuration } = state.configuration;
   const step: V2Configuration = {
@@ -90,6 +94,7 @@ function migrateV1(state: V1Configuration): CurrentConfiguration {
     client: {
       id: '',
       featureFlagThreshold: 0,
+      visitedAt: MIGRATION_TIMESTAMP,
     },
     configuration: {
       ...configuration,

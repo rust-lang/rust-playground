@@ -1,8 +1,12 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
+const NOW_TIMESTAMP = new Date().toISOString();
+
 interface State {
   id: string;
   featureFlagThreshold: number;
+  lastVisitedAt?: string;
+  visitedAt?: string;
 }
 
 const initialState: State = {
@@ -21,9 +25,14 @@ const slice = createSlice({
       state.id = action.payload.id;
       state.featureFlagThreshold = action.payload.featureFlagThreshold;
     },
+
+    updateLastVisitedAt: (state) => {
+      state.lastVisitedAt = state.visitedAt;
+      state.visitedAt = NOW_TIMESTAMP;
+    },
   },
 });
 
-export const { setIdentifiers } = slice.actions;
+export const { setIdentifiers, updateLastVisitedAt } = slice.actions;
 
 export default slice.reducer;

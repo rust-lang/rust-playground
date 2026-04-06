@@ -31,6 +31,8 @@ import { Theme } from './types';
 
 const store = configureStore(window);
 
+store.dispatch(client.updateLastVisitedAt());
+
 if (store.getState().client.id === '') {
   const { crypto } = window;
 
