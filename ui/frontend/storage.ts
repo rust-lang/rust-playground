@@ -2,7 +2,7 @@ import { DeepPartial } from 'ts-essentials';
 
 import { State } from './reducers';
 
-type SimpleStorage = Pick<Storage, 'getItem' | 'setItem'>;
+type SimpleStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 
 export type PartialState = DeepPartial<State> | undefined;
 
@@ -17,6 +17,7 @@ interface Config {
 interface InitializedStorage {
   initialState: PartialState;
   saveChanges: (state: State) => void;
+  clear: () => void;
 }
 
 export function removeVersion<T extends { version: unknown }>(data: T): Omit<T, 'version'> {
@@ -35,6 +36,10 @@ export class InMemoryStorage {
   public setItem(name: string, value: string) {
     this.data[name] = value;
   }
+
+  public removeItem(name: string) {
+    delete this.data[name];
+  }
 }
 
 const KEY = 'redux';
@@ -52,8 +57,10 @@ export function initializeStorage(config: Config) {
       storage.setItem(KEY, serializedState);
     };
 
-    return { initialState, saveChanges }
-  }
+    const clear = () => storage.removeItem(KEY);
+
+    return { initialState, saveChanges, clear };
+  };
 }
 
 // Attempt to use the storage to see if security settings are
