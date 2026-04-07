@@ -84,6 +84,10 @@ Capybara.add_selector(:stdin) do
   css { '[data-test-id = "stdin"]' }
 end
 
+Capybara.add_selector(:loader) do
+  css { '[data-test-id = "loader"]' }
+end
+
 Capybara.add_selector(:notification) do
   css { '[data-test-id = "notification"]' }
 end
