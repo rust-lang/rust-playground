@@ -59,9 +59,15 @@ pub struct CrateInformation {
 #[derive(Debug, Default, Deserialize)]
 pub struct Modifications {
     #[serde(default)]
-    pub exclusions: Vec<InternedString>,
+    pub exclusions: Vec<Exclusion>,
     #[serde(default)]
     pub additions: BTreeSet<InternedString>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Exclusion {
+    name: InternedString,
+    versions: Option<semver::Comparator>,
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -146,8 +152,17 @@ fn is_true(b: &bool) -> bool {
 }
 
 impl Modifications {
-    fn excluded(&self, name: &str) -> bool {
-        self.exclusions.iter().any(|n| n == name)
+    fn excluded(&self, name: &str, version: &Version) -> bool {
+        let Some(exclusion) = self.exclusions.iter().find(|n| n.name == name) else {
+            return false;
+        };
+
+        match &exclusion.versions {
+            Some(versions) => versions.matches(version),
+
+            // An unspecified version selector means to exclude all versions
+            _ => true,
+        }
     }
 }
 
@@ -336,10 +351,6 @@ fn populate_initial_direct_dependencies(
     // the interesting crates.
     let mut package_ids = Vec::new();
     for Crate { name } in top.crates {
-        if global.modifications.excluded(&name) {
-            continue;
-        }
-
         // Query the registry for a summary of this crate.
         // Usefully, this doesn't seem to include yanked versions
         let version = None;
@@ -364,11 +375,13 @@ fn populate_initial_direct_dependencies(
             .max_by_key(|summary| summary.as_summary().version().clone())
             .unwrap_or_else(|| panic!("Registry has no viable versions of {}", name));
 
-        let package_id = PackageId::new(
-            name,
-            summary.as_summary().version().clone(),
-            global.crates_io,
-        );
+        let version = summary.as_summary().version().clone();
+
+        if global.modifications.excluded(&name, &version) {
+            continue;
+        }
+
+        let package_id = PackageId::new(name, version, global.crates_io);
         package_ids.push(package_id);
     }
 
@@ -534,7 +547,10 @@ fn extend_direct_dependencies(
         for pkg_id in to_visit {
             for (dep_pkg_id, deps) in resolve.deps(pkg_id) {
                 // Don't add excluded packages
-                if global.modifications.excluded(&dep_pkg_id.name()) {
+                if global
+                    .modifications
+                    .excluded(&dep_pkg_id.name(), dep_pkg_id.version())
+                {
                     continue;
                 }
 
