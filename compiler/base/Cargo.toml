@@ -645,11 +645,6 @@ package = "generic-array"
 version = "=0.14.7"
 features = ["more_lengths"]
 
-[dependencies.generic_array_0_14_9]
-package = "generic-array"
-version = "=0.14.9"
-default-features = false
-
 [dependencies.getopts]
 package = "getopts"
 version = "=0.2.24"
@@ -2708,11 +2703,6 @@ features = ["alloc", "compat-0_14", "const-default", "faster-hex", "hybrid-array
 package = "generic-array"
 version = "=0.14.7"
 features = ["more_lengths"]
-
-[build-dependencies.generic_array_0_14_9]
-package = "generic-array"
-version = "=0.14.9"
-default-features = false
 
 [build-dependencies.getopts]
 package = "getopts"

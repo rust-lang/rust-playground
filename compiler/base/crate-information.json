@@ -710,11 +710,6 @@
     "id": "generic_array_0_14_7"
   },
   {
-    "name": "generic-array",
-    "version": "0.14.9",
-    "id": "generic_array_0_14_9"
-  },
-  {
     "name": "getopts",
     "version": "0.2.24",
     "id": "getopts"
