@@ -1,8 +1,3 @@
-exclusions = [
-    # https://github.com/advisories/GHSA-g98v-hv3f-hcfr
-    "atty",
-]
-
 additions = [
     # Crates that the compiler recommends
     # rg 'https://crates.io/crates/[a-z_-]+' \
@@ -20,3 +15,14 @@ additions = [
     # Crate that The Rust Programming Language book uses
     "trpl",
 ]
+
+[[exclusions]]
+# https://github.com/advisories/GHSA-g98v-hv3f-hcfr
+name = "atty"
+
+[[exclusions]]
+# crypto-common 0.1.7 depends on `generic-array =0.14.7`. Since
+# there's now a version 1.x of generic-array; it's no big deal to
+# exclude the newest version of the older series.
+name = "generic-array"
+versions = "0.14.9"

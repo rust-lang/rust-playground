@@ -55,11 +55,6 @@
     "id": "anstream"
   },
   {
-    "name": "anstream",
-    "version": "0.6.21",
-    "id": "anstream_0_6_21"
-  },
-  {
     "name": "anstyle",
     "version": "1.0.14",
     "id": "anstyle"
@@ -68,11 +63,6 @@
     "name": "anstyle-parse",
     "version": "1.0.0",
     "id": "anstyle_parse"
-  },
-  {
-    "name": "anstyle-parse",
-    "version": "0.2.7",
-    "id": "anstyle_parse_0_2_7"
   },
   {
     "name": "anstyle-query",
@@ -91,7 +81,7 @@
   },
   {
     "name": "arc-swap",
-    "version": "1.8.2",
+    "version": "1.9.1",
     "id": "arc_swap"
   },
   {
@@ -151,12 +141,12 @@
   },
   {
     "name": "aws-lc-rs",
-    "version": "1.16.1",
+    "version": "1.16.2",
     "id": "aws_lc_rs"
   },
   {
     "name": "aws-lc-sys",
-    "version": "0.38.0",
+    "version": "0.39.1",
     "id": "aws_lc_sys"
   },
   {
@@ -206,7 +196,7 @@
   },
   {
     "name": "borsh",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "id": "borsh"
   },
   {
@@ -261,7 +251,7 @@
   },
   {
     "name": "cc",
-    "version": "1.2.57",
+    "version": "1.2.59",
     "id": "cc"
   },
   {
@@ -306,8 +296,13 @@
   },
   {
     "name": "cmake",
-    "version": "0.1.57",
+    "version": "0.1.58",
     "id": "cmake"
+  },
+  {
+    "name": "cmov",
+    "version": "0.5.3",
+    "id": "cmov"
   },
   {
     "name": "color_quant",
@@ -335,6 +330,11 @@
     "id": "const_default"
   },
   {
+    "name": "const-oid",
+    "version": "0.10.2",
+    "id": "const_oid"
+  },
+  {
     "name": "convert_case",
     "version": "0.10.0",
     "id": "convert_case"
@@ -358,11 +358,6 @@
     "name": "cpufeatures",
     "version": "0.3.0",
     "id": "cpufeatures"
-  },
-  {
-    "name": "cpufeatures",
-    "version": "0.2.17",
-    "id": "cpufeatures_0_2_17"
   },
   {
     "name": "crc32fast",
@@ -428,6 +423,11 @@
     "name": "csv-core",
     "version": "0.1.13",
     "id": "csv_core"
+  },
+  {
+    "name": "ctutils",
+    "version": "0.4.2",
+    "id": "ctutils"
   },
   {
     "name": "data-encoding",
@@ -516,12 +516,12 @@
   },
   {
     "name": "env_filter",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "env_filter"
   },
   {
     "name": "env_logger",
-    "version": "0.11.9",
+    "version": "0.11.10",
     "id": "env_logger"
   },
   {
@@ -571,7 +571,7 @@
   },
   {
     "name": "fastrand",
-    "version": "2.3.0",
+    "version": "2.4.1",
     "id": "fastrand"
   },
   {
@@ -791,7 +791,7 @@
   },
   {
     "name": "hmac",
-    "version": "0.12.1",
+    "version": "0.13.0",
     "id": "hmac"
   },
   {
@@ -841,12 +841,12 @@
   },
   {
     "name": "hybrid-array",
-    "version": "0.4.8",
+    "version": "0.4.10",
     "id": "hybrid_array"
   },
   {
     "name": "hyper",
-    "version": "1.8.1",
+    "version": "1.9.0",
     "id": "hyper"
   },
   {
@@ -866,37 +866,37 @@
   },
   {
     "name": "icu_collections",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "id": "icu_collections"
   },
   {
     "name": "icu_locale_core",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "id": "icu_locale_core"
   },
   {
     "name": "icu_normalizer",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "id": "icu_normalizer"
   },
   {
     "name": "icu_normalizer_data",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "id": "icu_normalizer_data"
   },
   {
     "name": "icu_properties",
-    "version": "2.1.2",
+    "version": "2.2.0",
     "id": "icu_properties"
   },
   {
     "name": "icu_properties_data",
-    "version": "2.1.2",
+    "version": "2.2.0",
     "id": "icu_properties_data"
   },
   {
     "name": "icu_provider",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "id": "icu_provider"
   },
   {
@@ -911,7 +911,7 @@
   },
   {
     "name": "image",
-    "version": "0.25.9",
+    "version": "0.25.10",
     "id": "image"
   },
   {
@@ -926,7 +926,7 @@
   },
   {
     "name": "indexmap",
-    "version": "2.13.0",
+    "version": "2.13.1",
     "id": "indexmap"
   },
   {
@@ -941,7 +941,7 @@
   },
   {
     "name": "iri-string",
-    "version": "0.7.10",
+    "version": "0.7.12",
     "id": "iri_string"
   },
   {
@@ -956,7 +956,7 @@
   },
   {
     "name": "itoa",
-    "version": "1.0.17",
+    "version": "1.0.18",
     "id": "itoa"
   },
   {
@@ -991,7 +991,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.183",
+    "version": "0.2.184",
     "id": "libc"
   },
   {
@@ -1011,7 +1011,7 @@
   },
   {
     "name": "litemap",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "id": "litemap"
   },
   {
@@ -1076,8 +1076,13 @@
   },
   {
     "name": "md-5",
-    "version": "0.10.6",
+    "version": "0.11.0",
     "id": "md5"
+  },
+  {
+    "name": "md-5",
+    "version": "0.10.6",
+    "id": "md5_0_10_6"
   },
   {
     "name": "memchr",
@@ -1116,7 +1121,7 @@
   },
   {
     "name": "mio",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "id": "mio"
   },
   {
@@ -1131,7 +1136,7 @@
   },
   {
     "name": "nalgebra",
-    "version": "0.34.1",
+    "version": "0.34.2",
     "id": "nalgebra"
   },
   {
@@ -1181,7 +1186,7 @@
   },
   {
     "name": "num-conv",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "id": "num_conv"
   },
   {
@@ -1356,22 +1361,22 @@
   },
   {
     "name": "postgres",
-    "version": "0.19.12",
+    "version": "0.19.13",
     "id": "postgres"
   },
   {
     "name": "postgres-protocol",
-    "version": "0.6.10",
+    "version": "0.6.11",
     "id": "postgres_protocol"
   },
   {
     "name": "postgres-types",
-    "version": "0.2.12",
+    "version": "0.2.13",
     "id": "postgres_types"
   },
   {
     "name": "potential_utf",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "id": "potential_utf"
   },
   {
@@ -1626,7 +1631,7 @@
   },
   {
     "name": "semver",
-    "version": "1.0.27",
+    "version": "1.0.28",
     "id": "semver"
   },
   {
@@ -1651,7 +1656,7 @@
   },
   {
     "name": "serde_spanned",
-    "version": "1.0.4",
+    "version": "1.1.1",
     "id": "serde_spanned"
   },
   {
@@ -1681,7 +1686,7 @@
   },
   {
     "name": "sha2",
-    "version": "0.10.9",
+    "version": "0.11.0",
     "id": "sha2"
   },
   {
@@ -1706,7 +1711,7 @@
   },
   {
     "name": "simd-adler32",
-    "version": "0.3.8",
+    "version": "0.3.9",
     "id": "simd_adler32"
   },
   {
@@ -1796,7 +1801,7 @@
   },
   {
     "name": "tar",
-    "version": "0.4.44",
+    "version": "0.4.45",
     "id": "tar"
   },
   {
@@ -1811,7 +1816,7 @@
   },
   {
     "name": "terminal_size",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "id": "terminal_size"
   },
   {
@@ -1866,7 +1871,7 @@
   },
   {
     "name": "tinystr",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "id": "tinystr"
   },
   {
@@ -1881,7 +1886,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.50.0",
+    "version": "1.51.1",
     "id": "tokio"
   },
   {
@@ -1891,12 +1896,12 @@
   },
   {
     "name": "tokio-macros",
-    "version": "2.6.1",
+    "version": "2.7.0",
     "id": "tokio_macros"
   },
   {
     "name": "tokio-postgres",
-    "version": "0.7.16",
+    "version": "0.7.17",
     "id": "tokio_postgres"
   },
   {
@@ -1916,22 +1921,22 @@
   },
   {
     "name": "toml",
-    "version": "1.0.6+spec-1.1.0",
+    "version": "1.1.2+spec-1.1.0",
     "id": "toml"
   },
   {
     "name": "toml_datetime",
-    "version": "1.0.0+spec-1.1.0",
+    "version": "1.1.1+spec-1.1.0",
     "id": "toml_datetime"
   },
   {
     "name": "toml_parser",
-    "version": "1.0.9+spec-1.1.0",
+    "version": "1.1.2+spec-1.1.0",
     "id": "toml_parser"
   },
   {
     "name": "toml_writer",
-    "version": "1.0.6+spec-1.1.0",
+    "version": "1.1.1+spec-1.1.0",
     "id": "toml_writer"
   },
   {
@@ -2026,7 +2031,7 @@
   },
   {
     "name": "unicode-segmentation",
-    "version": "1.12.0",
+    "version": "1.13.2",
     "id": "unicode_segmentation"
   },
   {
@@ -2076,7 +2081,7 @@
   },
   {
     "name": "uuid",
-    "version": "1.22.0",
+    "version": "1.23.0",
     "id": "uuid"
   },
   {
@@ -2106,27 +2111,27 @@
   },
   {
     "name": "wasm-bindgen",
-    "version": "0.2.114",
+    "version": "0.2.117",
     "id": "wasm_bindgen"
   },
   {
     "name": "wasm-bindgen-macro",
-    "version": "0.2.114",
+    "version": "0.2.117",
     "id": "wasm_bindgen_macro"
   },
   {
     "name": "wasm-bindgen-macro-support",
-    "version": "0.2.114",
+    "version": "0.2.117",
     "id": "wasm_bindgen_macro_support"
   },
   {
     "name": "wasm-bindgen-shared",
-    "version": "0.2.114",
+    "version": "0.2.117",
     "id": "wasm_bindgen_shared"
   },
   {
     "name": "rustls-webpki",
-    "version": "0.103.9",
+    "version": "0.103.10",
     "id": "webpki"
   },
   {
@@ -2216,12 +2221,12 @@
   },
   {
     "name": "winnow",
-    "version": "0.7.15",
+    "version": "1.0.1",
     "id": "winnow"
   },
   {
     "name": "writeable",
-    "version": "0.6.2",
+    "version": "0.6.3",
     "id": "writeable"
   },
   {
@@ -2241,32 +2246,32 @@
   },
   {
     "name": "yoke",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "id": "yoke"
   },
   {
     "name": "yoke-derive",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "id": "yoke_derive"
   },
   {
     "name": "zerocopy",
-    "version": "0.8.42",
+    "version": "0.8.48",
     "id": "zerocopy"
   },
   {
     "name": "zerocopy-derive",
-    "version": "0.8.42",
+    "version": "0.8.48",
     "id": "zerocopy_derive"
   },
   {
     "name": "zerofrom",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "id": "zerofrom"
   },
   {
     "name": "zerofrom-derive",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "id": "zerofrom_derive"
   },
   {
@@ -2276,17 +2281,17 @@
   },
   {
     "name": "zerotrie",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "id": "zerotrie"
   },
   {
     "name": "zerovec",
-    "version": "0.11.5",
+    "version": "0.11.6",
     "id": "zerovec"
   },
   {
     "name": "zerovec-derive",
-    "version": "0.11.2",
+    "version": "0.11.3",
     "id": "zerovec_derive"
   },
   {
@@ -2321,7 +2326,7 @@
   },
   {
     "name": "zune-jpeg",
-    "version": "0.5.13",
+    "version": "0.5.15",
     "id": "zune_jpeg"
   }
 ]
