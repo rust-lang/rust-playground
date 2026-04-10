@@ -24,6 +24,6 @@ const slice = createSlice({
   },
 });
 
-export const { setIdentifiers: clientSetIdentifiers } = slice.actions;
+export const { setIdentifiers } = slice.actions;
 
 export default slice.reducer;
