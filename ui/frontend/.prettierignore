@@ -28,6 +28,7 @@ node_modules
 !Output/WarnAboutNoSymbols.tsx
 !PopButton.tsx
 !Prism.tsx
+!SimpleButtonMenuItem.tsx
 !Stdin.tsx
 !actions.ts
 !api.ts
