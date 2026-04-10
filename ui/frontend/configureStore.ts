@@ -67,6 +67,15 @@ export default function configureStore(window: Window) {
       localStorage.saveChanges(state);
       sessionStorage.saveChanges(state);
     }
+
+    if (state.client.resetEverything) {
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // This removes any query parameters and triggers all the
+      // initialization
+      window.location = state.globalConfiguration.baseUrl;
+    }
   });
 
   return store;

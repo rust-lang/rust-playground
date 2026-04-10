@@ -7,11 +7,13 @@ interface State {
   featureFlagThreshold: number;
   lastVisitedAt?: string;
   visitedAt?: string;
+  resetEverything: boolean;
 }
 
 const initialState: State = {
   id: '',
   featureFlagThreshold: 1.0,
+  resetEverything: false,
 };
 
 const slice = createSlice({
@@ -30,9 +32,13 @@ const slice = createSlice({
       state.lastVisitedAt = state.visitedAt;
       state.visitedAt = NOW_TIMESTAMP;
     },
+
+    resetEverything: (state) => {
+      state.resetEverything = true;
+    },
   },
 });
 
-export const { setIdentifiers, updateLastVisitedAt } = slice.actions;
+export const { setIdentifiers, updateLastVisitedAt, resetEverything } = slice.actions;
 
 export default slice.reducer;

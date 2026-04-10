@@ -3,6 +3,7 @@ import { Portal } from 'react-portal';
 
 import { Close } from './Icon';
 import { useAppDispatch, useAppSelector } from './hooks';
+import * as client from './reducers/client';
 import { seenRustSurvey2025 } from './reducers/notifications';
 import { allowLongRun, wsExecuteKillCurrent } from './reducers/output/execute';
 import * as selectors from './selectors';
@@ -17,6 +18,7 @@ const Notifications: React.FC = () => {
       <div className={styles.container}>
         <RustSurvey2025Notification />
         <ExcessiveExecutionNotification />
+        <ResetOldConfigurationNotification />
       </div>
     </Portal>
   );
@@ -56,6 +58,25 @@ const ExcessiveExecutionNotification: React.FC = () => {
       <div className={styles.action}>
         <button onClick={kill}>Kill the process now</button>
         <button onClick={allow}>Allow the process to continue</button>
+      </div>
+    </Notification>
+  ) : null;
+};
+
+const ResetOldConfigurationNotification: React.FC = () => {
+  const showResetOldConfiguration = useAppSelector(selectors.resetOldConfigurationSelector);
+
+  const dispatch = useAppDispatch();
+  const reset = useCallback(() => dispatch(client.resetEverything()), [dispatch]);
+  const keep = useCallback(() => dispatch(client.updateLastVisitedAt()), [dispatch]);
+
+  return showResetOldConfiguration ? (
+    <Notification onClose={keep}>
+      It&apos;s been a while since you&apos;ve used the Playground. Would you like to reset all code
+      and configuration back to the default values to get a fresh start?
+      <div className={styles.action}>
+        <button onClick={reset}>Reset all code and configuration</button>
+        <button onClick={keep}>Keep the current code and configuration</button>
       </div>
     </Notification>
   ) : null;
