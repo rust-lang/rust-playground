@@ -273,6 +273,8 @@ export const excessiveExecutionSelector = createSelector(
     (e.totalTimeSecs ?? 0.0) >= limit,
 );
 
+export const resetConfigurationSelector = (state: State) => state.client.showConfigReset;
+
 const parseMaybeISO = (s?: string): Date | undefined => {
   if (!s) {
     return undefined;
@@ -418,6 +420,7 @@ export const showRustSurvey2025Selector = createSelector(
 export const anyNotificationsToShowSelector = createSelector(
   showRustSurvey2025Selector,
   excessiveExecutionSelector,
+  resetConfigurationSelector,
   resetOldConfigurationSelector,
   (...allNotifications) => allNotifications.some(n => n),
 );

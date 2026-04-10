@@ -30,14 +30,6 @@ RSpec.feature "Resetting the configuration to defaults", type: :feature, js: tru
       expect(editor).to_not have_line(some_default_code)
     end
 
-    def code
-      'This is my old code'
-    end
-
-    def some_default_code
-      'Hello, world!'
-    end
-
     def config_overrides
       config = {
         oldConfigurationThresholdS: 0.001,
@@ -47,7 +39,38 @@ RSpec.feature "Resetting the configuration to defaults", type: :feature, js: tru
     end
   end
 
+  describe "manually" do
+    before do
+      visit "/"
+      editor.set(code)
+    end
+
+    scenario "the default values are restored" do
+      in_config_menu { click_on 'Reset all code and configuration to default values' }
+      within(:notification) { click_on 'Reset all code and configuration' }
+
+      expect(editor).to_not have_line(code)
+      expect(editor).to have_line(some_default_code)
+    end
+
+    scenario "the current values are kept" do
+      in_config_menu { click_on 'Reset all code and configuration to default values' }
+      within(:notification) { click_on 'Keep the current code and configuration' }
+
+      expect(editor).to have_line(code)
+      expect(editor).to_not have_line(some_default_code)
+    end
+  end
+
   def editor
     Editor.new(page)
+  end
+
+  def code
+    'This is my old code'
+  end
+
+  def some_default_code
+    'Hello, world!'
   end
 end
