@@ -10,7 +10,6 @@ additions = [
     #   | uniq \
     #   | cut -d '/' -f 5
     "async-trait",
-    "once_cell",
     "sptr",
     # Crate that The Rust Programming Language book uses
     "trpl",
