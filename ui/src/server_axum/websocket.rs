@@ -194,11 +194,15 @@ struct WSError {
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct FeatureFlags {}
+pub(crate) struct FeatureFlags {
+    multifile_threshold: Option<f64>,
+}
 
 impl From<crate::FeatureFlags> for FeatureFlags {
-    fn from(_value: crate::FeatureFlags) -> Self {
-        Self {}
+    fn from(value: crate::FeatureFlags) -> Self {
+        Self {
+            multifile_threshold: value.multifile_threshold,
+        }
     }
 }
 
