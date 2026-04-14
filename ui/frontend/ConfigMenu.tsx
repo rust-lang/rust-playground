@@ -4,8 +4,9 @@ import React, { Fragment, useCallback } from 'react';
 
 import { Either as EitherConfig, Select as SelectConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
+import SimpleButtonMenuItem from './SimpleButtonMenuItem';
 import { useAppDispatch, useAppSelector } from './hooks';
-
+import * as client from './reducers/client';
 import * as config from './reducers/configuration';
 import {
   AssemblyFlavor,
@@ -48,6 +49,7 @@ const ConfigMenu: React.FC = () => {
     useCallback((p: ProcessAssembly) => dispatch(config.changeProcessAssembly(p)), [dispatch]);
   const changeDemangleAssembly =
     useCallback((d: DemangleAssembly) => dispatch(config.changeDemangleAssembly(d)), [dispatch]);
+  const showConfigReset = useCallback(() => dispatch(client.showConfigReset()), [dispatch]);
 
   return (
     <Fragment>
@@ -150,6 +152,12 @@ const ConfigMenu: React.FC = () => {
           value={processAssembly}
           onChange={changeProcessAssembly}
         />
+      </MenuGroup>
+
+      <MenuGroup title="Reset">
+        <SimpleButtonMenuItem onClick={showConfigReset}>
+          Reset all code and configuration to default values
+        </SimpleButtonMenuItem>
       </MenuGroup>
     </Fragment>
   );

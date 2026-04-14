@@ -1,6 +1,6 @@
 import React, { type JSX } from 'react';
 
-import MenuItem from './MenuItem';
+import SimpleButtonMenuItem from './SimpleButtonMenuItem';
 
 import * as styles from './ButtonMenuItem.module.css';
 
@@ -12,12 +12,12 @@ interface ButtonMenuItemProps extends Button {
 }
 
 const ButtonMenuItem: React.FC<ButtonMenuItemProps> = ({ name, children, ...props }) => (
-  <MenuItem>
-    <button className={styles.container} {...props}>
-      <div className={styles.name} data-test-id="button-menu-item__name">{name}</div>
-      <div className={styles.description}>{children}</div>
-    </button>
-  </MenuItem>
+  <SimpleButtonMenuItem {...props}>
+    <div className={styles.name} data-test-id="button-menu-item__name">
+      {name}
+    </div>
+    <div className={styles.description}>{children}</div>
+  </SimpleButtonMenuItem>
 );
 
 export default ButtonMenuItem;

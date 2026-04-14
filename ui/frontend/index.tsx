@@ -14,7 +14,7 @@ import {
 import { configureRustErrors } from './highlighting';
 import PageSwitcher from './PageSwitcher';
 import playgroundApp from './reducers';
-import { clientSetIdentifiers } from './reducers/client';
+import * as client from './reducers/client';
 import { featureFlagsForceDisableAll, featureFlagsForceEnableAll } from './reducers/featureFlags';
 import { disableSyncChangesToStorage, override } from './reducers/globalConfiguration';
 import Router from './Router';
@@ -31,6 +31,8 @@ import { Theme } from './types';
 
 const store = configureStore(window);
 
+store.dispatch(client.updateLastVisitedAt());
+
 if (store.getState().client.id === '') {
   const { crypto } = window;
 
@@ -40,7 +42,7 @@ if (store.getState().client.id === '') {
   crypto.getRandomValues(rawValue);
   const featureFlagThreshold = rawValue[0] / 0xFFFF_FFFF;
 
-  store.dispatch(clientSetIdentifiers({ id, featureFlagThreshold }));
+  store.dispatch(client.setIdentifiers({ id, featureFlagThreshold }));
 }
 
 const params = new URLSearchParams(window.location.search);

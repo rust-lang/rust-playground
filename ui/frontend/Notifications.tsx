@@ -3,6 +3,7 @@ import { Portal } from 'react-portal';
 
 import { Close } from './Icon';
 import { useAppDispatch, useAppSelector } from './hooks';
+import * as client from './reducers/client';
 import { seenRustSurvey2025 } from './reducers/notifications';
 import { allowLongRun, wsExecuteKillCurrent } from './reducers/output/execute';
 import * as selectors from './selectors';
@@ -17,6 +18,8 @@ const Notifications: React.FC = () => {
       <div className={styles.container}>
         <RustSurvey2025Notification />
         <ExcessiveExecutionNotification />
+        <ResetConfigurationNotification />
+        <ResetOldConfigurationNotification />
       </div>
     </Portal>
   );
@@ -58,6 +61,54 @@ const ExcessiveExecutionNotification: React.FC = () => {
         <button onClick={allow}>Allow the process to continue</button>
       </div>
     </Notification>
+  ) : null;
+};
+
+interface ResetNotificationCommonProps {
+  preamble?: string;
+  onReset: () => void;
+  onCancel: () => void;
+}
+
+const ResetNotificationCommon: React.FC<ResetNotificationCommonProps> = ({
+  preamble,
+  onReset,
+  onCancel,
+}) => (
+  <Notification onClose={onReset}>
+    {preamble}
+    Would you like to reset all code and configuration back to the default values to get a fresh
+    start?
+    <div className={styles.action}>
+      <button onClick={onReset}>Reset all code and configuration</button>
+      <button onClick={onCancel}>Keep the current code and configuration</button>
+    </div>
+  </Notification>
+);
+
+const ResetConfigurationNotification: React.FC = () => {
+  const showResetConfiguration = useAppSelector(selectors.resetConfigurationSelector);
+
+  const dispatch = useAppDispatch();
+  const reset = useCallback(() => dispatch(client.resetEverything()), [dispatch]);
+  const keep = useCallback(() => dispatch(client.hideConfigReset()), [dispatch]);
+
+  return showResetConfiguration ? (
+    <ResetNotificationCommon onReset={reset} onCancel={keep} />
+  ) : null;
+};
+
+const ResetOldConfigurationNotification: React.FC = () => {
+  const showResetOldConfiguration = useAppSelector(selectors.resetOldConfigurationSelector);
+
+  const dispatch = useAppDispatch();
+  const reset = useCallback(() => dispatch(client.resetEverything()), [dispatch]);
+  const keep = useCallback(() => dispatch(client.updateLastVisitedAt()), [dispatch]);
+
+  const preamble = "It's been a while since you've used the Playground. ";
+
+  return showResetOldConfiguration ? (
+    <ResetNotificationCommon preamble={preamble} onReset={reset} onCancel={keep} />
   ) : null;
 };
 
