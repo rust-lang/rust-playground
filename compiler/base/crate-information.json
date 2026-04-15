@@ -176,12 +176,12 @@
   },
   {
     "name": "bitflags",
-    "version": "2.11.0",
+    "version": "2.11.1",
     "id": "bitflags"
   },
   {
     "name": "bitstream-io",
-    "version": "4.9.0",
+    "version": "4.10.0",
     "id": "bitstream_io"
   },
   {
@@ -251,7 +251,7 @@
   },
   {
     "name": "cc",
-    "version": "1.2.59",
+    "version": "1.2.60",
     "id": "cc"
   },
   {
@@ -348,11 +348,6 @@
     "name": "cookie_store",
     "version": "0.22.1",
     "id": "cookie_store"
-  },
-  {
-    "name": "core2",
-    "version": "0.4.0",
-    "id": "core2"
   },
   {
     "name": "cpufeatures",
@@ -731,7 +726,7 @@
   },
   {
     "name": "gif",
-    "version": "0.14.1",
+    "version": "0.14.2",
     "id": "gif"
   },
   {
@@ -761,13 +756,18 @@
   },
   {
     "name": "hashbrown",
-    "version": "0.16.1",
+    "version": "0.17.0",
     "id": "hashbrown"
   },
   {
     "name": "hashbrown",
     "version": "0.15.5",
     "id": "hashbrown_0_15_5"
+  },
+  {
+    "name": "hashbrown",
+    "version": "0.16.1",
+    "id": "hashbrown_0_16_1"
   },
   {
     "name": "hashlink",
@@ -851,7 +851,7 @@
   },
   {
     "name": "hyper-rustls",
-    "version": "0.27.7",
+    "version": "0.27.9",
     "id": "hyper_rustls"
   },
   {
@@ -926,7 +926,7 @@
   },
   {
     "name": "indexmap",
-    "version": "2.13.1",
+    "version": "2.14.0",
     "id": "indexmap"
   },
   {
@@ -991,7 +991,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.184",
+    "version": "0.2.185",
     "id": "libc"
   },
   {
@@ -1153,6 +1153,11 @@
     "name": "nix",
     "version": "0.31.2",
     "id": "nix"
+  },
+  {
+    "name": "no_std_io2",
+    "version": "0.9.3",
+    "id": "no_std_io2"
   },
   {
     "name": "nom",
@@ -1351,7 +1356,7 @@
   },
   {
     "name": "pkg-config",
-    "version": "0.3.32",
+    "version": "0.3.33",
     "id": "pkg_config"
   },
   {
@@ -1441,7 +1446,7 @@
   },
   {
     "name": "rand",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "id": "rand"
   },
   {
@@ -1451,8 +1456,8 @@
   },
   {
     "name": "rand",
-    "version": "0.9.2",
-    "id": "rand_0_9_2"
+    "version": "0.9.4",
+    "id": "rand_0_9_4"
   },
   {
     "name": "rand_chacha",
@@ -1471,7 +1476,7 @@
   },
   {
     "name": "rand_core",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "id": "rand_core"
   },
   {
@@ -1506,7 +1511,7 @@
   },
   {
     "name": "rayon",
-    "version": "1.11.0",
+    "version": "1.12.0",
     "id": "rayon"
   },
   {
@@ -1571,7 +1576,7 @@
   },
   {
     "name": "rustls",
-    "version": "0.23.37",
+    "version": "0.23.38",
     "id": "rustls"
   },
   {
@@ -1886,7 +1891,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.51.1",
+    "version": "1.52.0",
     "id": "tokio"
   },
   {
@@ -2111,27 +2116,27 @@
   },
   {
     "name": "wasm-bindgen",
-    "version": "0.2.117",
+    "version": "0.2.118",
     "id": "wasm_bindgen"
   },
   {
     "name": "wasm-bindgen-macro",
-    "version": "0.2.117",
+    "version": "0.2.118",
     "id": "wasm_bindgen_macro"
   },
   {
     "name": "wasm-bindgen-macro-support",
-    "version": "0.2.117",
+    "version": "0.2.118",
     "id": "wasm_bindgen_macro_support"
   },
   {
     "name": "wasm-bindgen-shared",
-    "version": "0.2.117",
+    "version": "0.2.118",
     "id": "wasm_bindgen_shared"
   },
   {
     "name": "rustls-webpki",
-    "version": "0.103.10",
+    "version": "0.103.12",
     "id": "webpki"
   },
   {

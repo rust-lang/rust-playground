@@ -10,15 +10,10 @@ additions = [
     #   | uniq \
     #   | cut -d '/' -f 5
     "async-trait",
-    "once_cell",
     "sptr",
     # Crate that The Rust Programming Language book uses
     "trpl",
 ]
-
-[[exclusions]]
-# https://github.com/advisories/GHSA-g98v-hv3f-hcfr
-name = "atty"
 
 [[exclusions]]
 # crypto-common 0.1.7 depends on `generic-array =0.14.7`. Since
