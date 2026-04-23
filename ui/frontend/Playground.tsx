@@ -1,5 +1,4 @@
-import React, { useEffect, useRef } from 'react';
-import Split from 'split-grid';
+import React, { Activity, useRef, useState } from 'react';
 
 import Header from './Header';
 import Notifications from './Notifications';
@@ -11,79 +10,201 @@ import { Orientation } from './types';
 
 import * as styles from './Playground.module.css';
 
-const TRACK_OPTION_NAME = {
-  [Orientation.Horizontal]: 'rowGutters',
-  [Orientation.Vertical]: 'columnGutters',
+interface Distances {
+  toTop: number;
+  toRight: number;
+  toBottom: number;
+  toLeft: number;
+}
+
+const clamp = (val: number, min: number, max: number) => Math.min(Math.max(val, min), max);
+const clampPositive = (v: number): number => (v > 0 ? v : 0);
+
+const distances = (bounds: DOMRectReadOnly, evt: React.MouseEvent): Distances => {
+  const { top, right, bottom, left } = bounds;
+
+  const pageX = clamp(evt.pageX, left, right);
+  const pageY = clamp(evt.pageY, top, bottom);
+
+  return {
+    toTop: pageY - top,
+    toLeft: pageX - left,
+    toRight: right - pageX,
+    toBottom: bottom - pageY,
+  };
 };
 
-const FOCUSED_GRID_STYLE = {
-  [Orientation.Horizontal]: styles.resizeableAreaRowOutputFocused,
-  [Orientation.Vertical]: styles.resizeableAreaColumnOutputFocused,
+const subtractDistances = (a: Distances, b: Distances): Distances => ({
+  toTop: clampPositive(a.toTop - b.toTop),
+  toRight: clampPositive(a.toRight - b.toRight),
+  toBottom: clampPositive(a.toBottom - b.toBottom),
+  toLeft: clampPositive(a.toLeft - b.toLeft),
+});
+
+interface GutterProps {
+  container: React.RefObject<HTMLDivElement | null>;
+  className: string;
+  orientation: Orientation;
+  hidden?: boolean;
+  onMove: (distances: Distances) => void;
+  onReset: () => void;
+}
+
+const Gutter: React.FC<GutterProps> = ({ container, className, orientation, onMove, onReset }) => {
+  'use memo';
+
+  // Values assumed to stay stable during a drag
+  interface Cache {
+    // The container's position and size. The container can not move
+    // or resize while we are dragging.
+    containerBounds: DOMRectReadOnly;
+
+    // The pointer's offset within the gutter. We take the offsets
+    // into account while dragging to avoid an initial jump.
+    initialPointerOffsets: Distances;
+  }
+  const cache = useRef<Cache | null>(null);
+  const pendingCallback = useRef<number | null>(null);
+
+  const onClick = (evt: React.MouseEvent) => {
+    if (evt.detail === 2) {
+      onReset();
+    }
+  };
+
+  const onPointerDown = (evt: React.PointerEvent<HTMLDivElement>) => {
+    if (!container.current || evt.button !== 0) {
+      return;
+    }
+
+    evt.currentTarget.setPointerCapture(evt.pointerId);
+
+    cache.current = {
+      containerBounds: container.current.getBoundingClientRect(),
+      initialPointerOffsets: distances(evt.currentTarget.getBoundingClientRect(), evt),
+    };
+  };
+
+  const onPointerMove = (evt: React.PointerEvent<HTMLDivElement>) => {
+    if (!cache.current) {
+      return;
+    }
+    const { containerBounds, initialPointerOffsets } = cache.current;
+
+    const rawDistances = distances(containerBounds, evt);
+
+    // Keep the offset of the cursor within the gutter to avoid a
+    // small jump when first dragging.
+    const offsetDistances = subtractDistances(rawDistances, initialPointerOffsets);
+
+    // Coalescing the callback because it only matters when we render.
+    if (pendingCallback.current) {
+      window.cancelAnimationFrame(pendingCallback.current);
+    }
+    pendingCallback.current = window.requestAnimationFrame(() => {
+      onMove(offsetDistances);
+      pendingCallback.current = null;
+    });
+  };
+
+  const onPointerUp = () => {
+    cache.current = null;
+  };
+
+  return (
+    <div
+      className={`${className} ${styles.gutter}`}
+      data-orientation={orientation}
+      onClick={onClick}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+    >
+      <span className={styles.gutterHandle}>⣿</span>
+    </div>
+  );
 };
 
-const UNFOCUSED_GRID_STYLE = {
-  [Orientation.Horizontal]: styles.resizeableAreaRowOutputUnfocused,
-  [Orientation.Vertical]: styles.resizeableAreaColumnOutputUnfocused,
+const makeStyleFromPixels = (cssProps: [string, number | undefined][]): React.CSSProperties => {
+  const massagedProps = cssProps
+    .filter(([_k, v]) => v !== undefined)
+    .map(([k, v]) => [k, `${v}px`]);
+  return Object.fromEntries(massagedProps) as React.CSSProperties;
 };
 
-const HANDLE_STYLES = {
-  [Orientation.Horizontal]: [styles.splitRowsGutter, styles.splitRowsGutterHandle],
-  [Orientation.Vertical]: [styles.splitColumnsGutter, ''],
-};
-
-// We drop down to lower-level split-grid code and use some hooks
-// because we want to reduce the number of times that the Editor
-// component is remounted. Each time it's remounted, we see a flicker and
-// lose state (like undo history).
 const ResizableArea: React.FC = () => {
+  'use memo';
+
   const somethingToShow = useAppSelector(selectors.getSomethingToShow);
   const isFocused = useAppSelector(selectors.isOutputFocused);
   const orientation = useAppSelector(selectors.orientation);
 
-  const grid = useRef<HTMLDivElement | null>(null);
-  const dragHandle = useRef(null);
+  const container = useRef<HTMLDivElement>(null);
 
-  // Reset styles left on the grid from split-grid when we change orientation or focus.
-  useEffect(() => {
-    if (grid.current) {
-      grid.current.style.removeProperty('grid-template-columns');
-      grid.current.style.removeProperty('grid-template-rows');
+  const [outputWidth, setOutputWidth] = useState<number | undefined>(undefined);
+  const [outputHeight, setOutputHeight] = useState<number | undefined>(undefined);
+
+  const editorOutputGutterMove = (distances: Distances) => {
+    if (orientation === Orientation.Horizontal) {
+      setOutputHeight(distances.toBottom);
+    } else {
+      setOutputWidth(distances.toRight);
     }
-  }, [orientation, isFocused]);
+  };
 
-  useEffect(() => {
-    const split = Split({
-      minSize: 100,
-      [TRACK_OPTION_NAME[orientation]]: [
-        {
-          track: 1,
-          element: dragHandle.current,
-        },
-      ],
-    });
+  const editorOutputGutterReset = () => {
+    if (orientation === Orientation.Horizontal) {
+      setOutputHeight(undefined);
+    } else {
+      setOutputWidth(undefined);
+    }
+  };
 
-    return () => split.destroy();
-  }, [orientation, isFocused, somethingToShow]);
+  const outputMode = (() => {
+    if (!somethingToShow) {
+      return 'none';
+    }
+    if (!isFocused) {
+      return 'slim';
+    }
+    return 'full';
+  })();
 
-  const gridStyles = isFocused ? FOCUSED_GRID_STYLE : UNFOCUSED_GRID_STYLE;
-  const gridStyle = gridStyles[orientation];
-  const [handleOuterStyle, handleInnerStyle] = HANDLE_STYLES[orientation];
+  const hideEditorOutputGutter = outputMode !== 'full';
+
+  const style = makeStyleFromPixels([
+    ['--output-height', outputHeight],
+    ['--output-width', outputWidth],
+  ]);
 
   return (
-    <div ref={grid} className={gridStyle}>
+    <div
+      className={styles.playground}
+      data-orientation={orientation}
+      data-output-mode={outputMode}
+      ref={container}
+      style={style}
+    >
       <div className={styles.editor}>
         <Editor />
       </div>
-      {isFocused && (
-        <div ref={dragHandle} className={handleOuterStyle}>
-          <span className={handleInnerStyle}>⣿</span>
-        </div>
-      )}
-      {somethingToShow && (
+
+      <Activity mode={hideEditorOutputGutter ? 'hidden' : 'visible'}>
+        <Gutter
+          className={styles.editorOutputGutter}
+          orientation={orientation}
+          container={container}
+          onMove={editorOutputGutterMove}
+          onReset={editorOutputGutterReset}
+        />
+      </Activity>
+
+      <Activity mode={somethingToShow ? 'visible' : 'hidden'}>
         <div className={styles.output}>
           <Output />
         </div>
-      )}
+      </Activity>
     </div>
   );
 };
