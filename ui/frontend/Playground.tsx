@@ -1,35 +1,35 @@
 import React, { useEffect, useRef } from 'react';
 import Split from 'split-grid';
 
-import Editor from './editor/Editor';
 import Header from './Header';
 import Notifications from './Notifications';
 import Output from './Output';
+import Editor from './editor/Editor';
+import { useAppSelector } from './hooks';
 import * as selectors from './selectors';
 import { Orientation } from './types';
-import { useAppSelector } from './hooks';
 
 import * as styles from './Playground.module.css';
 
 const TRACK_OPTION_NAME = {
   [Orientation.Horizontal]: 'rowGutters',
   [Orientation.Vertical]: 'columnGutters',
-}
+};
 
 const FOCUSED_GRID_STYLE = {
   [Orientation.Horizontal]: styles.resizeableAreaRowOutputFocused,
   [Orientation.Vertical]: styles.resizeableAreaColumnOutputFocused,
-}
+};
 
 const UNFOCUSED_GRID_STYLE = {
   [Orientation.Horizontal]: styles.resizeableAreaRowOutputUnfocused,
   [Orientation.Vertical]: styles.resizeableAreaColumnOutputUnfocused,
-}
+};
 
 const HANDLE_STYLES = {
   [Orientation.Horizontal]: [styles.splitRowsGutter, styles.splitRowsGutterHandle],
   [Orientation.Vertical]: [styles.splitColumnsGutter, ''],
-}
+};
 
 // We drop down to lower-level split-grid code and use some hooks
 // because we want to reduce the number of times that the Editor
@@ -49,19 +49,21 @@ const ResizableArea: React.FC = () => {
       grid.current.style.removeProperty('grid-template-columns');
       grid.current.style.removeProperty('grid-template-rows');
     }
-  }, [orientation, isFocused])
+  }, [orientation, isFocused]);
 
   useEffect(() => {
     const split = Split({
       minSize: 100,
-      [TRACK_OPTION_NAME[orientation]]: [{
-        track: 1,
-        element: dragHandle.current,
-      }],
+      [TRACK_OPTION_NAME[orientation]]: [
+        {
+          track: 1,
+          element: dragHandle.current,
+        },
+      ],
     });
 
     return () => split.destroy();
-  }, [orientation, isFocused, somethingToShow])
+  }, [orientation, isFocused, somethingToShow]);
 
   const gridStyles = isFocused ? FOCUSED_GRID_STYLE : UNFOCUSED_GRID_STYLE;
   const gridStyle = gridStyles[orientation];
@@ -69,23 +71,30 @@ const ResizableArea: React.FC = () => {
 
   return (
     <div ref={grid} className={gridStyle}>
-      <div className={styles.editor}><Editor /></div>
-      { isFocused &&
+      <div className={styles.editor}>
+        <Editor />
+      </div>
+      {isFocused && (
         <div ref={dragHandle} className={handleOuterStyle}>
           <span className={handleInnerStyle}>⣿</span>
         </div>
-      }
-      { somethingToShow && <div className={styles.output}><Output /></div>}
+      )}
+      {somethingToShow && (
+        <div className={styles.output}>
+          <Output />
+        </div>
+      )}
     </div>
   );
 };
-
 
 const WebSocketStatus: React.FC = () => {
   const enabled = useAppSelector(selectors.showGemSelector);
   const status = useAppSelector(selectors.websocketStatusSelector);
 
-  if (!enabled) { return null; }
+  if (!enabled) {
+    return null;
+  }
 
   const style: React.CSSProperties = {
     position: 'absolute',
@@ -103,9 +112,13 @@ const WebSocketStatus: React.FC = () => {
       return <div style={style}>⬤</div>;
     case 'error':
       style.color = 'red';
-      return <div style={style} title={status.error}>⬤</div>;
+      return (
+        <div style={style} title={status.error}>
+          ⬤
+        </div>
+      );
   }
-}
+};
 
 const Playground: React.FC = () => {
   const showNotifications = useAppSelector(selectors.anyNotificationsToShowSelector);
@@ -117,9 +130,9 @@ const Playground: React.FC = () => {
         <Header />
         <ResizableArea />
       </div>
-      { showNotifications && <Notifications />}
+      {showNotifications && <Notifications />}
     </>
   );
-}
+};
 
 export default Playground;
