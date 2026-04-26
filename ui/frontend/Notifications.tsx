@@ -75,7 +75,7 @@ const ResetNotificationCommon: React.FC<ResetNotificationCommonProps> = ({
   onReset,
   onCancel,
 }) => (
-  <Notification onClose={onReset}>
+  <Notification onClose={onCancel}>
     {preamble}
     Would you like to reset all code and configuration back to the default values to get a fresh
     start?
