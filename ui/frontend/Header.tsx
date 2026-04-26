@@ -87,12 +87,11 @@ const ExecuteButton: React.FC = () => {
 };
 
 const BuildMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
-  const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ toggle }, ref) => (
+  const Button: React.FC<ButtonProps> = ({ toggle, ref }) => (
     <IconButton type="button" title="Select what to build" ref={ref} onClick={toggle}>
       <MoreOptionsIcon />
     </IconButton>
-  ));
-  Button.displayName = 'BuildMenuButton.Button';
+  );
 
   return <PopButton Button={Button} Menu={BuildMenu} menuContainer={menuContainer} />;
 };
@@ -100,7 +99,7 @@ const BuildMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
 const ModeMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
   const label = useAppSelector(selectors.getModeLabel);
 
-  const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ toggle }, ref) => (
+  const Button: React.FC<ButtonProps> = ({ toggle, ref }) => (
     <OneButton
       type="button"
       title="Mode &mdash; Choose the optimization level"
@@ -110,8 +109,7 @@ const ModeMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
     >
       {label}
     </OneButton>
-  ));
-  Button.displayName = 'ModeMenuButton.Button';
+  );
 
   return <PopButton Button={Button} Menu={ModeMenu} menuContainer={menuContainer} />;
 };
@@ -119,7 +117,7 @@ const ModeMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
 const ChannelMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
   const label = useAppSelector(selectors.getChannelLabel);
 
-  const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ toggle }, ref) => (
+  const Button: React.FC<ButtonProps> = ({ toggle, ref }) => (
     <OneButton
       type="button"
       title="Channel &mdash; Choose the Rust version"
@@ -129,8 +127,7 @@ const ChannelMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
     >
       {label}
     </OneButton>
-  ));
-  Button.displayName = 'ChannelMenuButton.Button';
+  );
 
   return <PopButton Button={Button} Menu={ChannelMenu} menuContainer={menuContainer} />;
 };
@@ -138,12 +135,11 @@ const ChannelMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
 const AdvancedOptionsMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
   const advancedOptionsSet = useAppSelector(selectors.getAdvancedOptionsSet);
 
-  const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ toggle }, ref) => (
+  const Button: React.FC<ButtonProps> = ({ toggle, ref }) => (
     <IconButton type="button" title="Advanced compilation flags" ref={ref} onClick={toggle}>
       {advancedOptionsSet ? <MoreOptionsActiveIcon /> : <MoreOptionsIcon />}
     </IconButton>
-  ));
-  Button.displayName = 'AdvancedOptionsMenuButton.Button';
+  );
 
   return <PopButton Button={Button} Menu={AdvancedOptionsMenu} menuContainer={menuContainer} />;
 };
@@ -160,7 +156,7 @@ const ShareButton: React.FC = () => {
 };
 
 const ToolsMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
-  const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ toggle }, ref) => (
+  const Button: React.FC<ButtonProps> = ({ toggle, ref }) => (
     <OneButton
       type="button"
       title="Run extra tools on the source code"
@@ -170,14 +166,13 @@ const ToolsMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
     >
       Tools
     </OneButton>
-  ));
-  Button.displayName = 'ToolsMenuButton.Button';
+  );
 
   return <PopButton Button={Button} Menu={ToolsMenu} menuContainer={menuContainer} />;
 };
 
 const ConfigMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
-  const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ toggle }, ref) => (
+  const Button: React.FC<ButtonProps> = ({ toggle, ref }) => (
     <OneButton
       type="button"
       title="Show the configuration options"
@@ -188,8 +183,7 @@ const ConfigMenuButton: React.FC<PortalProps> = ({ menuContainer }) => {
     >
       Config
     </OneButton>
-  ));
-  Button.displayName = 'ConfigMenuButton.Button';
+  );
 
   return <PopButton Button={Button} Menu={ConfigMenu} menuContainer={menuContainer} />;
 };
