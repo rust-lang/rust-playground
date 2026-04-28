@@ -8,5 +8,10 @@
     [ "@babel/react", {
       "runtime": "automatic",
     }],
-  ]
+  ],
+  "plugins": [
+    ["babel-plugin-react-compiler", {
+      "compilationMode": "annotation",
+    }],
+  ],
 }
