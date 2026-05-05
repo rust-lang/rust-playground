@@ -169,14 +169,14 @@ pub(crate) struct MetaVersionResponse {
 
 #[derive(Debug, Clone, Deserialize)]
 pub(crate) struct MetaGistCreateRequest {
-    pub(crate) code: String,
+    pub(crate) code: Code,
 }
 
 #[derive(Debug, Clone, Serialize)]
 pub(crate) struct MetaGistResponse {
     pub(crate) id: String,
     pub(crate) url: String,
-    pub(crate) code: String,
+    pub(crate) code: Code,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

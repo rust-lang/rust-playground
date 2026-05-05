@@ -2329,6 +2329,7 @@ version = "1.1.3+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "53c96ecdfa941c8fc4fcaed14f99ada8ebed502eef533015095a07e3301d4c3c"
 dependencies = [
+ "indexmap",
  "serde_core",
  "serde_spanned",
  "toml_datetime",
@@ -2537,6 +2538,7 @@ dependencies = [
  "futures",
  "octocrab",
  "orchestrator",
+ "percent-encoding",
  "prometheus",
  "regex",
  "rusqlite",
@@ -2548,6 +2550,7 @@ dependencies = [
  "tempfile",
  "tokio",
  "tokio-util",
+ "toml",
  "tower-http 0.7.0",
  "tracing",
  "tracing-subscriber",

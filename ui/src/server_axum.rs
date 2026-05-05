@@ -549,7 +549,7 @@ async fn meta_gist_create(
     Json(req): Json<api::MetaGistCreateRequest>,
 ) -> Result<Json<api::MetaGistResponse>> {
     let token = must_get(&token)?;
-    gist::create_future(token, req.code)
+    gist::create_future(token, req.code.into())
         .await
         .map(Into::into)
         .map(Json)
@@ -816,7 +816,7 @@ where
 #[derive(Debug, Snafu)]
 enum Error {
     #[snafu(display("Gist creation failed"))]
-    GistCreation { source: octocrab::Error },
+    GistCreation { source: gist::CreateError },
 
     #[snafu(display("Gist loading failed"))]
     GistLoading { source: octocrab::Error },
@@ -1616,8 +1616,44 @@ pub(crate) mod api_orchestrator_integration_impls {
             api::MetaGistResponse {
                 id: me.id,
                 url: me.url,
-                code: me.code,
+                code: me.code.into(),
             }
+        }
+    }
+
+    impl From<api::Code> for gist::Code {
+        fn from(value: api::Code) -> Self {
+            match value {
+                api::Code::Single(code) => gist::Code::Single(code),
+                api::Code::Multiple(files) => {
+                    gist::Code::Multiple(files.into_iter().map(Into::into).collect())
+                }
+            }
+        }
+    }
+
+    impl From<gist::Code> for api::Code {
+        fn from(value: gist::Code) -> Self {
+            match value {
+                gist::Code::Single(code) => api::Code::Single(code),
+                gist::Code::Multiple(files) => {
+                    api::Code::Multiple(files.into_iter().map(Into::into).collect())
+                }
+            }
+        }
+    }
+
+    impl From<api::CodeFile> for gist::CodeFile {
+        fn from(value: api::CodeFile) -> Self {
+            let api::CodeFile { name, content } = value;
+            Self { name, content }
+        }
+    }
+
+    impl From<gist::CodeFile> for api::CodeFile {
+        fn from(value: gist::CodeFile) -> Self {
+            let gist::CodeFile { name, content } = value;
+            Self { name, content }
         }
     }
 }
