@@ -981,6 +981,38 @@ pub(crate) mod api_orchestrator_integration_impls {
         }
     }
 
+    impl From<api::Code> for Code {
+        fn from(value: api::Code) -> Self {
+            match value {
+                api::Code::Single(c) => Code::Single(c),
+                api::Code::Multiple(f) => Code::Multiple(f.into_iter().map(Into::into).collect()),
+            }
+        }
+    }
+
+    impl From<Code> for api::Code {
+        fn from(value: Code) -> Self {
+            match value {
+                Code::Single(c) => api::Code::Single(c),
+                Code::Multiple(f) => api::Code::Multiple(f.into_iter().map(Into::into).collect()),
+            }
+        }
+    }
+
+    impl From<api::CodeFile> for CodeFile {
+        fn from(value: api::CodeFile) -> Self {
+            let api::CodeFile { name, content } = value;
+            Self { name, content }
+        }
+    }
+
+    impl From<CodeFile> for api::CodeFile {
+        fn from(value: CodeFile) -> Self {
+            let CodeFile { name, content } = value;
+            Self { name, content }
+        }
+    }
+
     impl TryFrom<api::EvaluateRequest> for ExecuteRequest {
         type Error = ParseEvaluateRequestError;
 
@@ -1243,14 +1275,10 @@ pub(crate) mod api_orchestrator_integration_impls {
                 code,
             } = response;
 
-            let Code::Single(code) = code else {
-                unreachable!()
-            };
-
             Self {
                 success,
                 exit_detail,
-                code,
+                code: code.into(),
                 stdout,
                 stderr,
             }

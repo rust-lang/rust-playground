@@ -24,7 +24,7 @@ pub(crate) struct CompileRequest {
     pub(crate) tests: bool,
     #[serde(default)]
     pub(crate) backtrace: bool,
-    pub(crate) code: String,
+    pub(crate) code: Code,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -48,7 +48,7 @@ pub(crate) struct ExecuteRequest {
     pub(crate) tests: bool,
     #[serde(default)]
     pub(crate) backtrace: bool,
-    pub(crate) code: String,
+    pub(crate) code: Code,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -66,7 +66,7 @@ pub(crate) struct FormatRequest {
     pub(crate) channel: Option<String>,
     #[serde(default)]
     pub(crate) edition: String,
-    pub(crate) code: String,
+    pub(crate) code: Code,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -74,7 +74,7 @@ pub(crate) struct FormatResponse {
     pub(crate) success: bool,
     #[serde(rename = "exitDetail")]
     pub(crate) exit_detail: String,
-    pub(crate) code: String,
+    pub(crate) code: Code,
     pub(crate) stdout: String,
     pub(crate) stderr: String,
 }
@@ -87,7 +87,7 @@ pub(crate) struct ClippyRequest {
     pub(crate) crate_type: String,
     #[serde(default)]
     pub(crate) edition: String,
-    pub(crate) code: String,
+    pub(crate) code: Code,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -100,7 +100,7 @@ pub(crate) struct ClippyResponse {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct MiriRequest {
-    pub(crate) code: String,
+    pub(crate) code: Code,
     #[serde(default)]
     pub(crate) edition: String,
     #[serde(default)]
@@ -119,7 +119,7 @@ pub(crate) struct MiriResponse {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct MacroExpansionRequest {
-    pub(crate) code: String,
+    pub(crate) code: Code,
     #[serde(default)]
     pub(crate) edition: String,
 }
@@ -198,4 +198,17 @@ pub(crate) struct EvaluateResponse {
 
 fn default_crate_type() -> String {
     "bin".into()
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub(crate) enum Code {
+    Single(String),
+    Multiple(Vec<CodeFile>),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub(crate) struct CodeFile {
+    pub(crate) name: String,
+    pub(crate) content: String,
 }

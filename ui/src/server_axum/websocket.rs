@@ -82,7 +82,7 @@ struct ExecuteRequest {
     edition: String,
     crate_type: String,
     tests: bool,
-    code: String,
+    code: Code,
     backtrace: bool,
 }
 
@@ -125,6 +125,37 @@ pub(crate) enum ExecuteRequestParseError {
 
     #[snafu(transparent)]
     Edition { source: ParseEditionError },
+}
+
+#[derive(serde::Deserialize)]
+#[serde(untagged)]
+enum Code {
+    Single(String),
+    Multiple(Vec<CodeFile>),
+}
+
+#[derive(serde::Deserialize)]
+struct CodeFile {
+    name: String,
+    content: String,
+}
+
+impl From<Code> for coordinator::Code {
+    fn from(value: Code) -> Self {
+        match value {
+            Code::Single(c) => coordinator::Code::Single(c),
+            Code::Multiple(f) => {
+                coordinator::Code::Multiple(f.into_iter().map(Into::into).collect())
+            }
+        }
+    }
+}
+
+impl From<CodeFile> for coordinator::CodeFile {
+    fn from(value: CodeFile) -> Self {
+        let CodeFile { name, content } = value;
+        Self { name, content }
+    }
 }
 
 #[derive(Debug, serde::Serialize)]
