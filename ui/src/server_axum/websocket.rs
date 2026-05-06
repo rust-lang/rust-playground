@@ -107,7 +107,7 @@ impl TryFrom<ExecuteRequest> for coordinator::ExecuteRequest {
             crate_type: parse_crate_type(&crate_type)?,
             tests,
             backtrace,
-            code,
+            code: code.into(),
         })
     }
 }

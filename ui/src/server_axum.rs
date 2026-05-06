@@ -1012,7 +1012,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 crate_type: CrateType::Binary,
                 tests,
                 backtrace: false,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1089,7 +1089,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 edition: parse_edition(&edition)?,
                 tests,
                 backtrace,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1156,7 +1156,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 edition: parse_edition(&edition)?,
                 tests,
                 backtrace,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1216,7 +1216,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 channel,
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1242,6 +1242,10 @@ pub(crate) mod api_orchestrator_integration_impls {
                 exit_detail,
                 code,
             } = response;
+
+            let Code::Single(code) = code else {
+                unreachable!()
+            };
 
             Self {
                 success,
@@ -1273,7 +1277,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 channel,
                 crate_type: parse_crate_type(&crate_type)?,
                 edition: parse_edition(&edition)?,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1333,7 +1337,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 edition: parse_edition(&edition)?,
                 tests,
                 aliasing_model,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1377,7 +1381,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 channel: Channel::Nightly,     // TODO: use what user has submitted
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
-                code,
+                code: code.into(),
             })
         }
     }

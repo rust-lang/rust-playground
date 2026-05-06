@@ -331,13 +331,6 @@ impl CrateType {
         }
     }
 
-    pub(crate) fn other_path(self) -> &'static str {
-        match self {
-            CrateType::Binary => Self::LIB_RS,
-            CrateType::Library(_) => Self::MAIN_RS,
-        }
-    }
-
     pub(crate) fn to_cargo_toml_key(self) -> &'static str {
         use {CrateType::*, LibraryType::*};
 
@@ -379,16 +372,112 @@ pub struct ExecuteRequest {
     pub crate_type: CrateType,
     pub tests: bool,
     pub backtrace: bool,
-    pub code: String,
+    pub code: Code,
+}
+
+#[derive(Debug, Clone)]
+pub enum Code {
+    Single(String),
+    Multiple(Vec<CodeFile>),
+}
+
+#[derive(Debug, Clone)]
+pub struct CodeFile {
+    pub name: String,
+    pub content: String,
+}
+
+impl From<&str> for Code {
+    fn from(value: &str) -> Self {
+        Self::Single(value.to_owned())
+    }
+}
+
+impl From<String> for Code {
+    fn from(value: String) -> Self {
+        Self::Single(value)
+    }
+}
+
+impl<'a> FromIterator<(&'a str, &'a str)> for Code {
+    fn from_iter<T>(iter: T) -> Self
+    where
+        T: IntoIterator<Item = (&'a str, &'a str)>,
+    {
+        let files = iter
+            .into_iter()
+            .map(|(name, content)| CodeFile {
+                name: name.into(),
+                content: content.into(),
+            })
+            .collect();
+        Self::Multiple(files)
+    }
+}
+
+impl Code {
+    #[cfg(test)]
+    const fn new() -> Self {
+        Self::Single(String::new())
+    }
+
+    fn files(&self, crate_type: CrateType) -> Box<dyn Iterator<Item = (&str, &str)> + '_> {
+        match self {
+            Code::Single(code) => Box::new([(crate_type.primary_path(), &**code)].into_iter()),
+            Code::Multiple(files) => Box::new(files.iter().map(|cf| (&*cf.name, &*cf.content))),
+        }
+    }
+
+    fn delete_requests(
+        &self,
+        crate_type: CrateType,
+    ) -> impl Iterator<Item = DeleteFileRequest> + use<'_> {
+        let mut candidates = BTreeSet::from(["build.rs", CrateType::LIB_RS, CrateType::MAIN_RS]);
+
+        for (name, _) in self.files(crate_type) {
+            candidates.remove(name);
+        }
+
+        candidates
+            .into_iter()
+            .map(|path| DeleteFileRequest { path: path.into() })
+    }
+
+    fn write_requests(
+        &self,
+        crate_type: CrateType,
+    ) -> impl Iterator<Item = WriteFileRequest> + use<'_> {
+        self.files(crate_type)
+            .map(|(path, content)| WriteFileRequest {
+                path: path.to_owned(),
+                content: content.to_owned().into_bytes(),
+            })
+    }
+
+    #[cfg(test)]
+    fn assume_single(&self) -> &str {
+        match self {
+            Code::Single(c) => c,
+            Code::Multiple(_) => panic!("Code::Multiple found when expecting Single"),
+        }
+    }
+
+    #[cfg(test)]
+    fn assume_multiple(&self) -> &[CodeFile] {
+        match self {
+            Code::Single(_) => panic!("Code::Single found when expecting Multiple"),
+            Code::Multiple(f) => f,
+        }
+    }
 }
 
 impl LowerRequest for ExecuteRequest {
     fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
-        [delete_previous_primary_file_request(self.crate_type)].into_iter()
+        self.code.delete_requests(self.crate_type)
     }
 
     fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
-        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
+        self.code.write_requests(self.crate_type)
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -465,7 +554,7 @@ pub struct CompileRequest {
     // TODO: Remove `tests` and `backtrace` -- don't make sense for compiling.
     pub tests: bool,
     pub backtrace: bool,
-    pub code: String,
+    pub code: Code,
 }
 
 impl CompileRequest {
@@ -494,11 +583,11 @@ impl CompileRequest {
 
 impl LowerRequest for CompileRequest {
     fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
-        [delete_previous_primary_file_request(self.crate_type)].into_iter()
+        self.code.delete_requests(self.crate_type)
     }
 
     fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
-        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
+        self.code.write_requests(self.crate_type)
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -511,6 +600,11 @@ impl LowerRequest for CompileRequest {
         };
         if let Mode::Release = self.mode {
             args.push("--release");
+        }
+
+        match self.crate_type {
+            CrateType::Binary => args.extend(["--bin", "playground"]),
+            CrateType::Library(_) => args.push("--lib"),
         }
 
         match self.target {
@@ -577,24 +671,24 @@ pub struct FormatRequest {
     pub channel: Channel,
     pub crate_type: CrateType,
     pub edition: Edition,
-    pub code: String,
+    pub code: Code,
 }
 
 impl FormatRequest {
-    fn read_output_request(&self) -> ReadFileRequest {
-        ReadFileRequest {
-            path: self.crate_type.primary_path().to_owned(),
-        }
+    fn read_output_requests(&self) -> impl Iterator<Item = ReadFileRequest> + use<'_> {
+        self.code
+            .files(self.crate_type)
+            .map(|(path, _)| ReadFileRequest { path: path.into() })
     }
 }
 
 impl LowerRequest for FormatRequest {
     fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
-        [delete_previous_primary_file_request(self.crate_type)].into_iter()
+        self.code.delete_requests(self.crate_type)
     }
 
     fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
-        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
+        self.code.write_requests(self.crate_type)
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -622,7 +716,7 @@ impl CargoTomlModifier for FormatRequest {
 pub struct FormatResponse {
     pub success: bool,
     pub exit_detail: String,
-    pub code: String,
+    pub code: Code,
 }
 
 #[derive(Debug, Clone)]
@@ -630,16 +724,16 @@ pub struct ClippyRequest {
     pub channel: Channel,
     pub crate_type: CrateType,
     pub edition: Edition,
-    pub code: String,
+    pub code: Code,
 }
 
 impl LowerRequest for ClippyRequest {
     fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
-        [delete_previous_primary_file_request(self.crate_type)].into_iter()
+        self.code.delete_requests(self.crate_type)
     }
 
     fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
-        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
+        self.code.write_requests(self.crate_type)
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -676,16 +770,16 @@ pub struct MiriRequest {
     pub edition: Edition,
     pub tests: bool,
     pub aliasing_model: AliasingModel,
-    pub code: String,
+    pub code: Code,
 }
 
 impl LowerRequest for MiriRequest {
     fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
-        [delete_previous_primary_file_request(self.crate_type)].into_iter()
+        self.code.delete_requests(self.crate_type)
     }
 
     fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
-        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
+        self.code.write_requests(self.crate_type)
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -741,24 +835,31 @@ pub struct MacroExpansionRequest {
     pub channel: Channel,
     pub crate_type: CrateType,
     pub edition: Edition,
-    pub code: String,
+    pub code: Code,
 }
 
 impl LowerRequest for MacroExpansionRequest {
     fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
-        [delete_previous_primary_file_request(self.crate_type)].into_iter()
+        self.code.delete_requests(self.crate_type)
     }
 
     fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
-        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
+        self.code.write_requests(self.crate_type)
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
+        let mut args = vec!["rustc"];
+
+        match self.crate_type {
+            CrateType::Binary => args.extend(["--bin", "playground"]),
+            CrateType::Library(_) => args.push("--lib"),
+        }
+
+        args.extend(["--", "-Zunpretty=expanded"]);
+
         ExecuteCommandRequest {
             cmd: "cargo".to_owned(),
-            args: ["rustc", "--", "-Zunpretty=expanded"]
-                .map(str::to_owned)
-                .to_vec(),
+            args: args.into_iter().map(str::to_owned).collect(),
             envs: Default::default(),
             cwd: None,
         }
@@ -832,19 +933,6 @@ impl<T> ops::Deref for WithOutput<T> {
 
     fn deref(&self) -> &Self::Target {
         &self.response
-    }
-}
-
-fn write_primary_file_request(crate_type: CrateType, code: &str) -> WriteFileRequest {
-    WriteFileRequest {
-        path: crate_type.primary_path().to_owned(),
-        content: code.into(),
-    }
-}
-
-fn delete_previous_primary_file_request(crate_type: CrateType) -> DeleteFileRequest {
-    DeleteFileRequest {
-        path: crate_type.other_path().to_owned(),
     }
 }
 
@@ -1576,12 +1664,27 @@ impl Container {
                 .context(CargoTaskPanickedSnafu)?
                 .context(CargoFailedSnafu)?;
 
-            let read_output = request.read_output_request();
-            let file = commander
-                .one(read_output)
-                .await
-                .context(CouldNotReadCodeSnafu)?;
-            let code = String::from_utf8(file.0).context(CodeNotUtf8Snafu)?;
+            let mut files = request
+                .read_output_requests()
+                .map(|read_output| async {
+                    let name = read_output.path.clone();
+                    let file = commander
+                        .one(read_output)
+                        .await
+                        .context(CouldNotReadCodeSnafu)?;
+                    let content = String::from_utf8(file.0).context(CodeNotUtf8Snafu)?;
+
+                    Ok::<_, FormatError>(CodeFile { name, content })
+                })
+                .collect::<FuturesUnordered<_>>()
+                .try_collect::<Vec<_>>()
+                .await?;
+
+            let code = if matches!(request.code, Code::Single(..)) {
+                Code::Single(files.pop().map(|cf| cf.content).unwrap_or_default())
+            } else {
+                Code::Multiple(files)
+            };
 
             Ok(FormatResponse {
                 success,
@@ -3099,7 +3202,7 @@ mod tests {
         crate_type: CrateType::Binary,
         tests: false,
         backtrace: false,
-        code: String::new(),
+        code: Code::new(),
     };
 
     fn new_execute_request() -> ExecuteRequest {
@@ -3305,6 +3408,30 @@ mod tests {
         });
 
         try_join_all(tests).with_timeout().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn execute_multiple_files() -> Result<()> {
+        let coordinator = new_coordinator();
+
+        let request = ExecuteRequest {
+            code: kvs! {
+                "src/main.rs" => r#"mod the; fn main() { println!("{}", the::inner::light()); }"#,
+                "src/the.rs" => r#"pub mod inner;"#,
+                "src/the/inner/mod.rs" => r#"pub fn light() -> bool { true }"#,
+            }
+            .collect(),
+            ..new_execute_request()
+        };
+        let response = coordinator.execute(request).await.unwrap();
+
+        assert!(response.success, "stderr: {}", response.stderr);
+        assert_contains!(response.stdout, "true");
+
+        coordinator.shutdown().await?;
 
         Ok(())
     }
@@ -3548,7 +3675,7 @@ mod tests {
         edition: Edition::Rust2021,
         tests: false,
         backtrace: false,
-        code: String::new(),
+        code: Code::new(),
     };
 
     #[tokio::test]
@@ -3632,6 +3759,42 @@ mod tests {
         Ok(())
     }
 
+    #[tokio::test]
+    #[snafu::report]
+    async fn compile_multiple_files() -> Result<()> {
+        let coordinator = new_coordinator();
+
+        let req = CompileRequest {
+            code: kvs! {
+                "src/main.rs" => "fn main() { playground::add(41, 1); }",
+                "src/lib.rs" => ADD_CODE,
+            }
+            .collect(),
+            crate_type: CrateType::Library(LibraryType::Rlib),
+            ..ARBITRARY_ASSEMBLY_REQUEST
+        };
+
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
+
+        assert!(response.success, "stderr: {}", response.stderr);
+
+        let asm = docker_target_arch! {
+            x86_64: "eax, [rsi + rdi]",
+            aarch64: "w0, w1, w0",
+        };
+
+        assert_contains!(response.code, asm);
+        assert_not_contains!(
+            response.code,
+            "playground::main",
+            "Only compiling the library"
+        );
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
     const ADD_CODE: &str = r#"#[inline(never)] pub fn add(a: u8, b: u8) -> u8 { a + b }"#;
 
     const ARBITRARY_ASSEMBLY_REQUEST: CompileRequest = CompileRequest {
@@ -3646,7 +3809,7 @@ mod tests {
         edition: Edition::Rust2018,
         tests: false,
         backtrace: false,
-        code: String::new(),
+        code: Code::new(),
     };
 
     const DEFAULT_ASSEMBLY_FLAVOR: AssemblyFlavor = AssemblyFlavor::Intel;
@@ -3792,7 +3955,7 @@ mod tests {
         edition: Edition::Rust2021,
         tests: false,
         backtrace: false,
-        code: String::new(),
+        code: Code::new(),
     };
 
     #[tokio::test]
@@ -3875,7 +4038,7 @@ mod tests {
         channel: Channel::Stable,
         crate_type: CrateType::Binary,
         edition: Edition::Rust2015,
-        code: String::new(),
+        code: Code::new(),
     };
 
     const ARBITRARY_FORMAT_INPUT: &str = "fn main(){1+1;}";
@@ -3899,7 +4062,7 @@ mod tests {
         let response = coordinator.format(req).with_timeout().await.unwrap();
 
         assert!(response.success, "stderr: {}", response.stderr);
-        let lines = response.code.lines().collect::<Vec<_>>();
+        let lines = response.code.assume_single().lines().collect::<Vec<_>>();
         assert_eq!(ARBITRARY_FORMAT_OUTPUT, lines);
 
         coordinator.shutdown().await?;
@@ -3922,7 +4085,7 @@ mod tests {
             let response = coordinator.format(req).with_timeout().await.unwrap();
 
             assert!(response.success, "stderr: {}", response.stderr);
-            let lines = response.code.lines().collect::<Vec<_>>();
+            let lines = response.code.assume_single().lines().collect::<Vec<_>>();
             assert_eq!(ARBITRARY_FORMAT_OUTPUT, lines);
 
             coordinator.shutdown().await?;
@@ -3958,11 +4121,52 @@ mod tests {
         Ok(())
     }
 
+    #[tokio::test]
+    #[snafu::report]
+    async fn format_multiple_files() -> Result<()> {
+        let coordinator = new_coordinator();
+
+        let req = FormatRequest {
+            code: kvs! {
+                "src/main.rs" => "fn  main  (  ){playground  ::  amaze()}",
+                "src/lib.rs" => "fn  amaze  (  ){}",
+            }
+            .collect(),
+            ..ARBITRARY_FORMAT_REQUEST
+        };
+
+        let response = coordinator.format(req).with_timeout().await.unwrap();
+
+        assert!(response.success, "stderr: {}", response.stderr);
+
+        let lines_for = |name| {
+            response
+                .code
+                .assume_multiple()
+                .iter()
+                .find(|cf| cf.name == name)
+                .unwrap()
+                .content
+                .lines()
+                .collect::<Vec<_>>()
+        };
+
+        assert_eq!(
+            lines_for("src/main.rs"),
+            ["fn main() {", "    playground::amaze()", "}"]
+        );
+        assert_eq!(lines_for("src/lib.rs"), ["fn amaze() {}"]);
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
     const ARBITRARY_CLIPPY_REQUEST: ClippyRequest = ClippyRequest {
         channel: Channel::Stable,
         crate_type: CrateType::Library(LibraryType::Rlib),
         edition: Edition::Rust2021,
-        code: String::new(),
+        code: Code::new(),
     };
 
     #[tokio::test]
@@ -3986,6 +4190,31 @@ mod tests {
         assert!(!response.success, "stderr: {}", response.stderr);
         assert_contains!(response.stderr, "deny(clippy::eq_op)");
         assert_contains!(response.stderr, "warn(clippy::zero_divided_by_zero)");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn clippy_multiple_files() -> Result<()> {
+        let coordinator = new_coordinator();
+
+        let req = ClippyRequest {
+            code: kvs! {
+                "src/main.rs" => "fn main() { let _ = 1 == 1; }",
+                "src/lib.rs" => "pub fn oopsie_clippy() { let _ = 'a'..'z'; }",
+            }
+            .collect(),
+            ..ARBITRARY_CLIPPY_REQUEST
+        };
+
+        let response = coordinator.clippy(req).with_timeout().await.unwrap();
+
+        assert!(!response.success, "stderr: {}", response.stderr);
+        assert_contains!(response.stderr, "deny(clippy::eq_op)");
+        assert_contains!(response.stderr, "warn(clippy::almost_complete_range)");
 
         coordinator.shutdown().await?;
 
@@ -4038,7 +4267,7 @@ mod tests {
         edition: Edition::Rust2021,
         tests: false,
         aliasing_model: AliasingModel::Stacked,
-        code: String::new(),
+        code: Code::new(),
     };
 
     #[tokio::test]
@@ -4101,11 +4330,43 @@ mod tests {
         Ok(())
     }
 
+    #[tokio::test]
+    #[snafu::report]
+    async fn miri_multiple_files() -> Result<()> {
+        let coordinator = new_coordinator_docker();
+
+        let req = MiriRequest {
+            code: kvs! {
+                "src/main.rs" => "fn main() { playground::bad_stuff(); }",
+
+                "src/lib.rs" => r#"
+                    pub fn bad_stuff() {
+                        unsafe { core::mem::MaybeUninit::<u8>::uninit().assume_init() };
+                    }
+                "#
+            }
+            .collect(),
+            ..ARBITRARY_MIRI_REQUEST
+        };
+
+        let response = coordinator.miri(req).with_timeout().await.unwrap();
+
+        assert!(!response.success, "stderr: {}", response.stderr);
+
+        assert_contains!(response.stderr, "Undefined Behavior");
+        assert_contains!(response.stderr, "encountered uninitialized memory");
+        assert_contains!(response.stderr, "expected an integer");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
     const ARBITRARY_MACRO_EXPANSION_REQUEST: MacroExpansionRequest = MacroExpansionRequest {
         channel: Channel::Nightly,
         crate_type: CrateType::Library(LibraryType::Cdylib),
         edition: Edition::Rust2018,
-        code: String::new(),
+        code: Code::new(),
     };
 
     #[tokio::test]
@@ -4133,6 +4394,42 @@ mod tests {
         assert!(response.success, "stderr: {}", response.stderr);
         assert_contains!(response.stdout, "impl ::core::fmt::Debug for Dummy");
         assert_contains!(response.stdout, "Formatter::write_str");
+        assert_contains!(response.stdout, "::std::io::_print");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn macro_expansion_multiple_files() -> Result<()> {
+        let coordinator = new_coordinator();
+
+        let req = MacroExpansionRequest {
+            code: kvs! {
+                "src/main.rs" => r#"fn main() { println!("{}", playground::Dummy); }"#,
+                "src/lib.rs" => r#"#[derive(Debug)] pub struct Dummy;"#,
+            }
+            .collect(),
+            crate_type: CrateType::Library(LibraryType::Rlib),
+            ..ARBITRARY_MACRO_EXPANSION_REQUEST
+        };
+
+        let response = coordinator
+            .macro_expansion(req)
+            .with_timeout()
+            .await
+            .unwrap();
+
+        assert!(response.success, "stderr: {}", response.stderr);
+        assert_contains!(response.stdout, "impl ::core::fmt::Debug for Dummy");
+        assert_contains!(response.stdout, "Formatter::write_str");
+        assert_not_contains!(
+            response.stdout,
+            "::std::io::_print",
+            "This is only in main.rs"
+        );
 
         coordinator.shutdown().await?;
 
@@ -4254,7 +4551,7 @@ mod tests {
             crate_type: CrateType::Binary,
             tests: false,
             backtrace: false,
-            code: Default::default(),
+            code: Code::new(),
         }
     }
 
