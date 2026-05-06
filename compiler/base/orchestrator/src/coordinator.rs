@@ -3245,7 +3245,7 @@ mod tests {
             };
             let response = coordinator.execute(request).await.unwrap();
 
-            assert!(response.success, "({tests:?}), stderr: {}", response.stderr,);
+            assert!(response.success, "({tests:?}), stderr: {}", response.stderr);
             assert_contains!(response.stderr, expected);
 
             coordinator.shutdown().await?;
