@@ -14,7 +14,7 @@ while (( "$#" )); do
         shift
         output="$1"
     else
-        args+="$1"
+        args+=("$1")
     fi
 
     shift
