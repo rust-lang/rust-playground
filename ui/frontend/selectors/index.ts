@@ -21,6 +21,9 @@ const clientFeatureFlagThreshold = (state: State) => state.client.featureFlagThr
 const createFeatureFlagSelector = (ff: (state: State) => number) =>
   createSelector(clientFeatureFlagThreshold, ff, (c, ff) => c <= ff);
 
+const allowMultipleFilesThreshold = createSelector(featureFlags, ff => ff.multifileThreshold);
+export const allowMultipleFiles = createFeatureFlagSelector(allowMultipleFilesThreshold);
+
 export const codeSelector = (state: State) => state.code;
 export const positionSelector = (state: State) => state.position;
 export const selectionSelector = (state: State) => state.selection;

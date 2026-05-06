@@ -53,6 +53,12 @@ export interface CommonEditorProps {
   crates: Crate[];
 }
 
+export const FileView = {
+  Single: 'single',
+  Multiple: 'multiple',
+} as const;
+export type FileView = ValuesOf<typeof FileView>;
+
 export const Editor = {
   Simple: 'simple',
   Ace: 'ace',

@@ -12,11 +12,13 @@ import {
   AssemblyFlavor,
   DemangleAssembly,
   Editor,
+  FileView,
   Orientation,
   PairCharacters,
   ProcessAssembly,
   Theme,
 } from './types';
+import * as selectors from './selectors';
 
 const MONACO_THEMES = [
   'vs', 'vs-dark', 'vscode-dark-plus',
@@ -25,6 +27,8 @@ const MONACO_THEMES = [
 const ConfigMenu: React.FC = () => {
   'use memo';
 
+  const allowMultipleFiles = useAppSelector(selectors.allowMultipleFiles);
+  const fileView = useAppSelector((state) => state.configuration.fileView);
   const keybinding = useAppSelector((state) => state.configuration.ace.keybinding);
   const aceTheme = useAppSelector((state) => state.configuration.ace.theme);
   const monacoTheme = useAppSelector((state) => state.configuration.monaco.theme);
@@ -41,6 +45,15 @@ const ConfigMenu: React.FC = () => {
   return (
     <>
       <MenuGroup title="Editor">
+        {allowMultipleFiles && (
+          <EitherConfig
+            id="editor-file-view"
+            name="Edit files"
+            a={FileView.Single}
+            b={FileView.Multiple}
+            value={fileView}
+            onChange={(v) => dispatch(config.changeFileView(v))} />
+        )}
         <SelectConfig
           name="Editor"
           value={editorStyle}

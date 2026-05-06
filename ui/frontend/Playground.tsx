@@ -1,4 +1,4 @@
-import React, { Activity, useRef, useState } from 'react';
+import React, { Activity, StrictMode, useRef, useState } from 'react';
 
 import Header from './Header';
 import Notifications from './Notifications';
@@ -6,7 +6,7 @@ import Output from './Output';
 import Editor from './editor/Editor';
 import { useAppSelector } from './hooks';
 import * as selectors from './selectors';
-import { Orientation } from './types';
+import { FileView, Orientation } from './types';
 
 import * as styles from './Playground.module.css';
 
@@ -126,6 +126,8 @@ const Gutter: React.FC<GutterProps> = ({ container, className, orientation, onMo
   );
 };
 
+const FileTree = () => 'Placeholder for the file tree component';
+
 const makeStyleFromPixels = (cssProps: [string, number | undefined][]): React.CSSProperties => {
   const massagedProps = cssProps
     .filter(([_k, v]) => v !== undefined)
@@ -136,14 +138,25 @@ const makeStyleFromPixels = (cssProps: [string, number | undefined][]): React.CS
 const ResizableArea: React.FC = () => {
   'use memo';
 
+  // TODO: name `fileView`???
+  const fileView = useAppSelector((state) => state.configuration.fileView);
   const somethingToShow = useAppSelector(selectors.getSomethingToShow);
   const isFocused = useAppSelector(selectors.isOutputFocused);
   const orientation = useAppSelector(selectors.orientation);
 
   const container = useRef<HTMLDivElement>(null);
 
+  const [filesWidth, setFilesWidth] = useState<number | undefined>(undefined);
   const [outputWidth, setOutputWidth] = useState<number | undefined>(undefined);
   const [outputHeight, setOutputHeight] = useState<number | undefined>(undefined);
+
+  const filesEditorGutterMove = (distances: Distances) => {
+    setFilesWidth(distances.toLeft);
+  };
+
+  const filesEditorGutterReset = () => {
+    setFilesWidth(undefined);
+  };
 
   const editorOutputGutterMove = (distances: Distances) => {
     if (orientation === Orientation.Horizontal) {
@@ -174,6 +187,7 @@ const ResizableArea: React.FC = () => {
   const hideEditorOutputGutter = outputMode !== 'full';
 
   const style = makeStyleFromPixels([
+    ['--files-width', filesWidth],
     ['--output-height', outputHeight],
     ['--output-width', outputWidth],
   ]);
@@ -182,10 +196,27 @@ const ResizableArea: React.FC = () => {
     <div
       className={styles.playground}
       data-orientation={orientation}
+      data-file-view={fileView}
       data-output-mode={outputMode}
       ref={container}
       style={style}
     >
+      <Activity mode={fileView === FileView.Multiple ? 'visible' : 'hidden'}>
+        <div className={styles.files}>
+          <StrictMode>
+            <FileTree />
+          </StrictMode>
+        </div>
+
+        <Gutter
+          className={styles.filesEditorGutter}
+          orientation={Orientation.Vertical}
+          container={container}
+          onMove={filesEditorGutterMove}
+          onReset={filesEditorGutterReset}
+        />
+      </Activity>
+
       <div className={styles.editor}>
         <Editor />
       </div>
