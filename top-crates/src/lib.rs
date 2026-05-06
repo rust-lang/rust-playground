@@ -293,8 +293,8 @@ fn make_global_state<'cfg>(
     modifications: &'cfg Modifications,
 ) -> GlobalState<'cfg> {
     // Information about the playground's target platform.
-    let compile_target =
-        CompileTarget::new(PLAYGROUND_TARGET_PLATFORM).expect("Unable to create a CompileTarget");
+    let compile_target = CompileTarget::new(PLAYGROUND_TARGET_PLATFORM, false)
+        .expect("Unable to create a CompileTarget");
     let compile_kind = CompileKind::Target(compile_target);
     let rustc = config
         .load_global_rustc(None)
