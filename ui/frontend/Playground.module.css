@@ -6,6 +6,8 @@
 }
 
 .playground {
+  composes: -autoSize from './shared.module.css';
+
   --minimum: 100px;
   --gutter-dimension: 12px;
   --final-editor-dimension: minmax(var(--minimum), 1fr);
@@ -22,7 +24,6 @@
   --final-output-height: minmax(var(--minimum), var(--output-height-cap, 1fr));
 
   display: grid;
-  height: 100%;
   grid-template-areas: 'eee';
   grid-template-columns: var(--final-editor-dimension);
 }
