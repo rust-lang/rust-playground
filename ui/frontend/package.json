@@ -79,7 +79,7 @@
   },
   "engines": {
     "node": "^24.12",
-    "pnpm": "^10.27"
+    "pnpm": "^11.0"
   },
   "scripts": {
     "test": "jest",
