@@ -89,7 +89,7 @@ const Stdin: React.FC = () => {
   );
 };
 
-const MoreButton = React.forwardRef<HTMLButtonElement, ButtonProps>(({ toggle }, ref) => {
+const MoreButton: React.FC<ButtonProps> = ({ toggle, ref }) => {
   const disabled = !useAppSelector(enableStdinSelector);
 
   return (
@@ -104,8 +104,7 @@ const MoreButton = React.forwardRef<HTMLButtonElement, ButtonProps>(({ toggle },
       ⋮
     </IconButton>
   );
-});
-MoreButton.displayName = 'MoreButton';
+};
 
 const MoreMenu: React.FC<MenuProps> = ({ close }) => {
   const dispatch = useAppDispatch();

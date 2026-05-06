@@ -20,6 +20,7 @@ import * as styles from './PopButton.module.css';
 
 export interface ButtonProps {
   toggle: () => void;
+  ref: React.Ref<HTMLButtonElement>;
 }
 
 export interface MenuProps {
@@ -27,7 +28,7 @@ export interface MenuProps {
 }
 
 interface NewPopProps {
-  Button: React.ComponentType<ButtonProps & React.RefAttributes<HTMLButtonElement>>;
+  Button: React.ComponentType<ButtonProps>;
   Menu: React.ComponentType<MenuProps>;
   menuContainer?: React.RefObject<HTMLDivElement | null>;
 }
