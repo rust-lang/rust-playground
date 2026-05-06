@@ -1,6 +1,6 @@
 /* global ACE_KEYBINDINGS:false, ACE_THEMES:false */
 
-import React, { Fragment, useCallback } from 'react';
+import React from 'react';
 
 import { Either as EitherConfig, Select as SelectConfig } from './ConfigElement';
 import MenuGroup from './MenuGroup';
@@ -23,6 +23,8 @@ const MONACO_THEMES = [
 ];
 
 const ConfigMenu: React.FC = () => {
+  'use memo';
+
   const keybinding = useAppSelector((state) => state.configuration.ace.keybinding);
   const aceTheme = useAppSelector((state) => state.configuration.ace.theme);
   const monacoTheme = useAppSelector((state) => state.configuration.monaco.theme);
@@ -35,39 +37,24 @@ const ConfigMenu: React.FC = () => {
   const processAssembly = useAppSelector((state) => state.configuration.processAssembly);
 
   const dispatch = useAppDispatch();
-  const changeAceTheme = useCallback((t: string) => dispatch(config.changeAceTheme(t)), [dispatch]);
-  const changeMonacoTheme = useCallback((t: string) => dispatch(config.changeMonacoTheme(t)), [dispatch]);
-  const changeKeybinding = useCallback((k: string) => dispatch(config.changeKeybinding(k)), [dispatch]);
-  const changeTheme = useCallback((t: Theme) => dispatch(config.changeTheme(t)), [dispatch]);
-  const changeOrientation = useCallback((o: Orientation) => dispatch(config.changeOrientation(o)), [dispatch]);
-  const changeEditorStyle = useCallback((e: Editor) => dispatch(config.changeEditor(e)), [dispatch]);
-  const changeAssemblyFlavor =
-    useCallback((a: AssemblyFlavor) => dispatch(config.changeAssemblyFlavor(a)), [dispatch]);
-  const changePairCharacters =
-    useCallback((p: PairCharacters) => dispatch(config.changePairCharacters(p)), [dispatch]);
-  const changeProcessAssembly =
-    useCallback((p: ProcessAssembly) => dispatch(config.changeProcessAssembly(p)), [dispatch]);
-  const changeDemangleAssembly =
-    useCallback((d: DemangleAssembly) => dispatch(config.changeDemangleAssembly(d)), [dispatch]);
-  const showConfigReset = useCallback(() => dispatch(client.showConfigReset()), [dispatch]);
 
   return (
-    <Fragment>
+    <>
       <MenuGroup title="Editor">
         <SelectConfig
           name="Editor"
           value={editorStyle}
-          onChange={changeEditorStyle}
+          onChange={(e) => dispatch(config.changeEditor(e))}
         >
           {[Editor.Simple, Editor.Ace, Editor.Monaco]
             .map(k => <option key={k} value={k}>{k}</option>)}
         </SelectConfig>
         {editorStyle === Editor.Ace && (
-          <Fragment>
+          <>
             <SelectConfig
               name="Keybinding"
               value={keybinding}
-              onChange={changeKeybinding}
+              onChange={(k) => dispatch(config.changeKeybinding(k))}
             >
               {ACE_KEYBINDINGS.map(k => <option key={k} value={k}>{k}</option>)}
             </SelectConfig>
@@ -75,7 +62,7 @@ const ConfigMenu: React.FC = () => {
             <SelectConfig
               name="Theme"
               value={aceTheme}
-              onChange={changeAceTheme}
+              onChange={(t) => dispatch(config.changeAceTheme(t))}
             >
               {ACE_THEMES.map(t => <option key={t} value={t}>{t}</option>)}
             </SelectConfig>
@@ -86,24 +73,24 @@ const ConfigMenu: React.FC = () => {
               a={PairCharacters.Enabled}
               b={PairCharacters.Disabled}
               value={pairCharacters}
-              onChange={changePairCharacters} />
-          </Fragment>
+              onChange={(p) => dispatch(config.changePairCharacters(p))} />
+          </>
         )}
         {editorStyle === Editor.Monaco && (
-          <Fragment>
+          <>
             <SelectConfig
               name="Theme"
               value={monacoTheme}
-              onChange={changeMonacoTheme}
+              onChange={(t) => dispatch(config.changeMonacoTheme(t))}
             >
               {MONACO_THEMES.map(t => <option key={t} value={t}>{t}</option>)}
             </SelectConfig>
-          </Fragment>
+          </>
         )}
       </MenuGroup>
 
       <MenuGroup title="UI">
-        <SelectConfig name="Theme" value={theme} onChange={changeTheme}>
+        <SelectConfig name="Theme" value={theme} onChange={(t) => dispatch(config.changeTheme(t))}>
           <option value={Theme.System}>System</option>
           <option value={Theme.Light}>Light</option>
           <option value={Theme.Dark}>Dark</option>
@@ -112,7 +99,7 @@ const ConfigMenu: React.FC = () => {
         <SelectConfig
           name="Orientation"
           value={orientation}
-          onChange={changeOrientation}
+          onChange={(o) => dispatch(config.changeOrientation(o))}
         >
           <option value={Orientation.Automatic}>Automatic</option>
           <option value={Orientation.Horizontal}>Horizontal</option>
@@ -129,7 +116,7 @@ const ConfigMenu: React.FC = () => {
           aLabel="AT&T"
           bLabel="Intel"
           value={assemblyFlavor}
-          onChange={changeAssemblyFlavor} />
+          onChange={(a) => dispatch(config.changeAssemblyFlavor(a))} />
 
         <EitherConfig
           id="assembly-symbols"
@@ -139,7 +126,7 @@ const ConfigMenu: React.FC = () => {
           aLabel="On"
           bLabel="Off"
           value={demangleAssembly}
-          onChange={changeDemangleAssembly}
+          onChange={(d) => dispatch(config.changeDemangleAssembly(d))}
         />
 
         <EitherConfig
@@ -150,16 +137,16 @@ const ConfigMenu: React.FC = () => {
           aLabel="On"
           bLabel="Off"
           value={processAssembly}
-          onChange={changeProcessAssembly}
+          onChange={(p) => dispatch(config.changeProcessAssembly(p))}
         />
       </MenuGroup>
 
       <MenuGroup title="Reset">
-        <SimpleButtonMenuItem onClick={showConfigReset}>
+        <SimpleButtonMenuItem onClick={() => dispatch(client.showConfigReset())}>
           Reset all code and configuration to default values
         </SimpleButtonMenuItem>
       </MenuGroup>
-    </Fragment>
+    </>
   );
 };
 
