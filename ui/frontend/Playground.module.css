@@ -5,58 +5,95 @@
   height: 100vh;
 }
 
-.-resizeableArea {
-  composes: -autoSize from './shared.module.css';
+.playground {
+  --minimum: 100px;
+  --gutter-dimension: 12px;
+  --final-editor-dimension: minmax(var(--minimum), 1fr);
+  --final-output-width: minmax(var(--minimum), var(--output-width, 1fr));
+
+  /* Ensure the output height leaves room for the editor and the
+   * gutter. Otherwise, the output can grow such that the (editor +
+   * gutter + output) height causes the whole container to grow.
+   */
+  --output-height-cap: min(
+    var(--output-height),
+    calc(100% - var(--minimum) - var(--gutter-dimension))
+  );
+  --final-output-height: minmax(var(--minimum), var(--output-height-cap, 1fr));
+
   display: grid;
+  height: 100%;
+  grid-template-areas: 'eee';
+  grid-template-columns: var(--final-editor-dimension);
 }
 
-.resizeableAreaRowOutputUnfocused {
-  composes: -resizeableArea;
-  grid-template-rows: 1fr auto;
+.playground[data-orientation='horizontal'][data-output-mode='full'] {
+  grid-template-areas:
+    'eee'
+    'eog'
+    'ooo';
+  grid-template-rows:
+    var(--final-editor-dimension)
+    var(--gutter-dimension)
+    var(--final-output-height);
 }
 
-.resizeableAreaRowOutputFocused {
-  composes: -resizeableArea;
-  grid-template-rows: 1fr 12px 1fr;
+.playground[data-orientation='horizontal'][data-output-mode='slim'] {
+  grid-template-areas:
+    'eee'
+    'ooo';
+  grid-template-rows:
+    var(--final-editor-dimension)
+    auto;
 }
 
-.resizeableAreaColumnOutputUnfocused {
-  composes: -resizeableArea;
-  grid-template-columns: 1fr auto;
+.playground[data-orientation='vertical'][data-output-mode='full'] {
+  grid-template-areas: 'eee eog ooo';
+  grid-template-columns:
+    var(--final-editor-dimension)
+    var(--gutter-dimension)
+    var(--final-output-width);
 }
 
-.resizeableAreaColumnOutputFocused {
-  composes: -resizeableArea;
-  grid-template-columns: 1fr 12px 1fr;
+.playground[data-orientation='vertical'][data-output-mode='slim'] {
+  grid-template-areas: 'eee ooo';
+  grid-template-columns:
+    var(--final-editor-dimension)
+    auto;
 }
 
-.-gutter {
+.editor {
+  grid-area: eee;
+  border: 4px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.editorOutputGutter {
+  grid-area: eog;
+}
+
+.output {
+  grid-area: ooo;
+}
+
+.gutter {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.splitRowsGutter {
-  composes: -gutter;
-  cursor: row-resize;
-}
-
-.splitRowsGutterHandle {
-  transform: rotate(90deg);
-  pointer-events: none;
-}
-
-.splitColumnsGutter {
-  composes: -gutter;
+.gutter[data-orientation='vertical'] {
   cursor: col-resize;
 }
 
-.editor {
-  composes: -autoSize from './shared.module.css';
-  border: 4px solid var(--border-color);
-  border-radius: 4px;
+.gutterHandle {
+  user-select: none;
 }
 
-.output {
-  composes: -autoSize from './shared.module.css';
+.gutter[data-orientation='horizontal'] {
+  cursor: row-resize;
+
+  & .gutterHandle {
+    transform: rotate(90deg);
+  }
 }

@@ -26,6 +26,7 @@ node_modules
 !Output/PaneWithMir.tsx
 !Output/SimplePane.tsx
 !Output/WarnAboutNoSymbols.tsx
+!Playground.tsx
 !PopButton.tsx
 !Prism.tsx
 !SimpleButtonMenuItem.tsx

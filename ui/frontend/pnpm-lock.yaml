@@ -62,9 +62,6 @@ importers:
       route-parser:
         specifier: ^0.0.5
         version: 0.0.5
-      split-grid:
-        specifier: ^1.0.9
-        version: 1.0.11
       suspend-react:
         specifier: ^0.1.3
         version: 0.1.3(react@19.2.5)
@@ -129,6 +126,9 @@ importers:
       babel-loader:
         specifier: ^10.0.0
         version: 10.1.1(@babel/core@7.29.0)(webpack@5.106.2)
+      babel-plugin-react-compiler:
+        specifier: ^1.0.0
+        version: 1.0.0
       compression-webpack-plugin:
         specifier: ^11.0.0
         version: 11.1.0(webpack@5.106.2)
@@ -1776,6 +1776,9 @@ packages:
     resolution: {integrity: sha512-M762rNHfSF1EV3SLtnCJXFoQbbIIz0OyRwnCmV0KPC7qosSfCO0QLTSuJX3ayAebubhE6oYBAYPrBA5ljowaZg==}
     peerDependencies:
       '@babel/core': ^7.4.0 || ^8.0.0-0 <8.0.0
+
+  babel-plugin-react-compiler@1.0.0:
+    resolution: {integrity: sha512-Ixm8tFfoKKIPYdCCKYTsqv+Fd4IJ0DQqMyEimo+pxUOMUR9cVPlwTrFt9Avu+3cb6Zp3mAzl+t1MrG2fxxKsxw==}
 
   babel-preset-current-node-syntax@1.2.0:
     resolution: {integrity: sha512-E/VlAEzRrsLEb2+dv8yp3bo4scof3l9nR4lrld+Iy5NyVqgVYUJnDAmunkhPMisRI32Qc4iRiz425d8vM++2fg==}
@@ -3754,9 +3757,6 @@ packages:
   source-map@0.7.6:
     resolution: {integrity: sha512-i5uvt8C3ikiWeNZSVZNWcfZPItFQOsYTUAOkcUPGd8DqDy1uOUikjt5dG+uRlwyvR108Fb9DOd4GvXfT0N2/uQ==}
     engines: {node: '>= 12'}
-
-  split-grid@1.0.11:
-    resolution: {integrity: sha512-ELtFtxc3r5we5GZfe6Fi0BFFxIi2M6BY1YEntBscKRDD3zx4JVHqx2VnTRSQu1BixCYSTH3MTjKd4esI2R7EgQ==}
 
   sprintf-js@1.0.3:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
@@ -6066,6 +6066,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  babel-plugin-react-compiler@1.0.0:
+    dependencies:
+      '@babel/types': 7.29.0
+
   babel-preset-current-node-syntax@1.2.0(@babel/core@7.29.0):
     dependencies:
       '@babel/core': 7.29.0
@@ -8299,8 +8303,6 @@ snapshots:
   source-map@0.6.1: {}
 
   source-map@0.7.6: {}
-
-  split-grid@1.0.11: {}
 
   sprintf-js@1.0.3: {}
 
