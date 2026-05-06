@@ -44,7 +44,7 @@ type wsExecuteRequestPayload = {
 
 const { action: wsExecuteBegin, schema: wsExecuteBeginSchema } = createWebsocketResponse(
   'output/execute/wsExecuteBegin',
-  z.undefined(),
+  z.undefined().optional(),
 );
 
 const { action: wsExecuteStdout, schema: wsExecuteStdoutSchema } = createWebsocketResponse(
