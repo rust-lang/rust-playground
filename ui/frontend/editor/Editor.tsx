@@ -1,15 +1,13 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 
 import * as actions from '../actions';
-import { useAppDispatch } from '../hooks';
-
-import AceEditor from './AceEditor';
-import SimpleEditor from './SimpleEditor';
-import MonacoEditor from './MonacoEditor';
-import { Editor as EditorType } from '../types';
-import { codeSelector, positionSelector, selectionSelector } from '../selectors';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import { editCode } from '../reducers/code';
-import { useAppSelector } from '../hooks';
+import { codeSelector, positionSelector, selectionSelector } from '../selectors';
+import { Editor as EditorType } from '../types';
+import AceEditor from './AceEditor';
+import MonacoEditor from './MonacoEditor';
+import SimpleEditor from './SimpleEditor';
 
 import * as styles from './Editor.module.css';
 
@@ -20,6 +18,8 @@ const editorMap = {
 };
 
 const Editor: React.FC = () => {
+  'use memo';
+
   const code = useAppSelector(codeSelector);
   const editor = useAppSelector((state) => state.configuration.editor);
   const position = useAppSelector(positionSelector);
@@ -27,19 +27,19 @@ const Editor: React.FC = () => {
   const crates = useAppSelector((state) => state.crates);
 
   const dispatch = useAppDispatch();
-  const execute = useCallback(() => dispatch(actions.performPrimaryAction()), [dispatch]);
-  const onEditCode = useCallback((c: string) => dispatch(editCode(c)), [dispatch]);
 
   const SelectedEditor = editorMap[editor];
 
   return (
     <div className={styles.container}>
-      <SelectedEditor code={code}
+      <SelectedEditor
+        code={code}
         position={position}
         selection={selection}
         crates={crates}
-        onEditCode={onEditCode}
-        execute={execute} />
+        onEditCode={(c) => dispatch(editCode(c))}
+        execute={() => dispatch(actions.performPrimaryAction())}
+      />
     </div>
   );
 };
