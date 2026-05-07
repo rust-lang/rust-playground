@@ -85,9 +85,14 @@ const MonacoEditorCore: React.FC<CommonEditorProps> = (props) => {
   useEditorProp(
     editor,
     props.onEditCode,
-    useCallback((_editor, model, onEditCode) => {
-      model.onDidChangeContent(() => {
-        onEditCode(model.getValue());
+    useCallback((editor, _model, onEditCode) => {
+      editor.onDidChangeModelContent(() => {
+        // Must get the current model, not whatever model was active
+        // when we set up the callback.
+        const value = editor.getModel()?.getValue();
+        if (value) {
+          onEditCode(value);
+        }
       });
     }, []),
   );
