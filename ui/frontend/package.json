@@ -51,7 +51,7 @@
     "css-loader": "^7.1.2",
     "eslint": "^9.15.0",
     "eslint-plugin-react": "^7.14.3",
-    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-hooks": "^7.0.0",
     "html-webpack-plugin": "^5.2.0",
     "jest": "^30.0.5",
     "json-loader": "^0.5.4",

@@ -48,6 +48,7 @@ const PopButton: React.FC<NewPopProps> = ({ Button, Menu, menuContainer }) => {
   const { x, y, refs, strategy, context, placement } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
+    // eslint-disable-next-line react-hooks/refs
     middleware: [offset(10), flip(), shift(), arrow({ element: arrowRef })],
     whileElementsMounted: autoUpdate,
   });
@@ -91,6 +92,7 @@ const PopButton: React.FC<NewPopProps> = ({ Button, Menu, menuContainer }) => {
 
   return (
     <>
+      {/* eslint-disable-next-line react-hooks/refs */}
       <Button toggle={toggle} ref={refs.setReference} {...getReferenceProps()} />
 
       {Portal || FloatingMenu}
