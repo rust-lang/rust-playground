@@ -1,6 +1,6 @@
 import { configureStore as reduxConfigureStore } from '@reduxjs/toolkit';
 import { produce } from 'immer';
-import { merge } from 'lodash-es';
+import { mergeWith } from 'lodash-es';
 
 import initializeLocalStorage from './local_storage';
 import { observer } from './observer';
@@ -37,12 +37,24 @@ export default function configureStore(window: Window) {
   const sessionStorage = initializeSessionStorage();
 
   const preloadedState = produce(initialAppState, (initialAppState) =>
-    merge(
+    mergeWith(
       initialAppState,
       initialGlobalState,
       initialThemes,
       localStorage.initialState,
       sessionStorage.initialState,
+      (_objValue, srcValue, key, _object, _source, _stack) => {
+        if (key === 'code') {
+          // We want user-provided code to replace the initial code,
+          // not merge with it.
+          //
+          // This feels pretty brittle; it'd be nice if we could check
+          // the full path to the key we are merging.
+          return srcValue;
+        }
+
+        return undefined;
+      },
     ),
   );
 

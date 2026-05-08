@@ -98,6 +98,10 @@ Capybara.add_selector(:config_option) do
   end
 end
 
+Capybara.add_selector(:filetree) do
+  css { '[data-test-id = "filetree"]' }
+end
+
 RSpec.configure do |config|
   config.after(:example, :js) do
     page.execute_script <<~JS

@@ -44,6 +44,8 @@ export const ChannelVersion = z.object({
 
 export type ChannelVersion = z.infer<typeof ChannelVersion>;
 
+export type FileId = number;
+
 export interface CommonEditorProps {
   code: string;
   execute: () => void;

@@ -1,5 +1,6 @@
 import React, { Activity, StrictMode, useRef, useState } from 'react';
 
+import FileTree from './FileTree';
 import Header from './Header';
 import Notifications from './Notifications';
 import Output from './Output';
@@ -125,8 +126,6 @@ const Gutter: React.FC<GutterProps> = ({ container, className, orientation, onMo
     </div>
   );
 };
-
-const FileTree = () => 'Placeholder for the file tree component';
 
 const makeStyleFromPixels = (cssProps: [string, number | undefined][]): React.CSSProperties => {
   const massagedProps = cssProps
