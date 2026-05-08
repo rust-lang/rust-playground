@@ -6,7 +6,7 @@ import 'ace-builds/src-noconflict/ext-searchbox';
 import 'ace-builds/src-noconflict/mode-rust';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Crate, PairCharacters, Position, Selection } from '../types';
+import { CommonEditorProps, Crate, PairCharacters, Position } from '../types';
 
 import * as styles from './Editor.module.css';
 
@@ -79,16 +79,10 @@ function useRafDebouncedFunction<A extends unknown[]>(fn: (...args: A) => void, 
   }, [fn, onCall, timeout]);
 }
 
-interface AceEditorProps {
+interface AceEditorProps extends CommonEditorProps {
   autocompleteOnUse: boolean;
-  code: string;
-  execute: () => void;
   keybinding: string;
-  onEditCode: (_: string) => void;
-  position: Position;
-  selection: Selection;
   theme: string;
-  crates: Crate[];
   pairCharacters: PairCharacters;
 }
 
