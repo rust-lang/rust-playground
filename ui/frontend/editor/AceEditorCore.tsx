@@ -129,7 +129,7 @@ const AceEditor: React.FC<AceEditorProps> = props => {
       setEditor(null);
       danglingElement.textContent = '';
     };
-  }, [child]);
+  }, []);
 
   useEditorProp(editor, props.execute, useCallback((editor, execute) => {
     // TODO: Remove command?
