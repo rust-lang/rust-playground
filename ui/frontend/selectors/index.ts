@@ -16,6 +16,12 @@ import {
 
 const MS_PER_S = 1000;
 
+const featureFlags = (state: State) => state.featureFlags;
+const clientFeatureFlagThreshold = (state: State) => state.client.featureFlagThreshold;
+
+const createFeatureFlagSelector = (ff: (state: State) => number) =>
+  createSelector(clientFeatureFlagThreshold, ff, (c, ff) => c <= ff);
+
 export const codeSelector = (state: State) => state.code;
 export const positionSelector = (state: State) => state.position;
 export const selectionSelector = (state: State) => state.selection;
@@ -494,17 +500,9 @@ export const offerCrateAutocompleteOnUse = createSelector(
   (edition) => edition !== Edition.Rust2015,
 );
 
-const client = (state: State) => state.client;
-const featureFlags = (state: State) => state.featureFlags;
 const websocket = (state: State) => state.websocket;
 
-const clientFeatureFlagThreshold = createSelector(client, (c) => c.featureFlagThreshold);
-
 const showGemThreshold = createSelector(featureFlags, ff => ff.showGemThreshold);
-
-const createFeatureFlagSelector = (ff: (state: State) => number) =>
-  createSelector(clientFeatureFlagThreshold, ff, (c, ff) => c <= ff);
-
 export const showGemSelector = createFeatureFlagSelector(showGemThreshold);
 
 export const executeViaWebsocketSelector = createSelector(websocket, (ws) => ws.connected);
