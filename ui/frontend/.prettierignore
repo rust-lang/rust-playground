@@ -46,6 +46,7 @@ node_modules
 !observer.ts
 !prism-shim.ts
 !reducers/**/*.ts
+!selectors/gist.ts
 !selectors/index.spec.ts
 !types.ts
 !websocketActions.ts
