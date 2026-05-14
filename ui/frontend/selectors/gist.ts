@@ -4,37 +4,42 @@ import { source } from 'common-tags';
 import { baseUrlSelector, codeSelector } from '.';
 import { State } from '../reducers';
 
-const gistSelector = (state: State) => state.output.gist;
+const gistCodeSelector = (state: State) => state.output.gist.code;
 
 // Selects url.query of build configs.
-const urlQuerySelector = createSelector(gistSelector, (gist) => {
-  const res = new URLSearchParams();
-  if (gist.channel) {
-    res.set('version', gist.channel);
-  }
-  if (gist.mode) {
-    res.set('mode', gist.mode);
-  }
-  if (gist.edition) {
-    res.set('edition', gist.edition);
-  }
-  return res;
-});
+const urlQuerySelector = createSelector(
+  (state: State) => state.output.gist.channel,
+  (state: State) => state.output.gist.mode,
+  (state: State) => state.output.gist.edition,
+  (channel, mode, edition) => {
+    const res = new URLSearchParams();
+    if (channel) {
+      res.set('version', channel);
+    }
+    if (mode) {
+      res.set('mode', mode);
+    }
+    if (edition) {
+      res.set('edition', edition);
+    }
+    return res;
+  },
+);
 
 export const showGistLoaderSelector = createSelector(
-  gistSelector,
-  (gist) => gist.requestsInProgress > 0,
+  (state: State) => state.output.gist.requestsInProgress,
+  (requestsInProgress) => requestsInProgress > 0,
 );
 
 export const permalinkSelector = createSelector(
   baseUrlSelector,
   urlQuerySelector,
-  gistSelector,
-  (baseUrl, originalQuery, gist) => {
+  (state: State) => state.output.gist.id,
+  (baseUrl, originalQuery, id) => {
     const u = new URL(baseUrl);
     const query = new URLSearchParams(originalQuery);
-    if (gist.id) {
-      query.set('gist', gist.id);
+    if (id) {
+      query.set('gist', id);
     }
     u.search = query.toString();
     return u.href;
@@ -43,8 +48,8 @@ export const permalinkSelector = createSelector(
 
 export const textChangedSinceShareSelector = createSelector(
   codeSelector,
-  gistSelector,
-  (code, gist) => code !== gist.code,
+  gistCodeSelector,
+  (code, gistCode) => code !== gistCode,
 );
 
 const codeBlock = (code: string, language = '') => '```' + language + `\n${code}\n` + '```';
@@ -55,37 +60,43 @@ const maybeOutput = (code: string | undefined, whenPresent: (_: string) => void)
   }
 };
 
-const snippetSelector = createSelector(gistSelector, permalinkSelector, (gist, permalink) => {
-  let snippet = '';
+const snippetSelector = createSelector(
+  gistCodeSelector,
+  (state: State) => state.output.gist.stdout,
+  (state: State) => state.output.gist.stderr,
+  permalinkSelector,
+  (code, stdout, stderr, permalink) => {
+    let snippet = '';
 
-  maybeOutput(gist.code, (code) => {
-    snippet += source`
+    maybeOutput(code, (code) => {
+      snippet += source`
         ${codeBlock(code, 'rust')}
 
         ([Playground](${permalink}))
       `;
-  });
+    });
 
-  maybeOutput(gist.stdout, (stdout) => {
-    snippet += '\n\n';
-    snippet += source`
+    maybeOutput(stdout, (stdout) => {
+      snippet += '\n\n';
+      snippet += source`
           Output:
 
           ${codeBlock(stdout)}
         `;
-  });
+    });
 
-  maybeOutput(gist.stderr, (stderr) => {
-    snippet += '\n\n';
-    snippet += source`
+    maybeOutput(stderr, (stderr) => {
+      snippet += '\n\n';
+      snippet += source`
           Errors:
 
           ${codeBlock(stderr)}
         `;
-  });
+    });
 
-  return snippet;
-});
+    return snippet;
+  },
+);
 
 export const urloUrlSelector = createSelector(snippetSelector, (snippet) => {
   const newUsersPostUrl = new URL('https://users.rust-lang.org/new-topic');
@@ -96,12 +107,12 @@ export const urloUrlSelector = createSelector(snippetSelector, (snippet) => {
 export const codeUrlSelector = createSelector(
   baseUrlSelector,
   urlQuerySelector,
-  gistSelector,
-  (baseUrl, originalQuery, gist) => {
+  gistCodeSelector,
+  (baseUrl, originalQuery, code) => {
     const u = new URL(baseUrl);
     const query = new URLSearchParams(originalQuery);
-    if (gist.code) {
-      query.set('code', gist.code);
+    if (code) {
+      query.set('code', code);
     }
     u.search = new URLSearchParams(query).toString();
     return u.href;
