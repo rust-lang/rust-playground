@@ -5,6 +5,7 @@ import { useAppSelector } from '../hooks';
 import { offerCrateAutocompleteOnUse } from '../selectors';
 import { CommonEditorProps } from '../types';
 import { themeVsDarkPlus } from './rust_monaco_def';
+import { useLatest } from './useLatest';
 
 import * as styles from './Editor.module.css';
 
@@ -45,12 +46,8 @@ const MonacoEditorCore: React.FC<CommonEditorProps> = (props) => {
   const completionProvider = useRef<monaco.IDisposable | null>(null);
   const autocompleteOnUse = useAppSelector(offerCrateAutocompleteOnUse);
 
-  // Replace `initialCode` and `initialTheme` with an "effect event"
-  // when those stabilize.
-  //
-  // https://react.dev/learn/separating-events-from-effects#declaring-an-effect-event
-  const initialCode = useRef(props.code);
-  const initialTheme = useRef(theme);
+  const latestCodeRef = useLatest(props.code);
+  const latestThemeRef = useLatest(theme);
 
   // One-time setup
   useEffect(() => {
@@ -58,29 +55,32 @@ const MonacoEditorCore: React.FC<CommonEditorProps> = (props) => {
   }, []);
 
   // Construct the editor
-  const child = useCallback((node: HTMLDivElement | null) => {
-    if (!node) {
-      return;
-    }
+  const child = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (!node) {
+        return;
+      }
 
-    const nodeStyle = window.getComputedStyle(node);
+      const nodeStyle = window.getComputedStyle(node);
 
-    const editor = monaco.editor.create(node, {
-      language: 'rust',
-      value: initialCode.current,
-      theme: initialTheme.current,
-      fontSize: parseInt(nodeStyle.fontSize, 10),
-      fontFamily: nodeStyle.fontFamily,
-      automaticLayout: true,
-      'semanticHighlighting.enabled': true,
-      autoClosingOvertype: 'always',
-    });
-    setEditor(editor);
+      const editor = monaco.editor.create(node, {
+        language: 'rust',
+        value: latestCodeRef.current,
+        theme: latestThemeRef.current,
+        fontSize: parseInt(nodeStyle.fontSize, 10),
+        fontFamily: nodeStyle.fontFamily,
+        automaticLayout: true,
+        'semanticHighlighting.enabled': true,
+        autoClosingOvertype: 'always',
+      });
+      setEditor(editor);
 
-    remeasureFontWhenReady(document.fonts, nodeStyle.font);
+      remeasureFontWhenReady(document.fonts, nodeStyle.font);
 
-    editor.focus();
-  }, []);
+      editor.focus();
+    },
+    [latestCodeRef, latestThemeRef],
+  );
 
   useEditorProp(
     editor,
