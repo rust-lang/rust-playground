@@ -11,6 +11,7 @@ import {
   PrimaryActionAuto,
   PrimaryActionCore,
   Version,
+  FileView,
 } from '../types';
 
 const MS_PER_S = 1000;
@@ -25,6 +26,55 @@ const allowMultipleFilesThreshold = createSelector(featureFlags, ff => ff.multif
 export const allowMultipleFiles = createFeatureFlagSelector(allowMultipleFilesThreshold);
 
 export const codeSelector = (state: State) => state.code;
+const filesSelector = (state: State) => state.files.files;
+const filesActiveSelector = (state: State) => state.files.active;
+
+const multifileEnabledSelector = createSelector(
+  allowMultipleFiles,
+  (state: State) => state.configuration.fileView,
+  (allowed, selected) => allowed && selected === FileView.Multiple,
+);
+
+export const activeCodeSelector = createSelector(
+  multifileEnabledSelector,
+  codeSelector,
+  filesActiveSelector,
+  filesSelector,
+  (multifileEnabled, code, activeFile, files) => {
+    if (multifileEnabled) {
+      return files.find((f) => f.id === activeFile)?.content;
+    } else {
+      return code;
+    }
+  }
+);
+
+const SINGLE_FILE_ID = -1;
+
+export const activeFileIdSelector = createSelector(
+  multifileEnabledSelector,
+  filesActiveSelector,
+  (multifileEnabled, active) => {
+    if (multifileEnabled) {
+      return active;
+    } else {
+      return SINGLE_FILE_ID;
+    }
+  }
+);
+
+export const fileIdsSelector = createSelector(
+  multifileEnabledSelector,
+  filesSelector,
+  (multifileEnabled, files) => {
+    if (multifileEnabled) {
+      return files.map((f) => f.id)
+    } else {
+      return [SINGLE_FILE_ID]
+    }
+  }
+)
+
 export const positionSelector = (state: State) => state.position;
 export const selectionSelector = (state: State) => state.selection;
 

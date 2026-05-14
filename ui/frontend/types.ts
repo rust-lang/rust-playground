@@ -53,6 +53,8 @@ export interface CommonEditorProps {
   position: Position;
   selection: Selection;
   crates: Crate[];
+  activeFileId: FileId;
+  fileIds: FileId[];
 }
 
 export const FileView = {

@@ -6,7 +6,7 @@ import 'ace-builds/src-noconflict/ext-searchbox';
 import 'ace-builds/src-noconflict/mode-rust';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { CommonEditorProps, Crate, PairCharacters, Position } from '../types';
+import { CommonEditorProps, Crate, FileId, PairCharacters, Position } from '../types';
 import { useLatest } from './useLatest';
 
 import * as styles from './Editor.module.css';
@@ -100,15 +100,30 @@ function useEditorProp<T>(editor: Ace.Editor | null, prop: T, whenPresent: (edit
 
 const AceEditor: React.FC<AceEditorProps> = props => {
   const [editor, setEditor] = useState<Ace.Editor | null>(null);
+  const sessionCache = useRef<Map<FileId, ace.EditSession>>(new Map());
+  const latestActiveFileIdRef = useLatest(props.activeFileId);
   const latestCodeRef = useLatest(props.code);
   const latestThemeRef = useLatest(props.theme);
+
+  const createCachedSession = useCallback(() => {
+    const activeFileId = latestActiveFileIdRef.current;
+    const cache = sessionCache.current;
+
+    if (!cache.has(activeFileId)) {
+      const session = ace.createEditSession(latestCodeRef.current);
+      session.setMode('ace/mode/rust');
+      cache.set(activeFileId, session);
+    }
+    return cache.get(activeFileId);
+  }, [latestActiveFileIdRef, latestCodeRef]);
 
   const child = useCallback((node: HTMLDivElement | null) => {
     if (!node) { return; }
 
+    const session = createCachedSession();
+
     const editor = ace.edit(node, {
-      mode: 'ace/mode/rust',
-      value: latestCodeRef.current,
+      session,
       theme: themeToAceId(latestThemeRef.current),
     });
     setEditor(editor);
@@ -133,7 +148,33 @@ const AceEditor: React.FC<AceEditorProps> = props => {
       setEditor(null);
       node.textContent = '';
     };
-  }, [latestCodeRef, latestThemeRef]);
+  }, [createCachedSession, latestThemeRef]);
+
+  useEditorProp(editor, props.activeFileId, useCallback((editor, _activeFileId) => {
+    const session = createCachedSession();
+    editor.setSession(session);
+  }, [createCachedSession]));
+
+  // Destroy cached sessions that have been removed
+  useEffect(() => {
+    for (const [cachedFileId, session] of sessionCache.current) {
+      if (!props.fileIds.includes(cachedFileId)) {
+        session.destroy();
+        sessionCache.current.delete(cachedFileId);
+      }
+    }
+  }, [props.fileIds])
+
+  // Destroy all cached sessions when we unmount
+  useEffect(() => {
+    const cache = sessionCache;
+    return () => {
+      for (const session of cache.current.values()) {
+        session.destroy();
+      }
+      cache.current.clear();
+    }
+  }, []);
 
   useEditorProp(editor, props.execute, useCallback((editor, execute) => {
     // TODO: Remove command?

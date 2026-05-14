@@ -8,6 +8,7 @@ import {
   validateFilename,
 } from '../domain/filesRules';
 import { FileId } from '../types';
+import { editCode } from './code';
 
 const filenames = (state: State): string[] => state.files.map((f) => f.name);
 
@@ -155,6 +156,14 @@ const slice = createSlice({
         state.active = file.id;
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(editCode, (state, action) => {
+      const file = state.files.find((f) => f.id === state.active);
+      if (file) {
+        file.content = action.payload;
+      }
+    });
   },
 });
 
