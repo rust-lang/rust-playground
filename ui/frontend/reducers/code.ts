@@ -28,8 +28,20 @@ const slice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(performGistLoad.pending, () => '')
-      .addCase(performGistLoad.fulfilled, (_state, action) => action.payload.code)
-      .addCase(performFormat.fulfilled, (_state, action) => action.payload.code);
+      .addCase(performGistLoad.fulfilled, (state, action) => {
+        if (typeof action.payload.code === 'string') {
+          return action.payload.code;
+        } else {
+          return state;
+        }
+      })
+      .addCase(performFormat.fulfilled, (state, action) => {
+        if (typeof action.payload.code === 'string') {
+          return action.payload.code;
+        } else {
+          return state;
+        }
+      });
   },
 });
 

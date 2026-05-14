@@ -9,8 +9,8 @@ import * as z from 'zod';
 
 import { jsonGet, jsonPost, routes } from '../../api';
 import { State as RootState } from '../../reducers';
-import { baseUrlSelector, codeSelector } from '../../selectors';
-import { Channel, Edition, Mode } from '../../types';
+import { baseUrlSelector, codeOrFilesSelector } from '../../selectors';
+import { Channel, Code, Edition, Mode } from '../../types';
 
 const sliceName = 'output/gist';
 
@@ -22,7 +22,7 @@ interface State {
   requestsInProgress: number;
   id?: string;
   url?: string;
-  code?: string;
+  code?: Code;
   stdout?: string;
   stderr?: string;
   channel?: Channel;
@@ -34,7 +34,7 @@ interface State {
 interface SuccessProps {
   id: string;
   url: string;
-  code: string;
+  code: Code;
   stdout: string;
   stderr: string;
   channel: Channel;
@@ -50,7 +50,7 @@ type PerformGistLoadProps = Pick<
 const GistResponseBody = z.object({
   id: z.string(),
   url: z.string(),
-  code: z.string(),
+  code: Code,
 });
 type GistResponseBody = z.infer<typeof GistResponseBody>;
 
@@ -73,7 +73,7 @@ export const performGistSave = createAsyncThunk<SuccessProps, void, { state: Roo
   `${sliceName}/save`,
   async (_arg, { getState }) => {
     const state = getState();
-    const code = codeSelector(state);
+    const code = codeOrFilesSelector(state);
     const {
       configuration: { channel, mode, edition },
       output: {

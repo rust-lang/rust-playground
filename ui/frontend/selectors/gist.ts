@@ -1,10 +1,23 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { source } from 'common-tags';
 
-import { baseUrlSelector, codeSelector } from '.';
+import { baseUrlSelector, codeOrFilesSelector } from '.';
 import { State } from '../reducers';
 
 const gistCodeSelector = (state: State) => state.output.gist.code;
+
+const linearCodeSelector = createSelector(gistCodeSelector, (code) => {
+  if (!code) {
+    return code;
+  }
+  if (typeof code === 'string') {
+    return code;
+  } else {
+    const f = [...code];
+    f.sort((a, b) => a.name.localeCompare(b.name));
+    return f.reduce((acc, f) => acc + `// ${f.name}` + '\n\n' + f.content + '\n', '');
+  }
+});
 
 // Selects url.query of build configs.
 const urlQuerySelector = createSelector(
@@ -47,9 +60,37 @@ export const permalinkSelector = createSelector(
 );
 
 export const textChangedSinceShareSelector = createSelector(
-  codeSelector,
+  codeOrFilesSelector,
   gistCodeSelector,
-  (code, gistCode) => code !== gistCode,
+  (code, gistCode) => {
+    if (typeof code === 'string' && typeof gistCode === 'string') {
+      return code !== gistCode;
+    } else if (Array.isArray(code) && Array.isArray(gistCode)) {
+      // Does the count of files match?
+      if (code.length !== gistCode.length) {
+        return true;
+      }
+
+      const codeMap = new Map(code.map((c) => [c.name, c.content]));
+      const gistCodeMap = new Map(gistCode.map((gc) => [gc.name, gc.content]));
+
+      const codeFiles = new Set(codeMap.keys());
+      const gistCodeFiles = new Set(gistCodeMap.keys());
+
+      // Do all the filenames match?
+      if (codeFiles.symmetricDifference(gistCodeFiles).size !== 0) {
+        return true;
+      }
+
+      // Do all of the contents match?
+      return codeMap.entries().some(([name, content]) => {
+        const gistContent = gistCodeMap.get(name);
+        return gistContent !== content;
+      });
+    } else {
+      return true;
+    }
+  },
 );
 
 const codeBlock = (code: string, language = '') => '```' + language + `\n${code}\n` + '```';
@@ -61,20 +102,32 @@ const maybeOutput = (code: string | undefined, whenPresent: (_: string) => void)
 };
 
 const snippetSelector = createSelector(
-  gistCodeSelector,
+  codeOrFilesSelector,
   (state: State) => state.output.gist.stdout,
   (state: State) => state.output.gist.stderr,
   permalinkSelector,
   (code, stdout, stderr, permalink) => {
     let snippet = '';
 
-    maybeOutput(code, (code) => {
-      snippet += source`
+    if (typeof code === 'string') {
+      maybeOutput(code, (code) => {
+        snippet += source`
         ${codeBlock(code, 'rust')}
 
         ([Playground](${permalink}))
       `;
-    });
+      });
+    } else {
+      for (const { name, content } of code) {
+        snippet += source`
+        **${name}**
+        ${codeBlock(content, 'rust')}
+      `;
+      }
+      snippet += source`
+        ([Playground](${permalink}))
+      `;
+    }
 
     maybeOutput(stdout, (stdout) => {
       snippet += '\n\n';
@@ -107,7 +160,7 @@ export const urloUrlSelector = createSelector(snippetSelector, (snippet) => {
 export const codeUrlSelector = createSelector(
   baseUrlSelector,
   urlQuerySelector,
-  gistCodeSelector,
+  linearCodeSelector,
   (baseUrl, originalQuery, code) => {
     const u = new URL(baseUrl);
     const query = new URLSearchParams(originalQuery);

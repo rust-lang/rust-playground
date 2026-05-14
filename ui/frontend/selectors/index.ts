@@ -35,6 +35,19 @@ const multifileEnabledSelector = createSelector(
   (allowed, selected) => allowed && selected === FileView.Multiple,
 );
 
+export const codeOrFilesSelector = createSelector(
+  multifileEnabledSelector,
+  codeSelector,
+  filesSelector,
+  (multifileEnabled, single, multiple) => {
+    if (multifileEnabled) {
+      return multiple;
+    } else {
+      return single;
+    }
+  }
+);
+
 export const activeCodeSelector = createSelector(
   multifileEnabledSelector,
   codeSelector,
@@ -391,14 +404,14 @@ export const clippyRequestSelector = createSelector(
   channelSelector,
   getCrateType,
   editionSelector,
-  codeSelector,
+  codeOrFilesSelector,
   (channel, crateType, edition, code) => ({ channel, crateType, edition, code }),
 );
 
 export const formatRequestSelector = createSelector(
   channelSelector,
   editionSelector,
-  codeSelector,
+  codeOrFilesSelector,
   (channel, edition, code) => ({ channel, edition, code }),
 );
 
@@ -406,13 +419,13 @@ export const miriRequestSelector = createSelector(
   editionSelector,
   runAsTest,
   aliasingModelSelector,
-  codeSelector,
+  codeOrFilesSelector,
   (edition, tests, aliasingModel, code, ) => ({ edition, tests, aliasingModel, code }),
 );
 
 export const macroExpansionRequestSelector = createSelector(
   editionSelector,
-  codeSelector,
+  codeOrFilesSelector,
   (edition, code) => ({ edition, code })
 );
 
@@ -478,7 +491,7 @@ export const websocketStatusSelector = createSelector(
 );
 
 export const executeRequestPayloadSelector = createSelector(
-  codeSelector,
+  codeOrFilesSelector,
   channelSelector,
   (state: State) => state.configuration,
   getBacktraceSet,
@@ -495,7 +508,7 @@ export const executeRequestPayloadSelector = createSelector(
 );
 
 export const compileRequestPayloadSelector = createSelector(
-  codeSelector,
+  codeOrFilesSelector,
   channelSelector,
   (state: State) => state.configuration,
   getCrateType,

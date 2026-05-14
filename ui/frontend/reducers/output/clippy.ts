@@ -4,6 +4,7 @@ import * as z from 'zod';
 import { jsonPost, routes } from '../../api';
 import { State as RootState } from '../../reducers';
 import { clippyRequestSelector } from '../../selectors';
+import { Code } from '../../types';
 
 const sliceName = 'output/clippy';
 
@@ -22,7 +23,7 @@ interface ClippyRequestBody {
   channel: string;
   crateType: string;
   edition: string;
-  code: string;
+  code: Code;
 }
 
 const ClippyResponseBody = z.object({

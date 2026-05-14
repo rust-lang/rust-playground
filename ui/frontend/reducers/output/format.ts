@@ -4,6 +4,7 @@ import * as z from 'zod';
 import { jsonPost, routes } from '../../api';
 import { State as RootState } from '../../reducers';
 import { formatRequestSelector } from '../../selectors';
+import { Code } from '../../types';
 
 const sliceName = 'output/format';
 
@@ -20,12 +21,12 @@ interface State {
 interface FormatRequestBody {
   channel: string;
   edition: string;
-  code: string;
+  code: Code;
 }
 
 const FormatResponseBody = z.object({
   success: z.boolean(),
-  code: z.string(),
+  code: Code,
   stdout: z.string(),
   stderr: z.string(),
 });

@@ -9,6 +9,8 @@ import {
 } from '../domain/filesRules';
 import { FileId } from '../types';
 import { editCode } from './code';
+import { performFormat } from './output/format';
+import { performGistLoad } from './output/gist';
 
 const filenames = (state: State): string[] => state.files.map((f) => f.name);
 
@@ -158,12 +160,35 @@ const slice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(editCode, (state, action) => {
-      const file = state.files.find((f) => f.id === state.active);
-      if (file) {
-        file.content = action.payload;
-      }
-    });
+    builder
+      .addCase(editCode, (state, action) => {
+        const file = state.files.find((f) => f.id === state.active);
+        if (file) {
+          file.content = action.payload;
+        }
+      })
+      .addCase(performGistLoad.pending, (state) => {
+        state.active = null;
+        state.files = [];
+      })
+      .addCase(performGistLoad.fulfilled, (state, action) => {
+        if (typeof action.payload.code !== 'string') {
+          state.files = action.payload.code.map((f) => buildFile(state, f.name, f.content));
+          state.active = selectActiveFile(state.files);
+        }
+      })
+      .addCase(performFormat.fulfilled, (state, action) => {
+        if (typeof action.payload.code !== 'string') {
+          const formattedFiles = action.payload.code;
+          for (const f of state.files) {
+            const formattedFile = formattedFiles.find((ff) => ff.name === f.name);
+            if (formattedFile) {
+              f.content = formattedFile.content;
+            }
+          }
+          // we expect that active remains correct,
+        }
+      });
   },
 });
 
