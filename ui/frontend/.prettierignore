@@ -16,6 +16,7 @@ node_modules
 !BuildMenu.tsx
 !ButtonSet.tsx
 !ConfigElement.tsx
+!Gist.tsx
 !Header.tsx
 !HelpExample.tsx
 !Notifications.tsx
