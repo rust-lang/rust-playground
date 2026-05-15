@@ -20,10 +20,9 @@ interface InitializedStorage {
   clear: () => void;
 }
 
-export function removeVersion<T extends { version: unknown }>(data: T): Omit<T, 'version'> {
-  const munged: Record<string, unknown> = {...data};
-  delete munged.version;
-  return munged as Omit<T, 'version'>
+export function removeVersion<T extends { version?: unknown }>(data: T): Omit<T, 'version'> {
+  const { version, ...rest } = data;
+  return rest;
 }
 
 export class InMemoryStorage {
