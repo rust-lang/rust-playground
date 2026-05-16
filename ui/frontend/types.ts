@@ -59,12 +59,14 @@ export const Editor = {
   Monaco: 'monaco',
 } as const;
 export type Editor = ValuesOf<typeof Editor>;
+export const EditorSchema = z.enum(Object.values(Editor));
 
 export const PairCharacters = {
   Enabled: 'enabled',
   Disabled: 'disabled',
 } as const;
 export type PairCharacters = ValuesOf<typeof PairCharacters>;
+export const PairCharactersSchema = z.enum(Object.values(PairCharacters));
 
 export const Orientation = {
   Automatic: 'automatic',
@@ -72,6 +74,7 @@ export const Orientation = {
   Vertical: 'vertical',
 } as const;
 export type Orientation = ValuesOf<typeof Orientation>;
+export const OrientationSchema = z.enum(Object.values(Orientation));
 
 export const Theme = {
   Light: 'light',
@@ -79,24 +82,28 @@ export const Theme = {
   System: 'system',
 } as const;
 export type Theme = ValuesOf<typeof Theme>;
+export const ThemeSchema = z.enum(Object.values(Theme));
 
 export const AssemblyFlavor = {
   Att: 'att',
   Intel: 'intel',
 } as const;
 export type AssemblyFlavor = ValuesOf<typeof AssemblyFlavor>;
+export const AssemblyFlavorSchema = z.enum(Object.values(AssemblyFlavor));
 
 export const DemangleAssembly = {
   Demangle: 'demangle',
   Mangle: 'mangle',
 } as const;
 export type DemangleAssembly = ValuesOf<typeof DemangleAssembly>;
+export const DemangleAssemblySchema = z.enum(Object.values(DemangleAssembly));
 
 export const ProcessAssembly = {
   Filter: 'filter',
   Raw: 'raw',
 } as const;
 export type ProcessAssembly = ValuesOf<typeof ProcessAssembly>;
+export const ProcessAssemblySchema = z.enum(Object.values(ProcessAssembly));
 
 export const PrimaryActionAuto = {
   Auto: 'auto',
@@ -117,6 +124,7 @@ export type PrimaryActionCore = ValuesOf<typeof PrimaryActionCore>;
 
 export const PrimaryAction = { ...PrimaryActionAuto, ...PrimaryActionCore };
 export type PrimaryAction = ValuesOf<typeof PrimaryAction>;
+export const PrimaryActionSchema = z.enum(Object.values(PrimaryAction));
 
 export const Channel = {
   Stable: 'stable',
@@ -124,11 +132,10 @@ export const Channel = {
   Nightly: 'nightly',
 } as const;
 export type Channel = ValuesOf<typeof Channel>;
-
-const ChannelEnum = z.enum(Object.values(Channel));
+const ChannelSchema = z.enum(Object.values(Channel));
 
 export function parseChannel(s?: string): Channel | null {
-  const p = ChannelEnum.safeParse(s);
+  const p = ChannelSchema.safeParse(s);
   return p.success ? p.data : null;
 }
 
@@ -137,11 +144,10 @@ export const Mode = {
   Release: 'release',
 } as const;
 export type Mode = ValuesOf<typeof Mode>;
-
-const ModeEnum = z.enum(Object.values(Mode));
+const ModeSchema = z.enum(Object.values(Mode));
 
 export function parseMode(s?: string): Mode | null {
-  const p = ModeEnum.safeParse(s);
+  const p = ModeSchema.safeParse(s);
   return p.success ? p.data : null;
 }
 
@@ -152,11 +158,10 @@ export const Edition = {
   Rust2024: '2024',
 } as const;
 export type Edition = ValuesOf<typeof Edition>;
-
-const EditionEnum = z.enum(Object.values(Edition));
+const EditionSchema = z.enum(Object.values(Edition));
 
 export function parseEdition(s?: string): Edition | null {
-  const p = EditionEnum.safeParse(s);
+  const p = EditionSchema.safeParse(s);
   return p.success ? p.data : null;
 }
 

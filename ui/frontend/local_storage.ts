@@ -1,65 +1,87 @@
 // This is used to store "long-term" values; those which we want to be
 // preserved between completely independent sessions of the
 // playground.
+import * as z from 'zod';
+
 import { State } from './reducers';
 import { codeSelector } from './selectors';
 import { PartialState, initializeStorage, removeVersion } from './storage';
 import {
-  AssemblyFlavor,
-  DemangleAssembly,
+  AssemblyFlavorSchema,
+  DemangleAssemblySchema,
   Editor,
-  Orientation,
-  PairCharacters,
-  ProcessAssembly,
+  EditorSchema,
+  OrientationSchema,
+  PairCharactersSchema,
+  ProcessAssemblySchema,
   Theme,
+  ThemeSchema,
 } from './types';
 
 const CURRENT_VERSION = 2;
 
-interface V2Configuration {
-  version: 2;
-  client: {
-    id: string;
-    featureFlagThreshold: number;
-    visitedAt?: string;
-  };
-  configuration: {
-    editor: Editor;
-    ace: {
-      keybinding: string;
-      theme: string;
-      pairCharacters: PairCharacters;
-    };
-    monaco: {
-      theme: string;
-    };
-    theme: Theme;
-    orientation: Orientation;
-    assemblyFlavor: AssemblyFlavor;
-    demangleAssembly: DemangleAssembly;
-    processAssembly: ProcessAssembly;
-  };
-  code: string;
-  notifications: object;
-}
+const V2Configuration = z
+  .object({
+    version: z.literal(2),
+    client: z
+      .object({
+        id: z.string(),
+        featureFlagThreshold: z.number(),
+        visitedAt: z.string(),
+      })
+      .partial(),
+    configuration: z
+      .object({
+        editor: EditorSchema,
+        ace: z
+          .object({
+            keybinding: z.string(),
+            theme: z.string(),
+            pairCharacters: PairCharactersSchema,
+          })
+          .partial(),
+        monaco: z
+          .object({
+            theme: z.string(),
+          })
+          .partial(),
+        theme: ThemeSchema,
+        orientation: OrientationSchema,
+        assemblyFlavor: AssemblyFlavorSchema,
+        demangleAssembly: DemangleAssemblySchema,
+        processAssembly: ProcessAssemblySchema,
+      })
+      .partial(),
+    code: z.string(),
+    notifications: z.looseObject({}),
+  })
+  .partial();
+type V2Configuration = z.infer<typeof V2Configuration>;
 
-interface V1Configuration {
-  version: 1;
-  configuration: {
-    editor: 'simple' | 'advanced';
-    keybinding: string;
-    theme: string;
-    pairCharacters: PairCharacters;
-    orientation: Orientation;
-    assemblyFlavor: AssemblyFlavor;
-    demangleAssembly: DemangleAssembly;
-    processAssembly: ProcessAssembly;
-  };
-  code: string;
-  notifications: object;
-}
+const V1Configuration = z
+  .object({
+    version: z.literal(1),
+    configuration: z
+      .object({
+        editor: z.enum(['simple', 'advanced']),
+        keybinding: z.string(),
+        theme: z.string(),
+        pairCharacters: PairCharactersSchema,
+        orientation: OrientationSchema,
+        assemblyFlavor: AssemblyFlavorSchema,
+        demangleAssembly: DemangleAssemblySchema,
+        processAssembly: ProcessAssemblySchema,
+      })
+      .partial(),
+    code: z.string(),
+    notifications: z.looseObject({}),
+  })
+  .partial();
+type V1Configuration = z.infer<typeof V1Configuration>;
 
 type CurrentConfiguration = V2Configuration;
+
+const SomeConfiguration = V1Configuration.or(V2Configuration);
 
 export function serialize(state: State): string {
   const code = codeSelector(state);
@@ -87,7 +109,7 @@ export function serialize(state: State): string {
       processAssembly: state.configuration.processAssembly,
     },
     code,
-    notifications: state.notifications,
+    notifications: { ...state.notifications },
   };
   return JSON.stringify(conf);
 }
@@ -95,7 +117,7 @@ export function serialize(state: State): string {
 const MIGRATION_TIMESTAMP = '2021-08-21T21:51:05.000Z';
 
 function migrateV1(state: V1Configuration): CurrentConfiguration {
-  const { editor, theme, keybinding, pairCharacters, ...configuration } = state.configuration;
+  const { editor, theme, keybinding, pairCharacters, ...configuration } = state.configuration ?? {};
   const step: V2Configuration = {
     ...state,
     client: {
@@ -131,21 +153,20 @@ function migrate(state: V1Configuration | V2Configuration): CurrentConfiguration
 }
 
 export function deserialize(savedState: string): PartialState {
-  if (!savedState) {
+  try {
+    const parsedState = JSON.parse(savedState);
+
+    const validatedState = SomeConfiguration.parse(parsedState);
+
+    const result = migrate(validatedState);
+    if (!result) {
+      return undefined;
+    }
+
+    return removeVersion(result);
+  } catch {
     return undefined;
   }
-
-  const parsedState = JSON.parse(savedState);
-  if (!parsedState) {
-    return undefined;
-  }
-
-  const result = migrate(parsedState);
-  if (!result) {
-    return undefined;
-  }
-
-  return removeVersion(result);
 }
 
 export default initializeStorage({
