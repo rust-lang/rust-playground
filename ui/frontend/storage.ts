@@ -70,7 +70,6 @@ function validateStorage(storageFactory: StorageFactory): SimpleStorage {
     const current = storage.getItem(KEY);
     storage.setItem(KEY, current || '');
     return storage;
-
   } catch (_e) {
     console.warn('Unable to store configuration, falling back to non-persistent in-memory storage');
     return new InMemoryStorage();

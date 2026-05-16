@@ -1,10 +1,9 @@
 // This is used to store "short-term" values; those which we want to
 // be preserved between the same sessions of the playground, such as
 // when we reopen a closed tab.
-
 import { State } from './reducers';
-import {removeVersion, initializeStorage, PartialState} from './storage';
 import { codeSelector } from './selectors';
+import { PartialState, initializeStorage, removeVersion } from './storage';
 
 const CURRENT_VERSION = 1;
 
@@ -21,12 +20,18 @@ export function serialize(state: State): string {
 }
 
 export function deserialize(savedState: string): PartialState {
-  if (!savedState) { return undefined; }
+  if (!savedState) {
+    return undefined;
+  }
 
   const parsedState = JSON.parse(savedState);
-  if (!parsedState) { return undefined; }
+  if (!parsedState) {
+    return undefined;
+  }
 
-  if (parsedState.version !== CURRENT_VERSION) { return undefined; }
+  if (parsedState.version !== CURRENT_VERSION) {
+    return undefined;
+  }
 
   // This assumes that the keys we serialize with match the keys in the
   // live state. If that's no longer true, an additional renaming step

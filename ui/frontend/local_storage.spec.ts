@@ -34,7 +34,12 @@ describe('restoring saved state', () => {
 
   test('data is migrated', () => {
     const parsed = easyDeserialize({
-      configuration: { editor: 'advanced', theme: 'xcode', keybinding: 'vi', pairCharacters: 'disabled' },
+      configuration: {
+        editor: 'advanced',
+        theme: 'xcode',
+        keybinding: 'vi',
+        pairCharacters: 'disabled',
+      },
     });
 
     expect(parsed?.configuration?.editor).toEqual('ace');

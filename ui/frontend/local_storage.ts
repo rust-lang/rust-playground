@@ -1,11 +1,18 @@
 // This is used to store "long-term" values; those which we want to be
 // preserved between completely independent sessions of the
 // playground.
-
 import { State } from './reducers';
-import {removeVersion, initializeStorage, PartialState} from './storage';
-import { AssemblyFlavor, DemangleAssembly, Editor, Orientation, PairCharacters, ProcessAssembly, Theme } from './types';
 import { codeSelector } from './selectors';
+import { PartialState, initializeStorage, removeVersion } from './storage';
+import {
+  AssemblyFlavor,
+  DemangleAssembly,
+  Editor,
+  Orientation,
+  PairCharacters,
+  ProcessAssembly,
+  Theme,
+} from './types';
 
 const CURRENT_VERSION = 2;
 
@@ -114,20 +121,29 @@ function migrateV2(state: V2Configuration): CurrentConfiguration {
 
 function migrate(state: V1Configuration | V2Configuration): CurrentConfiguration | undefined {
   switch (state.version) {
-    case 1: return migrateV1(state);
-    case 2: return migrateV2(state);
-    default: return undefined
+    case 1:
+      return migrateV1(state);
+    case 2:
+      return migrateV2(state);
+    default:
+      return undefined;
   }
 }
 
 export function deserialize(savedState: string): PartialState {
-  if (!savedState) { return undefined; }
+  if (!savedState) {
+    return undefined;
+  }
 
   const parsedState = JSON.parse(savedState);
-  if (!parsedState) { return undefined; }
+  if (!parsedState) {
+    return undefined;
+  }
 
   const result = migrate(parsedState);
-  if (!result) { return undefined; }
+  if (!result) {
+    return undefined;
+  }
 
   return removeVersion(result);
 }
