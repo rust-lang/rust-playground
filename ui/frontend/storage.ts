@@ -1,4 +1,5 @@
 import { DeepPartial } from 'ts-essentials';
+import * as z from 'zod';
 
 import { State } from './reducers';
 
@@ -23,6 +24,35 @@ interface InitializedStorage {
 export function removeVersion<T extends { version?: unknown }>(data: T): Omit<T, 'version'> {
   const { version, ...rest } = data;
   return rest;
+}
+
+const File = z.object({ name: z.string(), content: z.string() });
+
+export const Code = z.string().or(z.array(File));
+export type Code = z.infer<typeof Code>;
+
+type FileState = State['files'];
+type ExpandedCode = { code?: string; files?: FileState };
+
+export function expandCode<T extends { code?: Code }>(data: T): Omit<T, 'code'> & ExpandedCode {
+  const { code, ...rest } = data;
+
+  if (code === undefined) {
+    return rest;
+  }
+
+  if (typeof code === 'string') {
+    return { code, ...rest };
+  } else {
+    let fileId = 0;
+    const files = code.map(({ name, content }) => ({
+      id: fileId++,
+      name,
+      content,
+    }));
+
+    return { files: { fileId, files, active: 0 }, ...rest };
+  }
 }
 
 export class InMemoryStorage {

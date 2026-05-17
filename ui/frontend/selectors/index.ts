@@ -25,7 +25,7 @@ const createFeatureFlagSelector = (ff: (state: State) => number) =>
 const allowMultipleFilesThreshold = createSelector(featureFlags, ff => ff.multifileThreshold);
 export const allowMultipleFiles = createFeatureFlagSelector(allowMultipleFilesThreshold);
 
-export const codeSelector = (state: State) => state.code;
+const codeSelector = (state: State) => state.code;
 const filesSelector = (state: State) => state.files.files;
 const filesActiveSelector = (state: State) => state.files.active;
 

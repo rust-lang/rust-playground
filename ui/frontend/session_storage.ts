@@ -4,8 +4,8 @@
 import * as z from 'zod';
 
 import { State } from './reducers';
-import { codeSelector } from './selectors';
-import { PartialState, initializeStorage, removeVersion } from './storage';
+import { codeOrFilesSelector } from './selectors';
+import { Code, PartialState, expandCode, initializeStorage, removeVersion } from './storage';
 import { PrimaryActionSchema } from './types';
 
 const CURRENT_VERSION = 1;
@@ -18,7 +18,7 @@ const V1Schema = z
         primaryAction: PrimaryActionSchema,
       })
       .partial(),
-    code: z.string(),
+    code: Code,
   })
   .partial();
 type V1Schema = z.infer<typeof V1Schema>;
@@ -29,7 +29,7 @@ export function serialize(state: State): string {
     configuration: {
       primaryAction: state.configuration.primaryAction,
     },
-    code: codeSelector(state),
+    code: codeOrFilesSelector(state),
   };
 
   return JSON.stringify(V1Schema.parse(value));
@@ -44,7 +44,7 @@ export function deserialize(savedState: string): PartialState {
     // live state. If that's no longer true, an additional renaming step
     // needs to be added.
 
-    return removeVersion(validatedState);
+    return expandCode(removeVersion(validatedState));
   } catch {
     return undefined;
   }
