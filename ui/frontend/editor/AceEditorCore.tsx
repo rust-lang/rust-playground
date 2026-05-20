@@ -7,6 +7,7 @@ import 'ace-builds/src-noconflict/mode-rust';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CommonEditorProps, Crate, PairCharacters, Position } from '../types';
+import { useLatest } from './useLatest';
 
 import * as styles from './Editor.module.css';
 
@@ -22,6 +23,8 @@ export const importTheme = (name: string) => import(
   /* webpackChunkName: "ace-[request]" */
   `ace-builds/src-noconflict/theme-${name}`
 );
+
+const themeToAceId = (theme: string) => `ace/theme/${theme}`;
 
 interface CodeMirrorEditor {
   ace: Ace.Editor;
@@ -97,13 +100,16 @@ function useEditorProp<T>(editor: Ace.Editor | null, prop: T, whenPresent: (edit
 
 const AceEditor: React.FC<AceEditorProps> = props => {
   const [editor, setEditor] = useState<Ace.Editor | null>(null);
-  const child = useRef<HTMLDivElement>(null);
+  const latestCodeRef = useLatest(props.code);
+  const latestThemeRef = useLatest(props.theme);
 
-  useEffect(() => {
-    if (!child.current) { return; }
+  const child = useCallback((node: HTMLDivElement | null) => {
+    if (!node) { return; }
 
-    const editor = ace.edit(child.current, {
+    const editor = ace.edit(node, {
       mode: 'ace/mode/rust',
+      value: latestCodeRef.current,
+      theme: themeToAceId(latestThemeRef.current),
     });
     setEditor(editor);
 
@@ -122,14 +128,12 @@ const AceEditor: React.FC<AceEditorProps> = props => {
       fixedWidthGutter: true,
     });
 
-    const danglingElement = child.current;
-
     return () => {
       editor.destroy();
       setEditor(null);
-      danglingElement.textContent = '';
+      node.textContent = '';
     };
-  }, []);
+  }, [latestCodeRef, latestThemeRef]);
 
   useEditorProp(editor, props.execute, useCallback((editor, execute) => {
     // TODO: Remove command?
@@ -239,7 +243,7 @@ const AceEditor: React.FC<AceEditorProps> = props => {
   }, []));
 
   useEditorProp(editor, props.theme, useCallback((editor, theme) => {
-    editor.setTheme(`ace/theme/${theme}`);
+    editor.setTheme(themeToAceId(theme));
   }, []));
 
   const keybindingProps = useMemo(() => ({
