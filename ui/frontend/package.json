@@ -46,7 +46,7 @@
     "autoprefixer": "^10.2.4",
     "babel-loader": "^10.0.0",
     "babel-plugin-react-compiler": "^1.0.0",
-    "compression-webpack-plugin": "^11.0.0",
+    "compression-webpack-plugin": "^12.0.0",
     "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^7.1.2",
     "eslint": "^9.15.0",
