@@ -28,6 +28,7 @@ import { selectText } from './reducers/selection';
 import { useAppSelector } from './hooks';
 import { themeSelector } from './selectors';
 import { Theme } from './types';
+import { activateFile } from './reducers/files';
 
 const store = configureStore(window);
 
@@ -68,6 +69,7 @@ maxWidthMediaQuery.addEventListener('change', whenBrowserWidthChanged);
 
 configureRustErrors({
   enableFeatureGate: featureGate => store.dispatch(enableFeatureGate(featureGate)),
+  activateFile: (f) => store.dispatch(activateFile(f)),
   gotoPosition: (p) => store.dispatch(gotoPosition(p)),
   selectText: (start, end) => store.dispatch(selectText(start, end)),
   addImport: (code) => store.dispatch(addImport(code)),
