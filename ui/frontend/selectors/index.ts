@@ -61,6 +61,19 @@ export const linearizeCode = (code: Code) => {
 
 export const linearCodeSelector = createSelector(codeOrFilesSelector, linearizeCode);
 
+export const allCodeContentsSelector = createSelector(
+  multifileEnabledSelector,
+  codeSelector,
+  filesSelector,
+  (multifileEnabled, single, multiple) => {
+    if (multifileEnabled) {
+      return multiple.map((f) => f.content);
+    } else {
+      return [single];
+    }
+  }
+);
+
 export const activeCodeSelector = createSelector(
   multifileEnabledSelector,
   codeSelector,
@@ -106,7 +119,7 @@ export const selectionSelector = (state: State) => state.selection;
 
 const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
 const hasTests = (code: string) => !!code.match(HAS_TESTS_RE);
-const hasTestsSelector = createSelector(codeSelector, hasTests);
+const hasTestsSelector = createSelector(allCodeContentsSelector, (f) => f.some(hasTests));
 
 // https://stackoverflow.com/a/34755045/155423
 const HAS_MAIN_FUNCTION_RE = new RegExp(
@@ -118,11 +131,35 @@ const HAS_MAIN_FUNCTION_RE = new RegExp(
   'm'
 );
 export const hasMainFunction = (code: string) => !!code.match(HAS_MAIN_FUNCTION_RE);
-const hasMainFunctionSelector = createSelector(codeSelector, hasMainFunction);
+const hasMainFunctionSelector = createSelector(
+  multifileEnabledSelector,
+  codeSelector,
+  filesSelector,
+  (multifileEnabled, code, files) => {
+    if (multifileEnabled) {
+      return files.some((f) => f.name === 'src/main.rs');
+    } else {
+      return hasMainFunction(code);
+    }
+  }
+);
 
 const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
 const crateType = (code: string) => (code.match(CRATE_TYPE_RE) ?? []).at(1);
-const crateTypeSelector = createSelector(codeSelector, crateType);
+const crateTypeSelector = createSelector(
+  multifileEnabledSelector,
+  codeSelector,
+  filesSelector,
+  (multifileEnabled, code, files) => {
+    if (multifileEnabled) {
+      const file = files.find((f) => f.name === 'src/lib.rs');
+      if (!file) { return undefined; }
+      return crateType(file.content);
+    } else {
+      return crateType(code);
+    }
+  }
+);
 
 const autoPrimaryActionSelector = createSelector(
   crateTypeSelector,
