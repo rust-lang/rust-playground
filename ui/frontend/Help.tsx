@@ -5,7 +5,8 @@ import Link from './uss-router/Link';
 
 import * as styles from './Help.module.css';
 
-import integer32Logo from './assets/integer32-logo.svg';
+import integer32LogoLight from './assets/integer32-logo-light.svg';
+import integer32LogoDark from './assets/integer32-logo-dark.svg';
 import { navigateToIndex } from './reducers/page';
 import { useAppSelector } from './hooks';
 import { baseUrlSelector } from './selectors';
@@ -112,7 +113,8 @@ const Help: React.FC = () => {
 
         <p className={styles.logo}>
           <a href={I32_URL}>
-            <img src={integer32Logo} alt="Integer 32 Logo" />
+            <img className={styles.logoLight} src={integer32LogoLight} alt="Integer 32 Logo" />
+            <img className={styles.logoDark} src={integer32LogoDark} alt="Integer 32 Logo" />
           </a>
         </p>
       </LinkableSection>

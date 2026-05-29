@@ -16,6 +16,38 @@
   text-align: center;
 }
 
+.logoLight {
+  display: inherit;
+
+  @media (prefers-color-scheme: dark) {
+    display: none;
+  }
+
+  :root[data-theme='light'] & {
+    display: inherit;
+  }
+
+  :root[data-theme='dark'] & {
+    display: none;
+  }
+}
+
+.logoDark {
+  display: none;
+
+  @media (prefers-color-scheme: dark) {
+    display: inherit;
+  }
+
+  :root[data-theme='light'] & {
+    display: none;
+  }
+
+  :root[data-theme='dark'] & {
+    display: inherit;
+  }
+}
+
 .header {
   &:hover::after {
     content: ' §';
