@@ -11,6 +11,7 @@ import {
   DemangleAssemblySchema,
   Editor,
   EditorSchema,
+  FileViewSchema,
   OrientationSchema,
   PairCharactersSchema,
   ProcessAssemblySchema,
@@ -32,6 +33,7 @@ const V2Configuration = z
       .partial(),
     configuration: z
       .object({
+        fileView: FileViewSchema,
         editor: EditorSchema,
         ace: z
           .object({
@@ -92,6 +94,7 @@ export function serialize(state: State): string {
       visitedAt: state.client.visitedAt,
     },
     configuration: {
+      fileView: state.configuration.fileView,
       editor: state.configuration.editor,
       ace: {
         keybinding: state.configuration.ace.keybinding,

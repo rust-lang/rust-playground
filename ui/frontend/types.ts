@@ -68,6 +68,7 @@ export const FileView = {
   Multiple: 'multiple',
 } as const;
 export type FileView = ValuesOf<typeof FileView>;
+export const FileViewSchema = z.enum(Object.values(FileView));
 
 export const Editor = {
   Simple: 'simple',
