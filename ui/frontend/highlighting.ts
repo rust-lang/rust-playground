@@ -4,6 +4,7 @@ import { Channel, makePosition, Position } from './types';
 interface ConfigureRustErrorsArgs {
   enableFeatureGate: (feature: string) => void;
   getChannel: () => Channel;
+  getMultifile: () => boolean;
   activateFile: (f: string) => void;
   gotoPosition: (p: Position) => void;
   selectText: (start: Position, end: Position) => void;
@@ -14,6 +15,7 @@ interface ConfigureRustErrorsArgs {
 export function configureRustErrors({
   enableFeatureGate,
   getChannel,
+  getMultifile,
   activateFile,
   gotoPosition,
   selectText,
@@ -99,12 +101,14 @@ export function configureRustErrors({
         env.attributes['data-col'] = col;
       }
     }
-    if (env.type === 'import-suggestion') {
+    // I don't know how to tell which file(s) to place the import into.
+    if (!getMultifile() && env.type === 'import-suggestion') {
       env.tag = 'a';
       env.attributes.href = '#';
       env.attributes['data-suggestion'] = env.content;
     }
-    if (env.type === 'feature-gate') {
+    // I don't know how to tell which file(s) to place the feature flag into.
+    if (!getMultifile() && env.type === 'feature-gate') {
       const featureMatch = /feature\((.*?)\)/.exec(env.content);
       if (featureMatch) {
         const [_, featureGate] = featureMatch;

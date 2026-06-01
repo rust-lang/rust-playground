@@ -75,6 +75,7 @@ configureRustErrors({
   addImport: (code) => store.dispatch(addImport(code)),
   reExecuteWithBacktrace: () => store.dispatch(reExecuteWithBacktrace()),
   getChannel: () => store.getState().configuration.channel,
+  getMultifile: () => store.getState().configuration.fileView === 'multiple',
 });
 
 store.dispatch(performCratesLoad());

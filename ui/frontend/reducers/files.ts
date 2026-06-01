@@ -8,7 +8,7 @@ import {
   validateFilename,
 } from '../domain/filesRules';
 import { FileId } from '../types';
-import { editCode } from './code';
+import { HELLO_WORLD, addCrateType, addMainFunction, doAddCrateType, editCode } from './code';
 import { performFormat } from './output/format';
 import { performGistLoad } from './output/gist';
 
@@ -177,6 +177,25 @@ const slice = createSlice({
         const file = state.files.find((f) => f.id === state.active);
         if (file) {
           file.content = action.payload;
+        }
+      })
+      .addCase(addMainFunction, (state) => {
+        const existing = state.files.find((f) => f.name === 'src/main.rs');
+
+        let file;
+        if (existing) {
+          file = existing;
+        } else {
+          file = buildFile(state, 'src/main.rs', HELLO_WORLD);
+          state.files.push(file);
+        }
+
+        state.active = file.id;
+      })
+      .addCase(addCrateType, (state, action) => {
+        const file = state.files.find((f) => f.name === 'src/lib.rs');
+        if (file) {
+          file.content = doAddCrateType(file.content, action.payload);
         }
       })
       .addCase(performGistLoad.pending, (state) => {

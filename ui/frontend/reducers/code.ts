@@ -3,11 +3,11 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { performFormat } from './output/format';
 import { performGistLoad } from './output/gist';
 
-const HELLO_WORLD: string = `fn main() {
+export const HELLO_WORLD: string = `fn main() {
     println!("Hello, world!");
 }`;
 
-const doAddCrateType = (code: string, crate_type: string): string =>
+export const doAddCrateType = (code: string, crate_type: string): string =>
   `#![crate_type = "${crate_type}"]\n${code}`;
 
 const slice = createSlice({
