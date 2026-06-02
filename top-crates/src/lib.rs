@@ -17,11 +17,7 @@ use cargo::{
 use itertools::Itertools;
 use semver::Version;
 use serde::{Deserialize, Serialize};
-use std::{
-    collections::{btree_map::Entry, BTreeMap, BTreeSet, HashSet},
-    io::Read,
-    task::Poll,
-};
+use std::collections::{btree_map::Entry, BTreeMap, BTreeSet, HashSet};
 
 const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
 
@@ -166,18 +162,20 @@ impl Modifications {
     }
 }
 
-fn simple_get(url: &str) -> reqwest::Result<reqwest::blocking::Response> {
-    reqwest::blocking::ClientBuilder::new()
+async fn simple_get(url: &str) -> reqwest::Result<reqwest::Response> {
+    reqwest::ClientBuilder::new()
         .user_agent("Rust Playground - Top Crates Utility")
         .build()?
         .get(url)
         .send()
+        .await
 }
 
 impl TopCrates {
     /// List top 100 crates by number of downloads on crates.io.
-    fn download() -> TopCrates {
+    async fn download() -> TopCrates {
         let resp = simple_get("https://crates.io/api/v1/crates?page=1&per_page=100&sort=downloads")
+            .await
             .expect("Could not fetch top crates");
         assert!(
             resp.status().is_success(),
@@ -185,13 +183,14 @@ impl TopCrates {
             resp.status(),
         );
 
-        serde_json::from_reader(resp).expect("Invalid JSON")
+        resp.json().await.expect("Invalid JSON")
     }
 
-    fn add_rust_cookbook_crates(&mut self) {
-        let mut resp = simple_get(
+    async fn add_rust_cookbook_crates(&mut self) {
+        let resp = simple_get(
             "https://raw.githubusercontent.com/rust-lang-nursery/rust-cookbook/master/Cargo.toml",
         )
+        .await
         .expect("Could not fetch cookbook manifest");
         assert!(
             resp.status().is_success(),
@@ -199,9 +198,7 @@ impl TopCrates {
             resp.status(),
         );
 
-        let mut content = String::new();
-        resp.read_to_string(&mut content)
-            .expect("could not read cookbook manifest");
+        let content = resp.text().await.expect("could not read cookbook manifest");
 
         let manifest = content
             .parse::<toml::Table>()
@@ -307,13 +304,9 @@ fn make_global_state<'cfg>(
 
     let source_config_map = SourceConfigMap::new(config).unwrap();
     let yanked_whitelist = HashSet::new();
-    let mut source = source_config_map
+    let source = source_config_map
         .load(crates_io, &yanked_whitelist)
         .expect("Unable to create registry source");
-
-    source
-        .block_until_ready()
-        .expect("Unable to wait for registry to be ready");
 
     GlobalState {
         config,
@@ -327,7 +320,7 @@ fn make_global_state<'cfg>(
 
 fn bulk_download(global: &mut GlobalState<'_>, package_ids: &[PackageId]) -> Vec<Package> {
     let mut sources = SourceMap::new();
-    sources.insert(Box::new(&mut global.source));
+    sources.insert(Box::new(&mut *global.source));
 
     let package_set = PackageSet::new(package_ids, sources, global.config)
         .expect("Unable to create a PackageSet");
@@ -340,11 +333,11 @@ fn bulk_download(global: &mut GlobalState<'_>, package_ids: &[PackageId]) -> Vec
         .collect()
 }
 
-fn populate_initial_direct_dependencies(
+async fn populate_initial_direct_dependencies(
     global: &mut GlobalState<'_>,
 ) -> BTreeMap<PackageId, ResolvedDep> {
-    let mut top = TopCrates::download();
-    top.add_rust_cookbook_crates();
+    let mut top = TopCrates::download().await;
+    top.add_rust_cookbook_crates().await;
     top.add_curated_crates(global.modifications);
 
     // Find the newest (non-prerelease, non-yanked) versions of all
@@ -357,16 +350,11 @@ fn populate_initial_direct_dependencies(
         let dep = Dependency::parse(name, version, global.crates_io)
             .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
-        let matches = loop {
-            match global.source.query_vec(&dep, QueryKind::Exact) {
-                Poll::Ready(Ok(v)) => break v,
-                Poll::Ready(Err(e)) => panic!("Unable to query registry for {}: {}", name, e),
-                Poll::Pending => global
-                    .source
-                    .block_until_ready()
-                    .expect("Unable to wait for registry to be ready"),
-            }
-        };
+        let matches = global
+            .source
+            .query_vec(&dep, QueryKind::Exact)
+            .await
+            .unwrap_or_else(|e| panic!("Unable to query registry for {}: {}", name, e));
 
         // Find the newest non-prelease version
         let summary = matches
@@ -636,7 +624,7 @@ fn extend_direct_dependencies(
     }
 }
 
-pub fn generate_info(
+pub async fn generate_info(
     modifications: &Modifications,
 ) -> (BTreeMap<String, DependencySpec>, Vec<CrateInformation>) {
     // Setup to interact with cargo.
@@ -644,7 +632,7 @@ pub fn generate_info(
     let _lock = config.acquire_package_cache_lock(CacheLockMode::DownloadExclusive);
     let mut global = make_global_state(&config, modifications);
 
-    let mut resolved_crates = populate_initial_direct_dependencies(&mut global);
+    let mut resolved_crates = populate_initial_direct_dependencies(&mut global).await;
 
     loop {
         let num_crates_before = resolved_crates.len();

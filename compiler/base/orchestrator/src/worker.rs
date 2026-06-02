@@ -1135,12 +1135,11 @@ pub enum Utf8BufReaderError {
 #[cfg(test)]
 mod test {
     use std::{
+        assert_matches,
         collections::VecDeque,
         pin::Pin,
         task::{Context, Poll},
     };
-
-    use assert_matches::assert_matches;
 
     use super::*;
 
@@ -1222,7 +1221,7 @@ mod test {
         let reader = FixedAsyncRead::success_exact([bytes]);
         let mut buffer = Utf8BufReader::new(reader);
 
-        assert_matches!(buffer.next().await, Ok(Some(s)) => s == "A");
+        assert_matches!(buffer.next().await, Ok(Some(s)) if s == "A");
         assert_matches!(buffer.next().await, Err(Utf8BufReaderError::InvalidUtf8));
         assert!(buffer.reader.is_empty());
     }
