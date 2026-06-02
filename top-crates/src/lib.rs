@@ -20,7 +20,6 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::{btree_map::Entry, BTreeMap, BTreeSet, HashSet},
     io::Read,
-    task::Poll,
 };
 
 const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
@@ -307,13 +306,9 @@ fn make_global_state<'cfg>(
 
     let source_config_map = SourceConfigMap::new(config).unwrap();
     let yanked_whitelist = HashSet::new();
-    let mut source = source_config_map
+    let source = source_config_map
         .load(crates_io, &yanked_whitelist)
         .expect("Unable to create registry source");
-
-    source
-        .block_until_ready()
-        .expect("Unable to wait for registry to be ready");
 
     GlobalState {
         config,
@@ -327,7 +322,7 @@ fn make_global_state<'cfg>(
 
 fn bulk_download(global: &mut GlobalState<'_>, package_ids: &[PackageId]) -> Vec<Package> {
     let mut sources = SourceMap::new();
-    sources.insert(Box::new(&mut global.source));
+    sources.insert(Box::new(&mut *global.source));
 
     let package_set = PackageSet::new(package_ids, sources, global.config)
         .expect("Unable to create a PackageSet");
@@ -357,16 +352,9 @@ fn populate_initial_direct_dependencies(
         let dep = Dependency::parse(name, version, global.crates_io)
             .unwrap_or_else(|e| panic!("Unable to parse dependency for {}: {}", name, e));
 
-        let matches = loop {
-            match global.source.query_vec(&dep, QueryKind::Exact) {
-                Poll::Ready(Ok(v)) => break v,
-                Poll::Ready(Err(e)) => panic!("Unable to query registry for {}: {}", name, e),
-                Poll::Pending => global
-                    .source
-                    .block_until_ready()
-                    .expect("Unable to wait for registry to be ready"),
-            }
-        };
+        let matches = futures::executor::block_on(global.source.query_vec(&dep, QueryKind::Exact));
+        let matches =
+            matches.unwrap_or_else(|e| panic!("Unable to query registry for {}: {}", name, e));
 
         // Find the newest non-prelease version
         let summary = matches
