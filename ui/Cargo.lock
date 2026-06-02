@@ -530,12 +530,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2"
 
 [[package]]
-name = "foldhash"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
-
-[[package]]
 name = "form_urlencoded"
 version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -698,16 +692,7 @@ version = "0.15.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
 dependencies = [
- "foldhash 0.1.5",
-]
-
-[[package]]
-name = "hashbrown"
-version = "0.16.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
-dependencies = [
- "foldhash 0.2.0",
+ "foldhash",
 ]
 
 [[package]]
@@ -1108,9 +1093,9 @@ checksum = "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
 
 [[package]]
 name = "libsqlite3-sys"
-version = "0.37.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1f111c8c41e7c61a49cd34e44c7619462967221a6443b0ec299e0ac30cfb9b1"
+checksum = "a76001fb4daed01e5f2b518aac0b4dc592e7c734da63dbffcf0c64fa612a8d0c"
 dependencies = [
  "cc",
  "pkg-config",
@@ -1740,27 +1725,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "rsqlite-vfs"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c51c9ae4df8a7fba42103df5c621fa3c37eccf3a3c650879e90fc48b11cc192c"
-dependencies = [
- "hashbrown 0.16.1",
- "thiserror",
-]
-
-[[package]]
 name = "rusqlite"
-version = "0.39.0"
+version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0d2b0146dd9661bf67bb107c0bb2a55064d556eeb3fc314151b957f313bcd4e"
+checksum = "1b3492ea85308705c3a5cc24fb9b9cf77273d30590349070db42991202b214c4"
 dependencies = [
  "bitflags",
  "fallible-iterator",
  "fallible-streaming-iterator",
  "libsqlite3-sys",
  "smallvec",
- "sqlite-wasm-rs",
 ]
 
 [[package]]
@@ -2145,18 +2119,6 @@ checksum = "d91ed6c858b01f942cd56b37a94b3e0a1798290327d1236e4d9cf4eaca44d29d"
 dependencies = [
  "base64ct",
  "der",
-]
-
-[[package]]
-name = "sqlite-wasm-rs"
-version = "0.5.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc3efc0da82635d7e1ced0053bbbfa8c7ab9645d0bf36ceb4f7127bb85315d75"
-dependencies = [
- "cc",
- "js-sys",
- "rsqlite-vfs",
- "wasm-bindgen",
 ]
 
 [[package]]
