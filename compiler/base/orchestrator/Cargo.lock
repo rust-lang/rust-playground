@@ -34,9 +34,9 @@ checksum = "9b34d609dfbaf33d6889b2b7106d3ca345eacad44200913df5ba02bfd31d2ba9"
 
 [[package]]
 name = "assertables"
-version = "9.9.0"
+version = "10.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "627b0b35c347252505ec6c078827dfcecc4e9dcfa931c54c54066f9245ac752b"
+checksum = "b3c16d80246a076246d8b525d9f404543e90fe0818636cd89c249c2a4bee3bb1"
 dependencies = [
  "regex",
  "walkdir",
