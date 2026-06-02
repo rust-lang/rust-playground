@@ -11,12 +11,12 @@ repository = "https://github.com/rust-lang/rust-playground"
 [dependencies]
 cargo = "0.97.0"
 cargo-util-schemas = "0.14.0"
-futures = { version = "0.3.32", default-features = false, features = ["executor"] }
 itertools = "0.14.0"
-reqwest = { version = "0.13.0", features = ["blocking"] }
+reqwest = { version = "0.13.0", features = ["json"] }
 semver = { version = "1.0.11", features = ["serde"] }
 serde = "1.0.1"
 serde_derive = "1.0.1"
 serde_json = "1.0.0"
 tempfile = "3.20.0"
+tokio = { version = "1.52.3", default-features = false, features = ["rt", "macros"] }
 toml = "1.0.3"

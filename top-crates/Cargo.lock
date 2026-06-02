@@ -3642,9 +3642,7 @@ dependencies = [
  "base64",
  "bytes",
  "encoding_rs",
- "futures-channel",
  "futures-core",
- "futures-util",
  "h2",
  "http",
  "http-body",
@@ -3661,6 +3659,8 @@ dependencies = [
  "rustls",
  "rustls-pki-types",
  "rustls-platform-verifier",
+ "serde",
+ "serde_json",
  "sync_wrapper",
  "tokio",
  "tokio-rustls",
@@ -3728,7 +3728,6 @@ version = "0.1.7"
 dependencies = [
  "cargo",
  "cargo-util-schemas",
- "futures",
  "itertools",
  "reqwest",
  "semver",
@@ -3736,6 +3735,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "tempfile",
+ "tokio",
  "toml",
 ]
 
@@ -4411,7 +4411,19 @@ dependencies = [
  "mio",
  "pin-project-lite",
  "socket2",
+ "tokio-macros",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "tokio-macros"
+version = "2.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "385a6cb71ab9ab790c5fe8d67f1645e6c450a7ce006a33de03daa956cf70a496"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
