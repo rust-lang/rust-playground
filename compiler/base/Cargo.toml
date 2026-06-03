@@ -136,7 +136,7 @@ version = "=1.1.2"
 
 [dependencies.autocfg]
 package = "autocfg"
-version = "=1.5.0"
+version = "=1.5.1"
 
 [dependencies.av1_grain]
 package = "av1-grain"
@@ -149,16 +149,16 @@ default-features = false
 
 [dependencies.avif_serialize]
 package = "avif-serialize"
-version = "=0.8.8"
+version = "=0.8.9"
 
 [dependencies.aws_lc_rs]
 package = "aws-lc-rs"
-version = "=1.16.3"
+version = "=1.17.0"
 default-features = false
 
 [dependencies.aws_lc_sys]
 package = "aws-lc-sys"
-version = "=0.40.0"
+version = "=0.41.0"
 default-features = false
 
 [dependencies.backtrace]
@@ -184,7 +184,7 @@ default-features = false
 
 [dependencies.bitflags]
 package = "bitflags"
-version = "=2.11.1"
+version = "=2.12.1"
 
 [dependencies.bitstream_io]
 package = "bitstream-io"
@@ -210,20 +210,30 @@ default-features = false
 
 [dependencies.brotli]
 package = "brotli"
-version = "=8.0.2"
+version = "=8.0.3"
 
 [dependencies.brotli_decompressor]
 package = "brotli-decompressor"
-version = "=5.0.0"
+version = "=5.0.1"
 default-features = false
 
 [dependencies.built]
 package = "built"
-version = "=0.8.0"
+version = "=0.8.1"
 
 [dependencies.bumpalo]
 package = "bumpalo"
-version = "=3.20.2"
+version = "=3.20.3"
+
+[dependencies.bytecheck]
+package = "bytecheck"
+version = "=0.8.2"
+default-features = false
+
+[dependencies.bytecheck_derive]
+package = "bytecheck_derive"
+version = "=0.8.2"
+default-features = false
 
 [dependencies.bytemuck]
 package = "bytemuck"
@@ -252,7 +262,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.2.61"
+version = "=1.2.63"
 features = ["parallel"]
 
 [dependencies.cfg_aliases]
@@ -298,7 +308,7 @@ version = "=0.1.58"
 
 [dependencies.cmov]
 package = "cmov"
-version = "=0.5.3"
+version = "=0.5.4"
 
 [dependencies.color_quant]
 package = "color_quant"
@@ -375,7 +385,7 @@ version = "=0.8.21"
 
 [dependencies.crypto_common]
 package = "crypto-common"
-version = "=0.2.1"
+version = "=0.2.2"
 
 [dependencies.crypto_common_0_1_7]
 package = "crypto-common"
@@ -403,7 +413,7 @@ version = "=0.4.2"
 
 [dependencies.data_encoding]
 package = "data-encoding"
-version = "=2.10.0"
+version = "=2.11.0"
 
 [dependencies.debug_unreachable]
 package = "new_debug_unreachable"
@@ -444,7 +454,7 @@ version = "=0.10.7"
 
 [dependencies.displaydoc]
 package = "displaydoc"
-version = "=0.2.5"
+version = "=0.2.6"
 default-features = false
 
 [dependencies.document_features]
@@ -469,7 +479,7 @@ version = "=0.6.3"
 
 [dependencies.either]
 package = "either"
-version = "=1.15.0"
+version = "=1.16.0"
 features = ["serde"]
 
 [dependencies.encoding_rs]
@@ -538,7 +548,7 @@ version = "=0.3.7"
 
 [dependencies.filetime]
 package = "filetime"
-version = "=0.2.27"
+version = "=0.2.29"
 
 [dependencies.find_msvc_tools]
 package = "find-msvc-tools"
@@ -643,8 +653,8 @@ version = "=0.2.1"
 
 [dependencies.generic_array]
 package = "generic-array"
-version = "=1.4.1"
-features = ["alloc", "arbitrary", "as_slice", "bitvec", "bytemuck", "compat-0_14", "const-default", "faster-hex", "hybrid-array-0_4", "internals", "serde", "subtle", "zeroize"]
+version = "=1.4.3"
+features = ["alloc", "arbitrary", "as_slice", "bitvec", "bytecheck-0_8", "bytemuck", "compat-0_14", "const-default", "faster-hex", "hybrid-array-0_4", "internals", "rkyv-0_8", "rkyv-0_8-full", "serde", "subtle", "zeroize"]
 
 [dependencies.generic_array_0_14_7]
 package = "generic-array"
@@ -695,7 +705,7 @@ version = "=0.3.1"
 
 [dependencies.hashbrown]
 package = "hashbrown"
-version = "=0.17.0"
+version = "=0.17.1"
 default-features = false
 
 [dependencies.hashbrown_0_15_5]
@@ -741,7 +751,7 @@ version = "=0.26.0"
 
 [dependencies.http]
 package = "http"
-version = "=1.4.0"
+version = "=1.4.1"
 
 [dependencies.http_body]
 package = "http-body"
@@ -769,11 +779,11 @@ version = "=2.3.0"
 
 [dependencies.hybrid_array]
 package = "hybrid-array"
-version = "=0.4.11"
+version = "=0.4.12"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=1.9.0"
+version = "=1.10.1"
 features = ["client", "full", "http1"]
 
 [dependencies.hyper_rustls]
@@ -876,12 +886,12 @@ version = "=1.0.18"
 
 [dependencies.jiff]
 package = "jiff"
-version = "=0.2.24"
+version = "=0.2.28"
 features = ["logging", "serde", "static", "std", "tzdb-bundle-always"]
 
 [dependencies.jiff_static]
 package = "jiff-static"
-version = "=0.2.24"
+version = "=0.2.28"
 
 [dependencies.jiff_tzdb]
 package = "jiff-tzdb"
@@ -910,7 +920,7 @@ version = "=0.2.16"
 
 [dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.37.0"
+version = "=0.38.0"
 
 [dependencies.linux_raw_sys]
 package = "linux-raw-sys"
@@ -933,7 +943,7 @@ version = "=0.4.14"
 
 [dependencies.log]
 package = "log"
-version = "=0.4.29"
+version = "=0.4.31"
 features = ["std"]
 
 [dependencies.log4rs]
@@ -985,15 +995,11 @@ default-features = false
 
 [dependencies.memchr]
 package = "memchr"
-version = "=2.8.0"
+version = "=2.8.1"
 
 [dependencies.memmap]
 package = "memmap"
 version = "=0.7.0"
-
-[dependencies.memoffset]
-package = "memoffset"
-version = "=0.9.1"
 
 [dependencies.mime]
 package = "mime"
@@ -1015,7 +1021,7 @@ features = ["simd", "with-alloc"]
 
 [dependencies.mio]
 package = "mio"
-version = "=1.2.0"
+version = "=1.2.1"
 features = ["net", "os-ext", "os-poll"]
 
 [dependencies.mock_instant]
@@ -1026,9 +1032,19 @@ version = "=0.6.0"
 package = "moxcms"
 version = "=0.8.1"
 
+[dependencies.munge]
+package = "munge"
+version = "=0.4.7"
+default-features = false
+
+[dependencies.munge_macro]
+package = "munge_macro"
+version = "=0.4.7"
+default-features = false
+
 [dependencies.nalgebra]
 package = "nalgebra"
-version = "=0.34.2"
+version = "=0.35.0"
 
 [dependencies.nalgebra_macros]
 package = "nalgebra-macros"
@@ -1070,7 +1086,7 @@ default-features = false
 
 [dependencies.num_conv]
 package = "num-conv"
-version = "=0.2.1"
+version = "=0.2.2"
 
 [dependencies.num_cpus]
 package = "num_cpus"
@@ -1267,6 +1283,17 @@ version = "=1.0.18"
 package = "psl-types"
 version = "=2.0.11"
 
+[dependencies.ptr_meta]
+package = "ptr_meta"
+version = "=0.3.1"
+features = ["derive"]
+default-features = false
+
+[dependencies.ptr_meta_derive]
+package = "ptr_meta_derive"
+version = "=0.3.1"
+default-features = false
+
 [dependencies.publicsuffix]
 package = "publicsuffix"
 version = "=2.3.0"
@@ -1291,6 +1318,11 @@ features = ["proc-macro"]
 [dependencies.radium]
 package = "radium"
 version = "=0.7.0"
+
+[dependencies.rancor]
+package = "rancor"
+version = "=0.1.1"
+default-features = false
 
 [dependencies.rand]
 package = "rand"
@@ -1378,9 +1410,14 @@ package = "regex-syntax"
 version = "=0.8.10"
 default-features = false
 
+[dependencies.rend]
+package = "rend"
+version = "=0.5.3"
+default-features = false
+
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.13.3"
+version = "=0.13.4"
 features = ["blocking", "cookies", "form", "json", "multipart", "query"]
 
 [dependencies.reqwest_0_12_28]
@@ -1397,9 +1434,19 @@ default-features = false
 package = "ring"
 version = "=0.17.14"
 
+[dependencies.rkyv]
+package = "rkyv"
+version = "=0.8.16"
+default-features = false
+
+[dependencies.rkyv_derive]
+package = "rkyv_derive"
+version = "=0.8.16"
+default-features = false
+
 [dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.39.0"
+version = "=0.40.0"
 features = ["bundled-full"]
 
 [dependencies.rustc_demangle]
@@ -1423,7 +1470,7 @@ default-features = false
 
 [dependencies.rustls_native_certs]
 package = "rustls-native-certs"
-version = "=0.8.3"
+version = "=0.8.4"
 
 [dependencies.rustls_pki_types]
 package = "rustls-pki-types"
@@ -1444,7 +1491,7 @@ version = "=1.0.23"
 
 [dependencies.safe_arch]
 package = "safe_arch"
-version = "=0.7.4"
+version = "=1.0.0"
 features = ["bytemuck"]
 
 [dependencies.same_file]
@@ -1489,7 +1536,7 @@ version = "=1.0.228"
 
 [dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.149"
+version = "=1.0.150"
 features = ["float_roundtrip", "raw_value", "unbounded_depth"]
 
 [dependencies.serde_spanned]
@@ -1529,7 +1576,7 @@ version = "=0.1.7"
 
 [dependencies.shlex]
 package = "shlex"
-version = "=1.3.0"
+version = "=2.0.1"
 
 [dependencies.signal_hook_registry]
 package = "signal-hook-registry"
@@ -1537,7 +1584,7 @@ version = "=1.4.8"
 
 [dependencies.simba]
 package = "simba"
-version = "=0.9.1"
+version = "=0.10.0"
 default-features = false
 
 [dependencies.simd_adler32]
@@ -1567,7 +1614,7 @@ features = ["const_generics", "const_new"]
 
 [dependencies.socket2]
 package = "socket2"
-version = "=0.6.3"
+version = "=0.6.4"
 features = ["all"]
 
 [dependencies.sptr]
@@ -1624,7 +1671,7 @@ version = "=1.0.1"
 
 [dependencies.tar]
 package = "tar"
-version = "=0.4.45"
+version = "=0.4.46"
 
 [dependencies.tempfile]
 package = "tempfile"
@@ -1691,7 +1738,7 @@ version = "=0.1.1"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.52.2"
+version = "=1.52.3"
 features = ["fs", "full", "io-util", "net", "rt", "rt-multi-thread", "sync", "test-util", "time"]
 
 [dependencies.tokio_io]
@@ -1750,7 +1797,7 @@ features = ["full", "retry", "timeout", "util"]
 
 [dependencies.tower_http]
 package = "tower-http"
-version = "=0.6.9"
+version = "=0.6.11"
 features = ["follow-redirect", "full"]
 
 [dependencies.tower_layer]
@@ -1799,7 +1846,7 @@ version = "=1.0.0"
 
 [dependencies.typenum]
 package = "typenum"
-version = "=1.20.0"
+version = "=1.20.1"
 features = ["const-generics", "i128"]
 
 [dependencies.unicase]
@@ -1824,7 +1871,7 @@ version = "=0.1.4"
 
 [dependencies.unicode_segmentation]
 package = "unicode-segmentation"
-version = "=1.13.2"
+version = "=1.13.3"
 
 [dependencies.unicode_width]
 package = "unicode-width"
@@ -1865,7 +1912,7 @@ version = "=0.2.2"
 
 [dependencies.uuid]
 package = "uuid"
-version = "=1.23.1"
+version = "=1.23.2"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [dependencies.v_frame]
@@ -1890,19 +1937,19 @@ version = "=0.3.1"
 
 [dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.120"
+version = "=0.2.122"
 
 [dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.120"
+version = "=0.2.122"
 
 [dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.120"
+version = "=0.2.122"
 
 [dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.120"
+version = "=0.2.122"
 
 [dependencies.webpki]
 package = "rustls-webpki"
@@ -1924,7 +1971,7 @@ version = "=2.1.2"
 
 [dependencies.wide]
 package = "wide"
-version = "=0.7.33"
+version = "=1.4.0"
 default-features = false
 
 [dependencies.windows_aarch64_gnullvm]
@@ -1979,7 +2026,7 @@ version = "=0.53.1"
 
 [dependencies.winnow]
 package = "winnow"
-version = "=1.0.2"
+version = "=1.0.3"
 default-features = false
 
 [dependencies.writeable]
@@ -2017,18 +2064,17 @@ default-features = false
 
 [dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.48"
+version = "=0.8.50"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.48"
+version = "=0.8.50"
 
 [dependencies.zerofrom]
 package = "zerofrom"
-version = "=0.1.7"
-features = ["derive"]
-default-features = false
+version = "=0.1.8"
+features = ["alloc", "derive"]
 
 [dependencies.zerofrom_derive]
 package = "zerofrom-derive"
@@ -2202,7 +2248,7 @@ version = "=1.1.2"
 
 [build-dependencies.autocfg]
 package = "autocfg"
-version = "=1.5.0"
+version = "=1.5.1"
 
 [build-dependencies.av1_grain]
 package = "av1-grain"
@@ -2215,16 +2261,16 @@ default-features = false
 
 [build-dependencies.avif_serialize]
 package = "avif-serialize"
-version = "=0.8.8"
+version = "=0.8.9"
 
 [build-dependencies.aws_lc_rs]
 package = "aws-lc-rs"
-version = "=1.16.3"
+version = "=1.17.0"
 default-features = false
 
 [build-dependencies.aws_lc_sys]
 package = "aws-lc-sys"
-version = "=0.40.0"
+version = "=0.41.0"
 default-features = false
 
 [build-dependencies.backtrace]
@@ -2250,7 +2296,7 @@ default-features = false
 
 [build-dependencies.bitflags]
 package = "bitflags"
-version = "=2.11.1"
+version = "=2.12.1"
 
 [build-dependencies.bitstream_io]
 package = "bitstream-io"
@@ -2276,20 +2322,30 @@ default-features = false
 
 [build-dependencies.brotli]
 package = "brotli"
-version = "=8.0.2"
+version = "=8.0.3"
 
 [build-dependencies.brotli_decompressor]
 package = "brotli-decompressor"
-version = "=5.0.0"
+version = "=5.0.1"
 default-features = false
 
 [build-dependencies.built]
 package = "built"
-version = "=0.8.0"
+version = "=0.8.1"
 
 [build-dependencies.bumpalo]
 package = "bumpalo"
-version = "=3.20.2"
+version = "=3.20.3"
+
+[build-dependencies.bytecheck]
+package = "bytecheck"
+version = "=0.8.2"
+default-features = false
+
+[build-dependencies.bytecheck_derive]
+package = "bytecheck_derive"
+version = "=0.8.2"
+default-features = false
 
 [build-dependencies.bytemuck]
 package = "bytemuck"
@@ -2318,7 +2374,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.2.61"
+version = "=1.2.63"
 features = ["parallel"]
 
 [build-dependencies.cfg_aliases]
@@ -2364,7 +2420,7 @@ version = "=0.1.58"
 
 [build-dependencies.cmov]
 package = "cmov"
-version = "=0.5.3"
+version = "=0.5.4"
 
 [build-dependencies.color_quant]
 package = "color_quant"
@@ -2441,7 +2497,7 @@ version = "=0.8.21"
 
 [build-dependencies.crypto_common]
 package = "crypto-common"
-version = "=0.2.1"
+version = "=0.2.2"
 
 [build-dependencies.crypto_common_0_1_7]
 package = "crypto-common"
@@ -2469,7 +2525,7 @@ version = "=0.4.2"
 
 [build-dependencies.data_encoding]
 package = "data-encoding"
-version = "=2.10.0"
+version = "=2.11.0"
 
 [build-dependencies.debug_unreachable]
 package = "new_debug_unreachable"
@@ -2510,7 +2566,7 @@ version = "=0.10.7"
 
 [build-dependencies.displaydoc]
 package = "displaydoc"
-version = "=0.2.5"
+version = "=0.2.6"
 default-features = false
 
 [build-dependencies.document_features]
@@ -2535,7 +2591,7 @@ version = "=0.6.3"
 
 [build-dependencies.either]
 package = "either"
-version = "=1.15.0"
+version = "=1.16.0"
 features = ["serde"]
 
 [build-dependencies.encoding_rs]
@@ -2604,7 +2660,7 @@ version = "=0.3.7"
 
 [build-dependencies.filetime]
 package = "filetime"
-version = "=0.2.27"
+version = "=0.2.29"
 
 [build-dependencies.find_msvc_tools]
 package = "find-msvc-tools"
@@ -2709,8 +2765,8 @@ version = "=0.2.1"
 
 [build-dependencies.generic_array]
 package = "generic-array"
-version = "=1.4.1"
-features = ["alloc", "arbitrary", "as_slice", "bitvec", "bytemuck", "compat-0_14", "const-default", "faster-hex", "hybrid-array-0_4", "internals", "serde", "subtle", "zeroize"]
+version = "=1.4.3"
+features = ["alloc", "arbitrary", "as_slice", "bitvec", "bytecheck-0_8", "bytemuck", "compat-0_14", "const-default", "faster-hex", "hybrid-array-0_4", "internals", "rkyv-0_8", "rkyv-0_8-full", "serde", "subtle", "zeroize"]
 
 [build-dependencies.generic_array_0_14_7]
 package = "generic-array"
@@ -2761,7 +2817,7 @@ version = "=0.3.1"
 
 [build-dependencies.hashbrown]
 package = "hashbrown"
-version = "=0.17.0"
+version = "=0.17.1"
 default-features = false
 
 [build-dependencies.hashbrown_0_15_5]
@@ -2807,7 +2863,7 @@ version = "=0.26.0"
 
 [build-dependencies.http]
 package = "http"
-version = "=1.4.0"
+version = "=1.4.1"
 
 [build-dependencies.http_body]
 package = "http-body"
@@ -2835,11 +2891,11 @@ version = "=2.3.0"
 
 [build-dependencies.hybrid_array]
 package = "hybrid-array"
-version = "=0.4.11"
+version = "=0.4.12"
 
 [build-dependencies.hyper]
 package = "hyper"
-version = "=1.9.0"
+version = "=1.10.1"
 features = ["client", "full", "http1"]
 
 [build-dependencies.hyper_rustls]
@@ -2942,12 +2998,12 @@ version = "=1.0.18"
 
 [build-dependencies.jiff]
 package = "jiff"
-version = "=0.2.24"
+version = "=0.2.28"
 features = ["logging", "serde", "static", "std", "tzdb-bundle-always"]
 
 [build-dependencies.jiff_static]
 package = "jiff-static"
-version = "=0.2.24"
+version = "=0.2.28"
 
 [build-dependencies.jiff_tzdb]
 package = "jiff-tzdb"
@@ -2976,7 +3032,7 @@ version = "=0.2.16"
 
 [build-dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.37.0"
+version = "=0.38.0"
 
 [build-dependencies.linux_raw_sys]
 package = "linux-raw-sys"
@@ -2999,7 +3055,7 @@ version = "=0.4.14"
 
 [build-dependencies.log]
 package = "log"
-version = "=0.4.29"
+version = "=0.4.31"
 features = ["std"]
 
 [build-dependencies.log4rs]
@@ -3051,15 +3107,11 @@ default-features = false
 
 [build-dependencies.memchr]
 package = "memchr"
-version = "=2.8.0"
+version = "=2.8.1"
 
 [build-dependencies.memmap]
 package = "memmap"
 version = "=0.7.0"
-
-[build-dependencies.memoffset]
-package = "memoffset"
-version = "=0.9.1"
 
 [build-dependencies.mime]
 package = "mime"
@@ -3081,7 +3133,7 @@ features = ["simd", "with-alloc"]
 
 [build-dependencies.mio]
 package = "mio"
-version = "=1.2.0"
+version = "=1.2.1"
 features = ["net", "os-ext", "os-poll"]
 
 [build-dependencies.mock_instant]
@@ -3092,9 +3144,19 @@ version = "=0.6.0"
 package = "moxcms"
 version = "=0.8.1"
 
+[build-dependencies.munge]
+package = "munge"
+version = "=0.4.7"
+default-features = false
+
+[build-dependencies.munge_macro]
+package = "munge_macro"
+version = "=0.4.7"
+default-features = false
+
 [build-dependencies.nalgebra]
 package = "nalgebra"
-version = "=0.34.2"
+version = "=0.35.0"
 
 [build-dependencies.nalgebra_macros]
 package = "nalgebra-macros"
@@ -3136,7 +3198,7 @@ default-features = false
 
 [build-dependencies.num_conv]
 package = "num-conv"
-version = "=0.2.1"
+version = "=0.2.2"
 
 [build-dependencies.num_cpus]
 package = "num_cpus"
@@ -3333,6 +3395,17 @@ version = "=1.0.18"
 package = "psl-types"
 version = "=2.0.11"
 
+[build-dependencies.ptr_meta]
+package = "ptr_meta"
+version = "=0.3.1"
+features = ["derive"]
+default-features = false
+
+[build-dependencies.ptr_meta_derive]
+package = "ptr_meta_derive"
+version = "=0.3.1"
+default-features = false
+
 [build-dependencies.publicsuffix]
 package = "publicsuffix"
 version = "=2.3.0"
@@ -3357,6 +3430,11 @@ features = ["proc-macro"]
 [build-dependencies.radium]
 package = "radium"
 version = "=0.7.0"
+
+[build-dependencies.rancor]
+package = "rancor"
+version = "=0.1.1"
+default-features = false
 
 [build-dependencies.rand]
 package = "rand"
@@ -3444,9 +3522,14 @@ package = "regex-syntax"
 version = "=0.8.10"
 default-features = false
 
+[build-dependencies.rend]
+package = "rend"
+version = "=0.5.3"
+default-features = false
+
 [build-dependencies.reqwest]
 package = "reqwest"
-version = "=0.13.3"
+version = "=0.13.4"
 features = ["blocking", "cookies", "form", "json", "multipart", "query"]
 
 [build-dependencies.reqwest_0_12_28]
@@ -3463,9 +3546,19 @@ default-features = false
 package = "ring"
 version = "=0.17.14"
 
+[build-dependencies.rkyv]
+package = "rkyv"
+version = "=0.8.16"
+default-features = false
+
+[build-dependencies.rkyv_derive]
+package = "rkyv_derive"
+version = "=0.8.16"
+default-features = false
+
 [build-dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.39.0"
+version = "=0.40.0"
 features = ["bundled-full"]
 
 [build-dependencies.rustc_demangle]
@@ -3489,7 +3582,7 @@ default-features = false
 
 [build-dependencies.rustls_native_certs]
 package = "rustls-native-certs"
-version = "=0.8.3"
+version = "=0.8.4"
 
 [build-dependencies.rustls_pki_types]
 package = "rustls-pki-types"
@@ -3510,7 +3603,7 @@ version = "=1.0.23"
 
 [build-dependencies.safe_arch]
 package = "safe_arch"
-version = "=0.7.4"
+version = "=1.0.0"
 features = ["bytemuck"]
 
 [build-dependencies.same_file]
@@ -3555,7 +3648,7 @@ version = "=1.0.228"
 
 [build-dependencies.serde_json]
 package = "serde_json"
-version = "=1.0.149"
+version = "=1.0.150"
 features = ["float_roundtrip", "raw_value", "unbounded_depth"]
 
 [build-dependencies.serde_spanned]
@@ -3595,7 +3688,7 @@ version = "=0.1.7"
 
 [build-dependencies.shlex]
 package = "shlex"
-version = "=1.3.0"
+version = "=2.0.1"
 
 [build-dependencies.signal_hook_registry]
 package = "signal-hook-registry"
@@ -3603,7 +3696,7 @@ version = "=1.4.8"
 
 [build-dependencies.simba]
 package = "simba"
-version = "=0.9.1"
+version = "=0.10.0"
 default-features = false
 
 [build-dependencies.simd_adler32]
@@ -3633,7 +3726,7 @@ features = ["const_generics", "const_new"]
 
 [build-dependencies.socket2]
 package = "socket2"
-version = "=0.6.3"
+version = "=0.6.4"
 features = ["all"]
 
 [build-dependencies.sptr]
@@ -3690,7 +3783,7 @@ version = "=1.0.1"
 
 [build-dependencies.tar]
 package = "tar"
-version = "=0.4.45"
+version = "=0.4.46"
 
 [build-dependencies.tempfile]
 package = "tempfile"
@@ -3757,7 +3850,7 @@ version = "=0.1.1"
 
 [build-dependencies.tokio]
 package = "tokio"
-version = "=1.52.2"
+version = "=1.52.3"
 features = ["fs", "full", "io-util", "net", "rt", "rt-multi-thread", "sync", "test-util", "time"]
 
 [build-dependencies.tokio_io]
@@ -3816,7 +3909,7 @@ features = ["full", "retry", "timeout", "util"]
 
 [build-dependencies.tower_http]
 package = "tower-http"
-version = "=0.6.9"
+version = "=0.6.11"
 features = ["follow-redirect", "full"]
 
 [build-dependencies.tower_layer]
@@ -3865,7 +3958,7 @@ version = "=1.0.0"
 
 [build-dependencies.typenum]
 package = "typenum"
-version = "=1.20.0"
+version = "=1.20.1"
 features = ["const-generics", "i128"]
 
 [build-dependencies.unicase]
@@ -3890,7 +3983,7 @@ version = "=0.1.4"
 
 [build-dependencies.unicode_segmentation]
 package = "unicode-segmentation"
-version = "=1.13.2"
+version = "=1.13.3"
 
 [build-dependencies.unicode_width]
 package = "unicode-width"
@@ -3931,7 +4024,7 @@ version = "=0.2.2"
 
 [build-dependencies.uuid]
 package = "uuid"
-version = "=1.23.1"
+version = "=1.23.2"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [build-dependencies.v_frame]
@@ -3956,19 +4049,19 @@ version = "=0.3.1"
 
 [build-dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.120"
+version = "=0.2.122"
 
 [build-dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.120"
+version = "=0.2.122"
 
 [build-dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.120"
+version = "=0.2.122"
 
 [build-dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.120"
+version = "=0.2.122"
 
 [build-dependencies.webpki]
 package = "rustls-webpki"
@@ -3990,7 +4083,7 @@ version = "=2.1.2"
 
 [build-dependencies.wide]
 package = "wide"
-version = "=0.7.33"
+version = "=1.4.0"
 default-features = false
 
 [build-dependencies.windows_aarch64_gnullvm]
@@ -4045,7 +4138,7 @@ version = "=0.53.1"
 
 [build-dependencies.winnow]
 package = "winnow"
-version = "=1.0.2"
+version = "=1.0.3"
 default-features = false
 
 [build-dependencies.writeable]
@@ -4083,18 +4176,17 @@ default-features = false
 
 [build-dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.48"
+version = "=0.8.50"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [build-dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.48"
+version = "=0.8.50"
 
 [build-dependencies.zerofrom]
 package = "zerofrom"
-version = "=0.1.7"
-features = ["derive"]
-default-features = false
+version = "=0.1.8"
+features = ["alloc", "derive"]
 
 [build-dependencies.zerofrom_derive]
 package = "zerofrom-derive"

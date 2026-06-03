@@ -52,14 +52,15 @@ struct Profiles {
     release: Profile,
 }
 
-fn main() {
+#[tokio::main(flavor = "current_thread")]
+async fn main() {
     let d = fs::read_to_string("crate-modifications.toml")
         .expect("unable to read crate modifications file");
 
     let modifications: Modifications =
         toml::from_str(&d).expect("unable to parse crate modifications file");
 
-    let (dependencies, infos) = rust_playground_top_crates::generate_info(&modifications);
+    let (dependencies, infos) = rust_playground_top_crates::generate_info(&modifications).await;
 
     // Construct playground's Cargo.toml.
     let manifest = TomlManifest {
