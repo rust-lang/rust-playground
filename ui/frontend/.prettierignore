@@ -43,11 +43,15 @@ node_modules
 !editor/rust_monaco_def.ts
 !eslint.config.mjs
 !hooks.ts
+!local_storage.ts
+!local_storage.spec.ts
 !observer.ts
 !prism-shim.ts
 !reducers/**/*.ts
 !selectors/gist.ts
 !selectors/index.spec.ts
+!session_storage.ts
+!storage.ts
 !types.ts
 !websocketActions.ts
 !websocketMiddleware.ts
