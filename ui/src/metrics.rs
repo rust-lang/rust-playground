@@ -299,6 +299,7 @@ impl HasLabelsCore for coordinator::ExecuteRequest {
             tests,
             backtrace,
             code: _,
+            execution_tool: _,
         } = *self;
 
         LabelsCore {

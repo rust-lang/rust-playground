@@ -14,6 +14,8 @@ import {
   Version,
 } from '../types';
 
+import { ExecutionTool } from '../reducers/output/execute';
+
 const MS_PER_S = 1000;
 
 export const codeSelector = (state: State) => state.code;
@@ -106,6 +108,7 @@ const LABELS: { [index in PrimaryActionCore]: string } = {
   [PrimaryActionCore.Mir]: 'Show MIR',
   [PrimaryActionCore.Test]: 'Test',
   [PrimaryActionCore.Wasm]: 'Show Wasm',
+  [PrimaryActionCore.Anneal]: 'Anneal',
 };
 
 export const getExecutionLabel = createSelector(primaryActionSelector, primaryAction => LABELS[primaryAction]);
@@ -528,8 +531,8 @@ export const executeRequestPayloadSelector = createSelector(
   channelSelector,
   (state: State) => state.configuration,
   getBacktraceSet,
-  (_state: State, args: { crateType: string, tests: boolean }) => args,
-  (code, channel, configuration, backtrace, { crateType, tests }) => ({
+  (_state: State, args: { crateType: string, tests: boolean, executionTool: ExecutionTool }) => args,
+  (code, channel, configuration, backtrace, { crateType, tests, executionTool }) => ({
     channel,
     mode: configuration.mode,
     edition: configuration.edition,
@@ -537,6 +540,7 @@ export const executeRequestPayloadSelector = createSelector(
     tests,
     code,
     backtrace,
+    executionTool,
   }),
 );
 

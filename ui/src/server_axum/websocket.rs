@@ -1,3 +1,4 @@
+use crate::public_http_api::default_execution_tool;
 use crate::{
     metrics::{self, record_metric, Endpoint, HasLabelsCore, Outcome},
     request_database::Handle,
@@ -84,6 +85,8 @@ struct ExecuteRequest {
     tests: bool,
     code: String,
     backtrace: bool,
+    #[serde(default = "default_execution_tool")]
+    execution_tool: String,
 }
 
 impl TryFrom<ExecuteRequest> for coordinator::ExecuteRequest {
@@ -98,6 +101,7 @@ impl TryFrom<ExecuteRequest> for coordinator::ExecuteRequest {
             tests,
             code,
             backtrace,
+            execution_tool,
         } = value;
 
         Ok(coordinator::ExecuteRequest {
@@ -108,6 +112,7 @@ impl TryFrom<ExecuteRequest> for coordinator::ExecuteRequest {
             tests,
             backtrace,
             code,
+            execution_tool: parse_execution_tool(&execution_tool)?,
         })
     }
 }
@@ -125,6 +130,9 @@ pub(crate) enum ExecuteRequestParseError {
 
     #[snafu(transparent)]
     Edition { source: ParseEditionError },
+
+    #[snafu(transparent)]
+    ExecutionTool { source: ParseExecutionToolError },
 }
 
 #[derive(Debug, serde::Serialize)]

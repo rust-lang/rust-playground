@@ -102,6 +102,7 @@ export enum PrimaryActionCore {
   Mir = 'mir',
   Test = 'test',
   Wasm = 'wasm',
+  Anneal = 'anneal-verify',
 }
 
 export type PrimaryAction = PrimaryActionCore | PrimaryActionAuto;

@@ -1013,6 +1013,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 tests,
                 backtrace: false,
                 code,
+                execution_tool: ExecutionTool::Cargo,
             })
         }
     }
@@ -1147,6 +1148,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 tests,
                 backtrace,
                 code,
+                execution_tool,
             } = other;
 
             Ok(Self {
@@ -1157,6 +1159,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 tests,
                 backtrace,
                 code,
+                execution_tool: parse_execution_tool(&execution_tool)?,
             })
         }
     }
@@ -1174,6 +1177,9 @@ pub(crate) mod api_orchestrator_integration_impls {
 
         #[snafu(transparent)]
         Edition { source: ParseEditionError },
+        
+        #[snafu(transparent)]
+        ExecutionTool { source: ParseExecutionToolError },
     }
 
     impl From<WithOutput<ExecuteResponse>> for api::ExecuteResponse {
@@ -1506,6 +1512,20 @@ pub(crate) mod api_orchestrator_integration_impls {
             "nightly" => Channel::Nightly,
             value => return ParseChannelSnafu { value }.fail(),
         })
+    }
+
+    pub(crate) fn parse_execution_tool(s: &str) -> Result<ExecutionTool, ParseExecutionToolError> {
+        Ok(match s {
+            "cargo" => ExecutionTool::Cargo,
+            "anneal-verify" => ExecutionTool::AnnealVerify,
+            value => return ParseExecutionToolSnafu { value }.fail(),
+        })
+    }
+
+    #[derive(Debug, Snafu)]
+    #[snafu(display("'{value}' is not a valid execution tool"))]
+    pub(crate) struct ParseExecutionToolError {
+        value: String,
     }
 
     #[derive(Debug, Snafu)]

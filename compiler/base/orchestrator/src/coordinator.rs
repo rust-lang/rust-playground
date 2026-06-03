@@ -367,6 +367,12 @@ pub enum LibraryType {
     ProcMacro,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum ExecutionTool {
+    Cargo, 
+    AnnealVerify,
+}
+
 #[derive(Debug, Clone)]
 pub struct ExecuteRequest {
     pub channel: Channel,
@@ -376,6 +382,7 @@ pub struct ExecuteRequest {
     pub tests: bool,
     pub backtrace: bool,
     pub code: String,
+    pub execution_tool: ExecutionTool,
 }
 
 impl LowerRequest for ExecuteRequest {
@@ -388,18 +395,25 @@ impl LowerRequest for ExecuteRequest {
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
-        let mut args = vec![];
+        let args = match self.execution_tool {
+            ExecutionTool::Cargo => {
+                let cmd = match (self.tests, self.crate_type.is_binary()) {
+                    (true, _) => "test",
+                    (_, true) => "run",
+                    (_, _) => "build",
+                };
 
-        let cmd = match (self.tests, self.crate_type.is_binary()) {
-            (true, _) => "test",
-            (_, true) => "run",
-            (_, _) => "build",
+                let mut args = vec![cmd];
+
+                if let Mode::Release = self.mode {
+                    args.push("--release");
+                }
+
+                args
+            }
+
+            ExecutionTool::AnnealVerify => vec!["anneal", "verify"],
         };
-        args.push(cmd);
-
-        if let Mode::Release = self.mode {
-            args.push("--release");
-        }
 
         let mut envs = HashMap::new();
         if self.backtrace {
@@ -4241,6 +4255,7 @@ mod tests {
             tests: false,
             backtrace: false,
             code: Default::default(),
+            execution_tool: ExecutionTool::Cargo,
         }
     }
 

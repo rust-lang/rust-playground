@@ -69,6 +69,7 @@ const performCompileToCdylibWasmOnly = (): ThunkAction => (dispatch, getState) =
   }
   dispatch(performCompileToWasmOnly());
 };
+const performCargoAnnealOnly = (): ThunkAction => performCommonExecute('bin', false, 'anneal-verify');
 
 const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Asm]: performCompileToAssemblyOnly,
@@ -80,6 +81,7 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Hir]: performCompileToHirOnly,
   [PrimaryActionCore.Mir]: performCompileToMirOnly,
   [PrimaryActionCore.Wasm]: performCompileToWasmOnly,
+  [PrimaryActionCore.Anneal]: performCargoAnnealOnly,
 };
 
 export const performPrimaryAction = (): ThunkAction => (dispatch, getState) => {
@@ -122,6 +124,10 @@ export const performCompileToNightlyHir = performAndSwitchPrimaryAction(
 export const performCompileToWasm = performAndSwitchPrimaryAction(
   performCompileToCdylibWasmOnly,
   PrimaryActionCore.Wasm,
+);
+export const performCargoAnneal = performAndSwitchPrimaryAction(
+  performCargoAnnealOnly,
+  PrimaryActionCore.Anneal,
 );
 
 export function indexPageLoad({

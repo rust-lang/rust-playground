@@ -105,6 +105,8 @@ RUN cargo build
 RUN cargo build --release
 RUN cargo clippy
 RUN if [ "${channel}" = 'nightly' ]; then cargo miri setup; cargo miri run; fi
+RUN cargo install --locked cargo-anneal --version 0.1.0-alpha.23
+RUN cargo anneal setup
 RUN rm src/*.rs
 
 COPY --from=build-orchestrator /playground/.cargo/bin/worker /playground/.cargo/bin/worker

@@ -40,6 +40,7 @@ type wsExecuteRequestPayload = {
   tests: boolean;
   code: string;
   backtrace: boolean;
+  executionTool: ExecutionTool;
 };
 
 const { action: wsExecuteBegin, schema: wsExecuteBeginSchema } = createWebsocketResponse(
@@ -75,6 +76,9 @@ const { action: wsExecuteEnd, schema: wsExecuteEndSchema } = createWebsocketResp
 
 const sliceName = 'output/execute';
 
+export type ExecutionTool = 'cargo' | 'anneal-verify';
+
+
 export interface ExecuteRequestBody {
   channel: string;
   mode: string;
@@ -83,6 +87,7 @@ export interface ExecuteRequestBody {
   code: string;
   edition: string;
   backtrace: boolean;
+  executionTool: ExecutionTool;
 }
 
 const ExecuteResponseBody = z.object({
@@ -230,10 +235,10 @@ const slice = createSlice({
 export const { wsExecuteRequest, allowLongRun, wsExecuteKill } = slice.actions;
 
 export const performCommonExecute =
-  (crateType: string, tests: boolean): ThunkAction =>
+  (crateType: string, tests: boolean, executionTool: ExecutionTool = 'cargo'): ThunkAction =>
   (dispatch, getState) => {
     const state = getState();
-    const body = executeRequestPayloadSelector(state, { crateType, tests });
+    const body = executeRequestPayloadSelector(state, { crateType, tests, executionTool, });
     const useWebSocket = executeViaWebsocketSelector(state);
 
     if (useWebSocket) {

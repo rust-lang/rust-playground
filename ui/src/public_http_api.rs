@@ -27,6 +27,10 @@ pub(crate) struct CompileRequest {
     pub(crate) code: String,
 }
 
+pub(crate) fn default_execution_tool() -> String {
+    "cargo".to_owned()
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub(crate) struct CompileResponse {
     pub(crate) success: bool,
@@ -49,6 +53,8 @@ pub(crate) struct ExecuteRequest {
     #[serde(default)]
     pub(crate) backtrace: bool,
     pub(crate) code: String,
+    #[serde(default = "default_execution_tool", rename = "executionTool")]
+    pub(crate) execution_tool: String,
 }
 
 #[derive(Debug, Clone, Serialize)]

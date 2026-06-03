@@ -34,6 +34,7 @@ const BuildMenu: React.FC<BuildMenuProps> = (props) => {
   const compileToWasm = useAppDispatchAndClose(actions.performCompileToWasm, props.close);
   const execute = useAppDispatchAndClose(actions.performExecute, props.close);
   const test = useAppDispatchAndClose(actions.performTest, props.close);
+  const performCargoAnneal = useAppDispatchAndClose(actions.performCargoAnneal, props.close);
 
   return (
     <MenuGroup title="What do you want to do?">
@@ -62,6 +63,10 @@ const BuildMenu: React.FC<BuildMenuProps> = (props) => {
       <ButtonMenuItem name="Wasm" onClick={compileToWasm}>
         Build a WebAssembly module for web browsers, in the .WAT textual representation.
         {!wasmLikelyToWork && <WasmAside />}
+      </ButtonMenuItem>
+      {/* TODO: add more details about what this does and when it would be useful. */}
+      <ButtonMenuItem name="Anneal-Verify" onClick={performCargoAnneal}>
+        Runs cargo anneal verify on the code.
       </ButtonMenuItem>
     </MenuGroup>
   );
