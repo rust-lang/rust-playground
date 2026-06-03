@@ -1,5 +1,7 @@
 import * as z from 'zod';
 
+type ValuesOf<T> = T[keyof T];
+
 export type Page = 'index' | 'help';
 
 export interface Position {
@@ -51,124 +53,141 @@ export interface CommonEditorProps {
   crates: Crate[];
 }
 
-export enum Editor {
-  Simple = 'simple',
-  Ace = 'ace',
-  Monaco = 'monaco',
-}
+export const Editor = {
+  Simple: 'simple',
+  Ace: 'ace',
+  Monaco: 'monaco',
+} as const;
+export type Editor = ValuesOf<typeof Editor>;
 
-export enum PairCharacters {
-  Enabled = 'enabled',
-  Disabled = 'disabled',
-}
+export const PairCharacters = {
+  Enabled: 'enabled',
+  Disabled: 'disabled',
+} as const;
+export type PairCharacters = ValuesOf<typeof PairCharacters>;
 
-export enum Orientation {
-  Automatic = 'automatic',
-  Horizontal = 'horizontal',
-  Vertical = 'vertical',
-}
+export const Orientation = {
+  Automatic: 'automatic',
+  Horizontal: 'horizontal',
+  Vertical: 'vertical',
+} as const;
+export type Orientation = ValuesOf<typeof Orientation>;
 
-export enum Theme {
-  Light = 'light',
-  Dark = 'dark',
-  System = 'system',
-}
+export const Theme = {
+  Light: 'light',
+  Dark: 'dark',
+  System: 'system',
+} as const;
+export type Theme = ValuesOf<typeof Theme>;
 
-export enum AssemblyFlavor {
-  Att = 'att',
-  Intel = 'intel',
-}
+export const AssemblyFlavor = {
+  Att: 'att',
+  Intel: 'intel',
+} as const;
+export type AssemblyFlavor = ValuesOf<typeof AssemblyFlavor>;
 
-export enum DemangleAssembly {
-  Demangle = 'demangle',
-  Mangle = 'mangle',
-}
+export const DemangleAssembly = {
+  Demangle: 'demangle',
+  Mangle: 'mangle',
+} as const;
+export type DemangleAssembly = ValuesOf<typeof DemangleAssembly>;
 
-export enum ProcessAssembly {
-  Filter = 'filter',
-  Raw = 'raw',
-}
+export const ProcessAssembly = {
+  Filter: 'filter',
+  Raw: 'raw',
+} as const;
+export type ProcessAssembly = ValuesOf<typeof ProcessAssembly>;
 
-export enum PrimaryActionAuto {
-  Auto = 'auto',
-}
+export const PrimaryActionAuto = {
+  Auto: 'auto',
+} as const;
+export type PrimaryActionAuto = ValuesOf<typeof PrimaryActionAuto>;
 
-export enum PrimaryActionCore {
-  Asm = 'asm',
-  Compile = 'compile',
-  Execute = 'execute',
-  LlvmIr = 'llvm-ir',
-  Hir = 'hir',
-  Mir = 'mir',
-  Test = 'test',
-  Wasm = 'wasm',
-}
+export const PrimaryActionCore = {
+  Asm: 'asm',
+  Compile: 'compile',
+  Execute: 'execute',
+  LlvmIr: 'llvm-ir',
+  Hir: 'hir',
+  Mir: 'mir',
+  Test: 'test',
+  Wasm: 'wasm',
+} as const;
+export type PrimaryActionCore = ValuesOf<typeof PrimaryActionCore>;
 
-export type PrimaryAction = PrimaryActionCore | PrimaryActionAuto;
+export const PrimaryAction = { ...PrimaryActionAuto, ...PrimaryActionCore };
+export type PrimaryAction = ValuesOf<typeof PrimaryAction>;
 
-export enum Channel {
-  Stable = 'stable',
-  Beta = 'beta',
-  Nightly = 'nightly',
-}
+export const Channel = {
+  Stable: 'stable',
+  Beta: 'beta',
+  Nightly: 'nightly',
+} as const;
+export type Channel = ValuesOf<typeof Channel>;
 
-const ChannelEnum = z.nativeEnum(Channel);
+const ChannelEnum = z.enum(Object.values(Channel));
 
 export function parseChannel(s?: string): Channel | null {
   const p = ChannelEnum.safeParse(s);
   return p.success ? p.data : null;
 }
 
-export enum Mode {
-  Debug = 'debug',
-  Release = 'release',
-}
+export const Mode = {
+  Debug: 'debug',
+  Release: 'release',
+} as const;
+export type Mode = ValuesOf<typeof Mode>;
 
-const ModeEnum = z.nativeEnum(Mode);
+const ModeEnum = z.enum(Object.values(Mode));
 
 export function parseMode(s?: string): Mode | null {
   const p = ModeEnum.safeParse(s);
   return p.success ? p.data : null;
 }
 
-export enum Edition {
-  Rust2015 = '2015',
-  Rust2018 = '2018',
-  Rust2021 = '2021',
-  Rust2024 = '2024',
-}
+export const Edition = {
+  Rust2015: '2015',
+  Rust2018: '2018',
+  Rust2021: '2021',
+  Rust2024: '2024',
+} as const;
+export type Edition = ValuesOf<typeof Edition>;
 
-const EditionEnum = z.nativeEnum(Edition);
+const EditionEnum = z.enum(Object.values(Edition));
 
 export function parseEdition(s?: string): Edition | null {
   const p = EditionEnum.safeParse(s);
   return p.success ? p.data : null;
 }
 
-export enum Backtrace {
-  Disabled = 'disabled',
-  Enabled = 'enabled',
-}
+export const Backtrace = {
+  Disabled: 'disabled',
+  Enabled: 'enabled',
+} as const;
+export type Backtrace = ValuesOf<typeof Backtrace>;
 
-export enum AliasingModel {
-  Stacked = 'stacked',
-  Tree = 'tree',
-}
+export const AliasingModel = {
+  Stacked: 'stacked',
+  Tree: 'tree',
+} as const;
+export type AliasingModel = ValuesOf<typeof AliasingModel>;
 
-export enum Focus {
-  Clippy = 'clippy',
-  Miri = 'miri',
-  MacroExpansion = 'macro-expansion',
-  LlvmIr = 'llvm-ir',
-  Mir = 'mir',
-  Hir = 'hir',
-  Wasm = 'wasm',
-  Asm = 'asm',
-  Execute = 'execute',
-  Format = 'format',
-  Gist = 'gist',
-}
+export const Focus = {
+  Clippy: 'clippy',
+  Miri: 'miri',
+  MacroExpansion: 'macro-expansion',
+  LlvmIr: 'llvm-ir',
+  Mir: 'mir',
+  Hir: 'hir',
+  Wasm: 'wasm',
+  Asm: 'asm',
+  Execute: 'execute',
+  Format: 'format',
+  Gist: 'gist',
+} as const;
+export type Focus = ValuesOf<typeof Focus>;
 
-export enum Notification {
-  RustSurvey2025 = 'rust-survey-2025',
-}
+export const Notification = {
+  RustSurvey2025: 'rust-survey-2025',
+} as const;
+export type Notification = ValuesOf<typeof Notification>;
