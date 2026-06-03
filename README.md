@@ -1,4 +1,14 @@
-# Rust Playground
+# Rust Playground (with Anneal Verify)
+
+// TODO: Figure out where to put this:
+## Workflow for making changes to the website:
+cd ~/rust-anneal-playground
+git pull
+cd ui/frontend
+pnpm build
+cd ..
+cargo build --release
+sudo systemctl restart anneal-playground
 
 This is the home of the [Rust Playground][real],
 also [hosted by Integer 32][us].
