@@ -16,6 +16,7 @@ node_modules
 !BuildMenu.tsx
 !ButtonSet.tsx
 !ConfigElement.tsx
+!Gist.tsx
 !Header.tsx
 !HelpExample.tsx
 !Notifications.tsx
@@ -36,6 +37,7 @@ node_modules
 !compileActions.ts
 !configureStore.ts
 !editor/AceEditor.tsx
+!editor/Editor.tsx
 !editor/MonacoEditorCore.tsx
 !editor/SimpleEditor.tsx
 !editor/rust_monaco_def.ts
