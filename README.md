@@ -1,4 +1,4 @@
-# Rust Playground (with Anneal Verify)
+# Rust Anneal Playground
 
 // TODO: Figure out where to put this:
 ## Workflow for making changes to the website:
