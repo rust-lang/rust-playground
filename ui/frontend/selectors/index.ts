@@ -26,7 +26,8 @@ export const positionSelector = (state: State) => state.position;
 export const selectionSelector = (state: State) => state.selection;
 
 const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
-const hasTestsSelector = createSelector(codeSelector, code => !!code.match(HAS_TESTS_RE));
+const hasTests = (code: string) => !!code.match(HAS_TESTS_RE);
+const hasTestsSelector = createSelector(codeSelector, hasTests);
 
 // https://stackoverflow.com/a/34755045/155423
 const HAS_MAIN_FUNCTION_RE = new RegExp(
@@ -37,10 +38,12 @@ const HAS_MAIN_FUNCTION_RE = new RegExp(
   ].map((r) => r.source).join(''),
   'm'
 );
-export const hasMainFunctionSelector = createSelector(codeSelector, code => !!code.match(HAS_MAIN_FUNCTION_RE));
+export const hasMainFunction = (code: string) => !!code.match(HAS_MAIN_FUNCTION_RE);
+const hasMainFunctionSelector = createSelector(codeSelector, hasMainFunction);
 
 const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
-const crateTypeSelector = createSelector(codeSelector, code => (code.match(CRATE_TYPE_RE) || [])[1]);
+const crateType = (code: string) => (code.match(CRATE_TYPE_RE) ?? []).at(1);
+const crateTypeSelector = createSelector(codeSelector, crateType);
 
 const autoPrimaryActionSelector = createSelector(
   crateTypeSelector,
