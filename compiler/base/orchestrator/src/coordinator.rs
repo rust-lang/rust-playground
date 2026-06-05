@@ -1,4 +1,8 @@
-use futures::{future::BoxFuture, stream::BoxStream, Future, FutureExt, Stream, StreamExt};
+use futures::{
+    future::BoxFuture,
+    stream::{BoxStream, FuturesUnordered},
+    Future, FutureExt, Stream, StreamExt, TryStreamExt,
+};
 use serde::Deserialize;
 use snafu::prelude::*;
 use std::{
@@ -379,12 +383,12 @@ pub struct ExecuteRequest {
 }
 
 impl LowerRequest for ExecuteRequest {
-    fn delete_previous_main_request(&self) -> DeleteFileRequest {
-        delete_previous_primary_file_request(self.crate_type)
+    fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
+        [delete_previous_primary_file_request(self.crate_type)].into_iter()
     }
 
-    fn write_main_request(&self) -> WriteFileRequest {
-        write_primary_file_request(self.crate_type, &self.code)
+    fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
+        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -489,12 +493,12 @@ impl CompileRequest {
 }
 
 impl LowerRequest for CompileRequest {
-    fn delete_previous_main_request(&self) -> DeleteFileRequest {
-        delete_previous_primary_file_request(self.crate_type)
+    fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
+        [delete_previous_primary_file_request(self.crate_type)].into_iter()
     }
 
-    fn write_main_request(&self) -> WriteFileRequest {
-        write_primary_file_request(self.crate_type, &self.code)
+    fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
+        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -585,12 +589,12 @@ impl FormatRequest {
 }
 
 impl LowerRequest for FormatRequest {
-    fn delete_previous_main_request(&self) -> DeleteFileRequest {
-        delete_previous_primary_file_request(self.crate_type)
+    fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
+        [delete_previous_primary_file_request(self.crate_type)].into_iter()
     }
 
-    fn write_main_request(&self) -> WriteFileRequest {
-        write_primary_file_request(self.crate_type, &self.code)
+    fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
+        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -630,12 +634,12 @@ pub struct ClippyRequest {
 }
 
 impl LowerRequest for ClippyRequest {
-    fn delete_previous_main_request(&self) -> DeleteFileRequest {
-        delete_previous_primary_file_request(self.crate_type)
+    fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
+        [delete_previous_primary_file_request(self.crate_type)].into_iter()
     }
 
-    fn write_main_request(&self) -> WriteFileRequest {
-        write_primary_file_request(self.crate_type, &self.code)
+    fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
+        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -676,12 +680,12 @@ pub struct MiriRequest {
 }
 
 impl LowerRequest for MiriRequest {
-    fn delete_previous_main_request(&self) -> DeleteFileRequest {
-        delete_previous_primary_file_request(self.crate_type)
+    fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
+        [delete_previous_primary_file_request(self.crate_type)].into_iter()
     }
 
-    fn write_main_request(&self) -> WriteFileRequest {
-        write_primary_file_request(self.crate_type, &self.code)
+    fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
+        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -741,12 +745,12 @@ pub struct MacroExpansionRequest {
 }
 
 impl LowerRequest for MacroExpansionRequest {
-    fn delete_previous_main_request(&self) -> DeleteFileRequest {
-        delete_previous_primary_file_request(self.crate_type)
+    fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
+        [delete_previous_primary_file_request(self.crate_type)].into_iter()
     }
 
-    fn write_main_request(&self) -> WriteFileRequest {
-        write_primary_file_request(self.crate_type, &self.code)
+    fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
+        [write_primary_file_request(self.crate_type, &self.code)].into_iter()
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
@@ -1776,21 +1780,29 @@ impl Container {
     ) -> Result<SpawnCargo, DoRequestError> {
         use do_request_error::*;
 
-        let delete_previous_main = async {
-            self.commander
-                .one(request.delete_previous_main_request())
-                .await
-                .context(CouldNotDeletePreviousCodeSnafu)
-                .map(drop::<crate::message::DeleteFileResponse>)
-        };
+        let delete_files = request
+            .delete_files()
+            .map(|req| async {
+                self.commander
+                    .one(req)
+                    .await
+                    .context(CouldNotDeletePreviousCodeSnafu)
+                    .map(drop::<crate::message::DeleteFileResponse>)
+            })
+            .collect::<FuturesUnordered<_>>()
+            .try_collect::<()>();
 
-        let write_main = async {
-            self.commander
-                .one(request.write_main_request())
-                .await
-                .context(CouldNotWriteCodeSnafu)
-                .map(drop::<crate::message::WriteFileResponse>)
-        };
+        let write_files = request
+            .write_files()
+            .map(|req| async {
+                self.commander
+                    .one(req)
+                    .await
+                    .context(CouldNotWriteCodeSnafu)
+                    .map(drop::<crate::message::WriteFileResponse>)
+            })
+            .collect::<FuturesUnordered<_>>()
+            .try_collect::<()>();
 
         let modify_cargo_toml = async {
             self.modify_cargo_toml
@@ -1799,7 +1811,7 @@ impl Container {
                 .context(CouldNotModifyCargoTomlSnafu)
         };
 
-        let (d, w, m) = try_join!(delete_previous_main, write_main, modify_cargo_toml)?;
+        let (d, w, m) = try_join!(delete_files, write_files, modify_cargo_toml)?;
         let _: [(); 3] = [d, w, m];
 
         let execute_cargo = request.execute_cargo_request();
@@ -2261,10 +2273,12 @@ struct Commander {
     id: Arc<AtomicU64>,
 }
 
+/// The set of files returned by `delete_files` should have no overlap
+/// with the set of files returned by `write_files`.
 trait LowerRequest {
-    fn delete_previous_main_request(&self) -> DeleteFileRequest;
+    fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest>;
 
-    fn write_main_request(&self) -> WriteFileRequest;
+    fn write_files(&self) -> impl Iterator<Item = WriteFileRequest>;
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest;
 }
@@ -2273,12 +2287,12 @@ impl<S> LowerRequest for &S
 where
     S: LowerRequest,
 {
-    fn delete_previous_main_request(&self) -> DeleteFileRequest {
-        S::delete_previous_main_request(self)
+    fn delete_files(&self) -> impl Iterator<Item = DeleteFileRequest> {
+        S::delete_files(self)
     }
 
-    fn write_main_request(&self) -> WriteFileRequest {
-        S::write_main_request(self)
+    fn write_files(&self) -> impl Iterator<Item = WriteFileRequest> {
+        S::write_files(self)
     }
 
     fn execute_cargo_request(&self) -> ExecuteCommandRequest {
