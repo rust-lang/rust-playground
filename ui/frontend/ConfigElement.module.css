@@ -31,31 +31,30 @@
 }
 
 .toggle {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 
   & label {
-    $border: 1px solid #bbb;
-
-    flex: 1;
     cursor: pointer;
-    border: $border;
-    border-right-width: 0;
-    border-top-left-radius: var(--header-border-radius);
-    border-bottom-left-radius: var(--header-border-radius);
     padding: 0 1em;
     color: #777;
     font-weight: 600;
     text-align: center;
     text-transform: uppercase;
-
-    & ~ label {
-      border-left: $border;
-      border-right-width: 1px;
-      border-radius: 0 var(--header-border-radius) var(--header-border-radius) 0;
-    }
+    border: 1px solid transparent;
 
     &:hover {
       background: hsl(208deg 100% 43% / 10%);
+    }
+
+    &:first-of-type {
+      border-radius: var(--header-border-radius) 0 0 var(--header-border-radius);
+      border-right-width: 0;
+    }
+
+    &:last-of-type {
+      border-radius: 0 var(--header-border-radius) var(--header-border-radius) 0;
+      border-left-width: 0;
     }
   }
 
@@ -63,13 +62,12 @@
     display: none;
 
     &:checked + label {
-      border-color: var(--header-tint);
       background: var(--header-tint);
       color: #fff;
+    }
 
-      & ~ label {
-        border-left-width: 0;
-      }
+    &:not(:checked) + label {
+      border-color: #bbb;
     }
   }
 }
