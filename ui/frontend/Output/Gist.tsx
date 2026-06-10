@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { ClipboardIcon } from '../Icon';
 import { useAppSelector } from '../hooks';
-import * as selectors from '../selectors';
+import * as selectors from '../selectors/gist';
 import Loader from './Loader';
 import Section from './Section';
 

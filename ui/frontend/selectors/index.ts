@@ -1,4 +1,3 @@
-import { source } from 'common-tags';
 import { createSelector } from '@reduxjs/toolkit';
 
 import { State } from '../reducers';
@@ -18,12 +17,19 @@ import { ExecutionTool } from '../reducers/output/execute';
 
 const MS_PER_S = 1000;
 
+const featureFlags = (state: State) => state.featureFlags;
+const clientFeatureFlagThreshold = (state: State) => state.client.featureFlagThreshold;
+
+const createFeatureFlagSelector = (ff: (state: State) => number) =>
+  createSelector(clientFeatureFlagThreshold, ff, (c, ff) => c <= ff);
+
 export const codeSelector = (state: State) => state.code;
 export const positionSelector = (state: State) => state.position;
 export const selectionSelector = (state: State) => state.selection;
 
 const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
-export const hasTestsSelector = createSelector(codeSelector, code => !!code.match(HAS_TESTS_RE));
+const hasTests = (code: string) => !!code.match(HAS_TESTS_RE);
+const hasTestsSelector = createSelector(codeSelector, hasTests);
 
 // https://stackoverflow.com/a/34755045/155423
 const HAS_MAIN_FUNCTION_RE = new RegExp(
@@ -34,10 +40,12 @@ const HAS_MAIN_FUNCTION_RE = new RegExp(
   ].map((r) => r.source).join(''),
   'm'
 );
-export const hasMainFunctionSelector = createSelector(codeSelector, code => !!code.match(HAS_MAIN_FUNCTION_RE));
+export const hasMainFunction = (code: string) => !!code.match(HAS_MAIN_FUNCTION_RE);
+const hasMainFunctionSelector = createSelector(codeSelector, hasMainFunction);
 
 const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
-export const crateTypeSelector = createSelector(codeSelector, code => (code.match(CRATE_TYPE_RE) || [])[1]);
+const crateType = (code: string) => (code.match(CRATE_TYPE_RE) ?? []).at(1);
+const crateTypeSelector = createSelector(codeSelector, crateType);
 
 const autoPrimaryActionSelector = createSelector(
   crateTypeSelector,
@@ -309,105 +317,6 @@ export const resetOldConfigurationSelector = createSelector(
   }
 );
 
-const gistSelector = (state: State) =>
-  state.output.gist;
-
-// Selects url.query of build configs.
-const urlQuerySelector = createSelector(
-  gistSelector,
-  gist => {
-    const res = new URLSearchParams();
-    if (gist.channel) { res.set('version', gist.channel) }
-    if (gist.mode) { res.set('mode', gist.mode) }
-    if (gist.edition) { res.set('edition', gist.edition) }
-    return res;
-  },
-);
-
-export const showGistLoaderSelector = createSelector(
-  gistSelector,
-  gist => gist.requestsInProgress > 0,
-);
-
-export const permalinkSelector = createSelector(
-  baseUrlSelector, urlQuerySelector, gistSelector,
-  (baseUrl, originalQuery, gist) => {
-    const u = new URL(baseUrl);
-    const query = new URLSearchParams(originalQuery);
-    if (gist.id) { query.set('gist', gist.id) }
-    u.search = query.toString();
-    return u.href;
-  },
-);
-
-export const textChangedSinceShareSelector = createSelector(
-  codeSelector, gistSelector,
-  (code, gist) => code !== gist.code
-)
-
-const codeBlock = (code: string, language = '') =>
-  '```' + language + `\n${code}\n` + '```';
-
-const maybeOutput = (code: string | undefined, whenPresent: (_: string) => void) => {
-  if (code && code.length !== 0) { whenPresent(code); }
-};
-
-const snippetSelector = createSelector(
-  gistSelector, permalinkSelector,
-  (gist, permalink) => {
-    let snippet = '';
-
-    maybeOutput(gist.code, code => {
-      snippet += source`
-        ${codeBlock(code, 'rust')}
-
-        ([Playground](${permalink}))
-      `;
-    });
-
-    maybeOutput(gist.stdout, stdout => {
-      snippet += '\n\n';
-      snippet +=
-        source`
-          Output:
-
-          ${codeBlock(stdout)}
-        `;
-    });
-
-    maybeOutput(gist.stderr, stderr => {
-      snippet += '\n\n';
-      snippet +=
-        source`
-          Errors:
-
-          ${codeBlock(stderr)}
-        `;
-    });
-
-    return snippet;
-  },
-);
-
-export const urloUrlSelector = createSelector(
-  snippetSelector,
-  snippet => {
-    const newUsersPostUrl = new URL('https://users.rust-lang.org/new-topic');
-    newUsersPostUrl.searchParams.set('body', snippet);
-    return newUsersPostUrl.href;
-  },
-);
-
-export const codeUrlSelector = createSelector(
-  baseUrlSelector, urlQuerySelector, gistSelector,
-  (baseUrl, originalQuery, gist) => {
-    const u = new URL(baseUrl);
-    const query = new URLSearchParams(originalQuery);
-    if (gist.code) { query.set('code', gist.code) }
-    u.search = new URLSearchParams(query).toString();
-    return u.href;
-  },
-);
 
 const notificationsSelector = (state: State) => state.notifications;
 
@@ -497,17 +406,9 @@ export const offerCrateAutocompleteOnUse = createSelector(
   (edition) => edition !== Edition.Rust2015,
 );
 
-const client = (state: State) => state.client;
-const featureFlags = (state: State) => state.featureFlags;
 const websocket = (state: State) => state.websocket;
 
-const clientFeatureFlagThreshold = createSelector(client, (c) => c.featureFlagThreshold);
-
 const showGemThreshold = createSelector(featureFlags, ff => ff.showGemThreshold);
-
-const createFeatureFlagSelector = (ff: (state: State) => number) =>
-  createSelector(clientFeatureFlagThreshold, ff, (c, ff) => c <= ff);
-
 export const showGemSelector = createFeatureFlagSelector(showGemThreshold);
 
 export const executeViaWebsocketSelector = createSelector(websocket, (ws) => ws.connected);

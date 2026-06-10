@@ -1,5 +1,7 @@
 import * as z from 'zod';
 
+type ValuesOf<T> = T[keyof T];
+
 export type Page = 'index' | 'help';
 
 export interface Position {
@@ -50,126 +52,147 @@ export interface CommonEditorProps {
   selection: Selection;
   crates: Crate[];
 }
+export const Editor = {
+  Simple: 'simple',
+  Ace: 'ace',
+  Monaco: 'monaco',
+} as const;
+export type Editor = ValuesOf<typeof Editor>;
+export const EditorSchema = z.enum(Object.values(Editor));
 
-export enum Editor {
-  Simple = 'simple',
-  Ace = 'ace',
-  Monaco = 'monaco',
-}
+export const PairCharacters = {
+  Enabled: 'enabled',
+  Disabled: 'disabled',
+} as const;
+export type PairCharacters = ValuesOf<typeof PairCharacters>;
+export const PairCharactersSchema = z.enum(Object.values(PairCharacters));
 
-export enum PairCharacters {
-  Enabled = 'enabled',
-  Disabled = 'disabled',
-}
+export const Orientation = {
+  Automatic: 'automatic',
+  Horizontal: 'horizontal',
+  Vertical: 'vertical',
+} as const;
+export type Orientation = ValuesOf<typeof Orientation>;
+export const OrientationSchema = z.enum(Object.values(Orientation));
 
-export enum Orientation {
-  Automatic = 'automatic',
-  Horizontal = 'horizontal',
-  Vertical = 'vertical',
-}
+export const Theme = {
+  Light: 'light',
+  Dark: 'dark',
+  System: 'system',
+} as const;
+export type Theme = ValuesOf<typeof Theme>;
+export const ThemeSchema = z.enum(Object.values(Theme));
 
-export enum Theme {
-  Light = 'light',
-  Dark = 'dark',
-  System = 'system',
-}
+export const AssemblyFlavor = {
+  Att: 'att',
+  Intel: 'intel',
+} as const;
+export type AssemblyFlavor = ValuesOf<typeof AssemblyFlavor>;
+export const AssemblyFlavorSchema = z.enum(Object.values(AssemblyFlavor));
 
-export enum AssemblyFlavor {
-  Att = 'att',
-  Intel = 'intel',
-}
+export const DemangleAssembly = {
+  Demangle: 'demangle',
+  Mangle: 'mangle',
+} as const;
+export type DemangleAssembly = ValuesOf<typeof DemangleAssembly>;
+export const DemangleAssemblySchema = z.enum(Object.values(DemangleAssembly));
 
-export enum DemangleAssembly {
-  Demangle = 'demangle',
-  Mangle = 'mangle',
-}
+export const ProcessAssembly = {
+  Filter: 'filter',
+  Raw: 'raw',
+} as const;
+export type ProcessAssembly = ValuesOf<typeof ProcessAssembly>;
+export const ProcessAssemblySchema = z.enum(Object.values(ProcessAssembly));
 
-export enum ProcessAssembly {
-  Filter = 'filter',
-  Raw = 'raw',
-}
+export const PrimaryActionAuto = {
+  Auto: 'auto',
+} as const;
+export type PrimaryActionAuto = ValuesOf<typeof PrimaryActionAuto>;
 
-export enum PrimaryActionAuto {
-  Auto = 'auto',
-}
+export const PrimaryActionCore = {
+  Asm: 'asm',
+  Compile: 'compile',
+  Execute: 'execute',
+  LlvmIr: 'llvm-ir',
+  Hir: 'hir',
+  Mir: 'mir',
+  Test: 'test',
+  Wasm: 'wasm',
+  Anneal: 'anneal-verify',
+} as const;
+export type PrimaryActionCore = ValuesOf<typeof PrimaryActionCore>;
 
-export enum PrimaryActionCore {
-  Asm = 'asm',
-  Compile = 'compile',
-  Execute = 'execute',
-  LlvmIr = 'llvm-ir',
-  Hir = 'hir',
-  Mir = 'mir',
-  Test = 'test',
-  Wasm = 'wasm',
-  Anneal = 'anneal-verify',
-}
+export const PrimaryAction = { ...PrimaryActionAuto, ...PrimaryActionCore };
+export type PrimaryAction = ValuesOf<typeof PrimaryAction>;
+export const PrimaryActionSchema = z.enum(Object.values(PrimaryAction));
 
-export type PrimaryAction = PrimaryActionCore | PrimaryActionAuto;
-
-export enum Channel {
-  Stable = 'stable',
-  Beta = 'beta',
-  Nightly = 'nightly',
-}
-
-const ChannelEnum = z.nativeEnum(Channel);
+export const Channel = {
+  Stable: 'stable',
+  Beta: 'beta',
+  Nightly: 'nightly',
+} as const;
+export type Channel = ValuesOf<typeof Channel>;
+const ChannelSchema = z.enum(Object.values(Channel));
 
 export function parseChannel(s?: string): Channel | null {
-  const p = ChannelEnum.safeParse(s);
+  const p = ChannelSchema.safeParse(s);
   return p.success ? p.data : null;
 }
 
-export enum Mode {
-  Debug = 'debug',
-  Release = 'release',
-}
-
-const ModeEnum = z.nativeEnum(Mode);
+export const Mode = {
+  Debug: 'debug',
+  Release: 'release',
+} as const;
+export type Mode = ValuesOf<typeof Mode>;
+const ModeSchema = z.enum(Object.values(Mode));
 
 export function parseMode(s?: string): Mode | null {
-  const p = ModeEnum.safeParse(s);
+  const p = ModeSchema.safeParse(s);
   return p.success ? p.data : null;
 }
 
-export enum Edition {
-  Rust2015 = '2015',
-  Rust2018 = '2018',
-  Rust2021 = '2021',
-  Rust2024 = '2024',
-}
-
-const EditionEnum = z.nativeEnum(Edition);
+export const Edition = {
+  Rust2015: '2015',
+  Rust2018: '2018',
+  Rust2021: '2021',
+  Rust2024: '2024',
+} as const;
+export type Edition = ValuesOf<typeof Edition>;
+const EditionSchema = z.enum(Object.values(Edition));
 
 export function parseEdition(s?: string): Edition | null {
-  const p = EditionEnum.safeParse(s);
+  const p = EditionSchema.safeParse(s);
   return p.success ? p.data : null;
 }
 
-export enum Backtrace {
-  Disabled = 'disabled',
-  Enabled = 'enabled',
-}
+export const Backtrace = {
+  Disabled: 'disabled',
+  Enabled: 'enabled',
+} as const;
+export type Backtrace = ValuesOf<typeof Backtrace>;
 
-export enum AliasingModel {
-  Stacked = 'stacked',
-  Tree = 'tree',
-}
+export const AliasingModel = {
+  Stacked: 'stacked',
+  Tree: 'tree',
+} as const;
+export type AliasingModel = ValuesOf<typeof AliasingModel>;
 
-export enum Focus {
-  Clippy = 'clippy',
-  Miri = 'miri',
-  MacroExpansion = 'macro-expansion',
-  LlvmIr = 'llvm-ir',
-  Mir = 'mir',
-  Hir = 'hir',
-  Wasm = 'wasm',
-  Asm = 'asm',
-  Execute = 'execute',
-  Format = 'format',
-  Gist = 'gist',
-}
+export const Focus = {
+  Clippy: 'clippy',
+  Miri: 'miri',
+  MacroExpansion: 'macro-expansion',
+  LlvmIr: 'llvm-ir',
+  Mir: 'mir',
+  Hir: 'hir',
+  Wasm: 'wasm',
+  Asm: 'asm',
+  Execute: 'execute',
+  Format: 'format',
+  Gist: 'gist',
+} as const;
+export type Focus = ValuesOf<typeof Focus>;
 
-export enum Notification {
-  RustSurvey2025 = 'rust-survey-2025',
-}
+export const Notification = {
+  RustSurvey2025: 'rust-survey-2025',
+} as const;
+export type Notification = ValuesOf<typeof Notification>;
