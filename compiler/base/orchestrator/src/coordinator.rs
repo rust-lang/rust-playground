@@ -412,7 +412,7 @@ impl LowerRequest for ExecuteRequest {
                 args
             }
 
-            ExecutionTool::AnnealVerify => vec!["anneal", "verify"],
+            ExecutionTool::AnnealVerify => vec!["anneal", "verify", "--unsound-allow-is-valid"],
         };
 
         let mut envs = HashMap::new();
