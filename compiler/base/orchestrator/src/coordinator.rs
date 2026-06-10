@@ -3100,6 +3100,7 @@ mod tests {
         tests: false,
         backtrace: false,
         code: String::new(),
+        execution_tool: ExecutionTool::Cargo,
     };
 
     fn new_execute_request() -> ExecuteRequest {
@@ -4156,6 +4157,7 @@ mod tests {
             tests: false,
             backtrace: false,
             code: "pub fn alpha() {}".into(),
+            execution_tool: ExecutionTool::Cargo,
         };
 
         let response = coordinator
@@ -4206,6 +4208,7 @@ mod tests {
             tests: false,
             backtrace: false,
             code: r#"fn main() { println!("hello") }"#.into(),
+            execution_tool: ExecutionTool::Cargo,
         };
 
         let res = coordinator.execute(req.clone()).await.unwrap();
@@ -4225,7 +4228,6 @@ mod tests {
     #[snafu::report]
     async fn exit_due_to_signal_is_reported() -> Result<()> {
         let coordinator = new_coordinator();
-
         let req = ExecuteRequest {
             channel: Channel::Stable,
             mode: Mode::Release,
@@ -4234,6 +4236,7 @@ mod tests {
             tests: false,
             backtrace: false,
             code: r#"fn main() { std::process::abort(); }"#.into(),
+            execution_tool: ExecutionTool::Cargo,
         };
 
         let res = coordinator.execute(req.clone()).await.unwrap();
