@@ -6,9 +6,11 @@ import {
   changeBacktrace,
   changeChannel,
   changeEdition,
+  changeFileView,
   changeMode,
   changePrimaryAction,
 } from './reducers/configuration';
+import * as files from './reducers/files';
 import { performCompileToAssemblyOnly } from './reducers/output/assembly';
 import { performCommonExecute } from './reducers/output/execute';
 import { performGistLoad } from './reducers/output/gist';
@@ -17,11 +19,18 @@ import { performCompileToLlvmIrOnly } from './reducers/output/llvmIr';
 import { performCompileToMirOnly } from './reducers/output/mir';
 import { performCompileToWasmOnly } from './reducers/output/wasm';
 import { navigateToHelp, navigateToIndex } from './reducers/page';
-import { getCrateType, runAsTest, wasmLikelyToWork } from './selectors';
+import {
+  getCrateType,
+  hasMainFunction,
+  linearCodeSelector,
+  runAsTest,
+  wasmLikelyToWork,
+} from './selectors';
 import {
   Backtrace,
   Channel,
   Edition,
+  FileView,
   Mode,
   PrimaryAction,
   PrimaryActionAuto,
@@ -176,5 +185,20 @@ export function showExample(code: string): ThunkAction {
     dispatch(changeMode(Mode.Debug));
     dispatch(changeEdition(Edition.Rust2024));
     dispatch(editCode(code));
+  };
+}
+
+export function preserveContentAndChangeFileView(fv: FileView): ThunkAction {
+  return function (dispatch, getState) {
+    const state = getState();
+    dispatch(changeFileView(fv));
+    if (fv === FileView.Single) {
+      const code = linearCodeSelector(state);
+      dispatch(editCode(code));
+    } else {
+      const content = state.code;
+      const name = hasMainFunction(content) ? 'src/main.rs' : 'src/lib.rs';
+      dispatch(files.initializeWith({ name, content }));
+    }
   };
 }

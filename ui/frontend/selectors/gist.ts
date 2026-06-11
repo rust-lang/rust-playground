@@ -1,21 +1,16 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { source } from 'common-tags';
 
-import { baseUrlSelector, codeOrFilesSelector } from '.';
+import { baseUrlSelector, codeOrFilesSelector, linearizeCode } from '.';
 import { State } from '../reducers';
 
 const gistCodeSelector = (state: State) => state.output.gist.code;
 
 const linearCodeSelector = createSelector(gistCodeSelector, (code) => {
-  if (!code) {
-    return code;
-  }
-  if (typeof code === 'string') {
-    return code;
+  if (code) {
+    return linearizeCode(code);
   } else {
-    const f = [...code];
-    f.sort((a, b) => a.name.localeCompare(b.name));
-    return f.reduce((acc, f) => acc + `// ${f.name}` + '\n\n' + f.content + '\n', '');
+    return code;
   }
 });
 

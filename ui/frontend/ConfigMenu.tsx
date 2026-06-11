@@ -19,16 +19,44 @@ import {
   Theme,
 } from './types';
 import * as selectors from './selectors';
+import MenuAside from './MenuAside';
+import { preserveContentAndChangeFileView } from './actions';
 
 const MONACO_THEMES = [
   'vs', 'vs-dark', 'vscode-dark-plus',
 ];
 
-const ConfigMenu: React.FC = () => {
+const MultifileAside = () => <MenuAside>All files will be prefixed with their name and concatenated if <code>Single</code> is selected.</MenuAside>;
+
+const MultifileConfig: React.FC = () => {
   'use memo';
 
   const allowMultipleFiles = useAppSelector(selectors.allowMultipleFiles);
   const fileView = useAppSelector((state) => state.configuration.fileView);
+
+  const dispatch = useAppDispatch();
+
+  if (!allowMultipleFiles) {
+    return null;
+  }
+
+  const aside = (fileView === FileView.Multiple) ? <MultifileAside /> : undefined;
+
+  return (
+    <EitherConfig
+      id="editor-file-view"
+      aside={aside}
+      name="Edit files"
+      a={FileView.Single}
+      b={FileView.Multiple}
+      value={fileView}
+      onChange={(v) => dispatch(preserveContentAndChangeFileView(v))} />
+  );
+}
+
+const ConfigMenu: React.FC = () => {
+  'use memo';
+
   const keybinding = useAppSelector((state) => state.configuration.ace.keybinding);
   const aceTheme = useAppSelector((state) => state.configuration.ace.theme);
   const monacoTheme = useAppSelector((state) => state.configuration.monaco.theme);
@@ -45,15 +73,7 @@ const ConfigMenu: React.FC = () => {
   return (
     <>
       <MenuGroup title="Editor">
-        {allowMultipleFiles && (
-          <EitherConfig
-            id="editor-file-view"
-            name="Edit files"
-            a={FileView.Single}
-            b={FileView.Multiple}
-            value={fileView}
-            onChange={(v) => dispatch(config.changeFileView(v))} />
-        )}
+        <MultifileConfig />
         <SelectConfig
           name="Editor"
           value={editorStyle}

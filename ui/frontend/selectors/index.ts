@@ -12,6 +12,7 @@ import {
   PrimaryActionCore,
   Version,
   FileView,
+  Code,
 } from '../types';
 
 const MS_PER_S = 1000;
@@ -47,6 +48,18 @@ export const codeOrFilesSelector = createSelector(
     }
   }
 );
+
+export const linearizeCode = (code: Code) => {
+  if (typeof code === 'string') {
+    return code;
+  } else {
+    const f = [...code];
+    f.sort((a, b) => a.name.localeCompare(b.name));
+    return f.reduce((acc, f) => acc + `// ${f.name}` + '\n\n' + f.content + '\n', '');
+  }
+};
+
+export const linearCodeSelector = createSelector(codeOrFilesSelector, linearizeCode);
 
 export const activeCodeSelector = createSelector(
   multifileEnabledSelector,

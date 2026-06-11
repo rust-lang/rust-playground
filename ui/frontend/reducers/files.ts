@@ -80,6 +80,18 @@ const slice = createSlice({
   name: 'files',
   initialState,
   reducers: {
+    initializeWith: (state, action: PayloadAction<{ name: string; content: string }>) => {
+      const { name, content } = action.payload;
+
+      if (!isFilenameValid(state, name)) {
+        return;
+      }
+
+      const newFile = buildFile(state, name, content);
+      state.files = [newFile];
+      state.active = newFile.id;
+    },
+
     createFile: (state, action: PayloadAction<string>) => {
       const candidateName = action.payload;
 
@@ -199,6 +211,7 @@ export const {
   deleteFile,
   renameDirectory,
   renameFile,
+  initializeWith,
 } = slice.actions;
 
 export default slice.reducer;
