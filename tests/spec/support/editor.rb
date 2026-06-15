@@ -16,6 +16,10 @@ class Editor
     page.has_css? '.ace_line', text: text
   end
 
+  def has_no_line?(text)
+    page.has_no_css? '.ace_line', text: text
+  end
+
   def has_highlighted_text?(text)
     page.within('.ace_text-input', visible: :any) do
       selected = page.evaluate_script <<~JS

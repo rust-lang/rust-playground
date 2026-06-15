@@ -2,6 +2,7 @@ require 'json'
 
 require 'spec_helper'
 require 'support/editor'
+require 'support/matchers/editor'
 require 'support/playground_actions'
 
 RSpec.feature "Resetting the configuration to defaults", type: :feature, js: true do
