@@ -14,7 +14,7 @@ axum = { version = "0.8", features = ["ws"] }
 axum-extra = { version = "0.12", features = ["typed-header"] }
 dotenv = "0.15.0"
 futures = "0.3.21"
-octocrab = "0.51"
+octocrab = "0.53"
 orchestrator = { path = "../compiler/base/orchestrator" }
 prometheus = { version = "0.14.0", default-features = false }
 regex = "1.0.0"
@@ -27,6 +27,6 @@ strum = { version = "0.28.0", features = ["derive"] }
 tempfile = "3"
 tokio = { version = "1.9", features = ["macros", "time", "process", "rt-multi-thread"] }
 tokio-util = { version = "0.7.9", default-features = false, features = ["time"] }
-tower-http = { version = "0.6", features = ["cors", "fs", "request-id", "set-header", "trace"] }
+tower-http = { version = "0.7", features = ["cors", "fs", "request-id", "set-header", "trace"] }
 tracing = { version = "0.1.37", features = ["attributes"] }
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }

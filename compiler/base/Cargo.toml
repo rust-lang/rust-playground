@@ -57,7 +57,7 @@ version = "=2.0.4"
 
 [dependencies.alloc_stdlib]
 package = "alloc-stdlib"
-version = "=0.2.2"
+version = "=0.2.4"
 
 [dependencies.allocator_api2]
 package = "allocator-api2"
@@ -88,7 +88,7 @@ version = "=1.1.5"
 
 [dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.102"
+version = "=1.0.103"
 
 [dependencies.approx]
 package = "approx"
@@ -102,7 +102,7 @@ default-features = false
 
 [dependencies.arc_swap]
 package = "arc-swap"
-version = "=1.9.1"
+version = "=1.9.2"
 
 [dependencies.arg_enum_proc_macro]
 package = "arg_enum_proc_macro"
@@ -110,7 +110,7 @@ version = "=0.3.4"
 
 [dependencies.arrayvec]
 package = "arrayvec"
-version = "=0.7.6"
+version = "=0.7.7"
 
 [dependencies.as_slice]
 package = "as-slice"
@@ -184,7 +184,7 @@ default-features = false
 
 [dependencies.bitflags]
 package = "bitflags"
-version = "=2.12.1"
+version = "=2.13.0"
 
 [dependencies.bitstream_io]
 package = "bitstream-io"
@@ -192,12 +192,12 @@ version = "=4.10.0"
 
 [dependencies.bitvec]
 package = "bitvec"
-version = "=1.0.1"
+version = "=1.1.1"
 default-features = false
 
 [dependencies.block_buffer]
 package = "block-buffer"
-version = "=0.12.0"
+version = "=0.12.1"
 
 [dependencies.block_buffer_0_10_4]
 package = "block-buffer"
@@ -205,16 +205,16 @@ version = "=0.10.4"
 
 [dependencies.borsh]
 package = "borsh"
-version = "=1.6.1"
+version = "=1.7.0"
 default-features = false
 
 [dependencies.brotli]
 package = "brotli"
-version = "=8.0.3"
+version = "=8.0.4"
 
 [dependencies.brotli_decompressor]
 package = "brotli-decompressor"
-version = "=5.0.1"
+version = "=5.0.3"
 default-features = false
 
 [dependencies.built]
@@ -254,7 +254,7 @@ version = "=0.1.0"
 
 [dependencies.bytes]
 package = "bytes"
-version = "=1.11.1"
+version = "=1.12.0"
 
 [dependencies.bytes_0_4_12]
 package = "bytes"
@@ -262,7 +262,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.2.63"
+version = "=1.2.65"
 features = ["parallel"]
 
 [dependencies.cfg_aliases]
@@ -275,13 +275,13 @@ version = "=1.0.4"
 
 [dependencies.chacha20]
 package = "chacha20"
-version = "=0.10.0"
+version = "=0.10.1"
 features = ["rng"]
 default-features = false
 
 [dependencies.chrono]
 package = "chrono"
-version = "=0.4.44"
+version = "=0.4.45"
 features = ["clock", "serde"]
 
 [dependencies.clap]
@@ -422,7 +422,6 @@ version = "=1.0.6"
 [dependencies.deranged]
 package = "deranged"
 version = "=0.5.8"
-features = ["powerfmt"]
 
 [dependencies.derive_more]
 package = "derive_more"
@@ -488,12 +487,13 @@ version = "=0.8.35"
 
 [dependencies.env_filter]
 package = "env_filter"
-version = "=1.0.1"
+version = "=2.0.0"
+features = ["std"]
 default-features = false
 
 [dependencies.env_logger]
 package = "env_logger"
-version = "=0.11.10"
+version = "=0.11.11"
 
 [dependencies.equator]
 package = "equator"
@@ -667,7 +667,7 @@ version = "=0.2.24"
 
 [dependencies.getrandom]
 package = "getrandom"
-version = "=0.4.2"
+version = "=0.4.3"
 
 [dependencies.getrandom_0_2_17]
 package = "getrandom"
@@ -693,7 +693,7 @@ version = "=0.3.3"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.4.14"
+version = "=0.4.15"
 
 [dependencies.half]
 package = "half"
@@ -706,6 +706,7 @@ version = "=0.3.1"
 [dependencies.hashbrown]
 package = "hashbrown"
 version = "=0.17.1"
+features = ["default-hasher"]
 default-features = false
 
 [dependencies.hashbrown_0_15_5]
@@ -714,15 +715,9 @@ version = "=0.15.5"
 features = ["default-hasher", "inline-more"]
 default-features = false
 
-[dependencies.hashbrown_0_16_1]
-package = "hashbrown"
-version = "=0.16.1"
-features = ["default-hasher"]
-default-features = false
-
 [dependencies.hashlink]
 package = "hashlink"
-version = "=0.11.0"
+version = "=0.12.0"
 
 [dependencies.hdrhistogram]
 package = "hdrhistogram"
@@ -751,7 +746,7 @@ version = "=0.26.0"
 
 [dependencies.http]
 package = "http"
-version = "=1.4.1"
+version = "=1.4.2"
 
 [dependencies.http_body]
 package = "http-body"
@@ -779,7 +774,7 @@ version = "=2.3.0"
 
 [dependencies.hybrid_array]
 package = "hybrid-array"
-version = "=0.4.12"
+version = "=0.4.13"
 
 [dependencies.hyper]
 package = "hyper"
@@ -857,7 +852,7 @@ version = "=0.2.4"
 
 [dependencies.imgref]
 package = "imgref"
-version = "=1.12.1"
+version = "=1.12.2"
 
 [dependencies.indexmap]
 package = "indexmap"
@@ -878,6 +873,10 @@ version = "=1.70.2"
 
 [dependencies.itertools]
 package = "itertools"
+version = "=0.15.0"
+
+[dependencies.itertools_0_14_0]
+package = "itertools"
 version = "=0.14.0"
 
 [dependencies.itoa]
@@ -886,12 +885,12 @@ version = "=1.0.18"
 
 [dependencies.jiff]
 package = "jiff"
-version = "=0.2.28"
+version = "=0.2.29"
 features = ["logging", "serde", "static", "std", "tzdb-bundle-always"]
 
 [dependencies.jiff_static]
 package = "jiff-static"
-version = "=0.2.28"
+version = "=0.2.29"
 
 [dependencies.jiff_tzdb]
 package = "jiff-tzdb"
@@ -920,7 +919,7 @@ version = "=0.2.16"
 
 [dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.38.0"
+version = "=0.38.1"
 
 [dependencies.linux_raw_sys]
 package = "linux-raw-sys"
@@ -943,7 +942,7 @@ version = "=0.4.14"
 
 [dependencies.log]
 package = "log"
-version = "=0.4.31"
+version = "=0.4.33"
 features = ["std"]
 
 [dependencies.log4rs]
@@ -995,7 +994,7 @@ default-features = false
 
 [dependencies.memchr]
 package = "memchr"
-version = "=2.8.1"
+version = "=2.8.2"
 
 [dependencies.memmap]
 package = "memmap"
@@ -1026,7 +1025,7 @@ features = ["net", "os-ext", "os-poll"]
 
 [dependencies.mock_instant]
 package = "mock_instant"
-version = "=0.6.0"
+version = "=0.6.1"
 
 [dependencies.moxcms]
 package = "moxcms"
@@ -1235,15 +1234,15 @@ version = "=0.18.1"
 
 [dependencies.postgres]
 package = "postgres"
-version = "=0.19.13"
+version = "=0.19.14"
 
 [dependencies.postgres_protocol]
 package = "postgres-protocol"
-version = "=0.6.11"
+version = "=0.6.12"
 
 [dependencies.postgres_types]
 package = "postgres-types"
-version = "=0.2.13"
+version = "=0.2.14"
 
 [dependencies.potential_utf]
 package = "potential_utf"
@@ -1312,7 +1311,7 @@ version = "=2.0.1"
 
 [dependencies.quote]
 package = "quote"
-version = "=1.0.45"
+version = "=1.0.46"
 features = ["proc-macro"]
 
 [dependencies.radium]
@@ -1395,8 +1394,8 @@ version = "=1.13.0"
 
 [dependencies.regex]
 package = "regex"
-version = "=1.12.3"
-features = ["perf", "std"]
+version = "=1.12.4"
+features = ["perf"]
 default-features = false
 
 [dependencies.regex_automata]
@@ -1407,7 +1406,7 @@ default-features = false
 
 [dependencies.regex_syntax]
 package = "regex-syntax"
-version = "=0.8.10"
+version = "=0.8.11"
 default-features = false
 
 [dependencies.rend]
@@ -1446,7 +1445,7 @@ default-features = false
 
 [dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.40.0"
+version = "=0.40.1"
 features = ["bundled-full"]
 
 [dependencies.rustc_demangle]
@@ -1464,7 +1463,7 @@ features = ["fs", "std", "termios"]
 
 [dependencies.rustls]
 package = "rustls"
-version = "=0.23.40"
+version = "=0.23.41"
 features = ["std", "tls12"]
 default-features = false
 
@@ -1609,7 +1608,7 @@ version = "=0.4.12"
 
 [dependencies.smallvec]
 package = "smallvec"
-version = "=1.15.1"
+version = "=1.15.2"
 features = ["const_generics", "const_new"]
 
 [dependencies.socket2]
@@ -1648,7 +1647,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=2.0.117"
+version = "=2.0.118"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1711,16 +1710,16 @@ version = "=0.11.3"
 
 [dependencies.time]
 package = "time"
-version = "=0.3.47"
+version = "=0.3.51"
 features = ["formatting", "macros", "parsing", "std"]
 
 [dependencies.time_core]
 package = "time-core"
-version = "=0.1.8"
+version = "=0.1.9"
 
 [dependencies.time_macros]
 package = "time-macros"
-version = "=0.2.27"
+version = "=0.2.30"
 
 [dependencies.tinystr]
 package = "tinystr"
@@ -1751,7 +1750,7 @@ version = "=2.7.0"
 
 [dependencies.tokio_postgres]
 package = "tokio-postgres"
-version = "=0.7.17"
+version = "=0.7.18"
 
 [dependencies.tokio_rustls]
 package = "tokio-rustls"
@@ -1912,7 +1911,7 @@ version = "=0.2.2"
 
 [dependencies.uuid]
 package = "uuid"
-version = "=1.23.2"
+version = "=1.23.4"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [dependencies.v_frame]
@@ -1937,19 +1936,19 @@ version = "=0.3.1"
 
 [dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.122"
+version = "=0.2.126"
 
 [dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.122"
+version = "=0.2.126"
 
 [dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.122"
+version = "=0.2.126"
 
 [dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.122"
+version = "=0.2.126"
 
 [dependencies.webpki]
 package = "rustls-webpki"
@@ -1959,7 +1958,7 @@ default-features = false
 
 [dependencies.webpki_roots]
 package = "webpki-roots"
-version = "=1.0.7"
+version = "=1.0.8"
 
 [dependencies.weezl]
 package = "weezl"
@@ -1971,7 +1970,7 @@ version = "=2.1.2"
 
 [dependencies.wide]
 package = "wide"
-version = "=1.4.0"
+version = "=1.5.0"
 default-features = false
 
 [dependencies.windows_aarch64_gnullvm]
@@ -2053,7 +2052,7 @@ version = "=0.8.0"
 
 [dependencies.yoke]
 package = "yoke"
-version = "=0.8.2"
+version = "=0.8.3"
 features = ["derive"]
 default-features = false
 
@@ -2064,12 +2063,12 @@ default-features = false
 
 [dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.50"
+version = "=0.8.52"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.50"
+version = "=0.8.52"
 
 [dependencies.zerofrom]
 package = "zerofrom"
@@ -2083,7 +2082,7 @@ default-features = false
 
 [dependencies.zeroize]
 package = "zeroize"
-version = "=1.8.2"
+version = "=1.9.0"
 
 [dependencies.zerotrie]
 package = "zerotrie"
@@ -2169,7 +2168,7 @@ version = "=2.0.4"
 
 [build-dependencies.alloc_stdlib]
 package = "alloc-stdlib"
-version = "=0.2.2"
+version = "=0.2.4"
 
 [build-dependencies.allocator_api2]
 package = "allocator-api2"
@@ -2200,7 +2199,7 @@ version = "=1.1.5"
 
 [build-dependencies.anyhow]
 package = "anyhow"
-version = "=1.0.102"
+version = "=1.0.103"
 
 [build-dependencies.approx]
 package = "approx"
@@ -2214,7 +2213,7 @@ default-features = false
 
 [build-dependencies.arc_swap]
 package = "arc-swap"
-version = "=1.9.1"
+version = "=1.9.2"
 
 [build-dependencies.arg_enum_proc_macro]
 package = "arg_enum_proc_macro"
@@ -2222,7 +2221,7 @@ version = "=0.3.4"
 
 [build-dependencies.arrayvec]
 package = "arrayvec"
-version = "=0.7.6"
+version = "=0.7.7"
 
 [build-dependencies.as_slice]
 package = "as-slice"
@@ -2296,7 +2295,7 @@ default-features = false
 
 [build-dependencies.bitflags]
 package = "bitflags"
-version = "=2.12.1"
+version = "=2.13.0"
 
 [build-dependencies.bitstream_io]
 package = "bitstream-io"
@@ -2304,12 +2303,12 @@ version = "=4.10.0"
 
 [build-dependencies.bitvec]
 package = "bitvec"
-version = "=1.0.1"
+version = "=1.1.1"
 default-features = false
 
 [build-dependencies.block_buffer]
 package = "block-buffer"
-version = "=0.12.0"
+version = "=0.12.1"
 
 [build-dependencies.block_buffer_0_10_4]
 package = "block-buffer"
@@ -2317,16 +2316,16 @@ version = "=0.10.4"
 
 [build-dependencies.borsh]
 package = "borsh"
-version = "=1.6.1"
+version = "=1.7.0"
 default-features = false
 
 [build-dependencies.brotli]
 package = "brotli"
-version = "=8.0.3"
+version = "=8.0.4"
 
 [build-dependencies.brotli_decompressor]
 package = "brotli-decompressor"
-version = "=5.0.1"
+version = "=5.0.3"
 default-features = false
 
 [build-dependencies.built]
@@ -2366,7 +2365,7 @@ version = "=0.1.0"
 
 [build-dependencies.bytes]
 package = "bytes"
-version = "=1.11.1"
+version = "=1.12.0"
 
 [build-dependencies.bytes_0_4_12]
 package = "bytes"
@@ -2374,7 +2373,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.2.63"
+version = "=1.2.65"
 features = ["parallel"]
 
 [build-dependencies.cfg_aliases]
@@ -2387,13 +2386,13 @@ version = "=1.0.4"
 
 [build-dependencies.chacha20]
 package = "chacha20"
-version = "=0.10.0"
+version = "=0.10.1"
 features = ["rng"]
 default-features = false
 
 [build-dependencies.chrono]
 package = "chrono"
-version = "=0.4.44"
+version = "=0.4.45"
 features = ["clock", "serde"]
 
 [build-dependencies.clap]
@@ -2534,7 +2533,6 @@ version = "=1.0.6"
 [build-dependencies.deranged]
 package = "deranged"
 version = "=0.5.8"
-features = ["powerfmt"]
 
 [build-dependencies.derive_more]
 package = "derive_more"
@@ -2600,12 +2598,13 @@ version = "=0.8.35"
 
 [build-dependencies.env_filter]
 package = "env_filter"
-version = "=1.0.1"
+version = "=2.0.0"
+features = ["std"]
 default-features = false
 
 [build-dependencies.env_logger]
 package = "env_logger"
-version = "=0.11.10"
+version = "=0.11.11"
 
 [build-dependencies.equator]
 package = "equator"
@@ -2779,7 +2778,7 @@ version = "=0.2.24"
 
 [build-dependencies.getrandom]
 package = "getrandom"
-version = "=0.4.2"
+version = "=0.4.3"
 
 [build-dependencies.getrandom_0_2_17]
 package = "getrandom"
@@ -2805,7 +2804,7 @@ version = "=0.3.3"
 
 [build-dependencies.h2]
 package = "h2"
-version = "=0.4.14"
+version = "=0.4.15"
 
 [build-dependencies.half]
 package = "half"
@@ -2818,6 +2817,7 @@ version = "=0.3.1"
 [build-dependencies.hashbrown]
 package = "hashbrown"
 version = "=0.17.1"
+features = ["default-hasher"]
 default-features = false
 
 [build-dependencies.hashbrown_0_15_5]
@@ -2826,15 +2826,9 @@ version = "=0.15.5"
 features = ["default-hasher", "inline-more"]
 default-features = false
 
-[build-dependencies.hashbrown_0_16_1]
-package = "hashbrown"
-version = "=0.16.1"
-features = ["default-hasher"]
-default-features = false
-
 [build-dependencies.hashlink]
 package = "hashlink"
-version = "=0.11.0"
+version = "=0.12.0"
 
 [build-dependencies.hdrhistogram]
 package = "hdrhistogram"
@@ -2863,7 +2857,7 @@ version = "=0.26.0"
 
 [build-dependencies.http]
 package = "http"
-version = "=1.4.1"
+version = "=1.4.2"
 
 [build-dependencies.http_body]
 package = "http-body"
@@ -2891,7 +2885,7 @@ version = "=2.3.0"
 
 [build-dependencies.hybrid_array]
 package = "hybrid-array"
-version = "=0.4.12"
+version = "=0.4.13"
 
 [build-dependencies.hyper]
 package = "hyper"
@@ -2969,7 +2963,7 @@ version = "=0.2.4"
 
 [build-dependencies.imgref]
 package = "imgref"
-version = "=1.12.1"
+version = "=1.12.2"
 
 [build-dependencies.indexmap]
 package = "indexmap"
@@ -2990,6 +2984,10 @@ version = "=1.70.2"
 
 [build-dependencies.itertools]
 package = "itertools"
+version = "=0.15.0"
+
+[build-dependencies.itertools_0_14_0]
+package = "itertools"
 version = "=0.14.0"
 
 [build-dependencies.itoa]
@@ -2998,12 +2996,12 @@ version = "=1.0.18"
 
 [build-dependencies.jiff]
 package = "jiff"
-version = "=0.2.28"
+version = "=0.2.29"
 features = ["logging", "serde", "static", "std", "tzdb-bundle-always"]
 
 [build-dependencies.jiff_static]
 package = "jiff-static"
-version = "=0.2.28"
+version = "=0.2.29"
 
 [build-dependencies.jiff_tzdb]
 package = "jiff-tzdb"
@@ -3032,7 +3030,7 @@ version = "=0.2.16"
 
 [build-dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.38.0"
+version = "=0.38.1"
 
 [build-dependencies.linux_raw_sys]
 package = "linux-raw-sys"
@@ -3055,7 +3053,7 @@ version = "=0.4.14"
 
 [build-dependencies.log]
 package = "log"
-version = "=0.4.31"
+version = "=0.4.33"
 features = ["std"]
 
 [build-dependencies.log4rs]
@@ -3107,7 +3105,7 @@ default-features = false
 
 [build-dependencies.memchr]
 package = "memchr"
-version = "=2.8.1"
+version = "=2.8.2"
 
 [build-dependencies.memmap]
 package = "memmap"
@@ -3138,7 +3136,7 @@ features = ["net", "os-ext", "os-poll"]
 
 [build-dependencies.mock_instant]
 package = "mock_instant"
-version = "=0.6.0"
+version = "=0.6.1"
 
 [build-dependencies.moxcms]
 package = "moxcms"
@@ -3347,15 +3345,15 @@ version = "=0.18.1"
 
 [build-dependencies.postgres]
 package = "postgres"
-version = "=0.19.13"
+version = "=0.19.14"
 
 [build-dependencies.postgres_protocol]
 package = "postgres-protocol"
-version = "=0.6.11"
+version = "=0.6.12"
 
 [build-dependencies.postgres_types]
 package = "postgres-types"
-version = "=0.2.13"
+version = "=0.2.14"
 
 [build-dependencies.potential_utf]
 package = "potential_utf"
@@ -3424,7 +3422,7 @@ version = "=2.0.1"
 
 [build-dependencies.quote]
 package = "quote"
-version = "=1.0.45"
+version = "=1.0.46"
 features = ["proc-macro"]
 
 [build-dependencies.radium]
@@ -3507,8 +3505,8 @@ version = "=1.13.0"
 
 [build-dependencies.regex]
 package = "regex"
-version = "=1.12.3"
-features = ["perf", "std"]
+version = "=1.12.4"
+features = ["perf"]
 default-features = false
 
 [build-dependencies.regex_automata]
@@ -3519,7 +3517,7 @@ default-features = false
 
 [build-dependencies.regex_syntax]
 package = "regex-syntax"
-version = "=0.8.10"
+version = "=0.8.11"
 default-features = false
 
 [build-dependencies.rend]
@@ -3558,7 +3556,7 @@ default-features = false
 
 [build-dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.40.0"
+version = "=0.40.1"
 features = ["bundled-full"]
 
 [build-dependencies.rustc_demangle]
@@ -3576,7 +3574,7 @@ features = ["fs", "std", "termios"]
 
 [build-dependencies.rustls]
 package = "rustls"
-version = "=0.23.40"
+version = "=0.23.41"
 features = ["std", "tls12"]
 default-features = false
 
@@ -3721,7 +3719,7 @@ version = "=0.4.12"
 
 [build-dependencies.smallvec]
 package = "smallvec"
-version = "=1.15.1"
+version = "=1.15.2"
 features = ["const_generics", "const_new"]
 
 [build-dependencies.socket2]
@@ -3760,7 +3758,7 @@ default-features = false
 
 [build-dependencies.syn]
 package = "syn"
-version = "=2.0.117"
+version = "=2.0.118"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [build-dependencies.syn_1_0_109]
@@ -3823,16 +3821,16 @@ version = "=0.11.3"
 
 [build-dependencies.time]
 package = "time"
-version = "=0.3.47"
+version = "=0.3.51"
 features = ["formatting", "macros", "parsing", "std"]
 
 [build-dependencies.time_core]
 package = "time-core"
-version = "=0.1.8"
+version = "=0.1.9"
 
 [build-dependencies.time_macros]
 package = "time-macros"
-version = "=0.2.27"
+version = "=0.2.30"
 
 [build-dependencies.tinystr]
 package = "tinystr"
@@ -3863,7 +3861,7 @@ version = "=2.7.0"
 
 [build-dependencies.tokio_postgres]
 package = "tokio-postgres"
-version = "=0.7.17"
+version = "=0.7.18"
 
 [build-dependencies.tokio_rustls]
 package = "tokio-rustls"
@@ -4024,7 +4022,7 @@ version = "=0.2.2"
 
 [build-dependencies.uuid]
 package = "uuid"
-version = "=1.23.2"
+version = "=1.23.4"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [build-dependencies.v_frame]
@@ -4049,19 +4047,19 @@ version = "=0.3.1"
 
 [build-dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.122"
+version = "=0.2.126"
 
 [build-dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.122"
+version = "=0.2.126"
 
 [build-dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.122"
+version = "=0.2.126"
 
 [build-dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.122"
+version = "=0.2.126"
 
 [build-dependencies.webpki]
 package = "rustls-webpki"
@@ -4071,7 +4069,7 @@ default-features = false
 
 [build-dependencies.webpki_roots]
 package = "webpki-roots"
-version = "=1.0.7"
+version = "=1.0.8"
 
 [build-dependencies.weezl]
 package = "weezl"
@@ -4083,7 +4081,7 @@ version = "=2.1.2"
 
 [build-dependencies.wide]
 package = "wide"
-version = "=1.4.0"
+version = "=1.5.0"
 default-features = false
 
 [build-dependencies.windows_aarch64_gnullvm]
@@ -4165,7 +4163,7 @@ version = "=0.8.0"
 
 [build-dependencies.yoke]
 package = "yoke"
-version = "=0.8.2"
+version = "=0.8.3"
 features = ["derive"]
 default-features = false
 
@@ -4176,12 +4174,12 @@ default-features = false
 
 [build-dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.50"
+version = "=0.8.52"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [build-dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.50"
+version = "=0.8.52"
 
 [build-dependencies.zerofrom]
 package = "zerofrom"
@@ -4195,7 +4193,7 @@ default-features = false
 
 [build-dependencies.zeroize]
 package = "zeroize"
-version = "=1.8.2"
+version = "=1.9.0"
 
 [build-dependencies.zerotrie]
 package = "zerotrie"

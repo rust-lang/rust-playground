@@ -4063,8 +4063,8 @@ mod tests {
         assert!(!response.success, "stderr: {}", response.stderr);
 
         assert_contains!(response.stderr, "Undefined Behavior");
-        assert_contains!(response.stderr, "memory is uninitialized");
-        assert_contains!(response.stderr, "operation requires initialized memory");
+        assert_contains!(response.stderr, "encountered uninitialized memory");
+        assert_contains!(response.stderr, "expected an integer");
 
         coordinator.shutdown().await?;
 
@@ -4093,8 +4093,8 @@ mod tests {
         assert!(!response.success, "stderr: {}", response.stderr);
 
         assert_contains!(response.stderr, "Undefined Behavior");
-        assert_contains!(response.stderr, "memory is uninitialized");
-        assert_contains!(response.stderr, "operation requires initialized memory");
+        assert_contains!(response.stderr, "encountered uninitialized memory");
+        assert_contains!(response.stderr, "expected an integer");
 
         coordinator.shutdown().await?;
 
@@ -4379,8 +4379,10 @@ mod tests {
         Ok(())
     }
 
+    const TIMEOUT_ENV_NAME: &str = "TESTS_TIMEOUT_MS";
+
     static TIMEOUT: LazyLock<Duration> = LazyLock::new(|| {
-        let millis = env::var("TESTS_TIMEOUT_MS")
+        let millis = env::var(TIMEOUT_ENV_NAME)
             .ok()
             .and_then(|v| v.parse().ok())
             .unwrap_or(5000);
@@ -4391,7 +4393,12 @@ mod tests {
         async fn with_timeout(self) -> Self::Output {
             tokio::time::timeout(*TIMEOUT, self)
                 .await
-                .expect("The operation timed out")
+                .unwrap_or_else(|_| {
+                    panic!(
+                        "The operation timed out after {:?}; change via {}",
+                        *TIMEOUT, TIMEOUT_ENV_NAME,
+                    )
+                })
         }
     }
 
