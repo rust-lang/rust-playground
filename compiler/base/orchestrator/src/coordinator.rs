@@ -4063,8 +4063,8 @@ mod tests {
         assert!(!response.success, "stderr: {}", response.stderr);
 
         assert_contains!(response.stderr, "Undefined Behavior");
-        assert_contains!(response.stderr, "memory is uninitialized");
-        assert_contains!(response.stderr, "operation requires initialized memory");
+        assert_contains!(response.stderr, "encountered uninitialized memory");
+        assert_contains!(response.stderr, "expected an integer");
 
         coordinator.shutdown().await?;
 
@@ -4093,8 +4093,8 @@ mod tests {
         assert!(!response.success, "stderr: {}", response.stderr);
 
         assert_contains!(response.stderr, "Undefined Behavior");
-        assert_contains!(response.stderr, "memory is uninitialized");
-        assert_contains!(response.stderr, "operation requires initialized memory");
+        assert_contains!(response.stderr, "encountered uninitialized memory");
+        assert_contains!(response.stderr, "expected an integer");
 
         coordinator.shutdown().await?;
 
