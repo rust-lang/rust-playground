@@ -36,7 +36,7 @@
   },
   {
     "name": "alloc-stdlib",
-    "version": "0.2.2",
+    "version": "0.2.4",
     "id": "alloc_stdlib"
   },
   {
@@ -71,7 +71,7 @@
   },
   {
     "name": "anyhow",
-    "version": "1.0.102",
+    "version": "1.0.103",
     "id": "anyhow"
   },
   {
@@ -86,7 +86,7 @@
   },
   {
     "name": "arc-swap",
-    "version": "1.9.1",
+    "version": "1.9.2",
     "id": "arc_swap"
   },
   {
@@ -96,7 +96,7 @@
   },
   {
     "name": "arrayvec",
-    "version": "0.7.6",
+    "version": "0.7.7",
     "id": "arrayvec"
   },
   {
@@ -181,7 +181,7 @@
   },
   {
     "name": "bitflags",
-    "version": "2.12.1",
+    "version": "2.13.0",
     "id": "bitflags"
   },
   {
@@ -191,12 +191,12 @@
   },
   {
     "name": "bitvec",
-    "version": "1.0.1",
+    "version": "1.1.1",
     "id": "bitvec"
   },
   {
     "name": "block-buffer",
-    "version": "0.12.0",
+    "version": "0.12.1",
     "id": "block_buffer"
   },
   {
@@ -206,17 +206,17 @@
   },
   {
     "name": "borsh",
-    "version": "1.6.1",
+    "version": "1.7.0",
     "id": "borsh"
   },
   {
     "name": "brotli",
-    "version": "8.0.3",
+    "version": "8.0.4",
     "id": "brotli"
   },
   {
     "name": "brotli-decompressor",
-    "version": "5.0.1",
+    "version": "5.0.3",
     "id": "brotli_decompressor"
   },
   {
@@ -261,7 +261,7 @@
   },
   {
     "name": "bytes",
-    "version": "1.11.1",
+    "version": "1.12.0",
     "id": "bytes"
   },
   {
@@ -271,7 +271,7 @@
   },
   {
     "name": "cc",
-    "version": "1.2.63",
+    "version": "1.2.65",
     "id": "cc"
   },
   {
@@ -286,12 +286,12 @@
   },
   {
     "name": "chacha20",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "id": "chacha20"
   },
   {
     "name": "chrono",
-    "version": "0.4.44",
+    "version": "0.4.45",
     "id": "chrono"
   },
   {
@@ -531,12 +531,12 @@
   },
   {
     "name": "env_filter",
-    "version": "1.0.1",
+    "version": "2.0.0",
     "id": "env_filter"
   },
   {
     "name": "env_logger",
-    "version": "0.11.10",
+    "version": "0.11.11",
     "id": "env_logger"
   },
   {
@@ -731,7 +731,7 @@
   },
   {
     "name": "getrandom",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "id": "getrandom"
   },
   {
@@ -761,7 +761,7 @@
   },
   {
     "name": "h2",
-    "version": "0.4.14",
+    "version": "0.4.15",
     "id": "h2"
   },
   {
@@ -785,13 +785,8 @@
     "id": "hashbrown_0_15_5"
   },
   {
-    "name": "hashbrown",
-    "version": "0.16.1",
-    "id": "hashbrown_0_16_1"
-  },
-  {
     "name": "hashlink",
-    "version": "0.11.0",
+    "version": "0.12.0",
     "id": "hashlink"
   },
   {
@@ -826,7 +821,7 @@
   },
   {
     "name": "http",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "id": "http"
   },
   {
@@ -861,7 +856,7 @@
   },
   {
     "name": "hybrid-array",
-    "version": "0.4.12",
+    "version": "0.4.13",
     "id": "hybrid_array"
   },
   {
@@ -941,7 +936,7 @@
   },
   {
     "name": "imgref",
-    "version": "1.12.1",
+    "version": "1.12.2",
     "id": "imgref"
   },
   {
@@ -966,8 +961,13 @@
   },
   {
     "name": "itertools",
-    "version": "0.14.0",
+    "version": "0.15.0",
     "id": "itertools"
+  },
+  {
+    "name": "itertools",
+    "version": "0.14.0",
+    "id": "itertools_0_14_0"
   },
   {
     "name": "itoa",
@@ -976,12 +976,12 @@
   },
   {
     "name": "jiff",
-    "version": "0.2.28",
+    "version": "0.2.29",
     "id": "jiff"
   },
   {
     "name": "jiff-static",
-    "version": "0.2.28",
+    "version": "0.2.29",
     "id": "jiff_static"
   },
   {
@@ -1016,7 +1016,7 @@
   },
   {
     "name": "libsqlite3-sys",
-    "version": "0.38.0",
+    "version": "0.38.1",
     "id": "libsqlite3_sys"
   },
   {
@@ -1041,7 +1041,7 @@
   },
   {
     "name": "log",
-    "version": "0.4.31",
+    "version": "0.4.33",
     "id": "log"
   },
   {
@@ -1101,7 +1101,7 @@
   },
   {
     "name": "memchr",
-    "version": "2.8.1",
+    "version": "2.8.2",
     "id": "memchr"
   },
   {
@@ -1136,7 +1136,7 @@
   },
   {
     "name": "mock_instant",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "id": "mock_instant"
   },
   {
@@ -1376,17 +1376,17 @@
   },
   {
     "name": "postgres",
-    "version": "0.19.13",
+    "version": "0.19.14",
     "id": "postgres"
   },
   {
     "name": "postgres-protocol",
-    "version": "0.6.11",
+    "version": "0.6.12",
     "id": "postgres_protocol"
   },
   {
     "name": "postgres-types",
-    "version": "0.2.13",
+    "version": "0.2.14",
     "id": "postgres_types"
   },
   {
@@ -1461,7 +1461,7 @@
   },
   {
     "name": "quote",
-    "version": "1.0.45",
+    "version": "1.0.46",
     "id": "quote"
   },
   {
@@ -1551,7 +1551,7 @@
   },
   {
     "name": "regex",
-    "version": "1.12.3",
+    "version": "1.12.4",
     "id": "regex"
   },
   {
@@ -1561,7 +1561,7 @@
   },
   {
     "name": "regex-syntax",
-    "version": "0.8.10",
+    "version": "0.8.11",
     "id": "regex_syntax"
   },
   {
@@ -1601,7 +1601,7 @@
   },
   {
     "name": "rusqlite",
-    "version": "0.40.0",
+    "version": "0.40.1",
     "id": "rusqlite"
   },
   {
@@ -1621,7 +1621,7 @@
   },
   {
     "name": "rustls",
-    "version": "0.23.40",
+    "version": "0.23.41",
     "id": "rustls"
   },
   {
@@ -1786,7 +1786,7 @@
   },
   {
     "name": "smallvec",
-    "version": "1.15.1",
+    "version": "1.15.2",
     "id": "smallvec"
   },
   {
@@ -1831,7 +1831,7 @@
   },
   {
     "name": "syn",
-    "version": "2.0.117",
+    "version": "2.0.118",
     "id": "syn"
   },
   {
@@ -1906,17 +1906,17 @@
   },
   {
     "name": "time",
-    "version": "0.3.47",
+    "version": "0.3.51",
     "id": "time"
   },
   {
     "name": "time-core",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "id": "time_core"
   },
   {
     "name": "time-macros",
-    "version": "0.2.27",
+    "version": "0.2.30",
     "id": "time_macros"
   },
   {
@@ -1951,7 +1951,7 @@
   },
   {
     "name": "tokio-postgres",
-    "version": "0.7.17",
+    "version": "0.7.18",
     "id": "tokio_postgres"
   },
   {
@@ -2131,7 +2131,7 @@
   },
   {
     "name": "uuid",
-    "version": "1.23.2",
+    "version": "1.23.4",
     "id": "uuid"
   },
   {
@@ -2161,22 +2161,22 @@
   },
   {
     "name": "wasm-bindgen",
-    "version": "0.2.122",
+    "version": "0.2.126",
     "id": "wasm_bindgen"
   },
   {
     "name": "wasm-bindgen-macro",
-    "version": "0.2.122",
+    "version": "0.2.126",
     "id": "wasm_bindgen_macro"
   },
   {
     "name": "wasm-bindgen-macro-support",
-    "version": "0.2.122",
+    "version": "0.2.126",
     "id": "wasm_bindgen_macro_support"
   },
   {
     "name": "wasm-bindgen-shared",
-    "version": "0.2.122",
+    "version": "0.2.126",
     "id": "wasm_bindgen_shared"
   },
   {
@@ -2186,7 +2186,7 @@
   },
   {
     "name": "webpki-roots",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "id": "webpki_roots"
   },
   {
@@ -2201,7 +2201,7 @@
   },
   {
     "name": "wide",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "id": "wide"
   },
   {
@@ -2296,7 +2296,7 @@
   },
   {
     "name": "yoke",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "id": "yoke"
   },
   {
@@ -2306,12 +2306,12 @@
   },
   {
     "name": "zerocopy",
-    "version": "0.8.50",
+    "version": "0.8.52",
     "id": "zerocopy"
   },
   {
     "name": "zerocopy-derive",
-    "version": "0.8.50",
+    "version": "0.8.52",
     "id": "zerocopy_derive"
   },
   {
@@ -2326,7 +2326,7 @@
   },
   {
     "name": "zeroize",
-    "version": "1.8.2",
+    "version": "1.9.0",
     "id": "zeroize"
   },
   {
