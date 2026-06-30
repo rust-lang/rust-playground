@@ -2694,7 +2694,7 @@ impl TerminateContainer {
             let stdout = stdout.trim();
             let stderr = stderr.trim();
 
-            error!(?code, %stdout, %stderr, %name, "Killing the container failed");
+            info!(?code, %stdout, %stderr, %name, "Killing the container failed");
         }
     }
 }
