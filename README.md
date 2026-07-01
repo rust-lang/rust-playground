@@ -84,34 +84,40 @@ perform tests on! Once fixed, you can choose to be credited here.
 ## Development
 
 ### Build the UI
-```
+```bash
 cd ui/frontend
 pnpm install
 pnpm watch # Will rebuild and watch for changes
 ```
 
-If you don't need the backend running because you are only making
-basic HTML/CSS/JS changes, directly open in your browser the built
-`ui/frontend/build/index.html`.
-
-### Build and run the server
-
-```
-cd ui
-cargo run
-```
-
-There are some optional configuration parameters described in the
-[ui README](./ui/README.md) which you may set in a `.env` file. The server will
-run with no configuration, but in order to load and save gists a GitHub token
-must be configured.
+> [!TIP]
+> If you don't need the backend running because you are only making
+> basic HTML/CSS/JS changes, directly open in your browser the built
+> `ui/frontend/build/index.html`.
 
 ### Build or download the containers
-```
+```bash
 cd compiler
 ./build.sh # If you want to test changes to the containers
 ./fetch.sh # If you just want the current playground
 ```
+
+### Build and run the server
+
+```bash
+cd ui
+cargo run
+```
+> [!TIP]
+> There are some optional configuration parameters described in the
+> [ui README](./ui/README.md) which you may set in a `.env` file. The server will
+> run with no configuration, but in order to load and save gists a GitHub token
+> must be configured.
+
+> [!IMPORTANT]
+> When running the server, you may see some docker warnings about missing containers. You can safely ignore them.
+> You shouldn't see any docker containers running most of the time. This is normal.
+> You don't need to spawn or kill any containers yourself. The backend manages that itself.
 
 ## Deployment
 
