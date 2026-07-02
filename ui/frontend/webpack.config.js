@@ -9,9 +9,6 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const thisPackage = require('./package.json');
-const devDependencies = Object.keys(thisPackage.devDependencies);
-
 const allKeybindingNames =
       fs.globSync('./node_modules/ace-builds/src-noconflict/keybinding-*.js')
       .map(n => path.basename(n))
