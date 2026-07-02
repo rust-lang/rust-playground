@@ -115,7 +115,6 @@ module.exports = function(_, argv) {
 
             // Everything else
             {
-              include: /node_modules/,
               use: [
                 MiniCssExtractPlugin.loader,
                 "css-loader",

@@ -218,13 +218,13 @@ body {
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
-:global(.language-rust_errors) {
-  & :global(.warning) {
+.language-rust_errors {
+  & .warning {
     color: var(--output-highlight-warning-color);
     background-color: var(--output-highlight-warning-bg-color);
   }
 
-  & :global(.error) {
+  & .error {
     color: var(--output-highlight-error-color);
     background-color: var(--output-highlight-error-bg-color);
   }
