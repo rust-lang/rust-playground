@@ -7,7 +7,7 @@
     "moduleResolution": "bundler",
     "esModuleInterop": true,
     "target": "esnext",
-    "types": ["jest"],
+    "types": ["@rstest/core/globals"],
 
     // Other Outputs
     "sourceMap": true,
