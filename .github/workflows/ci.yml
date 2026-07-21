@@ -183,6 +183,7 @@ jobs:
         PLAYGROUND_UI_ROOT: server/build/
         PLAYGROUND_CORS_ENABLED: true
         PLAYGROUND_GITHUB_TOKEN: "${{ secrets.PLAYGROUND_GITHUB_TOKEN }}"
+        PLAYGROUND_MULTIFILE_THRESHOLD: 1
       run: |-
         killall -q ui || true
         chmod +x ./server/ui && ./server/ui &

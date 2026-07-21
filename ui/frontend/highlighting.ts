@@ -4,6 +4,8 @@ import { Channel, makePosition, Position } from './types';
 interface ConfigureRustErrorsArgs {
   enableFeatureGate: (feature: string) => void;
   getChannel: () => Channel;
+  getMultifile: () => boolean;
+  activateFile: (f: string) => void;
   gotoPosition: (p: Position) => void;
   selectText: (start: Position, end: Position) => void;
   addImport: (code: string) => void;
@@ -13,6 +15,8 @@ interface ConfigureRustErrorsArgs {
 export function configureRustErrors({
   enableFeatureGate,
   getChannel,
+  getMultifile,
+  activateFile,
   gotoPosition,
   selectText,
   addImport,
@@ -37,7 +41,7 @@ export function configureRustErrors({
         'see-issue': /see .*rust-lang\/rust\/issues\/\d+>/,
       },
     },
-    'error-location': /-->\s+(\/playground\/)?src\/.*\n/,
+    'error-location': /-->\s+.*\.rs:.*\n/,
     'import-suggestion-outer': {
       pattern: /\+\s+use\s+([^;]+);/,
       inside: {
@@ -51,9 +55,12 @@ export function configureRustErrors({
       },
     },
     'backtrace': {
-      pattern: /at \.\/src\/.*\n/,
+      pattern: /(panicked |\s+)at [^:]+\.rs.*\n/,
       inside: {
-        'backtrace-location': /src\/main.rs:(\d+)/,
+        'backtrace-location': {
+          pattern: /(at )[^:]+:\d+:\d+/,
+          lookbehind: true,
+        },
       },
     },
     'backtrace-enable': /Run with `RUST_BACKTRACE=1` environment variable to display a backtrace/i,
@@ -83,32 +90,25 @@ export function configureRustErrors({
       }
     }
     if (env.type === 'error-location') {
-      let line;
-      let col;
-      const errorMatchFull = /(\d+):(\d+)/.exec(env.content);
-      if (errorMatchFull) {
-        line = errorMatchFull[1];
-        col = errorMatchFull[2];
-      } else {
-        const errorMatchShort = /:(\d+)/.exec(env.content);
-        if (errorMatchShort) {
-          line = errorMatchShort[1];
-          col = '1';
-        }
-      }
-      env.tag = 'a';
-      env.attributes.href = '#';
-      if (line && col) {
+      const errorMatch = /\s([^:]*):(\d+)(?::(\d+))?/.exec(env.content);
+      if (errorMatch) {
+        const [_, file, line, col = '1'] = errorMatch;
+
+        env.tag = 'a';
+        env.attributes.href = '#';
+        env.attributes['data-file'] = file;
         env.attributes['data-line'] = line;
         env.attributes['data-col'] = col;
       }
     }
-    if (env.type === 'import-suggestion') {
+    // I don't know how to tell which file(s) to place the import into.
+    if (!getMultifile() && env.type === 'import-suggestion') {
       env.tag = 'a';
       env.attributes.href = '#';
       env.attributes['data-suggestion'] = env.content;
     }
-    if (env.type === 'feature-gate') {
+    // I don't know how to tell which file(s) to place the feature flag into.
+    if (!getMultifile() && env.type === 'feature-gate') {
       const featureMatch = /feature\((.*?)\)/.exec(env.content);
       if (featureMatch) {
         const [_, featureGate] = featureMatch;
@@ -123,13 +123,19 @@ export function configureRustErrors({
       env.attributes['data-backtrace-enable'] = 'true';
     }
     if (env.type === 'backtrace-location') {
-      const errorMatch = /:(\d+)/.exec(env.content);
+      const errorMatch = /([^:]+):(\d+):(\d+)/.exec(env.content);
       if (errorMatch) {
-        const [_, line] = errorMatch;
-        env.tag = 'a';
-        env.attributes.href = '#';
-        env.attributes['data-line'] = line;
-        env.attributes['data-col'] = '1';
+        const [_, file, line, col] = errorMatch;
+
+        if (!file.includes('.rustup') && !file.includes('/rustc/')) {
+          const normalizedFile = file.replace(/^\.\//, '')
+
+          env.tag = 'a';
+          env.attributes.href = '#';
+          env.attributes['data-file'] = normalizedFile;
+          env.attributes['data-line'] = line;
+          env.attributes['data-col'] = col;
+        }
       }
     }
     if (env.type === 'mir-source') {
@@ -150,9 +156,12 @@ export function configureRustErrors({
     const links = env.element.querySelectorAll('.error-location, .backtrace-location');
     Array.from(links).forEach(link => {
       if (link instanceof HTMLAnchorElement) {
-        const { line, col } = link.dataset;
+        const { file, line, col } = link.dataset;
         link.onclick = e => {
           e.preventDefault();
+          if (file) {
+            activateFile(file);
+          }
           if (line && col) {
             gotoPosition(makePosition(line, col));
           }

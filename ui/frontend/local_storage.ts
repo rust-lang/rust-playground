@@ -4,13 +4,14 @@
 import * as z from 'zod';
 
 import { State } from './reducers';
-import { codeSelector } from './selectors';
-import { PartialState, initializeStorage, removeVersion } from './storage';
+import { codeOrFilesSelector } from './selectors';
+import { Code, PartialState, expandCode, initializeStorage, removeVersion } from './storage';
 import {
   AssemblyFlavorSchema,
   DemangleAssemblySchema,
   Editor,
   EditorSchema,
+  FileViewSchema,
   OrientationSchema,
   PairCharactersSchema,
   ProcessAssemblySchema,
@@ -32,6 +33,7 @@ const V2Configuration = z
       .partial(),
     configuration: z
       .object({
+        fileView: FileViewSchema,
         editor: EditorSchema,
         ace: z
           .object({
@@ -52,7 +54,7 @@ const V2Configuration = z
         processAssembly: ProcessAssemblySchema,
       })
       .partial(),
-    code: z.string(),
+    code: Code,
     notifications: z.looseObject({}),
   })
   .partial();
@@ -84,7 +86,6 @@ type CurrentConfiguration = V2Configuration;
 const SomeConfiguration = V1Configuration.or(V2Configuration);
 
 export function serialize(state: State): string {
-  const code = codeSelector(state);
   const conf: CurrentConfiguration = {
     version: CURRENT_VERSION,
     client: {
@@ -93,6 +94,7 @@ export function serialize(state: State): string {
       visitedAt: state.client.visitedAt,
     },
     configuration: {
+      fileView: state.configuration.fileView,
       editor: state.configuration.editor,
       ace: {
         keybinding: state.configuration.ace.keybinding,
@@ -108,7 +110,7 @@ export function serialize(state: State): string {
       demangleAssembly: state.configuration.demangleAssembly,
       processAssembly: state.configuration.processAssembly,
     },
-    code,
+    code: codeOrFilesSelector(state),
     notifications: { ...state.notifications },
   };
   return JSON.stringify(conf);
@@ -163,7 +165,7 @@ export function deserialize(savedState: string): PartialState {
       return undefined;
     }
 
-    return removeVersion(result);
+    return expandCode(removeVersion(result));
   } catch {
     return undefined;
   }

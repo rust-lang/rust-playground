@@ -4,7 +4,7 @@ import * as z from 'zod';
 import { jsonPost, routes } from '../../api';
 import { State as RootState } from '../../reducers';
 import { miriRequestSelector } from '../../selectors';
-import { AliasingModel } from '../../types';
+import { AliasingModel, Code } from '../../types';
 
 const sliceName = 'output/miri';
 
@@ -20,7 +20,7 @@ interface State {
 }
 
 interface MiriRequestBody {
-  code: string;
+  code: Code;
   edition: string;
   tests: boolean;
   aliasingModel: AliasingModel;

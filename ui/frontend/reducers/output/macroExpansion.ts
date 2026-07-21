@@ -4,6 +4,7 @@ import * as z from 'zod';
 import { jsonPost, routes } from '../../api';
 import { State as RootState } from '../../reducers';
 import { macroExpansionRequestSelector } from '../../selectors';
+import { Code } from '../../types';
 
 const sliceName = 'output/macroExpansion';
 
@@ -19,7 +20,7 @@ interface State {
 }
 
 interface MacroExpansionRequestBody {
-  code: string;
+  code: Code;
   edition: string;
 }
 

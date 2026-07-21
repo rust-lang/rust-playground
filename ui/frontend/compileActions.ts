@@ -4,13 +4,14 @@ import * as z from 'zod';
 import { ThunkAction } from './actions';
 import { jsonPost, routes } from './api';
 import { compileRequestPayloadSelector } from './selectors';
+import { Code } from './types';
 
 interface CompileRequestBody {
   channel: string;
   mode: string;
   crateType: string;
   tests: boolean; // Used?
-  code: string;
+  code: Code;
   edition: string;
   backtrace: boolean; // Used?
   target: string;

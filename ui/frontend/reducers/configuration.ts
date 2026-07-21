@@ -8,6 +8,7 @@ import {
   DemangleAssembly,
   Edition,
   Editor,
+  FileView,
   Mode,
   Orientation,
   PairCharacters,
@@ -18,6 +19,7 @@ import {
 } from '../types';
 
 interface State {
+  fileView: FileView;
   editor: Editor;
   ace: {
     keybinding: string;
@@ -41,6 +43,7 @@ interface State {
 }
 
 const initialState: State = {
+  fileView: FileView.Single,
   editor: Editor.Ace,
   ace: {
     keybinding: 'ace',
@@ -97,6 +100,10 @@ const slice = createSlice({
 
     changeEditor: (state, action: PayloadAction<Editor>) => {
       state.editor = action.payload;
+    },
+
+    changeFileView: (state, action: PayloadAction<FileView>) => {
+      state.fileView = action.payload;
     },
 
     changeKeybinding: (state, action: PayloadAction<string>) => {
@@ -158,6 +165,7 @@ export const {
   changeDemangleAssembly,
   changeEdition,
   changeEditor,
+  changeFileView,
   changeKeybinding,
   changeMode,
   changeMonacoTheme,

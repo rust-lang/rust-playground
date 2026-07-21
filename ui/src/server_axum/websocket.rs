@@ -82,7 +82,7 @@ struct ExecuteRequest {
     edition: String,
     crate_type: String,
     tests: bool,
-    code: String,
+    code: Code,
     backtrace: bool,
 }
 
@@ -107,7 +107,7 @@ impl TryFrom<ExecuteRequest> for coordinator::ExecuteRequest {
             crate_type: parse_crate_type(&crate_type)?,
             tests,
             backtrace,
-            code,
+            code: code.into(),
         })
     }
 }
@@ -125,6 +125,37 @@ pub(crate) enum ExecuteRequestParseError {
 
     #[snafu(transparent)]
     Edition { source: ParseEditionError },
+}
+
+#[derive(serde::Deserialize)]
+#[serde(untagged)]
+enum Code {
+    Single(String),
+    Multiple(Vec<CodeFile>),
+}
+
+#[derive(serde::Deserialize)]
+struct CodeFile {
+    name: String,
+    content: String,
+}
+
+impl From<Code> for coordinator::Code {
+    fn from(value: Code) -> Self {
+        match value {
+            Code::Single(c) => coordinator::Code::Single(c),
+            Code::Multiple(f) => {
+                coordinator::Code::Multiple(f.into_iter().map(Into::into).collect())
+            }
+        }
+    }
+}
+
+impl From<CodeFile> for coordinator::CodeFile {
+    fn from(value: CodeFile) -> Self {
+        let CodeFile { name, content } = value;
+        Self { name, content }
+    }
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -163,11 +194,15 @@ struct WSError {
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct FeatureFlags {}
+pub(crate) struct FeatureFlags {
+    multifile_threshold: Option<f64>,
+}
 
 impl From<crate::FeatureFlags> for FeatureFlags {
-    fn from(_value: crate::FeatureFlags) -> Self {
-        Self {}
+    fn from(value: crate::FeatureFlags) -> Self {
+        Self {
+            multifile_threshold: value.multifile_threshold,
+        }
     }
 }
 

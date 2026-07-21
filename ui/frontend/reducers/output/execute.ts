@@ -8,7 +8,7 @@ import {
   executeRequestPayloadSelector,
   executeViaWebsocketSelector,
 } from '../../selectors';
-import { Channel, Edition, Mode } from '../../types';
+import { Channel, Code, Edition, Mode } from '../../types';
 import {
   WsPayloadAction,
   createWebsocketResponse,
@@ -38,7 +38,7 @@ type wsExecuteRequestPayload = {
   edition: Edition;
   crateType: string;
   tests: boolean;
-  code: string;
+  code: Code;
   backtrace: boolean;
 };
 
@@ -80,7 +80,7 @@ export interface ExecuteRequestBody {
   mode: string;
   crateType: string;
   tests: boolean;
-  code: string;
+  code: Code;
   edition: string;
   backtrace: boolean;
 }

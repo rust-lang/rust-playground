@@ -48,7 +48,9 @@ fn main() {
 }
 
 #[derive(Copy, Clone)]
-pub(crate) struct FeatureFlags {}
+pub(crate) struct FeatureFlags {
+    multifile_threshold: Option<f64>,
+}
 
 struct Config {
     address: String,
@@ -112,7 +114,13 @@ impl Config {
 
         let cors_enabled = env::var_os("PLAYGROUND_CORS_ENABLED").is_some();
 
-        let feature_flags = FeatureFlags {};
+        let multifile_threshold = env::var("PLAYGROUND_MULTIFILE_THRESHOLD")
+            .ok()
+            .and_then(|v| v.parse().ok());
+
+        let feature_flags = FeatureFlags {
+            multifile_threshold,
+        };
 
         let request_db_path = env::var_os("PLAYGROUND_REQUEST_DATABASE").map(Into::into);
 

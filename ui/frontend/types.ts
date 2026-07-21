@@ -44,6 +44,14 @@ export const ChannelVersion = z.object({
 
 export type ChannelVersion = z.infer<typeof ChannelVersion>;
 
+export const CodeFile = z.object({ name: z.string(), content: z.string() });
+export type CodeFile = z.infer<typeof CodeFile>;
+
+export const Code = z.string().or(z.array(CodeFile));
+export type Code = z.infer<typeof Code>;
+
+export type FileId = number;
+
 export interface CommonEditorProps {
   code: string;
   execute: () => void;
@@ -51,7 +59,16 @@ export interface CommonEditorProps {
   position: Position;
   selection: Selection;
   crates: Crate[];
+  activeFileId: FileId;
+  fileIds: FileId[];
 }
+
+export const FileView = {
+  Single: 'single',
+  Multiple: 'multiple',
+} as const;
+export type FileView = ValuesOf<typeof FileView>;
+export const FileViewSchema = z.enum(Object.values(FileView));
 
 export const Editor = {
   Simple: 'simple',

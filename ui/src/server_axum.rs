@@ -549,7 +549,7 @@ async fn meta_gist_create(
     Json(req): Json<api::MetaGistCreateRequest>,
 ) -> Result<Json<api::MetaGistResponse>> {
     let token = must_get(&token)?;
-    gist::create_future(token, req.code)
+    gist::create_future(token, req.code.into())
         .await
         .map(Into::into)
         .map(Json)
@@ -816,7 +816,7 @@ where
 #[derive(Debug, Snafu)]
 enum Error {
     #[snafu(display("Gist creation failed"))]
-    GistCreation { source: octocrab::Error },
+    GistCreation { source: gist::CreateError },
 
     #[snafu(display("Gist loading failed"))]
     GistLoading { source: octocrab::Error },
@@ -981,6 +981,38 @@ pub(crate) mod api_orchestrator_integration_impls {
         }
     }
 
+    impl From<api::Code> for Code {
+        fn from(value: api::Code) -> Self {
+            match value {
+                api::Code::Single(c) => Code::Single(c),
+                api::Code::Multiple(f) => Code::Multiple(f.into_iter().map(Into::into).collect()),
+            }
+        }
+    }
+
+    impl From<Code> for api::Code {
+        fn from(value: Code) -> Self {
+            match value {
+                Code::Single(c) => api::Code::Single(c),
+                Code::Multiple(f) => api::Code::Multiple(f.into_iter().map(Into::into).collect()),
+            }
+        }
+    }
+
+    impl From<api::CodeFile> for CodeFile {
+        fn from(value: api::CodeFile) -> Self {
+            let api::CodeFile { name, content } = value;
+            Self { name, content }
+        }
+    }
+
+    impl From<CodeFile> for api::CodeFile {
+        fn from(value: CodeFile) -> Self {
+            let CodeFile { name, content } = value;
+            Self { name, content }
+        }
+    }
+
     impl TryFrom<api::EvaluateRequest> for ExecuteRequest {
         type Error = ParseEvaluateRequestError;
 
@@ -1012,7 +1044,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 crate_type: CrateType::Binary,
                 tests,
                 backtrace: false,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1089,7 +1121,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 edition: parse_edition(&edition)?,
                 tests,
                 backtrace,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1156,7 +1188,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 edition: parse_edition(&edition)?,
                 tests,
                 backtrace,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1216,7 +1248,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 channel,
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1246,7 +1278,7 @@ pub(crate) mod api_orchestrator_integration_impls {
             Self {
                 success,
                 exit_detail,
-                code,
+                code: code.into(),
                 stdout,
                 stderr,
             }
@@ -1273,7 +1305,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 channel,
                 crate_type: parse_crate_type(&crate_type)?,
                 edition: parse_edition(&edition)?,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1333,7 +1365,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 edition: parse_edition(&edition)?,
                 tests,
                 aliasing_model,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1377,7 +1409,7 @@ pub(crate) mod api_orchestrator_integration_impls {
                 channel: Channel::Nightly,     // TODO: use what user has submitted
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
-                code,
+                code: code.into(),
             })
         }
     }
@@ -1584,8 +1616,44 @@ pub(crate) mod api_orchestrator_integration_impls {
             api::MetaGistResponse {
                 id: me.id,
                 url: me.url,
-                code: me.code,
+                code: me.code.into(),
             }
+        }
+    }
+
+    impl From<api::Code> for gist::Code {
+        fn from(value: api::Code) -> Self {
+            match value {
+                api::Code::Single(code) => gist::Code::Single(code),
+                api::Code::Multiple(files) => {
+                    gist::Code::Multiple(files.into_iter().map(Into::into).collect())
+                }
+            }
+        }
+    }
+
+    impl From<gist::Code> for api::Code {
+        fn from(value: gist::Code) -> Self {
+            match value {
+                gist::Code::Single(code) => api::Code::Single(code),
+                gist::Code::Multiple(files) => {
+                    api::Code::Multiple(files.into_iter().map(Into::into).collect())
+                }
+            }
+        }
+    }
+
+    impl From<api::CodeFile> for gist::CodeFile {
+        fn from(value: api::CodeFile) -> Self {
+            let api::CodeFile { name, content } = value;
+            Self { name, content }
+        }
+    }
+
+    impl From<gist::CodeFile> for api::CodeFile {
+        fn from(value: gist::CodeFile) -> Self {
+            let gist::CodeFile { name, content } = value;
+            Self { name, content }
         }
     }
 }

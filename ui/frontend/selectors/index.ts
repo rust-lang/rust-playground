@@ -11,6 +11,8 @@ import {
   PrimaryActionAuto,
   PrimaryActionCore,
   Version,
+  FileView,
+  Code,
 } from '../types';
 
 const MS_PER_S = 1000;
@@ -21,13 +23,103 @@ const clientFeatureFlagThreshold = (state: State) => state.client.featureFlagThr
 const createFeatureFlagSelector = (ff: (state: State) => number) =>
   createSelector(clientFeatureFlagThreshold, ff, (c, ff) => c <= ff);
 
-export const codeSelector = (state: State) => state.code;
+const allowMultipleFilesThreshold = createSelector(featureFlags, ff => ff.multifileThreshold);
+export const allowMultipleFiles = createFeatureFlagSelector(allowMultipleFilesThreshold);
+
+const codeSelector = (state: State) => state.code;
+const filesSelector = (state: State) => state.files.files;
+const filesActiveSelector = (state: State) => state.files.active;
+
+const multifileEnabledSelector = createSelector(
+  allowMultipleFiles,
+  (state: State) => state.configuration.fileView,
+  (allowed, selected) => allowed && selected === FileView.Multiple,
+);
+
+export const codeOrFilesSelector = createSelector(
+  multifileEnabledSelector,
+  codeSelector,
+  filesSelector,
+  (multifileEnabled, single, multiple) => {
+    if (multifileEnabled) {
+      return multiple;
+    } else {
+      return single;
+    }
+  }
+);
+
+export const linearizeCode = (code: Code) => {
+  if (typeof code === 'string') {
+    return code;
+  } else {
+    const f = [...code];
+    f.sort((a, b) => a.name.localeCompare(b.name));
+    return f.reduce((acc, f) => acc + `// ${f.name}` + '\n\n' + f.content + '\n', '');
+  }
+};
+
+export const linearCodeSelector = createSelector(codeOrFilesSelector, linearizeCode);
+
+export const allCodeContentsSelector = createSelector(
+  multifileEnabledSelector,
+  codeSelector,
+  filesSelector,
+  (multifileEnabled, single, multiple) => {
+    if (multifileEnabled) {
+      return multiple.map((f) => f.content);
+    } else {
+      return [single];
+    }
+  }
+);
+
+export const activeCodeSelector = createSelector(
+  multifileEnabledSelector,
+  codeSelector,
+  filesActiveSelector,
+  filesSelector,
+  (multifileEnabled, code, activeFile, files) => {
+    if (multifileEnabled) {
+      return files.find((f) => f.id === activeFile)?.content;
+    } else {
+      return code;
+    }
+  }
+);
+
+const SINGLE_FILE_ID = -1;
+
+export const activeFileIdSelector = createSelector(
+  multifileEnabledSelector,
+  filesActiveSelector,
+  (multifileEnabled, active) => {
+    if (multifileEnabled) {
+      return active;
+    } else {
+      return SINGLE_FILE_ID;
+    }
+  }
+);
+
+export const fileIdsSelector = createSelector(
+  multifileEnabledSelector,
+  filesSelector,
+  (multifileEnabled, files) => {
+    if (multifileEnabled) {
+      return files.map((f) => f.id)
+    } else {
+      return [SINGLE_FILE_ID]
+    }
+  }
+)
+
 export const positionSelector = (state: State) => state.position;
 export const selectionSelector = (state: State) => state.selection;
 
 const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
 const hasTests = (code: string) => !!code.match(HAS_TESTS_RE);
-const hasTestsSelector = createSelector(codeSelector, hasTests);
+const hasTestsSelector = createSelector(allCodeContentsSelector, (f) => f.some(hasTests));
 
 // https://stackoverflow.com/a/34755045/155423
 const HAS_MAIN_FUNCTION_RE = new RegExp(
@@ -39,11 +131,35 @@ const HAS_MAIN_FUNCTION_RE = new RegExp(
   'm'
 );
 export const hasMainFunction = (code: string) => !!code.match(HAS_MAIN_FUNCTION_RE);
-const hasMainFunctionSelector = createSelector(codeSelector, hasMainFunction);
+const hasMainFunctionSelector = createSelector(
+  multifileEnabledSelector,
+  codeSelector,
+  filesSelector,
+  (multifileEnabled, code, files) => {
+    if (multifileEnabled) {
+      return files.some((f) => f.name === 'src/main.rs');
+    } else {
+      return hasMainFunction(code);
+    }
+  }
+);
 
 const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
 const crateType = (code: string) => (code.match(CRATE_TYPE_RE) ?? []).at(1);
-const crateTypeSelector = createSelector(codeSelector, crateType);
+const crateTypeSelector = createSelector(
+  multifileEnabledSelector,
+  codeSelector,
+  filesSelector,
+  (multifileEnabled, code, files) => {
+    if (multifileEnabled) {
+      const file = files.find((f) => f.name === 'src/lib.rs');
+      if (!file) { return undefined; }
+      return crateType(file.content);
+    } else {
+      return crateType(code);
+    }
+  }
+);
 
 const autoPrimaryActionSelector = createSelector(
   crateTypeSelector,
@@ -338,14 +454,14 @@ export const clippyRequestSelector = createSelector(
   channelSelector,
   getCrateType,
   editionSelector,
-  codeSelector,
+  codeOrFilesSelector,
   (channel, crateType, edition, code) => ({ channel, crateType, edition, code }),
 );
 
 export const formatRequestSelector = createSelector(
   channelSelector,
   editionSelector,
-  codeSelector,
+  codeOrFilesSelector,
   (channel, edition, code) => ({ channel, edition, code }),
 );
 
@@ -353,13 +469,13 @@ export const miriRequestSelector = createSelector(
   editionSelector,
   runAsTest,
   aliasingModelSelector,
-  codeSelector,
+  codeOrFilesSelector,
   (edition, tests, aliasingModel, code, ) => ({ edition, tests, aliasingModel, code }),
 );
 
 export const macroExpansionRequestSelector = createSelector(
   editionSelector,
-  codeSelector,
+  codeOrFilesSelector,
   (edition, code) => ({ edition, code })
 );
 
@@ -425,7 +541,7 @@ export const websocketStatusSelector = createSelector(
 );
 
 export const executeRequestPayloadSelector = createSelector(
-  codeSelector,
+  codeOrFilesSelector,
   channelSelector,
   (state: State) => state.configuration,
   getBacktraceSet,
@@ -442,7 +558,7 @@ export const executeRequestPayloadSelector = createSelector(
 );
 
 export const compileRequestPayloadSelector = createSelector(
-  codeSelector,
+  codeOrFilesSelector,
   channelSelector,
   (state: State) => state.configuration,
   getCrateType,

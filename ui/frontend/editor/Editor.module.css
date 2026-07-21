@@ -3,6 +3,17 @@
   position: relative;
 }
 
+.nothing {
+  composes: -autoSize from '../shared.module.css';
+  display: grid;
+  place-items: center;
+  font-size: 120%;
+}
+
+.nothingAction {
+  composes: -buttonAsLink from '../shared.module.css';
+}
+
 .-advanced {
   composes: -bodyMonospace -autoSize from '../shared.module.css';
   position: absolute;

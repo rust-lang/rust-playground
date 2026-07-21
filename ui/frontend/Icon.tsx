@@ -5,6 +5,16 @@ import * as styles from './Icon.module.css';
 // These icons came from Material Design originally
 // https://material.io/tools/icons/?icon=assignment&style=outline
 
+type IconProps = { className?: string };
+
+function addClassName(className?: string) {
+  if (className) {
+    return `${styles.icon} ${className}`;
+  } else {
+    return styles.icon;
+  }
+}
+
 // M.D. 'play_arrow'
 export const BuildIcon = () => (
   <svg className={styles.icon} height="14" viewBox="8 4 10 16" width="12" xmlns="http://www.w3.org/2000/svg">
@@ -67,4 +77,55 @@ export const Close = () => (
   <svg className={styles.icon} width="24px" height="24px" viewBox="0 0 24 24">
     <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41z" />
   </svg>
+);
+
+// M.D. 'insert_drive_file'
+export const File: React.FC<IconProps> = ({ className }) => (
+  <svg className={addClassName(className)} width="24px" height="24px" viewBox="0 0 24 24">
+    <path d="M0 0h24v24H0z" fill="none"/><path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"/>
+    </svg>
+);
+
+// M.D. 'folder'
+export const Directory: React.FC<IconProps> = ({ className }) => (
+  <svg className={addClassName(className)} width="24px" height="24px" viewBox="0 0 24 24">
+    <path d="M0 0h24v24H0z" fill="none"/><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+    </svg>
+);
+
+// M.D. 'note_add'
+export const FileAdd = () => (
+  <svg className={styles.icon} width="24px" height="24px" viewBox="0 0 24 24">
+    <path d="M0 0h24v24H0z" fill="none"/><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z"/>
+    </svg>
+);
+
+// M.D. 'delete_forever'
+export const DeleteForever = () => (
+  <svg className={styles.icon} width="24px" height="24px" viewBox="0 0 24 24">
+    <path d="M0 0h24v24H0z" fill="none"/>
+    <path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"/>
+    </svg>
+);
+
+// M.D. 'edit'
+export const Edit = () => (
+  <svg className={styles.icon} width="24px" height="24px" viewBox="0 0 24 24">
+    <path d="M0 0h24v24H0z" fill="none"/>
+    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+    </svg>
+);
+
+// M.D. 'check_circle'
+export const CheckCircle = () => (
+  <svg className={styles.icon} width="24px" height="24px" viewBox="0 0 24 24">
+    <path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+    </svg>
+);
+
+// M.D. 'cancel'
+export const Cancel = () => (
+  <svg className={styles.icon} width="24px" height="24px" viewBox="0 0 24 24">
+    <path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/>
+    </svg>
 );

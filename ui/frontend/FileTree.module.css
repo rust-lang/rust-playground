@@ -1,0 +1,153 @@
+@define-mixin light-theme-vars {
+  --ft-button-hover-bg-color: rgb(184 184 184);
+  --ft-button-focus-bg-color: rgb(203 203 203);
+  --ft-icon-color: rgb(155 155 155);
+  --ft-icon-hover-color: rgb(101 101 101);
+  --ft-icon-accept-hover-color: rgb(24 191 24);
+  --ft-icon-cancel-hover-color: rgb(211 31 70);
+}
+
+@define-mixin dark-theme-vars {
+  --ft-button-hover-bg-color: rgb(101 101 101);
+  --ft-button-focus-bg-color: rgb(60 60 60);
+  --ft-icon-color: rgb(184 184 184);
+  --ft-icon-hover-color: rgb(155 155 155);
+}
+
+.container,
+:root[data-theme='light'] .container {
+  @mixin light-theme-vars;
+}
+
+@media (prefers-color-scheme: dark) {
+  .container {
+    @mixin dark-theme-vars;
+  }
+}
+
+:root[data-theme='dark'] .container {
+  @mixin dark-theme-vars;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.actionsHeader {
+  flex-grow: 1;
+}
+
+.emptyPaths {
+  font-style: italic;
+  font-size: 80%;
+}
+
+.paths {
+  list-style: none;
+  padding-inline-start: 0;
+  margin: 0.5em 0;
+}
+
+.button {
+  composes: -buttonReset from './shared.module.css';
+  user-select: text;
+  width: 100%;
+  cursor: pointer;
+
+  &[data-focus] {
+    background-color: var(--ft-button-focus-bg-color);
+  }
+
+  &:hover {
+    background: var(--ft-button-hover-bg-color);
+  }
+}
+
+.nameInputForm {
+  display: grid;
+  width: 100%;
+  grid-template-columns: auto minmax(5em, 1fr) auto auto;
+}
+
+.nameInputInput {
+  grid-column: 2;
+  margin-right: 0.25em;
+}
+
+.nameInputError {
+  grid-row: 2;
+  grid-column: 2 / -1;
+}
+
+.name {
+  margin-left: calc(var(--depth) * 1em);
+  display: flex;
+  align-items: center;
+
+  &[data-active] {
+    font-weight: bold;
+  }
+}
+
+.icon {
+  color: var(--ft-icon-color);
+}
+
+.iconButton {
+  composes: -buttonReset from './shared.module.css';
+  cursor: pointer;
+  color: var(--ft-icon-color);
+
+  &:hover {
+    color: var(--ft-icon-hover-color);
+  }
+
+  &[data-kind='accept']:hover {
+    color: var(--ft-icon-accept-hover-color);
+  }
+
+  &[data-kind='cancel']:hover {
+    color: var(--ft-icon-cancel-hover-color);
+  }
+}
+
+.dialog {
+  &:not([open]) {
+    display: none;
+  }
+
+  &::backdrop {
+    backdrop-filter: grayscale(0.75) contrast(0.25) blur(1px);
+  }
+}
+
+.dialogContent {
+  display: grid;
+  grid-template-columns: 1fr max-content max-content;
+  gap: 1em;
+}
+
+.-dialogWide {
+  grid-column: 1/-1;
+  margin: 0;
+}
+
+.dialogText {
+  composes: -dialogWide;
+  max-width: 30em;
+}
+
+.dialogCancel {
+  grid-column: -3;
+}
+
+.dialogAccept {
+  grid-column: -2;
+}
+
+.dialogTip {
+  composes: -dialogWide;
+  font-style: italic;
+  font-size: 80%;
+}
