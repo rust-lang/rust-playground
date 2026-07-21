@@ -286,7 +286,7 @@ features = ["clock", "serde"]
 
 [dependencies.clap]
 package = "clap"
-version = "=4.6.2"
+version = "=4.6.3"
 features = ["unstable-doc"]
 
 [dependencies.clap_builder]
@@ -296,7 +296,7 @@ features = ["unstable-doc"]
 
 [dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.6.1"
+version = "=4.6.3"
 
 [dependencies.clap_lex]
 package = "clap_lex"
@@ -782,7 +782,7 @@ version = "=0.4.13"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=1.10.1"
+version = "=1.11.0"
 features = ["client", "full", "http1"]
 
 [dependencies.hyper_rustls]
@@ -919,7 +919,7 @@ version = "=0.5.3"
 
 [dependencies.libc]
 package = "libc"
-version = "=0.2.186"
+version = "=0.2.188"
 
 [dependencies.libm]
 package = "libm"
@@ -1781,7 +1781,7 @@ version = "=0.1.1"
 
 [dependencies.tokio]
 package = "tokio"
-version = "=1.53.0"
+version = "=1.53.1"
 features = ["fs", "full", "io-util", "net", "rt", "rt-multi-thread", "sync", "test-util", "time"]
 
 [dependencies.tokio_io]
@@ -1808,7 +1808,7 @@ version = "=0.1.18"
 
 [dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.18"
+version = "=0.7.19"
 features = ["codec", "full", "io"]
 
 [dependencies.toml]
@@ -2106,12 +2106,12 @@ default-features = false
 
 [dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.54"
+version = "=0.8.55"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.54"
+version = "=0.8.55"
 
 [dependencies.zerofrom]
 package = "zerofrom"
@@ -2440,7 +2440,7 @@ features = ["clock", "serde"]
 
 [build-dependencies.clap]
 package = "clap"
-version = "=4.6.2"
+version = "=4.6.3"
 features = ["unstable-doc"]
 
 [build-dependencies.clap_builder]
@@ -2450,7 +2450,7 @@ features = ["unstable-doc"]
 
 [build-dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.6.1"
+version = "=4.6.3"
 
 [build-dependencies.clap_lex]
 package = "clap_lex"
@@ -2936,7 +2936,7 @@ version = "=0.4.13"
 
 [build-dependencies.hyper]
 package = "hyper"
-version = "=1.10.1"
+version = "=1.11.0"
 features = ["client", "full", "http1"]
 
 [build-dependencies.hyper_rustls]
@@ -3073,7 +3073,7 @@ version = "=0.5.3"
 
 [build-dependencies.libc]
 package = "libc"
-version = "=0.2.186"
+version = "=0.2.188"
 
 [build-dependencies.libm]
 package = "libm"
@@ -3935,7 +3935,7 @@ version = "=0.1.1"
 
 [build-dependencies.tokio]
 package = "tokio"
-version = "=1.53.0"
+version = "=1.53.1"
 features = ["fs", "full", "io-util", "net", "rt", "rt-multi-thread", "sync", "test-util", "time"]
 
 [build-dependencies.tokio_io]
@@ -3962,7 +3962,7 @@ version = "=0.1.18"
 
 [build-dependencies.tokio_util]
 package = "tokio-util"
-version = "=0.7.18"
+version = "=0.7.19"
 features = ["codec", "full", "io"]
 
 [build-dependencies.toml]
@@ -4260,12 +4260,12 @@ default-features = false
 
 [build-dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.54"
+version = "=0.8.55"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [build-dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.54"
+version = "=0.8.55"
 
 [build-dependencies.zerofrom]
 package = "zerofrom"
