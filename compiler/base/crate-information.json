@@ -296,7 +296,7 @@
   },
   {
     "name": "clap",
-    "version": "4.6.2",
+    "version": "4.6.3",
     "id": "clap"
   },
   {
@@ -306,7 +306,7 @@
   },
   {
     "name": "clap_derive",
-    "version": "4.6.1",
+    "version": "4.6.3",
     "id": "clap_derive"
   },
   {
@@ -866,7 +866,7 @@
   },
   {
     "name": "hyper",
-    "version": "1.10.1",
+    "version": "1.11.0",
     "id": "hyper"
   },
   {
@@ -1016,7 +1016,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.186",
+    "version": "0.2.188",
     "id": "libc"
   },
   {
@@ -1986,7 +1986,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.53.0",
+    "version": "1.53.1",
     "id": "tokio"
   },
   {
@@ -2016,7 +2016,7 @@
   },
   {
     "name": "tokio-util",
-    "version": "0.7.18",
+    "version": "0.7.19",
     "id": "tokio_util"
   },
   {
@@ -2356,12 +2356,12 @@
   },
   {
     "name": "zerocopy",
-    "version": "0.8.54",
+    "version": "0.8.55",
     "id": "zerocopy"
   },
   {
     "name": "zerocopy-derive",
-    "version": "0.8.54",
+    "version": "0.8.55",
     "id": "zerocopy_derive"
   },
   {
