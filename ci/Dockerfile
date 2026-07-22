@@ -1,4 +1,4 @@
-FROM rust:alpine
+FROM rust:alpine AS build
 
 RUN apk add musl-dev openssl-dev openssl-libs-static
 
@@ -32,3 +32,9 @@ RUN \
 RUN \
     cargo rustc --locked --release -- -C relocation-model=static; \
     mv target/release/ui /output/ui;
+
+# ====================
+
+FROM scratch AS output
+
+COPY --from=build /output /
