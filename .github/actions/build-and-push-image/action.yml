@@ -2,6 +2,16 @@ name: "Build and push image"
 description: "Build and push image"
 
 inputs:
+  push:
+    description: "Push the image to the registry"
+    required: false
+    default: false
+
+  load:
+    description: "Load the image to the local service"
+    required: false
+    default: false
+
   channel:
     description: "The Rust channel to build"
     required: true
@@ -14,13 +24,14 @@ runs:
   using: "composite"
 
   steps:
-    - uses: docker/build-push-action@v6
+    - uses: docker/build-push-action@v7
       with:
         context: compiler/base/
         file: compiler/base/Dockerfile
         build-args: |-
           channel=${{ inputs.channel }}
-        push: true
+        push: ${{ inputs.push }}
+        load: ${{ inputs.load }}
         tags: ${{ inputs.tags }}
         cache-from: type=gha,scope=${{ inputs.channel }}
         cache-to: type=gha,scope=${{ inputs.channel }},mode=max
