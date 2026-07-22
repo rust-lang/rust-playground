@@ -63,7 +63,15 @@ jobs:
       run: cargo fmt --manifest-path top-crates/Cargo.toml --check
     - name: Format orchestrator
       run: cargo fmt --manifest-path compiler/base/orchestrator/Cargo.toml --check
+    - name: Cache backend intermediate products
+      uses: actions/cache@v5
+      with:
+        path: docker-output/cache.tar
+        key: "${{ runner.os }}-backend-${{ hashFiles('ui/Cargo.lock', 'compiler/base/orchestrator/Cargo.lock') }}"
+        restore-keys: "${{ runner.os }}-backend-\n"
     - name: Build backend
+      env:
+        CACHE_IMPORT_EXPORT: 1
       run: "./ci/build-backend.sh"
     - name: Save backend artifact
       uses: actions/upload-artifact@v6
