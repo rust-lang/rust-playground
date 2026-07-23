@@ -3,17 +3,7 @@ declare module '*.module.css' {
   export = classes;
 }
 
-declare module 'normalize.css/normalize.css' {
-  const content: string;
-  export default content;
-}
-
-declare module 'prismjs/themes/*.css' {
-  const content: string;
-  export default content;
-}
-
-declare module '*prismjs-overrides.css' {
+declare module '*.css' {
   const content: string;
   export default content;
 }
