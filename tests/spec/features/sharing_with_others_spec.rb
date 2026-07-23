@@ -4,7 +4,7 @@ require 'support/file_tree'
 require 'support/matchers/be_at_url'
 require 'support/playground_actions'
 
-RSpec.feature "Sharing the code with others", :external, type: :feature, js: true do
+RSpec.feature "Sharing the code with others", :gist, type: :feature, js: true do
   include PlaygroundActions
 
   before { visit '/' }
