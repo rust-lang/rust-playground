@@ -14,7 +14,7 @@ const slice = createSlice({
   },
 });
 
-export const { setPage } = slice.actions;
+const { setPage } = slice.actions;
 
 export const navigateToIndex = () => setPage('index');
 export const navigateToHelp = () => setPage('help');

@@ -3,7 +3,7 @@ import React from 'react';
 import Section from './Section';
 import SimplePane, { SimplePaneProps } from './SimplePane';
 
-export interface PaneWithCodeProps extends SimplePaneProps {
+interface PaneWithCodeProps extends SimplePaneProps {
   code?: string;
 }
 

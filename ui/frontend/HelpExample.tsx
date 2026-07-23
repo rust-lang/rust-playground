@@ -9,7 +9,7 @@ import * as styles from './HelpExample.module.css';
 import prismOverrides from './prismjs-overrides.css';
 import prismTheme from 'prismjs/themes/prism-okaidia.css';
 
-export interface HelpExampleProps {
+interface HelpExampleProps {
   code: string;
 }
 

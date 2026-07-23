@@ -7,7 +7,7 @@ const activeFileIdSelector = (state: State) => state.files.active;
 
 const filesSelector = (state: State) => state.files.files;
 
-export const activeFileSelector = createSelector(filesSelector, activeFileIdSelector, (files, id) =>
+const activeFileSelector = createSelector(filesSelector, activeFileIdSelector, (files, id) =>
   files.find((f) => f.id === id),
 );
 

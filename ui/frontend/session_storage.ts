@@ -23,7 +23,7 @@ const V1Schema = z
   .partial();
 type V1Schema = z.infer<typeof V1Schema>;
 
-export function serialize(state: State): string {
+function serialize(state: State): string {
   const value: V1Schema = {
     version: CURRENT_VERSION,
     configuration: {
@@ -35,7 +35,7 @@ export function serialize(state: State): string {
   return JSON.stringify(V1Schema.parse(value));
 }
 
-export function deserialize(savedState: string): PartialState {
+function deserialize(savedState: string): PartialState {
   try {
     const parsedState = JSON.parse(savedState);
     const validatedState = V1Schema.parse(parsedState);
