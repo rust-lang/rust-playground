@@ -103,6 +103,8 @@ end
 
 RSpec.configure do |config|
   config.after(:example, :js) do
+    # Return to the playground, in case we navigated away
+    page.visit '/'
     page.execute_script <<~JS
       (() => {
         if (window.rustPlayground) {
