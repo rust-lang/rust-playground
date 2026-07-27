@@ -1,19 +1,19 @@
 .form {
   display: flex;
-  gap: 0.25em;
   align-items: flex-end;
+  gap: 0.25em;
 }
 
 .multiLine {
-  flex: 1;
   display: grid;
+  flex: 1;
 }
 
 .text,
 .sizer {
+  grid-area: 1 / 1 / 2 /2;
   margin: 0;
   padding: 0.25em;
-  grid-area: 1 / 1 / 2 /2;
   max-height: 3.5lh;
 }
 
@@ -31,9 +31,9 @@
 }
 
 .menu {
-  list-style: none;
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
 .button {

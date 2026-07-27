@@ -30,16 +30,16 @@
 
 .close {
   composes: -buttonReset from './shared.module.css';
+  float: right;
   cursor: pointer;
   padding: var(--space);
-  float: right;
 }
 
 .action {
   display: flex;
   justify-content: center;
-  padding-top: 0.5em;
   gap: 0.5em;
+  padding-top: 0.5em;
 
   & button {
     cursor: pointer;

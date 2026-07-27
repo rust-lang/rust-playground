@@ -10,15 +10,15 @@ $radius: 4px;
   border-style: solid;
 
   &:first-child {
+    border-left-width: $width;
     border-top-left-radius: $radius;
     border-bottom-left-radius: $radius;
-    border-left-width: $width;
   }
 
   &:last-child {
+    border-right-width: $width;
     border-top-right-radius: $radius;
     border-bottom-right-radius: $radius;
-    border-right-width: $width;
   }
 }
 
@@ -31,9 +31,9 @@ $radius: 4px;
   composes: -buttonReset from './shared.module.css';
   display: grid;
   grid-auto-flow: column;
-  gap: var(--button-gap);
   align-content: center;
   align-items: center;
+  gap: var(--button-gap);
   padding: 0 var(--button-side-padding);
   height: var(--button-height);
   font-weight: 600;
@@ -55,14 +55,14 @@ $radius: 4px;
 
 .primary {
   composes: -border -button;
-  background-color: var(--button-primary-bg-color);
   border-color: var(--button-primary-border-color);
+  background-color: var(--button-primary-bg-color);
   color: var(--button-primary-color);
   font-weight: 700;
 
   &:disabled {
-    background-color: var(--button-primary-bg-color-light);
     border-color: var(--button-primary-border-color-light);
+    background-color: var(--button-primary-bg-color-light);
   }
 
   &:hover:enabled {
@@ -76,14 +76,14 @@ $radius: 4px;
 
 .secondary {
   composes: -border -button;
-  background: var(--button-secondary-bg-color);
   border-color: var(--button-secondary-border-color);
+  background: var(--button-secondary-bg-color);
   color: var(--button-secondary-color);
 
   &:disabled {
+    border-color: var(--button-secondary-border-color-light);
     background: inherit;
     background-color: var(--button-secondary-bg-color-light);
-    border-color: var(--button-secondary-border-color-light);
     color: var(--button-secondary-color-light);
   }
 
@@ -111,14 +111,14 @@ $radius: 4px;
 
 .rule {
   composes: -border;
+  border-color: var(--button-secondary-border-color);
   background-color: var(--button-secondary-border-color);
   width: 1px;
-  border-color: var(--button-secondary-border-color);
 }
 
 .icon {
   composes: secondary;
+  justify-items: center;
   padding: 0;
   aspect-ratio: 1/1;
-  justify-items: center;
 }

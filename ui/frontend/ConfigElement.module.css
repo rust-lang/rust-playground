@@ -18,14 +18,14 @@
 }
 
 .select {
-  width: 100%;
-  background: var(--button-secondary-bg-color);
   border-color: var(--button-secondary-border-color);
+  background: var(--button-secondary-bg-color);
+  width: 100%;
   color: var(--button-secondary-color);
 
   & option {
-    background-color: var(--button-secondary-bg-color-top);
     border-color: var(--button-secondary-border-color);
+    background-color: var(--button-secondary-bg-color-top);
     color: var(--button-secondary-color);
   }
 }
@@ -36,25 +36,25 @@
 
   & label {
     cursor: pointer;
+    border: 1px solid transparent;
     padding: 0 1em;
     color: #777;
     font-weight: 600;
     text-align: center;
     text-transform: uppercase;
-    border: 1px solid transparent;
 
     &:hover {
       background: hsl(208deg 100% 43% / 10%);
     }
 
     &:first-of-type {
-      border-radius: var(--header-border-radius) 0 0 var(--header-border-radius);
       border-right-width: 0;
+      border-radius: var(--header-border-radius) 0 0 var(--header-border-radius);
     }
 
     &:last-of-type {
-      border-radius: 0 var(--header-border-radius) var(--header-border-radius) 0;
       border-left-width: 0;
+      border-radius: 0 var(--header-border-radius) var(--header-border-radius) 0;
     }
   }
 

@@ -44,16 +44,16 @@
 }
 
 .paths {
-  list-style: none;
-  padding-inline-start: 0;
   margin: 0.5em 0;
+  padding-inline-start: 0;
+  list-style: none;
 }
 
 .button {
   composes: -buttonReset from './shared.module.css';
-  user-select: text;
-  width: 100%;
   cursor: pointer;
+  width: 100%;
+  user-select: text;
 
   &[data-focus] {
     background-color: var(--ft-button-focus-bg-color);
@@ -66,8 +66,8 @@
 
 .nameInputForm {
   display: grid;
-  width: 100%;
   grid-template-columns: auto minmax(5em, 1fr) auto auto;
+  width: 100%;
 }
 
 .nameInputInput {
@@ -81,9 +81,9 @@
 }
 
 .name {
-  margin-left: calc(var(--depth) * 1em);
   display: flex;
   align-items: center;
+  margin-left: calc(var(--depth) * 1em);
 
   &[data-active] {
     font-weight: bold;
