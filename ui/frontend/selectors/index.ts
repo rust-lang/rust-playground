@@ -121,6 +121,86 @@ const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
 const hasTests = (code: string) => !!code.match(HAS_TESTS_RE);
 const hasTestsSelector = createSelector(allCodeContentsSelector, (f) => f.some(hasTests));
 
+const withoutBlockComments = (code: string) => {
+  const characters = code.split('');
+  let blockDepth = 0;
+  let inLineComment = false;
+  let inString = false;
+  let escaped = false;
+  let rawHashes: number | undefined;
+
+  for (let i = 0; i < characters.length; i += 1) {
+    const current = characters[i];
+    const next = characters[i + 1];
+
+    if (blockDepth > 0) {
+      if (current === '/' && next === '*') {
+        characters[i] = characters[i + 1] = ' ';
+        blockDepth += 1;
+        i += 1;
+      } else if (current === '*' && next === '/') {
+        characters[i] = characters[i + 1] = ' ';
+        blockDepth -= 1;
+        i += 1;
+      } else if (current !== '\n' && current !== '\r') {
+        characters[i] = ' ';
+      }
+      continue;
+    }
+
+    if (inLineComment) {
+      if (current === '\n' || current === '\r') {
+        inLineComment = false;
+      }
+      continue;
+    }
+
+    if (rawHashes !== undefined) {
+      if (
+        current === '"' &&
+        characters.slice(i + 1, i + 1 + rawHashes).join('') === '#'.repeat(rawHashes)
+      ) {
+        i += rawHashes;
+        rawHashes = undefined;
+      }
+      continue;
+    }
+
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (current === '\\') {
+        escaped = true;
+      } else if (current === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (current === '/' && next === '/') {
+      inLineComment = true;
+      i += 1;
+    } else if (current === '/' && next === '*') {
+      characters[i] = characters[i + 1] = ' ';
+      blockDepth = 1;
+      i += 1;
+    } else if (current === 'r') {
+      let end = i + 1;
+      while (characters[end] === '#') {
+        end += 1;
+      }
+      if (characters[end] === '"') {
+        rawHashes = end - i - 1;
+        i = end;
+      }
+    } else if (current === '"') {
+      inString = true;
+    }
+  }
+
+  return characters.join('');
+};
+
 // https://stackoverflow.com/a/34755045/155423
 const HAS_MAIN_FUNCTION_RE = new RegExp(
   [
@@ -130,7 +210,8 @@ const HAS_MAIN_FUNCTION_RE = new RegExp(
   ].map((r) => r.source).join(''),
   'm'
 );
-export const hasMainFunction = (code: string) => !!code.match(HAS_MAIN_FUNCTION_RE);
+export const hasMainFunction = (code: string) =>
+  !!withoutBlockComments(code).match(HAS_MAIN_FUNCTION_RE);
 const hasMainFunctionSelector = createSelector(
   multifileEnabledSelector,
   codeSelector,
