@@ -430,20 +430,16 @@ export const resetOldConfigurationSelector = createSelector(
   }
 );
 
-
 const notificationsSelector = (state: State) => state.notifications;
 
-const NOW = new Date();
-
-const RUST_SURVEY_2025_END = new Date('2025-12-17T00:00:00Z');
-const RUST_SURVEY_2025_OPEN = NOW <= RUST_SURVEY_2025_END;
-export const showRustSurvey2025Selector = createSelector(
+export const showMultipleFilesSelector = createSelector(
+  allowMultipleFiles,
   notificationsSelector,
-  notifications => RUST_SURVEY_2025_OPEN && !notifications.seenRustSurvey2025,
+  (allowed, notifications) => allowed && !notifications.seenMultipleFiles,
 );
 
 export const anyNotificationsToShowSelector = createSelector(
-  showRustSurvey2025Selector,
+  showMultipleFilesSelector,
   excessiveExecutionSelector,
   resetConfigurationSelector,
   resetOldConfigurationSelector,

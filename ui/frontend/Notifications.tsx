@@ -2,21 +2,21 @@ import React, { useCallback } from 'react';
 import { Portal } from 'react-portal';
 
 import { Close } from './Icon';
+import { preserveContentAndChangeFileView } from './actions';
 import { useAppDispatch, useAppSelector } from './hooks';
 import * as client from './reducers/client';
-import { seenRustSurvey2025 } from './reducers/notifications';
+import { seenMultipleFiles } from './reducers/notifications';
 import { allowLongRun, wsExecuteKillCurrent } from './reducers/output/execute';
 import * as selectors from './selectors';
+import { FileView } from './types';
 
 import * as styles from './Notifications.module.css';
-
-const SURVEY_URL = 'https://blog.rust-lang.org/2025/11/17/launching-the-2025-state-of-rust-survey/';
 
 const Notifications: React.FC = () => {
   return (
     <Portal>
       <div className={styles.container}>
-        <RustSurvey2025Notification />
+        <MultiFileNotification />
         <ExcessiveExecutionNotification />
         <ResetConfigurationNotification />
         <ResetOldConfigurationNotification />
@@ -25,18 +25,28 @@ const Notifications: React.FC = () => {
   );
 };
 
-const RustSurvey2025Notification: React.FC = () => {
-  const showIt = useAppSelector(selectors.showRustSurvey2025Selector);
+const MultiFileNotification: React.FC = () => {
+  const showIt = useAppSelector(selectors.showMultipleFilesSelector);
 
   const dispatch = useAppDispatch();
-  const seenIt = useCallback(() => dispatch(seenRustSurvey2025()), [dispatch]);
+  const seenIt = useCallback(() => dispatch(seenMultipleFiles()), [dispatch]);
+  const single = useCallback(() => {
+    dispatch(preserveContentAndChangeFileView(FileView.Single));
+    dispatch(seenMultipleFiles());
+  }, [dispatch]);
+  const multiple = useCallback(() => {
+    dispatch(preserveContentAndChangeFileView(FileView.Multiple));
+    dispatch(seenMultipleFiles());
+  }, [dispatch]);
 
   return showIt ? (
     <Notification onClose={seenIt}>
-      Please help us take a look at who the Rust community is composed of, how the Rust project is
-      doing, and how we can improve the Rust programming experience by completing the{' '}
-      <a href={SURVEY_URL}>2025 State of Rust Survey</a>. Whether or not you use Rust today, we want
-      to know your opinions.
+      The Playground now allows editing multiple files! Turn this feature on and off in the
+      configuration menu.
+      <div className={styles.action}>
+        <button onClick={single}>Stay in single file mode</button>
+        <button onClick={multiple}>Change to multiple file mode</button>
+      </div>
     </Notification>
   ) : null;
 };
@@ -119,10 +129,10 @@ interface NotificationProps {
 
 const Notification: React.FC<NotificationProps> = ({ onClose, children }) => (
   <div className={styles.notification} data-test-id="notification">
-    <div className={styles.notificationContent}>{children}</div>
     <button className={styles.close} onClick={onClose} title="dismiss notification">
       <Close />
     </button>
+    <div className={styles.notificationContent}>{children}</div>
   </div>
 );
 

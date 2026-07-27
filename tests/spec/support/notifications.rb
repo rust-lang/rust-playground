@@ -4,8 +4,8 @@ class Notifications
     @page = page
   end
 
-  def close_all
-    page.all(:notification).each do |notification|
+  def close_all(**opts)
+    page.all(:notification, **opts).each do |notification|
       page.within(notification) do
         page.click_on('dismiss notification')
       end

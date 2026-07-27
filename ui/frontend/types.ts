@@ -210,6 +210,6 @@ export const Focus = {
 export type Focus = ValuesOf<typeof Focus>;
 
 export const Notification = {
-  RustSurvey2025: 'rust-survey-2025',
+  MultipleFiles: 'multiple-files',
 } as const;
 export type Notification = ValuesOf<typeof Notification>;
