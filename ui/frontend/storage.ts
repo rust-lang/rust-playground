@@ -55,7 +55,7 @@ export function expandCode<T extends { code?: Code }>(data: T): Omit<T, 'code'> 
   }
 }
 
-export class InMemoryStorage {
+class InMemoryStorage {
   private data: { [s: string]: string } = {};
 
   public getItem(name: string): string {

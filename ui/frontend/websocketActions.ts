@@ -7,7 +7,7 @@ export type WsPayloadAction<P = void, T extends string = string> = PayloadAction
   { sequenceNumber: number }
 >;
 
-export const createWebsocketResponseAction = <P, T extends string = string>(type: T) => {
+const createWebsocketResponseAction = <P, T extends string = string>(type: T) => {
   function actionCreator(): WsPayloadAction<P> {
     throw 'Should never be executed by JS';
   }

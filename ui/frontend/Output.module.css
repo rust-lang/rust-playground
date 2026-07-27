@@ -10,12 +10,12 @@
 }
 
 .tab {
-  color: var(--font-color);
   flex: 1 1 auto;
   cursor: pointer;
   border: var(--border);
   border-right: none;
   background-color: var(--output-background-tab);
+  color: var(--font-color);
   line-height: 1.5;
 
   &:last-of-type {

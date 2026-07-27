@@ -61,7 +61,7 @@ export const linearizeCode = (code: Code) => {
 
 export const linearCodeSelector = createSelector(codeOrFilesSelector, linearizeCode);
 
-export const allCodeContentsSelector = createSelector(
+const allCodeContentsSelector = createSelector(
   multifileEnabledSelector,
   codeSelector,
   filesSelector,
@@ -274,9 +274,9 @@ export const rustfmtVersionDetailsText = createSelector(getRustfmt, versionDetai
 export const miriVersionDetailsText = createSelector(getMiri, versionDetails);
 
 const editionSelector = (state: State) => state.configuration.edition;
-export const aliasingModelSelector = (state: State) => state.configuration.aliasingModel;
+const aliasingModelSelector = (state: State) => state.configuration.aliasingModel;
 
-export const isNightlyChannel = createSelector(
+const isNightlyChannel = createSelector(
   channelSelector,
   (channel) => channel === Channel.Nightly,
 );
@@ -307,7 +307,7 @@ export const isBacktraceDefault = (state: State) => (
   state.configuration.backtrace === Backtrace.Disabled
 );
 
-export const getBacktraceSet = createSelector(isBacktraceDefault, (b) => !b);
+const getBacktraceSet = createSelector(isBacktraceDefault, (b) => !b);
 
 export const isAliasingModelDefault = createSelector(
   aliasingModelSelector,

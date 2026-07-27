@@ -2,7 +2,7 @@ import React from 'react';
 
 import Section from './Section';
 
-export interface WarnAboutNoSymbolsProps {
+interface WarnAboutNoSymbolsProps {
   isInProgress: boolean;
   hasSymbols: boolean;
   name: string;

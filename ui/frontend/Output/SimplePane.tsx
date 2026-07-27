@@ -33,7 +33,7 @@ export interface SimplePaneProps extends ReallySimplePaneProps {
   kind: string;
 }
 
-export interface ReallySimplePaneProps {
+interface ReallySimplePaneProps {
   requestsInProgress: number;
   stdout?: string;
   stderr?: string;

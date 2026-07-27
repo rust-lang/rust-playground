@@ -85,7 +85,7 @@ type CurrentConfiguration = V2Configuration;
 
 const SomeConfiguration = V1Configuration.or(V2Configuration);
 
-export function serialize(state: State): string {
+function serialize(state: State): string {
   const conf: CurrentConfiguration = {
     version: CURRENT_VERSION,
     client: {

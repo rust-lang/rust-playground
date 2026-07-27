@@ -17,11 +17,11 @@
 }
 
 .-buttonReset {
-  color: var(--font-color);
   border: none;
   background: inherit;
   background-color: transparent; /* IE 11 */
   padding: 0;
+  color: var(--font-color);
   font: inherit;
   line-height: inherit;
   text-align: inherit;
