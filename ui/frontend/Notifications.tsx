@@ -1,5 +1,4 @@
-import React, { useCallback } from 'react';
-import { Portal } from 'react-portal';
+import React, { useEffect, useRef } from 'react';
 
 import { Close } from './Icon';
 import { preserveContentAndChangeFileView } from './actions';
@@ -13,31 +12,43 @@ import { FileView } from './types';
 import * as styles from './Notifications.module.css';
 
 const Notifications: React.FC = () => {
+  const showNotifications = useAppSelector(selectors.anyNotificationsToShowSelector);
+
+  const dialog = useRef<HTMLDialogElement | null>(null);
+
+  useEffect(() => {
+    if (showNotifications) {
+      dialog.current?.show();
+    } else {
+      dialog.current?.close();
+    }
+  }, [showNotifications]);
+
   return (
-    <Portal>
-      <div className={styles.container}>
-        <MultiFileNotification />
-        <ExcessiveExecutionNotification />
-        <ResetConfigurationNotification />
-        <ResetOldConfigurationNotification />
-      </div>
-    </Portal>
+    <dialog ref={dialog} className={styles.container}>
+      <MultiFileNotification />
+      <ExcessiveExecutionNotification />
+      <ResetConfigurationNotification />
+      <ResetOldConfigurationNotification />
+    </dialog>
   );
 };
 
 const MultiFileNotification: React.FC = () => {
+  'use memo';
+
   const showIt = useAppSelector(selectors.showMultipleFilesSelector);
 
   const dispatch = useAppDispatch();
-  const seenIt = useCallback(() => dispatch(seenMultipleFiles()), [dispatch]);
-  const single = useCallback(() => {
+  const seenIt = () => dispatch(seenMultipleFiles());
+  const single = () => {
     dispatch(preserveContentAndChangeFileView(FileView.Single));
     dispatch(seenMultipleFiles());
-  }, [dispatch]);
-  const multiple = useCallback(() => {
+  };
+  const multiple = () => {
     dispatch(preserveContentAndChangeFileView(FileView.Multiple));
     dispatch(seenMultipleFiles());
-  }, [dispatch]);
+  };
 
   return showIt ? (
     <Notification onClose={seenIt}>
@@ -52,13 +63,15 @@ const MultiFileNotification: React.FC = () => {
 };
 
 const ExcessiveExecutionNotification: React.FC = () => {
+  'use memo';
+
   const showExcessiveExecution = useAppSelector(selectors.excessiveExecutionSelector);
   const time = useAppSelector(selectors.excessiveExecutionTimeSelector);
   const gracePeriod = useAppSelector(selectors.killGracePeriodTimeSelector);
 
   const dispatch = useAppDispatch();
-  const allow = useCallback(() => dispatch(allowLongRun()), [dispatch]);
-  const kill = useCallback(() => dispatch(wsExecuteKillCurrent()), [dispatch]);
+  const allow = () => dispatch(allowLongRun());
+  const kill = () => dispatch(wsExecuteKillCurrent());
 
   return showExcessiveExecution ? (
     <Notification onClose={allow}>
@@ -97,11 +110,13 @@ const ResetNotificationCommon: React.FC<ResetNotificationCommonProps> = ({
 );
 
 const ResetConfigurationNotification: React.FC = () => {
+  'use memo';
+
   const showResetConfiguration = useAppSelector(selectors.resetConfigurationSelector);
 
   const dispatch = useAppDispatch();
-  const reset = useCallback(() => dispatch(client.resetEverything()), [dispatch]);
-  const keep = useCallback(() => dispatch(client.hideConfigReset()), [dispatch]);
+  const reset = () => dispatch(client.resetEverything());
+  const keep = () => dispatch(client.hideConfigReset());
 
   return showResetConfiguration ? (
     <ResetNotificationCommon onReset={reset} onCancel={keep} />
@@ -109,11 +124,13 @@ const ResetConfigurationNotification: React.FC = () => {
 };
 
 const ResetOldConfigurationNotification: React.FC = () => {
+  'use memo';
+
   const showResetOldConfiguration = useAppSelector(selectors.resetOldConfigurationSelector);
 
   const dispatch = useAppDispatch();
-  const reset = useCallback(() => dispatch(client.resetEverything()), [dispatch]);
-  const keep = useCallback(() => dispatch(client.updateLastVisitedAt()), [dispatch]);
+  const reset = () => dispatch(client.resetEverything());
+  const keep = () => dispatch(client.updateLastVisitedAt());
 
   const preamble = "It's been a while since you've used the Playground. ";
 

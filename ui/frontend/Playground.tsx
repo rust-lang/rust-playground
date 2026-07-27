@@ -272,17 +272,13 @@ const WebSocketStatus: React.FC = () => {
 };
 
 const Playground: React.FC = () => {
-  const showNotifications = useAppSelector(selectors.anyNotificationsToShowSelector);
-
   return (
-    <>
-      <div className={styles.container}>
-        <WebSocketStatus />
-        <Header />
-        <ResizableArea />
-      </div>
-      {showNotifications && <Notifications />}
-    </>
+    <div className={styles.container}>
+      <WebSocketStatus />
+      <Header />
+      <ResizableArea />
+      <Notifications />
+    </div>
   );
 };
 
