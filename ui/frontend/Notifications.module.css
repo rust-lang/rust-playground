@@ -1,32 +1,38 @@
-$buffer: 0.5em;
-$space: 0.25em;
-
 .container {
+  --buffer: 0.5em;
+  --space: calc(var(--buffer) / 2);
+  --border-color: #428bca;
+
   position: absolute;
-  right: $buffer;
-  bottom: $buffer;
-  left: $buffer;
+  right: var(--buffer);
+  bottom: var(--buffer);
+  left: var(--buffer);
   z-index: 10;
   margin-right: auto;
   margin-left: auto;
-  border: 2px solid #428bca;
+  border: 2px solid var(--border-color);
   background: var(--background-color);
   max-width: 50em;
 }
 
 .notification {
-  display: flex;
+  display: flow-root;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border-color);
+  }
 }
 
 .notificationContent {
-  padding: $space 0 $space $space;
+  padding: var(--space);
   width: 100%;
 }
 
 .close {
   composes: -buttonReset from './shared.module.css';
   cursor: pointer;
-  padding: $space;
+  padding: var(--space);
+  float: right;
 }
 
 .action {
@@ -34,6 +40,10 @@ $space: 0.25em;
   justify-content: center;
   padding-top: 0.5em;
   gap: 0.5em;
+
+  & button {
+    cursor: pointer;
+  }
 }
 
 .swapTheme {

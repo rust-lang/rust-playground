@@ -99,10 +99,10 @@ interface NotificationProps {
 
 const Notification: React.FC<NotificationProps> = ({ onClose, children }) => (
   <div className={styles.notification} data-test-id="notification">
-    <div className={styles.notificationContent}>{children}</div>
     <button className={styles.close} onClick={onClose} title="dismiss notification">
       <Close />
     </button>
+    <div className={styles.notificationContent}>{children}</div>
   </div>
 );
 
