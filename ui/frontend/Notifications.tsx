@@ -1,5 +1,4 @@
-import React from 'react';
-import { Portal } from 'react-portal';
+import React, { useEffect, useRef } from 'react';
 
 import { Close } from './Icon';
 import { preserveContentAndChangeFileView } from './actions';
@@ -13,15 +12,25 @@ import { FileView } from './types';
 import * as styles from './Notifications.module.css';
 
 const Notifications: React.FC = () => {
+  const showNotifications = useAppSelector(selectors.anyNotificationsToShowSelector);
+
+  const dialog = useRef<HTMLDialogElement | null>(null);
+
+  useEffect(() => {
+    if (showNotifications) {
+      dialog.current?.show();
+    } else {
+      dialog.current?.close();
+    }
+  }, [showNotifications]);
+
   return (
-    <Portal>
-      <div className={styles.container}>
-        <MultiFileNotification />
-        <ExcessiveExecutionNotification />
-        <ResetConfigurationNotification />
-        <ResetOldConfigurationNotification />
-      </div>
-    </Portal>
+    <dialog ref={dialog} className={styles.container}>
+      <MultiFileNotification />
+      <ExcessiveExecutionNotification />
+      <ResetConfigurationNotification />
+      <ResetOldConfigurationNotification />
+    </dialog>
   );
 };
 

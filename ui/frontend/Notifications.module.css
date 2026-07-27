@@ -12,7 +12,9 @@
   margin-left: auto;
   border: 2px solid var(--border-color);
   background: var(--background-color);
+  padding: 0;
   max-width: 50em;
+  color: inherit;
 }
 
 .notification {
