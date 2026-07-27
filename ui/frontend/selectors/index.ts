@@ -430,7 +430,16 @@ export const resetOldConfigurationSelector = createSelector(
   }
 );
 
+const notificationsSelector = (state: State) => state.notifications;
+
+export const showMultipleFilesSelector = createSelector(
+  allowMultipleFiles,
+  notificationsSelector,
+  (allowed, notifications) => allowed && !notifications.seenMultipleFiles,
+);
+
 export const anyNotificationsToShowSelector = createSelector(
+  showMultipleFilesSelector,
   excessiveExecutionSelector,
   resetConfigurationSelector,
   resetOldConfigurationSelector,

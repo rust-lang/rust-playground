@@ -209,5 +209,7 @@ export const Focus = {
 } as const;
 export type Focus = ValuesOf<typeof Focus>;
 
-export const Notification = {} as const;
+export const Notification = {
+  MultipleFiles: 'multiple-files',
+} as const;
 export type Notification = ValuesOf<typeof Notification>;

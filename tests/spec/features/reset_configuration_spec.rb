@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'support/editor'
 require 'support/matchers/editor'
 require 'support/playground_actions'
+require 'support/notifications'
 
 RSpec.feature "Resetting the configuration to defaults", type: :feature, js: true do
   include PlaygroundActions
@@ -11,6 +12,7 @@ RSpec.feature "Resetting the configuration to defaults", type: :feature, js: tru
   describe "after not visiting in a while" do
     before do
       visit "/"
+      Notifications.new(page).close_all(text: 'editing multiple files')
       editor.set(code)
 
       sleep(0.002)
@@ -43,6 +45,7 @@ RSpec.feature "Resetting the configuration to defaults", type: :feature, js: tru
   describe "manually" do
     before do
       visit "/"
+      Notifications.new(page).close_all(text: 'editing multiple files')
       editor.set(code)
     end
 

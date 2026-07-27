@@ -2,10 +2,13 @@ import React, { useCallback } from 'react';
 import { Portal } from 'react-portal';
 
 import { Close } from './Icon';
+import { preserveContentAndChangeFileView } from './actions';
 import { useAppDispatch, useAppSelector } from './hooks';
 import * as client from './reducers/client';
+import { seenMultipleFiles } from './reducers/notifications';
 import { allowLongRun, wsExecuteKillCurrent } from './reducers/output/execute';
 import * as selectors from './selectors';
+import { FileView } from './types';
 
 import * as styles from './Notifications.module.css';
 
@@ -13,12 +16,39 @@ const Notifications: React.FC = () => {
   return (
     <Portal>
       <div className={styles.container}>
+        <MultiFileNotification />
         <ExcessiveExecutionNotification />
         <ResetConfigurationNotification />
         <ResetOldConfigurationNotification />
       </div>
     </Portal>
   );
+};
+
+const MultiFileNotification: React.FC = () => {
+  const showIt = useAppSelector(selectors.showMultipleFilesSelector);
+
+  const dispatch = useAppDispatch();
+  const seenIt = useCallback(() => dispatch(seenMultipleFiles()), [dispatch]);
+  const single = useCallback(() => {
+    dispatch(preserveContentAndChangeFileView(FileView.Single));
+    dispatch(seenMultipleFiles());
+  }, [dispatch]);
+  const multiple = useCallback(() => {
+    dispatch(preserveContentAndChangeFileView(FileView.Multiple));
+    dispatch(seenMultipleFiles());
+  }, [dispatch]);
+
+  return showIt ? (
+    <Notification onClose={seenIt}>
+      The Playground now allows editing multiple files! Turn this feature on and off in the
+      configuration menu.
+      <div className={styles.action}>
+        <button onClick={single}>Stay in single file mode</button>
+        <button onClick={multiple}>Change to multiple file mode</button>
+      </div>
+    </Notification>
+  ) : null;
 };
 
 const ExcessiveExecutionNotification: React.FC = () => {

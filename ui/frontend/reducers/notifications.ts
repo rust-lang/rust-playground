@@ -1,4 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+
+import { Notification } from '../types';
 
 interface State {
   seenRustSurvey2018: boolean; // expired
@@ -13,6 +15,7 @@ interface State {
   seenRustSurvey2024: boolean; // expired
   seenRust2024IsDefault: boolean; // expired
   seenRustSurvey2025: boolean; // expired
+  seenMultipleFiles: boolean;
 }
 
 const initialState: State = {
@@ -28,14 +31,26 @@ const initialState: State = {
   seenRustSurvey2024: true,
   seenRust2024IsDefault: true,
   seenRustSurvey2025: true,
+  seenMultipleFiles: false,
 };
 
 const slice = createSlice({
   name: 'notifications',
   initialState,
   reducers: {
-    notificationSeen: (state) => state,
+    notificationSeen: (state, action: PayloadAction<Notification>) => {
+      switch (action.payload) {
+        case Notification.MultipleFiles: {
+          state.seenMultipleFiles = true;
+          break;
+        }
+      }
+    },
   },
 });
+
+const { notificationSeen } = slice.actions;
+
+export const seenMultipleFiles = () => notificationSeen(Notification.MultipleFiles);
 
 export default slice.reducer;
