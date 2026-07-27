@@ -209,7 +209,5 @@ export const Focus = {
 } as const;
 export type Focus = ValuesOf<typeof Focus>;
 
-export const Notification = {
-  RustSurvey2025: 'rust-survey-2025',
-} as const;
+export const Notification = {} as const;
 export type Notification = ValuesOf<typeof Notification>;
