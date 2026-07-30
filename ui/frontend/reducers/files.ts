@@ -1,5 +1,6 @@
 import { PayloadAction, WritableDraft, createSlice } from '@reduxjs/toolkit';
 
+import { ThunkAction } from '../actions';
 import {
   Rename,
   arrayIsPrefix,
@@ -126,8 +127,8 @@ const slice = createSlice({
       fromFile.name = to;
     },
 
-    deleteFile: (state, action: PayloadAction<string>) => {
-      state.files = state.files.filter((f) => f.name !== action.payload);
+    deleteFileIds: (state, action: PayloadAction<FileId[]>) => {
+      state.files = state.files.filter((f) => !action.payload.includes(f.id));
       fixupAfterDeletion(state);
     },
 
@@ -151,17 +152,6 @@ const slice = createSlice({
       for (const file of state.files) {
         file.name = performDirRename(file.name);
       }
-    },
-
-    deleteDirectory: (state, action: PayloadAction<string>) => {
-      const dirParts = action.payload.split('/');
-
-      state.files = state.files.filter((f) => {
-        const path = makeFilePath(f.name);
-        return !arrayIsPrefix(dirParts, path.parentNames);
-      });
-
-      fixupAfterDeletion(state);
     },
 
     activateFile: (state, action: PayloadAction<string>) => {
@@ -223,14 +213,33 @@ const slice = createSlice({
   },
 });
 
-export const {
-  activateFile,
-  createFile,
-  deleteDirectory,
-  deleteFile,
-  renameDirectory,
-  renameFile,
-  initializeWith,
-} = slice.actions;
+const { deleteFileIds } = slice.actions;
+
+export const deleteFile =
+  (filename: string): ThunkAction =>
+  (dispatch, getState) => {
+    const state = getState();
+
+    const ids = state.files.files.flatMap((f) => (f.name === filename ? [f.id] : []));
+
+    dispatch(deleteFileIds(ids));
+  };
+
+export const deleteDirectory =
+  (dirname: string): ThunkAction =>
+  (dispatch, getState) => {
+    const state = getState();
+    const dirParts = dirname.split('/');
+
+    const ids = state.files.files.flatMap((f) => {
+      const path = makeFilePath(f.name);
+      return arrayIsPrefix(dirParts, path.parentNames) ? [f.id] : [];
+    });
+
+    dispatch(deleteFileIds(ids));
+  };
+
+export const { activateFile, createFile, renameDirectory, renameFile, initializeWith } =
+  slice.actions;
 
 export default slice.reducer;
