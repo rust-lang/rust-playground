@@ -186,7 +186,7 @@ fn get_or_post<T: 'static>(handler: impl Handler<T, ()> + Copy) -> MethodRouter 
 }
 
 fn static_file_service(root: impl AsRef<path::Path>, max_age: HeaderValue) -> MethodRouter {
-    let files = ServeDir::new(root).precompressed_gzip();
+    let files = ServeDir::new(root).precompressed_gzip().precompressed_br();
 
     let with_caching = SetResponseHeader::if_not_present(files, header::CACHE_CONTROL, max_age);
 
