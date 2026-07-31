@@ -121,8 +121,13 @@ const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
 const hasTests = (code: string) => !!code.match(HAS_TESTS_RE);
 const hasTestsSelector = createSelector(allCodeContentsSelector, (f) => f.some(hasTests));
 
-const BLOCK_COMMENT_RE = /^[ \t]*\/\*(?:[^*]|\*(?!\/))*(?:\*\/|$)/gm;
-const withoutBlockComments = (code: string) => code.replace(BLOCK_COMMENT_RE, '');
+const BLOCK_COMMENT_OR_PROTECTED_RE =
+  /(?<protected>\/\/[^\r\n]*|[bc]?"(?:\\[\s\S]|[^"\\])*"|[bc]?r(?<hashes>#{0,255})"[\s\S]*?"\k<hashes>)|(?<blockComment>\/\*(?:[^*]|\*(?!\/))*(?:\*\/|$))/g;
+const withoutBlockComments = (code: string) =>
+  code.replace(
+    BLOCK_COMMENT_OR_PROTECTED_RE,
+    (match, _protected, _hashes, blockComment) => (blockComment ? '' : match),
+  );
 
 // https://stackoverflow.com/a/34755045/155423
 const HAS_MAIN_FUNCTION_RE = new RegExp(

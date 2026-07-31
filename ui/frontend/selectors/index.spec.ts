@@ -61,10 +61,16 @@ describe('checking for a main function', () => {
 
   test('block comment markers in strings do not hide a main', () => {
     expect(hasMainFunction('const marker: &str = "/*";\nfn main() {}')).toBe(true);
+    expect(hasMainFunction('const marker: &str = "line\n/*\ntext";\nfn main() {}')).toBe(true);
   });
 
   test('block comment markers in raw strings do not hide a main', () => {
     expect(hasMainFunction('const marker: &str = r#"/*"#;\nfn main() {}')).toBe(true);
+    expect(hasMainFunction('const marker: &str = r#"line\n/*\ntext"#;\nfn main() {}')).toBe(true);
+  });
+
+  test('block comment markers in line comments do not hide a main', () => {
+    expect(hasMainFunction('// /*\nfn main() {}')).toBe(true);
   });
 
   test('a function with the substring main does not count', () => {
