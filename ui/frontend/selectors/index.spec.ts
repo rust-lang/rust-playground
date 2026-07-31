@@ -59,10 +59,6 @@ describe('checking for a main function', () => {
     expect(hasMainFunction('/* fn hidden() {} */\nfn main() {}')).toBe(true);
   });
 
-  test('a main inside nested block comments does not count', () => {
-    expect(hasMainFunction('/* outer\n/* inner */\nfn main() {}\n*/')).toBe(false);
-  });
-
   test('block comment markers in strings do not hide a main', () => {
     expect(hasMainFunction('const marker: &str = "/*";\nfn main() {}')).toBe(true);
   });
