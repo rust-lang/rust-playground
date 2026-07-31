@@ -1,15 +1,11 @@
-import { UnknownAction } from '@reduxjs/toolkit';
-
-import reducer from '../reducers';
 import { editCode } from '../reducers/code';
 import { changeFileView } from '../reducers/configuration';
 import { featureFlagsForceEnableAll } from '../reducers/featureFlags';
 import { activateFile, createFile, deleteFile, renameFile } from '../reducers/files';
 import { performGistLoad } from '../reducers/output/gist';
+import { reduceAll } from '../testReducer';
 import { Channel, Code, Edition, Mode } from '../types';
 import { textChangedSinceShareSelector } from './gist';
-
-type State = ReturnType<typeof reducer>;
 
 const gistLoad = (code: Code) => {
   const arg = {
@@ -24,8 +20,6 @@ const gistLoad = (code: Code) => {
   };
   return performGistLoad.fulfilled(arg, 'request-id', arg);
 };
-
-const reduceAll = (actions: UnknownAction[]): State => actions.reduce(reducer, undefined)!;
 
 describe('checking if the code has changed since it was shared', () => {
   describe('string code, string gist', () => {
