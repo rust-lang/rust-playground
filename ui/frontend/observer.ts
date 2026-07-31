@@ -1,4 +1,4 @@
-import { TypedStartListening, createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
+import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
 
 import { AppDispatch } from './configureStore';
 import { State } from './reducers';
@@ -16,8 +16,7 @@ import {
 
 export const observer = createListenerMiddleware();
 
-type AppStartListening = TypedStartListening<State, AppDispatch>;
-const startAppListening = observer.startListening as AppStartListening;
+const startAppListening = observer.startListening.withTypes<State, AppDispatch>();
 
 // Watch for requests chewing up a lot of CPU and kill them unless the
 // user deliberately elects to keep them running.
