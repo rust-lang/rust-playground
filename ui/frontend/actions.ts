@@ -196,6 +196,7 @@ export function preserveContentAndChangeFileView(fv: FileView): ThunkAction {
     dispatch(changeFileView(fv));
     if (fv === FileView.Single) {
       const code = linearCodeSelector(state);
+      dispatch(files.deleteAll());
       dispatch(editCode(code));
     } else {
       const content = state.code;
