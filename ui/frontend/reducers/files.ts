@@ -9,7 +9,7 @@ import {
   validateFilename,
 } from '../domain/filesRules';
 import { FileId } from '../types';
-import { HELLO_WORLD, addCrateType, addMainFunction, doAddCrateType, editCode } from './code';
+import { HELLO_WORLD, addCrateType, addMainFunction, doAddCrateType } from './code';
 import { performFormat } from './output/format';
 import { performGistLoad } from './output/gist';
 
@@ -93,6 +93,13 @@ const slice = createSlice({
       state.active = newFile.id;
     },
 
+    editActiveFile: (state, action: PayloadAction<string>) => {
+      const file = state.files.find((f) => f.id === state.active);
+      if (file) {
+        file.content = action.payload;
+      }
+    },
+
     createFile: (state, action: PayloadAction<string>) => {
       const candidateName = action.payload;
 
@@ -163,12 +170,6 @@ const slice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(editCode, (state, action) => {
-        const file = state.files.find((f) => f.id === state.active);
-        if (file) {
-          file.content = action.payload;
-        }
-      })
       .addCase(addMainFunction, (state) => {
         const existing = state.files.find((f) => f.name === 'src/main.rs');
 
@@ -247,7 +248,13 @@ export const deleteAll = (): ThunkAction => (dispatch, getState) => {
   dispatch(deleteFileIds(ids));
 };
 
-export const { activateFile, createFile, initializeWith, renameDirectory, renameFile } =
-  slice.actions;
+export const {
+  activateFile,
+  createFile,
+  editActiveFile,
+  initializeWith,
+  renameDirectory,
+  renameFile,
+} = slice.actions;
 
 export default slice.reducer;

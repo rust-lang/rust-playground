@@ -1,4 +1,4 @@
-import { editCode } from '../reducers/code';
+import { editCode } from '../actions';
 import { changeFileView } from '../reducers/configuration';
 import { featureFlagsForceEnableAll } from '../reducers/featureFlags';
 import { activateFile, createFile, deleteFile, renameFile } from '../reducers/files';

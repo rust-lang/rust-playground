@@ -1,7 +1,7 @@
 import { ThunkAction as ReduxThunkAction, UnknownAction } from '@reduxjs/toolkit';
 
 import { State } from './reducers';
-import { addCrateType, editCode } from './reducers/code';
+import { addCrateType, editSingleCode } from './reducers/code';
 import {
   changeBacktrace,
   changeChannel,
@@ -41,6 +41,17 @@ import {
 } from './types';
 
 export type ThunkAction<T = void> = ReduxThunkAction<T, State, unknown, UnknownAction>;
+
+export const editCode =
+  (code: string): ThunkAction =>
+  (dispatch, getState) => {
+    const state = getState();
+    if (state.configuration.fileView === FileView.Single) {
+      dispatch(editSingleCode(code));
+    } else {
+      dispatch(files.editActiveFile(code));
+    }
+  };
 
 export const reExecuteWithBacktrace = (): ThunkAction => (dispatch) => {
   dispatch(changeBacktrace(Backtrace.Enabled));
@@ -197,7 +208,7 @@ export function preserveContentAndChangeFileView(fv: FileView): ThunkAction {
     if (fv === FileView.Single) {
       const code = linearCodeSelector(state);
       dispatch(files.deleteAll());
-      dispatch(editCode(code));
+      dispatch(editSingleCode(code));
     } else {
       const content = state.code;
       const name = hasMainFunction(content) ? 'src/main.rs' : 'src/lib.rs';

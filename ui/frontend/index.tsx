@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import { v4 } from 'uuid';
 
 import {
+  editCode,
   reExecuteWithBacktrace,
 } from './actions';
 import { configureRustErrors } from './highlighting';
@@ -20,7 +21,7 @@ import configureStore from './configureStore';
 import { performVersionsLoad } from './reducers/versions';
 import { performCratesLoad } from './reducers/crates';
 import { gotoPosition } from './reducers/position';
-import { addImport, editCode, enableFeatureGate } from './reducers/code';
+import { addImport, enableFeatureGate } from './reducers/code';
 import { browserWidthChanged } from './reducers/browser';
 import { selectText } from './reducers/selection';
 import { useAppSelector } from './hooks';
