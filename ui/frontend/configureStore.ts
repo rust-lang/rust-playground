@@ -2,6 +2,7 @@ import { configureStore as reduxConfigureStore } from '@reduxjs/toolkit';
 import { produce } from 'immer';
 import { mergeWith } from 'lodash-es';
 
+import { analyzer } from './analyzer';
 import initializeLocalStorage from './local_storage';
 import { observer } from './observer';
 import reducer from './reducers';
@@ -62,7 +63,10 @@ export default function configureStore(window: Window) {
     reducer,
     preloadedState,
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(websocket).prepend(observer.middleware),
+      getDefaultMiddleware()
+        .concat(websocket)
+        .prepend(observer.middleware)
+        .prepend(analyzer.middleware),
   });
 
   store.subscribe(() => {

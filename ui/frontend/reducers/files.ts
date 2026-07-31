@@ -214,8 +214,6 @@ const slice = createSlice({
   },
 });
 
-const { deleteFileIds } = slice.actions;
-
 export const deleteFile =
   (filename: string): ThunkAction =>
   (dispatch, getState) => {
@@ -251,6 +249,7 @@ export const deleteAll = (): ThunkAction => (dispatch, getState) => {
 export const {
   activateFile,
   createFile,
+  deleteFileIds,
   editActiveFile,
   initializeWith,
   renameDirectory,

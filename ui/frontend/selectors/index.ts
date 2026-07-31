@@ -61,19 +61,6 @@ export const linearizeCode = (code: Code) => {
 
 export const linearCodeSelector = createSelector(codeOrFilesSelector, linearizeCode);
 
-const allCodeContentsSelector = createSelector(
-  multifileEnabledSelector,
-  codeSelector,
-  filesSelector,
-  (multifileEnabled, single, multiple) => {
-    if (multifileEnabled) {
-      return multiple.map((f) => f.content);
-    } else {
-      return [single];
-    }
-  }
-);
-
 export const activeCodeSelector = createSelector(
   multifileEnabledSelector,
   codeSelector,
@@ -88,7 +75,7 @@ export const activeCodeSelector = createSelector(
   }
 );
 
-const SINGLE_FILE_ID = -1;
+export const SINGLE_FILE_ID = -1;
 
 export const activeFileIdSelector = createSelector(
   multifileEnabledSelector,
@@ -117,46 +104,47 @@ export const fileIdsSelector = createSelector(
 export const positionSelector = (state: State) => state.position;
 export const selectionSelector = (state: State) => state.selection;
 
-const HAS_TESTS_RE = /^\s*#\s*\[\s*test\s*([^"]*)]/m;
-const hasTests = (code: string) => !!code.match(HAS_TESTS_RE);
-const hasTestsSelector = createSelector(allCodeContentsSelector, (f) => f.some(hasTests));
+const analysisSelector = (state: State) => state.codeAnalysis;
 
-// https://stackoverflow.com/a/34755045/155423
-const HAS_MAIN_FUNCTION_RE = new RegExp(
-  [
-    /^([^\n\r/]*;)?/,
-    /\s*(pub\s+)?\s*(const\s+)?\s*(async\s+)?\s*/,
-    /fn\s+main\s*\(\s*(\/\*.*\*\/)?\s*\)/,
-  ].map((r) => r.source).join(''),
-  'm'
+const hasTestsSelector = createSelector(
+  fileIdsSelector,
+  analysisSelector,
+  (fileIds, as) => fileIds.some((id) => as[id]?.hasTests),
 );
-export const hasMainFunction = (code: string) => !!code.match(HAS_MAIN_FUNCTION_RE);
+
+export const activeFileHasMainFunctionSelector = createSelector(
+  activeFileIdSelector,
+  analysisSelector,
+  (id, as) => {
+    if (id === null) { return false }
+    return as[id]?.hasMain ?? false;
+  }
+)
+
 const hasMainFunctionSelector = createSelector(
   multifileEnabledSelector,
-  codeSelector,
+  activeFileHasMainFunctionSelector,
   filesSelector,
-  (multifileEnabled, code, files) => {
+  (multifileEnabled, activeHasMain, files) => {
     if (multifileEnabled) {
       return files.some((f) => f.name === 'src/main.rs');
     } else {
-      return hasMainFunction(code);
+      return activeHasMain;
     }
   }
 );
 
-const CRATE_TYPE_RE = /^\s*#!\s*\[\s*crate_type\s*=\s*"([^"]*)"\s*]/m;
-const crateType = (code: string) => (code.match(CRATE_TYPE_RE) ?? []).at(1);
 const crateTypeSelector = createSelector(
   multifileEnabledSelector,
-  codeSelector,
+  analysisSelector,
   filesSelector,
-  (multifileEnabled, code, files) => {
+  (multifileEnabled, as, files) => {
     if (multifileEnabled) {
       const file = files.find((f) => f.name === 'src/lib.rs');
       if (!file) { return undefined; }
-      return crateType(file.content);
+      return as[file.id]?.crateType;
     } else {
-      return crateType(code);
+      return as[SINGLE_FILE_ID]?.crateType;
     }
   }
 );

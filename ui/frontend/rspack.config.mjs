@@ -57,6 +57,11 @@ module.exports = function (_, argv) {
 
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      // Ignoring these brought in from web-tree-sitter
+      fallback: {
+        'fs/promises': false,
+        module: false,
+      },
     },
 
     module: {
