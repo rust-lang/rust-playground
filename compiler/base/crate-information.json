@@ -106,7 +106,7 @@
   },
   {
     "name": "async-compression",
-    "version": "0.4.42",
+    "version": "0.4.43",
     "id": "async_compression"
   },
   {
@@ -161,8 +161,13 @@
   },
   {
     "name": "base64",
-    "version": "0.22.1",
+    "version": "0.23.0",
     "id": "base64"
+  },
+  {
+    "name": "base64",
+    "version": "0.22.1",
+    "id": "base64_0_22_1"
   },
   {
     "name": "bit_field",
@@ -271,7 +276,7 @@
   },
   {
     "name": "cc",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "id": "cc"
   },
   {
@@ -296,17 +301,17 @@
   },
   {
     "name": "clap",
-    "version": "4.6.3",
+    "version": "4.6.5",
     "id": "clap"
   },
   {
     "name": "clap_builder",
-    "version": "4.6.2",
+    "version": "4.6.5",
     "id": "clap_builder"
   },
   {
     "name": "clap_derive",
-    "version": "4.6.3",
+    "version": "4.6.4",
     "id": "clap_derive"
   },
   {
@@ -491,7 +496,7 @@
   },
   {
     "name": "displaydoc",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "id": "displaydoc"
   },
   {
@@ -526,7 +531,7 @@
   },
   {
     "name": "either",
-    "version": "1.16.0",
+    "version": "1.17.0",
     "id": "either"
   },
   {
@@ -761,7 +766,7 @@
   },
   {
     "name": "glob",
-    "version": "0.3.3",
+    "version": "0.3.4",
     "id": "glob"
   },
   {
@@ -826,7 +831,7 @@
   },
   {
     "name": "http",
-    "version": "1.4.2",
+    "version": "1.5.0",
     "id": "http"
   },
   {
@@ -861,7 +866,7 @@
   },
   {
     "name": "hybrid-array",
-    "version": "0.4.13",
+    "version": "0.4.14",
     "id": "hybrid_array"
   },
   {
@@ -956,7 +961,7 @@
   },
   {
     "name": "ipnet",
-    "version": "2.12.0",
+    "version": "2.12.1",
     "id": "ipnet"
   },
   {
@@ -981,7 +986,7 @@
   },
   {
     "name": "jiff",
-    "version": "0.2.34",
+    "version": "0.2.35",
     "id": "jiff"
   },
   {
@@ -991,7 +996,7 @@
   },
   {
     "name": "jiff-static",
-    "version": "0.2.34",
+    "version": "0.2.35",
     "id": "jiff_static"
   },
   {
@@ -1016,7 +1021,7 @@
   },
   {
     "name": "libc",
-    "version": "0.2.188",
+    "version": "0.2.189",
     "id": "libc"
   },
   {
@@ -1661,7 +1666,7 @@
   },
   {
     "name": "rustls",
-    "version": "0.23.42",
+    "version": "0.23.43",
     "id": "rustls"
   },
   {
@@ -1671,7 +1676,7 @@
   },
   {
     "name": "rustls-pki-types",
-    "version": "1.15.0",
+    "version": "1.15.1",
     "id": "rustls_pki_types"
   },
   {
@@ -1701,7 +1706,7 @@
   },
   {
     "name": "schemars",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "id": "schemars"
   },
   {
@@ -1801,7 +1806,7 @@
   },
   {
     "name": "simba",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "id": "simba"
   },
   {
@@ -1876,7 +1881,7 @@
   },
   {
     "name": "syn",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "id": "syn"
   },
   {
@@ -1956,7 +1961,7 @@
   },
   {
     "name": "time",
-    "version": "0.3.54",
+    "version": "0.3.55",
     "id": "time"
   },
   {
@@ -1996,7 +2001,7 @@
   },
   {
     "name": "tokio-macros",
-    "version": "2.7.1",
+    "version": "2.7.2",
     "id": "tokio_macros"
   },
   {
@@ -2011,7 +2016,7 @@
   },
   {
     "name": "tokio-stream",
-    "version": "0.1.18",
+    "version": "0.1.19",
     "id": "tokio_stream"
   },
   {
@@ -2021,7 +2026,7 @@
   },
   {
     "name": "toml",
-    "version": "1.1.3+spec-1.1.0",
+    "version": "1.1.4+spec-1.1.0",
     "id": "toml"
   },
   {
@@ -2031,7 +2036,7 @@
   },
   {
     "name": "toml_parser",
-    "version": "1.1.2+spec-1.1.0",
+    "version": "1.1.3+spec-1.1.0",
     "id": "toml_parser"
   },
   {
@@ -2251,7 +2256,7 @@
   },
   {
     "name": "wide",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "id": "wide"
   },
   {
