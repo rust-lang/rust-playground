@@ -14,7 +14,7 @@ const slice = createSlice({
   name: 'code',
   initialState: HELLO_WORLD,
   reducers: {
-    editCode: (_state, action: PayloadAction<string>) => action.payload,
+    editSingleCode: (_state, action: PayloadAction<string>) => action.payload,
 
     addMainFunction: (state) => `${state}\n\n${HELLO_WORLD}`,
 
@@ -45,7 +45,7 @@ const slice = createSlice({
   },
 });
 
-export const { editCode, addMainFunction, addImport, addCrateType, enableFeatureGate } =
+export const { editSingleCode, addMainFunction, addImport, addCrateType, enableFeatureGate } =
   slice.actions;
 
 export default slice.reducer;

@@ -2,7 +2,6 @@ import React from 'react';
 
 import * as actions from '../actions';
 import { useAppDispatch, useAppSelector } from '../hooks';
-import { editCode } from '../reducers/code';
 import * as config from '../reducers/configuration';
 import * as files from '../reducers/files';
 import { activeCodeSelector, positionSelector, selectionSelector } from '../selectors';
@@ -81,7 +80,7 @@ const Editor: React.FC = () => {
         crates={crates}
         activeFileId={activeFileId}
         fileIds={fileIds}
-        onEditCode={(c) => dispatch(editCode(c))}
+        onEditCode={(c) => dispatch(actions.editCode(c))}
         execute={() => dispatch(actions.performPrimaryAction())}
       />
     </div>
