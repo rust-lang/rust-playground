@@ -34,7 +34,7 @@ interface Props {
 
 interface CompileActions {
   action: AsyncThunk<CompileResponseBody, CompileRequestBody, object>;
-  performCompile: () => ThunkAction;
+  performCompile: (overrides?: Partial<CompileRequestBody>) => ThunkAction;
 }
 
 export const makeCompileActions = ({ sliceName, target }: Props): CompileActions => {
@@ -43,11 +43,14 @@ export const makeCompileActions = ({ sliceName, target }: Props): CompileActions
     return CompileResponseBody.parseAsync(d);
   });
 
-  const performCompile = (): ThunkAction => (dispatch, getState) => {
-    const state = getState();
-    const body = compileRequestPayloadSelector(state, { target });
-    dispatch(action(body));
-  };
+  const performCompile =
+    (overrides?: Partial<CompileRequestBody>): ThunkAction =>
+    (dispatch, getState) => {
+      const state = getState();
+      const defaultBody = compileRequestPayloadSelector(state, { target });
+      const body = { ...defaultBody, ...overrides };
+      dispatch(action(body));
+    };
 
   return { action, performCompile };
 };

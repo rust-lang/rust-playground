@@ -75,8 +75,10 @@ const performCompileToCdylibWasmOnly = (): ThunkAction => (dispatch, getState) =
 
   if (!wasmLikelyToWork(state)) {
     dispatch(addCrateType('cdylib'));
+    dispatch(performCompileToWasmOnly({ crateType: 'cdylib' }));
+  } else {
+    dispatch(performCompileToWasmOnly());
   }
-  dispatch(performCompileToWasmOnly());
 };
 
 const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
