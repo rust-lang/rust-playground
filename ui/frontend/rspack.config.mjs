@@ -134,7 +134,12 @@ module.exports = function (_, argv) {
         filename: `${filenameTemplate}.worker.js`,
         languages: ['rust'],
       }),
-      ...(isProduction ? [new CompressionRspackPlugin()] : []),
+      ...(isProduction
+        ? [
+            new CompressionRspackPlugin({ algorithm: 'gzip' }),
+            new CompressionRspackPlugin({ algorithm: 'brotliCompress' }),
+          ]
+        : []),
     ],
 
     optimization: {
