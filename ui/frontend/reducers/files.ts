@@ -239,7 +239,15 @@ export const deleteDirectory =
     dispatch(deleteFileIds(ids));
   };
 
-export const { activateFile, createFile, renameDirectory, renameFile, initializeWith } =
+export const deleteAll = (): ThunkAction => (dispatch, getState) => {
+  const state = getState();
+
+  const ids = state.files.files.map((f) => f.id);
+
+  dispatch(deleteFileIds(ids));
+};
+
+export const { activateFile, createFile, initializeWith, renameDirectory, renameFile } =
   slice.actions;
 
 export default slice.reducer;
