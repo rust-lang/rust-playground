@@ -27,7 +27,6 @@ RSpec.configure do |config|
 end
 
 require 'capybara/rspec'
-require 'capybara-screenshot/rspec'
 
 PROTOCOL = ENV.fetch('PLAYGROUND_UI_PROTOCOL', 'http')
 ADDRESS = ENV.fetch('PLAYGROUND_UI_ADDRESS', '127.0.0.1')
@@ -58,9 +57,6 @@ Capybara.run_server = false
 Capybara.default_max_wait_time = ENV.fetch('CAPYBARA_WAIT', 5).to_f
 Capybara.automatic_label_click = true
 
-Capybara::Screenshot.register_driver(:firefox) do |driver, path|
-  driver.browser.save_screenshot(path)
-end
 Capybara.save_path = "./test-failures"
 
 Capybara.modify_selector(:link_or_button) do
@@ -113,4 +109,10 @@ RSpec.configure do |config|
       })()
     JS
   end
+end
+
+require 'capybara-screenshot/rspec'
+
+Capybara::Screenshot.register_driver(:firefox) do |driver, path|
+  driver.browser.save_screenshot(path)
 end
