@@ -6,8 +6,8 @@ import * as styles from './ConfigElement.module.css';
 
 interface EitherProps<T extends string> extends ConfigElementProps {
   id: string;
-  a: string;
-  b: string;
+  a: T;
+  b: T;
   aLabel?: string;
   bLabel?: string;
   value: T;
@@ -32,7 +32,7 @@ export const Either = <T extends string>({
         value={a}
         type="radio"
         checked={value === a}
-        onChange={() => onChange(a as T)}
+        onChange={() => onChange(a)}
       />
       <label htmlFor={`${id}-a`}>{aLabel}</label>
       <input
@@ -41,7 +41,7 @@ export const Either = <T extends string>({
         value={b}
         type="radio"
         checked={value === b}
-        onChange={() => onChange(b as T)}
+        onChange={() => onChange(b)}
       />
       <label htmlFor={`${id}-b`}>{bLabel}</label>
     </div>
