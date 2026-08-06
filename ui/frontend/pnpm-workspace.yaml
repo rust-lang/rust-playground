@@ -1,4 +1,5 @@
 allowBuilds:
   '@parcel/watcher': false
   'core-js': false
+  tree-sitter-rust: false
   'unrs-resolver': false

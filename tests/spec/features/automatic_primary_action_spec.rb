@@ -49,8 +49,7 @@ RSpec.feature "Automatically selecting the primary action", type: :feature, js: 
           "struct Aaa;".parse().unwrap()
       }
 
-      /*
-      #[test]*/
+      #[test] fn trigger() {}
     EOF
     click_on("Test")
 
