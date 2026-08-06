@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAppSelector } from '../hooks';
 import { offerCrateAutocompleteOnUse } from '../selectors';
 import { CommonEditorProps, FileId } from '../types';
+import { RUSTFMT_DEFAULT_MAX_WIDTH } from './common';
 import { themeVsDarkPlus } from './rust_monaco_def';
 import { useLatest } from './useLatest';
 
@@ -102,6 +103,7 @@ const MonacoEditorCore: React.FC<CommonEditorProps> = (props) => {
         automaticLayout: true,
         'semanticHighlighting.enabled': true,
         autoClosingOvertype: 'always',
+        rulers: [RUSTFMT_DEFAULT_MAX_WIDTH],
       });
       setEditor(editor);
 

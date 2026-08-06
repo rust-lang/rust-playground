@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { CommonEditorProps, Crate, FileId, PairCharacters, Position } from '../types';
 import { useLatest } from './useLatest';
+import { RUSTFMT_DEFAULT_MAX_WIDTH } from './common';
 
 import * as styles from './Editor.module.css';
 
@@ -141,6 +142,7 @@ const AceEditor: React.FC<AceEditorProps> = props => {
     editor.setOptions({
       enableBasicAutocompletion: true,
       fixedWidthGutter: true,
+      printMargin: RUSTFMT_DEFAULT_MAX_WIDTH,
     });
 
     return () => {
