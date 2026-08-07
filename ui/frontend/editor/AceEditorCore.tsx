@@ -15,10 +15,16 @@ import * as styles from './Editor.module.css';
 // The keybinding and theme need to be loaded **after** the Ace
 // library because they use the global value it provides. Loading this
 // file ensures that the library is available.
-export const importKeybinding = (name: string) => import(
-  /* webpackChunkName: "ace-[request]" */
-  `ace-builds/src-noconflict/keybinding-${name}`
-);
+export const importKeybinding = (name: string) => {
+  if (name === 'ace') {
+    return Promise.resolve();
+  }
+
+  return import(
+    /* webpackChunkName: "ace-[request]" */
+    `ace-builds/src-noconflict/keybinding-${name}`
+  );
+};
 
 export const importTheme = (name: string) => import(
   /* webpackChunkName: "ace-[request]" */
