@@ -438,11 +438,18 @@ export const showMultipleFilesSelector = createSelector(
   (allowed, notifications) => allowed && !notifications.seenMultipleFiles,
 );
 
+const fileModeAutomaticallyChangedSelector = createSelector(
+  (state: State) => state.configuration.fileViewAutomaticallyChangedFrom,
+  (state: State) => state.configuration.fileView,
+  (previous, current) => previous !== undefined && previous !== current,
+)
+
 export const anyNotificationsToShowSelector = createSelector(
   showMultipleFilesSelector,
   excessiveExecutionSelector,
   resetConfigurationSelector,
   resetOldConfigurationSelector,
+  fileModeAutomaticallyChangedSelector,
   (...allNotifications) => allNotifications.some(n => n),
 );
 

@@ -10,7 +10,8 @@ import * as z from 'zod';
 import { jsonGet, jsonPost, routes } from '../../api';
 import { State as RootState } from '../../reducers';
 import { baseUrlSelector, codeOrFilesSelector } from '../../selectors';
-import { Channel, Code, Edition, Mode } from '../../types';
+import { Channel, Code, Edition, FileView, Mode } from '../../types';
+import { changeFileViewAutomatically } from '../configuration';
 
 const sliceName = 'output/gist';
 
@@ -58,7 +59,7 @@ export const performGistLoad = createAsyncThunk<
   SuccessProps,
   PerformGistLoadProps,
   { state: RootState }
->(`${sliceName}/load`, async ({ id, channel, mode, edition }, { getState }) => {
+>(`${sliceName}/load`, async ({ id, channel, mode, edition }, { getState, dispatch }) => {
   const state = getState();
   const baseUrl = baseUrlSelector(state);
   const gistUrl = new URL(routes.meta.gistLoad, baseUrl);
@@ -66,6 +67,10 @@ export const performGistLoad = createAsyncThunk<
 
   const d = await jsonGet(u);
   const gist = await GistResponseBody.parseAsync(d);
+
+  const gistFileMode = typeof gist.code === 'string' ? FileView.Single : FileView.Multiple;
+  dispatch(changeFileViewAutomatically(gistFileMode));
+
   return { ...gist, channel, mode, edition, stdout: '', stderr: '' };
 });
 

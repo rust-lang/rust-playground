@@ -4,6 +4,7 @@ import { Close } from './Icon';
 import { preserveContentAndChangeFileView } from './actions';
 import { useAppDispatch, useAppSelector } from './hooks';
 import * as client from './reducers/client';
+import { acknowledgeAutomaticFileView } from './reducers/configuration';
 import { seenMultipleFiles } from './reducers/notifications';
 import { allowLongRun, wsExecuteKillCurrent } from './reducers/output/execute';
 import * as selectors from './selectors';
@@ -30,6 +31,7 @@ const Notifications: React.FC = () => {
       <ExcessiveExecutionNotification />
       <ResetConfigurationNotification />
       <ResetOldConfigurationNotification />
+      <FileModeChangedByUrlNotification />
     </dialog>
   );
 };
@@ -60,6 +62,41 @@ const MultiFileNotification: React.FC = () => {
       </div>
     </Notification>
   ) : null;
+};
+
+const FileModeChangedByUrlNotification: React.FC = () => {
+  'use memo';
+
+  const previous = useAppSelector((s) => s.configuration.fileViewAutomaticallyChangedFrom);
+  const current = useAppSelector((s) => s.configuration.fileView);
+
+  const dispatch = useAppDispatch();
+  const seenIt = () => dispatch(acknowledgeAutomaticFileView());
+  const single = () => {
+    dispatch(preserveContentAndChangeFileView(FileView.Single));
+    dispatch(acknowledgeAutomaticFileView());
+  };
+  const multiple = () => {
+    dispatch(preserveContentAndChangeFileView(FileView.Multiple));
+    dispatch(acknowledgeAutomaticFileView());
+  };
+
+  if (!previous) return;
+
+  const name = (fv: FileView) =>
+    fv === FileView.Single ? 'single file mode' : 'multiple file mode';
+  const s = (fv: FileView) => (current === fv ? `Stay in ${name(fv)}` : `Change to ${name(fv)}`);
+
+  return (
+    <Notification onClose={seenIt}>
+      The link you opened was created in {name(current)}, but the editor was in {name(previous)}.
+      The mode has been changed to match, but you can always switch back in the configuration menu.
+      <div className={styles.action}>
+        <button onClick={single}>{s(FileView.Single)}</button>
+        <button onClick={multiple}>{s(FileView.Multiple)}</button>
+      </div>
+    </Notification>
+  );
 };
 
 const ExcessiveExecutionNotification: React.FC = () => {
