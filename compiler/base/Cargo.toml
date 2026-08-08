@@ -40,7 +40,7 @@ version = "=0.8.12"
 
 [dependencies.aho_corasick]
 package = "aho-corasick"
-version = "=1.1.4"
+version = "=1.1.5"
 default-features = false
 
 [dependencies.aligned]
@@ -123,7 +123,7 @@ features = ["tokio"]
 
 [dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.91"
+version = "=0.1.92"
 
 [dependencies.atomic]
 package = "atomic"
@@ -153,12 +153,12 @@ version = "=0.8.9"
 
 [dependencies.aws_lc_rs]
 package = "aws-lc-rs"
-version = "=1.17.3"
+version = "=1.18.0"
 default-features = false
 
 [dependencies.aws_lc_sys]
 package = "aws-lc-sys"
-version = "=0.43.0"
+version = "=0.44.0"
 default-features = false
 
 [dependencies.backtrace]
@@ -167,7 +167,7 @@ version = "=0.3.76"
 
 [dependencies.base64]
 package = "base64"
-version = "=0.23.0"
+version = "=0.23.1"
 
 [dependencies.base64_0_22_1]
 package = "base64"
@@ -231,12 +231,12 @@ version = "=3.20.3"
 
 [dependencies.bytecheck]
 package = "bytecheck"
-version = "=0.8.2"
+version = "=0.8.3"
 default-features = false
 
 [dependencies.bytecheck_derive]
 package = "bytecheck_derive"
-version = "=0.8.2"
+version = "=0.8.3"
 default-features = false
 
 [dependencies.bytemuck]
@@ -246,7 +246,7 @@ features = ["aarch64_simd", "extern_crate_alloc", "extern_crate_std", "latest_st
 
 [dependencies.bytemuck_derive]
 package = "bytemuck_derive"
-version = "=1.11.0"
+version = "=1.12.0"
 
 [dependencies.byteorder]
 package = "byteorder"
@@ -266,7 +266,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.4.0"
+version = "=1.4.2"
 features = ["parallel"]
 
 [dependencies.cfg_aliases]
@@ -290,12 +290,12 @@ features = ["clock", "serde"]
 
 [dependencies.clap]
 package = "clap"
-version = "=4.6.5"
+version = "=4.6.6"
 features = ["unstable-doc"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.6.5"
+version = "=4.6.6"
 features = ["unstable-doc"]
 
 [dependencies.clap_derive]
@@ -417,7 +417,7 @@ version = "=0.4.2"
 
 [dependencies.data_encoding]
 package = "data-encoding"
-version = "=2.11.0"
+version = "=2.11.1"
 
 [dependencies.debug_unreachable]
 package = "new_debug_unreachable"
@@ -560,7 +560,7 @@ version = "=0.2.29"
 
 [dependencies.find_msvc_tools]
 package = "find-msvc-tools"
-version = "=0.1.9"
+version = "=0.1.10"
 
 [dependencies.fixedbitset]
 package = "fixedbitset"
@@ -931,7 +931,7 @@ version = "=0.2.16"
 
 [dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.38.1"
+version = "=0.38.2"
 
 [dependencies.linux_raw_sys]
 package = "linux-raw-sys"
@@ -1296,13 +1296,13 @@ version = "=2.0.11"
 
 [dependencies.ptr_meta]
 package = "ptr_meta"
-version = "=0.3.1"
+version = "=0.3.2"
 features = ["derive"]
 default-features = false
 
 [dependencies.ptr_meta_derive]
 package = "ptr_meta_derive"
-version = "=0.3.1"
+version = "=0.3.2"
 default-features = false
 
 [dependencies.publicsuffix]
@@ -1341,7 +1341,7 @@ version = "=0.7.0"
 
 [dependencies.rancor]
 package = "rancor"
-version = "=0.1.2"
+version = "=0.1.3"
 default-features = false
 
 [dependencies.rand]
@@ -1438,7 +1438,7 @@ default-features = false
 
 [dependencies.regex_automata]
 package = "regex-automata"
-version = "=0.4.16"
+version = "=0.4.18"
 features = ["alloc", "meta", "nfa-pikevm", "syntax"]
 default-features = false
 
@@ -1473,17 +1473,17 @@ version = "=0.17.14"
 
 [dependencies.rkyv]
 package = "rkyv"
-version = "=0.8.17"
+version = "=0.8.18"
 default-features = false
 
 [dependencies.rkyv_derive]
 package = "rkyv_derive"
-version = "=0.8.17"
+version = "=0.8.18"
 default-features = false
 
 [dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.40.1"
+version = "=0.40.2"
 features = ["bundled-full"]
 
 [dependencies.rustc_demangle]
@@ -1626,7 +1626,7 @@ version = "=1.4.8"
 
 [dependencies.simba]
 package = "simba"
-version = "=0.10.1"
+version = "=0.10.2"
 default-features = false
 
 [dependencies.simd_adler32]
@@ -1734,11 +1734,11 @@ version = "=0.4.4"
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=2.0.19"
+version = "=2.0.20"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=2.0.19"
+version = "=2.0.20"
 
 [dependencies.thread_id]
 package = "thread-id"
@@ -1823,19 +1823,20 @@ version = "=1.1.4"
 package = "toml_datetime"
 version = "=1.1.1"
 features = ["alloc"]
-default-features = false
+
+[dependencies.toml_edit]
+package = "toml_edit"
+version = "=0.25.13"
 
 [dependencies.toml_parser]
 package = "toml_parser"
 version = "=1.1.3"
 features = ["alloc"]
-default-features = false
 
 [dependencies.toml_writer]
 package = "toml_writer"
 version = "=1.1.2"
 features = ["alloc"]
-default-features = false
 
 [dependencies.tower]
 package = "tower"
@@ -1984,19 +1985,19 @@ version = "=0.3.1"
 
 [dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.126"
+version = "=0.2.127"
 
 [dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.126"
+version = "=0.2.127"
 
 [dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.126"
+version = "=0.2.127"
 
 [dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.126"
+version = "=0.2.127"
 
 [dependencies.webpki]
 package = "rustls-webpki"
@@ -2018,7 +2019,7 @@ version = "=2.1.2"
 
 [dependencies.wide]
 package = "wide"
-version = "=1.6.0"
+version = "=1.6.1"
 default-features = false
 
 [dependencies.windows_aarch64_gnullvm]
@@ -2073,7 +2074,6 @@ version = "=0.53.1"
 [dependencies.winnow]
 package = "winnow"
 version = "=1.0.4"
-default-features = false
 
 [dependencies.writeable]
 package = "writeable"
@@ -2110,12 +2110,12 @@ default-features = false
 
 [dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.55"
+version = "=0.8.56"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.55"
+version = "=0.8.56"
 
 [dependencies.zerofrom]
 package = "zerofrom"
@@ -2170,7 +2170,7 @@ default-features = false
 
 [dependencies.zune_core]
 package = "zune-core"
-version = "=0.5.1"
+version = "=0.5.3"
 
 [dependencies.zune_inflate]
 package = "zune-inflate"
@@ -2198,7 +2198,7 @@ version = "=0.8.12"
 
 [build-dependencies.aho_corasick]
 package = "aho-corasick"
-version = "=1.1.4"
+version = "=1.1.5"
 default-features = false
 
 [build-dependencies.aligned]
@@ -2281,7 +2281,7 @@ features = ["tokio"]
 
 [build-dependencies.async_trait]
 package = "async-trait"
-version = "=0.1.91"
+version = "=0.1.92"
 
 [build-dependencies.atomic]
 package = "atomic"
@@ -2311,12 +2311,12 @@ version = "=0.8.9"
 
 [build-dependencies.aws_lc_rs]
 package = "aws-lc-rs"
-version = "=1.17.3"
+version = "=1.18.0"
 default-features = false
 
 [build-dependencies.aws_lc_sys]
 package = "aws-lc-sys"
-version = "=0.43.0"
+version = "=0.44.0"
 default-features = false
 
 [build-dependencies.backtrace]
@@ -2325,7 +2325,7 @@ version = "=0.3.76"
 
 [build-dependencies.base64]
 package = "base64"
-version = "=0.23.0"
+version = "=0.23.1"
 
 [build-dependencies.base64_0_22_1]
 package = "base64"
@@ -2389,12 +2389,12 @@ version = "=3.20.3"
 
 [build-dependencies.bytecheck]
 package = "bytecheck"
-version = "=0.8.2"
+version = "=0.8.3"
 default-features = false
 
 [build-dependencies.bytecheck_derive]
 package = "bytecheck_derive"
-version = "=0.8.2"
+version = "=0.8.3"
 default-features = false
 
 [build-dependencies.bytemuck]
@@ -2404,7 +2404,7 @@ features = ["aarch64_simd", "extern_crate_alloc", "extern_crate_std", "latest_st
 
 [build-dependencies.bytemuck_derive]
 package = "bytemuck_derive"
-version = "=1.11.0"
+version = "=1.12.0"
 
 [build-dependencies.byteorder]
 package = "byteorder"
@@ -2424,7 +2424,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.4.0"
+version = "=1.4.2"
 features = ["parallel"]
 
 [build-dependencies.cfg_aliases]
@@ -2448,12 +2448,12 @@ features = ["clock", "serde"]
 
 [build-dependencies.clap]
 package = "clap"
-version = "=4.6.5"
+version = "=4.6.6"
 features = ["unstable-doc"]
 
 [build-dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.6.5"
+version = "=4.6.6"
 features = ["unstable-doc"]
 
 [build-dependencies.clap_derive]
@@ -2575,7 +2575,7 @@ version = "=0.4.2"
 
 [build-dependencies.data_encoding]
 package = "data-encoding"
-version = "=2.11.0"
+version = "=2.11.1"
 
 [build-dependencies.debug_unreachable]
 package = "new_debug_unreachable"
@@ -2718,7 +2718,7 @@ version = "=0.2.29"
 
 [build-dependencies.find_msvc_tools]
 package = "find-msvc-tools"
-version = "=0.1.9"
+version = "=0.1.10"
 
 [build-dependencies.fixedbitset]
 package = "fixedbitset"
@@ -3089,7 +3089,7 @@ version = "=0.2.16"
 
 [build-dependencies.libsqlite3_sys]
 package = "libsqlite3-sys"
-version = "=0.38.1"
+version = "=0.38.2"
 
 [build-dependencies.linux_raw_sys]
 package = "linux-raw-sys"
@@ -3454,13 +3454,13 @@ version = "=2.0.11"
 
 [build-dependencies.ptr_meta]
 package = "ptr_meta"
-version = "=0.3.1"
+version = "=0.3.2"
 features = ["derive"]
 default-features = false
 
 [build-dependencies.ptr_meta_derive]
 package = "ptr_meta_derive"
-version = "=0.3.1"
+version = "=0.3.2"
 default-features = false
 
 [build-dependencies.publicsuffix]
@@ -3499,7 +3499,7 @@ version = "=0.7.0"
 
 [build-dependencies.rancor]
 package = "rancor"
-version = "=0.1.2"
+version = "=0.1.3"
 default-features = false
 
 [build-dependencies.rand]
@@ -3596,7 +3596,7 @@ default-features = false
 
 [build-dependencies.regex_automata]
 package = "regex-automata"
-version = "=0.4.16"
+version = "=0.4.18"
 features = ["alloc", "meta", "nfa-pikevm", "syntax"]
 default-features = false
 
@@ -3631,17 +3631,17 @@ version = "=0.17.14"
 
 [build-dependencies.rkyv]
 package = "rkyv"
-version = "=0.8.17"
+version = "=0.8.18"
 default-features = false
 
 [build-dependencies.rkyv_derive]
 package = "rkyv_derive"
-version = "=0.8.17"
+version = "=0.8.18"
 default-features = false
 
 [build-dependencies.rusqlite]
 package = "rusqlite"
-version = "=0.40.1"
+version = "=0.40.2"
 features = ["bundled-full"]
 
 [build-dependencies.rustc_demangle]
@@ -3784,7 +3784,7 @@ version = "=1.4.8"
 
 [build-dependencies.simba]
 package = "simba"
-version = "=0.10.1"
+version = "=0.10.2"
 default-features = false
 
 [build-dependencies.simd_adler32]
@@ -3892,11 +3892,11 @@ version = "=0.4.4"
 
 [build-dependencies.thiserror]
 package = "thiserror"
-version = "=2.0.19"
+version = "=2.0.20"
 
 [build-dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=2.0.19"
+version = "=2.0.20"
 
 [build-dependencies.thread_id]
 package = "thread-id"
@@ -3981,19 +3981,20 @@ version = "=1.1.4"
 package = "toml_datetime"
 version = "=1.1.1"
 features = ["alloc"]
-default-features = false
+
+[build-dependencies.toml_edit]
+package = "toml_edit"
+version = "=0.25.13"
 
 [build-dependencies.toml_parser]
 package = "toml_parser"
 version = "=1.1.3"
 features = ["alloc"]
-default-features = false
 
 [build-dependencies.toml_writer]
 package = "toml_writer"
 version = "=1.1.2"
 features = ["alloc"]
-default-features = false
 
 [build-dependencies.tower]
 package = "tower"
@@ -4142,19 +4143,19 @@ version = "=0.3.1"
 
 [build-dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.126"
+version = "=0.2.127"
 
 [build-dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.126"
+version = "=0.2.127"
 
 [build-dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.126"
+version = "=0.2.127"
 
 [build-dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.126"
+version = "=0.2.127"
 
 [build-dependencies.webpki]
 package = "rustls-webpki"
@@ -4176,7 +4177,7 @@ version = "=2.1.2"
 
 [build-dependencies.wide]
 package = "wide"
-version = "=1.6.0"
+version = "=1.6.1"
 default-features = false
 
 [build-dependencies.windows_aarch64_gnullvm]
@@ -4231,7 +4232,6 @@ version = "=0.53.1"
 [build-dependencies.winnow]
 package = "winnow"
 version = "=1.0.4"
-default-features = false
 
 [build-dependencies.writeable]
 package = "writeable"
@@ -4268,12 +4268,12 @@ default-features = false
 
 [build-dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.55"
+version = "=0.8.56"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [build-dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.55"
+version = "=0.8.56"
 
 [build-dependencies.zerofrom]
 package = "zerofrom"
@@ -4328,7 +4328,7 @@ default-features = false
 
 [build-dependencies.zune_core]
 package = "zune-core"
-version = "=0.5.1"
+version = "=0.5.3"
 
 [build-dependencies.zune_inflate]
 package = "zune-inflate"
