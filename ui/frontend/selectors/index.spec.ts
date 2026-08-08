@@ -47,6 +47,36 @@ describe('checking for a main function', () => {
     expect(hasMainFunction('/* fn main()')).toBe(false);
   });
 
+  test('a main inside a multiline block comment does not count', () => {
+    expect(hasMainFunction('/*\nfn main() {}\n*/')).toBe(false);
+  });
+
+  test('a main inside an unclosed block comment does not count', () => {
+    expect(hasMainFunction('/*\nfn main() {}')).toBe(false);
+  });
+
+  test('a main after a multiline block comment counts', () => {
+    expect(hasMainFunction('/* fn hidden() {} */\nfn main() {}')).toBe(true);
+  });
+
+  test('a main inside a block comment after code does not count', () => {
+    expect(hasMainFunction('const X: () = (); /*\nfn main() {}\n*/')).toBe(false);
+  });
+
+  test('block comment markers in strings do not hide a main', () => {
+    expect(hasMainFunction('const marker: &str = "/*";\nfn main() {}')).toBe(true);
+    expect(hasMainFunction('const marker: &str = "line\n/*\ntext";\nfn main() {}')).toBe(true);
+  });
+
+  test('block comment markers in raw strings do not hide a main', () => {
+    expect(hasMainFunction('const marker: &str = r#"/*"#;\nfn main() {}')).toBe(true);
+    expect(hasMainFunction('const marker: &str = r#"line\n/*\ntext"#;\nfn main() {}')).toBe(true);
+  });
+
+  test('block comment markers in line comments do not hide a main', () => {
+    expect(hasMainFunction('// /*\nfn main() {}')).toBe(true);
+  });
+
   test('a function with the substring main does not count', () => {
     expect(hasMainFunction('fn mainly()')).toBe(false);
   });
