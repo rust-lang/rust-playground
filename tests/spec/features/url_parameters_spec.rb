@@ -72,6 +72,23 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
     expect(page).to have_link("Permalink to the playground", href: /edition=2015/)
   end
 
+  scenario "loading a single-file Gist in multi-file mode", :gist do
+    visit '/'
+    in_config_menu { choose('multiple') }
+
+    visit '/?gist=20fb1e0475f890d0fdb7864e3ad0820c'
+
+    expect(editor).to have_line 'This source code came from a Gist'
+    expect(page).to have_selector(:notification, text: 'The mode has been changed to match')
+  end
+
+  scenario "loading a multi-file Gist in single-file mode", :gist do
+    visit '/?gist=7d50582164bff1f7795a80a99ebd9bd9'
+
+    expect(editor).to have_line 'utils::greet()'
+    expect(page).to have_selector(:notification, text: 'The mode has been changed to match')
+  end
+
   scenario "loading code directly from a parameter" do
     visit '/?code=fn%20main()%20%7B%0A%20%20%20%20println!(%22Hello%2C%20world!%22)%3B%0A%7D'
 
@@ -82,6 +99,16 @@ RSpec.feature "Configuration by URL parameters", type: :feature, js: true do
     visit '/?code=fn%20main()%20%7B%0A%20%20%20%20println!(%22Hello%2C%20world!%22)%3B%0A%7D'
 
     expect(page).to have_edition('2015')
+  end
+
+  scenario "loading code directly from a parameter in multi-file mode" do
+    visit '/'
+    in_config_menu { choose('multiple') }
+
+    visit '/?code=fn%20main()%20%7B%0A%20%20%20%20println!(%22Hello%2C%20world!%22)%3B%0A%7D'
+
+    expect(editor).to have_line 'println!("Hello, world!")'
+    expect(page).to have_selector(:notification, text: 'The mode has been changed to match')
   end
 
   scenario "loading with a channel" do

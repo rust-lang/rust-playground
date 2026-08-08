@@ -7,6 +7,7 @@ import {
   changeChannel,
   changeEdition,
   changeFileView,
+  changeFileViewAutomatically,
   changeMode,
   changePrimaryAction,
 } from './reducers/configuration';
@@ -178,6 +179,7 @@ export function indexPageLoad({
     const edition = maybeEdition || Edition.Rust2024;
 
     if (code) {
+      dispatch(changeFileViewAutomatically(FileView.Single));
       dispatch(editCode(code));
     } else if (gist) {
       dispatch(performGistLoad({ id: gist, channel, mode, edition }));

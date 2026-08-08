@@ -20,6 +20,7 @@ import {
 
 interface State {
   fileView: FileView;
+  fileViewAutomaticallyChangedFrom?: FileView;
   editor: Editor;
   ace: {
     keybinding: string;
@@ -70,6 +71,10 @@ const slice = createSlice({
   name: 'configuration',
   initialState,
   reducers: {
+    acknowledgeAutomaticFileView: (state) => {
+      delete state.fileViewAutomaticallyChangedFrom;
+    },
+
     changeAceTheme: (state, action: PayloadAction<string>) => {
       state.ace.theme = action.payload;
     },
@@ -103,6 +108,13 @@ const slice = createSlice({
     },
 
     changeFileView: (state, action: PayloadAction<FileView>) => {
+      state.fileView = action.payload;
+    },
+
+    changeFileViewAutomatically: (state, action: PayloadAction<FileView>) => {
+      if (state.fileView !== action.payload) {
+        state.fileViewAutomaticallyChangedFrom = state.fileView;
+      }
       state.fileView = action.payload;
     },
 
@@ -141,6 +153,7 @@ const slice = createSlice({
 });
 
 export const {
+  acknowledgeAutomaticFileView,
   changeAceTheme,
   changeAssemblyFlavor,
   changeBacktrace,
@@ -150,6 +163,7 @@ export const {
   changeEdition,
   changeEditor,
   changeFileView,
+  changeFileViewAutomatically,
   changeKeybinding,
   changeMode,
   changeMonacoTheme,
