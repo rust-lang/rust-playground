@@ -21,6 +21,8 @@ of choice.
 
 ### Troubleshooting
 
+If you can't get the UI to show up outside of your network, you may need to set the `PLAYGROUND_UI_ADDRESS` environment variable to `0.0.0.0`.
+
 #### macOS
 
 After launching `ui`, when you try to do any action (ex. `build`, `rustfmt`, `run` and so on), you get errors from Docker about "Mounts denied":
