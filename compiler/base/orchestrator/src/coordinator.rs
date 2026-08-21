@@ -7,6 +7,8 @@ use serde::Deserialize;
 use snafu::prelude::*;
 use std::{
     collections::{BTreeSet, HashMap},
+    env,
+    ffi::{OsStr, OsString},
     fmt, mem, ops,
     pin::{self, pin},
     process::Stdio,
@@ -2888,8 +2890,10 @@ const DOCKER_ARCH: &str = docker_target_arch! {
     aarch64: "linux/arm64",
 };
 
-fn basic_secure_docker_command() -> Command {
-    docker_command!(
+const DOCKER_RUNTIME_ENV_VAR: &str = "PLAYGROUND_DOCKER_RUNTIME";
+
+fn basic_secure_docker_command(runtime: Option<&OsStr>) -> Command {
+    let mut command = docker_command!(
         "run",
         "--platform",
         DOCKER_ARCH,
@@ -2904,11 +2908,27 @@ fn basic_secure_docker_command() -> Command {
         "512",
         "--oom-score-adj",
         "1000",
-    )
+    );
+
+    if let Some(runtime) = runtime {
+        command.arg("--runtime").arg(runtime);
+    }
+
+    command
 }
 
-#[derive(Default)]
-pub struct DockerBackend(());
+#[derive(Debug)]
+pub struct DockerBackend {
+    runtime: Option<OsString>,
+}
+
+impl Default for DockerBackend {
+    fn default() -> Self {
+        let runtime = env::var_os(DOCKER_RUNTIME_ENV_VAR).filter(|runtime| !runtime.is_empty());
+
+        Self { runtime }
+    }
+}
 
 impl Backend for DockerBackend {
     fn prepare_worker_command(
@@ -2918,7 +2938,7 @@ impl Backend for DockerBackend {
     ) -> (Command, TerminateContainer) {
         let name = format!("playground-{id}");
 
-        let mut command = basic_secure_docker_command();
+        let mut command = basic_secure_docker_command(self.runtime.as_deref());
         command
             .args(["--name", &name])
             .arg("-i")
@@ -3077,6 +3097,23 @@ mod tests {
     use tempfile::TempDir;
 
     use super::*;
+
+    #[test]
+    fn docker_command_uses_configured_runtime() {
+        let command = basic_secure_docker_command(Some(OsStr::new("runsc")));
+        let args: Vec<_> = command.as_std().get_args().collect();
+
+        assert!(args
+            .windows(2)
+            .any(|wnd| wnd[0] == "--runtime" && wnd[1] == "runsc"));
+    }
+
+    #[test]
+    fn docker_command_omits_unconfigured_runtime() {
+        let command = basic_secure_docker_command(None);
+
+        assert!(command.as_std().get_args().all(|arg| arg != "--runtime"));
+    }
 
     #[allow(dead_code)]
     fn setup_tracing() {
