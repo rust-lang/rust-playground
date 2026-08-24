@@ -276,7 +276,7 @@
   },
   {
     "name": "cc",
-    "version": "1.4.2",
+    "version": "1.4.4",
     "id": "cc"
   },
   {
@@ -366,7 +366,7 @@
   },
   {
     "name": "cookie",
-    "version": "0.18.1",
+    "version": "0.18.2",
     "id": "cookie"
   },
   {
@@ -381,7 +381,7 @@
   },
   {
     "name": "crc32fast",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "id": "crc32fast"
   },
   {
@@ -531,7 +531,7 @@
   },
   {
     "name": "either",
-    "version": "1.17.0",
+    "version": "1.18.0",
     "id": "either"
   },
   {
@@ -616,7 +616,7 @@
   },
   {
     "name": "find-msvc-tools",
-    "version": "0.1.10",
+    "version": "0.1.11",
     "id": "find_msvc_tools"
   },
   {
@@ -671,7 +671,7 @@
   },
   {
     "name": "futures",
-    "version": "0.3.33",
+    "version": "0.3.34",
     "id": "futures"
   },
   {
@@ -681,42 +681,42 @@
   },
   {
     "name": "futures-channel",
-    "version": "0.3.33",
+    "version": "0.3.34",
     "id": "futures_channel"
   },
   {
     "name": "futures-core",
-    "version": "0.3.33",
+    "version": "0.3.34",
     "id": "futures_core"
   },
   {
     "name": "futures-executor",
-    "version": "0.3.33",
+    "version": "0.3.34",
     "id": "futures_executor"
   },
   {
     "name": "futures-io",
-    "version": "0.3.33",
+    "version": "0.3.34",
     "id": "futures_io"
   },
   {
     "name": "futures-macro",
-    "version": "0.3.33",
+    "version": "0.3.34",
     "id": "futures_macro"
   },
   {
     "name": "futures-sink",
-    "version": "0.3.33",
+    "version": "0.3.34",
     "id": "futures_sink"
   },
   {
     "name": "futures-task",
-    "version": "0.3.33",
+    "version": "0.3.34",
     "id": "futures_task"
   },
   {
     "name": "futures-util",
-    "version": "0.3.33",
+    "version": "0.3.34",
     "id": "futures_util"
   },
   {
@@ -726,7 +726,7 @@
   },
   {
     "name": "generic-array",
-    "version": "1.4.4",
+    "version": "1.4.5",
     "id": "generic_array"
   },
   {
@@ -771,7 +771,7 @@
   },
   {
     "name": "h2",
-    "version": "0.4.15",
+    "version": "0.4.19",
     "id": "h2"
   },
   {
@@ -841,7 +841,7 @@
   },
   {
     "name": "http-body-util",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "id": "http_body_util"
   },
   {
@@ -891,37 +891,37 @@
   },
   {
     "name": "icu_collections",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "id": "icu_collections"
   },
   {
     "name": "icu_locale_core",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "id": "icu_locale_core"
   },
   {
     "name": "icu_normalizer",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "id": "icu_normalizer"
   },
   {
     "name": "icu_normalizer_data",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "id": "icu_normalizer_data"
   },
   {
     "name": "icu_properties",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "id": "icu_properties"
   },
   {
     "name": "icu_properties_data",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "id": "icu_properties_data"
   },
   {
     "name": "icu_provider",
-    "version": "2.2.0",
+    "version": "2.3.1",
     "id": "icu_provider"
   },
   {
@@ -1041,7 +1041,7 @@
   },
   {
     "name": "litemap",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "id": "litemap"
   },
   {
@@ -1056,7 +1056,7 @@
   },
   {
     "name": "log",
-    "version": "0.4.33",
+    "version": "0.4.34",
     "id": "log"
   },
   {
@@ -1236,7 +1236,7 @@
   },
   {
     "name": "num-integer",
-    "version": "0.1.46",
+    "version": "0.1.47",
     "id": "num_integer"
   },
   {
@@ -1381,7 +1381,7 @@
   },
   {
     "name": "pkg-config",
-    "version": "0.3.33",
+    "version": "0.3.34",
     "id": "pkg_config"
   },
   {
@@ -1406,7 +1406,7 @@
   },
   {
     "name": "potential_utf",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "id": "potential_utf"
   },
   {
@@ -1586,12 +1586,12 @@
   },
   {
     "name": "ref-cast",
-    "version": "1.0.26",
+    "version": "1.0.27",
     "id": "ref_cast"
   },
   {
     "name": "ref-cast-impl",
-    "version": "1.0.26",
+    "version": "1.0.27",
     "id": "ref_cast_impl"
   },
   {
@@ -1696,7 +1696,7 @@
   },
   {
     "name": "safe_arch",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "id": "safe_arch"
   },
   {
@@ -1881,7 +1881,7 @@
   },
   {
     "name": "syn",
-    "version": "3.0.3",
+    "version": "3.0.4",
     "id": "syn"
   },
   {
@@ -1976,7 +1976,7 @@
   },
   {
     "name": "tinystr",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "id": "tinystr"
   },
   {
@@ -2191,7 +2191,7 @@
   },
   {
     "name": "uuid",
-    "version": "1.24.0",
+    "version": "1.25.0",
     "id": "uuid"
   },
   {
@@ -2241,7 +2241,7 @@
   },
   {
     "name": "rustls-webpki",
-    "version": "0.103.13",
+    "version": "0.103.15",
     "id": "webpki"
   },
   {
@@ -2256,7 +2256,7 @@
   },
   {
     "name": "whoami",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "id": "whoami"
   },
   {
@@ -2331,7 +2331,7 @@
   },
   {
     "name": "writeable",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "id": "writeable"
   },
   {
@@ -2391,17 +2391,17 @@
   },
   {
     "name": "zerotrie",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "id": "zerotrie"
   },
   {
     "name": "zerovec",
-    "version": "0.11.6",
+    "version": "0.11.8",
     "id": "zerovec"
   },
   {
     "name": "zerovec-derive",
-    "version": "0.11.3",
+    "version": "0.11.6",
     "id": "zerovec_derive"
   },
   {

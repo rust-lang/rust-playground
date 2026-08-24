@@ -266,7 +266,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.4.2"
+version = "=1.4.4"
 features = ["parallel"]
 
 [dependencies.cfg_aliases]
@@ -345,7 +345,7 @@ version = "=0.10.0"
 
 [dependencies.cookie]
 package = "cookie"
-version = "=0.18.1"
+version = "=0.18.2"
 features = ["percent-encode"]
 
 [dependencies.cookie_store]
@@ -358,7 +358,7 @@ version = "=0.3.0"
 
 [dependencies.crc32fast]
 package = "crc32fast"
-version = "=1.5.0"
+version = "=1.5.1"
 
 [dependencies.crossbeam]
 package = "crossbeam"
@@ -486,7 +486,7 @@ version = "=0.6.3"
 
 [dependencies.either]
 package = "either"
-version = "=1.17.0"
+version = "=1.18.0"
 features = ["serde"]
 
 [dependencies.encoding_rs]
@@ -560,7 +560,7 @@ version = "=0.2.29"
 
 [dependencies.find_msvc_tools]
 package = "find-msvc-tools"
-version = "=0.1.10"
+version = "=0.1.11"
 
 [dependencies.fixedbitset]
 package = "fixedbitset"
@@ -610,7 +610,7 @@ version = "=0.1.5"
 
 [dependencies.futures]
 package = "futures"
-version = "=0.3.33"
+version = "=0.3.34"
 features = ["async-await", "compat", "executor", "io-compat", "std", "thread-pool"]
 
 [dependencies.futures_0_1_31]
@@ -619,40 +619,40 @@ version = "=0.1.31"
 
 [dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.33"
+version = "=0.3.34"
 features = ["sink", "std"]
 
 [dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.33"
+version = "=0.3.34"
 
 [dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.33"
+version = "=0.3.34"
 default-features = false
 
 [dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.33"
+version = "=0.3.34"
 features = ["std"]
 
 [dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.33"
+version = "=0.3.34"
 default-features = false
 
 [dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.33"
+version = "=0.3.34"
 
 [dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.33"
+version = "=0.3.34"
 default-features = false
 
 [dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.33"
+version = "=0.3.34"
 features = ["alloc", "sink"]
 
 [dependencies.fxhash]
@@ -661,7 +661,7 @@ version = "=0.2.1"
 
 [dependencies.generic_array]
 package = "generic-array"
-version = "=1.4.4"
+version = "=1.4.5"
 features = ["alloc", "arbitrary", "as_slice", "bitvec", "bytecheck-0_8", "bytemuck", "compat-0_14", "const-default", "faster-hex", "hybrid-array-0_4", "internals", "rkyv-0_8", "rkyv-0_8-full", "serde", "subtle", "zeroize"]
 
 [dependencies.generic_array_0_14_7]
@@ -701,7 +701,7 @@ version = "=0.3.4"
 
 [dependencies.h2]
 package = "h2"
-version = "=0.4.15"
+version = "=0.4.19"
 
 [dependencies.half]
 package = "half"
@@ -762,7 +762,7 @@ version = "=1.1.0"
 
 [dependencies.http_body_util]
 package = "http-body-util"
-version = "=0.1.4"
+version = "=0.1.5"
 
 [dependencies.http_range_header]
 package = "http-range-header"
@@ -807,38 +807,38 @@ features = ["fallback"]
 
 [dependencies.icu_collections]
 package = "icu_collections"
-version = "=2.2.0"
+version = "=2.3.0"
 default-features = false
 
 [dependencies.icu_locale_core]
 package = "icu_locale_core"
-version = "=2.2.0"
+version = "=2.3.0"
 features = ["zerovec"]
 default-features = false
 
 [dependencies.icu_normalizer]
 package = "icu_normalizer"
-version = "=2.2.0"
+version = "=2.3.0"
 default-features = false
 
 [dependencies.icu_normalizer_data]
 package = "icu_normalizer_data"
-version = "=2.2.0"
+version = "=2.3.0"
 default-features = false
 
 [dependencies.icu_properties]
 package = "icu_properties"
-version = "=2.2.0"
+version = "=2.3.0"
 default-features = false
 
 [dependencies.icu_properties_data]
 package = "icu_properties_data"
-version = "=2.2.0"
+version = "=2.3.0"
 default-features = false
 
 [dependencies.icu_provider]
 package = "icu_provider"
-version = "=2.2.0"
+version = "=2.3.1"
 default-features = false
 
 [dependencies.idna]
@@ -941,7 +941,7 @@ default-features = false
 
 [dependencies.litemap]
 package = "litemap"
-version = "=0.8.2"
+version = "=0.8.3"
 default-features = false
 
 [dependencies.litrs]
@@ -954,7 +954,7 @@ version = "=0.4.14"
 
 [dependencies.log]
 package = "log"
-version = "=0.4.33"
+version = "=0.4.34"
 features = ["std"]
 
 [dependencies.log4rs]
@@ -1109,7 +1109,7 @@ version = "=0.4.2"
 
 [dependencies.num_integer]
 package = "num-integer"
-version = "=0.1.46"
+version = "=0.1.47"
 features = ["i128"]
 default-features = false
 
@@ -1238,7 +1238,7 @@ version = "=0.2.17"
 
 [dependencies.pkg_config]
 package = "pkg-config"
-version = "=0.3.33"
+version = "=0.3.34"
 
 [dependencies.png]
 package = "png"
@@ -1258,7 +1258,7 @@ version = "=0.2.14"
 
 [dependencies.potential_utf]
 package = "potential_utf"
-version = "=0.1.5"
+version = "=0.1.6"
 features = ["zerovec"]
 default-features = false
 
@@ -1424,11 +1424,11 @@ version = "=0.5.5"
 
 [dependencies.ref_cast]
 package = "ref-cast"
-version = "=1.0.26"
+version = "=1.0.27"
 
 [dependencies.ref_cast_impl]
 package = "ref-cast-impl"
-version = "=1.0.26"
+version = "=1.0.27"
 
 [dependencies.regex]
 package = "regex"
@@ -1528,7 +1528,7 @@ version = "=1.0.23"
 
 [dependencies.safe_arch]
 package = "safe_arch"
-version = "=1.1.0"
+version = "=1.2.0"
 features = ["bytemuck"]
 
 [dependencies.same_file]
@@ -1690,7 +1690,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=3.0.3"
+version = "=3.0.4"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1771,7 +1771,7 @@ version = "=0.2.32"
 
 [dependencies.tinystr]
 package = "tinystr"
-version = "=0.8.3"
+version = "=0.8.4"
 default-features = false
 
 [dependencies.tinyvec]
@@ -1960,7 +1960,7 @@ version = "=0.2.2"
 
 [dependencies.uuid]
 package = "uuid"
-version = "=1.24.0"
+version = "=1.25.0"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [dependencies.v_frame]
@@ -2001,7 +2001,7 @@ version = "=0.2.127"
 
 [dependencies.webpki]
 package = "rustls-webpki"
-version = "=0.103.13"
+version = "=0.103.15"
 features = ["alloc"]
 default-features = false
 
@@ -2015,7 +2015,7 @@ version = "=0.1.12"
 
 [dependencies.whoami]
 package = "whoami"
-version = "=2.1.2"
+version = "=2.1.3"
 
 [dependencies.wide]
 package = "wide"
@@ -2077,7 +2077,7 @@ version = "=1.0.4"
 
 [dependencies.writeable]
 package = "writeable"
-version = "=0.6.3"
+version = "=0.6.4"
 default-features = false
 
 [dependencies.wyz]
@@ -2133,19 +2133,19 @@ version = "=1.9.0"
 
 [dependencies.zerotrie]
 package = "zerotrie"
-version = "=0.2.4"
+version = "=0.2.5"
 features = ["yoke", "zerofrom"]
 default-features = false
 
 [dependencies.zerovec]
 package = "zerovec"
-version = "=0.11.6"
+version = "=0.11.8"
 features = ["derive", "yoke"]
 default-features = false
 
 [dependencies.zerovec_derive]
 package = "zerovec-derive"
-version = "=0.11.3"
+version = "=0.11.6"
 default-features = false
 
 [dependencies.zmij]
@@ -2424,7 +2424,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.4.2"
+version = "=1.4.4"
 features = ["parallel"]
 
 [build-dependencies.cfg_aliases]
@@ -2503,7 +2503,7 @@ version = "=0.10.0"
 
 [build-dependencies.cookie]
 package = "cookie"
-version = "=0.18.1"
+version = "=0.18.2"
 features = ["percent-encode"]
 
 [build-dependencies.cookie_store]
@@ -2516,7 +2516,7 @@ version = "=0.3.0"
 
 [build-dependencies.crc32fast]
 package = "crc32fast"
-version = "=1.5.0"
+version = "=1.5.1"
 
 [build-dependencies.crossbeam]
 package = "crossbeam"
@@ -2644,7 +2644,7 @@ version = "=0.6.3"
 
 [build-dependencies.either]
 package = "either"
-version = "=1.17.0"
+version = "=1.18.0"
 features = ["serde"]
 
 [build-dependencies.encoding_rs]
@@ -2718,7 +2718,7 @@ version = "=0.2.29"
 
 [build-dependencies.find_msvc_tools]
 package = "find-msvc-tools"
-version = "=0.1.10"
+version = "=0.1.11"
 
 [build-dependencies.fixedbitset]
 package = "fixedbitset"
@@ -2768,7 +2768,7 @@ version = "=0.1.5"
 
 [build-dependencies.futures]
 package = "futures"
-version = "=0.3.33"
+version = "=0.3.34"
 features = ["async-await", "compat", "executor", "io-compat", "std", "thread-pool"]
 
 [build-dependencies.futures_0_1_31]
@@ -2777,40 +2777,40 @@ version = "=0.1.31"
 
 [build-dependencies.futures_channel]
 package = "futures-channel"
-version = "=0.3.33"
+version = "=0.3.34"
 features = ["sink", "std"]
 
 [build-dependencies.futures_core]
 package = "futures-core"
-version = "=0.3.33"
+version = "=0.3.34"
 
 [build-dependencies.futures_executor]
 package = "futures-executor"
-version = "=0.3.33"
+version = "=0.3.34"
 default-features = false
 
 [build-dependencies.futures_io]
 package = "futures-io"
-version = "=0.3.33"
+version = "=0.3.34"
 features = ["std"]
 
 [build-dependencies.futures_macro]
 package = "futures-macro"
-version = "=0.3.33"
+version = "=0.3.34"
 default-features = false
 
 [build-dependencies.futures_sink]
 package = "futures-sink"
-version = "=0.3.33"
+version = "=0.3.34"
 
 [build-dependencies.futures_task]
 package = "futures-task"
-version = "=0.3.33"
+version = "=0.3.34"
 default-features = false
 
 [build-dependencies.futures_util]
 package = "futures-util"
-version = "=0.3.33"
+version = "=0.3.34"
 features = ["alloc", "sink"]
 
 [build-dependencies.fxhash]
@@ -2819,7 +2819,7 @@ version = "=0.2.1"
 
 [build-dependencies.generic_array]
 package = "generic-array"
-version = "=1.4.4"
+version = "=1.4.5"
 features = ["alloc", "arbitrary", "as_slice", "bitvec", "bytecheck-0_8", "bytemuck", "compat-0_14", "const-default", "faster-hex", "hybrid-array-0_4", "internals", "rkyv-0_8", "rkyv-0_8-full", "serde", "subtle", "zeroize"]
 
 [build-dependencies.generic_array_0_14_7]
@@ -2859,7 +2859,7 @@ version = "=0.3.4"
 
 [build-dependencies.h2]
 package = "h2"
-version = "=0.4.15"
+version = "=0.4.19"
 
 [build-dependencies.half]
 package = "half"
@@ -2920,7 +2920,7 @@ version = "=1.1.0"
 
 [build-dependencies.http_body_util]
 package = "http-body-util"
-version = "=0.1.4"
+version = "=0.1.5"
 
 [build-dependencies.http_range_header]
 package = "http-range-header"
@@ -2965,38 +2965,38 @@ features = ["fallback"]
 
 [build-dependencies.icu_collections]
 package = "icu_collections"
-version = "=2.2.0"
+version = "=2.3.0"
 default-features = false
 
 [build-dependencies.icu_locale_core]
 package = "icu_locale_core"
-version = "=2.2.0"
+version = "=2.3.0"
 features = ["zerovec"]
 default-features = false
 
 [build-dependencies.icu_normalizer]
 package = "icu_normalizer"
-version = "=2.2.0"
+version = "=2.3.0"
 default-features = false
 
 [build-dependencies.icu_normalizer_data]
 package = "icu_normalizer_data"
-version = "=2.2.0"
+version = "=2.3.0"
 default-features = false
 
 [build-dependencies.icu_properties]
 package = "icu_properties"
-version = "=2.2.0"
+version = "=2.3.0"
 default-features = false
 
 [build-dependencies.icu_properties_data]
 package = "icu_properties_data"
-version = "=2.2.0"
+version = "=2.3.0"
 default-features = false
 
 [build-dependencies.icu_provider]
 package = "icu_provider"
-version = "=2.2.0"
+version = "=2.3.1"
 default-features = false
 
 [build-dependencies.idna]
@@ -3099,7 +3099,7 @@ default-features = false
 
 [build-dependencies.litemap]
 package = "litemap"
-version = "=0.8.2"
+version = "=0.8.3"
 default-features = false
 
 [build-dependencies.litrs]
@@ -3112,7 +3112,7 @@ version = "=0.4.14"
 
 [build-dependencies.log]
 package = "log"
-version = "=0.4.33"
+version = "=0.4.34"
 features = ["std"]
 
 [build-dependencies.log4rs]
@@ -3267,7 +3267,7 @@ version = "=0.4.2"
 
 [build-dependencies.num_integer]
 package = "num-integer"
-version = "=0.1.46"
+version = "=0.1.47"
 features = ["i128"]
 default-features = false
 
@@ -3396,7 +3396,7 @@ version = "=0.2.17"
 
 [build-dependencies.pkg_config]
 package = "pkg-config"
-version = "=0.3.33"
+version = "=0.3.34"
 
 [build-dependencies.png]
 package = "png"
@@ -3416,7 +3416,7 @@ version = "=0.2.14"
 
 [build-dependencies.potential_utf]
 package = "potential_utf"
-version = "=0.1.5"
+version = "=0.1.6"
 features = ["zerovec"]
 default-features = false
 
@@ -3582,11 +3582,11 @@ version = "=0.5.5"
 
 [build-dependencies.ref_cast]
 package = "ref-cast"
-version = "=1.0.26"
+version = "=1.0.27"
 
 [build-dependencies.ref_cast_impl]
 package = "ref-cast-impl"
-version = "=1.0.26"
+version = "=1.0.27"
 
 [build-dependencies.regex]
 package = "regex"
@@ -3686,7 +3686,7 @@ version = "=1.0.23"
 
 [build-dependencies.safe_arch]
 package = "safe_arch"
-version = "=1.1.0"
+version = "=1.2.0"
 features = ["bytemuck"]
 
 [build-dependencies.same_file]
@@ -3848,7 +3848,7 @@ default-features = false
 
 [build-dependencies.syn]
 package = "syn"
-version = "=3.0.3"
+version = "=3.0.4"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [build-dependencies.syn_1_0_109]
@@ -3929,7 +3929,7 @@ version = "=0.2.32"
 
 [build-dependencies.tinystr]
 package = "tinystr"
-version = "=0.8.3"
+version = "=0.8.4"
 default-features = false
 
 [build-dependencies.tinyvec]
@@ -4118,7 +4118,7 @@ version = "=0.2.2"
 
 [build-dependencies.uuid]
 package = "uuid"
-version = "=1.24.0"
+version = "=1.25.0"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [build-dependencies.v_frame]
@@ -4159,7 +4159,7 @@ version = "=0.2.127"
 
 [build-dependencies.webpki]
 package = "rustls-webpki"
-version = "=0.103.13"
+version = "=0.103.15"
 features = ["alloc"]
 default-features = false
 
@@ -4173,7 +4173,7 @@ version = "=0.1.12"
 
 [build-dependencies.whoami]
 package = "whoami"
-version = "=2.1.2"
+version = "=2.1.3"
 
 [build-dependencies.wide]
 package = "wide"
@@ -4235,7 +4235,7 @@ version = "=1.0.4"
 
 [build-dependencies.writeable]
 package = "writeable"
-version = "=0.6.3"
+version = "=0.6.4"
 default-features = false
 
 [build-dependencies.wyz]
@@ -4291,19 +4291,19 @@ version = "=1.9.0"
 
 [build-dependencies.zerotrie]
 package = "zerotrie"
-version = "=0.2.4"
+version = "=0.2.5"
 features = ["yoke", "zerofrom"]
 default-features = false
 
 [build-dependencies.zerovec]
 package = "zerovec"
-version = "=0.11.6"
+version = "=0.11.8"
 features = ["derive", "yoke"]
 default-features = false
 
 [build-dependencies.zerovec_derive]
 package = "zerovec-derive"
-version = "=0.11.3"
+version = "=0.11.6"
 default-features = false
 
 [build-dependencies.zmij]
