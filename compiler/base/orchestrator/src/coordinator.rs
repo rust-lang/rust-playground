@@ -835,6 +835,7 @@ pub struct MacroExpansionRequest {
     pub channel: Channel,
     pub crate_type: CrateType,
     pub edition: Edition,
+    pub tests: bool,
     pub code: Code,
 }
 
@@ -856,6 +857,10 @@ impl LowerRequest for MacroExpansionRequest {
         }
 
         args.extend(["--", "-Zunpretty=expanded"]);
+
+        if self.tests {
+            args.push("--test");
+        }
 
         ExecuteCommandRequest {
             cmd: "cargo".to_owned(),
@@ -4366,6 +4371,7 @@ mod tests {
         channel: Channel::Nightly,
         crate_type: CrateType::Library(LibraryType::Cdylib),
         edition: Edition::Rust2018,
+        tests: false,
         code: Code::new(),
     };
 

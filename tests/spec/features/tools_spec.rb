@@ -111,6 +111,18 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     EOF
   end
 
+  scenario "expand macros from the test harness" do
+    editor.set <<~EOF
+    #[test]
+    fn pure_logic() { assert!(true); }
+    EOF
+    in_tools_menu { click_on("Expand macros") }
+
+    within(:output, :stdout) do
+      expect(page).to have_content('#[rustc_test_entrypoint_marker]')
+    end
+  end
+
   def editor
     Editor.new(page)
   end

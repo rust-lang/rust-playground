@@ -1403,12 +1403,18 @@ pub(crate) mod api_orchestrator_integration_impls {
         type Error = ParseMacroExpansionRequestError;
 
         fn try_from(other: api::MacroExpansionRequest) -> std::result::Result<Self, Self::Error> {
-            let api::MacroExpansionRequest { code, edition } = other;
+            let api::MacroExpansionRequest {
+                code,
+                crate_type,
+                edition,
+                tests,
+            } = other;
 
             Ok(MacroExpansionRequest {
-                channel: Channel::Nightly,     // TODO: use what user has submitted
-                crate_type: CrateType::Binary, // TODO: use what user has submitted
+                channel: Channel::Nightly, // TODO: use what user has submitted
+                crate_type: parse_crate_type(&crate_type)?,
                 edition: parse_edition(&edition)?,
+                tests,
                 code: code.into(),
             })
         }
@@ -1416,6 +1422,9 @@ pub(crate) mod api_orchestrator_integration_impls {
 
     #[derive(Debug, Snafu)]
     pub(crate) enum ParseMacroExpansionRequestError {
+        #[snafu(transparent)]
+        CrateType { source: ParseCrateTypeError },
+
         #[snafu(transparent)]
         Edition { source: ParseEditionError },
     }

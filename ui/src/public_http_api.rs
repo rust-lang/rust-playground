@@ -120,8 +120,12 @@ pub(crate) struct MiriResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct MacroExpansionRequest {
     pub(crate) code: Code,
+    #[serde(default = "default_crate_type", rename = "crateType")]
+    pub(crate) crate_type: String,
     #[serde(default)]
     pub(crate) edition: String,
+    #[serde(default)]
+    pub(crate) tests: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
