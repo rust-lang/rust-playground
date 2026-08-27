@@ -1403,12 +1403,17 @@ pub(crate) mod api_orchestrator_integration_impls {
         type Error = ParseMacroExpansionRequestError;
 
         fn try_from(other: api::MacroExpansionRequest) -> std::result::Result<Self, Self::Error> {
-            let api::MacroExpansionRequest { code, edition } = other;
+            let api::MacroExpansionRequest {
+                code,
+                edition,
+                tests,
+            } = other;
 
             Ok(MacroExpansionRequest {
                 channel: Channel::Nightly,     // TODO: use what user has submitted
                 crate_type: CrateType::Binary, // TODO: use what user has submitted
                 edition: parse_edition(&edition)?,
+                tests,
                 code: code.into(),
             })
         }

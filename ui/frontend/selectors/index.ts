@@ -466,8 +466,9 @@ export const miriRequestSelector = createSelector(
 
 export const macroExpansionRequestSelector = createSelector(
   editionSelector,
+  runAsTest,
   codeOrFilesSelector,
-  (edition, code) => ({ edition, code })
+  (edition, tests, code) => ({ edition, tests, code })
 );
 
 const focus = (state: State) => state.output.meta.focus;

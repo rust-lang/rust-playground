@@ -384,6 +384,7 @@ impl HasLabelsCore for coordinator::MacroExpansionRequest {
             channel,
             crate_type,
             edition,
+            tests,
             code: _,
         } = *self;
 
@@ -393,7 +394,7 @@ impl HasLabelsCore for coordinator::MacroExpansionRequest {
             mode: None,
             edition: Some(Some(edition)),
             crate_type: Some(crate_type),
-            tests: None,
+            tests: Some(tests),
             backtrace: None,
         }
     }

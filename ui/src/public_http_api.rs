@@ -122,6 +122,8 @@ pub(crate) struct MacroExpansionRequest {
     pub(crate) code: Code,
     #[serde(default)]
     pub(crate) edition: String,
+    #[serde(default)]
+    pub(crate) tests: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]

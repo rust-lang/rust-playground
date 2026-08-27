@@ -22,6 +22,7 @@ interface State {
 interface MacroExpansionRequestBody {
   code: Code;
   edition: string;
+  tests: boolean;
 }
 
 const MacroExpansionResponseBody = z.object({
