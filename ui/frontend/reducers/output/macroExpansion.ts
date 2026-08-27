@@ -21,6 +21,7 @@ interface State {
 
 interface MacroExpansionRequestBody {
   code: Code;
+  crateType: string;
   edition: string;
   tests: boolean;
 }

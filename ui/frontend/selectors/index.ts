@@ -465,10 +465,11 @@ export const miriRequestSelector = createSelector(
 );
 
 export const macroExpansionRequestSelector = createSelector(
+  getCrateType,
   editionSelector,
   runAsTest,
   codeOrFilesSelector,
-  (edition, tests, code) => ({ edition, tests, code })
+  (crateType, edition, tests, code) => ({ crateType, edition, tests, code })
 );
 
 const focus = (state: State) => state.output.meta.focus;
