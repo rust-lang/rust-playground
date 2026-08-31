@@ -209,7 +209,7 @@ version = "=0.10.4"
 
 [dependencies.borsh]
 package = "borsh"
-version = "=1.8.0"
+version = "=1.8.1"
 default-features = false
 
 [dependencies.brotli]
@@ -279,7 +279,7 @@ version = "=1.0.4"
 
 [dependencies.chacha20]
 package = "chacha20"
-version = "=0.10.1"
+version = "=0.10.2"
 features = ["rng"]
 default-features = false
 
@@ -354,7 +354,7 @@ version = "=0.22.1"
 
 [dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.3.0"
+version = "=0.3.1"
 
 [dependencies.crc32fast]
 package = "crc32fast"
@@ -574,7 +574,7 @@ default-features = false
 
 [dependencies.flate2]
 package = "flate2"
-version = "=1.1.9"
+version = "=1.1.10"
 
 [dependencies.fnv]
 package = "fnv"
@@ -786,7 +786,7 @@ version = "=0.4.14"
 
 [dependencies.hyper]
 package = "hyper"
-version = "=1.11.0"
+version = "=1.11.1"
 features = ["client", "full", "http1"]
 
 [dependencies.hyper_rustls]
@@ -860,11 +860,11 @@ version = "=0.2.4"
 
 [dependencies.imgref]
 package = "imgref"
-version = "=1.12.2"
+version = "=1.12.3"
 
 [dependencies.indexmap]
 package = "indexmap"
-version = "=2.14.0"
+version = "=2.14.1"
 features = ["std"]
 
 [dependencies.iovec]
@@ -1024,11 +1024,12 @@ default-features = false
 [dependencies.miniz_oxide]
 package = "miniz_oxide"
 version = "=0.9.1"
+features = ["simd"]
 
 [dependencies.miniz_oxide_0_8_9]
 package = "miniz_oxide"
 version = "=0.8.9"
-features = ["simd", "with-alloc"]
+features = ["simd"]
 
 [dependencies.mio]
 package = "mio"
@@ -1349,9 +1350,9 @@ package = "rand"
 version = "=0.10.2"
 features = ["serde"]
 
-[dependencies.rand_0_8_7]
+[dependencies.rand_0_8_8]
 package = "rand"
-version = "=0.8.7"
+version = "=0.8.8"
 features = ["serde1", "small_rng"]
 
 [dependencies.rand_0_9_5]
@@ -1960,7 +1961,7 @@ version = "=0.2.2"
 
 [dependencies.uuid]
 package = "uuid"
-version = "=1.25.0"
+version = "=1.26.0"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [dependencies.v_frame]
@@ -2019,7 +2020,7 @@ version = "=2.1.3"
 
 [dependencies.wide]
 package = "wide"
-version = "=1.6.1"
+version = "=1.7.0"
 default-features = false
 
 [dependencies.windows_aarch64_gnullvm]
@@ -2367,7 +2368,7 @@ version = "=0.10.4"
 
 [build-dependencies.borsh]
 package = "borsh"
-version = "=1.8.0"
+version = "=1.8.1"
 default-features = false
 
 [build-dependencies.brotli]
@@ -2437,7 +2438,7 @@ version = "=1.0.4"
 
 [build-dependencies.chacha20]
 package = "chacha20"
-version = "=0.10.1"
+version = "=0.10.2"
 features = ["rng"]
 default-features = false
 
@@ -2512,7 +2513,7 @@ version = "=0.22.1"
 
 [build-dependencies.cpufeatures]
 package = "cpufeatures"
-version = "=0.3.0"
+version = "=0.3.1"
 
 [build-dependencies.crc32fast]
 package = "crc32fast"
@@ -2732,7 +2733,7 @@ default-features = false
 
 [build-dependencies.flate2]
 package = "flate2"
-version = "=1.1.9"
+version = "=1.1.10"
 
 [build-dependencies.fnv]
 package = "fnv"
@@ -2944,7 +2945,7 @@ version = "=0.4.14"
 
 [build-dependencies.hyper]
 package = "hyper"
-version = "=1.11.0"
+version = "=1.11.1"
 features = ["client", "full", "http1"]
 
 [build-dependencies.hyper_rustls]
@@ -3018,11 +3019,11 @@ version = "=0.2.4"
 
 [build-dependencies.imgref]
 package = "imgref"
-version = "=1.12.2"
+version = "=1.12.3"
 
 [build-dependencies.indexmap]
 package = "indexmap"
-version = "=2.14.0"
+version = "=2.14.1"
 features = ["std"]
 
 [build-dependencies.iovec]
@@ -3182,11 +3183,12 @@ default-features = false
 [build-dependencies.miniz_oxide]
 package = "miniz_oxide"
 version = "=0.9.1"
+features = ["simd"]
 
 [build-dependencies.miniz_oxide_0_8_9]
 package = "miniz_oxide"
 version = "=0.8.9"
-features = ["simd", "with-alloc"]
+features = ["simd"]
 
 [build-dependencies.mio]
 package = "mio"
@@ -3507,9 +3509,9 @@ package = "rand"
 version = "=0.10.2"
 features = ["serde"]
 
-[build-dependencies.rand_0_8_7]
+[build-dependencies.rand_0_8_8]
 package = "rand"
-version = "=0.8.7"
+version = "=0.8.8"
 features = ["serde1", "small_rng"]
 
 [build-dependencies.rand_0_9_5]
@@ -4118,7 +4120,7 @@ version = "=0.2.2"
 
 [build-dependencies.uuid]
 package = "uuid"
-version = "=1.25.0"
+version = "=1.26.0"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [build-dependencies.v_frame]
@@ -4177,7 +4179,7 @@ version = "=2.1.3"
 
 [build-dependencies.wide]
 package = "wide"
-version = "=1.6.1"
+version = "=1.7.0"
 default-features = false
 
 [build-dependencies.windows_aarch64_gnullvm]

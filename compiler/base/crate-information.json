@@ -211,7 +211,7 @@
   },
   {
     "name": "borsh",
-    "version": "1.8.0",
+    "version": "1.8.1",
     "id": "borsh"
   },
   {
@@ -291,7 +291,7 @@
   },
   {
     "name": "chacha20",
-    "version": "0.10.1",
+    "version": "0.10.2",
     "id": "chacha20"
   },
   {
@@ -376,7 +376,7 @@
   },
   {
     "name": "cpufeatures",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "id": "cpufeatures"
   },
   {
@@ -631,7 +631,7 @@
   },
   {
     "name": "flate2",
-    "version": "1.1.9",
+    "version": "1.1.10",
     "id": "flate2"
   },
   {
@@ -871,7 +871,7 @@
   },
   {
     "name": "hyper",
-    "version": "1.11.0",
+    "version": "1.11.1",
     "id": "hyper"
   },
   {
@@ -946,12 +946,12 @@
   },
   {
     "name": "imgref",
-    "version": "1.12.2",
+    "version": "1.12.3",
     "id": "imgref"
   },
   {
     "name": "indexmap",
-    "version": "2.14.0",
+    "version": "2.14.1",
     "id": "indexmap"
   },
   {
@@ -1506,8 +1506,8 @@
   },
   {
     "name": "rand",
-    "version": "0.8.7",
-    "id": "rand_0_8_7"
+    "version": "0.8.8",
+    "id": "rand_0_8_8"
   },
   {
     "name": "rand",
@@ -2191,7 +2191,7 @@
   },
   {
     "name": "uuid",
-    "version": "1.25.0",
+    "version": "1.26.0",
     "id": "uuid"
   },
   {
@@ -2261,7 +2261,7 @@
   },
   {
     "name": "wide",
-    "version": "1.6.1",
+    "version": "1.7.0",
     "id": "wide"
   },
   {
