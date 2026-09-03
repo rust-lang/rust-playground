@@ -118,7 +118,7 @@ version = "=0.2.1"
 
 [dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.43"
+version = "=0.4.44"
 features = ["tokio"]
 
 [dependencies.async_trait]
@@ -153,12 +153,12 @@ version = "=0.8.9"
 
 [dependencies.aws_lc_rs]
 package = "aws-lc-rs"
-version = "=1.18.0"
+version = "=1.18.1"
 default-features = false
 
 [dependencies.aws_lc_sys]
 package = "aws-lc-sys"
-version = "=0.44.0"
+version = "=0.45.0"
 default-features = false
 
 [dependencies.backtrace]
@@ -324,11 +324,11 @@ version = "=1.0.5"
 
 [dependencies.compression_codecs]
 package = "compression-codecs"
-version = "=0.4.38"
+version = "=0.4.39"
 
 [dependencies.compression_core]
 package = "compression-core"
-version = "=0.4.32"
+version = "=0.4.33"
 
 [dependencies.const_default]
 package = "const-default"
@@ -1033,7 +1033,7 @@ features = ["simd"]
 
 [dependencies.mio]
 package = "mio"
-version = "=1.2.2"
+version = "=1.2.3"
 features = ["net", "os-ext", "os-poll"]
 
 [dependencies.mock_instant]
@@ -1652,7 +1652,7 @@ version = "=0.4.12"
 
 [dependencies.smallvec]
 package = "smallvec"
-version = "=1.15.2"
+version = "=1.16.0"
 features = ["const_generics", "const_new"]
 
 [dependencies.socket2]
@@ -1818,7 +1818,7 @@ features = ["codec", "full", "io"]
 
 [dependencies.toml]
 package = "toml"
-version = "=1.1.4"
+version = "=1.1.5"
 
 [dependencies.toml_datetime]
 package = "toml_datetime"
@@ -2277,7 +2277,7 @@ version = "=0.2.1"
 
 [build-dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.43"
+version = "=0.4.44"
 features = ["tokio"]
 
 [build-dependencies.async_trait]
@@ -2312,12 +2312,12 @@ version = "=0.8.9"
 
 [build-dependencies.aws_lc_rs]
 package = "aws-lc-rs"
-version = "=1.18.0"
+version = "=1.18.1"
 default-features = false
 
 [build-dependencies.aws_lc_sys]
 package = "aws-lc-sys"
-version = "=0.44.0"
+version = "=0.45.0"
 default-features = false
 
 [build-dependencies.backtrace]
@@ -2483,11 +2483,11 @@ version = "=1.0.5"
 
 [build-dependencies.compression_codecs]
 package = "compression-codecs"
-version = "=0.4.38"
+version = "=0.4.39"
 
 [build-dependencies.compression_core]
 package = "compression-core"
-version = "=0.4.32"
+version = "=0.4.33"
 
 [build-dependencies.const_default]
 package = "const-default"
@@ -3192,7 +3192,7 @@ features = ["simd"]
 
 [build-dependencies.mio]
 package = "mio"
-version = "=1.2.2"
+version = "=1.2.3"
 features = ["net", "os-ext", "os-poll"]
 
 [build-dependencies.mock_instant]
@@ -3811,7 +3811,7 @@ version = "=0.4.12"
 
 [build-dependencies.smallvec]
 package = "smallvec"
-version = "=1.15.2"
+version = "=1.16.0"
 features = ["const_generics", "const_new"]
 
 [build-dependencies.socket2]
@@ -3977,7 +3977,7 @@ features = ["codec", "full", "io"]
 
 [build-dependencies.toml]
 package = "toml"
-version = "=1.1.4"
+version = "=1.1.5"
 
 [build-dependencies.toml_datetime]
 package = "toml_datetime"
