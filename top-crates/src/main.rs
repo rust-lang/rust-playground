@@ -5,6 +5,7 @@ use serde::Serialize;
 use std::{
     collections::BTreeMap,
     fs::{self, File},
+    iter::FromIterator,
     path::{Path, PathBuf},
 };
 
@@ -14,6 +15,7 @@ use std::{
 struct TomlManifest {
     package: TomlPackage,
     profile: Profiles,
+    lints: BTreeMap<&'static str, BTreeMap<&'static str, &'static str>>,
     dependencies: BTreeMap<String, DependencySpec>,
     build_dependencies: BTreeMap<String, DependencySpec>,
 }
@@ -88,6 +90,10 @@ async fn main() {
                 },
             },
         },
+        lints: BTreeMap::from_iter([(
+            "cargo",
+            BTreeMap::from_iter([("unused_dependencies", "allow")]),
+        )]),
         dependencies: dependencies.clone(),
         build_dependencies: dependencies,
     };

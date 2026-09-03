@@ -106,7 +106,7 @@
   },
   {
     "name": "async-compression",
-    "version": "0.4.43",
+    "version": "0.4.44",
     "id": "async_compression"
   },
   {
@@ -146,12 +146,12 @@
   },
   {
     "name": "aws-lc-rs",
-    "version": "1.18.0",
+    "version": "1.18.1",
     "id": "aws_lc_rs"
   },
   {
     "name": "aws-lc-sys",
-    "version": "0.44.0",
+    "version": "0.45.0",
     "id": "aws_lc_sys"
   },
   {
@@ -341,12 +341,12 @@
   },
   {
     "name": "compression-codecs",
-    "version": "0.4.38",
+    "version": "0.4.39",
     "id": "compression_codecs"
   },
   {
     "name": "compression-core",
-    "version": "0.4.32",
+    "version": "0.4.33",
     "id": "compression_core"
   },
   {
@@ -1146,7 +1146,7 @@
   },
   {
     "name": "mio",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "id": "mio"
   },
   {
@@ -1836,7 +1836,7 @@
   },
   {
     "name": "smallvec",
-    "version": "1.15.2",
+    "version": "1.16.0",
     "id": "smallvec"
   },
   {
@@ -2026,7 +2026,7 @@
   },
   {
     "name": "toml",
-    "version": "1.1.4+spec-1.1.0",
+    "version": "1.1.5+spec-1.1.0",
     "id": "toml"
   },
   {

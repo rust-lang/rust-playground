@@ -119,7 +119,7 @@ RSpec.feature "Using third-party Rust tools", type: :feature, js: true do
     in_tools_menu { click_on("Expand macros") }
 
     within(:output, :stdout) do
-      expect(page).to have_content('#[rustc_test_entrypoint_marker]')
+      expect(page).to have_content('extern crate test')
     end
   end
 
