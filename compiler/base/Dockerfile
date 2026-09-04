@@ -47,7 +47,11 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- \
     --component rustfmt \
     --component clippy \
     --component rust-src
-RUN if [ "${channel}" = 'nightly' ]; then rustup component add miri; fi
+RUN <<EOF
+if [ "${channel}" = 'nightly' ]; then
+    rustup component add miri;
+fi
+EOF
 
 COPY --chown=playground entrypoint.sh /playground/tools/
 
@@ -104,7 +108,12 @@ ARG channel
 RUN cargo build
 RUN cargo build --release
 RUN cargo clippy
-RUN if [ "${channel}" = 'nightly' ]; then cargo miri setup; cargo miri run; fi
+RUN <<EOF
+if [ "${channel}" = 'nightly' ]; then
+    cargo miri setup;
+    cargo miri run;
+fi
+EOF
 RUN rm src/*.rs
 
 COPY --from=build-orchestrator /playground/.cargo/bin/worker /playground/.cargo/bin/worker
