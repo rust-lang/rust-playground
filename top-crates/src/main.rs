@@ -5,7 +5,6 @@ use serde::Serialize;
 use std::{
     collections::BTreeMap,
     fs::{self, File},
-    iter::FromIterator,
     path::{Path, PathBuf},
 };
 
@@ -90,10 +89,16 @@ async fn main() {
                 },
             },
         },
-        lints: BTreeMap::from_iter([(
-            "cargo",
-            BTreeMap::from_iter([("unused_dependencies", "allow")]),
-        )]),
+        lints: Default::default(),
+        // For now, manually adding the lints table to the Cargo.toml
+        // in the Dockerfile. When the lint table is understood in all
+        // channels (should be when Rust 1.100 is stable), we can
+        // switch to writing it here.
+        //
+        // BTreeMap::from_iter([(
+        //     "cargo",
+        //     BTreeMap::from_iter([("unused_dependencies", "allow")]),
+        // )]),
         dependencies: dependencies.clone(),
         build_dependencies: dependencies,
     };

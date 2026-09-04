@@ -24,6 +24,8 @@ incremental = false
 codegen-units = 1
 debug = false
 
+[lints]
+
 [dependencies.addr2line]
 package = "addr2line"
 version = "=0.25.1"
@@ -266,7 +268,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.4.4"
+version = "=1.4.5"
 features = ["parallel"]
 
 [dependencies.cfg_aliases]
@@ -560,7 +562,7 @@ version = "=0.2.29"
 
 [dependencies.find_msvc_tools]
 package = "find-msvc-tools"
-version = "=0.1.11"
+version = "=0.1.12"
 
 [dependencies.fixedbitset]
 package = "fixedbitset"
@@ -1777,7 +1779,7 @@ default-features = false
 
 [dependencies.tinyvec]
 package = "tinyvec"
-version = "=1.12.0"
+version = "=1.13.2"
 features = ["alloc", "borsh", "grab_spare_slice", "latest_stable_rust", "schemars", "serde", "std"]
 
 [dependencies.tinyvec_macros]
@@ -1803,7 +1805,7 @@ version = "=0.7.18"
 
 [dependencies.tokio_rustls]
 package = "tokio-rustls"
-version = "=0.26.4"
+version = "=0.26.5"
 features = ["tls12"]
 default-features = false
 
@@ -2425,7 +2427,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.4.4"
+version = "=1.4.5"
 features = ["parallel"]
 
 [build-dependencies.cfg_aliases]
@@ -2719,7 +2721,7 @@ version = "=0.2.29"
 
 [build-dependencies.find_msvc_tools]
 package = "find-msvc-tools"
-version = "=0.1.11"
+version = "=0.1.12"
 
 [build-dependencies.fixedbitset]
 package = "fixedbitset"
@@ -3936,7 +3938,7 @@ default-features = false
 
 [build-dependencies.tinyvec]
 package = "tinyvec"
-version = "=1.12.0"
+version = "=1.13.2"
 features = ["alloc", "borsh", "grab_spare_slice", "latest_stable_rust", "schemars", "serde", "std"]
 
 [build-dependencies.tinyvec_macros]
@@ -3962,7 +3964,7 @@ version = "=0.7.18"
 
 [build-dependencies.tokio_rustls]
 package = "tokio-rustls"
-version = "=0.26.4"
+version = "=0.26.5"
 features = ["tls12"]
 default-features = false
 
