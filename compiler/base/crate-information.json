@@ -276,7 +276,7 @@
   },
   {
     "name": "cc",
-    "version": "1.4.4",
+    "version": "1.4.5",
     "id": "cc"
   },
   {
@@ -616,7 +616,7 @@
   },
   {
     "name": "find-msvc-tools",
-    "version": "0.1.11",
+    "version": "0.1.12",
     "id": "find_msvc_tools"
   },
   {
@@ -1981,7 +1981,7 @@
   },
   {
     "name": "tinyvec",
-    "version": "1.12.0",
+    "version": "1.13.2",
     "id": "tinyvec"
   },
   {
@@ -2011,7 +2011,7 @@
   },
   {
     "name": "tokio-rustls",
-    "version": "0.26.4",
+    "version": "0.26.5",
     "id": "tokio_rustls"
   },
   {
