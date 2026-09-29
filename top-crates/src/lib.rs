@@ -17,7 +17,7 @@ use cargo::{
 use itertools::Itertools;
 use semver::Version;
 use serde::{Deserialize, Serialize};
-use std::collections::{btree_map::Entry, BTreeMap, BTreeSet, HashSet};
+use std::collections::{btree_map::Entry, BTreeMap, BTreeSet};
 
 const PLAYGROUND_TARGET_PLATFORM: &str = "x86_64-unknown-linux-gnu";
 
@@ -303,9 +303,8 @@ fn make_global_state<'cfg>(
     let crates_io = SourceId::crates_io(config).expect("Unable to create crates.io source ID");
 
     let source_config_map = SourceConfigMap::new(config).unwrap();
-    let yanked_whitelist = HashSet::new();
     let source = source_config_map
-        .load(crates_io, &yanked_whitelist)
+        .load(crates_io)
         .expect("Unable to create registry source");
 
     GlobalState {
@@ -359,11 +358,11 @@ async fn populate_initial_direct_dependencies(
         // Find the newest non-prelease version
         let summary = matches
             .into_iter()
-            .filter(|summary| !summary.as_summary().version().is_prerelease())
-            .max_by_key(|summary| summary.as_summary().version().clone())
+            .filter(|summary| !summary.package_id().version().is_prerelease())
+            .max_by_key(|summary| summary.package_id().version().clone())
             .unwrap_or_else(|| panic!("Registry has no viable versions of {}", name));
 
-        let version = summary.as_summary().version().clone();
+        let version = summary.package_id().version().clone();
 
         if global.modifications.excluded(&name, &version) {
             continue;
