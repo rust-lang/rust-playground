@@ -30,7 +30,7 @@
     "@eslint/js": "^9.15.0",
     "@rspack/cli": "^2.1.2",
     "@rspack/core": "^2.1.2",
-    "@rstest/core": "^0.11.3",
+    "@rstest/core": "^0.12.2",
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/common-tags": "^1.8.1",
     "@types/lodash-es": "^4.17.6",

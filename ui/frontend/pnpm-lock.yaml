@@ -82,8 +82,8 @@ importers:
         specifier: ^2.1.2
         version: 2.2.8(@swc/helpers@0.5.23)
       '@rstest/core':
-        specifier: ^0.11.3
-        version: 0.11.12
+        specifier: ^0.12.2
+        version: 0.12.2
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^6.0.0
         version: 6.0.2(prettier@3.9.9)(supports-color@10.2.2)
@@ -776,8 +776,8 @@ packages:
   '@rspack/lite-tapable@1.3.0':
     resolution: {integrity: sha512-YQLaGRltBp5wzh9ee7PMmh1pErbx0E3zDlfO4K3iQpsEcJcBcgj3+9gq6/wqB/zbXbluoWoRCvL+odkft/Qt3A==}
 
-  '@rstest/core@0.11.12':
-    resolution: {integrity: sha512-dklEYLtL1eip/11K+o3xEchEs2nCGua2u2W8Pycf6PS8TE0PDJH2Bn9y/txuQI4YVHyIQ88PISWtS6fVnxSyXQ==}
+  '@rstest/core@0.12.2':
+    resolution: {integrity: sha512-vDn3fCWnfv1UnjG0ZBUyDyQstRNEuceBFMLKuvPvsSm+8vTRj3ad0O2izRdj0MuPj4AqzgYVlDMv+cGBYHTUlw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -1179,6 +1179,9 @@ packages:
   chrome-trace-event@1.0.4:
     resolution: {integrity: sha512-rNjApaLzuwaOTjCiT8lSDdGN1APCiqkChLMJxJPWLunPAt5fy8xgU9/jNOchV84wfIxrA0lRQB7oCT8jrn/wrQ==}
     engines: {node: '>=6.0'}
+
+  cjs-module-lexer@2.2.1:
+    resolution: {integrity: sha512-Ca8swihM+/4yKecYHY52kgJd300hi2lADU/a1RxNTRe+RJ9jvqQlESpbz9DnG9mowez8qwXHB8qYdIUw9e+F5Q==}
 
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
@@ -3550,10 +3553,11 @@ snapshots:
 
   '@rspack/lite-tapable@1.3.0': {}
 
-  '@rstest/core@0.11.12':
+  '@rstest/core@0.12.2':
     dependencies:
       '@rsbuild/core': 2.2.10
       '@types/chai': 5.2.3
+      cjs-module-lexer: 2.2.1
     transitivePeerDependencies:
       - '@module-federation/runtime-tools'
       - core-js
@@ -4024,6 +4028,8 @@ snapshots:
       readdirp: 5.1.1
 
   chrome-trace-event@1.0.4: {}
+
+  cjs-module-lexer@2.2.1: {}
 
   color-convert@2.0.1:
     dependencies:
