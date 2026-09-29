@@ -120,7 +120,7 @@ version = "=0.2.1"
 
 [dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.44"
+version = "=0.4.48"
 features = ["tokio"]
 
 [dependencies.async_trait]
@@ -190,7 +190,7 @@ default-features = false
 
 [dependencies.bitflags]
 package = "bitflags"
-version = "=2.13.1"
+version = "=2.13.2"
 
 [dependencies.bitstream_io]
 package = "bitstream-io"
@@ -248,7 +248,7 @@ features = ["aarch64_simd", "extern_crate_alloc", "extern_crate_std", "latest_st
 
 [dependencies.bytemuck_derive]
 package = "bytemuck_derive"
-version = "=1.12.0"
+version = "=1.12.1"
 
 [dependencies.byteorder]
 package = "byteorder"
@@ -268,7 +268,7 @@ version = "=0.4.12"
 
 [dependencies.cc]
 package = "cc"
-version = "=1.4.5"
+version = "=1.5.1"
 features = ["parallel"]
 
 [dependencies.cfg_aliases]
@@ -277,7 +277,7 @@ version = "=0.2.2"
 
 [dependencies.cfg_if]
 package = "cfg-if"
-version = "=1.0.4"
+version = "=1.0.5"
 
 [dependencies.chacha20]
 package = "chacha20"
@@ -292,21 +292,21 @@ features = ["clock", "serde"]
 
 [dependencies.clap]
 package = "clap"
-version = "=4.6.6"
+version = "=4.6.7"
 features = ["unstable-doc"]
 
 [dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.6.6"
+version = "=4.6.7"
 features = ["unstable-doc"]
 
 [dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.6.4"
+version = "=4.6.7"
 
 [dependencies.clap_lex]
 package = "clap_lex"
-version = "=1.1.0"
+version = "=1.1.1"
 
 [dependencies.cmake]
 package = "cmake"
@@ -326,7 +326,7 @@ version = "=1.0.5"
 
 [dependencies.compression_codecs]
 package = "compression-codecs"
-version = "=0.4.39"
+version = "=0.4.43"
 
 [dependencies.compression_core]
 package = "compression-core"
@@ -354,40 +354,44 @@ features = ["percent-encode"]
 package = "cookie_store"
 version = "=0.22.1"
 
+[dependencies.core_detect]
+package = "core_detect"
+version = "=1.0.0"
+
 [dependencies.cpufeatures]
 package = "cpufeatures"
 version = "=0.3.1"
 
 [dependencies.crc32fast]
 package = "crc32fast"
-version = "=1.5.1"
+version = "=1.5.2"
 
 [dependencies.crossbeam]
 package = "crossbeam"
-version = "=0.8.4"
+version = "=0.8.5"
 
 [dependencies.crossbeam_channel]
 package = "crossbeam-channel"
-version = "=0.5.16"
+version = "=0.5.17"
 default-features = false
 
 [dependencies.crossbeam_deque]
 package = "crossbeam-deque"
-version = "=0.8.7"
+version = "=0.8.8"
 
 [dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.20"
+version = "=0.9.21"
 default-features = false
 
 [dependencies.crossbeam_queue]
 package = "crossbeam-queue"
-version = "=0.3.13"
+version = "=0.3.14"
 default-features = false
 
 [dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.22"
+version = "=0.8.23"
 
 [dependencies.crypto_common]
 package = "crypto-common"
@@ -493,7 +497,7 @@ features = ["serde"]
 
 [dependencies.encoding_rs]
 package = "encoding_rs"
-version = "=0.8.35"
+version = "=0.8.42"
 
 [dependencies.env_filter]
 package = "env_filter"
@@ -541,7 +545,7 @@ version = "=0.1.9"
 
 [dependencies.faster_hex]
 package = "faster-hex"
-version = "=0.10.0"
+version = "=0.10.1"
 default-features = false
 
 [dependencies.fastrand]
@@ -562,7 +566,7 @@ version = "=0.2.29"
 
 [dependencies.find_msvc_tools]
 package = "find-msvc-tools"
-version = "=0.1.12"
+version = "=0.1.14"
 
 [dependencies.fixedbitset]
 package = "fixedbitset"
@@ -727,7 +731,7 @@ default-features = false
 
 [dependencies.hashlink]
 package = "hashlink"
-version = "=0.12.1"
+version = "=0.12.2"
 
 [dependencies.hdrhistogram]
 package = "hdrhistogram"
@@ -784,7 +788,7 @@ version = "=2.4.0"
 
 [dependencies.hybrid_array]
 package = "hybrid-array"
-version = "=0.4.14"
+version = "=0.4.15"
 
 [dependencies.hyper]
 package = "hyper"
@@ -793,13 +797,13 @@ features = ["client", "full", "http1"]
 
 [dependencies.hyper_rustls]
 package = "hyper-rustls"
-version = "=0.27.9"
+version = "=0.27.10"
 features = ["http1", "tls12"]
 default-features = false
 
 [dependencies.hyper_util]
 package = "hyper-util"
-version = "=0.1.20"
+version = "=0.1.21"
 features = ["client", "client-legacy", "client-proxy", "http1", "tokio"]
 
 [dependencies.iana_time_zone]
@@ -866,7 +870,7 @@ version = "=1.12.3"
 
 [dependencies.indexmap]
 package = "indexmap"
-version = "=2.14.1"
+version = "=2.14.2"
 features = ["std"]
 
 [dependencies.iovec]
@@ -875,7 +879,7 @@ version = "=0.1.4"
 
 [dependencies.ipnet]
 package = "ipnet"
-version = "=2.12.1"
+version = "=2.12.2"
 
 [dependencies.is_terminal_polyfill]
 package = "is_terminal_polyfill"
@@ -895,16 +899,16 @@ version = "=1.0.18"
 
 [dependencies.jiff]
 package = "jiff"
-version = "=0.2.35"
+version = "=0.2.37"
 features = ["logging", "serde", "static", "std", "tzdb-bundle-always"]
 
 [dependencies.jiff_core]
 package = "jiff-core"
-version = "=0.1.0"
+version = "=0.1.1"
 
 [dependencies.jiff_static]
 package = "jiff-static"
-version = "=0.2.35"
+version = "=0.2.37"
 
 [dependencies.jiff_tzdb]
 package = "jiff-tzdb"
@@ -1045,6 +1049,10 @@ version = "=0.6.1"
 [dependencies.moxcms]
 package = "moxcms"
 version = "=0.8.1"
+
+[dependencies.multiversion_no_op]
+package = "multiversion_no_op"
+version = "=1.0.0"
 
 [dependencies.munge]
 package = "munge"
@@ -1349,7 +1357,7 @@ default-features = false
 
 [dependencies.rand]
 package = "rand"
-version = "=0.10.2"
+version = "=0.10.3"
 features = ["serde"]
 
 [dependencies.rand_0_8_8]
@@ -1457,7 +1465,7 @@ default-features = false
 
 [dependencies.reqwest]
 package = "reqwest"
-version = "=0.13.4"
+version = "=0.13.5"
 features = ["blocking", "cookies", "form", "json", "multipart", "query"]
 
 [dependencies.reqwest_0_12_28]
@@ -1499,12 +1507,12 @@ version = "=0.4.1"
 
 [dependencies.rustix]
 package = "rustix"
-version = "=1.1.4"
+version = "=1.1.5"
 features = ["fs", "std", "termios"]
 
 [dependencies.rustls]
 package = "rustls"
-version = "=0.23.43"
+version = "=0.23.45"
 features = ["std", "tls12"]
 default-features = false
 
@@ -1519,7 +1527,7 @@ features = ["alloc", "std"]
 
 [dependencies.rustls_platform_verifier]
 package = "rustls-platform-verifier"
-version = "=0.7.0"
+version = "=0.7.1"
 
 [dependencies.rustversion]
 package = "rustversion"
@@ -1640,9 +1648,15 @@ version = "=0.3.10"
 package = "simd_helpers"
 version = "=0.1.0"
 
+[dependencies.simdutf8]
+package = "simdutf8"
+version = "=0.1.5"
+features = ["aarch64_neon", "public_imp"]
+default-features = false
+
 [dependencies.siphasher]
 package = "siphasher"
-version = "=1.0.3"
+version = "=1.0.4"
 
 [dependencies.siphasher_0_3_11]
 package = "siphasher"
@@ -1654,7 +1668,7 @@ version = "=0.4.12"
 
 [dependencies.smallvec]
 package = "smallvec"
-version = "=1.16.0"
+version = "=1.16.2"
 features = ["const_generics", "const_new"]
 
 [dependencies.socket2]
@@ -1693,7 +1707,7 @@ default-features = false
 
 [dependencies.syn]
 package = "syn"
-version = "=3.0.4"
+version = "=3.0.6"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [dependencies.syn_1_0_109]
@@ -1704,7 +1718,7 @@ features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 [dependencies.syn_2_0_119]
 package = "syn"
 version = "=2.0.119"
-features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
+features = ["clone-impls", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [dependencies.sync_wrapper]
 package = "sync_wrapper"
@@ -1713,7 +1727,7 @@ features = ["futures"]
 
 [dependencies.synstructure]
 package = "synstructure"
-version = "=0.13.2"
+version = "=0.14.0"
 
 [dependencies.tap]
 package = "tap"
@@ -1737,11 +1751,11 @@ version = "=0.4.4"
 
 [dependencies.thiserror]
 package = "thiserror"
-version = "=2.0.20"
+version = "=2.0.21"
 
 [dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=2.0.20"
+version = "=2.0.21"
 
 [dependencies.thread_id]
 package = "thread-id"
@@ -1779,12 +1793,8 @@ default-features = false
 
 [dependencies.tinyvec]
 package = "tinyvec"
-version = "=1.13.2"
+version = "=1.13.3"
 features = ["alloc", "borsh", "grab_spare_slice", "latest_stable_rust", "schemars", "serde", "std"]
-
-[dependencies.tinyvec_macros]
-package = "tinyvec_macros"
-version = "=0.1.1"
 
 [dependencies.tokio]
 package = "tokio"
@@ -1805,7 +1815,7 @@ version = "=0.7.18"
 
 [dependencies.tokio_rustls]
 package = "tokio-rustls"
-version = "=0.26.5"
+version = "=0.26.6"
 features = ["tls12"]
 default-features = false
 
@@ -1820,7 +1830,7 @@ features = ["codec", "full", "io"]
 
 [dependencies.toml]
 package = "toml"
-version = "=1.1.5"
+version = "=1.1.6"
 
 [dependencies.toml_datetime]
 package = "toml_datetime"
@@ -1829,7 +1839,7 @@ features = ["alloc"]
 
 [dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.25.13"
+version = "=0.25.15"
 
 [dependencies.toml_parser]
 package = "toml_parser"
@@ -1910,7 +1920,7 @@ version = "=0.3.18"
 
 [dependencies.unicode_ident]
 package = "unicode-ident"
-version = "=1.0.24"
+version = "=1.0.26"
 
 [dependencies.unicode_normalization]
 package = "unicode-normalization"
@@ -1963,7 +1973,7 @@ version = "=0.2.2"
 
 [dependencies.uuid]
 package = "uuid"
-version = "=1.26.0"
+version = "=1.26.1"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [dependencies.v_frame]
@@ -1988,19 +1998,19 @@ version = "=0.3.1"
 
 [dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.127"
+version = "=0.2.129"
 
 [dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.127"
+version = "=0.2.129"
 
 [dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.127"
+version = "=0.2.129"
 
 [dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.127"
+version = "=0.2.129"
 
 [dependencies.webpki]
 package = "rustls-webpki"
@@ -2022,7 +2032,7 @@ version = "=2.1.3"
 
 [dependencies.wide]
 package = "wide"
-version = "=1.7.0"
+version = "=1.7.1"
 default-features = false
 
 [dependencies.windows_aarch64_gnullvm]
@@ -2108,17 +2118,17 @@ default-features = false
 
 [dependencies.yoke_derive]
 package = "yoke-derive"
-version = "=0.8.2"
+version = "=0.8.3"
 default-features = false
 
 [dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.56"
+version = "=0.8.59"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.56"
+version = "=0.8.59"
 
 [dependencies.zerofrom]
 package = "zerofrom"
@@ -2127,7 +2137,7 @@ features = ["alloc", "derive"]
 
 [dependencies.zerofrom_derive]
 package = "zerofrom-derive"
-version = "=0.1.7"
+version = "=0.1.8"
 default-features = false
 
 [dependencies.zeroize]
@@ -2157,18 +2167,18 @@ version = "=1.0.23"
 
 [dependencies.zstd]
 package = "zstd"
-version = "=0.13.3"
+version = "=0.14.0"
 default-features = false
 
 [dependencies.zstd_safe]
 package = "zstd-safe"
-version = "=7.2.4"
+version = "=8.0.0"
 features = ["std"]
 default-features = false
 
 [dependencies.zstd_sys]
 package = "zstd-sys"
-version = "=2.0.16"
+version = "=2.1.0"
 default-features = false
 
 [dependencies.zune_core]
@@ -2279,7 +2289,7 @@ version = "=0.2.1"
 
 [build-dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.44"
+version = "=0.4.48"
 features = ["tokio"]
 
 [build-dependencies.async_trait]
@@ -2349,7 +2359,7 @@ default-features = false
 
 [build-dependencies.bitflags]
 package = "bitflags"
-version = "=2.13.1"
+version = "=2.13.2"
 
 [build-dependencies.bitstream_io]
 package = "bitstream-io"
@@ -2407,7 +2417,7 @@ features = ["aarch64_simd", "extern_crate_alloc", "extern_crate_std", "latest_st
 
 [build-dependencies.bytemuck_derive]
 package = "bytemuck_derive"
-version = "=1.12.0"
+version = "=1.12.1"
 
 [build-dependencies.byteorder]
 package = "byteorder"
@@ -2427,7 +2437,7 @@ version = "=0.4.12"
 
 [build-dependencies.cc]
 package = "cc"
-version = "=1.4.5"
+version = "=1.5.1"
 features = ["parallel"]
 
 [build-dependencies.cfg_aliases]
@@ -2436,7 +2446,7 @@ version = "=0.2.2"
 
 [build-dependencies.cfg_if]
 package = "cfg-if"
-version = "=1.0.4"
+version = "=1.0.5"
 
 [build-dependencies.chacha20]
 package = "chacha20"
@@ -2451,21 +2461,21 @@ features = ["clock", "serde"]
 
 [build-dependencies.clap]
 package = "clap"
-version = "=4.6.6"
+version = "=4.6.7"
 features = ["unstable-doc"]
 
 [build-dependencies.clap_builder]
 package = "clap_builder"
-version = "=4.6.6"
+version = "=4.6.7"
 features = ["unstable-doc"]
 
 [build-dependencies.clap_derive]
 package = "clap_derive"
-version = "=4.6.4"
+version = "=4.6.7"
 
 [build-dependencies.clap_lex]
 package = "clap_lex"
-version = "=1.1.0"
+version = "=1.1.1"
 
 [build-dependencies.cmake]
 package = "cmake"
@@ -2485,7 +2495,7 @@ version = "=1.0.5"
 
 [build-dependencies.compression_codecs]
 package = "compression-codecs"
-version = "=0.4.39"
+version = "=0.4.43"
 
 [build-dependencies.compression_core]
 package = "compression-core"
@@ -2513,40 +2523,44 @@ features = ["percent-encode"]
 package = "cookie_store"
 version = "=0.22.1"
 
+[build-dependencies.core_detect]
+package = "core_detect"
+version = "=1.0.0"
+
 [build-dependencies.cpufeatures]
 package = "cpufeatures"
 version = "=0.3.1"
 
 [build-dependencies.crc32fast]
 package = "crc32fast"
-version = "=1.5.1"
+version = "=1.5.2"
 
 [build-dependencies.crossbeam]
 package = "crossbeam"
-version = "=0.8.4"
+version = "=0.8.5"
 
 [build-dependencies.crossbeam_channel]
 package = "crossbeam-channel"
-version = "=0.5.16"
+version = "=0.5.17"
 default-features = false
 
 [build-dependencies.crossbeam_deque]
 package = "crossbeam-deque"
-version = "=0.8.7"
+version = "=0.8.8"
 
 [build-dependencies.crossbeam_epoch]
 package = "crossbeam-epoch"
-version = "=0.9.20"
+version = "=0.9.21"
 default-features = false
 
 [build-dependencies.crossbeam_queue]
 package = "crossbeam-queue"
-version = "=0.3.13"
+version = "=0.3.14"
 default-features = false
 
 [build-dependencies.crossbeam_utils]
 package = "crossbeam-utils"
-version = "=0.8.22"
+version = "=0.8.23"
 
 [build-dependencies.crypto_common]
 package = "crypto-common"
@@ -2652,7 +2666,7 @@ features = ["serde"]
 
 [build-dependencies.encoding_rs]
 package = "encoding_rs"
-version = "=0.8.35"
+version = "=0.8.42"
 
 [build-dependencies.env_filter]
 package = "env_filter"
@@ -2700,7 +2714,7 @@ version = "=0.1.9"
 
 [build-dependencies.faster_hex]
 package = "faster-hex"
-version = "=0.10.0"
+version = "=0.10.1"
 default-features = false
 
 [build-dependencies.fastrand]
@@ -2721,7 +2735,7 @@ version = "=0.2.29"
 
 [build-dependencies.find_msvc_tools]
 package = "find-msvc-tools"
-version = "=0.1.12"
+version = "=0.1.14"
 
 [build-dependencies.fixedbitset]
 package = "fixedbitset"
@@ -2886,7 +2900,7 @@ default-features = false
 
 [build-dependencies.hashlink]
 package = "hashlink"
-version = "=0.12.1"
+version = "=0.12.2"
 
 [build-dependencies.hdrhistogram]
 package = "hdrhistogram"
@@ -2943,7 +2957,7 @@ version = "=2.4.0"
 
 [build-dependencies.hybrid_array]
 package = "hybrid-array"
-version = "=0.4.14"
+version = "=0.4.15"
 
 [build-dependencies.hyper]
 package = "hyper"
@@ -2952,13 +2966,13 @@ features = ["client", "full", "http1"]
 
 [build-dependencies.hyper_rustls]
 package = "hyper-rustls"
-version = "=0.27.9"
+version = "=0.27.10"
 features = ["http1", "tls12"]
 default-features = false
 
 [build-dependencies.hyper_util]
 package = "hyper-util"
-version = "=0.1.20"
+version = "=0.1.21"
 features = ["client", "client-legacy", "client-proxy", "http1", "tokio"]
 
 [build-dependencies.iana_time_zone]
@@ -3025,7 +3039,7 @@ version = "=1.12.3"
 
 [build-dependencies.indexmap]
 package = "indexmap"
-version = "=2.14.1"
+version = "=2.14.2"
 features = ["std"]
 
 [build-dependencies.iovec]
@@ -3034,7 +3048,7 @@ version = "=0.1.4"
 
 [build-dependencies.ipnet]
 package = "ipnet"
-version = "=2.12.1"
+version = "=2.12.2"
 
 [build-dependencies.is_terminal_polyfill]
 package = "is_terminal_polyfill"
@@ -3054,16 +3068,16 @@ version = "=1.0.18"
 
 [build-dependencies.jiff]
 package = "jiff"
-version = "=0.2.35"
+version = "=0.2.37"
 features = ["logging", "serde", "static", "std", "tzdb-bundle-always"]
 
 [build-dependencies.jiff_core]
 package = "jiff-core"
-version = "=0.1.0"
+version = "=0.1.1"
 
 [build-dependencies.jiff_static]
 package = "jiff-static"
-version = "=0.2.35"
+version = "=0.2.37"
 
 [build-dependencies.jiff_tzdb]
 package = "jiff-tzdb"
@@ -3204,6 +3218,10 @@ version = "=0.6.1"
 [build-dependencies.moxcms]
 package = "moxcms"
 version = "=0.8.1"
+
+[build-dependencies.multiversion_no_op]
+package = "multiversion_no_op"
+version = "=1.0.0"
 
 [build-dependencies.munge]
 package = "munge"
@@ -3508,7 +3526,7 @@ default-features = false
 
 [build-dependencies.rand]
 package = "rand"
-version = "=0.10.2"
+version = "=0.10.3"
 features = ["serde"]
 
 [build-dependencies.rand_0_8_8]
@@ -3616,7 +3634,7 @@ default-features = false
 
 [build-dependencies.reqwest]
 package = "reqwest"
-version = "=0.13.4"
+version = "=0.13.5"
 features = ["blocking", "cookies", "form", "json", "multipart", "query"]
 
 [build-dependencies.reqwest_0_12_28]
@@ -3658,12 +3676,12 @@ version = "=0.4.1"
 
 [build-dependencies.rustix]
 package = "rustix"
-version = "=1.1.4"
+version = "=1.1.5"
 features = ["fs", "std", "termios"]
 
 [build-dependencies.rustls]
 package = "rustls"
-version = "=0.23.43"
+version = "=0.23.45"
 features = ["std", "tls12"]
 default-features = false
 
@@ -3678,7 +3696,7 @@ features = ["alloc", "std"]
 
 [build-dependencies.rustls_platform_verifier]
 package = "rustls-platform-verifier"
-version = "=0.7.0"
+version = "=0.7.1"
 
 [build-dependencies.rustversion]
 package = "rustversion"
@@ -3799,9 +3817,15 @@ version = "=0.3.10"
 package = "simd_helpers"
 version = "=0.1.0"
 
+[build-dependencies.simdutf8]
+package = "simdutf8"
+version = "=0.1.5"
+features = ["aarch64_neon", "public_imp"]
+default-features = false
+
 [build-dependencies.siphasher]
 package = "siphasher"
-version = "=1.0.3"
+version = "=1.0.4"
 
 [build-dependencies.siphasher_0_3_11]
 package = "siphasher"
@@ -3813,7 +3837,7 @@ version = "=0.4.12"
 
 [build-dependencies.smallvec]
 package = "smallvec"
-version = "=1.16.0"
+version = "=1.16.2"
 features = ["const_generics", "const_new"]
 
 [build-dependencies.socket2]
@@ -3852,7 +3876,7 @@ default-features = false
 
 [build-dependencies.syn]
 package = "syn"
-version = "=3.0.4"
+version = "=3.0.6"
 features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [build-dependencies.syn_1_0_109]
@@ -3863,7 +3887,7 @@ features = ["extra-traits", "fold", "full", "visit", "visit-mut"]
 [build-dependencies.syn_2_0_119]
 package = "syn"
 version = "=2.0.119"
-features = ["clone-impls", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
+features = ["clone-impls", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "visit", "visit-mut"]
 
 [build-dependencies.sync_wrapper]
 package = "sync_wrapper"
@@ -3872,7 +3896,7 @@ features = ["futures"]
 
 [build-dependencies.synstructure]
 package = "synstructure"
-version = "=0.13.2"
+version = "=0.14.0"
 
 [build-dependencies.tap]
 package = "tap"
@@ -3896,11 +3920,11 @@ version = "=0.4.4"
 
 [build-dependencies.thiserror]
 package = "thiserror"
-version = "=2.0.20"
+version = "=2.0.21"
 
 [build-dependencies.thiserror_impl]
 package = "thiserror-impl"
-version = "=2.0.20"
+version = "=2.0.21"
 
 [build-dependencies.thread_id]
 package = "thread-id"
@@ -3938,12 +3962,8 @@ default-features = false
 
 [build-dependencies.tinyvec]
 package = "tinyvec"
-version = "=1.13.2"
+version = "=1.13.3"
 features = ["alloc", "borsh", "grab_spare_slice", "latest_stable_rust", "schemars", "serde", "std"]
-
-[build-dependencies.tinyvec_macros]
-package = "tinyvec_macros"
-version = "=0.1.1"
 
 [build-dependencies.tokio]
 package = "tokio"
@@ -3964,7 +3984,7 @@ version = "=0.7.18"
 
 [build-dependencies.tokio_rustls]
 package = "tokio-rustls"
-version = "=0.26.5"
+version = "=0.26.6"
 features = ["tls12"]
 default-features = false
 
@@ -3979,7 +3999,7 @@ features = ["codec", "full", "io"]
 
 [build-dependencies.toml]
 package = "toml"
-version = "=1.1.5"
+version = "=1.1.6"
 
 [build-dependencies.toml_datetime]
 package = "toml_datetime"
@@ -3988,7 +4008,7 @@ features = ["alloc"]
 
 [build-dependencies.toml_edit]
 package = "toml_edit"
-version = "=0.25.13"
+version = "=0.25.15"
 
 [build-dependencies.toml_parser]
 package = "toml_parser"
@@ -4069,7 +4089,7 @@ version = "=0.3.18"
 
 [build-dependencies.unicode_ident]
 package = "unicode-ident"
-version = "=1.0.24"
+version = "=1.0.26"
 
 [build-dependencies.unicode_normalization]
 package = "unicode-normalization"
@@ -4122,7 +4142,7 @@ version = "=0.2.2"
 
 [build-dependencies.uuid]
 package = "uuid"
-version = "=1.26.0"
+version = "=1.26.1"
 features = ["serde", "v1", "v3", "v4", "v5", "v6", "v7", "v8"]
 
 [build-dependencies.v_frame]
@@ -4147,19 +4167,19 @@ version = "=0.3.1"
 
 [build-dependencies.wasm_bindgen]
 package = "wasm-bindgen"
-version = "=0.2.127"
+version = "=0.2.129"
 
 [build-dependencies.wasm_bindgen_macro]
 package = "wasm-bindgen-macro"
-version = "=0.2.127"
+version = "=0.2.129"
 
 [build-dependencies.wasm_bindgen_macro_support]
 package = "wasm-bindgen-macro-support"
-version = "=0.2.127"
+version = "=0.2.129"
 
 [build-dependencies.wasm_bindgen_shared]
 package = "wasm-bindgen-shared"
-version = "=0.2.127"
+version = "=0.2.129"
 
 [build-dependencies.webpki]
 package = "rustls-webpki"
@@ -4181,7 +4201,7 @@ version = "=2.1.3"
 
 [build-dependencies.wide]
 package = "wide"
-version = "=1.7.0"
+version = "=1.7.1"
 default-features = false
 
 [build-dependencies.windows_aarch64_gnullvm]
@@ -4267,17 +4287,17 @@ default-features = false
 
 [build-dependencies.yoke_derive]
 package = "yoke-derive"
-version = "=0.8.2"
+version = "=0.8.3"
 default-features = false
 
 [build-dependencies.zerocopy]
 package = "zerocopy"
-version = "=0.8.56"
+version = "=0.8.59"
 features = ["__internal_use_only_features_that_work_on_stable", "derive", "simd"]
 
 [build-dependencies.zerocopy_derive]
 package = "zerocopy-derive"
-version = "=0.8.56"
+version = "=0.8.59"
 
 [build-dependencies.zerofrom]
 package = "zerofrom"
@@ -4286,7 +4306,7 @@ features = ["alloc", "derive"]
 
 [build-dependencies.zerofrom_derive]
 package = "zerofrom-derive"
-version = "=0.1.7"
+version = "=0.1.8"
 default-features = false
 
 [build-dependencies.zeroize]
@@ -4316,18 +4336,18 @@ version = "=1.0.23"
 
 [build-dependencies.zstd]
 package = "zstd"
-version = "=0.13.3"
+version = "=0.14.0"
 default-features = false
 
 [build-dependencies.zstd_safe]
 package = "zstd-safe"
-version = "=7.2.4"
+version = "=8.0.0"
 features = ["std"]
 default-features = false
 
 [build-dependencies.zstd_sys]
 package = "zstd-sys"
-version = "=2.0.16"
+version = "=2.1.0"
 default-features = false
 
 [build-dependencies.zune_core]
