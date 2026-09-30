@@ -134,6 +134,7 @@ jobs:
     - name: Configure Ruby
       uses: ruby/setup-ruby@v1
       with:
+        working-directory: tests
         ruby-version: 3.3.6
     - name: Cache bundler intermediate products
       uses: actions/cache@v5
@@ -143,7 +144,7 @@ jobs:
         restore-keys: "${{ runner.os }}-gems-"
     - name: Install gems
       run: |-
-        bundle config path vendor/bundle
+        bundle config set path vendor/bundle
         bundle install --jobs 4 --retry 3
     - name: Build provisional stable image
       uses: "./.github/actions/build-and-push-image"

@@ -200,6 +200,7 @@ workflows:
           - name: "Configure Ruby"
             uses: ruby/setup-ruby@v1
             with:
+              working-directory: 'tests'
               ruby-version: '3.3.6'
 
           - name: "Cache bundler intermediate products"
@@ -212,7 +213,7 @@ workflows:
 
           - name: "Install gems"
             run: |-
-              bundle config path vendor/bundle
+              bundle config set path vendor/bundle
               bundle install --jobs 4 --retry 3
 
           - name: "Build provisional stable image"
