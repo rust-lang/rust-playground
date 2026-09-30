@@ -143,7 +143,6 @@ jobs:
         restore-keys: "${{ runner.os }}-gems-"
     - name: Install gems
       run: |-
-        gem install bundler
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
     - name: Build provisional stable image
