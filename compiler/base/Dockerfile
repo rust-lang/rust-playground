@@ -109,6 +109,9 @@ RUN cargo build
 RUN cargo build --release
 RUN cargo clippy
 RUN <<EOF
+if [ "${channel}" = 'beta' ]; then
+    echo '\n[lints.cargo]\nunused_dependencies = "allow"\n' >> Cargo.toml
+fi
 if [ "${channel}" = 'nightly' ]; then
     echo '\n[lints.cargo]\nunused_dependencies = "allow"\n' >> Cargo.toml
     cargo miri setup;
