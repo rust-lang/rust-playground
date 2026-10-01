@@ -31,12 +31,12 @@
   },
   {
     "name": "alloc-no-stdlib",
-    "version": "2.0.4",
+    "version": "3.0.0",
     "id": "alloc_no_stdlib"
   },
   {
     "name": "alloc-stdlib",
-    "version": "0.2.4",
+    "version": "0.3.0",
     "id": "alloc_stdlib"
   },
   {
@@ -106,7 +106,7 @@
   },
   {
     "name": "async-compression",
-    "version": "0.4.48",
+    "version": "0.4.50",
     "id": "async_compression"
   },
   {
@@ -216,12 +216,12 @@
   },
   {
     "name": "brotli",
-    "version": "8.0.4",
+    "version": "9.0.0",
     "id": "brotli"
   },
   {
     "name": "brotli-decompressor",
-    "version": "5.0.3",
+    "version": "6.0.1",
     "id": "brotli_decompressor"
   },
   {
@@ -341,7 +341,7 @@
   },
   {
     "name": "compression-codecs",
-    "version": "0.4.43",
+    "version": "0.4.45",
     "id": "compression_codecs"
   },
   {
@@ -1016,7 +1016,7 @@
   },
   {
     "name": "lazy_static",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "id": "lazy_static"
   },
   {
@@ -2371,7 +2371,7 @@
   },
   {
     "name": "yoke-derive",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "id": "yoke_derive"
   },
   {
