@@ -55,11 +55,11 @@ version = "=0.6.4"
 
 [dependencies.alloc_no_stdlib]
 package = "alloc-no-stdlib"
-version = "=2.0.4"
+version = "=3.0.0"
 
 [dependencies.alloc_stdlib]
 package = "alloc-stdlib"
-version = "=0.2.4"
+version = "=0.3.0"
 
 [dependencies.allocator_api2]
 package = "allocator-api2"
@@ -120,7 +120,7 @@ version = "=0.2.1"
 
 [dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.48"
+version = "=0.4.50"
 features = ["tokio"]
 
 [dependencies.async_trait]
@@ -216,11 +216,11 @@ default-features = false
 
 [dependencies.brotli]
 package = "brotli"
-version = "=8.0.4"
+version = "=9.0.0"
 
 [dependencies.brotli_decompressor]
 package = "brotli-decompressor"
-version = "=5.0.3"
+version = "=6.0.1"
 default-features = false
 
 [dependencies.built]
@@ -326,7 +326,7 @@ version = "=1.0.5"
 
 [dependencies.compression_codecs]
 package = "compression-codecs"
-version = "=0.4.43"
+version = "=0.4.45"
 
 [dependencies.compression_core]
 package = "compression-core"
@@ -921,7 +921,7 @@ default-features = false
 
 [dependencies.lazy_static]
 package = "lazy_static"
-version = "=1.5.0"
+version = "=1.5.1"
 
 [dependencies.lebe]
 package = "lebe"
@@ -2118,7 +2118,7 @@ default-features = false
 
 [dependencies.yoke_derive]
 package = "yoke-derive"
-version = "=0.8.3"
+version = "=0.8.4"
 default-features = false
 
 [dependencies.zerocopy]
@@ -2224,11 +2224,11 @@ version = "=0.6.4"
 
 [build-dependencies.alloc_no_stdlib]
 package = "alloc-no-stdlib"
-version = "=2.0.4"
+version = "=3.0.0"
 
 [build-dependencies.alloc_stdlib]
 package = "alloc-stdlib"
-version = "=0.2.4"
+version = "=0.3.0"
 
 [build-dependencies.allocator_api2]
 package = "allocator-api2"
@@ -2289,7 +2289,7 @@ version = "=0.2.1"
 
 [build-dependencies.async_compression]
 package = "async-compression"
-version = "=0.4.48"
+version = "=0.4.50"
 features = ["tokio"]
 
 [build-dependencies.async_trait]
@@ -2385,11 +2385,11 @@ default-features = false
 
 [build-dependencies.brotli]
 package = "brotli"
-version = "=8.0.4"
+version = "=9.0.0"
 
 [build-dependencies.brotli_decompressor]
 package = "brotli-decompressor"
-version = "=5.0.3"
+version = "=6.0.1"
 default-features = false
 
 [build-dependencies.built]
@@ -2495,7 +2495,7 @@ version = "=1.0.5"
 
 [build-dependencies.compression_codecs]
 package = "compression-codecs"
-version = "=0.4.43"
+version = "=0.4.45"
 
 [build-dependencies.compression_core]
 package = "compression-core"
@@ -3090,7 +3090,7 @@ default-features = false
 
 [build-dependencies.lazy_static]
 package = "lazy_static"
-version = "=1.5.0"
+version = "=1.5.1"
 
 [build-dependencies.lebe]
 package = "lebe"
@@ -4287,7 +4287,7 @@ default-features = false
 
 [build-dependencies.yoke_derive]
 package = "yoke-derive"
-version = "=0.8.3"
+version = "=0.8.4"
 default-features = false
 
 [build-dependencies.zerocopy]
