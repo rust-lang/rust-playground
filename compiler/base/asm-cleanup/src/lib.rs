@@ -125,10 +125,15 @@ pub fn filter_asm(block: &str) -> String {
     let mut data_labels = Vec::new();
     let mut used_labels: HashSet<_> = labels.intersection(&opcode_operands).collect();
 
+    // Reuse the `Dfs` to avoid visiting the same nodes multiple
+    // times. This prevents quadratic behavior that occurs if we start
+    // with a fresh `Dfs` each iteration.
+    let mut label_search = Dfs::empty(&label_graph);
+
     // We only include labels ref'd by data dirs if directly or indirectly used by an opcode
     for label in &used_labels {
         if label_graph.contains_node(label) {
-            let mut label_search = Dfs::new(&label_graph, label);
+            label_search.move_to(label);
             while let Some(next_label) = label_search.next(&label_graph) {
                 data_labels.push(next_label);
             }
@@ -532,6 +537,53 @@ ref.end:
 # %bb.0:
  subq $24, %rsp
 "#,
+        );
+    }
+
+    fn build_long_chain_of_labels(n: usize) -> String {
+        use std::fmt::Write;
+
+        assert!(n > 0);
+
+        let mut s = String::new();
+
+        // Reference the labels
+        for i in 0..n {
+            writeln!(s, "  mov .L{}", i).unwrap();
+        }
+
+        // Each label references the next one
+        for i in 0..(n - 1) {
+            writeln!(s, ".L{}:", i).unwrap();
+            writeln!(s, "  .quad .L{}", i + 1).unwrap();
+        }
+
+        // And the last one is a constant
+        writeln!(s, ".L{}:", n - 1).unwrap();
+        writeln!(s, "  .quad 1").unwrap();
+
+        s
+    }
+
+    #[test]
+    fn label_chain_quadratic_scaling() {
+        use std::time::Instant;
+
+        let times = [1, 8].map(|n| {
+            let asm_code = build_long_chain_of_labels(n * 1000);
+            let start = Instant::now();
+            super::filter_asm(&asm_code);
+            start.elapsed()
+        });
+
+        let [base, eight_times_base] = times;
+        // Using 10 to provide a bit of fuzziness; if we are quadratic
+        // we should be well past that.
+        assert!(
+            eight_times_base <= base * 10,
+            "{:?} should be a factor of 10 or less than {:?}",
+            eight_times_base,
+            base,
         );
     }
 }
