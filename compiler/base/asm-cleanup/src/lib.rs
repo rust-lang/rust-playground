@@ -372,6 +372,41 @@ main:
     }
 
     #[test]
+    fn unused_data_label_referencing_used_data_label_is_removed() {
+        assert_filtered!(
+            r#"
+  move ref.used
+ref.unused:
+  .quad ref.used
+ref.used:
+  .quad 1
+"#,
+            r#"
+  move ref.used
+
+ref.used:
+  .quad 1
+"#,
+        );
+    }
+
+    #[test]
+    fn data_label_only_used_by_unused_data_label_is_removed() {
+        assert_filtered!(
+            r#"
+  move rax
+ref.unused.1:
+  .quad ref.unused.2
+ref.unused.2:
+  .quad 1
+"#,
+            r#"
+  move rax
+"#,
+        );
+    }
+
+    #[test]
     fn used_data_ref_label_graph_walk() {
         assert_filtered!(
             r#"
@@ -392,6 +427,77 @@ ref.1:
   .quad ref.2
 
 ref.2:
+  .quad 1
+"#,
+        );
+    }
+
+    #[test]
+    fn cycle_of_two_labels() {
+        assert_filtered!(
+            r#"
+  mov ref.1
+ref.1:
+  .quad ref.2
+ref.2:
+  .quad ref.1
+"#,
+            r#"
+  mov ref.1
+
+ref.1:
+  .quad ref.2
+
+ref.2:
+  .quad ref.1
+"#,
+        );
+    }
+
+    #[test]
+    fn cycle_of_one_label() {
+        assert_filtered!(
+            r#"
+  mov ref.1
+ref.1:
+  .quad ref.1
+"#,
+            r#"
+  mov ref.1
+
+ref.1:
+  .quad ref.1
+"#,
+        );
+    }
+
+    #[test]
+    fn labels_in_a_diamond() {
+        assert_filtered!(
+            r#"
+  mov ref.start
+ref.start:
+  add ref.left, ref.right
+ref.left:
+  mov ref.end
+ref.right:
+  mov ref.end
+ref.end:
+  .quad 1
+"#,
+            r#"
+  mov ref.start
+
+ref.start:
+  add ref.left, ref.right
+
+ref.left:
+  mov ref.end
+
+ref.right:
+  mov ref.end
+
+ref.end:
   .quad 1
 "#,
         );
