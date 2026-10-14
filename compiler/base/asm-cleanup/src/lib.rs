@@ -162,131 +162,270 @@ pub fn filter_asm(block: &str) -> String {
 
 #[cfg(test)]
 mod test {
+    macro_rules! assert_demangled {
+        ($input:literal, $expected:literal $(,)?) => {
+            let output = super::demangle_asm($input);
+            assert_eq!(output, $expected);
+        };
+    }
+
     #[test]
     fn demangles() {
-        assert_eq!(
-            super::demangle_asm("_ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE"),
-            "core::fmt::Arguments::new_v1"
+        assert_demangled!(
+            "_ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE",
+            "core::fmt::Arguments::new_v1",
         );
     }
 
     #[test]
     fn many_demangles() {
-        assert_eq!(
-            super::demangle_asm(".section.text._ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE,\"ax\",@progbits\n .p2align4, 0x90\n .type_ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE,@function"),
-            ".section.text.core::fmt::Arguments::new_v1,\"ax\",@progbits\n .p2align4, 0x90\n .typecore::fmt::Arguments::new_v1,@function");
-    }
-
-    #[test]
-    fn demangle_pass_through() {
-        assert_eq!(
-            super::demangle_asm("push rbp\n mov rbp, rsp"),
-            "push rbp\n mov rbp, rsp"
+        assert_demangled!(
+            r#"
+.section.text._ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE,"ax",@progbits
+ .p2align4, 0x90
+ .type_ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE,@function
+"#,
+            r#"
+.section.text.core::fmt::Arguments::new_v1,"ax",@progbits
+ .p2align4, 0x90
+ .typecore::fmt::Arguments::new_v1,@function
+"#,
         );
     }
 
     #[test]
+    fn demangle_pass_through() {
+        assert_demangled!(
+            r#"
+push rbp
+ mov rbp, rsp
+"#,
+            r#"
+push rbp
+ mov rbp, rsp
+"#,
+        );
+    }
+
+    macro_rules! assert_filtered {
+        ($input:literal, $expected:literal $(,)?) => {
+            let output = super::filter_asm($input);
+            assert_eq!(output.trim(), $expected.trim());
+        };
+    }
+
+    #[test]
     fn one_directive_removed() {
-        assert_eq!(
-            super::filter_asm("  .filesystem1 \"<println macros>\"\n  movq%rsp, %rbp\n"),
-            "  movq%rsp, %rbp\n"
+        assert_filtered!(
+            r#"
+  .filesystem1 "<println macros>"
+  movq%rsp, %rbp
+"#,
+            r#"  movq%rsp, %rbp"#,
         );
     }
 
     #[test]
     fn many_directives_removed() {
-        assert_eq!(
-            super::filter_asm(" .cfi_def_cfa_register %rbp\n subq$80, %rsp\n .text\n"),
-            " subq$80, %rsp\n"
+        assert_filtered!(
+            r#"
+ .cfi_def_cfa_register %rbp
+ subq$80, %rsp
+ .text
+"#,
+            r#"
+ subq$80, %rsp
+"#,
         );
     }
 
     #[test]
     fn used_label_kept() {
-        assert_eq!(
-            super::filter_asm(".Lcfi0:\n  callq    .Lcfi0\n"),
-            "\n.Lcfi0:\n  callq    .Lcfi0\n"
+        assert_filtered!(
+            r#"
+.Lcfi0:
+  callq    .Lcfi0
+"#,
+            r#"
+.Lcfi0:
+  callq    .Lcfi0
+"#,
         );
     }
 
     #[test]
     fn unused_label_removed() {
-        assert_eq!(
-            super::filter_asm(
-                "addq    $16, %rsp\n    popq    %rbp\n    retq\n.Lfunc_end31:\nstr.0:\n"
-            ),
-            "addq    $16, %rsp\n    popq    %rbp\n    retq\n"
+        assert_filtered!(
+            r#"
+    addq    $16, %rsp
+    popq    %rbp
+    retq
+.Lfunc_end31:
+str.0:
+"#,
+            r#"
+    addq    $16, %rsp
+    popq    %rbp
+    retq
+"#,
         );
     }
 
     #[test]
     fn used_data_kept() {
-        assert_eq!(
-            super::filter_asm("ref.2:\n  .quad 1\n  jmp ref.2\n"),
-            "\nref.2:\n  .quad 1\n  jmp ref.2\n"
-        )
+        assert_filtered!(
+            r#"
+ref.2:
+  .quad 1
+  jmp ref.2
+"#,
+            r#"
+ref.2:
+  .quad 1
+  jmp ref.2
+"#,
+        );
     }
 
     #[test]
     fn unused_data_removed() {
-        assert_eq!(
-            super::filter_asm("str.0:\n  .ascii \"Hello, world\"\n  pop rbp\n"),
-            "  pop rbp\n"
+        assert_filtered!(
+            r#"
+str.0:
+  .ascii "Hello, world"
+  pop rbp
+"#,
+            r#"
+  pop rbp
+"#,
         );
     }
 
     #[test]
     fn blank_lines_removed() {
-        assert_eq!(
-            super::filter_asm("  mov rbp, rsp\nmain:\n  jmp core::fmt::Arguments\n  \n"),
-            "  mov rbp, rsp\n  jmp core::fmt::Arguments\n"
-        )
+        assert_filtered!(
+            r#"
+  mov rbp, rsp
+main:
+  jmp core::fmt::Arguments
+"#,
+            r#"
+  mov rbp, rsp
+  jmp core::fmt::Arguments
+"#,
+        );
     }
 
     #[test]
     fn functions_kept() {
-        assert_eq!(
-            super::filter_asm("  .type main,@function\nmain:\n  pushq %rax\n"),
-            "\nmain:\n  pushq %rax\n"
+        assert_filtered!(
+            r#"
+  .type main,@function
+main:
+  pushq %rax
+"#,
+            r#"
+main:
+  pushq %rax
+"#,
         );
     }
+
     #[test]
     fn used_data_ref_label_kept() {
-        assert_eq!(
-            super::filter_asm(".Lcfi0:\n  .quad .Lcfi1\n  mov .Lcfi0\n.Lcfi1:\n  addq $16, %rsp\n"),
-            "\n.Lcfi0:\n  .quad .Lcfi1\n  mov .Lcfi0\n\n.Lcfi1:\n  addq $16, %rsp\n"
+        assert_filtered!(
+            r#"
+.Lcfi0:
+  .quad .Lcfi1
+  mov .Lcfi0
+.Lcfi1:
+  addq $16, %rsp
+"#,
+            r#"
+.Lcfi0:
+  .quad .Lcfi1
+  mov .Lcfi0
+
+.Lcfi1:
+  addq $16, %rsp
+"#,
         );
     }
+
     #[test]
     fn unused_data_ref_label_removed() {
-        assert_eq!(
-            super::filter_asm(".Lcfi0:\n  .quad 1\n  mov .Lcfi0\n.Lcfi1:\n  addq $16, %rsp\n"),
-            "\n.Lcfi0:\n  .quad 1\n  mov .Lcfi0\n  addq $16, %rsp\n"
+        assert_filtered!(
+            r#"
+.Lcfi0:
+  .quad 1
+  mov .Lcfi0
+.Lcfi1:
+  addq $16, %rsp
+"#,
+            r#"
+.Lcfi0:
+  .quad 1
+  mov .Lcfi0
+  addq $16, %rsp
+"#,
         );
     }
+
     #[test]
     fn used_data_ref_label_graph_walk() {
-        assert_eq!(
-            super::filter_asm(
-                "main:\n  .quad ref.1\n  mov main\nref.1:\n  .quad ref.2\nref.2:\n  .quad 1"
-            ),
-            "\nmain:\n  .quad ref.1\n  mov main\n\nref.1:\n  .quad ref.2\n\nref.2:\n  .quad 1\n"
+        assert_filtered!(
+            r#"
+main:
+  .quad ref.1
+  mov main
+ref.1:
+  .quad ref.2
+ref.2:
+  .quad 1
+"#,
+            r#"
+main:
+  .quad ref.1
+  mov main
+
+ref.1:
+  .quad ref.2
+
+ref.2:
+  .quad 1
+"#,
         );
     }
+
     #[test]
     fn label_with_comment_recognized() {
-        assert_eq!(
-            super::filter_asm(
-                ".LBB6_10:  # =>Comment\n movq %r15, %rsi\n movq %rbx, %rdx\n ja .LBB6_10\n"
-            ),
-            "\n.LBB6_10:  # =>Comment\n movq %r15, %rsi\n movq %rbx, %rdx\n ja .LBB6_10\n"
+        assert_filtered!(
+            r#"
+.LBB6_10:  # =>Comment
+ movq %r15, %rsi
+ movq %rbx, %rdx
+ ja .LBB6_10
+"#,
+            r#"
+.LBB6_10:  # =>Comment
+ movq %r15, %rsi
+ movq %rbx, %rdx
+ ja .LBB6_10
+"#,
         );
     }
+
     #[test]
     fn comment_retained() {
-        assert_eq!(
-            super::filter_asm("# %bb.0:\n subq $24, %rsp\n"),
-            "# %bb.0:\n subq $24, %rsp\n"
-        )
+        assert_filtered!(
+            r#"
+# %bb.0:
+ subq $24, %rsp
+"#,
+            r#"
+# %bb.0:
+ subq $24, %rsp
+"#,
+        );
     }
 }
