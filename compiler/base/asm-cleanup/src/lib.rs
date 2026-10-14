@@ -125,10 +125,15 @@ pub fn filter_asm(block: &str) -> String {
     let mut data_labels = Vec::new();
     let mut used_labels: HashSet<_> = labels.intersection(&opcode_operands).collect();
 
+    // Reuse the `Dfs` to avoid visiting the same nodes multiple
+    // times. This prevents quadratic behavior that occurs if we start
+    // with a fresh `Dfs` each iteration.
+    let mut label_search = Dfs::empty(&label_graph);
+
     // We only include labels ref'd by data dirs if directly or indirectly used by an opcode
     for label in &used_labels {
         if label_graph.contains_node(label) {
-            let mut label_search = Dfs::new(&label_graph, label);
+            label_search.move_to(label);
             while let Some(next_label) = label_search.next(&label_graph) {
                 data_labels.push(next_label);
             }
@@ -162,131 +167,423 @@ pub fn filter_asm(block: &str) -> String {
 
 #[cfg(test)]
 mod test {
+    macro_rules! assert_demangled {
+        ($input:literal, $expected:literal $(,)?) => {
+            let output = super::demangle_asm($input);
+            assert_eq!(output, $expected);
+        };
+    }
+
     #[test]
     fn demangles() {
-        assert_eq!(
-            super::demangle_asm("_ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE"),
-            "core::fmt::Arguments::new_v1"
+        assert_demangled!(
+            "_ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE",
+            "core::fmt::Arguments::new_v1",
         );
     }
 
     #[test]
     fn many_demangles() {
-        assert_eq!(
-            super::demangle_asm(".section.text._ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE,\"ax\",@progbits\n .p2align4, 0x90\n .type_ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE,@function"),
-            ".section.text.core::fmt::Arguments::new_v1,\"ax\",@progbits\n .p2align4, 0x90\n .typecore::fmt::Arguments::new_v1,@function");
-    }
-
-    #[test]
-    fn demangle_pass_through() {
-        assert_eq!(
-            super::demangle_asm("push rbp\n mov rbp, rsp"),
-            "push rbp\n mov rbp, rsp"
+        assert_demangled!(
+            r#"
+.section.text._ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE,"ax",@progbits
+ .p2align4, 0x90
+ .type_ZN4core3fmt9Arguments6new_v117h3c6f806acbe1ddabE,@function
+"#,
+            r#"
+.section.text.core::fmt::Arguments::new_v1,"ax",@progbits
+ .p2align4, 0x90
+ .typecore::fmt::Arguments::new_v1,@function
+"#,
         );
     }
 
     #[test]
+    fn demangle_pass_through() {
+        assert_demangled!(
+            r#"
+push rbp
+ mov rbp, rsp
+"#,
+            r#"
+push rbp
+ mov rbp, rsp
+"#,
+        );
+    }
+
+    macro_rules! assert_filtered {
+        ($input:literal, $expected:literal $(,)?) => {
+            let output = super::filter_asm($input);
+            assert_eq!(output.trim(), $expected.trim());
+        };
+    }
+
+    #[test]
     fn one_directive_removed() {
-        assert_eq!(
-            super::filter_asm("  .filesystem1 \"<println macros>\"\n  movq%rsp, %rbp\n"),
-            "  movq%rsp, %rbp\n"
+        assert_filtered!(
+            r#"
+  .filesystem1 "<println macros>"
+  movq%rsp, %rbp
+"#,
+            r#"  movq%rsp, %rbp"#,
         );
     }
 
     #[test]
     fn many_directives_removed() {
-        assert_eq!(
-            super::filter_asm(" .cfi_def_cfa_register %rbp\n subq$80, %rsp\n .text\n"),
-            " subq$80, %rsp\n"
+        assert_filtered!(
+            r#"
+ .cfi_def_cfa_register %rbp
+ subq$80, %rsp
+ .text
+"#,
+            r#"
+ subq$80, %rsp
+"#,
         );
     }
 
     #[test]
     fn used_label_kept() {
-        assert_eq!(
-            super::filter_asm(".Lcfi0:\n  callq    .Lcfi0\n"),
-            "\n.Lcfi0:\n  callq    .Lcfi0\n"
+        assert_filtered!(
+            r#"
+.Lcfi0:
+  callq    .Lcfi0
+"#,
+            r#"
+.Lcfi0:
+  callq    .Lcfi0
+"#,
         );
     }
 
     #[test]
     fn unused_label_removed() {
-        assert_eq!(
-            super::filter_asm(
-                "addq    $16, %rsp\n    popq    %rbp\n    retq\n.Lfunc_end31:\nstr.0:\n"
-            ),
-            "addq    $16, %rsp\n    popq    %rbp\n    retq\n"
+        assert_filtered!(
+            r#"
+    addq    $16, %rsp
+    popq    %rbp
+    retq
+.Lfunc_end31:
+str.0:
+"#,
+            r#"
+    addq    $16, %rsp
+    popq    %rbp
+    retq
+"#,
         );
     }
 
     #[test]
     fn used_data_kept() {
-        assert_eq!(
-            super::filter_asm("ref.2:\n  .quad 1\n  jmp ref.2\n"),
-            "\nref.2:\n  .quad 1\n  jmp ref.2\n"
-        )
+        assert_filtered!(
+            r#"
+ref.2:
+  .quad 1
+  jmp ref.2
+"#,
+            r#"
+ref.2:
+  .quad 1
+  jmp ref.2
+"#,
+        );
     }
 
     #[test]
     fn unused_data_removed() {
-        assert_eq!(
-            super::filter_asm("str.0:\n  .ascii \"Hello, world\"\n  pop rbp\n"),
-            "  pop rbp\n"
+        assert_filtered!(
+            r#"
+str.0:
+  .ascii "Hello, world"
+  pop rbp
+"#,
+            r#"
+  pop rbp
+"#,
         );
     }
 
     #[test]
     fn blank_lines_removed() {
-        assert_eq!(
-            super::filter_asm("  mov rbp, rsp\nmain:\n  jmp core::fmt::Arguments\n  \n"),
-            "  mov rbp, rsp\n  jmp core::fmt::Arguments\n"
-        )
+        assert_filtered!(
+            r#"
+  mov rbp, rsp
+main:
+  jmp core::fmt::Arguments
+"#,
+            r#"
+  mov rbp, rsp
+  jmp core::fmt::Arguments
+"#,
+        );
     }
 
     #[test]
     fn functions_kept() {
-        assert_eq!(
-            super::filter_asm("  .type main,@function\nmain:\n  pushq %rax\n"),
-            "\nmain:\n  pushq %rax\n"
+        assert_filtered!(
+            r#"
+  .type main,@function
+main:
+  pushq %rax
+"#,
+            r#"
+main:
+  pushq %rax
+"#,
         );
     }
+
     #[test]
     fn used_data_ref_label_kept() {
-        assert_eq!(
-            super::filter_asm(".Lcfi0:\n  .quad .Lcfi1\n  mov .Lcfi0\n.Lcfi1:\n  addq $16, %rsp\n"),
-            "\n.Lcfi0:\n  .quad .Lcfi1\n  mov .Lcfi0\n\n.Lcfi1:\n  addq $16, %rsp\n"
+        assert_filtered!(
+            r#"
+.Lcfi0:
+  .quad .Lcfi1
+  mov .Lcfi0
+.Lcfi1:
+  addq $16, %rsp
+"#,
+            r#"
+.Lcfi0:
+  .quad .Lcfi1
+  mov .Lcfi0
+
+.Lcfi1:
+  addq $16, %rsp
+"#,
         );
     }
+
     #[test]
     fn unused_data_ref_label_removed() {
-        assert_eq!(
-            super::filter_asm(".Lcfi0:\n  .quad 1\n  mov .Lcfi0\n.Lcfi1:\n  addq $16, %rsp\n"),
-            "\n.Lcfi0:\n  .quad 1\n  mov .Lcfi0\n  addq $16, %rsp\n"
+        assert_filtered!(
+            r#"
+.Lcfi0:
+  .quad 1
+  mov .Lcfi0
+.Lcfi1:
+  addq $16, %rsp
+"#,
+            r#"
+.Lcfi0:
+  .quad 1
+  mov .Lcfi0
+  addq $16, %rsp
+"#,
         );
     }
+
+    #[test]
+    fn unused_data_label_referencing_used_data_label_is_removed() {
+        assert_filtered!(
+            r#"
+  move ref.used
+ref.unused:
+  .quad ref.used
+ref.used:
+  .quad 1
+"#,
+            r#"
+  move ref.used
+
+ref.used:
+  .quad 1
+"#,
+        );
+    }
+
+    #[test]
+    fn data_label_only_used_by_unused_data_label_is_removed() {
+        assert_filtered!(
+            r#"
+  move rax
+ref.unused.1:
+  .quad ref.unused.2
+ref.unused.2:
+  .quad 1
+"#,
+            r#"
+  move rax
+"#,
+        );
+    }
+
     #[test]
     fn used_data_ref_label_graph_walk() {
-        assert_eq!(
-            super::filter_asm(
-                "main:\n  .quad ref.1\n  mov main\nref.1:\n  .quad ref.2\nref.2:\n  .quad 1"
-            ),
-            "\nmain:\n  .quad ref.1\n  mov main\n\nref.1:\n  .quad ref.2\n\nref.2:\n  .quad 1\n"
+        assert_filtered!(
+            r#"
+main:
+  .quad ref.1
+  mov main
+ref.1:
+  .quad ref.2
+ref.2:
+  .quad 1
+"#,
+            r#"
+main:
+  .quad ref.1
+  mov main
+
+ref.1:
+  .quad ref.2
+
+ref.2:
+  .quad 1
+"#,
         );
     }
+
+    #[test]
+    fn cycle_of_two_labels() {
+        assert_filtered!(
+            r#"
+  mov ref.1
+ref.1:
+  .quad ref.2
+ref.2:
+  .quad ref.1
+"#,
+            r#"
+  mov ref.1
+
+ref.1:
+  .quad ref.2
+
+ref.2:
+  .quad ref.1
+"#,
+        );
+    }
+
+    #[test]
+    fn cycle_of_one_label() {
+        assert_filtered!(
+            r#"
+  mov ref.1
+ref.1:
+  .quad ref.1
+"#,
+            r#"
+  mov ref.1
+
+ref.1:
+  .quad ref.1
+"#,
+        );
+    }
+
+    #[test]
+    fn labels_in_a_diamond() {
+        assert_filtered!(
+            r#"
+  mov ref.start
+ref.start:
+  add ref.left, ref.right
+ref.left:
+  mov ref.end
+ref.right:
+  mov ref.end
+ref.end:
+  .quad 1
+"#,
+            r#"
+  mov ref.start
+
+ref.start:
+  add ref.left, ref.right
+
+ref.left:
+  mov ref.end
+
+ref.right:
+  mov ref.end
+
+ref.end:
+  .quad 1
+"#,
+        );
+    }
+
     #[test]
     fn label_with_comment_recognized() {
-        assert_eq!(
-            super::filter_asm(
-                ".LBB6_10:  # =>Comment\n movq %r15, %rsi\n movq %rbx, %rdx\n ja .LBB6_10\n"
-            ),
-            "\n.LBB6_10:  # =>Comment\n movq %r15, %rsi\n movq %rbx, %rdx\n ja .LBB6_10\n"
+        assert_filtered!(
+            r#"
+.LBB6_10:  # =>Comment
+ movq %r15, %rsi
+ movq %rbx, %rdx
+ ja .LBB6_10
+"#,
+            r#"
+.LBB6_10:  # =>Comment
+ movq %r15, %rsi
+ movq %rbx, %rdx
+ ja .LBB6_10
+"#,
         );
     }
+
     #[test]
     fn comment_retained() {
-        assert_eq!(
-            super::filter_asm("# %bb.0:\n subq $24, %rsp\n"),
-            "# %bb.0:\n subq $24, %rsp\n"
-        )
+        assert_filtered!(
+            r#"
+# %bb.0:
+ subq $24, %rsp
+"#,
+            r#"
+# %bb.0:
+ subq $24, %rsp
+"#,
+        );
+    }
+
+    fn build_long_chain_of_labels(n: usize) -> String {
+        use std::fmt::Write;
+
+        assert!(n > 0);
+
+        let mut s = String::new();
+
+        // Reference the labels
+        for i in 0..n {
+            writeln!(s, "  mov .L{}", i).unwrap();
+        }
+
+        // Each label references the next one
+        for i in 0..(n - 1) {
+            writeln!(s, ".L{}:", i).unwrap();
+            writeln!(s, "  .quad .L{}", i + 1).unwrap();
+        }
+
+        // And the last one is a constant
+        writeln!(s, ".L{}:", n - 1).unwrap();
+        writeln!(s, "  .quad 1").unwrap();
+
+        s
+    }
+
+    #[test]
+    fn label_chain_quadratic_scaling() {
+        use std::time::Instant;
+
+        let times = [1, 8].map(|n| {
+            let asm_code = build_long_chain_of_labels(n * 1000);
+            let start = Instant::now();
+            super::filter_asm(&asm_code);
+            start.elapsed()
+        });
+
+        let [base, eight_times_base] = times;
+        // Using 10 to provide a bit of fuzziness; if we are quadratic
+        // we should be well past that.
+        assert!(
+            eight_times_base <= base * 10,
+            "{:?} should be a factor of 10 or less than {:?}",
+            eight_times_base,
+            base,
+        );
     }
 }
