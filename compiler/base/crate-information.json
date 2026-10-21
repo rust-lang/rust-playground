@@ -2251,12 +2251,12 @@
   },
   {
     "name": "rustls-webpki",
-    "version": "0.103.15",
+    "version": "0.103.16",
     "id": "webpki"
   },
   {
     "name": "webpki-roots",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "id": "webpki_roots"
   },
   {
