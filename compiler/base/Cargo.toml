@@ -2014,13 +2014,13 @@ version = "=0.2.129"
 
 [dependencies.webpki]
 package = "rustls-webpki"
-version = "=0.103.15"
+version = "=0.103.16"
 features = ["alloc"]
 default-features = false
 
 [dependencies.webpki_roots]
 package = "webpki-roots"
-version = "=1.0.9"
+version = "=1.0.10"
 
 [dependencies.weezl]
 package = "weezl"
@@ -4183,13 +4183,13 @@ version = "=0.2.129"
 
 [build-dependencies.webpki]
 package = "rustls-webpki"
-version = "=0.103.15"
+version = "=0.103.16"
 features = ["alloc"]
 default-features = false
 
 [build-dependencies.webpki_roots]
 package = "webpki-roots"
-version = "=1.0.9"
+version = "=1.0.10"
 
 [build-dependencies.weezl]
 package = "weezl"
