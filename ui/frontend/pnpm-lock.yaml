@@ -35,6 +35,9 @@ importers:
       monaco-editor:
         specifier: ^0.57.0
         version: 0.57.0
+      pako:
+        specifier: ^3.0.2
+        version: 3.0.2
       prismjs:
         specifier: ^1.6.0
         version: 1.30.0
@@ -93,6 +96,9 @@ importers:
       '@types/lodash-es':
         specifier: ^4.17.6
         version: 4.17.12
+      '@types/pako':
+        specifier: ^3.0.0
+        version: 3.0.0
       '@types/prismjs':
         specifier: ^1.26.0
         version: 1.26.6
@@ -847,6 +853,10 @@ packages:
 
   '@types/node@26.6.3':
     resolution: {integrity: sha512-dsqMQQoeTLqu9wynDD00q573mNzso3IdQOAfHRJqLCcmCFPoGo9A1bDpUcv/9tnKpErQWv9uKeGfl37EIS02Yg==}
+
+  '@types/pako@3.0.0':
+    resolution: {integrity: sha512-MtIzg1Ul1GxhHZLq6oSKvWQENKqmfK1fdaW+SDcPJe7+YcJVo6AbmkW0BvGFH6+559+hEuCwdXZZe8F85lBPkA==}
+    deprecated: This is a stub types definition. pako provides its own type definitions, so you do not need this installed.
 
   '@types/postcss-modules-local-by-default@4.0.2':
     resolution: {integrity: sha512-CtYCcD+L+trB3reJPny+bKWKMzPfxEyQpKIwit7kErnOexf5/faaGpkFy4I5AwbV4hp1sk7/aTg0tt0B67VkLQ==}
@@ -2231,6 +2241,9 @@ packages:
     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
     engines: {node: '>=10'}
 
+  pako@3.0.2:
+    resolution: {integrity: sha512-uBv6IT2aT1A78iU6dpNEbf6+CyhlV/6g9JlJs9kpgjFGFhruIICVRysF/W0SLzXg5+hCl+KroH7e4YUyfEmgLg==}
+
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
@@ -3608,6 +3621,10 @@ snapshots:
     dependencies:
       undici-types: 8.9.0
 
+  '@types/pako@3.0.0':
+    dependencies:
+      pako: 3.0.2
+
   '@types/postcss-modules-local-by-default@4.0.2':
     dependencies:
       postcss: 8.5.28
@@ -3814,8 +3831,8 @@ snapshots:
 
   acorn@8.18.0: {}
 
-  ajv-formats@2.1.1(ajv@8.20.0):
-    optionalDependencies:
+  ajv-formats@2.1.1:
+    dependencies:
       ajv: 8.20.0
 
   ajv-formats@3.0.1(ajv@8.20.0):
@@ -5119,6 +5136,8 @@ snapshots:
     dependencies:
       p-limit: 3.1.0
 
+  pako@3.0.2: {}
+
   parent-module@1.0.1:
     dependencies:
       callsites: 3.1.0
@@ -5415,7 +5434,7 @@ snapshots:
     dependencies:
       '@types/json-schema': 7.0.15
       ajv: 8.20.0
-      ajv-formats: 2.1.1(ajv@8.20.0)
+      ajv-formats: 2.1.1
       ajv-keywords: 5.1.0(ajv@8.20.0)
 
   schema-utils@4.5.0:
