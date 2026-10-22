@@ -1,6 +1,6 @@
 import { ThunkAction as ReduxThunkAction, UnknownAction } from '@reduxjs/toolkit';
-
 import { inflate } from 'pako';
+
 import { State } from './reducers';
 import { addCrateType, editSingleCode } from './reducers/code';
 import {
@@ -156,7 +156,7 @@ export const performCompileToWasm = performAndSwitchPrimaryAction(
 //     state64c = base64.b64encode(zlib.compress(code.encode('utf-8'),level=9)).decode('ascii')
 //     zcode = state64c.replace('+','-').replace('/','_')
 // example code:
-//     http://localhost:5000/?version=stable&mode=debug&edition=2024&zcode=eNpNi0EKwjAURPf_FAOCtAsp6C6tgXoAPYBICJpooP2RJEqDeHdDcdHZvZk3RK9ooGPmq0pBuyTEAlqi1XnBFzQNUsgIZvRvx3ekh4s0b-jxIZTMPixD2WodzWBrbCTcbtvSl6j0o3Zc1X97MAlqEjg9k_PcHfzU3TKjlxJ7HD2b8gJ-G380cA== 
+//     http://localhost:5000/?version=stable&mode=debug&edition=2024&zcode=eNpNi0EKwjAURPf_FAOCtAsp6C6tgXoAPYBICJpooP2RJEqDeHdDcdHZvZk3RK9ooGPmq0pBuyTEAlqi1XnBFzQNUsgIZvRvx3ekh4s0b-jxIZTMPixD2WodzWBrbCTcbtvSl6j0o3Zc1X97MAlqEjg9k_PcHfzU3TKjlxJ7HD2b8gJ-G380cA==
 function decodeZcode(zcode: string): string | undefined {
   let errorText = '// invalid zlib compressed base64 code detected';
   try {
@@ -193,7 +193,6 @@ export function indexPageLoad({
   return function (dispatch) {
     if (!code && zcode) {
       code = decodeZcode(zcode);
-      console.log('code=',code);
     }
     const channel = parseChannel(version) || Channel.Stable;
     const mode = parseMode(modeString) || Mode.Debug;
