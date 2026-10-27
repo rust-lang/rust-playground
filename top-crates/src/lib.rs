@@ -1,17 +1,17 @@
 #![deny(rust_2018_idioms)]
 
 use cargo::{
-    core::{
-        compiler::{CompileKind, CompileTarget, TargetInfo},
-        package::PackageSet,
-        resolver::{self},
-        Dependency, Package, PackageId, SourceId, Summary, Target,
-    },
+    compiler::{CompileKind, CompileTarget, TargetInfo},
+    resolver,
     sources::{
         source::{QueryKind, Source, SourceMap},
         SourceConfigMap,
     },
     util::{cache_lock::CacheLockMode, interning::InternedString, VersionExt},
+    workspace::{
+        Dependency, EitherManifest, Package, PackageId, PackageIdSpec, PackageSet, SourceId,
+        Summary, Target, Workspace,
+    },
     GlobalContext,
 };
 use itertools::Itertools;
@@ -448,38 +448,39 @@ fn write_scratch_cargo_toml(
 fn load_workspace<'ctx>(
     global: &GlobalState<'ctx>,
     manifest_path: &std::path::Path,
-) -> cargo::core::Workspace<'ctx> {
-    let manifest = cargo::util::toml::read_manifest(manifest_path, global.crates_io, global.config)
-        .expect("Could not read the manifest");
-    let cargo::core::EitherManifest::Real(manifest) = manifest else {
+) -> Workspace<'ctx> {
+    let manifest =
+        cargo::workspace::parser::read_manifest(manifest_path, global.crates_io, global.config)
+            .expect("Could not read the manifest");
+    let EitherManifest::Real(manifest) = manifest else {
         panic!("Only real manifests are supported")
     };
 
     let package = Package::new(manifest, manifest_path);
     let target_dir = None;
     let require_optional_deps = false;
-    cargo::core::Workspace::ephemeral(package, global.config, target_dir, require_optional_deps)
+    Workspace::ephemeral(package, global.config, target_dir, require_optional_deps)
         .expect("Could not construct a workspace")
 }
 
 fn resolve_dependencies(
     global: &GlobalState<'_>,
     scratch_package_name: String,
-    ws: &cargo::core::Workspace<'_>,
+    ws: &Workspace<'_>,
 ) -> (resolver::Resolve, resolver::features::ResolvedFeatures) {
     let dry_run = true;
     let (pkg_set, resolve) =
         cargo::ops::resolve_ws(ws, dry_run).expect("Could not resolve the workspace");
 
     let requested_kinds = &[global.compile_kind];
-    let mut target_data = cargo::core::compiler::RustcTargetData::new(ws, requested_kinds)
+    let mut target_data = cargo::compiler::RustcTargetData::new(ws, requested_kinds)
         .expect("Could not construct target data");
     let cli_features = resolver::CliFeatures {
         features: Default::default(),
         all_features: false,
         uses_default_features: true,
     };
-    let spec = cargo::core::PackageIdSpec::new(scratch_package_name);
+    let spec = PackageIdSpec::new(scratch_package_name);
     let specs = &[spec];
     let requested_targets = &[];
     let opts = resolver::features::FeatureOpts::default();
