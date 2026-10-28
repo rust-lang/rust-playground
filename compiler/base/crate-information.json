@@ -1,7 +1,7 @@
 [
   {
     "name": "addr2line",
-    "version": "0.25.1",
+    "version": "0.27.1",
     "id": "addr2line"
   },
   {
@@ -20,16 +20,6 @@
     "id": "aho_corasick"
   },
   {
-    "name": "aligned",
-    "version": "0.4.3",
-    "id": "aligned"
-  },
-  {
-    "name": "aligned-vec",
-    "version": "0.6.4",
-    "id": "aligned_vec"
-  },
-  {
     "name": "alloc-no-stdlib",
     "version": "3.0.0",
     "id": "alloc_no_stdlib"
@@ -43,11 +33,6 @@
     "name": "allocator-api2",
     "version": "0.2.21",
     "id": "allocator_api2"
-  },
-  {
-    "name": "ansi_term",
-    "version": "0.12.1",
-    "id": "ansi_term"
   },
   {
     "name": "anstream",
@@ -75,29 +60,9 @@
     "id": "anyhow"
   },
   {
-    "name": "approx",
-    "version": "0.5.1",
-    "id": "approx"
-  },
-  {
     "name": "arbitrary",
-    "version": "1.4.2",
+    "version": "1.5.0",
     "id": "arbitrary"
-  },
-  {
-    "name": "arc-swap",
-    "version": "1.9.2",
-    "id": "arc_swap"
-  },
-  {
-    "name": "arg_enum_proc_macro",
-    "version": "0.3.4",
-    "id": "arg_enum_proc_macro"
-  },
-  {
-    "name": "arrayvec",
-    "version": "0.7.8",
-    "id": "arrayvec"
   },
   {
     "name": "as-slice",
@@ -106,7 +71,7 @@
   },
   {
     "name": "async-compression",
-    "version": "0.4.50",
+    "version": "0.4.51",
     "id": "async_compression"
   },
   {
@@ -130,33 +95,18 @@
     "id": "autocfg"
   },
   {
-    "name": "av1-grain",
-    "version": "0.2.5",
-    "id": "av1_grain"
-  },
-  {
-    "name": "av-scenechange",
-    "version": "0.14.1",
-    "id": "av_scenechange"
-  },
-  {
-    "name": "avif-serialize",
-    "version": "0.8.9",
-    "id": "avif_serialize"
-  },
-  {
     "name": "aws-lc-rs",
-    "version": "1.18.1",
+    "version": "1.18.2",
     "id": "aws_lc_rs"
   },
   {
     "name": "aws-lc-sys",
-    "version": "0.45.0",
+    "version": "0.46.0",
     "id": "aws_lc_sys"
   },
   {
     "name": "backtrace",
-    "version": "0.3.76",
+    "version": "0.3.77",
     "id": "backtrace"
   },
   {
@@ -170,29 +120,9 @@
     "id": "base64_0_22_1"
   },
   {
-    "name": "bit_field",
-    "version": "0.10.3",
-    "id": "bit_field"
-  },
-  {
-    "name": "bit-set",
-    "version": "0.5.3",
-    "id": "bit_set"
-  },
-  {
-    "name": "bit-vec",
-    "version": "0.6.3",
-    "id": "bit_vec"
-  },
-  {
     "name": "bitflags",
     "version": "2.13.2",
     "id": "bitflags"
-  },
-  {
-    "name": "bitstream-io",
-    "version": "4.10.0",
-    "id": "bitstream_io"
   },
   {
     "name": "bitvec",
@@ -216,23 +146,13 @@
   },
   {
     "name": "brotli",
-    "version": "9.0.0",
+    "version": "9.1.1",
     "id": "brotli"
   },
   {
     "name": "brotli-decompressor",
-    "version": "6.0.1",
+    "version": "6.2.0",
     "id": "brotli_decompressor"
-  },
-  {
-    "name": "built",
-    "version": "0.8.1",
-    "id": "built"
-  },
-  {
-    "name": "bumpalo",
-    "version": "3.20.3",
-    "id": "bumpalo"
   },
   {
     "name": "bytecheck",
@@ -260,11 +180,6 @@
     "id": "byteorder"
   },
   {
-    "name": "byteorder-lite",
-    "version": "0.1.0",
-    "id": "byteorder_lite"
-  },
-  {
     "name": "bytes",
     "version": "1.12.1",
     "id": "bytes"
@@ -276,7 +191,7 @@
   },
   {
     "name": "cc",
-    "version": "1.5.1",
+    "version": "1.10.0",
     "id": "cc"
   },
   {
@@ -330,23 +245,18 @@
     "id": "cmov"
   },
   {
-    "name": "color_quant",
-    "version": "1.1.0",
-    "id": "color_quant"
-  },
-  {
     "name": "colorchoice",
     "version": "1.0.5",
     "id": "colorchoice"
   },
   {
     "name": "compression-codecs",
-    "version": "0.4.45",
+    "version": "0.4.46",
     "id": "compression_codecs"
   },
   {
     "name": "compression-core",
-    "version": "0.4.33",
+    "version": "0.4.34",
     "id": "compression_core"
   },
   {
@@ -358,11 +268,6 @@
     "name": "const-oid",
     "version": "0.10.2",
     "id": "const_oid"
-  },
-  {
-    "name": "convert_case",
-    "version": "0.10.0",
-    "id": "convert_case"
   },
   {
     "name": "cookie",
@@ -386,7 +291,7 @@
   },
   {
     "name": "crc32fast",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "id": "crc32fast"
   },
   {
@@ -451,7 +356,7 @@
   },
   {
     "name": "ctutils",
-    "version": "0.4.2",
+    "version": "0.4.6",
     "id": "ctutils"
   },
   {
@@ -466,28 +371,13 @@
   },
   {
     "name": "deranged",
-    "version": "0.5.8",
+    "version": "0.5.9",
     "id": "deranged"
   },
   {
     "name": "derive_more",
-    "version": "2.1.1",
-    "id": "derive_more"
-  },
-  {
-    "name": "derive_more",
     "version": "0.99.20",
-    "id": "derive_more_0_99_20"
-  },
-  {
-    "name": "derive_more-impl",
-    "version": "2.1.1",
-    "id": "derive_more_impl"
-  },
-  {
-    "name": "destructure_traitobject",
-    "version": "0.2.0",
-    "id": "destructure_traitobject"
+    "id": "derive_more"
   },
   {
     "name": "digest",
@@ -536,7 +426,7 @@
   },
   {
     "name": "either",
-    "version": "1.18.0",
+    "version": "1.19.0",
     "id": "either"
   },
   {
@@ -555,18 +445,8 @@
     "id": "env_logger"
   },
   {
-    "name": "equator",
-    "version": "0.4.2",
-    "id": "equator"
-  },
-  {
-    "name": "equator-macro",
-    "version": "0.4.2",
-    "id": "equator_macro"
-  },
-  {
     "name": "equivalent",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "id": "equivalent"
   },
   {
@@ -575,24 +455,9 @@
     "id": "errno"
   },
   {
-    "name": "exr",
-    "version": "1.74.2",
-    "id": "exr"
-  },
-  {
-    "name": "fallible-iterator",
-    "version": "0.3.0",
-    "id": "fallible_iterator"
-  },
-  {
     "name": "fallible-iterator",
     "version": "0.2.0",
-    "id": "fallible_iterator_0_2_0"
-  },
-  {
-    "name": "fallible-streaming-iterator",
-    "version": "0.1.9",
-    "id": "fallible_streaming_iterator"
+    "id": "fallible_iterator"
   },
   {
     "name": "faster-hex",
@@ -605,34 +470,19 @@
     "id": "fastrand"
   },
   {
-    "name": "fax",
-    "version": "0.2.7",
-    "id": "fax"
-  },
-  {
-    "name": "fdeflate",
-    "version": "0.3.7",
-    "id": "fdeflate"
-  },
-  {
     "name": "filetime",
     "version": "0.2.29",
     "id": "filetime"
   },
   {
     "name": "find-msvc-tools",
-    "version": "0.1.14",
+    "version": "0.1.15",
     "id": "find_msvc_tools"
   },
   {
     "name": "fixedbitset",
     "version": "0.5.7",
     "id": "fixedbitset"
-  },
-  {
-    "name": "fixedbitset",
-    "version": "0.4.2",
-    "id": "fixedbitset_0_4_2"
   },
   {
     "name": "flate2",
@@ -653,6 +503,16 @@
     "name": "foldhash",
     "version": "0.1.5",
     "id": "foldhash_0_1_5"
+  },
+  {
+    "name": "foreign-types",
+    "version": "0.3.2",
+    "id": "foreign_types"
+  },
+  {
+    "name": "foreign-types-shared",
+    "version": "0.1.1",
+    "id": "foreign_types_shared"
   },
   {
     "name": "form_urlencoded",
@@ -760,13 +620,8 @@
     "id": "getrandom_0_3_4"
   },
   {
-    "name": "gif",
-    "version": "0.14.2",
-    "id": "gif"
-  },
-  {
     "name": "gimli",
-    "version": "0.32.3",
+    "version": "0.34.0",
     "id": "gimli"
   },
   {
@@ -776,13 +631,8 @@
   },
   {
     "name": "h2",
-    "version": "0.4.19",
+    "version": "0.4.20",
     "id": "h2"
-  },
-  {
-    "name": "half",
-    "version": "2.7.1",
-    "id": "half"
   },
   {
     "name": "hash32",
@@ -798,11 +648,6 @@
     "name": "hashbrown",
     "version": "0.15.5",
     "id": "hashbrown_0_15_5"
-  },
-  {
-    "name": "hashlink",
-    "version": "0.12.2",
-    "id": "hashlink"
   },
   {
     "name": "hdrhistogram",
@@ -828,11 +673,6 @@
     "name": "html5ever",
     "version": "0.27.0",
     "id": "html5ever"
-  },
-  {
-    "name": "html5ever",
-    "version": "0.26.0",
-    "id": "html5ever_0_26_0"
   },
   {
     "name": "http",
@@ -865,24 +705,24 @@
     "id": "httpdate"
   },
   {
-    "name": "humantime",
-    "version": "2.4.0",
-    "id": "humantime"
-  },
-  {
     "name": "hybrid-array",
     "version": "0.4.15",
     "id": "hybrid_array"
   },
   {
     "name": "hyper",
-    "version": "1.11.1",
+    "version": "1.12.0",
     "id": "hyper"
   },
   {
     "name": "hyper-rustls",
     "version": "0.27.10",
     "id": "hyper_rustls"
+  },
+  {
+    "name": "hyper-tls",
+    "version": "0.6.0",
+    "id": "hyper_tls"
   },
   {
     "name": "hyper-util",
@@ -896,37 +736,37 @@
   },
   {
     "name": "icu_collections",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "id": "icu_collections"
   },
   {
     "name": "icu_locale_core",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "id": "icu_locale_core"
   },
   {
     "name": "icu_normalizer",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "id": "icu_normalizer"
   },
   {
     "name": "icu_normalizer_data",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "id": "icu_normalizer_data"
   },
   {
     "name": "icu_properties",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "id": "icu_properties"
   },
   {
     "name": "icu_properties_data",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "id": "icu_properties_data"
   },
   {
     "name": "icu_provider",
-    "version": "2.3.1",
+    "version": "2.4.0",
     "id": "icu_provider"
   },
   {
@@ -938,21 +778,6 @@
     "name": "idna_adapter",
     "version": "1.2.2",
     "id": "idna_adapter"
-  },
-  {
-    "name": "image",
-    "version": "0.25.10",
-    "id": "image"
-  },
-  {
-    "name": "image-webp",
-    "version": "0.2.4",
-    "id": "image_webp"
-  },
-  {
-    "name": "imgref",
-    "version": "1.12.3",
-    "id": "imgref"
   },
   {
     "name": "indexmap",
@@ -980,18 +805,13 @@
     "id": "itertools"
   },
   {
-    "name": "itertools",
-    "version": "0.14.0",
-    "id": "itertools_0_14_0"
-  },
-  {
     "name": "itoa",
     "version": "1.0.18",
     "id": "itoa"
   },
   {
     "name": "jiff",
-    "version": "0.2.37",
+    "version": "0.2.38",
     "id": "jiff"
   },
   {
@@ -1001,12 +821,12 @@
   },
   {
     "name": "jiff-static",
-    "version": "0.2.37",
+    "version": "0.2.38",
     "id": "jiff_static"
   },
   {
     "name": "jiff-tzdb",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "id": "jiff_tzdb"
   },
   {
@@ -1020,24 +840,9 @@
     "id": "lazy_static"
   },
   {
-    "name": "lebe",
-    "version": "0.5.3",
-    "id": "lebe"
-  },
-  {
     "name": "libc",
-    "version": "0.2.189",
+    "version": "0.2.191",
     "id": "libc"
-  },
-  {
-    "name": "libm",
-    "version": "0.2.16",
-    "id": "libm"
-  },
-  {
-    "name": "libsqlite3-sys",
-    "version": "0.38.2",
-    "id": "libsqlite3_sys"
   },
   {
     "name": "linux-raw-sys",
@@ -1051,33 +856,23 @@
   },
   {
     "name": "litrs",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "id": "litrs"
   },
   {
     "name": "lock_api",
-    "version": "0.4.14",
+    "version": "0.5.0",
     "id": "lock_api"
+  },
+  {
+    "name": "lock_api",
+    "version": "0.4.14",
+    "id": "lock_api_0_4_14"
   },
   {
     "name": "log",
     "version": "0.4.34",
     "id": "log"
-  },
-  {
-    "name": "log4rs",
-    "version": "1.4.0",
-    "id": "log4rs"
-  },
-  {
-    "name": "log-mdc",
-    "version": "0.1.0",
-    "id": "log_mdc"
-  },
-  {
-    "name": "loop9",
-    "version": "0.1.5",
-    "id": "loop9"
   },
   {
     "name": "mac",
@@ -1088,26 +883,6 @@
     "name": "markup5ever",
     "version": "0.12.1",
     "id": "markup5ever"
-  },
-  {
-    "name": "markup5ever",
-    "version": "0.11.0",
-    "id": "markup5ever_0_11_0"
-  },
-  {
-    "name": "markup5ever_rcdom",
-    "version": "0.2.0",
-    "id": "markup5ever_rcdom"
-  },
-  {
-    "name": "matrixmultiply",
-    "version": "0.3.11",
-    "id": "matrixmultiply"
-  },
-  {
-    "name": "maybe-rayon",
-    "version": "0.1.1",
-    "id": "maybe_rayon"
   },
   {
     "name": "md-5",
@@ -1125,11 +900,6 @@
     "id": "memchr"
   },
   {
-    "name": "memmap",
-    "version": "0.7.0",
-    "id": "memmap"
-  },
-  {
     "name": "mime",
     "version": "0.3.17",
     "id": "mime"
@@ -1145,24 +915,9 @@
     "id": "miniz_oxide"
   },
   {
-    "name": "miniz_oxide",
-    "version": "0.8.9",
-    "id": "miniz_oxide_0_8_9"
-  },
-  {
     "name": "mio",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "id": "mio"
-  },
-  {
-    "name": "mock_instant",
-    "version": "0.6.1",
-    "id": "mock_instant"
-  },
-  {
-    "name": "moxcms",
-    "version": "0.8.1",
-    "id": "moxcms"
   },
   {
     "name": "multiversion_no_op",
@@ -1180,34 +935,9 @@
     "id": "munge_macro"
   },
   {
-    "name": "nalgebra",
-    "version": "0.35.0",
-    "id": "nalgebra"
-  },
-  {
-    "name": "nalgebra-macros",
-    "version": "0.3.0",
-    "id": "nalgebra_macros"
-  },
-  {
-    "name": "ndarray",
-    "version": "0.17.2",
-    "id": "ndarray"
-  },
-  {
-    "name": "no_std_io2",
-    "version": "0.9.4",
-    "id": "no_std_io2"
-  },
-  {
-    "name": "nom",
-    "version": "8.0.0",
-    "id": "nom"
-  },
-  {
-    "name": "noop_proc_macro",
-    "version": "0.3.0",
-    "id": "noop_proc_macro"
+    "name": "native-tls",
+    "version": "0.2.18",
+    "id": "native_tls"
   },
   {
     "name": "nu-ansi-term",
@@ -1240,11 +970,6 @@
     "id": "num_cpus"
   },
   {
-    "name": "num-derive",
-    "version": "0.4.2",
-    "id": "num_derive"
-  },
-  {
     "name": "num-integer",
     "version": "0.1.47",
     "id": "num_integer"
@@ -1266,7 +991,7 @@
   },
   {
     "name": "object",
-    "version": "0.37.3",
+    "version": "0.40.0",
     "id": "object"
   },
   {
@@ -1275,34 +1000,44 @@
     "id": "once_cell"
   },
   {
+    "name": "openssl",
+    "version": "0.10.81",
+    "id": "openssl"
+  },
+  {
+    "name": "openssl-macros",
+    "version": "0.1.1",
+    "id": "openssl_macros"
+  },
+  {
     "name": "openssl-probe",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "id": "openssl_probe"
   },
   {
-    "name": "ordered-float",
-    "version": "2.10.1",
-    "id": "ordered_float"
+    "name": "openssl-sys",
+    "version": "0.9.117",
+    "id": "openssl_sys"
+  },
+  {
+    "name": "parking_lot",
+    "version": "0.13.0",
+    "id": "parking_lot"
   },
   {
     "name": "parking_lot",
     "version": "0.12.5",
-    "id": "parking_lot"
+    "id": "parking_lot_0_12_5"
+  },
+  {
+    "name": "parking_lot_core",
+    "version": "0.10.0",
+    "id": "parking_lot_core"
   },
   {
     "name": "parking_lot_core",
     "version": "0.9.12",
-    "id": "parking_lot_core"
-  },
-  {
-    "name": "paste",
-    "version": "1.0.15",
-    "id": "paste"
-  },
-  {
-    "name": "pastey",
-    "version": "0.1.1",
-    "id": "pastey"
+    "id": "parking_lot_core_0_9_12"
   },
   {
     "name": "percent-encoding",
@@ -1313,11 +1048,6 @@
     "name": "petgraph",
     "version": "0.8.3",
     "id": "petgraph"
-  },
-  {
-    "name": "petgraph",
-    "version": "0.6.5",
-    "id": "petgraph_0_6_5"
   },
   {
     "name": "phf",
@@ -1395,11 +1125,6 @@
     "id": "pkg_config"
   },
   {
-    "name": "png",
-    "version": "0.18.1",
-    "id": "png"
-  },
-  {
     "name": "postgres",
     "version": "0.19.14",
     "id": "postgres"
@@ -1421,7 +1146,7 @@
   },
   {
     "name": "powerfmt",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "id": "powerfmt"
   },
   {
@@ -1438,16 +1163,6 @@
     "name": "proc-macro2",
     "version": "1.0.107",
     "id": "proc_macro2"
-  },
-  {
-    "name": "profiling",
-    "version": "1.0.18",
-    "id": "profiling"
-  },
-  {
-    "name": "profiling-procmacros",
-    "version": "1.0.18",
-    "id": "profiling_procmacros"
   },
   {
     "name": "psl-types",
@@ -1468,31 +1183,6 @@
     "name": "publicsuffix",
     "version": "2.3.0",
     "id": "publicsuffix"
-  },
-  {
-    "name": "pulp",
-    "version": "0.22.3",
-    "id": "pulp"
-  },
-  {
-    "name": "pulp-wasm-simd-flag",
-    "version": "0.1.1",
-    "id": "pulp_wasm_simd_flag"
-  },
-  {
-    "name": "pxfm",
-    "version": "0.1.30",
-    "id": "pxfm"
-  },
-  {
-    "name": "qoi",
-    "version": "0.4.1",
-    "id": "qoi"
-  },
-  {
-    "name": "quick-error",
-    "version": "2.0.1",
-    "id": "quick_error"
   },
   {
     "name": "quote",
@@ -1520,11 +1210,6 @@
     "id": "rand_0_8_8"
   },
   {
-    "name": "rand",
-    "version": "0.9.5",
-    "id": "rand_0_9_5"
-  },
-  {
     "name": "rand_chacha",
     "version": "0.10.0",
     "id": "rand_chacha"
@@ -1533,11 +1218,6 @@
     "name": "rand_chacha",
     "version": "0.3.1",
     "id": "rand_chacha_0_3_1"
-  },
-  {
-    "name": "rand_chacha",
-    "version": "0.9.0",
-    "id": "rand_chacha_0_9_0"
   },
   {
     "name": "rand_core",
@@ -1550,36 +1230,6 @@
     "id": "rand_core_0_6_4"
   },
   {
-    "name": "rand_core",
-    "version": "0.9.5",
-    "id": "rand_core_0_9_5"
-  },
-  {
-    "name": "rand_distr",
-    "version": "0.6.0",
-    "id": "rand_distr"
-  },
-  {
-    "name": "rav1e",
-    "version": "0.8.1",
-    "id": "rav1e"
-  },
-  {
-    "name": "ravif",
-    "version": "0.13.0",
-    "id": "ravif"
-  },
-  {
-    "name": "raw-cpuid",
-    "version": "11.6.0",
-    "id": "raw_cpuid"
-  },
-  {
-    "name": "rawpointer",
-    "version": "0.2.1",
-    "id": "rawpointer"
-  },
-  {
     "name": "rayon",
     "version": "1.12.0",
     "id": "rayon"
@@ -1588,11 +1238,6 @@
     "name": "rayon-core",
     "version": "1.13.0",
     "id": "rayon_core"
-  },
-  {
-    "name": "reborrow",
-    "version": "0.5.5",
-    "id": "reborrow"
   },
   {
     "name": "ref-cast",
@@ -1626,18 +1271,8 @@
   },
   {
     "name": "reqwest",
-    "version": "0.13.5",
-    "id": "reqwest"
-  },
-  {
-    "name": "reqwest",
     "version": "0.12.28",
-    "id": "reqwest_0_12_28"
-  },
-  {
-    "name": "rgb",
-    "version": "0.8.53",
-    "id": "rgb"
+    "id": "reqwest"
   },
   {
     "name": "ring",
@@ -1655,44 +1290,29 @@
     "id": "rkyv_derive"
   },
   {
-    "name": "rusqlite",
-    "version": "0.40.2",
-    "id": "rusqlite"
-  },
-  {
     "name": "rustc-demangle",
     "version": "0.1.28",
     "id": "rustc_demangle"
   },
   {
-    "name": "rustc_version",
-    "version": "0.4.1",
-    "id": "rustc_version"
+    "name": "rustc-hash",
+    "version": "2.1.3",
+    "id": "rustc_hash"
   },
   {
     "name": "rustix",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "id": "rustix"
   },
   {
     "name": "rustls",
-    "version": "0.23.45",
+    "version": "0.23.46",
     "id": "rustls"
-  },
-  {
-    "name": "rustls-native-certs",
-    "version": "0.8.4",
-    "id": "rustls_native_certs"
   },
   {
     "name": "rustls-pki-types",
     "version": "1.15.1",
     "id": "rustls_pki_types"
-  },
-  {
-    "name": "rustls-platform-verifier",
-    "version": "0.7.1",
-    "id": "rustls_platform_verifier"
   },
   {
     "name": "rustversion",
@@ -1705,18 +1325,13 @@
     "id": "ryu"
   },
   {
-    "name": "safe_arch",
-    "version": "1.2.0",
-    "id": "safe_arch"
-  },
-  {
     "name": "same-file",
     "version": "1.0.6",
     "id": "same_file"
   },
   {
     "name": "schemars",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "id": "schemars"
   },
   {
@@ -1728,11 +1343,6 @@
     "name": "scraper",
     "version": "0.20.0",
     "id": "scraper"
-  },
-  {
-    "name": "select",
-    "version": "0.6.1",
-    "id": "select"
   },
   {
     "name": "selectors",
@@ -1761,28 +1371,18 @@
   },
   {
     "name": "serde_json",
-    "version": "1.0.151",
+    "version": "1.0.154",
     "id": "serde_json"
   },
   {
     "name": "serde_spanned",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "id": "serde_spanned"
   },
   {
     "name": "serde_urlencoded",
     "version": "0.7.1",
     "id": "serde_urlencoded"
-  },
-  {
-    "name": "serde-value",
-    "version": "0.7.0",
-    "id": "serde_value"
-  },
-  {
-    "name": "serde_yaml",
-    "version": "0.9.34+deprecated",
-    "id": "serde_yaml"
   },
   {
     "name": "servo_arc",
@@ -1796,7 +1396,7 @@
   },
   {
     "name": "sha2",
-    "version": "0.11.0",
+    "version": "0.11.1",
     "id": "sha2"
   },
   {
@@ -1815,19 +1415,9 @@
     "id": "signal_hook_registry"
   },
   {
-    "name": "simba",
-    "version": "0.10.2",
-    "id": "simba"
-  },
-  {
     "name": "simd-adler32",
     "version": "0.3.10",
     "id": "simd_adler32"
-  },
-  {
-    "name": "simd_helpers",
-    "version": "0.1.0",
-    "id": "simd_helpers"
   },
   {
     "name": "simdutf8",
@@ -1851,7 +1441,7 @@
   },
   {
     "name": "smallvec",
-    "version": "1.16.2",
+    "version": "1.16.4",
     "id": "smallvec"
   },
   {
@@ -1896,13 +1486,8 @@
   },
   {
     "name": "syn",
-    "version": "3.0.6",
+    "version": "3.0.9",
     "id": "syn"
-  },
-  {
-    "name": "syn",
-    "version": "1.0.109",
-    "id": "syn_1_0_109"
   },
   {
     "name": "syn",
@@ -1955,24 +1540,9 @@
     "id": "thiserror_impl"
   },
   {
-    "name": "thread-id",
-    "version": "5.1.0",
-    "id": "thread_id"
-  },
-  {
     "name": "thread_local",
     "version": "1.1.10",
     "id": "thread_local"
-  },
-  {
-    "name": "threadpool",
-    "version": "1.8.1",
-    "id": "threadpool"
-  },
-  {
-    "name": "tiff",
-    "version": "0.11.3",
-    "id": "tiff"
   },
   {
     "name": "time",
@@ -1991,7 +1561,7 @@
   },
   {
     "name": "tinystr",
-    "version": "0.8.4",
+    "version": "0.8.5",
     "id": "tinystr"
   },
   {
@@ -2001,7 +1571,7 @@
   },
   {
     "name": "tokio",
-    "version": "1.53.1",
+    "version": "1.54.1",
     "id": "tokio"
   },
   {
@@ -2013,6 +1583,11 @@
     "name": "tokio-macros",
     "version": "2.7.2",
     "id": "tokio_macros"
+  },
+  {
+    "name": "tokio-native-tls",
+    "version": "0.3.1",
+    "id": "tokio_native_tls"
   },
   {
     "name": "tokio-postgres",
@@ -2031,32 +1606,32 @@
   },
   {
     "name": "tokio-util",
-    "version": "0.7.19",
+    "version": "0.7.20",
     "id": "tokio_util"
   },
   {
     "name": "toml",
-    "version": "1.1.6+spec-1.1.0",
+    "version": "1.1.8+spec-1.1.0",
     "id": "toml"
   },
   {
     "name": "toml_datetime",
-    "version": "1.1.1+spec-1.1.0",
+    "version": "1.1.2+spec-1.1.0",
     "id": "toml_datetime"
   },
   {
     "name": "toml_edit",
-    "version": "0.25.15+spec-1.1.0",
+    "version": "0.25.17+spec-1.1.0",
     "id": "toml_edit"
   },
   {
     "name": "toml_parser",
-    "version": "1.1.3+spec-1.1.0",
+    "version": "1.1.5+spec-1.1.0",
     "id": "toml_parser"
   },
   {
     "name": "toml_writer",
-    "version": "1.1.2+spec-1.1.0",
+    "version": "1.1.3+spec-1.1.0",
     "id": "toml_writer"
   },
   {
@@ -2115,18 +1690,13 @@
     "id": "try_lock"
   },
   {
-    "name": "typemap-ors",
-    "version": "1.0.0",
-    "id": "typemap_ors"
-  },
-  {
     "name": "typenum",
     "version": "1.20.1",
     "id": "typenum"
   },
   {
     "name": "unicase",
-    "version": "2.9.0",
+    "version": "2.10.0",
     "id": "unicase"
   },
   {
@@ -2136,12 +1706,12 @@
   },
   {
     "name": "unicode-ident",
-    "version": "1.0.26",
+    "version": "1.0.27",
     "id": "unicode_ident"
   },
   {
     "name": "unicode-normalization",
-    "version": "0.1.25",
+    "version": "0.1.26",
     "id": "unicode_normalization"
   },
   {
@@ -2156,23 +1726,8 @@
   },
   {
     "name": "unicode-width",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "id": "unicode_width"
-  },
-  {
-    "name": "unicode-xid",
-    "version": "0.2.6",
-    "id": "unicode_xid"
-  },
-  {
-    "name": "unsafe-any-ors",
-    "version": "1.0.0",
-    "id": "unsafe_any_ors"
-  },
-  {
-    "name": "unsafe-libyaml",
-    "version": "0.2.11",
-    "id": "unsafe_libyaml"
   },
   {
     "name": "untrusted",
@@ -2201,13 +1756,8 @@
   },
   {
     "name": "uuid",
-    "version": "1.26.1",
+    "version": "1.29.0",
     "id": "uuid"
-  },
-  {
-    "name": "v_frame",
-    "version": "0.3.9",
-    "id": "v_frame"
   },
   {
     "name": "vcpkg",
@@ -2226,28 +1776,8 @@
   },
   {
     "name": "want",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "id": "want"
-  },
-  {
-    "name": "wasm-bindgen",
-    "version": "0.2.129",
-    "id": "wasm_bindgen"
-  },
-  {
-    "name": "wasm-bindgen-macro",
-    "version": "0.2.129",
-    "id": "wasm_bindgen_macro"
-  },
-  {
-    "name": "wasm-bindgen-macro-support",
-    "version": "0.2.129",
-    "id": "wasm_bindgen_macro_support"
-  },
-  {
-    "name": "wasm-bindgen-shared",
-    "version": "0.2.129",
-    "id": "wasm_bindgen_shared"
   },
   {
     "name": "rustls-webpki",
@@ -2256,23 +1786,13 @@
   },
   {
     "name": "webpki-roots",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "id": "webpki_roots"
-  },
-  {
-    "name": "weezl",
-    "version": "0.1.12",
-    "id": "weezl"
   },
   {
     "name": "whoami",
     "version": "2.1.3",
     "id": "whoami"
-  },
-  {
-    "name": "wide",
-    "version": "1.7.1",
-    "id": "wide"
   },
   {
     "name": "windows_aarch64_gnullvm",
@@ -2351,22 +1871,12 @@
   },
   {
     "name": "xattr",
-    "version": "1.6.1",
+    "version": "1.7.0",
     "id": "xattr"
   },
   {
-    "name": "xml5ever",
-    "version": "0.17.0",
-    "id": "xml5ever"
-  },
-  {
-    "name": "y4m",
-    "version": "0.8.0",
-    "id": "y4m"
-  },
-  {
     "name": "yoke",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "id": "yoke"
   },
   {
@@ -2376,12 +1886,12 @@
   },
   {
     "name": "zerocopy",
-    "version": "0.8.59",
+    "version": "0.8.63",
     "id": "zerocopy"
   },
   {
     "name": "zerocopy-derive",
-    "version": "0.8.59",
+    "version": "0.8.63",
     "id": "zerocopy_derive"
   },
   {
@@ -2396,7 +1906,7 @@
   },
   {
     "name": "zeroize",
-    "version": "1.9.0",
+    "version": "1.9.1",
     "id": "zeroize"
   },
   {
@@ -2406,12 +1916,12 @@
   },
   {
     "name": "zerovec",
-    "version": "0.11.8",
+    "version": "0.11.9",
     "id": "zerovec"
   },
   {
     "name": "zerovec-derive",
-    "version": "0.11.6",
+    "version": "0.11.7",
     "id": "zerovec_derive"
   },
   {
@@ -2421,32 +1931,17 @@
   },
   {
     "name": "zstd",
-    "version": "0.14.0",
+    "version": "0.14.3",
     "id": "zstd"
   },
   {
     "name": "zstd-safe",
-    "version": "8.0.0",
+    "version": "8.2.0",
     "id": "zstd_safe"
   },
   {
     "name": "zstd-sys",
-    "version": "2.1.0+zstd.1.5.7",
+    "version": "2.1.2+zstd.1.5.7",
     "id": "zstd_sys"
-  },
-  {
-    "name": "zune-core",
-    "version": "0.5.3",
-    "id": "zune_core"
-  },
-  {
-    "name": "zune-inflate",
-    "version": "0.2.54",
-    "id": "zune_inflate"
-  },
-  {
-    "name": "zune-jpeg",
-    "version": "0.5.15",
-    "id": "zune_jpeg"
   }
 ]
