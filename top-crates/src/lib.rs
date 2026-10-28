@@ -601,10 +601,6 @@ fn extend_direct_dependencies(
 
     for download in packages {
         let id = download.package_id();
-        let lib_target = download
-            .library()
-            .unwrap_or_else(|| panic!("{} did not have a library", id))
-            .clone();
 
         let mut features = visited.remove(&id).unwrap_or_else(|| {
             unreachable!("Downloaded a crate that we didn't visit");
@@ -614,13 +610,25 @@ fn extend_direct_dependencies(
             features.merge(metadata_features);
         }
 
-        let dep = ResolvedDep {
-            summary: download.summary().clone(),
-            lib_target,
-            features,
-        };
+        match crates.entry(id) {
+            Entry::Vacant(entry) => {
+                let summary = download.summary().clone();
 
-        crates.insert(id, dep);
+                let lib_target = download
+                    .library()
+                    .unwrap_or_else(|| panic!("{} did not have a library", id))
+                    .clone();
+
+                entry.insert(ResolvedDep {
+                    summary,
+                    lib_target,
+                    features,
+                });
+            }
+            Entry::Occupied(mut entry) => {
+                entry.get_mut().features.merge(features);
+            }
+        }
     }
 }
 
