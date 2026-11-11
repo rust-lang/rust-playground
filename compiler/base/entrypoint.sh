@@ -2,6 +2,7 @@
 
 set -eu
 
-# This entrypoint is a no-op but I'm leaving it to be easier to
-# re-create at some future point.
+env_path=/playground/tools/miri-environment
+[ -f "${env_path}" ] && source "${env_path}"
+
 exec "$@"

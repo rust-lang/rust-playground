@@ -114,8 +114,14 @@ if [ "${channel}" = 'beta' ]; then
 fi
 if [ "${channel}" = 'nightly' ]; then
     echo '\n[lints.cargo]\nunused_dependencies = "allow"\n' >> Cargo.toml
-    cargo miri setup;
+    sysroot=$(cargo miri setup --print-sysroot);
     cargo miri run;
+    # Be sure that `cargo miri` will not build a new
+    # sysroot. Creating a sysroot takes a while and Miri
+    # will build one by default if it's missing. If
+    # `MIRI_SYSROOT` is set and the sysroot is missing,
+    # it will error instead.
+    echo "export MIRI_SYSROOT='${sysroot}'" >> /playground/tools/miri-environment
 fi
 EOF
 RUN rm src/*.rs
