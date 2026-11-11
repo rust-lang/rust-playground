@@ -800,12 +800,6 @@ impl LowerRequest for MiriRequest {
             args: ["miri", subcommand].map(Into::into).into(),
             envs: kvs! {
                 "MIRIFLAGS" => miriflags,
-                // Be sure that `cargo miri` will not build a new
-                // sysroot. Creating a sysroot takes a while and Miri
-                // will build one by default if it's missing. If
-                // `MIRI_SYSROOT` is set and the sysroot is missing,
-                // it will error instead.
-                "MIRI_SYSROOT" => "/playground/.cache/miri",
             }
             .collect(),
             cwd: None,
@@ -4278,9 +4272,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn miri() -> Result<()> {
-        // We set the `MIRI_SYSROOT` variable to something that's only
-        // valid on Linux.
-        let coordinator = new_coordinator_docker();
+        let coordinator = new_coordinator();
 
         let req = MiriRequest {
             code: r#"
@@ -4308,7 +4300,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn miri_tests() -> Result<()> {
-        let coordinator = new_coordinator_docker();
+        let coordinator = new_coordinator();
 
         let req = MiriRequest {
             tests: true,
@@ -4338,7 +4330,7 @@ mod tests {
     #[tokio::test]
     #[snafu::report]
     async fn miri_multiple_files() -> Result<()> {
-        let coordinator = new_coordinator_docker();
+        let coordinator = new_coordinator();
 
         let req = MiriRequest {
             code: kvs! {
