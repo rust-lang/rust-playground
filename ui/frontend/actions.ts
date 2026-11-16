@@ -1,4 +1,5 @@
 import { ThunkAction as ReduxThunkAction, UnknownAction } from '@reduxjs/toolkit';
+import { inflate } from 'pako';
 
 import { State } from './reducers';
 import { addCrateType, editSingleCode } from './reducers/code';
@@ -147,20 +148,52 @@ export const performCompileToWasm = performAndSwitchPrimaryAction(
   PrimaryActionCore.Wasm,
 );
 
+// Decode a base64(+zlib) payload from the `zcode` URL parameter.
+// Accepts both standard and URL-safe base64 (`-`/`_`), as `qs.parse`
+// would otherwise turn `+` into a space if the link was not properly
+// percent-encoded.
+// obtain code from a python script
+//     state64c = base64.b64encode(zlib.compress(code.encode('utf-8'),level=9)).decode('ascii')
+//     zcode = state64c.replace('+','-').replace('/','_')
+// example code:
+//     http://localhost:5000/?version=stable&mode=debug&edition=2024&zcode=eNpNi0EKwjAURPf_FAOCtAsp6C6tgXoAPYBICJpooP2RJEqDeHdDcdHZvZk3RK9ooGPmq0pBuyTEAlqi1XnBFzQNUsgIZvRvx3ekh4s0b-jxIZTMPixD2WodzWBrbCTcbtvSl6j0o3Zc1X97MAlqEjg9k_PcHfzU3TKjlxJ7HD2b8gJ-G380cA==
+function decodeZcode(zcode: string): string | undefined {
+  let errorText = '// invalid zlib compressed base64 code detected';
+  try {
+    const normalized = zcode.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized + '='.repeat((4 - (normalized.length % 4)) % 4);
+    const binary = window.atob(padded);
+    errorText += '(base64 decoding ok)';
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; ++i) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    const text = inflate(bytes, { toText: true });
+    return text || errorText;
+  } catch {
+    return errorText;
+  }
+}
+
 export function indexPageLoad({
   code,
+  zcode,
   gist,
   version,
   mode: modeString,
   edition: editionString,
 }: {
   code?: string;
+  zcode?: string;
   gist?: string;
   version?: string;
   mode?: string;
   edition?: string;
 }): ThunkAction {
   return function (dispatch) {
+    if (!code && zcode) {
+      code = decodeZcode(zcode);
+    }
     const channel = parseChannel(version) || Channel.Stable;
     const mode = parseMode(modeString) || Mode.Debug;
     let maybeEdition = parseEdition(editionString);
