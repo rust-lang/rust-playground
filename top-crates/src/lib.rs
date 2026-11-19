@@ -188,7 +188,7 @@ impl TopCrates {
 
     async fn add_rust_cookbook_crates(&mut self) {
         let resp = simple_get(
-            "https://raw.githubusercontent.com/rust-lang-nursery/rust-cookbook/master/Cargo.toml",
+            "https://raw.githubusercontent.com/rust-lang/rust-cookbook/master/Cargo.toml",
         )
         .await
         .expect("Could not fetch cookbook manifest");

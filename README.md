@@ -26,7 +26,7 @@ It has a number of features, including:
 1. The ability to see the LLVM IR, assembly, or Rust MIR for the
    source code.
 
-[Rust Cookbook]: https://rust-lang-nursery.github.io/rust-cookbook/
+[Rust Cookbook]: https://rust-lang.github.io/rust-cookbook/
 [gist]: https://gist.github.com/
 [rustfmt]: https://github.com/rust-lang/rustfmt
 [clippy]: https://github.com/rust-lang/rust-clippy

@@ -66,6 +66,6 @@ all-features = false
 
 [prerelease]: https://semver.org/#spec-item-9
 [all time downloads]: https://crates.io/crates?sort=downloads
-[Rust cookbook]: https://rust-lang-nursery.github.io/rust-cookbook/
+[Rust cookbook]: https://rust-lang.github.io/rust-cookbook/
 [alternate algorithms]: https://github.com/rust-lang/rust-playground/issues/101
 [docs.rs metadata]: https://docs.rs/about/metadata
