@@ -24,6 +24,7 @@ const useAppDispatchAndClose = (action: () => actions.ThunkAction, close: () => 
 
 const BuildMenu: React.FC<BuildMenuProps> = (props) => {
   const isHirAvailable = useAppSelector(selectors.isHirAvailable);
+  const isAstAvailable = useAppSelector(selectors.isAstAvailable);
   const wasmLikelyToWork = useAppSelector(selectors.wasmLikelyToWork);
 
   const compile = useAppDispatchAndClose(actions.performCompile, props.close);
@@ -31,6 +32,7 @@ const BuildMenu: React.FC<BuildMenuProps> = (props) => {
   const compileToLLVM = useAppDispatchAndClose(actions.performCompileToLLVM, props.close);
   const compileToMir = useAppDispatchAndClose(actions.performCompileToMir, props.close);
   const compileToHir = useAppDispatchAndClose(actions.performCompileToNightlyHir, props.close);
+  const compileToAst = useAppDispatchAndClose(actions.performCompileToNightlyAst, props.close);
   const compileToWasm = useAppDispatchAndClose(actions.performCompileToWasm, props.close);
   const execute = useAppDispatchAndClose(actions.performExecute, props.close);
   const test = useAppDispatchAndClose(actions.performTest, props.close);
@@ -59,6 +61,10 @@ const BuildMenu: React.FC<BuildMenuProps> = (props) => {
         Build and show the resulting HIR, Rust’s syntax-based intermediate representation.
         {!isHirAvailable && <HirAside />}
       </ButtonMenuItem>
+      <ButtonMenuItem name="AST" onClick={compileToAst}>
+        Parse and show the resulting AST, Rust’s abstract syntax tree, before macro expansion.
+        {!isAstAvailable && <AstAside />}
+      </ButtonMenuItem>
       <ButtonMenuItem name="Wasm" onClick={compileToWasm}>
         Build a WebAssembly module for web browsers, in the .WAT textual representation.
         {!wasmLikelyToWork && <WasmAside />}
@@ -74,6 +80,13 @@ const Code: React.FC<{ children: string }> = ({ children }) => (
 const HirAside: React.FC = () => (
   <MenuAside>
     Note: HIR currently requires using the Nightly channel, selecting this option will switch to
+    Nightly.
+  </MenuAside>
+);
+
+const AstAside: React.FC = () => (
+  <MenuAside>
+    Note: AST currently requires using the Nightly channel, selecting this option will switch to
     Nightly.
   </MenuAside>
 );

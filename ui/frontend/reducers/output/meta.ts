@@ -3,6 +3,7 @@ import { Draft } from 'immer';
 
 import { Focus } from '../../types';
 import { performCompileAssembly } from './assembly';
+import { performCompileAst } from './ast';
 import { performClippy } from './clippy';
 import { performExecute, wsExecuteRequest } from './execute';
 import { performFormat } from './format';
@@ -54,6 +55,10 @@ const slice = createSlice({
 
       .addCase(performCompileAssembly.pending, (state) => {
         state.focus = Focus.Asm;
+      })
+
+      .addCase(performCompileAst.pending, (state) => {
+        state.focus = Focus.Ast;
       })
 
       .addCase(performCompileHir.pending, (state) => {

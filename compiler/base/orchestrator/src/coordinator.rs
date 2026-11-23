@@ -240,6 +240,7 @@ pub enum ProcessAssembly {
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum CompileTarget {
     Assembly(AssemblyFlavor, DemangleAssembly, ProcessAssembly),
+    Ast,
     Hir,
     LlvmIr,
     Mir,
@@ -625,6 +626,7 @@ impl LowerRequest for CompileRequest {
             }
             LlvmIr => args.extend(&["--", "--emit", "llvm-ir=compilation"]),
             Mir => args.extend(&["--", "--emit", "mir=compilation"]),
+            Ast => args.extend(&["--", "-Zunpretty=ast-tree", "-o", Self::OUTPUT_PATH]),
             Hir => args.extend(&["--", "-Zunpretty=hir", "-o", Self::OUTPUT_PATH]),
             Wasm => args.extend(&["-o", Self::OUTPUT_PATH]),
         }
@@ -3945,6 +3947,29 @@ mod tests {
     }
 
     const SUBTRACT_CODE: &str = r#"pub fn sub(a: u8, b: u8) -> u8 { a - b }"#;
+
+    #[tokio::test]
+    #[snafu::report]
+    async fn compile_ast() -> Result<()> {
+        let coordinator = new_coordinator();
+
+        let req = CompileRequest {
+            target: CompileTarget::Ast,
+            code: SUBTRACT_CODE.into(),
+            ..ARBITRARY_HIR_REQUEST
+        };
+
+        let response = coordinator.compile(req).with_timeout().await.unwrap();
+
+        assert!(response.success, "stderr: {}", response.stderr);
+        // The AST tree is `Debug` output; identifiers include their
+        // syntax context.
+        assert_contains!(response.code, "sub#0");
+
+        coordinator.shutdown().await?;
+
+        Ok(())
+    }
 
     const ARBITRARY_HIR_REQUEST: CompileRequest = CompileRequest {
         target: CompileTarget::Hir,

@@ -156,6 +156,7 @@ impl Labels {
 
         let target = match target {
             Some(CompileTarget::Assembly(_, _, _)) => "Assembly",
+            Some(CompileTarget::Ast) => "Ast",
             Some(CompileTarget::Hir) => "Hir",
             Some(CompileTarget::LlvmIr) => "LlvmIr",
             Some(CompileTarget::Mir) => "Mir",

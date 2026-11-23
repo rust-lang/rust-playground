@@ -13,6 +13,7 @@ import {
 } from './reducers/configuration';
 import * as files from './reducers/files';
 import { performCompileToAssemblyOnly } from './reducers/output/assembly';
+import { performCompileToAstOnly } from './reducers/output/ast';
 import { performCommonExecute } from './reducers/output/execute';
 import { performGistLoad } from './reducers/output/gist';
 import { performCompileToHirOnly } from './reducers/output/hir';
@@ -82,6 +83,11 @@ const performCompileToNightlyHirOnly = (): ThunkAction => (dispatch) => {
   dispatch(performCompileToHirOnly());
 };
 
+const performCompileToNightlyAstOnly = (): ThunkAction => (dispatch) => {
+  dispatch(changeChannel(Channel.Nightly));
+  dispatch(performCompileToAstOnly());
+};
+
 const performCompileToCdylibWasmOnly = (): ThunkAction => (dispatch, getState) => {
   const state = getState();
 
@@ -101,6 +107,7 @@ const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionAuto.Auto]: performAutoOnly,
   [PrimaryActionCore.LlvmIr]: performCompileToLlvmIrOnly,
   [PrimaryActionCore.Hir]: performCompileToHirOnly,
+  [PrimaryActionCore.Ast]: performCompileToAstOnly,
   [PrimaryActionCore.Mir]: performCompileToMirOnly,
   [PrimaryActionCore.Wasm]: performCompileToWasmOnly,
 };
@@ -141,6 +148,10 @@ export const performCompileToMir = performAndSwitchPrimaryAction(
 export const performCompileToNightlyHir = performAndSwitchPrimaryAction(
   performCompileToNightlyHirOnly,
   PrimaryActionCore.Hir,
+);
+export const performCompileToNightlyAst = performAndSwitchPrimaryAction(
+  performCompileToNightlyAstOnly,
+  PrimaryActionCore.Ast,
 );
 export const performCompileToWasm = performAndSwitchPrimaryAction(
   performCompileToCdylibWasmOnly,

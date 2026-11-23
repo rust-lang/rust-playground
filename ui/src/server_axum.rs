@@ -1477,6 +1477,7 @@ pub(crate) mod api_orchestrator_integration_impls {
             }
             "llvm-ir" => CompileTarget::LlvmIr,
             "mir" => CompileTarget::Mir,
+            "ast" => CompileTarget::Ast,
             "hir" => CompileTarget::Hir,
             "wasm" => CompileTarget::Wasm,
             value => return InvalidTargetSnafu { value }.fail(),
