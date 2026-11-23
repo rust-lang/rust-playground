@@ -215,6 +215,7 @@ const LABELS: { [index in PrimaryActionCore]: string } = {
   [PrimaryActionCore.Execute]: 'Run',
   [PrimaryActionCore.LlvmIr]: 'Show LLVM IR',
   [PrimaryActionCore.Hir]: 'Show HIR',
+  [PrimaryActionCore.Ast]: 'Show AST',
   [PrimaryActionCore.Mir]: 'Show MIR',
   [PrimaryActionCore.Test]: 'Test',
   [PrimaryActionCore.Wasm]: 'Show Wasm',
@@ -269,6 +270,7 @@ const isNightlyChannel = createSelector(
   (channel) => channel === Channel.Nightly,
 );
 export const isHirAvailable = isNightlyChannel;
+export const isAstAvailable = isNightlyChannel;
 
 export const wasmLikelyToWork = createSelector(
   crateTypeSelector,
@@ -320,6 +322,7 @@ const getOutputs = createSelector(
     state.output.llvmIr,
     state.output.mir,
     state.output.hir,
+    state.output.ast,
     state.output.miri,
     state.output.macroExpansion,
     state.output.wasm,

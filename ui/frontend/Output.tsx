@@ -39,7 +39,7 @@ interface TabProps {
 
 const Output: React.FC = () => {
   const somethingToShow = useAppSelector(selectors.getSomethingToShow);
-  const { meta: { focus }, execute, format, clippy, miri, macroExpansion, assembly, llvmIr, mir, hir, wasm, gist } =
+  const { meta: { focus }, execute, format, clippy, miri, macroExpansion, assembly, llvmIr, mir, hir, ast, wasm, gist } =
     useAppSelector((state) => state.output);
 
   const dispatch = useAppDispatch();
@@ -53,6 +53,7 @@ const Output: React.FC = () => {
   const focusLlvmIr = useCallback(() => dispatch(changeFocus(Focus.LlvmIr)), [dispatch]);
   const focusMir = useCallback(() => dispatch(changeFocus(Focus.Mir)), [dispatch]);
   const focusHir = useCallback(() => dispatch(changeFocus(Focus.Hir)), [dispatch]);
+  const focusAst = useCallback(() => dispatch(changeFocus(Focus.Ast)), [dispatch]);
   const focusWasm = useCallback(() => dispatch(changeFocus(Focus.Wasm)), [dispatch]);
   const focusGist = useCallback(() => dispatch(changeFocus(Focus.Gist)), [dispatch]);
 
@@ -79,6 +80,7 @@ const Output: React.FC = () => {
           {focus === Focus.LlvmIr && <LlvmIr />}
           {focus === Focus.Mir && <PaneWithMir {...mir} kind="mir" />}
           {focus === Focus.Hir && <PaneWithMir {...hir} kind="hir" />}
+          {focus === Focus.Ast && <PaneWithMir {...ast} kind="ast" />}
           {focus === Focus.Wasm && <PaneWithCode {...wasm} kind="wasm" />}
           {focus === Focus.Gist && <Gist />}
         </div>
@@ -130,6 +132,10 @@ const Output: React.FC = () => {
           label="HIR"
           onClick={focusHir}
           tabProps={hir} />
+        <Tab kind={Focus.Ast} focus={focus}
+          label="AST"
+          onClick={focusAst}
+          tabProps={ast} />
         <Tab kind={Focus.Wasm} focus={focus}
           label="Wasm"
           onClick={focusWasm}

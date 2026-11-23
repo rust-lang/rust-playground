@@ -106,6 +106,18 @@ RSpec.feature "Compiling to different formats", type: :feature, js: true do
     end
   end
 
+  scenario "compiling to AST" do
+    editor.set <<~EOF
+      fn demo() -> impl std::fmt::Display { 42 }
+    EOF
+
+    in_build_menu { click_on("AST") }
+
+    within(:output, :result) do
+      expect(page).to have_content 'demo#0'
+    end
+  end
+
   scenario "compiling to WebAssembly" do
     editor.set ['#![crate_type = "bin"]', code].join("\n")
 
